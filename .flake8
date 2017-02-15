@@ -1,0 +1,20 @@
+[flake8]
+max_line_length = 80
+
+exclude =
+    .git,
+    .tox,
+    __pycache__,
+    *.pyc,
+    attic,
+    packaging,
+    build_doc,
+    docs,
+    dist,
+    pywbem.egg-info,
+
+# remove the comment and it will ignore noga entries at least in files.
+#disable_noqa
+    
+ignore =
+
