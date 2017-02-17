@@ -1,30 +1,40 @@
 #!/bin/bash
 
-pywbemcli --help
-pywbemcli class --help
-pywbemcli class get --help
-pywbemcli class names  --help
-pywbemcli class enumerate --help
-pywbemcli class associators --help
-pywbemcli class references --help
-pywbemcli class find --help
+HOST=http://localhost
+function cmd {
+    echo pywbemcli $HOST $1
+    pywbemcli -s $HOST $1 --help
+    if [ $? != 0 ]; then
+        echo ERROR pywbemcli $HOST $1
+    fi
+}
 
-pywbemcli instance associators --help
-pywbemcli instance delete --help
-pywbemcli instance enumerate --help
-pywbemcli instance get --help
-pywbemcli instance names --help
-pywbemcli instance count --help
-pywbemcli instance references --help
+cmd ""
+cmd "class"
+cmd "class get"
+cmd "class names"
+cmd "class enumerate"
+cmd "class associators"
+cmd "class references"
+cmd "class find"
+cmd "class tree"
 
-pywbemcli qualifier --help
-pywbemcli qualifier enumerate --help
-pywbemcli qualifier get --help
-pywbemcli server --help
-pywbemcli server brand --help
-pywbemcli server connection --help
-pywbemcli server info --help
-pywbemcli server namespaces --help
-pywbemcli server interop --help
-pywbemcli server profiles --help
+cmd "instance associators"
+cmd "instance delete"
+cmd "instance enumerate"
+cmd "instance get"
+cmd "instance names"
+cmd "instance count"
+cmd "instance references"
+
+cmd "qualifier"
+cmd "qualifier enumerate"
+cmd "qualifier get"
+cmd "server"
+cmd "server brand"
+cmd "server connection"
+cmd "server info"
+cmd "server namespaces"
+cmd "server interop"
+cmd "server profiles"
 

@@ -33,7 +33,7 @@ def print_profile_info(org_vm, inst):
     org = org_vm.tovalues(inst['RegisteredOrganization'])
     name = inst['RegisteredName']
     vers = inst['RegisteredVersion']
-    print("  %s %s Profile %s" % (org, name, vers))
+    print("  %s %s %s" % (org, name, vers))
 
 
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
@@ -154,8 +154,8 @@ def cmd_server_profiles(context, options):
     Display general overview of info from current WBEMServer
     """
     found_server_profiles = context.wbem_server.get_selected_profiles(
-        options['organization'],
-        options['profilename'])
+        registered_org=options['organization'],
+        registered_name=options['profilename'])
 
     org_vm = ValueMapping.for_property(context.wbem_server,
                                        context.wbem_server.interop_ns,

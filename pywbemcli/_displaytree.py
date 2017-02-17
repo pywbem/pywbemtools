@@ -18,6 +18,8 @@ cmds for get and enumerate for CIM qualifier types.
 
 from __future__ import absolute_import
 
+import six
+
 from asciitree import LeftAligned
 import click
 from pywbem.cim_obj import NocaseDict
@@ -44,11 +46,10 @@ def build_tree(class_subclass_dict, top_class):
             cn_list = class_subclass_dict[cn]
             # This should not be necessary if end nodes are not in the dict.
             if cn_list:
-                print('cn_list %s' % cn_list)
                 for key in cn_list:
                     node_dict[key] = _tree_node(class_subclass_dict, key)
             else:
-                node_dict = {}
+                node_dict = NocaseDict()
         else:
             return {}
 
@@ -87,7 +88,9 @@ def display_class_tree(classes, top_class=None):
     # Hack to build the class to subclass dictionary from the
     # superclass to class dictionary
     cn_subcn = NocaseDict()
-    [cn_subcn.setdefault(v, []).append(k) for (k, v) in cn_supercn.iteritems()]
+    # pylint: disable=bad-continuation, expression-not-assigned
+    [cn_subcn.setdefault(v, []).append(k) for (k, v) in
+            six.iteritems(cn_supercn)]  # noqa: F841
     tree = build_tree(cn_subcn, top_class)
 
     tr = LeftAligned()
