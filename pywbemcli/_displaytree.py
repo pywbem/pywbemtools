@@ -19,38 +19,76 @@ cmds for get and enumerate for CIM qualifier types.
 from __future__ import absolute_import
 
 from asciitree import LeftAligned
-from collections import OrderedDict as OD
+import click
+from pywbem.cim_obj import NocaseDict
 
 
-def display_class_tree(classes):
-    """ Display the list of classes as a left justified tree"""
+def build_tree(class_subclass_dict, top_class):
+    """
+    Build a dictionary structure based on the class/subclass relationships
+    in the class_subclass tree dictionary provided.
 
-    # Create list of top level classes
+    Returns the dictionary structure in a form suitable for ascii tree
+    display
+    """
+    def _tree_node(class_subclass_dict, cn):
+        """
+        Build dictionary of the class/subclass relationships for class cn
+        in dictionary of class_subclass names.
 
-    top_classes = [cl.classname for cl in classes if cl.superclass is None]
+        Returns dictionary of dictionaries in form suitable for asciitree
+        """
+        node_dict = NocaseDict()
+        # If there is no subclass, the class will not exist in this dictionary
+        if cn in class_subclass_dict:
+            cn_list = class_subclass_dict[cn]
+            # This should not be necessary if end nodes are not in the dict.
+            if cn_list:
+                print('cn_list %s' % cn_list)
+                for key in cn_list:
+                    node_dict[key] = _tree_node(class_subclass_dict, key)
+            else:
+                node_dict = {}
+        else:
+            return {}
 
-    cl_tree = {cl.classname: cl.superclassname for cl in classes}
-    print(top_classes)
-    print(cl_tree)
-    # TODO finish this. The following is example of dictionary we must build
+        return node_dict
 
-    tree = {
-        'root': OD([
-            ('sometimes',
-                {'you': {}}),
-            ('just',
-                {'want': OD([
-                    ('to', {}),
-                    ('draw', {}),
-                ])}),
-            ('trees', {}),
-            ('in', {
-                'your': {
-                    'terminal': {}
-                }
-            })
-        ])
-    }
+    rtn_dict = {}
+    # _tree_node generates dictionary node for elements in class-subclass
+    # dictionary and returns complete node structure
+    rtn_dict[top_class] = _tree_node(class_subclass_dict, top_class)
+    return rtn_dict
 
-    tr = LeftAligned
-    print(tr(tree))
+
+def display_class_tree(classes, top_class=None):
+    """
+    Display the list of classes as a left justified tree  in ascii to the
+    click.echo output
+
+    Parameters:
+        classes (list of :class:`~pywbem.CIMClass`)
+
+        top_class (:term: `string`)
+            The top level class to display or None if the display is
+            from root.
+    """
+
+    # build dictionary of classname : superclassname
+    cn_supercn = {cl.classname: cl.superclass for cl in classes}
+
+    # if top_Class is none, create artifical root
+    if top_class is None:
+        for cn in cn_supercn:
+            if not cn_supercn[cn]:
+                cn_supercn[cn] = 'root'
+        top_class = 'root'
+
+    # Hack to build the class to subclass dictionary from the
+    # superclass to class dictionary
+    cn_subcn = NocaseDict()
+    [cn_subcn.setdefault(v, []).append(k) for (k, v) in cn_supercn.iteritems()]
+    tree = build_tree(cn_subcn, top_class)
+
+    tr = LeftAligned()
+    click.echo(tr(tree))

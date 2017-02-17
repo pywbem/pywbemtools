@@ -178,6 +178,11 @@ def class_find(context, classname, **options):
 
 @class_group.command('tree', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False)
+@click.option('-s', '--superclasses', is_flag=True, required=False,
+              default=False,
+              help='Display the superclasses to CLASSNAME.  In this case '
+              'CLASSNAME is required')
+@add_options(namespace_option)
 @click.pass_obj
 def class_tree(context, classname, **options):
     """
@@ -342,9 +347,8 @@ def cmd_class_find(context, classname, options):
                 filtered_classnames.sort()
             names_dict[ns] = filtered_classnames
 
-        # special display function to display classnames returned with
+        # Display function to display classnames returned with
         # their namespaces in the form <namespace>:<classname>
-        # TODO merge into single for-loop
         for ns_name in names_dict:
             for classname in names_dict[ns_name]:
                 print('  %s:%s' % (ns_name, classname))
@@ -360,7 +364,25 @@ def cmd_class_tree(context, classname, options):
     classname argument. Then format the results to be displayed as a
     left-justified tree using the asciitree library
     """
-    classes = context.conn.EnumerateClasses(classname,
-                                            namespace=options['namespace'],
-                                            DeepInheritance=True)
-    display_class_tree(classes)
+
+    if options['superclasses']:
+        if classname is None:
+            raise click.ClickException('Classname required for superclasses '
+                                       'option')
+
+        class_ = context.conn.GetClass(classname,
+                                       namespace=options['namespace'])
+        classes = []
+        classes.append(class_)
+        while class_.superclass:
+            class_ = context.conn.GetClass(class_.superclass,
+                                           namespace=options['namespace'])
+            classes.append(class_)
+        classname = None
+
+    else:
+        classes = context.conn.EnumerateClasses(ClassName=classname,
+                                                namespace=options['namespace'],
+                                                DeepInheritance=True)
+
+    display_class_tree(classes, classname)
