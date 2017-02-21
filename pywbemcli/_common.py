@@ -18,7 +18,9 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import
 
 import re
+from six.moves import input
 import click
+
 from pywbem import WBEMConnection, CIMInstanceName
 
 from .config import DEFAULT_CONNECTION_TIMEOUT
@@ -62,14 +64,14 @@ def pick_instance(context, objectname, namespace=None):
                                                          namespace)
 
     try:
-        instancename, _ = pick_from_list(instance_names,
+        instancename, _ = pick_from_list(context, instance_names,
                                          'Pick Instance name to process')
         return instancename
     except Exception:
         raise ValueError('Invalid pick')
 
 
-def pick_from_list(options, title):
+def pick_from_list(context, options, title):
     """
     Interactive component that displays a set of options (strings) and asks
     the user to select one.  Returns the item and index of the selected string.
@@ -91,13 +93,14 @@ def pick_from_list(options, title):
     TODO: This could be replaced by the python pick library that would use
     curses for the selection process.
     """
+    context.spinner.stop()
     print(title)
     index = -1
     for str_ in options:
         index += 1
         print('%s: %s' % (index, str_))
     while True:
-        n = raw_input('Index of selection or Ctrl-C to exit> ')
+        n = input('Index of selection or Ctrl-C to exit> ')
         try:
             n = int(n)
             if n >= 0 and n <= index:
@@ -109,6 +112,7 @@ def pick_from_list(options, title):
             raise ValueError
         print('%s Invalid. Must be integer between 0 and %s. Ctrl-C to '
               ' terminate selection' % (n, index))
+    context.spinner.start()
 
 
 def is_classname(str_):
@@ -123,7 +127,7 @@ def is_classname(str_):
     return False if match else True
 
 
-def filter_namelist(regex, name_list, case_insensitive=True):
+def filter_namelist(regex, name_list, ignore_case=True):
     """
     Filter out names in name_list that match compiled_regex.
 
@@ -133,16 +137,18 @@ def filter_namelist(regex, name_list, case_insensitive=True):
         - CIM_ABC$ matches only the name CIM_ABC.
 
     Parameters:
-      Compiled_regex: Compile regex string to match
+      regex (:term: `String`) Python regular expression to match
 
       name_list: List of strings to be matched.
+
+      ignore_case: bool. If True, do case-insensitive match. Default = True
 
     Returns the list of names that match.
 
     """
-    flags = re.IGNORECASE if case_insensitive else None
+    flags = re.IGNORECASE if ignore_case else None
 
-    compiled_regex = re.compile(regex, flags=flags)
+    compiled_regex = re.compile(regex, flags) if flags else re.compile(regex)
 
     nl = [n for n in name_list for m in[compiled_regex.match(n)] if m]
 
@@ -312,7 +318,18 @@ def parse_wbem_uri(uri, namespace=None):
     return inst_name
 
 
-def display_cim_objects(objects, output_format='mof'):
+def parse_kv_pair(pair):
+    """
+    Parse a single key value pair separated by = and return the key
+    and value components.
+    The value may be empty
+    """
+    name, value = pair.partition("=")[::2]
+
+    return name, value
+
+
+def display_cim_objects(context, objects, output_format='mof'):
     """
     Input is either a list of cim objects or a single object. It may be
     any of the CIM types.  This is used to display:
@@ -329,10 +346,11 @@ def display_cim_objects(objects, output_format='mof'):
     mof output makes no sense for class names. In that case, the output is
     in the str of the type.
     """
+    context.spinner.stop()
     # TODO this is very simplistic and needs refinement.
     if isinstance(objects, (list, tuple)):
         for item in objects:
-            display_cim_objects(item)
+            display_cim_objects(context, item, output_format=output_format)
 
     # display the item
     else:

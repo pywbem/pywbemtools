@@ -18,12 +18,15 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import, print_function
 
 import click
-from pywbem import Error
+from pywbem import Error, tocimobj, CIMProperty, CIMInstance
+from pywbem.cim_obj import NocaseDict
 from .pywbemcli import cli, CMD_OPTS_TXT
 from ._common import display_cim_objects, parse_wbem_uri, pick_instance, \
-    objects_sort, fix_propertylist
+    objects_sort, fix_propertylist, parse_kv_pair
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
+from .config import DEFAULT_QUERY_LANGUAGE
+
 
 #
 #   Common option definitions for class group
@@ -32,7 +35,7 @@ from ._common_options import propertylist_option, names_only_option, \
 
 # TODO This should default to use qualifiers for class commands.
 includequalifiers_option = [              # pylint: disable=invalid-name
-    click.option('-i', '--includequalifiers', is_flag=True, required=False,
+    click.option('-q', '--includequalifiers', is_flag=True, required=False,
                  help='Include qualifiers in the result.')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
@@ -40,10 +43,12 @@ deepinheritance_option = [              # pylint: disable=invalid-name
                  help='Return properties in subclasses of defined target. '
                       ' If not specified only properties in target class are '
                       'returned')]
+
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='instancename is classname. Gets list of all instances '
-                      'namesand the user selects the instance to be returned.')]
+                 help='If set, instancename argument must be a class and '
+                      ' user is provided with a list of instances of the '
+                      ' class from which the instance to delete is selected.')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
@@ -56,6 +61,7 @@ def instance_group():
     to get more general information on instances (ex. counts) within the
     namespace
     """
+    pass
 
 
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
@@ -83,24 +89,11 @@ def instance_get(context, instancename, **options):
                                                  options))
 
 
-@instance_group.command('names', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', required=False,)
-@add_options(namespace_option)
-@click.pass_obj
-def instance_names(context, classname, **options):
-    """
-    Get and display a list of instance names of the classname argument.
-    """
-    context.execute_cmd(lambda: cmd_instance_names(context, classname, options))
-
-
 @instance_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-i', '--interactive', is_flag=True, required=False,
-              help='If set, instancename argument must be a class and '
-                   ' user is provided with a list of instances of the '
-                   ' class from which the instance to delete is selected.')
+@add_options(interactive_option)
 @add_options(namespace_option)
+@click.pass_obj
 def instance_delete(context, instancename, **options):
     """
     Delete a single instance defined by instancename from the WBEM server.
@@ -114,33 +107,50 @@ def instance_delete(context, instancename, **options):
 
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='classname', required=True)
-@click.option('-p', 'property', type=str, metavar='property', required=False,
+@click.option('-x', '--property', type=str, metavar='property', required=False,
               multiple=True,
-              help='optional multipleproperties of form name=value')
+              help='Optional multiple property definitions of form name=value')
+@add_options(propertylist_option)
 @add_options(namespace_option)
+@click.pass_obj
 def instance_create(context, classname, **options):
     """
     Create an instance of classname.
 
     """
-    context.execute_cmd(lambda: cmd_instance_delete(context, classname,
+    context.execute_cmd(lambda: cmd_instance_create(context, classname,
                                                     options))
 
 
 @instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='name', required=True)
 @click.argument('methodname', type=str, metavar='name', required=True)
-@click.option('-p', 'parameter', type=str, metavar='parameter', required=False,
-              multiple=True,
-              help='optionsl multiple parameters of form name=value')
+@click.option('-p', '--parameter', type=str, metavar='parameter',
+              required=False, multiple=True,
+              help='Optionall multiple method parameters of form name=value')
 @add_options(namespace_option)
-def instance_invokemethod(context, classname, **options):
+@click.pass_obj
+def instance_invokemethod(context, instancename, methodname, **options):
     """
     Create an instance of classname.
 
     """
-    context.execute_cmd(lambda: cmd_instance_invokemethod(context, classname,
+    context.execute_cmd(lambda: cmd_instance_invokemethod(context,
+                                                          instancename,
+                                                          methodname,
                                                           options))
+
+
+@instance_group.command('names', options_metavar=CMD_OPTS_TXT)
+@click.argument('classname', required=False,)
+@add_options(namespace_option)
+@add_options(sort_option)
+@click.pass_obj
+def instance_names(context, classname, **options):
+    """
+    Get and display a list of instance names of the classname argument.
+    """
+    context.execute_cmd(lambda: cmd_instance_names(context, classname, options))
 
 
 @instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
@@ -231,6 +241,23 @@ def instance_associators(context, instancename, **options):
                                                          options))
 
 
+@instance_group.command('query', options_metavar=CMD_OPTS_TXT)
+@click.argument('query', type=str, required=True, metavar='<query string>')
+@click.option('-l', '--querylanguage', type=str, required=False,
+              metavar='<query language>', default=DEFAULT_QUERY_LANGUAGE,
+              help='Use the query language defined. Default is DMTF:CQL')
+@add_options(namespace_option)
+@add_options(sort_option)
+@click.pass_obj
+def instance_query(context, query, **options):
+    """
+    Execute the query defined by the query argument.
+
+    """
+    # TODO get correct default into querylanguage help
+    context.execute_cmd(lambda: cmd_instance_query(context, query, options))
+
+
 # TODO option for class regex
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
@@ -271,7 +298,114 @@ def cmd_instance_get(context, instancename, options):
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=fix_propertylist(options['propertylist']))
 
-        display_cim_objects(instance, context.output_format)
+        display_cim_objects(context, instance, context.output_format)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_instance_delete(context, instancename, options):
+    """
+        If option interactive is set, get instances of the class defined
+        by instance name and allow the user to select the instance to
+        delete.
+        Otherwise attempt to delete the instance defined by instancename
+    """
+    if options['interactive']:
+        try:
+            instancepath = pick_instance(context, instancename,
+                                         namespace=options['namespace'])
+        except ValueError:
+            print('Function aborted')
+            return
+    else:
+        instancepath = parse_wbem_uri(instancename, options['namespace'])
+
+    try:
+        context.conn.DeleteInstance(instancepath)
+
+        print('Deleted %s', instancepath)
+
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_instance_create(context, classname, options):
+    """Create an instance and submit to wbemserver"""
+    print('create_instance class: %s\noptions: %s' % (classname, options))
+
+    try:
+        work_class = context.conn.GetClass(
+            classname, namespace=options['namespace'], LocalOnly=False)
+
+        properties = NocaseDict()
+        for p in options['property']:
+            name, value_str = parse_kv_pair(p)
+            if not work_class.has_key(name):  # noqa" W601
+                raise click.ClickException('Error. Property %s not in '
+                                           'class %s' % (name, classname))
+            cl_prop = work_class.get(name)
+
+            # isarray = cl_prop.is_array
+            # TODO account for array properties.
+            # TODO account for embedded properties and reference properties
+            # in the scanner.
+
+            value_ = tocimobj(cl_prop.type, value_str)
+            properties[name] = CIMProperty(name, value_)
+
+        new_inst = CIMInstance(
+            classname, properties=properties,
+            property_list=fix_propertylist(options['propertylist']))
+        context.conn.CreateInstance(new_inst, namespace=options['namespace'])
+
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_instance_invokemethod(context, instancename, methodname,
+                              options):
+    """Create an instance and submit to wbemserver"""
+    print('create_instance %s\n%s\n%s' % (instancename, methodname, options))
+
+    if options['interactive']:
+        try:
+            instancepath = pick_instance(context, instancename,
+                                         options['namespace'])
+        except ValueError:
+            print('Function aborted')
+            return
+    else:
+        instancepath = parse_wbem_uri(instancename, options['namespace'])
+
+    try:
+        work_class = context.conn.GetClass(
+            instancepath.classname,
+            namespace=options['namespace'], LocalOnly=False)
+
+        methods = work_class.methods
+        if methodname not in methods:
+            raise click.ClickException('Error. Method %s not in '
+                                       'class %s' %
+                                       (methodname, instancepath.classname))
+        method = work_class.methods[methodname]
+
+        params = NocaseDict()
+        for p in options['parameter']:
+            name, value_str = parse_kv_pair(p)
+            if name not in method.parameters:
+                raise click.ClickException('Error. Parameter %s not in method '
+                                           ' %s' % (name, methodname))
+
+            cl_param = work_class.parameters[name]
+
+            # isarray = cl_param.is_array
+            # TODO account for arrays of parameters
+
+            value_ = tocimobj(cl_param.type, value_str)
+            params[name] = (name, value_)
+
+        context.conn.InvokeMethod(instancepath, methodname, params)
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -284,12 +418,11 @@ def cmd_instance_names(context, classname, options):
     try:
         inst_names = context.conn.EnumerateInstanceNames(
             classname,
-            namespace=options['namespace'],
-            DeepInheritance=options['deepinheritance'])
+            namespace=options['namespace'])
 
         if options['sort']:
             inst_names.sort()
-        display_cim_objects(inst_names, context.output_format)
+        display_cim_objects(context, inst_names, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -320,7 +453,7 @@ def cmd_instance_enumerate(context, classname, options):
             if options['sort']:
                 results = objects_sort(results)
 
-        display_cim_objects(results, context.output_format)
+        display_cim_objects(context, results, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -367,7 +500,7 @@ def cmd_instance_references(context, instancename, options):
         if options['sort']:
             results = objects_sort(results)
 
-        display_cim_objects(results, context.output_format)
+        display_cim_objects(context, results, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -412,52 +545,10 @@ def cmd_instance_associators(context, instancename, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(results)
+        display_cim_objects(context, results)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-
-def cmd_instance_delete(context, instancename, options):
-    """
-        If option interactive is set, get instances of the class defined
-        by instance name and allow the user to select the instance to
-        delete.
-        Otherwise attempt to delete the instance defined by instancename
-    """
-    if options['interactive']:
-        try:
-            instancename = pick_instance(context, instancename)
-        except ValueError:
-            print('Function aborted')
-            return
-
-    try:
-        instancepath = parse_wbem_uri(instancename)
-        context.conn.DeleteInstance(instancepath,
-                                    namespace=options['namespace'])
-
-        print('%s deleted')
-
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-
-def cmd_instance_create(context, classname, property, options):
-    """Create an instance and submit to wbemserver"""
-    print('create_instance %s\n%s\n%s' % (classname, property, options))
-    print('NOT IMPLEMENTED')
-    # TODO: Finish this function
-
-
-def cmd_instance_invokemethod(context, instancename, methodname, parameter,
-                              options):
-    """Create an instance and submit to wbemserver"""
-    print('create_instance %s\n%s\n%s' % (instancename, methodname,
-                                          parameter, options))
-    print('NOT IMPLEMENTED')
-
-    # TODO: Finish this function
 
 
 # TODO account for errors in the process and continue if found
@@ -502,3 +593,19 @@ def cmd_instance_count(context, options):
         print('')
         for item in display_data:
             print('{0:<{width}}: {1}'.format(item[0], item[1], width=maxlen))
+
+
+def cmd_instance_query(context, query, options):
+    """Execute the query defined by the inputs"""
+
+    try:
+        results = context.conn.execquery(options['querylanguage'],
+                                         query, options['namespace'])
+
+        if options['sort']:
+            results.sort(key=lambda x: x.classname)
+
+        display_cim_objects(context, results)
+
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

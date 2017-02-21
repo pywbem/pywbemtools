@@ -4,7 +4,9 @@ Design Document for a PyWBEM Command Line Browser
 
 Status: In Process
 Date: 9 Feb. 2017
-      Update 11 Feb 2017
+Update: 11 Feb 2017
+Update: 20 Feb 2017 - Add more subcommands and define characteristics of
+        create instances and invoke method.
 
 Goals
 -----
@@ -16,8 +18,19 @@ Goals
   * Script mode (complete command entered from command line)
 * Capable of executing all WBEM CIM/XML operations (with specific exceptions)
 * Include commands for other operations that will be a real advantage to
-developers, users, etc.
+  developers, users, etc.
 * Good integrated help to minize requirement for external documentation
+* This is primarily a user tool and not an internal test tool so it needs
+  to protect the user and provide as much convience as possible for the user.
+
+Also, to make this really usable for testers, developers, etc. we need to
+provide a rich set of display/analysis tools within the structure.  Just
+having an implementation of the 20 some cim/xml operations is NOT sufficient.
+We want the user to be able to see:
+
+* Structure information on the environment. How components relate to one another
+* Size information on the environment (how many instances, classes, etc.)
+* 
 
 Licensing
 ---------
@@ -38,11 +51,11 @@ We propose that the code be in a separate git repository in the pywbem project
 for a number of reasons including:
 
 * It uses a number of additional packages that are not used elsewhere in the
-pywbem client package and this imposes an extra set of constraints on uses
-of just the infrastructure.
+  pywbem client package and this imposes an extra set of constraints on uses
+  of just the infrastructure.
 * It is not certain that the cli can meet the same python versoning constraints
-as the client infrastructure code because of the extra packages used some of
-which are not today compatible with python 2.6.
+  as the client infrastructure code because of the extra packages used some of
+  which are not today compatible with python 2.6.
 
 It would have its own release cycle, etc.  However since pywbem and pywbemcli
 are closely developed we should seriously consider integrating them into a
@@ -68,10 +81,10 @@ we propose that the taxonomy of this cli be organized around the following
 levels:
 
 * first subcommand - noun representing the entity type against which the
-command is to be executed (class, instance, qualifierdecl, server,
-subscription manager, log, connection, etc.)
+  command is to be executed (class, instance, qualifierdecl, server,
+  subscription manager, log, connection, etc.)
 * the second level subcommand be an action on that entity, for example, get,
-delete, create, enumarate, etc.
+  delete, create, enumarate, etc.
 * The options for each subcommand represent
   * All of the options available for the corresponding client api (i.e.
     localonly, includeclassorigin, includequalifiers, propertylist, etc.)
@@ -86,20 +99,25 @@ options.
 **pywbemwcli**
 
 * **class**
-  * **get** &lt;classname> --namespace &lt;getclass options> (corresponds to getclass)  
+  * **get** &lt;classname> --namespace &lt;getclass options> (corresponds to getclass)
+  * **invokemethod** &lt:classname> &lt:methodname > [--parameter <name>=<value>]* --namespace
+  * **query** &lt:query> --querylanguage <name> -- namespace
   * **enumerate**  (corresponds to enumerateclasses) &lt;classname> --namespace --names-only &lt;enumerateclass options>  
   * **references**  &lt;sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)  
   * **associators** &lt;sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)  
   * **method** &lt;classname> &lt;methodname> [&lt;param_name=value>]*  
   * **find** Find a class across namespaces (regex names allowed)
+  * **tree** Show a tree of the class hiearchy
   
 * **instance**
   * **get** &lt;inst_name>  --namespace &lt;get inst options> (corresponds to GetInstance)
+  * **delete** &lt;instname> | &lt;classname>   (use classname for interactive select mode)
+  * **create**  &lt;classname> --property <name>=<value>
+  * **invokemethod** &lt:cinstancename> &lt:methodname > [--parameter <name>=<value>]* --namespace
   * **enumerate** &lt;instname>-- namespace --names-only &lt;enumerate inst options> (corresponds to EnumerateInstances)
   * **references** &lt;instname>--namespace --names_only &lt;references options>(corresponds to inst references)
   * **associators** &lt;instname> --namespace --names_only &lt;associator options>(corresponds to inst associators)
-  * **delete** &lt;instname> | &lt;classname>   (use classname for interactive select mode)
-  * **method** &lt;instname> &lt;methodname> [&lt;param_name=value>]*
+  * **invokemethod** &lt;instname> &lt;methodname> [&lt;param_name=value>]*
 * **qualifier**             # operations on the QualifierDecl type
   * **get** &lt;qualifier_name>  --namespace &lt;get qualifier options> (corresponds to GetQualifier)
   * **enumerate**   --namespace &lt;enumerate qualifier options> (corresponds to EnumerateQualifiers)
@@ -134,6 +152,34 @@ options.
     * **classes**
     * **attached_instances**
 
+Specialized Options
+-------------------
+There are a few specialized arguments/options, specifically to implement
+those operations that create things (instance create, invokemethod parameters).
+These differ from most of the options/arguments in that:
+
+* They must be complete enough to define properties with values and
+parameters with values
+* The values that are to be implemented include
+   * all of the CIM Types
+   * Both scalars and Arrays
+   * Reference property values
+   * embedded objects
+
+In cimcli we implemented this with extra parameters on the command line of
+the form <name>=<value>
+
+where value could be:
+    * scalar (integer, float, string, boolean, etc.)
+    * Arrays where arrays could be made up of repetititions of a scalar or
+      comma separated values with brackets to indicate that it was an array
+      ex.
+         propertyx=[123.345]
+         propertyx=123 propertyx=345
+
+    * embedded objects - TODO
+
+
 General Options
 ---------------
 
@@ -155,16 +201,27 @@ solutions:
    many variations.  See the connection group of the above taxonomy. That
    would seem to solve the problem
 
+Output Formats
+^^^^^^^^^^^^^^
+The following output formats should be supported:
+
+  * mof - Mof display of cim objects and lists of cim objects
+  * xml - cim/xml output for cim objects and lists of cim objects
+  * table - For at least properties of instances
+  * json - output for cim objects and lists of cim objects. Uses cim rest fmt
+  * NOTE that there may be more outputs. (ex. html)
+
+
 
 Required Packages
 -----------------
 
 We are going to base this on the python click package and other contributions
 to click so at least click and possibly several of the click contributions will
-be required
+be required.
 
 User Defined Extensions
-----------------------
+-----------------------
 Reserve for future.  Lets not put this in V1
 
 Testing

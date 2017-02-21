@@ -104,7 +104,8 @@ endif
 
 # Files the distribution archive depends upon.
 dist_dependent_files := \
-    README.rst \
+    LICENSE \
+    README.md \
     requirements.txt \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
@@ -223,7 +224,7 @@ test: $(test_log_file)
 .PHONY: clobber
 clobber: uninstall clean
 	rm -fv pylint.log flake8.log test_*.log
-	rm -Rfv $(doc_build_dir) htmlcov .tox
+	rm -Rfv $(doc_build_dir) htmlcov .tox $(coverage_html_dir)
 	rm -fv $(bdist_file) $(sdist_file) $(win64_dist_file)
 	@echo 'Done: Removed all build products to get to a fresh state.'
 	@echo '$@ done.'
@@ -296,6 +297,6 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 
 $(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  tests/function/*.py coveragerc
 	rm -fv $@
-	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name)  --cov-config .coveragerc --cov-report=html $(pytest_opts) -s 2>&1 |tee $@.tmp'
+	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name)  --cov-config .coveragerc --cov-report=html $(pytest_opts) --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'

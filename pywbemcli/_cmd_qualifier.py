@@ -80,7 +80,7 @@ def cmd_qualifier_get(context, name, options):
         qual_decl = context.conn.GetQualifier(name,
                                               namespace=options['namespace'])
 
-        display_cim_objects(qual_decl, context.ouput_format)
+        display_cim_objects(context, qual_decl, context.ouput_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -97,7 +97,7 @@ def cmd_qualifier_enumerate(context, options):
         if options['sort']:
             qual_decls.sort(key=lambda x: x.name)
 
-        display_cim_objects(qual_decls, context.ouput_format)
+        display_cim_objects(context, qual_decls, context.ouput_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

@@ -21,7 +21,8 @@ Tests for _common functions.
 from __future__ import absolute_import, print_function
 import unittest
 
-from pywbemcli._common import parse_wbem_uri, create_connection
+from pywbemcli._common import parse_wbem_uri, create_connection, \
+    filter_namelist, parse_kv_pair
 
 
 class ParseWbemUriTest(unittest.TestCase):
@@ -60,6 +61,65 @@ class CreateConnectionTest(unittest.TestCase):
                                  password='blah')
         self.assertEqual(conn.url, url)
         self.assertEqual(conn.default_namespace, 'root/cimvxx')
+
+
+class FilterNamelistTest(unittest.TestCase):
+    """Test the common filter_namelist function."""
+
+    def test_case_insensitive(self):
+        """Test case insensitive match"""
+        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
+
+        self.assertEqual(filter_namelist('TST_', name_list), ['TST_abc'])
+        self.assertEqual(filter_namelist('TSt_', name_list), ['TST_abc'])
+        self.assertEqual(filter_namelist('XST_', name_list), [])
+        self.assertEqual(filter_namelist('CIM_', name_list), ['CIM_abc',
+                                                              'CIM_def',
+                                                              'CIM_123'])
+
+    def test_case_sensitive(self):
+        """Test case sensitive matches"""
+        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
+
+        self.assertEqual(filter_namelist('TSt_', name_list,
+                                         ignore_case=False), [])
+
+    def test_wildcard_filters(self):
+        """Test more complex regex"""
+        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
+        self.assertEqual(filter_namelist(r'.*abc$', name_list), ['CIM_abc',
+                                                                 'TST_abc'])
+        self.assertEqual(filter_namelist(r'.*def', name_list), ['CIM_def'])
+
+
+class NameValuePairTest(unittest.TestCase):
+    """Test simple name value pair parser"""
+
+    def test_simple_pairs(self):
+        """Test simple pair parsing"""
+        name, value = parse_kv_pair('abc=test')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, 'test')
+
+        name, value = parse_kv_pair('abc=')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '')
+
+        name, value = parse_kv_pair('abc')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '')
+
+        name, value = parse_kv_pair('abc=12345')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '12345')
+
+        name, value = parse_kv_pair('abc="fred"')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '"fred"')
+
+        name, value = parse_kv_pair('abc="fr ed"')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '"fr ed"')
 
 
 if __name__ == '__main__':

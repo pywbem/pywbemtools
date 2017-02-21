@@ -11,17 +11,18 @@ python:
   - "2.7"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 # commands to install dependencies
 install:
   - pip list
   - pip install --upgrade pip
-  - make install
   - pip list
   - make develop
+  - make install
   - pip install python-coveralls
   - pip list
-  - make clean
+  - make clobber
 
 # commands to run builds & tests
 script:

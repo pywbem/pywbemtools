@@ -18,9 +18,11 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import
 
 import click
-from pywbem import Error, CIMClassName
+from pywbem import Error, CIMClassName, tocimobj
+from pywbem.cim_obj import NocaseDict
 from .pywbemcli import cli, CMD_OPTS_TXT
-from ._common import display_cim_objects, filter_namelist, fix_propertylist
+from ._common import display_cim_objects, filter_namelist, fix_propertylist, \
+    parse_kv_pair
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
@@ -28,7 +30,6 @@ from ._displaytree import display_class_tree
 #
 #   Common option definitions for class group
 #
-
 
 # TODO This should default to use qualifiers for class commands.
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
@@ -67,6 +68,25 @@ def class_get(context, classname, **options):
     get and display a single class from the WBEM Server
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
+
+
+@class_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
+@click.argument('classname', type=str, metavar='classname', required=True)
+@click.argument('methodname', type=str, metavar='name', required=True)
+@click.option('-p', '--parameter', type=str, metavar='parameter',
+              required=False, multiple=True,
+              help='Optionall multiple method parameters of form name=value')
+@add_options(namespace_option)
+@click.pass_obj
+def class_invokemethod(context, classname, methodname, **options):
+    """
+    Invoke the class method named methodname in the class classname
+
+    """
+    context.execute_cmd(lambda: cmd_class_invokemethod(context,
+                                                       classname,
+                                                       methodname,
+                                                       options))
 
 
 @class_group.command('names', options_metavar=CMD_OPTS_TXT)
@@ -212,7 +232,43 @@ def cmd_class_get(context, classname, options):
             IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=fix_propertylist(options['propertylist']))
-        display_cim_objects(result_class, context.output_format)
+        display_cim_objects(context, result_class, context.output_format)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_class_invokemethod(context, classname, methodname, options):
+    """Create an instance and submit to wbemserver"""
+
+    try:
+        work_class = context.conn.GetClass(
+            classname,
+            namespace=options['namespace'], LocalOnly=False)
+
+        methods = work_class.methods
+        if methodname not in methods:
+                raise click.ClickException('Error. Method %s not in '
+                                           'class %s' %
+                                           (methodname, classname))
+        method = work_class.methods[methodname]
+
+        params = NocaseDict()
+        for p in options['parameter']:
+            name, value_str = parse_kv_pair(p)
+            if name not in method.parameters:
+                raise click.ClickException('Error. Parameter %s not in method' %
+                                           (name, methodname))
+
+            cl_param = work_class.parameters[name]
+
+            # isarray = cl_param.is_array
+            # TODO account for arrays of parameters
+
+            value_ = tocimobj(cl_param.type, value_str)
+            params[name] = (name, value_)
+
+        context.conn.InvokeMethod(classname, methodname, params)
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -226,7 +282,7 @@ def cmd_class_names(context, classname, options):
             DeepInheritance=options['deepinheritance'])
         if options['sort']:
             result_classnames.sort()
-        display_cim_objects(result_classnames, context.output_format)
+        display_cim_objects(context, result_classnames, context.output_format)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -255,7 +311,7 @@ def cmd_class_enumerate(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(results, context.output_format)
+        display_cim_objects(context, results, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -287,7 +343,7 @@ def cmd_class_references(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(results, context.output_format)
+        display_cim_objects(context, results, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -322,7 +378,7 @@ def cmd_class_associators(context, classname, options):
                 PropertyList=fix_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
-        display_cim_objects(results, context.output_format)
+        display_cim_objects(context, results, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

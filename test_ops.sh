@@ -22,7 +22,7 @@ cmd "class tree CIM_System"
 cmd "class tree CIM_System -s"
 cmd "class tree CIM_ManagedElement -s"
 
-
+# invoke method
 
 cmd "instance enumerate PyWBEM_Person"
 cmd "instance enumerate PyWBEM_Person -p name"
@@ -30,6 +30,13 @@ cmd "instance enumerate PyWBEM_Person -o"
 
 cmd "instance get PyWBEM_Person -i"
 cmd "instance get PyWBEM_Person.name=bob"
+
+cmd "instance create  -x Name=Fred -x GivenName=Jones -x CreationClassName=PyWBEM_Person PyWBEM_Person"
+cmd "instance delete PyWBEM_Person.name=Fred"
+
+## invoke method
+
+## query
 
 cmd "instance count"
 

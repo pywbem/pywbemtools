@@ -118,14 +118,15 @@ def cmd_server_namespaces(context, options):
     Display namespaces in the current WBEMServer
     """
     ns = context.wbem_server.namespaces
-    display_cim_objects(ns, context.output_format)
+    display_cim_objects(context, ns, context.output_format)
 
 
 def cmd_server_interop(context, options):
     """
     Display interop namespace in the current WBEMServer
     """
-    display_cim_objects(context.wbem_server.interop_ns, context.output_format)
+    display_cim_objects(context, context.wbem_server.interop_ns,
+                        context.output_format)
 
 
 def cmd_server_brand(context, options):

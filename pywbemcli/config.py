@@ -54,3 +54,8 @@ DEFAULT_OUTPUT_FORMAT = 'mof'
 #: on the cmd line, environment variable, or a config file.
 
 DEFAULT_NAMESPACE = 'root/cimv2'
+
+#: Specifies the default query language to be used for exedquery operations
+#: when a query language is not specified in the request or config
+
+DEFAULT_QUERY_LANGUAGE = 'DMTF:CQL'
