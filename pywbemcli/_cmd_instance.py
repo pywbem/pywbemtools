@@ -340,10 +340,10 @@ def cmd_instance_create(context, classname, options):
         properties = NocaseDict()
         for p in options['property']:
             name, value_str = parse_kv_pair(p)
-            if not work_class.has_key(name):  # noqa" W601
+            if not work_class.properties[name]:
                 raise click.ClickException('Error. Property %s not in '
                                            'class %s' % (name, classname))
-            cl_prop = work_class.get(name)
+            cl_prop = work_class.properties[name]
 
             # isarray = cl_prop.is_array
             # TODO account for array properties.

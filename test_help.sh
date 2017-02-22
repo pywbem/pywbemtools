@@ -1,11 +1,20 @@
 #!/bin/bash
-
+#
+#  This script exercises the help functions.
+#  It should have an entry for each subcommand to work completely
+#  It does not validate the options or text, just that the commands do
+#  not fail
+#
 HOST=http://localhost
+ERRORS=0
 function cmd {
-    echo pywbemcli $HOST $1
-    pywbemcli -s $HOST $1 --help
+    echo ==========================================================
+    CMD="pywbemcli -s $HOST $1 --help"
+    echo $CMD
+    $CMD
     if [ $? != 0 ]; then
-        echo ERROR pywbemcli $HOST $1
+        echo ERROR: $CMD
+        ((ERRORS=ERRORS+1))
     fi
 }
 
@@ -24,6 +33,7 @@ cmd "instance get"
 cmd "instance delete"
 cmd "instance create"
 cmd "instance invokemethod"
+cmd "instance query"
 cmd "instance names"
 cmd "instance enumerate"
 cmd "instance count"
@@ -33,6 +43,7 @@ cmd "instance associators"
 cmd "qualifier"
 cmd "qualifier enumerate"
 cmd "qualifier get"
+
 cmd "server"
 cmd "server brand"
 cmd "server connection"
@@ -40,4 +51,10 @@ cmd "server info"
 cmd "server namespaces"
 cmd "server interop"
 cmd "server profiles"
+
+if (( $ERRORS != 0 )); then
+    echo ERROR: $ERRORS Cmds failed
+    exit 1
+fi
+exit 0
 

@@ -86,7 +86,7 @@ def server_info(context):
 @class_group.command('profiles', options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, required=False,
               metavar='<org name>',
-              help='Filter by the defined organization. (ex. -o DMTF_')
+              help='Filter by the defined organization. (ex. -o DMTF')
 @click.option('-n', '--profilename', type=str, required=False,
               metavar='<profile name>',
               help='Filter by the profile name. (ex. -n Array')
@@ -140,7 +140,7 @@ def cmd_server_info(context):
     """
     Display general overview of info from current WBEMServer
     """
-
+    context.spinner.stop()
     click.echo("Brand:\n  %s" % context.wbem_server.brand)
     click.echo("Version:\n  %s" % context.wbem_server.version)
     click.echo("Interop namespace:\n  %s" % context.wbem_server.interop_ns)
@@ -165,6 +165,8 @@ def cmd_server_profiles(context, options):
 
     print('Profiles for %s:%s' % (options['organization'],
                                   options['profilename']))
+
+    context.spinner.stop()
     for inst in found_server_profiles:
         print_profile_info(org_vm, inst)
 

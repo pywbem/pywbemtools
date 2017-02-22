@@ -1,3 +1,5 @@
+==========================================================
+pywbemcli http://localhost
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
   Command line browser for WBEM Servers. This cli tool implements the
@@ -42,6 +44,8 @@ Commands:
   qualifier  Command Group to manage CIM...
   repl       Start an interactive shell.
   server     Command group for server operations.
+==========================================================
+pywbemcli http://localhost class
 Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group to manage CIM Classes.
@@ -50,13 +54,16 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  associators  Get the associated classes for the CLASSNAME...
-  enumerate    Enumerate classes from the WBEMServer...
-  find         Find all classes that match the CLASSNAME...
-  get          get and display a single class from the WBEM...
-  names        get and display a list of classnames from the...
-  references   Get the reference classes for the CLASSNAME...
-  tree         Display the classnames as a tree on the...
+  associators   Get the associated classes for the CLASSNAME...
+  enumerate     Enumerate classes from the WBEMServer...
+  find          Find all classes that match the CLASSNAME...
+  get           get and display a single class from the WBEM...
+  invokemethod  Invoke the class method named methodname in...
+  names         get and display a list of classnames from the...
+  references    Get the reference classes for the CLASSNAME...
+  tree          Display the classnames as a tree on the...
+==========================================================
+pywbemcli http://localhost class get
 Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
 
   get and display a single class from the WBEM Server
@@ -78,6 +85,21 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost class invokemethod
+Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] classname name
+
+  Invoke the class method named methodname in the class classname
+
+Options:
+  -p, --parameter parameter  Optionall multiple method parameters of form
+                             name=value
+  -n, --namespace <name>     Namespace to use for this operation. If defined
+                             that namespace overrides the general options
+                             namespace
+  --help                     Show this message and exit.
+==========================================================
+pywbemcli http://localhost class names
 Usage: pywbemcli class names [COMMAND-OPTIONS] CLASSNAME
 
   get and display a list of classnames from the WBEM Server.
@@ -96,6 +118,8 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost class enumerate
 Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate classes from the WBEMServer starting either at the top or from
@@ -115,6 +139,8 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost class associators
 Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME
 
   Get the associated classes for the CLASSNAME argument filtered by the
@@ -143,6 +169,8 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost class references
 Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
 
   Get the reference classes for the CLASSNAME argument filtered by the role
@@ -168,6 +196,8 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost class find
 Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME
 
   Find all classes that match the CLASSNAME argument in the namespaces of
@@ -177,6 +207,202 @@ Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
+==========================================================
+pywbemcli http://localhost class tree
+Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
+
+  Display the classnames as a tree on the console.
+
+  The classname option, if it exists defines the topmost  class of the tree
+  to include in the display. This is a separate subcommand because it is
+  tied specifically to this one output_format.
+
+Options:
+  -s, --superclasses      Display the superclasses to CLASSNAME.  In this case
+                          CLASSNAME is required
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance get
+Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
+
+  Get a single CIMInstance.
+
+  Gets the instance defined by instancename.
+
+  This may be executed interactively by providing only a classname and the
+  interactive option.
+
+Options:
+  -l, --localonly                 Show only local properties of the returned
+                                  instance.
+  -q, --includequalifiers         Include qualifiers in the result.
+  -c, --includeclassorigin        Include Class Origin in the returned
+                                  instance.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  not included a Null property list is defined
+                                  and the server returns all properties. If
+                                  defined as empty string the server returns
+                                  no properties. ex: -p propertyname1 -p
+                                  propertyname2
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -i, --interactive               If set, instancename argument must be a
+                                  class and  user is provided with a list of
+                                  instances of the  class from which the
+                                  instance to delete is selected.
+  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance delete
+Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
+
+  Delete a single instance defined by instancename from the WBEM server.
+  This may be executed interactively by providing only a classname and the
+  interactive option.
+
+Options:
+  -i, --interactive       If set, instancename argument must be a class and
+                          user is provided with a list of instances of the
+                          class from which the instance to delete is selected.
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance create
+Usage: pywbemcli instance create [COMMAND-OPTIONS] classname
+
+  Create an instance of classname.
+
+Options:
+  -x, --property property         Optional multiple property definitions of
+                                  form name=value
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  not included a Null property list is defined
+                                  and the server returns all properties. If
+                                  defined as empty string the server returns
+                                  no properties. ex: -p propertyname1 -p
+                                  propertyname2
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance invokemethod
+Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] name name
+
+  Create an instance of classname.
+
+Options:
+  -p, --parameter parameter  Optionall multiple method parameters of form
+                             name=value
+  -n, --namespace <name>     Namespace to use for this operation. If defined
+                             that namespace overrides the general options
+                             namespace
+  --help                     Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance query
+Usage: pywbemcli instance query [COMMAND-OPTIONS] <query string>
+
+  Execute the query defined by the query argument.
+
+Options:
+  -l, --querylanguage <query language>
+                                  Use the query language defined. Default is
+                                  DMTF:CQL
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -s, --sort                      Sort into alphabetical order by classname.
+  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance names
+Usage: pywbemcli instance names [COMMAND-OPTIONS] [CLASSNAME]
+
+  Get and display a list of instance names of the classname argument.
+
+Options:
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -s, --sort              Sort into alphabetical order by classname.
+  --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance enumerate
+Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
+
+  Enumerate instances or instance names from the WBEMServer starting either
+  at the top  of the hiearchy (if no classname provided) or from the
+  classname argument.
+
+Options:
+  -l, --localonly                 Show only local properties of the class.
+  -d, --deepinheritance           Return properties in subclasses of defined
+                                  target.  If not specified only properties in
+                                  target class are returned
+  -q, --includequalifiers         Include qualifiers in the result.
+  -c, --includeclassorigin        Include ClassOrigin in the result.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  not included a Null property list is defined
+                                  and the server returns all properties. If
+                                  defined as empty string the server returns
+                                  no properties. ex: -p propertyname1 -p
+                                  propertyname2
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -o, --names_only                Show only local properties of the class.
+  -s, --sort                      Sort into alphabetical order by classname.
+  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance count
+Usage: pywbemcli instance count [COMMAND-OPTIONS]
+
+  Get number of instances for each class in namespace.
+
+Options:
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -s, --sort              Sort into alphabetical order by classname.
+  --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance references
+Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
+
+  Get the reference instances or instance names.
+
+  For the INSTANCENAME argument provided return instances or instance names
+  (names-only option) filtered by the role and result class options. This
+  may be executed interactively by providing only a classname and the
+  interactive option.
+
+Options:
+  -r, --resultclass <class name>  Filter by the result class name provided.
+  -o, --role <role name>          Filter by the role name provided.
+  -q, --includequalifiers         Include qualifiers in the result.
+  -c, --includeclassorigin        Include classorigin in the result.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  not included a Null property list is defined
+                                  and the server returns all properties. If
+                                  defined as empty string the server returns
+                                  no properties. ex: -p propertyname1 -p
+                                  propertyname2
+  -o, --names_only                Show only local properties of the class.
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -s, --sort                      Sort into alphabetical order by classname.
+  -i, --interactive               If set, instancename argument must be a
+                                  class and  user is provided with a list of
+                                  instances of the  class from which the
+                                  instance to delete is selected.
+  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost instance associators
 Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
 
   Get the associated instances or instance names.
@@ -192,7 +418,7 @@ Options:
   -r, --resultclass <class name>  Filter by the result class name provided.
   -x, --role <role name>          Filter by the role name provided.
   -o, --resultrole <class name>   Filter by the result role name provided.
-  -i, --includequalifiers         Include qualifiers in the result.
+  -q, --includequalifiers         Include qualifiers in the result.
   -c, --includeclassorigin        Include classorigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
@@ -206,125 +432,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   -s, --sort                      Sort into alphabetical order by classname.
-  -i, --interactive               instancename is classname. Gets list of all
-                                  instances namesand the user selects the
-                                  instance to be returned.
+  -i, --interactive               If set, instancename argument must be a
+                                  class and  user is provided with a list of
+                                  instances of the  class from which the
+                                  instance to delete is selected.
   --help                          Show this message and exit.
-Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
-
-  Delete a single instance defined by instancename from the WBEM server.
-  This may be executed interactively by providing only a classname and the
-  interactive option.
-
-Options:
-  -i, --interactive       If set, instancename argument must be a class and
-                          user is provided with a list of instances of the
-                          class from which the instance to delete is selected.
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
-  --help                  Show this message and exit.
-Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
-
-  Enumerate instances or instance names from the WBEMServer starting either
-  at the top  of the hiearchy (if no classname provided) or from the
-  classname argument.
-
-Options:
-  -l, --localonly                 Show only local properties of the class.
-  -d, --deepinheritance           Return properties in subclasses of defined
-                                  target.  If not specified only properties in
-                                  target class are returned
-  -i, --includequalifiers         Include qualifiers in the result.
-  -c, --includeclassorigin        Include ClassOrigin in the result.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  not included a Null property list is defined
-                                  and the server returns all properties. If
-                                  defined as empty string the server returns
-                                  no properties. ex: -p propertyname1 -p
-                                  propertyname2
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
-  -o, --names_only                Show only local properties of the class.
-  -s, --sort                      Sort into alphabetical order by classname.
-  --help                          Show this message and exit.
-Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
-
-  Get a single CIMInstance.
-
-  Gets the instance defined by instancename.
-
-  This may be executed interactively by providing only a classname and the
-  interactive option.
-
-Options:
-  -l, --localonly                 Show only local properties of the returned
-                                  instance.
-  -i, --includequalifiers         Include qualifiers in the result.
-  -c, --includeclassorigin        Include Class Origin in the returned
-                                  instance.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  not included a Null property list is defined
-                                  and the server returns all properties. If
-                                  defined as empty string the server returns
-                                  no properties. ex: -p propertyname1 -p
-                                  propertyname2
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
-  -i, --interactive               instancename is classname. Gets list of all
-                                  instances namesand the user selects the
-                                  instance to be returned.
-  --help                          Show this message and exit.
-Usage: pywbemcli instance names [COMMAND-OPTIONS] [CLASSNAME]
-
-  Get and display a list of instance names of the classname argument.
-
-Options:
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
-  --help                  Show this message and exit.
-Usage: pywbemcli instance count [COMMAND-OPTIONS]
-
-  Get number of instances for each class in namespace.
-
-Options:
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
-  -s, --sort              Sort into alphabetical order by classname.
-  --help                  Show this message and exit.
-Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
-
-  Get the reference instances or instance names.
-
-  For the INSTANCENAME argument provided return instances or instance names
-  (names-only option) filtered by the role and result class options. This
-  may be executed interactively by providing only a classname and the
-  interactive option.
-
-Options:
-  -r, --resultclass <class name>  Filter by the result class name provided.
-  -o, --role <role name>          Filter by the role name provided.
-  -i, --includequalifiers         Include qualifiers in the result.
-  -c, --includeclassorigin        Include classorigin in the result.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  not included a Null property list is defined
-                                  and the server returns all properties. If
-                                  defined as empty string the server returns
-                                  no properties. ex: -p propertyname1 -p
-                                  propertyname2
-  -o, --names_only                Show only local properties of the class.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
-  -s, --sort                      Sort into alphabetical order by classname.
-  -i, --interactive               instancename is classname. Gets list of all
-                                  instances namesand the user selects the
-                                  instance to be returned.
-  --help                          Show this message and exit.
+==========================================================
+pywbemcli http://localhost qualifier
 Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command Group to manage CIM QualifierDeclarations.
@@ -340,6 +454,8 @@ Options:
 Commands:
   enumerate  Enumerate CIMQualifierDeclaractions.
   get        Display CIMQualifierDeclaration.
+==========================================================
+pywbemcli http://localhost qualifier enumerate
 Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
 
   Enumerate CIMQualifierDeclaractions.
@@ -352,6 +468,8 @@ Options:
                           namespace overrides the general options namespace
   -s, --sort              Sort into alphabetical order by classname.
   --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost qualifier get
 Usage: pywbemcli qualifier get [COMMAND-OPTIONS] NAME
 
   Display CIMQualifierDeclaration.
@@ -363,6 +481,8 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   --help                  Show this message and exit.
+==========================================================
+pywbemcli http://localhost server
 Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group for server operations.
@@ -377,6 +497,8 @@ Commands:
   interop     Display the interop namespace name in the...
   namespaces  Display the set of namespaces in the current...
   profiles    Display profiles on the current WBEM Server.
+==========================================================
+pywbemcli http://localhost server brand
 Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
   Display the interop namespace name in the WBEM Server.
@@ -384,18 +506,24 @@ Usage: pywbemcli server brand [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
+==========================================================
+pywbemcli http://localhost server connection
 Usage: pywbemcli server connection [COMMAND-OPTIONS]
 
   Display information on the connection used by this server.
 
 Options:
   --help  Show this message and exit.
+==========================================================
+pywbemcli http://localhost server info
 Usage: pywbemcli server info [COMMAND-OPTIONS]
 
   Display the brand information on the current WBEM Server.
 
 Options:
   --help  Show this message and exit.
+==========================================================
+pywbemcli http://localhost server namespaces
 Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 
   Display the set of namespaces in the current WBEM server
@@ -403,6 +531,8 @@ Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
+==========================================================
+pywbemcli http://localhost server interop
 Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
   Display the interop namespace name in the WBEM Server.
@@ -410,6 +540,8 @@ Usage: pywbemcli server interop [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
+==========================================================
+pywbemcli http://localhost server profiles
 Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
   Display profiles on the current WBEM Server.

@@ -1,11 +1,17 @@
 #!/bin/bash
 
 HOST=http://localhost
+ERRORS=0
+
+# Single input argument, the input arguments for the command
 function cmd {
-    echo pywbemcli $HOST $1
-    pywbemcli -s $HOST $1
+    echo '==========================================================='
+    CMD="pywbemcli -s $HOST $1"
+    echo $CMD
+    $CMD
     if [ $? != 0 ]; then
-        echo ERROR pywbemcli $HOST $1
+        echo ERROR: $CMD
+        ((ERRORS+=1))
     fi
 }
 
@@ -28,7 +34,8 @@ cmd "instance enumerate PyWBEM_Person"
 cmd "instance enumerate PyWBEM_Person -p name"
 cmd "instance enumerate PyWBEM_Person -o"
 
-cmd "instance get PyWBEM_Person -i"
+# TODO find way to do interactive in batch
+# cmd "instance get PyWBEM_Person -i"
 cmd "instance get PyWBEM_Person.name=bob"
 
 cmd "instance create  -x Name=Fred -x GivenName=Jones -x CreationClassName=PyWBEM_Person PyWBEM_Person"
@@ -47,5 +54,11 @@ cmd "server namespaces"
 cmd "server profiles"
 cmd "server profiles -o DMTF"
 # -n broken
-cmd "server profiles -n \"CPU Profile\""
+cmd "server profiles -n CPU"
+
+if (( $ERRORS != 0 )); then
+    echo ERROR: $ERRORS cmds failed
+    exit 1
+fi
+exit 0
 
