@@ -33,7 +33,8 @@ from .config import DEFAULT_QUERY_LANGUAGE
 #
 
 
-# TODO This should default to use qualifiers for class commands.
+# This is instance only because the default is False for includequalifiers
+# on instances but True on classes
 includequalifiers_option = [              # pylint: disable=invalid-name
     click.option('-q', '--includequalifiers', is_flag=True, required=False,
                  help='Include qualifiers in the result.')]
@@ -132,7 +133,10 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
-    Create an instance of classname.
+    Invoke the method defined by instancename and methodname with parameters.
+
+    This issues an instance level invokemethod request and displays the
+    results.
 
     """
     context.execute_cmd(lambda: cmd_instance_invokemethod(context,
@@ -149,6 +153,8 @@ def instance_invokemethod(context, instancename, methodname, **options):
 def instance_names(context, classname, **options):
     """
     Get and display a list of instance names of the classname argument.
+
+    This is equivalent to pywbemcli instance enumerate -o
     """
     context.execute_cmd(lambda: cmd_instance_names(context, classname, options))
 
@@ -170,7 +176,9 @@ def instance_enumerate(context, classname, **options):
     """
     Enumerate instances or instance names from the WBEMServer starting either
     at the top  of the hiearchy (if no classname provided) or from the
-    classname argument.
+    classname argument provided.
+
+    Displays the returned instances or names
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -258,7 +266,7 @@ def instance_query(context, query, **options):
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
-# TODO option for class regex
+# TODO option for class regex to limit the search
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @add_options(sort_option)
@@ -314,9 +322,8 @@ def cmd_instance_delete(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          namespace=options['namespace'])
-        except ValueError:
-            print('Function aborted')
-            return
+        except ValueError as ve:
+            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
     else:
         instancepath = parse_wbem_uri(instancename, options['namespace'])
 
@@ -331,7 +338,6 @@ def cmd_instance_delete(context, instancename, options):
 
 def cmd_instance_create(context, classname, options):
     """Create an instance and submit to wbemserver"""
-    print('create_instance class: %s\noptions: %s' % (classname, options))
 
     try:
         work_class = context.conn.GetClass(
@@ -365,7 +371,6 @@ def cmd_instance_create(context, classname, options):
 def cmd_instance_invokemethod(context, instancename, methodname,
                               options):
     """Create an instance and submit to wbemserver"""
-    print('create_instance %s\n%s\n%s' % (instancename, methodname, options))
 
     if options['interactive']:
         try:
@@ -459,8 +464,6 @@ def cmd_instance_enumerate(context, classname, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-# TODO the class and instance references and associators can go to a single
-#       client processing module I believe
 def cmd_instance_references(context, instancename, options):
     """Execute the references request operation to get references for
        the classname defined. This may be either interactive or if the
@@ -478,6 +481,9 @@ def cmd_instance_references(context, instancename, options):
             return
     else:
         instancepath = parse_wbem_uri(instancename, options['namespace'])
+
+    # TODO the class and instance references and associators can go to a single
+    #       client processing function
 
     try:
         if options['names_only']:
@@ -507,8 +513,9 @@ def cmd_instance_references(context, instancename, options):
 
 
 def cmd_instance_associators(context, instancename, options):
-    """Execute the references request operation to get references for
-       the classname defined
+    """
+    Execute the references request operation to get references for
+    the classname defined
     """
 
     # TODO, this could be common between assoc and ref
@@ -516,9 +523,8 @@ def cmd_instance_associators(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          options['namespace'])
-        except ValueError:
-            print('Function aborted')
-            return
+        except ValueError as ve:
+            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
     else:
         instancepath = parse_wbem_uri(instancename, options['namespace'])
 

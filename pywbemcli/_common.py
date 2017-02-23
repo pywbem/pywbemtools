@@ -18,7 +18,7 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import
 
 import re
-from six.moves import input
+from six.moves import input  # pylint: disable=redefined-builtin
 import click
 
 from pywbem import WBEMConnection, CIMInstanceName
@@ -34,11 +34,15 @@ def fix_propertylist(propertylist):
     empty list when there is no property list.  Pywbem requires None
     when there is no propertylist
     """
+    # If no property list, return None which means all properties
     if not propertylist:
-        rtn = None
-    else:
-        rtn = propertylist
-    return rtn
+        propertylist = None
+    # if cmdline was a single empty string, we set to empty list
+    # This means send no propertylist
+    elif len(propertylist) == 1 and len(propertylist[0]) == 0:
+        propertylist = []
+
+    return propertylist
 
 
 def pick_instance(context, objectname, namespace=None):

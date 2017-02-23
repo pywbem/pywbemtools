@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  This script exercises the help functions.
+#  This script exercises the pywbemcli help functions.
 #  It should have an entry for each subcommand to work completely
 #  It does not validate the options or text, just that the commands do
 #  not fail
@@ -10,7 +10,8 @@ ERRORS=0
 function cmd {
     echo ==========================================================
     CMD="pywbemcli -s $HOST $1 --help"
-    echo $CMD
+    echo  pywbemcli command:  $CMD
+    echo ===== Cmd help output 
     $CMD
     if [ $? != 0 ]; then
         echo ERROR: $CMD
@@ -18,6 +19,10 @@ function cmd {
     fi
 }
 
+#
+# Each of the following is a subcmd sequence.  Since there is no
+# concept of listing all help in click today we use this to get each command
+#
 cmd ""
 cmd "class"
 cmd "class get"
@@ -27,7 +32,7 @@ cmd "class enumerate"
 cmd "class associators"
 cmd "class references"
 cmd "class find"
-cmd "class tree"
+cmd "class hierarchy"
 
 cmd "instance get"
 cmd "instance delete"

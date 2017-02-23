@@ -31,7 +31,9 @@ from ._displaytree import display_class_tree
 #   Common option definitions for class group
 #
 
-# TODO This should default to use qualifiers for class commands.
+# TODO This is an awkward form for a boolean. Should we change. Note that
+# the default is True which is what we want.
+# One alternative might be -i --ignorequalifiers
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
     click.option('--includequalifiers/--no_includequalifiers',
                  is_flag=True, required=False, default=True,
@@ -42,8 +44,7 @@ deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
                  help='Return complete subclass hiearchy for this class.')]
 
-# TODO add a case sensitive option and make the sort an option group.
-
+# TODO add a case sensitive option for those things that use regex
 
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
 def class_group():
@@ -181,7 +182,7 @@ def class_associators(context, classname, **options):
                                                       options))
 
 
-# TODO we can make optional namespace option the limit search
+# TODO we can make optional namespace option tolimit search
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
 @add_options(sort_option)
@@ -196,7 +197,7 @@ def class_find(context, classname, **options):
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 
 
-@class_group.command('tree', options_metavar=CMD_OPTS_TXT)
+@class_group.command('hierarchy', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False)
 @click.option('-s', '--superclasses', is_flag=True, required=False,
               default=False,
@@ -204,16 +205,16 @@ def class_find(context, classname, **options):
               'CLASSNAME is required')
 @add_options(namespace_option)
 @click.pass_obj
-def class_tree(context, classname, **options):
+def class_hierarchy(context, classname, **options):
     """
-    Display the classnames as a tree on the console.
+    Display classnames inheritance hierarchy as a tree.
 
-    The classname option, if it exists defines the topmost  class of the tree
-    to include in the display. This is a separate subcommand because it
-    is tied specifically to this one output_format.
+    The classname option, if it exists defines the topmost class of the
+    hierarchy to include in the display. This is a separate subcommand because
+    it is tied specifically to displaying in a tree format.
     """
-    context.execute_cmd(lambda: cmd_class_tree(context, classname,
-                                               options))
+    context.execute_cmd(lambda: cmd_class_hierarchy(context, classname,
+                                                    options))
 
 #
 #  Command functions for each of the subcommands in the class group
@@ -247,16 +248,17 @@ def cmd_class_invokemethod(context, classname, methodname, options):
 
         methods = work_class.methods
         if methodname not in methods:
-                raise click.ClickException('Error. Method %s not in '
-                                           'class %s' %
-                                           (methodname, classname))
+            raise click.ClickException('Error. Method %s not in '
+                                       'class %s' %
+                                       (methodname, classname))
         method = work_class.methods[methodname]
 
         params = NocaseDict()
         for p in options['parameter']:
             name, value_str = parse_kv_pair(p)
             if name not in method.parameters:
-                raise click.ClickException('Error. Parameter %s not in method' %
+                raise click.ClickException('Error. Parameter %s not in '
+                                           'method %s' %
                                            (name, methodname))
 
             cl_param = work_class.parameters[name]
@@ -414,7 +416,7 @@ def cmd_class_find(context, classname, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_class_tree(context, classname, options):
+def cmd_class_hierarchy(context, classname, options):
     """
     Execute the command to enumerate classes from the top or starting at the
     classname argument. Then format the results to be displayed as a
@@ -423,8 +425,8 @@ def cmd_class_tree(context, classname, options):
 
     if options['superclasses']:
         if classname is None:
-            raise click.ClickException('Classname required for superclasses '
-                                       'option')
+            raise click.ClickException('Classname argument required for '
+                                       'superclasses option')
 
         class_ = context.conn.GetClass(classname,
                                        namespace=options['namespace'])

@@ -20,7 +20,7 @@ information.
 from __future__ import absolute_import
 
 import click
-from pywbem import ValueMapping
+from pywbem import ValueMapping, Error
 from .pywbemcli import cli, CMD_OPTS_TXT
 from ._common import display_cim_objects
 from ._common_options import sort_option, add_options
@@ -117,64 +117,82 @@ def cmd_server_namespaces(context, options):
     """
     Display namespaces in the current WBEMServer
     """
-    ns = context.wbem_server.namespaces
-    display_cim_objects(context, ns, context.output_format)
+    try:
+        ns = context.wbem_server.namespaces
+        display_cim_objects(context, ns, context.output_format)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
 def cmd_server_interop(context, options):
     """
     Display interop namespace in the current WBEMServer
     """
-    display_cim_objects(context, context.wbem_server.interop_ns,
-                        context.output_format)
+    try:
+        display_cim_objects(context, context.wbem_server.interop_ns,
+                            context.output_format)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
 def cmd_server_brand(context, options):
     """
     Display product and version info of the current WBEMServer
     """
-    click.echo(context.wbem_server.brand)
+    try:
+        click.echo(context.wbem_server.brand)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
 def cmd_server_info(context):
     """
     Display general overview of info from current WBEMServer
     """
-    context.spinner.stop()
-    click.echo("Brand:\n  %s" % context.wbem_server.brand)
-    click.echo("Version:\n  %s" % context.wbem_server.version)
-    click.echo("Interop namespace:\n  %s" % context.wbem_server.interop_ns)
+    try:
+        context.spinner.stop()
+        click.echo("Brand:\n  %s" % context.wbem_server.brand)
+        click.echo("Version:\n  %s" % context.wbem_server.version)
+        click.echo("Interop namespace:\n  %s" % context.wbem_server.interop_ns)
 
-    click.echo("All namespaces:")
-    for ns in context.wbem_server.namespaces:
-        click.echo("  %s" % ns)
+        click.echo("All namespaces:")
+        for ns in context.wbem_server.namespaces:
+            click.echo("  %s" % ns)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
 def cmd_server_profiles(context, options):
     """
     Display general overview of info from current WBEMServer
     """
-    found_server_profiles = context.wbem_server.get_selected_profiles(
-        registered_org=options['organization'],
-        registered_name=options['profilename'])
+    try:
+        found_server_profiles = context.wbem_server.get_selected_profiles(
+            registered_org=options['organization'],
+            registered_name=options['profilename'])
 
-    org_vm = ValueMapping.for_property(context.wbem_server,
-                                       context.wbem_server.interop_ns,
-                                       'CIM_RegisteredProfile',
-                                       'RegisteredOrganization')
+        org_vm = ValueMapping.for_property(context.wbem_server,
+                                           context.wbem_server.interop_ns,
+                                           'CIM_RegisteredProfile',
+                                           'RegisteredOrganization')
 
-    print('Profiles for %s:%s' % (options['organization'],
-                                  options['profilename']))
+        print('Profiles for %s:%s' % (options['organization'],
+                                      options['profilename']))
 
-    context.spinner.stop()
-    for inst in found_server_profiles:
-        print_profile_info(org_vm, inst)
+        context.spinner.stop()
+        for inst in found_server_profiles:
+            print_profile_info(org_vm, inst)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
 def cmd_server_connection(context):
     """Display information on the current WBEM Connection"""
-    conn = context.conn
-    click.echo('\nurl: %s\ncreds: %s\n.x509: %s\ndefault_namespace: %s\n'
-               'timeout: %s sec.\nca_certs: %s' %
-               (conn.url, conn.creds, conn.x509, conn.default_namespace,
-                conn.timeout, conn.ca_certs))
+    try:
+        conn = context.conn
+        click.echo('\nurl: %s\ncreds: %s\n.x509: %s\ndefault_namespace: %s\n'
+                   'timeout: %s sec.\nca_certs: %s' %
+                   (conn.url, conn.creds, conn.x509, conn.default_namespace,
+                    conn.timeout, conn.ca_certs))
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

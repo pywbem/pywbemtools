@@ -7,7 +7,8 @@ ERRORS=0
 function cmd {
     echo '==========================================================='
     CMD="pywbemcli -s $HOST $1"
-    echo $CMD
+    echo pywbemcli Command: $CMD
+    echo ===== Command Result
     $CMD
     if [ $? != 0 ]; then
         echo ERROR: $CMD
@@ -15,20 +16,54 @@ function cmd {
     fi
 }
 
-
+#
+#  The following is the input arguments for a single pywbemcli command
+#
 cmd "class get CIM_ManagedElement"
+cmd "class get CIM_ManagedElement -l"
+cmd "class get CIM_ManagedElement --localonly"
+cmd "class get CIM_ManagedElement --no_includequalifiers"
+cmd "class get CIM_ManagedElement -c"
+cmd "class get CIM_ManagedElement --includeclassorigin"
+cmd "class get CIM_ManagedElement --includeclassorigin"
+cmd "class get CIM_ManagedElement --namespace root/PG_Interop"
+cmd "class get CIM_ManagedElement -p InstanceID -p Caption"
+cmd "class get CIM_ManagedElement -p InstanceID"
+cmd "class get CIM_ManagedElement -p \"\""
+
 cmd "class enumerate"
 cmd "class enumerate CIM_System"
 cmd "class enumerate CIM_System -d"
 cmd "class enumerate CIM_System -l"
+cmd "class enumerate CIM_System -s"
+cmd "class enumerate CIM_System --localonly"
+cmd "class enumerate CIM_System --names_only"
+cmd "class enumerate CIM_System -o"
+cmd "class enumerate CIM_System -o -s"
+
+#
+cmd "class assocators CIM_System"
+cmd "class assocators CIM_System s" 
+cmd "class assocators CIM_System -o"
+cmd "class assocators CIM_System -o -s"
+
+cmd "class references CIM_System -o"
+cmd "class references CIM_System -o -s"
+cmd "class references CIM_System"
+cmd "class references CIM_System -s"
+
 cmd "class find CIM_System"
 cmd "class find PyWBEM"
 
-cmd "class tree CIM_System"
-cmd "class tree CIM_System -s"
-cmd "class tree CIM_ManagedElement -s"
+# NOTE -s means something different here
+cmd "class hierarchy CIM_System"
+cmd "class hierarchy CIM_System -s"
+cmd "class hierarchy CIM_ManagedElement -s"
+cmd "class hierarchy CIM_ManagedElement --superclasses"
+cmd "class hierarchy CIM_System --superclasses --namespace root/PG_Interop"
+cmd "class hierarchy CIM_System --namespace root/PG_Interop"
 
-# invoke method
+# invoke method on a class
 
 cmd "instance enumerate PyWBEM_Person"
 cmd "instance enumerate PyWBEM_Person -p name"
