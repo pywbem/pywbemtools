@@ -42,31 +42,32 @@ CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
 @click.group(invoke_without_command=True,
              options_metavar=GENERAL_OPTIONS_METAVAR)
-@click.option('-s', '--server', type=str, envvar='WBEM_SERVER',
+@click.option('-s', '--server', type=str, envvar='PYWBEMCLI_SERVER',
               help="Hostname or IP address of the WBEMServer "
-                   "(Default: WBEM_SERVER environment variable).")
-@click.option('-d', '--default_namespace', type=str, envvar='WBEM_NAMESPACE',
+                   "(Default: PYWBEMCLI_SERVER environment variable).")
+@click.option('-d', '--default_namespace', type=str,
+              envvar='PYWBEMCLI_NAMESPACE',
               help="Default Namespace to use in the target WBEMServer if no "
                    "namespace is defined in the subcommand"
-                   "(Default: WBEM_NAMESPACE environment variable or "
+                   "(Default: PYWBEMCLI_NAMESPACE environment variable or "
                    "pywbemcli default TODO).")
-@click.option('-u', '--user', type=str, envvar='WBEM_USER',
+@click.option('-u', '--user', type=str, envvar='PYWBEMCLI_USER',
               help="Username for the WBEM Server "
-                   "(Default: WBEM_USER environment variable).")
-@click.option('-p', '--password', type=str, envvar='WBEM_PASSWORD',
+                   "(Default: PYWBEMCLI_USER environment variable).")
+@click.option('-p', '--password', type=str, envvar='PYWBEMCLI_PASSWORD',
               help="Password for the WBEM Server "
-                   "(Default: WBEM_PASSWORD environment variable).")
-@click.option('-t', '--timeout', type=str, envvar='WBEM_TIMEOUT',
+                   "(Default: PYWBEMCLI_PASSWORD environment variable).")
+@click.option('-t', '--timeout', type=str, envvar='PYWBEMCLI_TIMEOUT',
               help="Operation timeout for the WBEM Server "
-                   "(Default: WBEM_TIMEOUT environment variable).")
+                   "(Default: PYWBEMCLI_TIMEOUT environment variable).")
 @click.option('-n', '--noverify', type=str, is_flag=True,
               help='If set, client does not verify server certificate.')
-@click.option('-k', '--certfile', type=str, envvar='WBEM_CERTFILE',
+@click.option('-k', '--certfile', type=str, envvar='PYWBEMCLI_CERTFILE',
               help="Server certfile. Not used if noverify set"
-                   "(Default: WBEM_KEYFILE environment variable).")
-@click.option('-k', '--keyfile', type=str, envvar='WBEM_KEYFILE',
+                   "(Default: PYWBEMCLI_KEYFILE environment variable).")
+@click.option('-k', '--keyfile', type=str, envvar='PYWBEMCLI_KEYFILE',
               help="Client private key file"
-                   "(Default: WBEM_KEYFILE environment variable).")
+                   "(Default: PYWBEMCLI_KEYFILE environment variable).")
 @click.option('-o', '--output-format',
               type=click.Choice(['mof', 'xml', 'table', 'csv', 'text']),
               help='Output format (Default: {of}).'

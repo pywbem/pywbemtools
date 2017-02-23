@@ -1,5 +1,11 @@
-==========================================================
-pywbemcli http://localhost
+**Overview of pywbemcli help with the multiple subcommands***
+
+
+
+pywbemcli  --help
+=================
+
+```
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
   Command line browser for WBEM Servers. This cli tool implements the
@@ -44,8 +50,13 @@ Commands:
   qualifier  Command Group to manage CIM...
   repl       Start an interactive shell.
   server     Command group for server operations.
-==========================================================
-pywbemcli http://localhost class
+
+```
+
+pywbemcli class --help
+======================
+
+```
 Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group to manage CIM Classes.
@@ -58,12 +69,17 @@ Commands:
   enumerate     Enumerate classes from the WBEMServer...
   find          Find all classes that match the CLASSNAME...
   get           get and display a single class from the WBEM...
+  hierarchy     Display classnames inheritance hierarchy as a...
   invokemethod  Invoke the class method named methodname in...
   names         get and display a list of classnames from the...
   references    Get the reference classes for the CLASSNAME...
-  tree          Display the classnames as a tree on the...
-==========================================================
-pywbemcli http://localhost class get
+
+```
+
+pywbemcli class get --help
+==========================
+
+```
 Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
 
   get and display a single class from the WBEM Server
@@ -85,8 +101,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost class invokemethod
+
+```
+
+pywbemcli class invokemethod --help
+===================================
+
+```
 Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] classname name
 
   Invoke the class method named methodname in the class classname
@@ -98,8 +119,13 @@ Options:
                              that namespace overrides the general options
                              namespace
   --help                     Show this message and exit.
-==========================================================
-pywbemcli http://localhost class names
+
+```
+
+pywbemcli class names --help
+============================
+
+```
 Usage: pywbemcli class names [COMMAND-OPTIONS] CLASSNAME
 
   get and display a list of classnames from the WBEM Server.
@@ -118,8 +144,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost class enumerate
+
+```
+
+pywbemcli class enumerate --help
+================================
+
+```
 Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate classes from the WBEMServer starting either at the top or from
@@ -139,8 +170,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost class associators
+
+```
+
+pywbemcli class associators --help
+==================================
+
+```
 Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME
 
   Get the associated classes for the CLASSNAME argument filtered by the
@@ -169,8 +205,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost class references
+
+```
+
+pywbemcli class references --help
+=================================
+
+```
 Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
 
   Get the reference classes for the CLASSNAME argument filtered by the role
@@ -196,8 +237,13 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost class find
+
+```
+
+pywbemcli class find --help
+===========================
+
+```
 Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME
 
   Find all classes that match the CLASSNAME argument in the namespaces of
@@ -207,15 +253,20 @@ Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
-==========================================================
-pywbemcli http://localhost class tree
-Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
 
-  Display the classnames as a tree on the console.
+```
 
-  The classname option, if it exists defines the topmost  class of the tree
-  to include in the display. This is a separate subcommand because it is
-  tied specifically to this one output_format.
+pywbemcli class hierarchy --help
+================================
+
+```
+Usage: pywbemcli class hierarchy [COMMAND-OPTIONS] CLASSNAME
+
+  Display classnames inheritance hierarchy as a tree.
+
+  The classname option, if it exists defines the topmost class of the
+  hierarchy to include in the display. This is a separate subcommand because
+  it is tied specifically to displaying in a tree format.
 
 Options:
   -s, --superclasses      Display the superclasses to CLASSNAME.  In this case
@@ -223,8 +274,13 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance get
+
+```
+
+pywbemcli instance get --help
+=============================
+
+```
 Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
@@ -255,8 +311,13 @@ Options:
                                   instances of the  class from which the
                                   instance to delete is selected.
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance delete
+
+```
+
+pywbemcli instance delete --help
+================================
+
+```
 Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
 
   Delete a single instance defined by instancename from the WBEM server.
@@ -270,8 +331,13 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance create
+
+```
+
+pywbemcli instance create --help
+================================
+
+```
 Usage: pywbemcli instance create [COMMAND-OPTIONS] classname
 
   Create an instance of classname.
@@ -290,11 +356,19 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance invokemethod
+
+```
+
+pywbemcli instance invokemethod --help
+======================================
+
+```
 Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] name name
 
-  Create an instance of classname.
+  Invoke the method defined by instancename and methodname with parameters.
+
+  This issues an instance level invokemethod request and displays the
+  results.
 
 Options:
   -p, --parameter parameter  Optionall multiple method parameters of form
@@ -303,8 +377,13 @@ Options:
                              that namespace overrides the general options
                              namespace
   --help                     Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance query
+
+```
+
+pywbemcli instance query --help
+===============================
+
+```
 Usage: pywbemcli instance query [COMMAND-OPTIONS] <query string>
 
   Execute the query defined by the query argument.
@@ -318,24 +397,38 @@ Options:
                                   options namespace
   -s, --sort                      Sort into alphabetical order by classname.
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance names
+
+```
+
+pywbemcli instance names --help
+===============================
+
+```
 Usage: pywbemcli instance names [COMMAND-OPTIONS] [CLASSNAME]
 
   Get and display a list of instance names of the classname argument.
+
+  This is equivalent to pywbemcli instance enumerate -o
 
 Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   -s, --sort              Sort into alphabetical order by classname.
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance enumerate
+
+```
+
+pywbemcli instance enumerate --help
+===================================
+
+```
 Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate instances or instance names from the WBEMServer starting either
   at the top  of the hiearchy (if no classname provided) or from the
-  classname argument.
+  classname argument provided.
+
+  Displays the returned instances or names
 
 Options:
   -l, --localonly                 Show only local properties of the class.
@@ -357,8 +450,13 @@ Options:
   -o, --names_only                Show only local properties of the class.
   -s, --sort                      Sort into alphabetical order by classname.
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance count
+
+```
+
+pywbemcli instance count --help
+===============================
+
+```
 Usage: pywbemcli instance count [COMMAND-OPTIONS]
 
   Get number of instances for each class in namespace.
@@ -368,8 +466,13 @@ Options:
                           namespace overrides the general options namespace
   -s, --sort              Sort into alphabetical order by classname.
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance references
+
+```
+
+pywbemcli instance references --help
+====================================
+
+```
 Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
   Get the reference instances or instance names.
@@ -401,8 +504,13 @@ Options:
                                   instances of the  class from which the
                                   instance to delete is selected.
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost instance associators
+
+```
+
+pywbemcli instance associators --help
+=====================================
+
+```
 Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
 
   Get the associated instances or instance names.
@@ -437,8 +545,13 @@ Options:
                                   instances of the  class from which the
                                   instance to delete is selected.
   --help                          Show this message and exit.
-==========================================================
-pywbemcli http://localhost qualifier
+
+```
+
+pywbemcli qualifier --help
+==========================
+
+```
 Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command Group to manage CIM QualifierDeclarations.
@@ -454,8 +567,13 @@ Options:
 Commands:
   enumerate  Enumerate CIMQualifierDeclaractions.
   get        Display CIMQualifierDeclaration.
-==========================================================
-pywbemcli http://localhost qualifier enumerate
+
+```
+
+pywbemcli qualifier enumerate --help
+====================================
+
+```
 Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
 
   Enumerate CIMQualifierDeclaractions.
@@ -468,8 +586,13 @@ Options:
                           namespace overrides the general options namespace
   -s, --sort              Sort into alphabetical order by classname.
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost qualifier get
+
+```
+
+pywbemcli qualifier get --help
+==============================
+
+```
 Usage: pywbemcli qualifier get [COMMAND-OPTIONS] NAME
 
   Display CIMQualifierDeclaration.
@@ -481,8 +604,13 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   --help                  Show this message and exit.
-==========================================================
-pywbemcli http://localhost server
+
+```
+
+pywbemcli server --help
+=======================
+
+```
 Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group for server operations.
@@ -497,8 +625,13 @@ Commands:
   interop     Display the interop namespace name in the...
   namespaces  Display the set of namespaces in the current...
   profiles    Display profiles on the current WBEM Server.
-==========================================================
-pywbemcli http://localhost server brand
+
+```
+
+pywbemcli server brand --help
+=============================
+
+```
 Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
   Display the interop namespace name in the WBEM Server.
@@ -506,24 +639,39 @@ Usage: pywbemcli server brand [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
-==========================================================
-pywbemcli http://localhost server connection
+
+```
+
+pywbemcli server connection --help
+==================================
+
+```
 Usage: pywbemcli server connection [COMMAND-OPTIONS]
 
   Display information on the connection used by this server.
 
 Options:
   --help  Show this message and exit.
-==========================================================
-pywbemcli http://localhost server info
+
+```
+
+pywbemcli server info --help
+============================
+
+```
 Usage: pywbemcli server info [COMMAND-OPTIONS]
 
   Display the brand information on the current WBEM Server.
 
 Options:
   --help  Show this message and exit.
-==========================================================
-pywbemcli http://localhost server namespaces
+
+```
+
+pywbemcli server namespaces --help
+==================================
+
+```
 Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 
   Display the set of namespaces in the current WBEM server
@@ -531,8 +679,13 @@ Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
-==========================================================
-pywbemcli http://localhost server interop
+
+```
+
+pywbemcli server interop --help
+===============================
+
+```
 Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
   Display the interop namespace name in the WBEM Server.
@@ -540,8 +693,13 @@ Usage: pywbemcli server interop [COMMAND-OPTIONS]
 Options:
   -s, --sort  Sort into alphabetical order by classname.
   --help      Show this message and exit.
-==========================================================
-pywbemcli http://localhost server profiles
+
+```
+
+pywbemcli server profiles --help
+================================
+
+```
 Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
   Display profiles on the current WBEM Server.
@@ -551,7 +709,9 @@ Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
 Options:
   -o, --organization <org name>   Filter by the defined organization. (ex. -o
-                                  DMTF_
+                                  DMTF
   -n, --profilename <profile name>
                                   Filter by the profile name. (ex. -n Array
   --help                          Show this message and exit.
+
+```

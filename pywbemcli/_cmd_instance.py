@@ -128,7 +128,7 @@ def instance_create(context, classname, **options):
 @click.argument('methodname', type=str, metavar='name', required=True)
 @click.option('-p', '--parameter', type=str, metavar='parameter',
               required=False, multiple=True,
-              help='Optionall multiple method parameters of form name=value')
+              help='Optional multiple method parameters of form name=value')
 @add_options(namespace_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
