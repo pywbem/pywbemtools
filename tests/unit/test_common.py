@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright TODO
+# Copyright 2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@ Tests for _common functions.
 from __future__ import absolute_import, print_function
 import unittest
 
-from pywbemcli._common import parse_wbem_uri, create_connection, \
-    filter_namelist, parse_kv_pair, escape_split, split
+from pywbemcli._common import parse_wbem_uri, _create_connection, \
+    filter_namelist, parse_kv_pair, split, objects_sort
+
+from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
+    CIMInstanceName, Uint32
 
 
 class ParseWbemUriTest(unittest.TestCase):
@@ -57,8 +60,8 @@ class CreateConnectionTest(unittest.TestCase):
     def test_simple(self):
         """Test simple creation of a connection"""
         url = 'http://localhost'
-        conn = create_connection(url, namespace='root/cimvxx', user='fred',
-                                 password='blah')
+        conn = _create_connection(url, namespace='root/cimvxx', user='fred',
+                                  password='blah')
         self.assertEqual(conn.url, url)
         self.assertEqual(conn.default_namespace, 'root/cimvxx')
 
@@ -129,17 +132,108 @@ class NameValuePairTest(unittest.TestCase):
         self.assertEqual(name, '')
         self.assertEqual(value, 'def')
 
+
+class SorterTest(unittest.TestCase):
+    """Test the object sort function in _common"""
+
+    def test_sort_classes(self):
+        """Test sorting list of classes"""
+
+        classes = []
+
+        classes.append(CIMClass(
+            'CIM_Foo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        classes.append(CIMClass(
+            'CIM_Boo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        classes.append(CIMClass(
+            'CID_Boo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        sorted_rslt = objects_sort(classes)
+        self.assertEqual(len(classes), len(sorted_rslt))
+        self.assertEqual(sorted_rslt[0].classname, 'CID_Boo')
+        self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
+        self.assertEqual(sorted_rslt[2].classname, 'CIM_Foo')
+
+        classes = []
+        sorted_rslt = objects_sort(classes)
+        self.assertEqual(len(classes), len(sorted_rslt))
+
+        classes = []
+        sorted_rslt = objects_sort(classes)
+        classes.append(CIMClass(
+            'CIM_Foo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        self.assertEqual(len(classes), len(sorted_rslt))
+        self.assertEqual(sorted_rslt[0].classname, 'CIM_Foo')
+
+    def test_sort_instancenames(self):
+        """Test ability to sort list of instance names"""
+
+        inst_names = []
+
+        kb = {'Chicken': 'Ham', 'Beans': 42}
+        obj = CIMInstanceName('CIM_Foo', kb)
+        inst_names.append(obj)
+
+        kb = {'Chicken': 'Ham', 'Beans': 42}
+        obj = CIMInstanceName('CIM_Boo', kb)
+        inst_names.append(obj)
+
+        kb = {'Chicken': 'Ham', 'Beans': 42}
+        obj = CIMInstanceName('CID_Foo', kb)
+        inst_names.append(obj)
+
+        sorted_rslt = objects_sort(inst_names)
+        self.assertEqual(len(inst_names), len(sorted_rslt))
+        self.assertEqual(sorted_rslt[0].classname, 'CID_Foo')
+        self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
+        self.assertEqual(sorted_rslt[2].classname, 'CIM_Foo')
+
+    def test_sort_instances(self):
+        """Test sort of instances"""
+
+        instances = []
+
+        props = {'Chicken': CIMProperty('Chicken', 'Ham'),
+                 'Number': CIMProperty('Number', Uint32(42))}
+        quals = {'Key': CIMQualifier('Key', True)}
+        path = CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})
+
+        obj = CIMInstance('CIM_Foo',
+                          properties=props,
+                          qualifiers=quals,
+                          path=path)
+        instances.append(obj)
+
+
 class SplitTest(unittest.TestCase):
+    """Test splitting input parameters"""
 
-    def do_split(self, str):
-        result = split(str, ',')
-        print('split result %s' % result)
-              
+    def do_split(self, input_str, exp_result):
+        """
+        Common function to do the split and compare input to expected
+        result.
+        """
+        result = split(input_str, ',')
+        # print('split input %s result %s' % (input_str, result))
+        self.assertEqual(result, exp_result)
+
     def test_split(self):
-        self.do_split('0,1,2,3,4,5,6')
-        self.do_split('abc,def,jhi,klm,nop')
-        self.do_split('abc,def,jhi,klm,n\,op')
+        """Define strings to split and call test function"""
+        self.do_split('0,1,2,3,4,5,6',
+                      ['0', '1', '2', '3', '4', '5', '6'])
 
+        self.do_split('abc,def,jhi,klm,nop',
+                      ['abc', 'def', 'jhi', 'klm', 'nop'])
+
+        self.do_split('abc,def,jhi,klm,n\,op',
+                      ['abc', 'def', 'jhi', 'klm', 'n\,op'])
 
 
 if __name__ == '__main__':

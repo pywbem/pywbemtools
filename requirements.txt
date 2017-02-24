@@ -9,4 +9,5 @@ click # BSD
 click-spinner>=0.1.5 # MIT
 click-repl # MIT
 asciitree # MIT
+terminaltables #  MIT
 pywbem # LGPL

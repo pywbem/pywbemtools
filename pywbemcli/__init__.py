@@ -1,4 +1,4 @@
-# Copyright TODO
+# Copyright  2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from ._cmd_class import *       # noqa: F403, F401
 from ._cmd_instance import *       # noqa: F403, F401
 from ._cmd_qualifier import *       # noqa: F403, F401
 from ._cmd_server import *       # noqa: F403, F401
+from ._cmd_connection import *   # noqa: F403, F401
 from .pywbemcli import *       # noqa: F403, F401
 from .config import *  # noqa: F403,F401
 

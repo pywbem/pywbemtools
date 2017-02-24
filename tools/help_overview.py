@@ -16,7 +16,6 @@ commands and subcommands.
 from __future__ import absolute_import, print_function
 import shlex
 from subprocess import Popen, PIPE
-import os
 
 
 ERRORS = 0
@@ -25,17 +24,35 @@ ERRORS = 0
 # format
 USE_MD = True
 
-def get_exitcode_stdout_stderr(cmd):
-    """
-    Execute the external command and get its exitcode, stdout and stderr.
-    """
-    args = shlex.split(cmd)
 
-    proc = Popen(args, stdout=PIPE, stderr=PIPE)
-    out, err = proc.communicate()
+def execute_cmd(cmd_str, shell=False):
+    """
+    Execute the command in cmd_str and get its exitcode, stdout and stderr.
+
+    This function calls subprocess Popen to be able to execute the
+    command and  get stdout, stderr, and the exitcode.
+
+    Parameters:
+      cmd_str (:term: `string)
+        Command to be executed
+
+      shell (boolean)
+        Defines whether shell is to be used to execute the command.  Normally
+        the shell should not be required.
+
+    Return:
+        Tuple of exitcode, out, err where out and err are strings representing
+        the stderr and stdout data
+    """
+    args = shlex.split(cmd_str)
+
+    proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
+    std_out_str, std_err_str = proc.communicate()
     exitcode = proc.returncode
-    #
-    return exitcode, out, err
+
+    # return tuple of exitcode, stdout, stderr
+    return exitcode, std_out_str, std_err_str
+
 
 def md_headline(title, level):
     """
@@ -49,6 +66,7 @@ def md_headline(title, level):
 
     return '\n%s\n%s\n' % (title, (level_char * len(title)))
 
+
 def print_md_verbatum_text(text_str):
     """
     Print the text on input surrounded by the back quotes defining
@@ -56,29 +74,29 @@ def print_md_verbatum_text(text_str):
     """
     print('```')
     print(text_str)
-    print('```')    
+    print('```')
+
 
 def help_cmd(cmd_str):
     """Output a command created from the input and test result.
     """
-    global ERRORS
-    global USE_MD
+    global ERRORS  # pylint: disable=global-statement
 
     if isinstance(cmd_str, list):
         for cmd in cmd_str:
             help_cmd(cmd)
-    else:    
+    else:
         command = 'pywbemcli %s --help' % (cmd_str)
         if USE_MD:
             print(md_headline(command, 0))
         else:
-            print('%s\nPYWBEMCLI COMMAND: %s' % (('=' * 50),command))
-      
-        exitcode, out, err = get_exitcode_stdout_stderr(command)
-        
+            print('%s\nPYWBEMCLI COMMAND: %s' % (('=' * 50), command))
+
+        exitcode, out, err = execute_cmd(command)
+
         if USE_MD:
             print_md_verbatum_text(out)
-        else:            
+        else:
             print(out)
         if err:
             print('**STDER:** %s' % err)
@@ -86,6 +104,7 @@ def help_cmd(cmd_str):
         if exitcode != 0:
             ERRORS += 1
             print('**ERROR:** cmd `%s`' % command)
+
 
 #
 #  List of the help commands
@@ -125,6 +144,8 @@ help_cmd("server info")
 help_cmd("server namespaces")
 help_cmd("server interop")
 help_cmd("server profiles")
+
+help_cmd("connection show")
 
 if ERRORS != 0:
     print('%s ERRORS encountered in output' % ERRORS)

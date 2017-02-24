@@ -1,4 +1,4 @@
-# Copyright TODO
+# Copyright 2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ from ._common_options import sort_option, add_options
 
 def print_profile_info(org_vm, inst):
     """Print the registered org, name, version for the profile defined by
-       inst
+       inst.
     """
     org = org_vm.tovalues(inst['RegisteredOrganization'])
     name = inst['RegisteredName']
@@ -39,7 +39,7 @@ def print_profile_info(org_vm, inst):
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
-    Command group for server operations.
+    Command Group for WBEM server operations.
     """
     pass
 

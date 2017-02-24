@@ -3,6 +3,12 @@
 .pydevproject
 /.cache/
 /.tox/
+/htmlcov/
+/build/
+/build_doc/
+/dist/
+AUTHORS
+ChangeLog
 .ipynb_checkpoints/
 *.pyc
 *.log
@@ -20,3 +26,13 @@ setuptools-*.zip
 /tmp_*/
 /dist/pywbemcli*.tar.gz
 /dist/pywbemcli*.whl
+tmp_*
+*,cover
+cover
+*.pyc
+.idea
+*.sw?
+*~
+*.egg
+*.eggs
+*egg-info

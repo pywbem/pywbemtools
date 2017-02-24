@@ -4,33 +4,50 @@ Design Document for a PyWBEM Command Line Browser
 
 Status: In Process
 Date: 9 Feb. 2017
+
 Update: 11 Feb 2017
+
 Update: 20 Feb 2017 - Add more subcommands and define characteristics of
         create instances and invoke method.
+        
+Update: 27 Feb 2017 - Clarify further the taxonomy and try to reduce the
+        number of different subcommands (i.e. list vs enumerate)
 
 Goals
 -----
+* Provide the capability to inspect and manage WBEM Servers and in particular
+WBEM Servers compatible with the DMTF and SNIA specifications from a command
+line interface.
+* Use the pywbem API and classes as the basis for interfacing with WBEM
+servers
+* This is primarily a user tool and not an internal test tool so it needs
+  to protect the user and provide as much convience as possible for the user.
 
-* Python Based
-* Expandable. Users should be able to add functionality with plugins
 * Usable effectively by both occasional and power users
-  * Interactive mode
+  * Interactive mode - Use a REPL so that within pywbemcli the user can
+    execute multiple commands without exiting the pywbemcli shell. Thus, the
+    user can make a connection and then explore that connection with multiple
+    commands.
   * Script mode (complete command entered from command line)
 * Capable of executing all WBEM CIM/XML operations (with specific exceptions)
 * Include commands for other operations that will be a real advantage to
   developers, users, etc.
 * Good integrated help to minize requirement for external documentation
-* This is primarily a user tool and not an internal test tool so it needs
-  to protect the user and provide as much convience as possible for the user.
+* Python based and pure python implementation so that it can be used almost
+any python environment.
+* Expandable. Users should be able to add functionality with plugins
+
 
 Also, to make this really usable for testers, developers, etc. we need to
-provide a rich set of display/analysis tools within the structure.  Just
+provide a rich set of display/analysis tools within the tool.  Just
 having an implementation of the 20 some cim/xml operations is NOT sufficient.
 We want the user to be able to see:
 
-* Structure information on the environment. How components relate to one another
+* Structure information on the WBEM server environment; how components relate
+ to one another.
 * Size information on the environment (how many instances, classes, etc.)
-* 
+* Time sequences of changing things within the environment
+* etc.
 
 Licensing
 ---------
@@ -107,7 +124,7 @@ options.
   * **associators** &lt;sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)  
   * **method** &lt;classname> &lt;methodname> [&lt;param_name=value>]*  
   * **find** Find a class across namespaces (regex names allowed)
-  * **tree** Show a tree of the class hiearchy
+  * **hierarchy** Show a tree of the class hiearchy
   
 * **instance**
   * **get** &lt;inst_name>  --namespace &lt;get inst options> (corresponds to GetInstance)
@@ -126,27 +143,29 @@ options.
   * **interop**             # return interop namespace
   * **branding**            #Present overall name/brand info
   * **profiles**            #List with options for filtering
-  *  &lt;possible other server objects, etc. adapters> 
+  *  &lt;possible other server objects, etc. adapters>
+* **profiles**            # Further operations on the pywbem server class
+  * **enumerate**         # Enumerae profiles
+  * TODO can we show profile relationships (reference profiles)?  
 * **subscriptions**       # Operations on the PywbemSubscriptionManager Class
-  * **list** --filters --subs --dest
+  * **enumerate** --filters --subs --dest
   * **create** &lt;filter|destination|subscription>
   * **delete** &lt;filter|destination|subscription>
   * TODO: Should there be capability for listener in some modes???  
-  * **profiles**            # Further operations on the pywbem server class
-    * **list**
-    * ???
 * **connection**          # changes to the WBEMConnection Class
-  * **info**              # detailed info on current connection
+  * **show**              # detailed info on current connection
+  * **save**              # save the detailed information on the connection as exports  
   * **setdefaultnamespace**
+  * **THE FOLLOWING ARE FUTURE to allow multiple connections to be saved**
   * list                  # list connections saved in persistent storage
   * select                # select connection from persistent and make current
   * create                # create new connection and save
   * delete                # delete a connection
-  * NOTE: Needs new general options (ex. --severname, --configfile)
-* **job**                # Operations on a future Jobs Class *FUTURE* 
+  * NOTE: Probably needs new general options (ex. --severname, --configfile)
+* **job FUTURE**                # Operations on a future Jobs Class *FUTURE* 
   *  list
   *  TBD   
-* **profile**             # Lots unknown here. This is where we can expand into profiles
+* **profile FUTURE**             # Lots unknown here. This is where we can expand into profiles
   * **profilename**
     * **info**
     * **classes**
@@ -174,7 +193,7 @@ where value could be:
     * Arrays where arrays could be made up of repetititions of a scalar or
       comma separated values with brackets to indicate that it was an array
       ex.
-         propertyx=[123.345]
+         propertyx=[123,345]
          propertyx=123 propertyx=345
 
     * embedded objects - TODO
@@ -185,7 +204,12 @@ General Options
 
 The general options/arguments will include;
 * arguments to define the connection to a wbem server (uri, defaultnamespace,
-credentials, security, output format, verbosity, etc.)
+credentials, security, etc.)
+
+* arguments that customize the general operation
+  * output_format
+  * verbosity of output
+  * etc
 
 This can parallel the existing parameter set in wbemcli.
 
@@ -193,7 +217,7 @@ ISSUES: This is a lot of overhead for each command.  There are two logical
 solutions:
 
 1. Click includes the capability to use environment variables as alternate
-   to cmd line input for options.  We should take advantage of that
+   to cmd line input for options.  We must take advantage of that capability.
 
 2. It is probably seriously time to begin to use a config file for at least
    some characteristics so that the user can set defaults, specific options,
@@ -209,8 +233,9 @@ The following output formats should be supported:
   * xml - cim/xml output for cim objects and lists of cim objects
   * table - For at least properties of instances
   * json - output for cim objects and lists of cim objects. Uses cim rest fmt
+  * csv - Similar to table output except creates output that could be loaded
+    into a spreadsheet.
   * NOTE that there may be more outputs. (ex. html)
-
 
 
 Required Packages
@@ -249,13 +274,13 @@ single tool with git-like subcommand structure:
 
 Examples:
 
-    pywbemcli http://localhost -o mof class get CIM_ManagedElement
+    pywbemcli -s http://localhost -o mof class get CIM_ManagedElement
     # Returns the mof for CIM_ManagedElement
 
-    pywbem http://localhost instance get CIM_Blah -i
+    pywbem -s http://localhost instance get CIM_Blah -i
     # Does get instances of CIM_Blah and offers user selection for operation
 
-    pywbem http://localhost class fine TST_
+    pywbem -s http://localhost class fine TST_
     # finds all classes in environment that begins with TST_ and returns list
     # of class and namespace
 
@@ -270,20 +295,26 @@ The overall directory structure is probably:
 
 QUESTION: Should we break up the code into a package that implements the
 commands and subcommands and a separate one that implements the action functions
-as shown above. Question: Advantages/disadvantages
+as shown above. At this point we have grouped each subcommand group into a
+single file (i.e. _cmd_class.py, _cmd_instance.py where the action function
+for that subcommand is part of the same file.)
 
-## TODO Items
+TODO Items
+---------
 
-### Timing
+Timing of execution
+^^^^^^^^^^^^^^^^^^^
 Timing of cmd execution. Should we have an option to time the execution of
 commands
 
-### Command Chaining
+Command Chaining
+^^^^^^^^^^^^^^^^
 Is there a way to achieve command chaining.
 
 TODO Need real example first.
 
-### Aliases
+Command Aliases
+^^^^^^^^^^^^^^^
 There are at least two possibilities for aliases:
 
   * subcommand alias (en substitutes for enumerate)
@@ -294,6 +325,7 @@ There are at least two possibilities for aliases:
 I believe that the current `alias` contrib handles the first but not the second
 form of aliasing.
 
-### Manual level documentation
+Manual level documentation
+--------------------------
  TODO 
 

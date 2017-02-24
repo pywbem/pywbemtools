@@ -3,6 +3,8 @@
 HOST=http://localhost
 ERRORS=0
 
+FAILED_CMDS = []
+
 # Single input argument, the input arguments for the command
 function cmd {
     echo '==========================================================='
@@ -13,6 +15,7 @@ function cmd {
     if [ $? != 0 ]; then
         echo ERROR: $CMD
         ((ERRORS+=1))
+        FAILED_CMDS.append $CMD
     fi
 }
 
@@ -93,6 +96,8 @@ cmd "server profiles -n CPU"
 
 if (( $ERRORS != 0 )); then
     echo ERROR: $ERRORS cmds failed
+    for i, cmd in enumerateFAILED_CMDS:
+        print('%s: %s' % (i, cmd))
     exit 1
 fi
 exit 0

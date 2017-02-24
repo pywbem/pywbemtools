@@ -1,4 +1,4 @@
-# Copyright TODO
+# Copyright  2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,10 +46,11 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 
 # TODO add a case sensitive option for those things that use regex
 
+
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
-    Command group to manage CIM Classes.
+    Command Group to manage CIM Classes.
     """
     pass
 
@@ -128,12 +129,13 @@ def class_enumerate(context, classname, **options):
                                                     options))
 
 
+# TODO the single char name for role is very poor
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
 @click.option('-r', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the classname provided.')
-@click.option('-o', '--role', type=str, required=False,
+@click.option('-x', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includeclassqualifiers_option)
@@ -152,6 +154,7 @@ def class_references(context, classname, **options):
                                                      options))
 
 
+# need to sort out the single char char for role, etc. better
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
 @click.option('-a', '--assocclass', type=str, required=False,
@@ -163,7 +166,7 @@ def class_references(context, classname, **options):
 @click.option('-x', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
-@click.option('-o', '--resultrole', type=str, required=False,
+@click.option('-y', '--resultrole', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includeclassqualifiers_option)

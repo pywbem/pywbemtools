@@ -1,4 +1,4 @@
-# Copyright TODO
+# Copyright  2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -253,7 +253,8 @@ def instance_associators(context, instancename, **options):
 @click.argument('query', type=str, required=True, metavar='<query string>')
 @click.option('-l', '--querylanguage', type=str, required=False,
               metavar='<query language>', default=DEFAULT_QUERY_LANGUAGE,
-              help='Use the query language defined. Default is DMTF:CQL')
+              help='Use the query language defined. '
+                   '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
 @add_options(sort_option)
 @click.pass_obj
@@ -262,11 +263,10 @@ def instance_query(context, query, **options):
     Execute the query defined by the query argument.
 
     """
-    # TODO get correct default into querylanguage help
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
-# TODO option for class regex to limit the search
+# TODO add option for class regex to limit the search
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @add_options(sort_option)
@@ -518,7 +518,7 @@ def cmd_instance_associators(context, instancename, options):
     the classname defined
     """
 
-    # TODO, this could be common between assoc and ref
+    # TODO, this could be common code between assoc and ref
     if options['interactive']:
         try:
             instancepath = pick_instance(context, instancename,
@@ -557,7 +557,6 @@ def cmd_instance_associators(context, instancename, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-# TODO account for errors in the process and continue if found
 def cmd_instance_count(context, options):
     """
     Get the number of instances of each class in the namespace
@@ -570,10 +569,13 @@ def cmd_instance_count(context, options):
                 maxlen = len(item)
         return maxlen
 
+    # TODO Am I handling the namspace correctly? What about default?
+    namespace = options['namespace']
+
     # Get all classes in Namespace
     classlist = context.conn.EnumerateClassNames(
         DeepInheritance=True,
-        namespace=options['namespace'])
+        namespace=namespace)
     if options['sort']:
         classlist.sort()
 
@@ -581,9 +583,17 @@ def cmd_instance_count(context, options):
 
     display_data = []
     for classname in classlist:
-        insts = context.conn.EnumerateInstanceNames(
-            classname,
-            namespace=options['namespace'])
+
+        # Try block allows issues where enumerate does not properly execute
+        # in some cases. The totals may be wrong but at least it gets what
+        # it can.
+        try:
+            insts = context.conn.EnumerateInstanceNames(
+                classname,
+                namespace=namespace)
+        except Error as er:
+            print('Server Error %s with %s:%s. Continuing' % (er, namespace,
+                                                              classname))
         count = 0
         # get only for the defined classname, not subclasses
         for inst in insts:

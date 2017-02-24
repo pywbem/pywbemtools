@@ -1,4 +1,4 @@
-# Copyright TODO
+# Copyright  2017 IBM Corp. and Inova Development Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,14 @@ from __future__ import absolute_import
 import re
 from six.moves import input  # pylint: disable=redefined-builtin
 import click
+import click_spinner
 
-from pywbem import WBEMConnection, CIMInstanceName
+from pywbem import WBEMConnection, WBEMServer, CIMInstanceName, CIMInstance, \
+    CIMClass, CIMQualifierDeclaration
+from pywbem.cim_obj import mofstr
 
 from .config import DEFAULT_CONNECTION_TIMEOUT
+from ._asciitable import print_ascii_table
 
 
 # TODO This should become a special click option type rather than a
@@ -159,9 +163,9 @@ def filter_namelist(regex, name_list, ignore_case=True):
     return nl
 
 
-def create_connection(server, namespace, user=None, password=None,
-                      cert_file=None, key_file=None, ca_certs=None,
-                      no_verify_cert=False):
+def _create_connection(server, namespace, user=None, password=None,
+                       cert_file=None, key_file=None, ca_certs=None,
+                       no_verify_cert=False):
     """
     Initiate a remote connection, via PyWBEM. Arguments for
     the request are the parameters required by the pywbem
@@ -250,14 +254,39 @@ def create_connection(server, namespace, user=None, password=None,
 
 def objects_sort(objects):
     """
-    Sort CIMInstances or instance names
+    Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names
     """
-    # TODO: Not implemented
-    return objects
+    if len(objects) < 2:
+        return objects
+    if isinstance(objects[0], CIMClass):
+        print('sort classes')
+        return sorted(objects, key=lambda class_: class_.classname)
 
+    sort_dict = {}
+    rtn_objs = []
+    if isinstance(objects[0], CIMInstanceName):
+        for instname in objects:
+            key = "%s" % instname
+            sort_dict[key] = instname
+    elif isinstance(objects[0], CIMInstance):
+        for inst in objects:
+            key = "%s" % inst.path
+            sort_dict[key] = inst
+    elif isinstance(objects[0], CIMQualifierDeclaration):
+        for qd in objects:
+            key = "%s" % qd.name
+            sort_dict[key] = qd
+    else:
+        raise TypeError('%s cannot be sorted' % type(objects[0]))
+
+    for key in sorted(sort_dict):
+        rtn_objs.append(sort_dict[key])
+    return rtn_objs
 
 # TODO if namespace element, it should go back to context. I think.
 # TODO: I do not like the name.  This is really cimnamespacename parser
+
+
 def parse_wbem_uri(uri, namespace=None):
     """
     Create and return a CIMObjectPath from a string input.
@@ -332,11 +361,19 @@ def parse_kv_pair(pair):
 
     return name, value
 
-def split(string,delimiter):
+
+def split(string, delimiter):
+    """Simple split of a string based on a delimiter"""
+
     rslt = [item for item in split_esc(string, delimiter)]
     return rslt
 
+
 def split_esc(string, delimiter):
+    """Spit a string based on a delimiter character and bypass escaped
+       instances of the delimiter.
+       Delimiter must be single character.
+    """
     if len(delimiter) != 1:
         raise ValueError('Invalid delimiter: ' + delimiter)
     ln = len(string)
@@ -354,6 +391,8 @@ def split_esc(string, delimiter):
         j += 1
     yield string[i:j]
 
+
+# TODO Think I will remove this version of the splitter
 def escape_split(s, delim):
     i, res, buf = 0, [], ''
     while True:
@@ -369,7 +408,6 @@ def escape_split(s, delim):
             continue  # add more to buf
         res.append(buf + s[i:j - d])
         i, buf = j + len(delim), ''  # start after delim
-        
 
 
 def display_cim_objects(context, objects, output_format='mof'):
@@ -390,10 +428,16 @@ def display_cim_objects(context, objects, output_format='mof'):
     in the str of the type.
     """
     context.spinner.stop()
-    # TODO this is very simplistic and needs refinement.
+    if output_format == 'csv' or output_format == 'txt':
+        click.echo("Csv and txt formats not implemented. Using MOF.")
+    output_format = 'mof'
+    # TODO this is very simplistic formatter and needs refinement.
     if isinstance(objects, (list, tuple)):
-        for item in objects:
-            display_cim_objects(context, item, output_format=output_format)
+        if output_format == 'table':
+            display_table(objects)
+        else:
+            for item in objects:
+                display_cim_objects(context, item, output_format=output_format)
 
     # display the item
     else:
@@ -415,5 +459,242 @@ def display_cim_objects(context, objects, output_format='mof'):
                 click.echo(object)
             except AttributeError:
                 click.echo('%r' % object)
+
         elif output_format == 'tree':
             raise click.ClickException("tree output format not allowed")
+
+
+def display_table(objects):
+    """If possible display the list of object as a table.
+    Currently this only works for instances where the table is a column
+    per property.
+
+    This cannot display properties with embedded instances.
+    """
+    lines = []
+    title = None
+    prop_names = []
+
+    # find instance with max number of properties
+    for inst in objects:
+        pn = inst.keys()
+        if len(pn) > len(prop_names):
+            prop_names = pn
+
+    lines.append(prop_names)
+    title = objects[0].classname
+
+    for inst in objects:
+        if not isinstance(inst, CIMInstance):
+            raise ValueError('Only CIMInstance display allows table output')
+        # Look for not allowed property types
+        for name in prop_names:
+            p = inst.properties[name]
+            if p.embedded_object:
+                raise ValueError('Cannot process embeddedObject')
+
+        line = []
+        # get value for each property in this object
+        # TODO: account for possible non-existence of name
+        for name in prop_names:
+            # Account for possible instances without all properties
+            if name not in inst.properties:
+                val_str = '-'
+            else:
+                value = inst.get(name)
+                p = inst.properties[name]
+                if not value:
+                    val_str = ''
+                else:
+                    if p.is_array:
+                        val_str = _array_value(p.type, value)
+                    else:
+                        val_str = _scalar_value(p.type, value)
+            line.append(val_str)
+
+        lines.append(line)
+    print('lines %s' % lines)
+    print_ascii_table(lines, title=title, inner=True, outer=True)
+
+
+def _scalar_value(type_, value_, max_width=None):
+    """
+    Private function to map provided value to string for output.
+    Used by :meth:`tomof`.
+
+    Parameters:
+
+      value_ (:term:`CIM data type`): Value to be mapped to string for MOF
+        output.
+
+      indent (:term:`integer`): Number of spaces to indent the initial
+        line of the generated MOF.
+    """
+
+    if type_ == 'string':
+        _str = mofstr(value_, indent=0)
+    elif type_ == 'datetime':
+        _str = '"%s"' % str(value_)
+    else:
+        _str = str(value_)
+    return _str
+
+
+def _array_value(type_, value_, fold, max_width=None):
+    """
+    Output array of values either on single line or one line per value.
+
+    Parameters:
+
+      fold (bool): If True, fold the output string for each entry.
+
+    """
+    str_ = ''
+
+    sep = ', ' if not fold else ',\n'
+    for i, val_ in enumerate(value_):
+        if i > 0:
+            str_ += sep
+        str_ += _scalar_value(type_, val_, max_width=max_width)
+    return str_
+
+
+class Context(object):
+    """
+        Manage the click context object. This is the object that communicates
+        between the cli commands and command groups. It contains the
+        information that is common to the multiple commands
+    """
+
+    def __init__(self, ctx, server, default_namespace, user, password, timeout,
+                 noverify, certfile, keyfile, output_format, verbose, conn,
+                 wbem_server):
+        self._server = server
+        self._default_namespace = default_namespace
+        self._user = user
+        self._password = password
+        self._timeout = timeout
+        self._noverify = noverify
+        self._certfile = certfile
+        self._keyfile = keyfile
+        self._output_format = output_format
+        self._verbose = verbose
+        self._conn = conn
+        self._wbem_server = wbem_server
+        self._spinner = click_spinner.Spinner()
+
+    @property
+    def server(self):
+        """
+        :term:`string`: Scheme with Hostname or IP address of the WBEM Server.
+        """
+        return self._server
+
+    @property
+    def user(self):
+        """
+        :term:`string`: Username on the WBEM Server.
+        """
+        return self._user
+
+    @property
+    def output_format(self):
+        """
+        :term:`string`: Output format to be used.
+        """
+        return self._output_format
+
+    @property
+    def default_namespace(self):
+        """
+        :term:`string`: Namespace to be used as default  or requests.
+        """
+        return self._default_namespace
+
+    @property
+    def timeout(self):
+        """
+        :term: `int`: Connection timeout to be used on requests in seconds
+        """
+        return self._timeout
+
+    @property
+    def certfile(self):
+        """
+        :term: `int`: Connection timeout to be used on requests in seconds
+        """
+        return self._certfile
+
+    @property
+    def keyfile(self):
+        """
+        :term: `int`: Connection timeout to be used on requests in seconds
+        """
+        return self._keyfile
+
+    @property
+    def noverify(self):
+        """
+        :term: `bool`: Connection server verfication flag. If True
+        server cert not verified during connection.
+        """
+        return self._noverify
+
+    @property
+    def conn(self):
+        """
+        :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
+        """
+        # TODO. We always create wbemserver so not need wbemconnection
+        # object in context
+        return self._conn
+
+    @property
+    def wbem_server(self):
+        """
+        :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
+        requests.
+        """
+        return self._wbem_server
+
+    @property
+    def password(self):
+        """
+        :term:`string`: password to be used instead of logging on, or `None`.
+        """
+        return self._password
+
+    @property
+    def spinner(self):
+        """
+        :class:`~click_spinner.Spinner` object.
+        """
+        return self._spinner
+
+    @property
+    def verbose(self):
+        """
+        :bool:` '~click.verbose.
+        """
+        return self._verbose
+
+    def execute_cmd(self, cmd):
+        """
+        Call the cmd executor defined by cmd with the spinner
+        """
+        if self._conn is None:
+            if self._server is None:
+                raise click.ClickException("No WBEM Server defined")
+            # TODO We do not cover the ca_certs parameter of wbemconnection
+            self._conn = _create_connection(self.server, self.default_namespace,
+                                            user=self.user,
+                                            password=self.password,
+                                            cert_file=self.certfile,
+                                            key_file=self.keyfile,
+                                            no_verify_cert=self.noverify)
+            self._wbem_server = WBEMServer(self.conn)
+        self.spinner.start()
+        try:
+            cmd()
+        finally:
+            self.spinner.stop()
