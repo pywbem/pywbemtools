@@ -233,7 +233,7 @@ clobber: uninstall clean
 .PHONY: clean
 clean:
 	bash -c 'find . -path ./.tox -prune -o -name "*.pyc" -print -o -name "__pycache__" -print -o -name "*.tmp" -print -o -name "tmp_*" -print |xargs -r rm -Rfv'
-	rm -fv MANIFEST MANIFEST.in AUTHORS ChangeLog .coverage
+	rm -fv MANIFEST MANIFEST.in ChangeLog .coverage
 	rm -Rfv build .cache $(package_name).egg-info .eggs
 	@echo 'Done: Cleaned out all temporary files.'
 	@echo '$@ done.'
