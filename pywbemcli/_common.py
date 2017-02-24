@@ -332,6 +332,45 @@ def parse_kv_pair(pair):
 
     return name, value
 
+def split(string,delimiter):
+    rslt = [item for item in split_esc(string, delimiter)]
+    return rslt
+
+def split_esc(string, delimiter):
+    if len(delimiter) != 1:
+        raise ValueError('Invalid delimiter: ' + delimiter)
+    ln = len(string)
+    i = 0
+    j = 0
+    while j < ln:
+        if string[j] == '\\':
+            if j + 1 >= ln:
+                yield string[i:j]
+                return
+            j += 1
+        elif string[j] == delimiter:
+            yield string[i:j]
+            i = j + 1
+        j += 1
+    yield string[i:j]
+
+def escape_split(s, delim):
+    i, res, buf = 0, [], ''
+    while True:
+        j, e = s.find(delim, i), 0
+        if j < 0:  # end reached
+            return res + [buf + s[i:]]  # add remainder
+        while j - e and s[j - e - 1] == '\\':
+            e += 1  # number of escapes
+        d = e // 2  # number of double escapes
+        if e != d * 2:  # odd number of escapes
+            buf += s[i:j - d - 1] + s[j]  # add the escaped char
+            i = j + 1  # and skip it
+            continue  # add more to buf
+        res.append(buf + s[i:j - d])
+        i, buf = j + len(delim), ''  # start after delim
+        
+
 
 def display_cim_objects(context, objects, output_format='mof'):
     """

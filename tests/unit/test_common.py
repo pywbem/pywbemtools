@@ -22,7 +22,7 @@ from __future__ import absolute_import, print_function
 import unittest
 
 from pywbemcli._common import parse_wbem_uri, create_connection, \
-    filter_namelist, parse_kv_pair
+    filter_namelist, parse_kv_pair, escape_split, split
 
 
 class ParseWbemUriTest(unittest.TestCase):
@@ -120,6 +120,26 @@ class NameValuePairTest(unittest.TestCase):
         name, value = parse_kv_pair('abc="fr ed"')
         self.assertEqual(name, 'abc')
         self.assertEqual(value, '"fr ed"')
+
+        name, value = parse_kv_pair('abc="fre\"d"')
+        self.assertEqual(name, 'abc')
+        self.assertEqual(value, '"fre"d"')
+
+        name, value = parse_kv_pair('=def')
+        self.assertEqual(name, '')
+        self.assertEqual(value, 'def')
+
+class SplitTest(unittest.TestCase):
+
+    def do_split(self, str):
+        result = split(str, ',')
+        print('split result %s' % result)
+              
+    def test_split(self):
+        self.do_split('0,1,2,3,4,5,6')
+        self.do_split('abc,def,jhi,klm,nop')
+        self.do_split('abc,def,jhi,klm,n\,op')
+
 
 
 if __name__ == '__main__':

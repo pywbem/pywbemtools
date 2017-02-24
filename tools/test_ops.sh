@@ -42,10 +42,10 @@ cmd "class enumerate CIM_System -o"
 cmd "class enumerate CIM_System -o -s"
 
 #
-cmd "class assocators CIM_System"
-cmd "class assocators CIM_System s" 
-cmd "class assocators CIM_System -o"
-cmd "class assocators CIM_System -o -s"
+cmd "class associators CIM_System"
+cmd "class associators CIM_System s" 
+cmd "class associators CIM_System -o"
+cmd "class associators CIM_System -o -s"
 
 cmd "class references CIM_System -o"
 cmd "class references CIM_System -o -s"
@@ -71,11 +71,11 @@ cmd "instance enumerate PyWBEM_Person -o"
 
 # TODO find way to do interactive in batch
 # cmd "instance get PyWBEM_Person -i"
-cmd "instance get PyWBEM_Person.name=bob"
+cmd "instance get PyWBEM_Person.CreationClassName=PyWBEM_Person,name=Bob"
 
-cmd "instance create  -x Name=Fred -x GivenName=Jones -x CreationClassName=PyWBEM_Person PyWBEM_Person"
-cmd "instance delete PyWBEM_Person.name=Fred"
+cmd "instance create  PyWBEM_Person -x Name=Fred -x GivenName=Jones -x CreationClassName=PyWBEM_Person"
 
+cmd "instance delete PyWBEM_Person.CreationClassName=PyWBEM_Person,Name=Fred"
 ## invoke method
 
 ## query
