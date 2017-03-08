@@ -75,10 +75,16 @@ cmd "instance enumerate PyWBEM_Person -o"
 # TODO find way to do interactive in batch
 # cmd "instance get PyWBEM_Person -i"
 cmd "instance get PyWBEM_Person.CreationClassName=PyWBEM_Person,name=Bob"
-
-cmd "instance create  PyWBEM_Person -x Name=Fred -x GivenName=Jones -x CreationClassName=PyWBEM_Person"
-
+cmd "instance create  PyWBEM_Person --property Name=Fred --property GivenName=Jones --property CreationClassName=PyWBEM_Person"
 cmd "instance delete PyWBEM_Person.CreationClassName=PyWBEM_Person,Name=Fred"
+
+cmd "instance create pywbem_alltypes --property instanceid=array1 --property scalBool=True --property arrayBool=True,False"
+cmd "instance get pywbem_alltypes.InstancdId=array1"
+cmd "instance get pywbem_alltypes.InstancdId=array1 -p InstanceID"
+cmd "instance get pywbem_alltypes.InstancdId=array1 -p InstanceID -p scalBool"
+cmd "instance get pywbem_alltypes.InstancdId=array1 -p InstanceID,scalBool"
+cmd "instance delete pywbem_alltypes.instanceid=array1"
+
 ## invoke method
 
 ## query

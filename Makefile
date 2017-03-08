@@ -125,10 +125,10 @@ help:
 	@echo '  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)'
 	@echo '  builddoc   - Build documentation in: $(doc_build_dir)'
 	@echo '  check      - Run PyLint and Flake8 on sources and save results in: pylint.log and flake8.log'
+	@echo '  install    - Install package in active Python environment and test import (includes build)'
 	@echo '  test       - Run unit tests (and test coverage) and save results in: $(test_log_file)'
 	@echo '               Env.var TESTCASES can be used to specify a py.test expression for its -k option'
 	@echo '  all        - Do all of the above (except buildwin when not on Windows)'
-	@echo '  install    - Install package in active Python environment and test import (includes build)'
 	@echo '  uninstall  - Uninstall package from active Python environment'
 	@echo '  upload     - Upload the distribution files to PyPI (includes uninstall+build)'
 	@echo '  clean      - Remove any temporary files'
@@ -239,7 +239,7 @@ clean:
 	@echo '$@ done.'
 
 .PHONY: all
-all: develop check build builddoc test
+all: develop check build builddoc install test
 	@echo '$@ done.'
 
 .PHONY: upload
@@ -297,6 +297,6 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 
 $(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  tests/function/*.py coveragerc
 	rm -fv $@
-	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) --cov-config .coveragerc --cov-report=html $(pytest_opts) --ignore=tools --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
+	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) --cov-config .coveragerc --cov-report=html $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'

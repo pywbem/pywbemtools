@@ -69,12 +69,15 @@ CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
                    'the format choice depending on the operation since not '
                    'all formats apply to all output data types'
               .format(of=DEFAULT_OUTPUT_FORMAT))
+# TODO this is not where we want to define displaying packets. Needs log.
+@click.option('--debug', type=str, is_flag=True,
+              help='Display transmited and received packets TEMP.')
 @click.option('-v', '--verbose', type=str, is_flag=True,
               help='Display extra information about the processing.')
 @click.version_option(help="Show the version of this command and exit.")
 @click.pass_context
 def cli(ctx, server, default_namespace, user, password, timeout, noverify,
-        certfile, keyfile, output_format, verbose, conn=None,
+        certfile, keyfile, output_format, verbose, debug, conn=None,
         wbem_server=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
@@ -94,6 +97,8 @@ def cli(ctx, server, default_namespace, user, password, timeout, noverify,
             default_namespace = DEFAULT_NAMESPACE
         if noverify is None:
             noverify = True
+        if debug is None:
+            debug = False
     else:
         # Processing an interactive command.
         # Apply the option defaults from the command line options.
@@ -117,15 +122,20 @@ def cli(ctx, server, default_namespace, user, password, timeout, noverify,
             output_format = ctx.obj.output_format
         if conn is None:
             conn = ctx.obj.conn
+        if verbose is None:
+            verbose = ctx.obj.verbose
+        if debug is None:
+            debug = ctx.obj.debug
         if wbem_server is None:
             wbem_server = ctx.obj.wbem_server
 
     # Create a command context for each command: An interactive command has
     # its own command context different from the command context for the
     # command line.
+    # pylint: disable=too-many-function-args
     ctx.obj = Context(ctx, server, default_namespace, user, password, timeout,
                       noverify, certfile, keyfile, output_format, verbose,
-                      conn, wbem_server)
+                      debug, conn, wbem_server)
 
     # Invoke default command
     if ctx.invoked_subcommand is None:

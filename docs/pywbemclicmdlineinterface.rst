@@ -19,7 +19,7 @@ Pywbemcli Command line interface
 ================================
 
 This package provides a command line interface (CLI) in the pywbemcli tool
-that supports manual communication with a WBEM server through the pywbem client
+that supports communication with a WBEM server through the pywbem client
 api and shell scripting.
 
 .. _`Modes of operation`:
@@ -221,7 +221,7 @@ first as follows (in a bash shell)::
 
     $ eval "$(_PYWBEMCLI_COMPLETE=source pywbemcli)"
 
-Bash tab completion for pywbemcli is used like any other bash tab completion::
+Bash tab completion for ``pywbemcli`` is used like any other bash tab completion::
 
     $ pywbemcli --<TAB><TAB>
     ... <shows the global options to select from>
@@ -237,27 +237,37 @@ Bash tab completion for pywbemcli is used like any other bash tab completion::
 Environment variables and avoiding password prompts
 ---------------------------------------------------
 
-The pywbemcli CLI has command line options for specifying the general
-options to be used including:
+The pywbemcli CLI has  environment variable options corresponding to the
+command line options for specifying the general options to be used including:
 
-  1. PYWBEMCLI_SERVER
-  2. PYWBEM_CLI_DEFAULT_NAMESPACE
-  3. PYWBEMCLI_USER
-  4. PYWBEMCLI_PASSWORD
-  5. PYWBEWCLI_NOVERIFY
-  6. PYWBEMCLI_CERTFILE
-  7. PYWBEMCLI_KEYFILE
+* PYWBEMCLI_SERVER - Corresponds to the general input option --server
+* PYWBEM_CLI_DEFAULT_NAMESPACE - Corresponds to the general input option  --namespace
+* PYWBEMCLI_USER - Corresponds to the general input opiton --user
+* PYWBEMCLI_PASSWORD - Corresponds to the general input opiton --password
+* PYWBEWCLI_NOVERIFY - Corresponds to the general input opiton -noverify
+* PYWBEMCLI_CERTFILE - Corresponds to the general input opiton --cerrtfile
+* PYWBEMCLI_KEYFILE - Corresponds to the general input opiton --keyfile
 
+If these environment variables are set, the corresponding general option on the
+command line is not required and the value of the environment variable is
+used.
+
+Thus, in the following example, the second line accesses the server
+http://localhost::
+
+      $ export PYWBEMCLI_SERVER=http://localhost
+      $ pywbemcli class get CIM_Managed element
 
 If the WBEM operations performed by a particular pywbemcli command require a
-password, the password is prompted for (in both modes of operation)::
+password, the password is prompted for if the --user option is set (in both
+modes of operation)::
 
       $ pywbemcli -s http://localhost -n root/cimv2 -u username class get
       Enter password: <password>
       . . . <The display output from get class>
 
 If the operations performed by a particular pywbemcli command do not
-require a password, no password is prompted for::
+require a password or no user is supplied, no password is prompted for::
 
       $ pywbemcli --help
       . . . <help output>
@@ -271,7 +281,7 @@ TODO: This is frought with issues and we need to change it
 The ``pywbemcli`` command supports a ``connection save`` (sub-)command that
 outputs the (bash) shell commands to set all needed environment variables::
 
-      $ pywbemcli -s http://localhost -n root/cimv2 -u username
+      $ pywbemcli -s http://localhost -n root/cimv2 -u fred
       Enter password: <password>
       export PYWBEMCLI_SERVER=http://localhost
       export PYWBEMCLI_NAMESPACE=root/cimv2
@@ -295,8 +305,3 @@ The password is only prompted for when creating the connection, and the
 connection info stored in the shell environment is utilized in the
 ``pywbemcli instance server namespaces`` command, avoiding
 another password prompt.
-
-
-The PYWBEMCLI_SERVER and PYWBEMCLI_NAMESPACE environment variables act as
-defaults for the
-corresponding command line options.

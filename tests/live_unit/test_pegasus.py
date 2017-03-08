@@ -26,27 +26,28 @@ import shlex
 import six
 
 
+# default host
 HOST = 'http://localhost'
 
+VERBOSE = False
 
 class TestsContainer(unittest.TestCase):
     """Container class for all tests"""
 
     def execute_cmd(self, cmd_str, shell=None):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
+        if VERBOSE:
+            print('cmd %s' % cmd_str)
         args = shlex.split(cmd_str)
-
+        if VERBOSE:
+            print('args %s' % args)
         proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
         std_out_str, std_err_str = proc.communicate()
         exitcode = proc.returncode
+        if VERBOSE:
+            print('rtn %s\n%s\n%s' % (std_out_str, std_err_str, exitcode))
 
         # return tuple of exitcode, stdout, stderr
-        return exitcode, std_out_str, std_err_str
-
-    def class_cmd(self, params):
-        """Adds the cmd name prefix and executes"""
-        cmd = 'pywbemcli -s %s class %s' % (HOST, params)
-        exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
     def assert_not_found(self, regex, test_str):
@@ -90,12 +91,19 @@ class TestsContainer(unittest.TestCase):
 class ClassTests(TestsContainer):
     """Test operations in the class group"""
 
+    def class_cmd(self, params):
+        """Adds the cmd name prefix and executes"""
+        cmd = 'pywbemcli -s %s class %s' % (HOST, params)
+        exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
+        return exitcode, std_out_str, std_err_str
+
     def test_get_simple(self):
         """ """
         print('get_simple')
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement')
 
         self.assertEqual(exitcode, 0)
+        self.assertEqual(err == '')
         self.assert_found('CIM_ManagedElement', out)
 
     def test__get_localonly(self):
@@ -137,8 +145,8 @@ class ClassTests(TestsContainer):
             'get CIM_ManagedElement -p ""')
         self.assertEqual(exitcode, 0)
         self.assert_found('class CIM_ManagedElement', out)
-        self.assert_not_found(['InstanceID','Caption'], out )
-      
+        self.assert_not_found(['InstanceID', 'Caption'], out)
+
 
 # TODO finish this based on the test_ops in the tools directory
 
@@ -146,9 +154,115 @@ class ClassTests(TestsContainer):
 # cmd "class get CIM_ManagedElement --includeclassorigin"
 # cmd "class get CIM_ManagedElement --namespace root/PG_Interop"
 
-# TODO create tests for instance, qualifier, server
+# TODO create tests for qualifier, server
+
+class InstanceTests(TestsContainer):
+    """Test operations in the instance group"""
+
+    def instance_cmd(self, params):
+        """Adds the instance cmd name prefix and executes"""
+        cmd = 'pywbemcli -s %s instance %s' % (HOST, params)
+        exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
+        return exitcode, std_out_str, std_err_str
+
+    def test_enumerate_simple(self):
+        """ """
+        exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found('instance of PyWBEM_Person', out)
+
+    def test_enumerate_proplist(self):
+        """ """
+        exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person '
+                                               '-p Name')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found(['instance of PyWBEM_Person', 'Name'], out)
+        self.assert_not_found('CreationClassName', out)
+
+    def test_get_simple(self):
+        """ """
+        exitcode, out, err = self.instance_cmd(
+            'get PyWBEM_Person.CreationClassname=PyWBEM_Person,Name=Bob')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found('PyWBEM_Person', out)
+
+    def test_create_simple(self):
+        """
+        Test create a simple instance. To be complete this must both
+        create and delete the instance since tests are not ordered and each
+        test should leave the repository in the same state in which it
+        was before the test.
+        """
+        exitcode, out, err = self.instance_cmd(
+            'create PyWBEM_Person --property name=Fred '
+            '--property CreationClassname=PyWBEM_Person')
+        self.assertEqual(exitcode, 0)
+
+        exitcode, out, err = self.instance_cmd(
+            'delete PyWBEM_Person.Name=Fred,CreationClassName=PyWBEM_Person')
+        self.assertEqual(exitcode, 0)
+        self.assert_found(['Deleted', 'Fred'], out)
+
+    def test_create_array_prop(self):
+        """Create an instance of an array property"""
+
+        exitcode, out, err = self.instance_cmd(
+            'create pywbem_alltypes --property InstanceId=ArrayBool '
+            '--property arrayBool=True,False')
+
+        self.assertEqual(exitcode, 0, "Failed create test")
+        exitcode, out, err = self.instance_cmd(
+            'get pywbem_alltypes.InstanceId=ArrayBool')
+
+        self.assert_found(["instance of PyWBEM_AllTypes", 'ArrayBool',
+                           "{True, False}"], out)
+
+        exitcode, out, err = self.instance_cmd(
+            'delete PyWBEM_AllTypes.InstanceId=ArrayBool')
+        self.assertEqual(exitcode, 0)
+        self.assert_found(['Deleted', 'ArrayBool'], out)
+
+    def test_create_alltypes(self):
+        """
+        Create an instance of a class with all types
+        """
+
+        exitcode, out, err = self.instance_cmd(
+            'create PyWBEM_AllTypes --property InstanceId=ScalarTest1 '
+            '--property scalBool=True '
+            '--property scalUint8=8 '
+            '--property scalSint8=-8 '
+            '--property scalUint32=9999 '
+            '--property scalSint32=-9999 '
+            '--property scalUint64=12345678 '
+            '--property scalSint64=-12345678 '
+            '--property scalReal32=5678.32 '
+            '--property scalReal64=345876.3 '
+            '--property scalDateTime="19991224120000.000000+360" '
+            '--property scalString="A string value" ')
+        self.assertEqual(exitcode, 0, 'Expected good response. Rcvd '
+                         ' code %s err %s' % (exitcode, err))
+        self.assertEqual(exitcode, 0, 'Create instance of Pywbem_AllTypes '
+                         'failed. exitcode %s, err %s' % (exitcode, err))
+
+        exitcode, out, err = self.instance_cmd(
+            'delete PyWBEM_AllTypes.InstanceId=ScalarTest1')
+        self.assertEqual(exitcode, 0)
+        self.assert_found(['Deleted', 'ScalarTest1'], out)
+
+    def test_property_notexist(self):
+        """
+        Validate the error when property does not exist in class
+        """
+        exitcode, out, err = self.instance_cmd(
+            'create pywbem_alltypes --property InstanceId=ArrayBool '
+            '--property BlahBool=True,False')
+        print('err %s' % err)
+        self.assertEqual(exitcode, 1)        
 
 
 if __name__ == '__main__':
-
     unittest.main()

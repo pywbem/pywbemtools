@@ -16,35 +16,36 @@ Update: 27 Feb 2017 - Clarify further the taxonomy and try to reduce the
 Goals
 -----
 * Provide the capability to inspect and manage WBEM Servers and in particular
-WBEM Servers compatible with the DMTF and SNIA specifications from a command
-line interface.
+  WBEM Servers compatible with the DMTF and SNIA specifications from a command
+  line interface.
 * Use the pywbem API and classes as the basis for interfacing with WBEM
-servers
+  servers
 * This is primarily a user tool and not an internal test tool so it needs
   to protect the user and provide as much convience as possible for the user.
+* Usable effectively by both occasional and power users:
 
-* Usable effectively by both occasional and power users
   * Interactive mode - Use a REPL so that within pywbemcli the user can
     execute multiple commands without exiting the pywbemcli shell. Thus, the
     user can make a connection and then explore that connection with multiple
-    commands.
-  * Script mode (complete command entered from command line)
+    commands.    
+  * Script mode (complete command entered from command line)  
 * Capable of executing all WBEM CIM/XML operations (with specific exceptions)
 * Include commands for other operations that will be a real advantage to
-  developers, users, etc.
-* Good integrated help to minize requirement for external documentation
+  developers, users, etc.  
+* Integrated help to minize requirement for external documentation.
 * Python based and pure python implementation so that it can be used almost
-any python environment.
+  any python environment.
 * Expandable. Users should be able to add functionality with plugins
 
 
-Also, to make this really usable for testers, developers, etc. we need to
+To make this really usable for testers, developers, etc. we need to
 provide a rich set of display/analysis tools within the tool.  Just
 having an implementation of the 20 some cim/xml operations is NOT sufficient.
 We want the user to be able to see:
 
 * Structure information on the WBEM server environment; how components relate
- to one another.
+  to one another.  This means showing a visutal reprentation of the
+  hierarchy of multiple items like classes and associations
 * Size information on the environment (how many instances, classes, etc.)
 * Time sequences of changing things within the environment
 * etc.
@@ -82,8 +83,8 @@ The only negatives to this approach are:
 
 * We now have two repositories to maintain with two issue lists, etc.
 * It will be more difficult to consider using pywbemcli as a testtool for
-pywbem itself, in part because they are on different development and release
-cycles.
+  pywbem itself, in part because they are on different development and release
+  cycles.
   
 
 Command Taxonomy
@@ -102,7 +103,8 @@ levels:
   subscription manager, log, connection, etc.)
 * the second level subcommand be an action on that entity, for example, get,
   delete, create, enumarate, etc.
-* The options for each subcommand represent
+* The options for each subcommand represent:
+
   * All of the options available for the corresponding client api (i.e.
     localonly, includeclassorigin, includequalifiers, propertylist, etc.)
   * Include only the maxObjectCount as an option to represent the existence
@@ -111,48 +113,59 @@ levels:
     do not need a namespace or use all namespaces.
 
 The following is the current overall taxonomy of subcommands and their major
-options.
+options.  The commands and subcommands are shown in **bold**:
 
 **pywbemwcli**
 
 * **class**
-  * **get** &lt;classname> --namespace &lt;getclass options> (corresponds to getclass)
-  * **invokemethod** &lt:classname> &lt:methodname > [--parameter <name>=<value>]* --namespace
-  * **query** &lt:query> --querylanguage <name> -- namespace
-  * **enumerate**  (corresponds to enumerateclasses) &lt;classname> --namespace --names-only &lt;enumerateclass options>  
-  * **references**  &lt;sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)  
-  * **associators** &lt;sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)  
-  * **method** &lt;classname> &lt;methodname> [&lt;param_name=value>]*  
+
+  * **get** <classname> --namespace <getclass options> (corresponds to getclass)
+  * **invokemethod** <classname> <methodname > [--parameter <name>=<value>]* --namespace
+  * **query** <query> --querylanguage <name> -- namespace
+  * **enumerate**  (corresponds to enumerateclasses) <classname> --namespace --names-only &lt;enumerateclass options>  
+  * **references**  <sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)  
+  * **associators** <sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)  
+  * **method** <classname> <methodname> [<param_name=value>]*  
   * **find** Find a class across namespaces (regex names allowed)
   * **hierarchy** Show a tree of the class hiearchy
   
 * **instance**
-  * **get** &lt;inst_name>  --namespace &lt;get inst options> (corresponds to GetInstance)
-  * **delete** &lt;instname> | &lt;classname>   (use classname for interactive select mode)
-  * **create**  &lt;classname> --property <name>=<value>
+
+  * **get** <inst_name>  --namespace <get inst options> (corresponds to GetInstance)
+  * **delete** <instname> | <classname>   (use classname for interactive select mode)
+  * **create**  <classname> --property <name>=<value>
   * **invokemethod** &lt:cinstancename> &lt:methodname > [--parameter <name>=<value>]* --namespace
-  * **enumerate** &lt;instname>-- namespace --names-only &lt;enumerate inst options> (corresponds to EnumerateInstances)
-  * **references** &lt;instname>--namespace --names_only &lt;references options>(corresponds to inst references)
-  * **associators** &lt;instname> --namespace --names_only &lt;associator options>(corresponds to inst associators)
-  * **invokemethod** &lt;instname> &lt;methodname> [&lt;param_name=value>]*
+  * **enumerate** <instname>-- namespace --names-only <enumerate inst options> (corresponds to EnumerateInstances)
+  * **references** <instname>--namespace --names_only <references options>(corresponds to inst references)
+  * **associators** <instname> --namespace --names_only <associator options>(corresponds to inst associators)
+  * **invokemethod** <instname> <methodname> [<param_name=value>]*
 * **qualifier**             # operations on the QualifierDecl type
-  * **get** &lt;qualifier_name>  --namespace &lt;get qualifier options> (corresponds to GetQualifier)
-  * **enumerate**   --namespace &lt;enumerate qualifier options> (corresponds to EnumerateQualifiers)
-* **server**                # operations on the pywbem Server Class       
+
+  * **get** <qualifier_name>  --namespace <get qualifier options> (corresponds to GetQualifier)
+  * **enumerate**   --namespace <enumerate qualifier options> (corresponds to EnumerateQualifiers)
+  
+* **server**                # operations on the pywbem Server Class
+  
   * **namespaces**          # return list of all namespaces
   * **interop**             # return interop namespace
   * **branding**            #Present overall name/brand info
   * **profiles**            #List with options for filtering
-  *  &lt;possible other server objects, etc. adapters>
+  *  <possible other server objects, etc. adapters>
+  
 * **profiles**            # Further operations on the pywbem server class
+
   * **enumerate**         # Enumerae profiles
-  * TODO can we show profile relationships (reference profiles)?  
+  * TODO can we show profile relationships (reference profiles)?
+  
 * **subscriptions**       # Operations on the PywbemSubscriptionManager Class
+
   * **enumerate** --filters --subs --dest
-  * **create** &lt;filter|destination|subscription>
-  * **delete** &lt;filter|destination|subscription>
-  * TODO: Should there be capability for listener in some modes???  
+  * **create** <filter|destination|subscription>
+  * **delete** <filter|destination|subscription>
+  * TODO: Should there be capability for listener in some modes???
+   
 * **connection**          # changes to the WBEMConnection Class
+
   * **show**              # detailed info on current connection
   * **save**              # save the detailed information on the connection as exports  
   * **setdefaultnamespace**
@@ -162,41 +175,122 @@ options.
   * create                # create new connection and save
   * delete                # delete a connection
   * NOTE: Probably needs new general options (ex. --severname, --configfile)
-* **job FUTURE**                # Operations on a future Jobs Class *FUTURE* 
+  
+* **job FUTURE**                # Operations on a future Jobs Class *FUTURE*
+
   *  list
-  *  TBD   
+  *  TBD
+  
 * **profile FUTURE**             # Lots unknown here. This is where we can expand into profiles
+
   * **profilename**
     * **info**
     * **classes**
     * **attached_instances**
 
-Specialized Options
--------------------
-There are a few specialized arguments/options, specifically to implement
-those operations that create things (instance create, invokemethod parameters).
-These differ from most of the options/arguments in that:
+Special Operations
+------------------
+While most of the operations are fairly straight forward, requiring possibly
+an argument (which generally defines the object to be visualized) and some
+options (where generally the options represent filtering or display
+characteristcs of the objects), at least the create_instance and invoke_method
+operations have more extensive input requirements.  These operations require
+building one or more objects to be passed to the server.
 
-* They must be complete enough to define properties with values and
-parameters with values
-* The values that are to be implemented include
-   * all of the CIM Types
-   * Both scalars and Arrays
-   * Reference property values
-   * embedded objects
+The create_instance requires building an instance of a class with possible
+properties and the invoke_method requires building parameters which consist
+of CIMData types.
 
-In cimcli we implemented this with extra parameters on the command line of
-the form <name>=<value>
+Create_Instance cmd line input requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-where value could be:
-    * scalar (integer, float, string, boolean, etc.)
-    * Arrays where arrays could be made up of repetititions of a scalar or
-      comma separated values with brackets to indicate that it was an array
-      ex.
-         propertyx=[123,345]
-         propertyx=123 propertyx=345
+This command requires:
+#. an argument defining the CIMClass for which the instance is to be created.
 
-    * embedded objects - TODO
+#. Multiple inputs arguments representing the values of the properties to be
+   included in the request.  For each property the input parameters must be
+   capable of representing:
+   
+   #. The property name
+   #. The property value type
+   #. The scalar value if it is a scalar property. This might be any of the
+      CIM Types
+   #. The Array value for array properties. This might be an array of any of
+      the CIMTypes.
+   #. Whether the property is array type
+   #. The size of the array (optional)
+   #. The value for an embedded instance property.
+
+Since all we have available is:
+
+1. Command line arguments
+2. The existence of the class defining the properties
+
+We want to make this simple enough that a command line user can enter
+property information without excessive formatting wo we prpose the following
+limitations:
+
+1. Pywbemcli will make use of both the CIM class for the property from the server
+   and the input arguments. Specifically:
+   
+   1. The CIM class will be used to get the property type and whether it
+      is an array.
+   2. This information can be used to validate the input arguments
+   3. The array_size attribute of properties will be ignored.  It is not really
+       use in any case.
+
+Each property will be represented by an options (ex. -p) which will define
+the name and value of the property as a single string of the form
+
+    <name>'='<value>
+
+Thus, for example:
+
+* ``Id=3``
+* ``fred=thisStringValue``
+* ``fred="this String Value``
+
+Representing the CIM Data types
+
+Representing arrays
+
+Arrays will be represented either as a single name value pair with the
+values separated by commas or as repeated arguments with the same name
+component.
+
+Thus an array property could be represented as:
+
+* ``-p pname=1,2,3,55,88,11``
+* ``-p pname=Fred,John,Louie``
+* ``-p pname="Fred and John","Jim and Ron"``
+
+or
+
+* ``-p pname=1 -p pname=2``
+
+In the second case, pywbemcli will assemble the multiple parameters into
+a single array parameter.
+
+NOTE: We are NOT distinguishing array properties specifically in any way in
+this structure so that  ``pname=1`` could be either an array or non-array
+parameter.  The information from the class is required to separate the
+array property from scalars.
+
+This means that that there is a limitation in that we are trying to create
+correct properties and not provide for the user to create properties that
+are specifically incorrect on invalid.  Therefore the pybwbemcli property
+parser will tell the user immediatly if the property is a valid scalar or
+array value.
+
+ALTERNATIVES TO CONSIDER:
+
+1. Different option name for array and scalar properties.
+
+Embedded Instance Properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**TODO**
+
+
 
 
 General Options
@@ -280,8 +374,8 @@ Examples:
     pywbem -s http://localhost instance get CIM_Blah -i
     # Does get instances of CIM_Blah and offers user selection for operation
 
-    pywbem -s http://localhost class fine TST_
-    # finds all classes in environment that begins with TST_ and returns list
+    pywbem -s http://localhost class find TST_
+    # finds all classes in environment that begin with TST_ and returns list
     # of class and namespace
 
 The overall directory structure is probably:
@@ -300,7 +394,7 @@ single file (i.e. _cmd_class.py, _cmd_instance.py where the action function
 for that subcommand is part of the same file.)
 
 TODO Items
----------
+----------
 
 Timing of execution
 ^^^^^^^^^^^^^^^^^^^
