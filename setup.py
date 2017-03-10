@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# Copyright  2017 IBM Corp. and Inova Development Inc.
+# (C) Copyright 2017 IBM Corp.
+# (C) Copyright 2017 Inova Development Inc.
+# All Rights Reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
