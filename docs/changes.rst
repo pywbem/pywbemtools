@@ -16,7 +16,7 @@ contains the `master` branch up to this commit:
 
 
 pywbemcli v0.1.0.dev0
--------------------
+---------------------
 
 Released: Not yet
 
@@ -26,10 +26,13 @@ Incompatible changes
 Enhancements
 ^^^^^^^^^^^^
 
+This is the initial release of pywbemcli command line tool.
+
 Bug fixes
 ^^^^^^^^^
 
-
+* Fix issues with the create_instance function. It now processes scalar
+  and array properties. Issue # 11
 
 
 Build, test, quality

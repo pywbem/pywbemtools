@@ -20,11 +20,11 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import, print_function
 
 import click
-from pywbem import Error, tocimobj, CIMProperty, CIMInstance
-from pywbem.cim_obj import NocaseDict
+from pywbem import Error
 from .pywbemcli import cli, CMD_OPTS_TXT
-from ._common import display_cim_objects, parse_wbem_uri, pick_instance, \
-    objects_sort, fix_propertylist, parse_kv_pair
+from ._common import display_cim_objects, parse_cim_namespace_str, \
+    pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
+    create_params
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from .config import DEFAULT_QUERY_LANGUAGE
@@ -35,7 +35,7 @@ from .config import DEFAULT_QUERY_LANGUAGE
 #
 
 
-# This is instance only because the default is False for includequalifiers
+# This is instance-only because the default is False for includequalifiers
 # on instances but True on classes
 includequalifiers_option = [              # pylint: disable=invalid-name
     click.option('-q', '--includequalifiers', is_flag=True, required=False,
@@ -294,11 +294,14 @@ def cmd_instance_get(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          namespace=options['namespace'])
-        except ValueError:
-            print('Function aborted')
-            return
+            if not instancepath:
+                return
+        except ValueError as ve:
+            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
+
     else:
-        instancepath = parse_wbem_uri(instancename, options['namespace'])
+        instancepath = parse_cim_namespace_str(instancename,
+                                               options['namespace'])
 
     try:
         instance = context.conn.GetInstance(
@@ -306,7 +309,7 @@ def cmd_instance_get(context, instancename, options):
             LocalOnly=options['localonly'],
             IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
-            PropertyList=fix_propertylist(options['propertylist']))
+            PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, instance, context.output_format)
     except Error as er:
@@ -324,10 +327,13 @@ def cmd_instance_delete(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          namespace=options['namespace'])
+            if not instancepath:
+                return
         except ValueError as ve:
             raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
     else:
-        instancepath = parse_wbem_uri(instancename, options['namespace'])
+        instancepath = parse_cim_namespace_str(instancename,
+                                               options['namespace'])
 
     try:
         context.conn.DeleteInstance(instancepath)
@@ -342,29 +348,18 @@ def cmd_instance_create(context, classname, options):
     """Create an instance and submit to wbemserver"""
 
     try:
-        work_class = context.conn.GetClass(
+        class_ = context.conn.GetClass(
             classname, namespace=options['namespace'], LocalOnly=False)
 
-        properties = NocaseDict()
-        for p in options['property']:
-            name, value_str = parse_kv_pair(p)
-            if not work_class.properties[name]:
-                raise click.ClickException('Error. Property %s not in '
-                                           'class %s' % (name, classname))
-            cl_prop = work_class.properties[name]
+        property_list = resolve_propertylist(options['propertylist'])
 
-            # isarray = cl_prop.is_array
-            # TODO account for array properties.
-            # TODO account for embedded properties and reference properties
-            # in the scanner.
+        properties = options['property']
 
-            value_ = tocimobj(cl_prop.type, value_str)
-            properties[name] = CIMProperty(name, value_)
-
-        new_inst = CIMInstance(
-            classname, properties=properties,
-            property_list=fix_propertylist(options['propertylist']))
+        # properties is a tuple of name,value pairs
+        new_inst = create_ciminstance(class_, properties, property_list)
+        # context.conn.debug = True
         context.conn.CreateInstance(new_inst, namespace=options['namespace'])
+        # print('Request as debug shows\n%s' % context.conn.last_request)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -378,38 +373,27 @@ def cmd_instance_invokemethod(context, instancename, methodname,
         try:
             instancepath = pick_instance(context, instancename,
                                          options['namespace'])
-        except ValueError:
-            print('Function aborted')
-            return
+            if not instancepath:
+                return
+        except ValueError as er:
+            raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
     else:
-        instancepath = parse_wbem_uri(instancename, options['namespace'])
+        instancepath = parse_cim_namespace_str(instancename,
+                                               options['namespace'])
 
     try:
-        work_class = context.conn.GetClass(
+        cim_class = context.conn.GetClass(
             instancepath.classname,
             namespace=options['namespace'], LocalOnly=False)
 
-        methods = work_class.methods
-        if methodname not in methods:
+        cim_methods = cim_class.methods
+        if methodname not in cim_methods:
             raise click.ClickException('Error. Method %s not in '
                                        'class %s' %
                                        (methodname, instancepath.classname))
-        method = work_class.methods[methodname]
+        cim_method = cim_class.methods[methodname]
 
-        params = NocaseDict()
-        for p in options['parameter']:
-            name, value_str = parse_kv_pair(p)
-            if name not in method.parameters:
-                raise click.ClickException('Error. Parameter %s not in method '
-                                           ' %s' % (name, methodname))
-
-            cl_param = work_class.parameters[name]
-
-            # isarray = cl_param.is_array
-            # TODO account for arrays of parameters
-
-            value_ = tocimobj(cl_param.type, value_str)
-            params[name] = (name, value_)
+        params = create_params(cim_method, options['parameter'])
 
         context.conn.InvokeMethod(instancepath, methodname, params)
 
@@ -455,7 +439,7 @@ def cmd_instance_enumerate(context, classname, options):
                 Deepinheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
-                PropertyList=fix_propertylist(options['propertylist']))
+                PropertyList=resolve_propertylist(options['propertylist']))
 
             if options['sort']:
                 results = objects_sort(results)
@@ -478,11 +462,14 @@ def cmd_instance_references(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          options['namespace'])
+            if not instancepath:
+                return
         except ValueError:
             print('Function aborted')
             return
     else:
-        instancepath = parse_wbem_uri(instancename, options['namespace'])
+        instancepath = parse_cim_namespace_str(instancename,
+                                               options['namespace'])
 
     # TODO the class and instance references and associators can go to a single
     #       client processing function
@@ -502,7 +489,7 @@ def cmd_instance_references(context, instancename, options):
                 Role=options['role'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
-                PropertyList=fix_propertylist(options['propertylist']))
+                PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
         if options['sort']:
@@ -525,10 +512,13 @@ def cmd_instance_associators(context, instancename, options):
         try:
             instancepath = pick_instance(context, instancename,
                                          options['namespace'])
+            if not instancepath:
+                return
         except ValueError as ve:
             raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
     else:
-        instancepath = parse_wbem_uri(instancename, options['namespace'])
+        instancepath = parse_cim_namespace_str(instancename,
+                                               options['namespace'])
 
     try:
         if options['names_only']:
@@ -549,7 +539,7 @@ def cmd_instance_associators(context, instancename, options):
                 ResultRole=options['resultrole'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
-                PropertyList=fix_propertylist(options['propertylist']))
+                PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
@@ -571,7 +561,7 @@ def cmd_instance_count(context, options):
                 maxlen = len(item)
         return maxlen
 
-    # TODO Am I handling the namspace correctly? What about default?
+    # TODO Am I handling the namespace correctly? What about default?
     namespace = options['namespace']
 
     # Get all classes in Namespace

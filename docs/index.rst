@@ -24,7 +24,7 @@ The general pywbem web site is: http://pywbem.github.io/pywbem/index.html.
    :numbered:
 
    introduction.rst
-   cmdlineinterface.rst
+   pywbemclicmdlineinterface.rst
    pywbemclisubcommands.rst
    appendix.rst
    changes.rst

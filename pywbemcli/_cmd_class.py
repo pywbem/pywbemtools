@@ -23,8 +23,8 @@ import click
 from pywbem import Error, CIMClassName, tocimobj
 from pywbem.cim_obj import NocaseDict
 from .pywbemcli import cli, CMD_OPTS_TXT
-from ._common import display_cim_objects, filter_namelist, fix_propertylist, \
-    parse_kv_pair
+from ._common import display_cim_objects, filter_namelist, \
+    resolve_propertylist, parse_kv_pair
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
@@ -237,7 +237,7 @@ def cmd_class_get(context, classname, options):
             LocalOnly=options['localonly'],
             IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
-            PropertyList=fix_propertylist(options['propertylist']))
+            PropertyList=resolve_propertylist(options['propertylist']))
         display_cim_objects(context, result_class, context.output_format)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -346,7 +346,7 @@ def cmd_class_references(context, classname, options):
                 Role=options['role'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
-                PropertyList=fix_propertylist(options['propertylist']))
+                PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
@@ -382,7 +382,7 @@ def cmd_class_associators(context, classname, options):
                 ResultRole=options['resultrole'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
-                PropertyList=fix_propertylist(options['propertylist']))
+                PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
         display_cim_objects(context, results, context.output_format)

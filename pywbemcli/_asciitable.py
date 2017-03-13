@@ -68,12 +68,12 @@ def print_ascii_table(table_data, title=None, inner=False, outer=False,
     print()
 
 
-def fold_cell(cell_string, max_cell_width):
+def fold_line(line_string, max_line_width):
     """ Fold a line within a maximum width to fit within a table entry
     """
-    new_cell = cell_string
-    if isinstance(cell_string, six.string_types):
-        if max_cell_width < len(cell_string):
-            new_cell = '\n'.join(wrap(cell_string, max_cell_width))
+    new_line = line_string
+    if isinstance(line_string, six.string_types):
+        if max_line_width < len(line_string):
+            new_line = '\n'.join(wrap(line_string, max_line_width))
 
-    return new_cell
+    return new_line

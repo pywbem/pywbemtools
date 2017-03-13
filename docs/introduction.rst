@@ -33,18 +33,18 @@ The goal of this package is to provide a simple, complete and extensible
 tools to allow inspection and management of the data in WBEM
 servers that are compatible with the DMTF specifications.
 
-Today the only tool in this package is pywbemcli
+Today the only tool in this package is pywbemcli:
 
 Pywbemcli Command Line Browser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The only tool that exists in this package today is pywbemcli, an extensible
-command line browser for WBEM Servers.  This tool provides access to a
-WBEM server directly from the command line.  It provides commands to:
+pywbemcli, an extensible command line browser for WBEM Servers.  This tool
+provides access to a WBEM server directly from the command line.
+It provides commands to:
 
 1. Inspect and manage the primitive CIM Objects CIMClasses, CIMInstances,
 and CIM QualifierDeclaractions defined by the server using the
-requests APIs of the pywbem package
+requests APIs of the pywbem package.  
 
 2. Inspect and manage higher level components of the WBEM Server including
 

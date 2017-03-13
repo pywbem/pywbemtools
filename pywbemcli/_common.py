@@ -25,28 +25,46 @@ import click
 import click_spinner
 
 from pywbem import WBEMConnection, WBEMServer, CIMInstanceName, CIMInstance, \
-    CIMClass, CIMQualifierDeclaration
+    CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
 from pywbem.cim_obj import mofstr
+from pywbem.cim_obj import NocaseDict
 
 from .config import DEFAULT_CONNECTION_TIMEOUT
-from ._asciitable import print_ascii_table
+from ._asciitable import print_ascii_table, fold_line
+
+# from ._debugtools import DumpArgs
 
 
-# TODO This should become a special click option type rather than a
+# TODO Could this become a special click option type rather than a
 # separate function.
-def fix_propertylist(propertylist):
+def resolve_propertylist(propertylist):
     """
     Correct property list received from options.  Click options produces an
     empty list when there is no property list.  Pywbem requires None
     when there is no propertylist
+
+    Further, property lists can be input as a comma separated list so this
+    function also splits these.
     """
     # If no property list, return None which means all properties
     if not propertylist:
         propertylist = None
+
     # if cmdline was a single empty string, we set to empty list
-    # This means send no propertylist
+    # This means send no propertylist and is a special case for the
+    # cim/xml and pywbem interface.
     elif len(propertylist) == 1 and len(propertylist[0]) == 0:
         propertylist = []
+
+    # expand any comma separated entries in the list
+    else:
+        pl = []
+        for item in propertylist:
+            if ',' in item:
+                pl.extend(item.split(','))
+            else:
+                pl.append(item)
+        propertylist = pl
 
     return propertylist
 
@@ -64,7 +82,7 @@ def pick_instance(context, objectname, namespace=None):
             Classname to use to get instance names from server
 
       Returns:
-        instancename selected
+        instancename selected or None if there are no instances to pick
       Exception:
         ValueError Exception if user elects to abort the selection
     """
@@ -72,6 +90,10 @@ def pick_instance(context, objectname, namespace=None):
         raise click.ClickException('%s must be a classname' % objectname)
     instance_names = context.conn.EnumerateInstanceNames(objectname,
                                                          namespace)
+
+    if not instance_names:
+        click.echo('No instance paths found for %s', objectname)
+        return None
 
     try:
         instancename, _ = pick_from_list(context, instance_names,
@@ -167,9 +189,9 @@ def filter_namelist(regex, name_list, ignore_case=True):
 
 def _create_connection(server, namespace, user=None, password=None,
                        cert_file=None, key_file=None, ca_certs=None,
-                       no_verify_cert=False):
+                       no_verify_cert=False, debug=False):
     """
-    Initiate a remote connection, via PyWBEM. Arguments for
+    Initiate a WBEB connection, via PyWBEM api. Arguments for
     the request are the parameters required by the pywbem
     WBEMConnection constructor.
     See the pywbem WBEMConnection class for more details on the parameters.
@@ -201,6 +223,12 @@ def _create_connection(server, namespace, user=None, password=None,
         no_verify_certs: (bool):
             Optional boolean that determines if client verifys server
             certificate.  If None or False, No verification is performed.
+
+        debug: (bool)
+            Optional boolean that is passed to connection. This attribute
+            defines whether the server saves output and input packets.
+            This functionality is NOT a feature of the WBEMConnection
+            constructor but is set after the connection is created.
 
        Return:
             pywbem WBEMConnection object that can be used to execute
@@ -250,18 +278,18 @@ def _create_connection(server, namespace, user=None, password=None,
                           x509=x509_dict, ca_certs=ca_certs,
                           timeout=timeout)
 
-    conn.debug = True
+    conn.debug = debug
     return conn
 
 
 def objects_sort(objects):
     """
-    Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names
+    Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names.
+    Returns new list with the sorted objects.
     """
     if len(objects) < 2:
         return objects
     if isinstance(objects[0], CIMClass):
-        print('sort classes')
         return sorted(objects, key=lambda class_: class_.classname)
 
     sort_dict = {}
@@ -289,7 +317,7 @@ def objects_sort(objects):
 # TODO: I do not like the name.  This is really cimnamespacename parser
 
 
-def parse_wbem_uri(uri, namespace=None):
+def parse_cim_namespace_str(uri, namespace=None):
     """
     Create and return a CIMObjectPath from a string input.
     For now we do not allow the host element.  The uri is of the form
@@ -353,27 +381,203 @@ def parse_wbem_uri(uri, namespace=None):
     return inst_name
 
 
+def create_params(cim_method, kv_params):
+    """
+    Create a parameter values from the input arguments and class.
+    """
+    params = NocaseDict()
+    for p in kv_params:
+        name, value_str = parse_kv_pair(p)
+        if name not in cim_method.parameters:
+            raise click.ClickException('Error. Parameter %s not in method '
+                                       ' %s' % (name, cim_method.name))
+
+        cl_param = cim_method.parameters[name]
+        is_array = cl_param.is_array
+
+        cim_value = create_cimvalue(cl_param.type, value_str, is_array)
+
+        params[name] = (name, cim_value)
+    return params
+
+
+def create_cimvalue(cim_type, value_str, is_array):
+    """
+    Build a cim value of the type in cim_type and the information in value_str
+    or fail with an exception if the value_str cannot be parsed into a
+    CIMValue or list of CIMValue elements.
+
+    Parameters:
+      CIM_Type: TODO
+        CIMType for this value.
+
+      Value_str (:term: `string`):
+        String defining the input to be parsed.
+        TODO cover escapes
+
+      is_array (:class:`py:bool`):
+        The value_str is to be treated as a comma separated set of values.
+
+    Return:
+        is_array == False. Returns a single CIMValue
+        is_array == True. Returns a list of CIMValues
+
+    Exceptions:
+        ValueError if the value_str cannot be parsed consistent with
+        the cim_type and is_array attributes of the call.
+    """
+    cim_value = None
+
+    if not is_array:
+        cim_value = tocimobj(cim_type, value_str)
+    else:
+        cim_value = []
+        values_list = split_array_value(value_str, ',')
+        for value_str in values_list:
+            cim_value.append(tocimobj(cim_type, value_str))
+    return cim_value
+
+
+def create_cim_property(cim_class, name, value_str):
+    """
+    Create and return a CIMProperty from the input parameters and the
+    information in cim_class.
+
+      Parameters:
+        cim_class (:class:`~pywbem.CIMClass`)
+          CIM Class that includes the property defined by name
+
+        name (:term: `string`)
+            Name of the property to be constructed
+
+        value_str (:term: `string`)
+            String form for the value to be inserted.
+
+      Return:
+        CIMProperty with name defined by name and CIMValue corresponding to
+        value_str and property information from the class
+
+      Exception:
+        KeyError if name not in class or ValueError if the value in
+        value_str cannot be mapped to a CIMValue
+    """
+
+    cl_prop = cim_class.properties[name]
+
+    cim_value = create_cimvalue(cl_prop.type, value_str, cl_prop.is_array)
+
+    return CIMProperty(name, cim_value, cl_prop.type)
+
+
+def create_ciminstance(cim_class, kv_properties, property_list=None):
+    """
+    Create a cim instance from the input parameters.
+
+      Parameters:
+
+        class_: (CIMClass)
+            The class from which the CIMInstance is to be created
+
+        properties ():
+            A tuple of name/value pairs representing the properties and their
+            values that are to be constructed for the instance. Required
+
+        property_list ():
+            a list of properties that is to be the list that is supplied
+            when the instance is created. Optional
+
+      Returns: CIMInstance
+
+      Exceptions: KeyError if Property name not found in class.
+    """
+    properties = NocaseDict()
+    for kv_property in kv_properties:
+        name, value_str = parse_kv_pair(kv_property)
+        try:
+            properties[name] = create_cim_property(cim_class, name, value_str)
+        except KeyError as ke:
+            raise click.ClickException('Error: property name %s not in class %s'
+                                       '. Exception %s' %
+                                       (cim_class.classname, name, ke))
+
+        except ValueError as ve:
+            raise click.ClickException('Error: property  %s value %s cannot be'
+                                       ' parsed. Exception %s' %
+                                       (name, value_str, ve))
+
+    new_inst = CIMInstance(cim_class.classname, properties=properties,
+                           property_list=property_list)
+
+    return new_inst
+
+
+def compare_obj(obj1, obj2, msg):
+    """
+    Compare two objects and display error if different.  Returns True if
+    match or False if different
+    """
+    if obj1 != obj2:
+        print('OOPS %s: compare mismatch:\n%r\n%r' % (msg, obj1, obj2))
+        return False
+    return True
+
+
+def compare_instances(inst1, inst2):
+    """
+    Compare two instances. If they do not match, compare the details to
+    find differnes and report the differences. Report the differences
+    """
+    if inst1 != inst2:
+        if not compare_obj(inst1.classname, inst2.classname, "classname"):
+            return False
+        if not compare_obj(inst1.path, inst2.path, "path"):
+            return False
+        if not compare_obj(inst1.qualifiers, inst2.qualifiers, "qualifiers"):
+            return False
+        if len(inst1.properties) != len(inst2.properties):
+            print('Different number of properties %s vs %s' %
+                  (len(inst1.properties, len(inst2.properties))))
+            keys1 = set(inst1.keys())
+            keys2 = set(inst2.keys())
+            diff = keys1.symmetric_difference(keys2)
+            print('Property Name differences %s' % diff)
+            return False
+        for n1, v1 in inst1.iteritems():
+            if v1 != inst2[n1]:
+                msg = 'property ' + n1
+                if not compare_obj(inst1.get(n1), inst2.get(n1), msg):
+                    return False
+    return True
+
+
 def parse_kv_pair(pair):
     """
     Parse a single key value pair separated by = and return the key
     and value components.
-    The value may be empty
+
+    If the value component is empty, returns None
     """
     name, value = pair.partition("=")[::2]
+
+    # if value has nothing in it, return None.
+    if len(value) == 0:
+        value = None
 
     return name, value
 
 
-def split(string, delimiter):
+def split_array_value(string, delimiter):
     """Simple split of a string based on a delimiter"""
 
-    rslt = [item for item in split_esc(string, delimiter)]
+    rslt = [item for item in split_value_str(string, delimiter)]
     return rslt
 
 
-def split_esc(string, delimiter):
-    """Spit a string based on a delimiter character and bypass escaped
-       instances of the delimiter.
+def split_value_str(string, delimiter):
+    """Spit a string based on a delimiter character bypassing escaped
+       instances of the delimiter.  This is a generator function in that
+       it yields each time it separates a value.
+
        Delimiter must be single character.
     """
     if len(delimiter) != 1:
@@ -392,24 +596,6 @@ def split_esc(string, delimiter):
             i = j + 1
         j += 1
     yield string[i:j]
-
-
-# TODO Think I will remove this version of the splitter
-def escape_split(s, delim):
-    i, res, buf = 0, [], ''
-    while True:
-        j, e = s.find(delim, i), 0
-        if j < 0:  # end reached
-            return res + [buf + s[i:]]  # add remainder
-        while j - e and s[j - e - 1] == '\\':
-            e += 1  # number of escapes
-        d = e // 2  # number of double escapes
-        if e != d * 2:  # odd number of escapes
-            buf += s[i:j - d - 1] + s[j]  # add the escaped char
-            i = j + 1  # and skip it
-            continue  # add more to buf
-        res.append(buf + s[i:j - d])
-        i, buf = j + len(delim), ''  # start after delim
 
 
 def display_cim_objects(context, objects, output_format='mof'):
@@ -432,7 +618,7 @@ def display_cim_objects(context, objects, output_format='mof'):
     context.spinner.stop()
     if output_format == 'csv' or output_format == 'txt':
         click.echo("Csv and txt formats not implemented. Using MOF.")
-    output_format = 'mof'
+        output_format = 'mof'
     # TODO this is very simplistic formatter and needs refinement.
     if isinstance(objects, (list, tuple)):
         if output_format == 'table':
@@ -466,12 +652,21 @@ def display_cim_objects(context, objects, output_format='mof'):
             raise click.ClickException("tree output format not allowed")
 
 
-def display_table(objects):
+# TODO how can we build the include_classes into the format requirements
+# TODO how can we set up the max_cell_width
+def display_table(objects, include_classes=False,
+                  max_cell_width=20):
     """If possible display the list of object as a table.
     Currently this only works for instances where the table is a column
     per property.
 
-    This cannot display properties with embedded instances.
+    This cannot display properties with embedded instances. They are ignored
+
+    include_classes if True sets the classname as the first column.
+
+    max_width if not None folds col entries longer than the defined length.
+    If max_width is None, the data length is ignored. The property names used
+    as the col headers are ignored.
     """
     lines = []
     title = None
@@ -483,7 +678,12 @@ def display_table(objects):
         if len(pn) > len(prop_names):
             prop_names = pn
 
-    lines.append(prop_names)
+    header_line = []
+    if include_classes:
+        header_line.append("classname")
+    header_line.extend(prop_names)
+    lines.append(header_line)
+
     title = objects[0].classname
 
     for inst in objects:
@@ -491,17 +691,18 @@ def display_table(objects):
             raise ValueError('Only CIMInstance display allows table output')
         # Look for not allowed property types
         for name in prop_names:
-            p = inst.properties[name]
-            if p.embedded_object:
-                raise ValueError('Cannot process embeddedObject')
+            if name in inst.properties:
+                p = inst.properties[name]
+                if p.embedded_object:
+                    raise ValueError('Cannot process embeddedObject')
 
-        line = []
+        line = [inst.classname] if include_classes else []
         # get value for each property in this object
         # TODO: account for possible non-existence of name
         for name in prop_names:
             # Account for possible instances without all properties
             if name not in inst.properties:
-                val_str = '-'
+                val_str = '?no_name?'
             else:
                 value = inst.get(name)
                 p = inst.properties[name]
@@ -512,10 +713,12 @@ def display_table(objects):
                         val_str = _array_value(p.type, value)
                     else:
                         val_str = _scalar_value(p.type, value)
+            if max_cell_width:
+                if len(val_str) > max_cell_width:
+                    val_str = fold_line(val_str, max_cell_width)
             line.append(val_str)
 
         lines.append(line)
-    print('lines %s' % lines)
     print_ascii_table(lines, title=title, inner=True, outer=True)
 
 
@@ -529,8 +732,11 @@ def _scalar_value(type_, value_, max_width=None):
       value_ (:term:`CIM data type`): Value to be mapped to string for MOF
         output.
 
-      indent (:term:`integer`): Number of spaces to indent the initial
-        line of the generated MOF.
+      max_wdith (:term:`integer`): If not None causes any result string
+      longer than the integer value of max_width to be folded.
+
+    Return:
+        The string value of value_ based on type_
     """
 
     if type_ == 'string':
@@ -539,10 +745,14 @@ def _scalar_value(type_, value_, max_width=None):
         _str = '"%s"' % str(value_)
     else:
         _str = str(value_)
+    if max_width:
+        if len(str) > max_width:
+            _str = fold_line(_str, max_width)
     return _str
 
 
-def _array_value(type_, value_, fold, max_width=None):
+# TODO We do not know how to handle the fold mechanism
+def _array_value(type_, value_, fold=False, max_cell_width=None):
     """
     Output array of values either on single line or one line per value.
 
@@ -551,13 +761,18 @@ def _array_value(type_, value_, fold, max_width=None):
       fold (bool): If True, fold the output string for each entry.
 
     """
-    str_ = ''
+    def enum_value(type_, value_, sep, max_cell_width):
+        """ Convert the array values and return resulting string"""
+        str_ = ""
+        for i, val_ in enumerate(value_):
+            if i > 0:
+                str_ += sep
+            str_ += _scalar_value(type_, val_, max_width=max_cell_width)
+        return str_
 
     sep = ', ' if not fold else ',\n'
-    for i, val_ in enumerate(value_):
-        if i > 0:
-            str_ += sep
-        str_ += _scalar_value(type_, val_, max_width=max_width)
+    str_ = enum_value(type_, value_, sep, max_cell_width)
+
     return str_
 
 
@@ -569,8 +784,8 @@ class Context(object):
     """
 
     def __init__(self, ctx, server, default_namespace, user, password, timeout,
-                 noverify, certfile, keyfile, output_format, verbose, conn,
-                 wbem_server):
+                 noverify, certfile, keyfile, output_format, verbose, debug,
+                 conn, wbem_server):
         self._server = server
         self._default_namespace = default_namespace
         self._user = user
@@ -581,6 +796,7 @@ class Context(object):
         self._keyfile = keyfile
         self._output_format = output_format
         self._verbose = verbose
+        self._debug = debug
         self._conn = conn
         self._wbem_server = wbem_server
         self._spinner = click_spinner.Spinner()
@@ -679,6 +895,13 @@ class Context(object):
         :bool:` '~click.verbose.
         """
         return self._verbose
+
+    @property
+    def debug(self):
+        """
+        :bool:` '~click.debug.
+        """
+        return self._debug
 
     def execute_cmd(self, cmd):
         """

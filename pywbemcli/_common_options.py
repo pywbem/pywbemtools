@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import click
 
 #
-# property_list opetion - Defined here because the option is used in
+# property_list option - Defined here because the option is used in
 # multiple places in the command structure.
 #
 propertylist_option = [                      # pylint: disable=invalid-name
@@ -33,7 +33,8 @@ propertylist_option = [                      # pylint: disable=invalid-name
                       'a Null property list is defined and the server '
                       'returns all properties. If defined as empty string '
                       'the server returns no properties.'
-                      ' ex: -p propertyname1 -p propertyname2')]
+                      ' ex: -p propertyname1 -p propertyname2 or '
+                      '-p propertyname1,propertyname2')]
 
 names_only_option = [                      # pylint: disable=invalid-name
     click.option('-o', '--names_only', is_flag=True, required=False,
