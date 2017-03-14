@@ -17,12 +17,12 @@
 Common Functions applicable across multiple components of pywbemcli
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
-from six.moves import input  # pylint: disable=redefined-builtin
 import click
 import click_spinner
+from prompt_toolkit import prompt
 
 from pywbem import WBEMConnection, WBEMServer, CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
@@ -32,7 +32,11 @@ from pywbem.cim_obj import NocaseDict
 from .config import DEFAULT_CONNECTION_TIMEOUT
 from ._asciitable import print_ascii_table, fold_line
 
+
 # from ._debugtools import DumpArgs
+
+GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
+CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
 
 # TODO Could this become a special click option type rather than a
@@ -84,7 +88,7 @@ def pick_instance(context, objectname, namespace=None):
       Returns:
         instancename selected or None if there are no instances to pick
       Exception:
-        ValueError Exception if user elects to abort the selection
+        ClickException if user choses to terminate the selection process
     """
     if not is_classname(objectname):
         raise click.ClickException('%s must be a classname' % objectname)
@@ -96,11 +100,11 @@ def pick_instance(context, objectname, namespace=None):
         return None
 
     try:
-        instancename, _ = pick_from_list(context, instance_names,
-                                         'Pick Instance name to process')
-        return instancename
+        index = pick_from_list(context, instance_names,
+                               'Pick Instance name to process')
+        return instance_names[index]
     except Exception:
-        raise ValueError('Invalid pick')
+        raise click.ClickException('Command terminated')
 
 
 def pick_from_list(context, options, title):
@@ -118,7 +122,7 @@ def pick_from_list(context, options, title):
     Retries until either integer within range of options list is input
     or user enter ctrl-c.
 
-    Returns: Tuple of option selected, index of selected item
+    Returns: Index of selected item
 
     Exception: Returns ValueError if Ctrl-c input from console.
 
@@ -132,18 +136,17 @@ def pick_from_list(context, options, title):
         index += 1
         print('%s: %s' % (index, str_))
     while True:
-        n = input('Index of selection or Ctrl-C to exit> ')
         try:
-            n = int(n)
-            if n >= 0 and n <= index:
-                return options[index], index
+            selection = int(prompt(
+                'Select one entry by index or Ctrl-C to exit command>'))
+            if selection >= 0 and selection <= index:
+                return selection
         except ValueError:
             pass
-        # TODO make this one our own exception.
         except KeyboardInterrupt:
             raise ValueError
-        print('%s Invalid. Must be integer between 0 and %s. Ctrl-C to '
-              ' terminate selection' % (n, index))
+        print('%s Invalid. Input integer between 0 and %s or Ctrl-C to '
+              'stop selection.' % (selection, index))
     context.spinner.start()
 
 

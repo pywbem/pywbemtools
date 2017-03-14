@@ -19,11 +19,14 @@ the pywbemcli click tool
 """
 from __future__ import absolute_import
 
-
-from click_repl import register_repl, repl
+import os
+import click_repl
 import click
-from ._common import Context
-from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE
+from prompt_toolkit.history import FileHistory
+from ._common import Context, GENERAL_OPTIONS_METAVAR
+
+from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
+    PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE
 
 __all__ = ['cli']
 
@@ -32,8 +35,6 @@ __all__ = ['cli']
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 # Display of options in usage line
-GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
-CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
 
 @click.group(invoke_without_command=True,
@@ -71,7 +72,7 @@ CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
                    'the format choice depending on the operation since not '
                    'all formats apply to all output data types'
               .format(of=DEFAULT_OUTPUT_FORMAT))
-# TODO this is not where we want to define displaying packets. Needs log.
+# TODO Move this to log after we define log capability
 @click.option('--debug', type=str, is_flag=True,
               help='Display transmited and received packets TEMP.')
 @click.option('-v', '--verbose', type=str, is_flag=True,
@@ -141,9 +142,54 @@ def cli(ctx, server, default_namespace, user, password, timeout, noverify,
 
     # Invoke default command
     if ctx.invoked_subcommand is None:
-        repl(ctx)
+        ctx.invoke(repl)
+
+
+@cli.command('help')
+@click.pass_context
+def repl_help(ctx):  # pylint: disable=unused-argument
+    """
+    Show help message for interactive mode.
+    """
+    print("""
+The following can be entered in interactive mode:
+
+  <pywbemcli-cmd>             Execute pywbemcli command <pywbemcli-cmd>.
+  !<shell-cmd>                Execute shell command <shell-cmd>.
+
+  <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+
+  <TAB>                       Tab completion (can be used anywhere).
+  --help                      Show pywbemcli general help message, including a
+                              list of pywbemcli commands.
+  <pywbemcli-cmd> --help      Show help message for pywbemcli command
+                              <pywbemcli-cmd>.
+  help                        Show this help message.
+  :?, :h, :help               Show help message about interactive mode.
+""")
+
+
+@cli.command('repl')
+@click.pass_context
+def repl(ctx):
+    """
+    Enter interactive (REPL) mode (default) and load any existing
+    history file.
+    """
+
+    history_file = PYWBEMCLI_HISTORY_FILE
+    if history_file.startswith('~'):
+        history_file = os.path.expanduser(history_file)
+
+    print("Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.")
+
+    prompt_kwargs = {
+        'message': PYWBEMCLI_PROMPT,
+        'history': FileHistory(history_file),
+    }
+    click_repl.repl(ctx, prompt_kwargs=prompt_kwargs)
 
 
 # register the repl function so it becomes an active component of the
-# top level commands
-register_repl(cli)
+# top level commands. Apparently this not needed.
+# click_repl.register_repl(cli)

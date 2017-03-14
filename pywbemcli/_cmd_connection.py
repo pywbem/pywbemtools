@@ -20,15 +20,20 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import
 
 import click
-from .pywbemcli import cli, CMD_OPTS_TXT
+from pywbem import Error
+from .pywbemcli import cli
+from ._common import CMD_OPTS_TXT
 
 
 @cli.group('connection', options_metavar=CMD_OPTS_TXT)
 def connection_group():
     """
-    Command group to manage WBEM connections.
-    This should include subcommands for:
-        - save - save the current connection definition to env variables
+    Command group to manage WBEM connections These command allow viewing
+    and setting connection information.
+
+    In addition to the command-specific options shown in this help text, the
+    general options (see 'pywbemcli --help') can also be specified before the
+    command. These are NOT retained after the command is executed.
     """
     pass
 
@@ -37,7 +42,8 @@ def connection_group():
 @click.pass_obj
 def connection_save(context):
     """
-    get and display a single class from the WBEM Server
+    Call the funciton to save the current connection information by
+    exporting it
     """
     context.execute_cmd(lambda: cmd_connection_save(context))
 
@@ -60,6 +66,16 @@ def connection_set(context):
     make up the current connection
     """
     context.execute_cmd(lambda: cmd_connection_set(context))
+
+
+@connection_group.command('test', options_metavar=CMD_OPTS_TXT)
+@click.pass_obj
+def connection_test(context):
+    """
+    Execute a simple wbem request to test that the connection exists
+    and is working.
+    """
+    context.execute_cmd(lambda: cmd_connection_test(context))
 
 
 ################################################################
@@ -111,7 +127,20 @@ def cmd_connection_show(context):
 
 def cmd_connection_set(context):
     """
-    Show the parameters that make up the current connection information
+    Test the current connection by executing a predefined WBEM request.
+    Currently this request is a get class CIM_ManagedElement on the
+    default namespace
     """
     click.echo('NOT IMPLEMENTED. This will set the parameters.')
     show_connection_information(context)
+
+
+def cmd_connection_test(context):
+    """
+    Show the parameters that make up the current connection information
+    """
+    try:
+        context.conn.GetClass('CIM_ManagedElement')
+        click.echo('Connection successful')
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

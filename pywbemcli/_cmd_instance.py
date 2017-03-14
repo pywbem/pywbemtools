@@ -21,10 +21,10 @@ from __future__ import absolute_import, print_function
 
 import click
 from pywbem import Error
-from .pywbemcli import cli, CMD_OPTS_TXT
+from .pywbemcli import cli
 from ._common import display_cim_objects, parse_cim_namespace_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
-    create_params
+    create_params, CMD_OPTS_TXT
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from .config import DEFAULT_QUERY_LANGUAGE
@@ -63,6 +63,10 @@ def instance_group():
     create, modify, and delete instances in a namspace and additional functions
     to get more general information on instances (ex. counts) within the
     namespace
+
+    In addition to the command-specific options shown in this help text, the
+    general options (see 'pywbemcli --help') can also be specified before the
+    command. These are NOT retained after the command is executed.
     """
     pass
 
