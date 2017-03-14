@@ -22,8 +22,8 @@ from __future__ import absolute_import
 
 import click
 from pywbem import Error
-from .pywbemcli import cli, CMD_OPTS_TXT
-from ._common import display_cim_objects
+from .pywbemcli import cli
+from ._common import display_cim_objects, CMD_OPTS_TXT
 from ._common_options import sort_option, namespace_option, add_options
 
 
@@ -36,6 +36,10 @@ def qualifier_group():
 
     This does not provide the capability to create or delete CIM
     QualifierDeclarations
+
+    In addition to the command-specific options shown in this help text, the
+    general options (see 'pywbemcli --help') can also be specified before the
+    command. These are NOT retained after the command is executed.
     """
     pass
 

@@ -39,7 +39,7 @@ However, they should be used from the ``pywbemcli`` namespace.
 # This module is meant to be safe for 'import *'.
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
-           'DEFAULT_NAMESPACE']
+           'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE']
 
 #: Default value in seconds for a WBEMConnection to timeout if the value
 #: is not set by an input parameter.
@@ -60,3 +60,16 @@ DEFAULT_NAMESPACE = 'root/cimv2'
 #: when a query language is not specified in the request or config
 
 DEFAULT_QUERY_LANGUAGE = 'DMTF:CQL'
+
+#: Characters for cmdline prompt when the pywbemcli repl is executing.
+#: The prompt is presented at the beginning of a line awaiting a command
+#: input.
+#: The prompt MUST BE Unicode (prompt-toolkit requirement)
+
+PYWBEMCLI_PROMPT = u'pywbemcli> '
+
+#: File path of history file for interactive mode.
+#: If the file name starts with tilde (which is handled by the shell, not by
+#: the file system), it is properly expanded.
+
+PYWBEMCLI_HISTORY_FILE = '~/.pywbemcli_history'

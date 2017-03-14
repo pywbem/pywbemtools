@@ -11,3 +11,10 @@ click-repl # MIT
 asciitree # MIT
 terminaltables #  MIT
 pywbem # LGPL
+
+# From click-repl
+prompt_toolkit>=1.0.0 # BSD
+
+# From prompt_toolkit
+wcwidth>=0.1.6 # MIT
+

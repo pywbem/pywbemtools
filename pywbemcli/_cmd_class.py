@@ -20,11 +20,13 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import
 
 import click
+
 from pywbem import Error, CIMClassName, tocimobj
 from pywbem.cim_obj import NocaseDict
-from .pywbemcli import cli, CMD_OPTS_TXT
+
+from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
-    resolve_propertylist, parse_kv_pair
+    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
@@ -53,6 +55,10 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 def class_group():
     """
     Command Group to manage CIM Classes.
+
+    In addition to the command-specific options shown in this help text, the
+    general options (see 'pywbemcli --help') can also be specified before the
+    command. These are NOT retained after the command is executed.
     """
     pass
 

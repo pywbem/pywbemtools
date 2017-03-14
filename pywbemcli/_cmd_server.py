@@ -23,8 +23,8 @@ from __future__ import absolute_import
 
 import click
 from pywbem import ValueMapping, Error
-from .pywbemcli import cli, CMD_OPTS_TXT
-from ._common import display_cim_objects
+from .pywbemcli import cli
+from ._common import display_cim_objects, CMD_OPTS_TXT
 from ._common_options import sort_option, add_options
 
 
@@ -42,6 +42,10 @@ def print_profile_info(org_vm, inst):
 def class_group():
     """
     Command Group for WBEM server operations.
+
+    In addition to the command-specific options shown in this help text, the
+    general options (see 'pywbemcli --help') can also be specified before the
+    command. These are NOT retained after the command is executed.
     """
     pass
 
@@ -53,6 +57,7 @@ def server_namespaces(context, **options):
     """
     Display the set of namespaces in the current WBEM server
     """
+    # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
 
 
@@ -63,6 +68,7 @@ def server_interop(context, **options):
     """
     Display the interop namespace name in the WBEM Server.
     """
+    # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_interop(context, options))
 
 
@@ -73,6 +79,7 @@ def server_brand(context, **options):
     """
     Display the interop namespace name in the WBEM Server.
     """
+    # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_brand(context, options))
 
 
@@ -115,7 +122,7 @@ def server_connection(context):
 ###############################################################
 #         Server cmds
 ###############################################################
-def cmd_server_namespaces(context, options):
+def cmd_server_namespaces(context):
     """
     Display namespaces in the current WBEMServer
     """
@@ -126,7 +133,7 @@ def cmd_server_namespaces(context, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_server_interop(context, options):
+def cmd_server_interop(context):
     """
     Display interop namespace in the current WBEMServer
     """
@@ -137,7 +144,7 @@ def cmd_server_interop(context, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_server_brand(context, options):
+def cmd_server_brand(context):
     """
     Display product and version info of the current WBEMServer
     """
