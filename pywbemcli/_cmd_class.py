@@ -63,7 +63,6 @@ def class_group():
     pass
 
 
-# Reverse includequalifiers so the default is true
 @class_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True,)
 @click.option('-l', '--localonly', is_flag=True, required=False,
@@ -75,7 +74,7 @@ def class_group():
 @click.pass_obj
 def class_get(context, classname, **options):
     """
-    get and display a single class from the WBEM Server
+    get and display a single CIM class from the WBEM Server
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 

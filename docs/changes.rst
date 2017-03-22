@@ -37,6 +37,9 @@ Bug fixes
   the resulting output could be viewed by only some tools (i.e. github
   messed it up). Changed to display as a .rst file output. (see issue #27gi)
 
+* Fix issues around password so that we get the password from a prompt rather
+  than just from the command line. (issue # 6))
+
 
 Build, test, quality
 ^^^^^^^^^^^^^^^^^^^^

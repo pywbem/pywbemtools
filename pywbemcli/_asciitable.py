@@ -30,8 +30,8 @@ from terminaltables import SingleTable, AsciiTable
 
 
 # TODO account for max width of table and columns.
-def print_ascii_table(table_data, title=None, inner=False, outer=False,
-                      ascii=True):
+def print_ascii_table(table_data, title=None, header=None, inner=False,
+                      outer=False, ascii=True):
     """ Print table data as an ascii table. The input is a dictionary
         of table data in the format used by terminaltable package.
 
@@ -57,6 +57,8 @@ def print_ascii_table(table_data, title=None, inner=False, outer=False,
 
         The remaining lines are the table lines each as a list of entries
     """
+    if header:
+        table_data.insert(0, header)
 
     table_instance = AsciiTable(table_data) if ascii else \
         SingleTable(table_data)

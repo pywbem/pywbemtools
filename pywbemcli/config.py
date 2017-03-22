@@ -73,3 +73,9 @@ PYWBEMCLI_PROMPT = u'pywbemcli> '
 #: the file system), it is properly expanded.
 
 PYWBEMCLI_HISTORY_FILE = '~/.pywbemcli_history'
+
+#: Default uri scheme is none is provided.  Thus if a server uri without
+#: scheme component is provided, this is the default prepended to the
+#: uri.
+
+DEFAULT_URI_SCHEME = 'https'
