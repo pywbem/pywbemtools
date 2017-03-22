@@ -95,7 +95,7 @@ class ContainerMeta(type):
             results
             """
             def test(self):  # pylint: disable=missing-docstring
-                command = 'pywbemcli %s --help' % (cmd_str)
+                command = 'pywbemcli -s http://blah %s --help' % (cmd_str)
                 args = shlex.split(command)
                 proc = Popen(args, stdout=PIPE, stderr=PIPE)
                 out, err = proc.communicate()

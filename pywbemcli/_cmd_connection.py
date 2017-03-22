@@ -28,7 +28,7 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
 from ._asciitable import print_ascii_table
 from ._connection_repository import get_pywbemcli_servers, \
-    server_definitions_file_save
+    server_definitions_create_new, server_definitions_delete
 
 
 @cli.group('connection', options_metavar=CMD_OPTS_TXT)
@@ -106,6 +106,8 @@ def connection_set(context, name):
 
 
 # TODO Maybe most of these options can be generalized for here and cli
+
+# pylint: disable=bad-continuation
 @connection_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='name', required=True,)
 @click.argument('server', type=str, envvar=PywbemServer.server_envvar,
@@ -249,15 +251,15 @@ def cmd_connection_set(context, name):
     """
     svr = context.pywbem_server
     if svr.name and name:
+        # TODO we are accessing a protected member of the dictionary
         svr._name = name
     elif not svr.name and not name:
         raise click.ClickException('No name definition' % name)
         # TODO we can ask for name in this case in interactive mode
     elif svr.name:
         name = svr.name
-    pywbemcli_servers = get_pywbemcli_servers()
-    pywbemcli_servers[name] = svr
-    server_definitions_file_save()
+
+    server_definitions_create_new(name, svr)
 
     show_connection_information(context, context.pywbem_server)
 
@@ -336,8 +338,9 @@ def cmd_connection_delete(context, name):
         if pywbemcli_servers[name] == context.pywbem_server:
             raise click.ClickException(
                 'Please do not delete current connection %s' % name)
-        del pywbemcli_servers[name]
-        server_definitions_file_save()
+
+        server_definitions_delete(name)
+
     else:
         raise click.ClickException(
             '%s not a defined connection name' % name)
@@ -360,9 +363,8 @@ def cmd_connection_create(context, name, server, options):
                                  certfile=options['certfile'],
                                  keyfile=options['keyfile'],
                                  ca_certs=options['ca_certs'])
-    pywbemcli_servers[name] = pywbem_server
 
-    server_definitions_file_save()
+    server_definitions_create_new(name, pywbem_server)
 
 
 def cmd_connection_list(context):
@@ -378,7 +380,7 @@ def cmd_connection_list(context):
     lines = []
 
     for name, svr in pywbemcli_servers.iteritems():
-        line = [svr.name, svr.server_uri, svr.default_namespace, svr.user,
+        line = [name, svr.server_uri, svr.default_namespace, svr.user,
                 svr.password, svr.timeout, svr.noverify, svr.certfile,
                 svr.keyfile]
         lines.append(line)
