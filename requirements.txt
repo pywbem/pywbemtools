@@ -4,7 +4,7 @@
 
 six # MIT
 pbr>=1.8 # Apache-2.0
-pywbem # gpl
+-e git+https://gitlab.com/m2crypto/m2crypto.git@master#egg=M2Crypto
 click # BSD
 click-spinner>=0.1.5 # MIT
 click-repl # MIT
