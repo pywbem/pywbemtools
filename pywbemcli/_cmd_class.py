@@ -111,7 +111,20 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_names(context, classname, **options):
     """
-    get and display a list of classnames from the WBEM Server.
+    Get and display classnames from the WBEMServer.
+
+    Enumerates the classnames from the WBEMServer starting
+    either at the top of the class hierarchy or from  the position in the
+    class hierarch defined by the optional`classname` argument if provided.
+
+    The output format is normally a list of the classnames
+
+    This command corresponds to `class enumerate  -o`
+
+    The deepinheritance option defines whether the complete hiearchy is
+    retrieved or just the next level in the hiearchy.
+
+
     """
     context.execute_cmd(lambda: cmd_class_names(context, classname, options))
 
@@ -119,7 +132,8 @@ def class_names(context, classname, **options):
 @class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False)
 @click.option('-d', '--deepinheritance', is_flag=True, required=False,
-              help='Return complete subclass hiearchy for this class.')
+              help='Return complete subclass hierarchy for this class if '
+                   'set. Otherwise retrieve only the next hierarchy level.')
 @click.option('-l', '--localonly', is_flag=True, required=False,
               help='Show only local properties of the class.')
 @add_options(includeclassqualifiers_option)
@@ -130,8 +144,19 @@ def class_names(context, classname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Enumerate classes from the WBEMServer starting either at the top or from
-    the classname argument if provided
+    Enumerate classes from the WBEMServer.
+
+    Enumerates the classes (or classnames) from the WBEMServer starting
+    either at the top of the class hierarchy or from  the position in the
+    class hierarch defined by `classname` argument if provided.
+
+    The output format is defined by the output_format global option.
+
+    The includeclassqualifiers, includeclassorigin options define optional
+    information to be included in the output.
+
+    The deepinheritance option defines whether the complete hiearchy is
+    retrieved or just the next level in the hiearchy.
     """
     context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
                                                     options))
@@ -155,26 +180,28 @@ def class_enumerate(context, classname, **options):
 @click.pass_obj
 def class_references(context, classname, **options):
     """
-    Get the reference classes for the CLASSNAME argument filtered by the
-    role and result class options.
+    Get the reference classes for the CLASSNAME.
+
+    Get the reference classes (or their classnames) for the CLASSNAME argument
+    filtered by the role and result class options and modified  by the
+    other options.
     """
     context.execute_cmd(lambda: cmd_class_references(context, classname,
                                                      options))
 
 
-# need to sort out the single char char for role, etc. better
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the associated class name provided.')
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-c', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
-@click.option('-x', '--role', type=str, required=False,
+@click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
-@click.option('-y', '--resultrole', type=str, required=False,
+@click.option('-R', '--resultrole', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includeclassqualifiers_option)
@@ -186,24 +213,42 @@ def class_references(context, classname, **options):
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
-    Get the associated classes for the CLASSNAME argument filtered by the
-    assocclass, resultclass, role and resultrole arguments.
+    Get the associated classes for the CLASSNAME.
+
+    Get the classes(or classnames) that are associated with the CLASSNAME
+    argument filtered by the assocclass, resultclass, role and resultrole
+    arguments options.
+
+    Results are displayed as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_class_associators(context, classname,
                                                       options))
 
 
-# TODO we can make optional namespace option tolimit search
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
-@click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
+@click.argument('CLASSNAME', type=str, metavar='CLASSNAME regex', required=True)
 @add_options(sort_option)
+@add_options(namespace_option)
 @click.pass_obj
 def class_find(context, classname, **options):
     """
-    Find all classes that match the CLASSNAME argument in the namespaces of
-    the defined WBEMserver. The CLASSNAME argument may be either a
-    classname or a regular expression that can be matched to one or more
-    classnames.
+    Find all classes that match the CLASSNAME regex.
+
+    Find all of the classes in the namespace  of the defined WBEMServer that
+     match the CLASSNAME  regular expression argument in the namespaces of
+    the defined WBEMserver.
+
+    The CLASSNAME argument is required.
+
+    The CLASSNAME argument may be either a complete classname or a regular
+    expression that can be matched to one or more classnames. To limit the
+    filter to a single classname, terminate the classname with $.
+
+    The regular expression is anchored to the beginning of the classname and
+    is case insensitive. Thus pywbem_ returns all classes that begin with
+    PyWBEM_, pywbem_, etc.
+
+    The namespace option limits the search to the defined namespace
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 
@@ -218,7 +263,7 @@ def class_find(context, classname, **options):
 @click.pass_obj
 def class_hierarchy(context, classname, **options):
     """
-    Display classnames inheritance hierarchy as a tree.
+    Display class inheritance hierarchy as a tree.
 
     The classname option, if it exists defines the topmost class of the
     hierarchy to include in the display. This is a separate subcommand because
@@ -234,8 +279,9 @@ def class_hierarchy(context, classname, **options):
 
 def cmd_class_get(context, classname, options):
     """
-    Execute the command for get class and display the result
+    Get the class defined by the argument and display.
     """
+
     try:
         result_class = context.conn.GetClass(
             classname,
@@ -245,6 +291,7 @@ def cmd_class_get(context, classname, options):
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
         display_cim_objects(context, result_class, context.output_format)
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -296,6 +343,7 @@ def cmd_class_names(context, classname, options):
         if options['sort']:
             result_classnames.sort()
         display_cim_objects(context, result_classnames, context.output_format)
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -354,7 +402,7 @@ def cmd_class_references(context, classname, options):
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
-                results.sort(key=lambda x: x.classname)
+                results.sort(key=lambda x: x[1].classname)
 
         display_cim_objects(context, results, context.output_format)
 
@@ -390,7 +438,7 @@ def cmd_class_associators(context, classname, options):
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
-                results.sort(key=lambda x: x.classname)
+                results.sort(key=lambda x: x[1].classname)
         display_cim_objects(context, results, context.output_format)
 
     except Error as er:
@@ -402,9 +450,12 @@ def cmd_class_find(context, classname, options):
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
     """
-    ns_names = context.wbem_server.namespaces
-    if options['sort']:
-        ns_names.sort()
+    if options['namespace']:
+        ns_names = options['namespace']
+    else:
+        ns_names = context.wbem_server.namespaces
+        if options['sort']:
+            ns_names.sort()
 
     try:
         names_dict = {}
@@ -422,7 +473,6 @@ def cmd_class_find(context, classname, options):
             for classname in names_dict[ns_name]:
                 print('  %s:%s' % (ns_name, classname))
 
-        # ##display_result(result)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -431,27 +481,36 @@ def cmd_class_hierarchy(context, classname, options):
     """
     Execute the command to enumerate classes from the top or starting at the
     classname argument. Then format the results to be displayed as a
-    left-justified tree using the asciitree library
+    left-justified tree using the asciitree library.
+    The superclasses option determines if the superclass tree or the
+    subclass tree is displayed.
     """
+    try:
+        if options['superclasses']:
+            if classname is None:
+                raise click.ClickException('Classname argument required for '
+                                           'superclasses option')
 
-    if options['superclasses']:
-        if classname is None:
-            raise click.ClickException('Classname argument required for '
-                                       'superclasses option')
-
-        class_ = context.conn.GetClass(classname,
-                                       namespace=options['namespace'])
-        classes = []
-        classes.append(class_)
-        while class_.superclass:
-            class_ = context.conn.GetClass(class_.superclass,
+            # get the superclasses into a list
+            class_ = context.conn.GetClass(classname,
                                            namespace=options['namespace'])
+            classes = []
             classes.append(class_)
-        classname = None
+            while class_.superclass:
+                class_ = context.conn.GetClass(class_.superclass,
+                                               namespace=options['namespace'])
+                classes.append(class_)
+            classname = None
 
-    else:
-        classes = context.conn.EnumerateClasses(ClassName=classname,
-                                                namespace=options['namespace'],
-                                                DeepInheritance=True)
+        else:
+            # get the complete subclass hiearchy
+            classes = context.conn.EnumerateClasses(
+                ClassName=classname,
+                namespace=options['namespace'],
+                DeepInheritance=True)
+        # display the list of classes as a tree. The classname is the top
+        # of the tree.
+        display_class_tree(classes, classname)
 
-    display_class_tree(classes, classname)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

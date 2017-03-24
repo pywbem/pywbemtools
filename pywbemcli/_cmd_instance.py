@@ -24,7 +24,7 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_cim_namespace_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
-    create_params, CMD_OPTS_TXT
+    create_params, filter_namelist, CMD_OPTS_TXT
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from .config import DEFAULT_QUERY_LANGUAGE
@@ -272,17 +272,33 @@ def instance_query(context, query, **options):
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
-# TODO add option for class regex to limit the search
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
+@click.argument('CLASSNAME', type=str, metavar='CLASSNAME regex',
+                required=False)
+@click.option('-s', '--sort', is_flag=True, required=False,
+              help='Sort by instance count. Otherwise sorted by classname')
 @add_options(namespace_option)
-@add_options(sort_option)
 @click.pass_obj
-def instance_count(context, **options):
+def instance_count(context, classname, **options):
     """
     Get number of instances for each class in namespace.
 
+    The size of the response may be limited by CLASSNAME argument which
+    defines a classname regular expression so that only those classes are
+    counted
+
+    The CLASSNAME argument is optional.
+
+    The CLASSNAME argument may be either a complete classname or a regular
+    expression that can be matched to one or more classnames. To limit the
+    filter to a single classname, terminate the classname with $.
+
+    The regular expression is anchored to the beginning of the classname and
+    is case insensitive. Thus pywbem_ returns all classes that begin with
+    PyWBEM_, pywbem_, etc.
+
     """
-    context.execute_cmd(lambda: cmd_instance_count(context, options))
+    context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
 
 ####################################################################
@@ -294,18 +310,17 @@ def cmd_instance_get(context, instancename, options):
     or by the classname provided in instancename if the interactive flag
     is provided
     """
-    if options['interactive']:
-        try:
+    try:
+        if options['interactive']:
             instancepath = pick_instance(context, instancename,
                                          namespace=options['namespace'])
             if not instancepath:
                 return
-        except ValueError as ve:
-            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
-
-    else:
-        instancepath = parse_cim_namespace_str(instancename,
-                                               options['namespace'])
+        else:
+            instancepath = parse_cim_namespace_str(instancename,
+                                                   options['namespace'])
+    except ValueError as ve:
+        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
 
     try:
         instance = context.conn.GetInstance(
@@ -327,17 +342,17 @@ def cmd_instance_delete(context, instancename, options):
         delete.
         Otherwise attempt to delete the instance defined by instancename
     """
-    if options['interactive']:
-        try:
+    try:
+        if options['interactive']:
             instancepath = pick_instance(context, instancename,
                                          namespace=options['namespace'])
             if not instancepath:
                 return
-        except ValueError as ve:
-            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
-    else:
-        instancepath = parse_cim_namespace_str(instancename,
-                                               options['namespace'])
+        else:
+            instancepath = parse_cim_namespace_str(instancename,
+                                                   options['namespace'])
+    except ValueError as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
     try:
         context.conn.DeleteInstance(instancepath)
@@ -373,17 +388,17 @@ def cmd_instance_invokemethod(context, instancename, methodname,
                               options):
     """Create an instance and submit to wbemserver"""
 
-    if options['interactive']:
-        try:
+    try:
+        if options['interactive']:
             instancepath = pick_instance(context, instancename,
                                          options['namespace'])
             if not instancepath:
                 return
-        except ValueError as er:
-            raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-    else:
-        instancepath = parse_cim_namespace_str(instancename,
-                                               options['namespace'])
+        else:
+            instancepath = parse_cim_namespace_str(instancename,
+                                                   options['namespace'])
+    except ValueError as ve:
+        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
 
     try:
         cim_class = context.conn.GetClass(
@@ -476,7 +491,7 @@ def cmd_instance_references(context, instancename, options):
                                                options['namespace'])
 
     # TODO the class and instance references and associators can go to a single
-    #       client processing function
+    #      client processing function
 
     try:
         if options['names_only']:
@@ -553,7 +568,7 @@ def cmd_instance_associators(context, instancename, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_instance_count(context, options):
+def cmd_instance_count(context, classname, options):
     """
     Get the number of instances of each class in the namespace
     """
@@ -569,42 +584,62 @@ def cmd_instance_count(context, options):
     namespace = options['namespace']
 
     # Get all classes in Namespace
-    classlist = context.conn.EnumerateClassNames(
-        DeepInheritance=True,
-        namespace=namespace)
-    if options['sort']:
-        classlist.sort()
+    try:
+        classlist = context.conn.EnumerateClassNames(
+            DeepInheritance=True,
+            namespace=namespace)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
-    maxlen = maxlen(classlist)
+    if classname:
+        classlist = filter_namelist(classname, classlist, ignore_case=True)
+
+    # sort  since normal output for this command is by class alphabetic order.
+    classlist.sort()
+
+    maxlen = maxlen(classlist)    # get max classname size for display
 
     display_data = []
     for classname in classlist:
 
         # Try block allows issues where enumerate does not properly execute
         # in some cases. The totals may be wrong but at least it gets what
-        # it can.
+        # it can.  This accounts for issues with some servers where there
+        # are providers that return errors from the enumerate.
         try:
-            insts = context.conn.EnumerateInstanceNames(
+            inst_names = context.conn.EnumerateInstanceNames(
                 classname,
                 namespace=namespace)
         except Error as er:
             print('Server Error %s with %s:%s. Continuing' % (er, namespace,
                                                               classname))
-        count = 0
-        # get only for the defined classname, not subclasses
-        for inst in insts:
-            if inst.classname == classname:
-                count += 1
+
+        # Sum the number of instances with the defined classname.
+        # this counts only classes with that specific classname and not
+        # subclasses
+        count = sum(1 for inst in inst_names if (inst.classname == classname))
 
         if count != 0:
-            tx = (classname, count)
-            display_data.append(tx)
+            display_tuple = (classname, count)
+            display_data.append(display_tuple)
 
-    # finally display the results
+    # If sort set, resort by count size
+    if options['sort']:
+        display_data.sort(key=lambda x: x[1])
+
+    # set the max width of the count field based on the max integer to display
+    max_count = 0
+    for i in display_data:
+        if i[1] > max_count:
+            max_count = i[1]
+    max_int_len = len(str(max_count))
+
     if display_data:
         print('')
         for item in display_data:
-            print('{0:<{width}}: {1}'.format(item[0], item[1], width=maxlen))
+            print('{0:<{width}} :{1:>{i_width}}'.format(item[0], item[1],
+                                                        width=maxlen,
+                                                        i_width=max_int_len))
 
 
 def cmd_instance_query(context, query, options):

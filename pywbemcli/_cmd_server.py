@@ -62,25 +62,23 @@ def server_namespaces(context, **options):
 
 
 @class_group.command('interop', options_metavar=CMD_OPTS_TXT)
-@add_options(sort_option)
 @click.pass_obj
 def server_interop(context, **options):
     """
     Display the interop namespace name in the WBEM Server.
     """
     # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_interop(context, options))
+    context.execute_cmd(lambda: cmd_server_interop(context))
 
 
 @class_group.command('brand', options_metavar=CMD_OPTS_TXT)
-@add_options(sort_option)
 @click.pass_obj
-def server_brand(context, **options):
+def server_brand(context):
     """
     Display the interop namespace name in the WBEM Server.
     """
     # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_brand(context, options))
+    context.execute_cmd(lambda: cmd_server_brand(context))
 
 
 @class_group.command('info', options_metavar=CMD_OPTS_TXT)
@@ -122,7 +120,7 @@ def server_connection(context):
 ###############################################################
 #         Server cmds
 ###############################################################
-def cmd_server_namespaces(context):
+def cmd_server_namespaces(context, options):
     """
     Display namespaces in the current WBEMServer
     """
