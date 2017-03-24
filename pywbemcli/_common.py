@@ -20,9 +20,9 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import, unicode_literals
 
 import re
-import click
 import click_spinner
 from prompt_toolkit import prompt
+import click
 
 from pywbem import WBEMConnection, WBEMServer, CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
@@ -120,7 +120,7 @@ def pick_from_list(context, options, title):
         Title to display before selection
 
     Retries until either integer within range of options list is input
-    or user enter ctrl-c.
+    or user enter no value. Ctrl_C ends even the REPL.
 
     Returns: Index of selected item
 
@@ -138,7 +138,7 @@ def pick_from_list(context, options, title):
     while True:
         try:
             selection = int(prompt(
-                'Select one entry by index or Ctrl-C to exit command>'))
+                'Select an entry by index or hit enter to exit command>'))
             if selection >= 0 and selection <= index:
                 return selection
         except ValueError:
@@ -164,7 +164,7 @@ def is_classname(str_):
 
 def filter_namelist(regex, name_list, ignore_case=True):
     """
-    Filter out names in name_list that match compiled_regex.
+    Filter out names in name_list that do not match compiled_regex.
 
     Note that the regex may define a subset of the name string.  Thus,  regex:
         - CIM matches any name that starts with CIM
@@ -185,9 +185,9 @@ def filter_namelist(regex, name_list, ignore_case=True):
 
     compiled_regex = re.compile(regex, flags) if flags else re.compile(regex)
 
-    nl = [n for n in name_list for m in[compiled_regex.match(n)] if m]
+    new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
 
-    return nl
+    return new_list
 
 
 def _create_connection(server, namespace, user=None, password=None,
@@ -328,6 +328,9 @@ def parse_cim_namespace_str(uri, namespace=None):
 
     This differs from wbemuri in that it does not require quotes around
     value elements unless they include commas or quotation marks
+
+    Exceptions:
+        ValueError
     """
     # print('parse uri %s' % uri)
     host = None
