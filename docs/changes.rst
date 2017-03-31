@@ -33,6 +33,9 @@ Bug fixes
 
 * Fix issues with the create_instance function. It now processes scalar
   and array properties. Issue # 11
+* fix issue with the help_over file format.  It was output as .md file and
+  the resulting output could be viewed by only some tools (i.e. github
+  messed it up). Changed to display as a .rst file output. (see issue #27)
 
 
 Build, test, quality
