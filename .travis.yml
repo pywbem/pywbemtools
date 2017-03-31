@@ -14,6 +14,8 @@ python:
   - "3.6"
 
 # commands to install dependencies
+# added pip install --upgrade coverage below to correct problem in
+# issue 21 where python-coveralls installs old version of coverage
 install:
   - pip list
   - pip install --upgrade pip
@@ -21,6 +23,7 @@ install:
   - make develop
   - make install
   - pip install python-coveralls
+  - pip install --upgrade coverage
   - pip list
   - make clobber
 

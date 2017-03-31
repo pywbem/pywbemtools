@@ -10,6 +10,7 @@ pytest-cov # BSD
 mock # BSD
 requests-mock>=1.0 # Apache-2.0
 testfixtures # Apache-2.0
+coverage >=4.3 # Apache-2.0
 
 # Sphinx:
 # Note: The ordereddict package is a backport of collections.OrderedDict
