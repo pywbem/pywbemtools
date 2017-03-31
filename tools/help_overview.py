@@ -5,7 +5,7 @@ This is a simple tool to display the help for commands in pywbemcli.
 It depends on having a complete list of the commands and subcommands that
 are in the tool and simply executes the command and dislays the results
 
-The output normally is in markdown format but there is an internal flag
+The output normally is in restructuredTxt format but there is an internal flag
 to allow pure ascii output.
 
 This was written as a tool to review the pywbemcli commands and options largely
@@ -16,13 +16,25 @@ commands and subcommands.
 from __future__ import absolute_import, print_function
 import shlex
 from subprocess import Popen, PIPE
+try:
+    import textwrap
+    textwrap.indent  # pylint: disable=pointless-statement
+except AttributeError:  # undefined function (wasn't added until Python 3.3)
+    def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
+        """Indent locally define"""
+        padding = amount * ch
+        return ''.join(padding + line for line in text.splitlines(True))
+else:
+    def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
+        """Wrap textwrap function"""
+        return textwrap.indent(text, amount * ch)
 
 
 ERRORS = 0
 
 # Flag that allows displaying the data as pure text rather than markdown
 # format
-USE_MD = True
+USE_RST = True
 
 
 def execute_cmd(cmd_str, shell=False):
@@ -54,27 +66,36 @@ def execute_cmd(cmd_str, shell=False):
     return exitcode, std_out_str, std_err_str
 
 
-def md_headline(title, level):
+def rst_headline(title, level):
     """
-    Format a markdown header line based on the level argument
+    Format a markdown header line based on the level argument. The rst format
+    for headings is generally of the form
+    ====================
+    title for this thing
+    ====================
     """
-    level_char_list = ['=', '-']
+    level_char_list = ['#', '*', '=', '-', '^', '"']
     try:
         level_char = level_char_list[level]
     except IndexError:
         level_char = '='
 
-    return '\n%s\n%s\n' % (title, (level_char * len(title)))
+    return '\n%s\n%s\n%s\n' % (level_char * len(title),
+                               title,
+                               (level_char * len(title)))
 
 
-def print_md_verbatum_text(text_str):
+def print_rst_verbatum_text(text_str):
     """
     Print the text on input surrounded by the back quotes defining
     veratum text
     """
-    print('```')
-    print(text_str)
-    print('```')
+    print('::\n')
+    # indent text for rst. rst requires that block monospace test be
+    # indented and preceeded by line with just '::' and followed by
+    # empty line. This indents by two char the complete test_str except
+    # the first line
+    print('%s\n' % indent(text_str, 4))
 
 
 def help_cmd(cmd_str):
@@ -87,15 +108,15 @@ def help_cmd(cmd_str):
             help_cmd(cmd)
     else:
         command = 'pywbemcli %s --help' % (cmd_str)
-        if USE_MD:
-            print(md_headline(command, 0))
+        if USE_RST:
+            print(rst_headline(command, 1))
         else:
             print('%s\nPYWBEMCLI COMMAND: %s' % (('=' * 50), command))
 
         exitcode, out, err = execute_cmd(command)
 
-        if USE_MD:
-            print_md_verbatum_text(out)
+        if USE_RST:
+            print_rst_verbatum_text(out)
         else:
             print(out)
         if err:
@@ -109,7 +130,13 @@ def help_cmd(cmd_str):
 #
 #  List of the help commands
 #
-print('**Overview of pywbemcli help with the multiple subcommands***\n\n')
+print(rst_headline(
+    'Overview of pywbemcli help with the multiple subcommands', 0))
+
+print('This is a display of the output of the pywbemcli commands define in '
+    'this file. Each help output is presented as a section title with the '
+    'command as sent to pywbemcli followed by the ouput returned by '
+    'pywbemcli.'     )
 
 help_cmd("")
 help_cmd("class")
