@@ -80,6 +80,26 @@ def class_get(context, classname, **options):
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 
 
+@class_group.command('delete', options_metavar=CMD_OPTS_TXT)
+@click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True,)
+@click.option('-f', '--force', is_flag=True, required=False,
+              help='Force the delete request to be issued even if '
+              'there are instances in the server or subclasses to this class. '
+              ' The WBEM Server may still refuse the request.')
+@add_options(namespace_option)
+@click.pass_obj
+def class_delete(context, classname, **options):
+    """
+    Delete the class defined by CLASSNAME from the WBEM Server.
+    If the class has instances, the command is refused unless the
+    --force option is used.
+
+    WARNING: Removing classes from a WBEM Server can cause damage to the
+    server. Use this with caution.
+    """
+    context.execute_cmd(lambda: cmd_class_delete(context, classname, options))
+
+
 @class_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='classname', required=True)
 @click.argument('methodname', type=str, metavar='name', required=True)
@@ -511,6 +531,26 @@ def cmd_class_hierarchy(context, classname, options):
         # display the list of classes as a tree. The classname is the top
         # of the tree.
         display_class_tree(classes, classname)
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
+    display_class_tree(classes, classname)
+
+
+def cmd_class_delete(context, classname, options):
+    """Delete a class from the wbemserver repository"""
+
+    if options['namespace']:
+        classname = CIMClassName(classname, namespace=options['namespace'])
+
+    if not options['force']:
+        insts = context.conn.EnumerateInstanceNames(classname)
+        if len(insts) != 0:
+            raise click.ClickException('Ignored; instances exist')
+        # TODO test for subclasses
+
+    try:
+        context.conn.DeleteClass(classname)
+        click.echo('%s delete successful' % classname)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
