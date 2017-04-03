@@ -95,6 +95,9 @@ class ContainerMeta(type):
 
                 self.assertEqual(exitcode, 0, '%s: ExitCond Err, cmd="%s" '
                                  'exitcode %s' % (tname, command, exitcode))
+
+                # issue 21. The following generates a deprecation warning
+                # during the coverage test.
                 self.assertEqual(err, "", '%s stderr not empty. returned %s'
                                  % (tname, err))
                 for item in result_data:
