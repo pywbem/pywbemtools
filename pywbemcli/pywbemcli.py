@@ -38,12 +38,7 @@ from ._connection_repository import get_pywbemcli_servers
 __all__ = ['cli']
 
 
-# uses -h  and --help rather than just --help
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-# Display of options in usage line
-
-
+# pylint: disable=bad-continuation
 @click.group(invoke_without_command=True,
              options_metavar=GENERAL_OPTIONS_METAVAR)
 @click.option('-s', '--server', type=str, envvar=PywbemServer.server_envvar,
@@ -138,9 +133,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
-        if not name:
-            name = 'default'
+
         if server:
+            if not name:
+                name = 'default'
             pywbem_server = PywbemServer(server,
                                          default_namespace,
                                          name=name,
@@ -154,11 +150,16 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          verbose=verbose)
         else:
             if name:
-                pywbem_server = pywbemcli_servers[name]
+                if name in pywbemcli_servers:
+                    pywbem_server = pywbemcli_servers[name]
+                else:
+                    raise click.ClickException('%s named connection does not '
+                                               'exist' % name)
             elif 'default' in pywbemcli_servers:
                 pywbem_server = pywbemcli_servers['default']
             else:
-                raise click.ClickException('No defined connection')
+                raise click.ClickException('No defined connection. Use -s '
+                                           'option to define a connection')
 
     else:
         # Processing an interactive command.

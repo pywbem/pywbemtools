@@ -257,6 +257,7 @@ def cmd_connection_set(context, name):
         name = svr.name
     pywbemcli_servers = get_pywbemcli_servers()
     pywbemcli_servers[name] = svr
+    server_definitions_file_save()
 
     show_connection_information(context, context.pywbem_server)
 
