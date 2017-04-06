@@ -101,6 +101,8 @@ class ContainerMeta(type):
                 out, err = proc.communicate()
                 exitcode = proc.returncode
 
+                if exitcode != 0:
+                    print('exitcode %s, err %s' % (exitcode, err))
                 self.assertEqual(exitcode, 0, ('%s: ExitCode Err, cmd="%s" '
                                                'exitcode %s' %
                                                (test_name, command, exitcode)))
