@@ -23,6 +23,10 @@ from ._cmd_instance import *       # noqa: F403, F401
 from ._cmd_qualifier import *       # noqa: F403, F401
 from ._cmd_server import *       # noqa: F403, F401
 from ._cmd_connection import *   # noqa: F403, F401
+from ._common import *   # noqa: F403, F401
+from ._pywbem_server import *   # noqa: F403, F401
+from ._context_obj import *   # noqa: F403, F401
+from ._connection_repository import *   # noqa: F403, F401
 from .pywbemcli import *       # noqa: F403, F401
 from .config import *  # noqa: F403,F401
 

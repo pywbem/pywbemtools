@@ -62,13 +62,9 @@ doc_build_dir := build_doc
 # Directory where Sphinx conf.py is located
 doc_conf_dir := docs
 
-# Paper format for the Sphinx LaTex/PDF builder.
-# Valid values: a4, letter
-doc_paper_format := a4
-
 # Documentation generator command
 doc_cmd := sphinx-build
-doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_paper_size=$(doc_paper_format) .
+doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) .
 
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
@@ -90,7 +86,6 @@ check_py_files := \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(cli_package_name)/*.py) \
     $(wildcard tests/unit/*.py) \
-    $(wildcard tests/function/*.py) \
     $(wildcard docs/notebooks/*.py) \
 
 # Test log
@@ -137,7 +132,7 @@ help:
 .PHONY: develop
 develop:
 	pip install --upgrade pip
-	pip install -r dev-requirements.txt
+	pip install --upgrade -r dev-requirements.txt
 	@echo '$@ done.'
 
 .PHONY: build
@@ -224,7 +219,7 @@ test: $(test_log_file)
 .PHONY: clobber
 clobber: uninstall clean
 	rm -fv pylint.log flake8.log test_*.log
-	rm -Rfv $(doc_build_dir) htmlcov .tox $(coverage_html_dir)
+	rm -Rfv $(doc_build_dir) htmlcov .tox
 	rm -fv $(bdist_file) $(sdist_file) $(win64_dist_file)
 	@echo 'Done: Removed all build products to get to a fresh state.'
 	@echo '$@ done.'
@@ -295,7 +290,7 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 	mv -f $@.tmp $@
 	@echo 'Done: Created Flake8 log file: $@'
 
-$(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  tests/function/*.py coveragerc
+$(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  coveragerc
 	rm -fv $@
 	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) --cov-config .coveragerc --cov-report=html $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@

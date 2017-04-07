@@ -29,7 +29,7 @@ import click
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMInstanceName, Uint32
-from pywbemcli._common import parse_cim_namespace_str, _create_connection, \
+from pywbemcli._common import parse_cim_namespace_str, \
     filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
     create_ciminstance, compare_instances, resolve_propertylist
 
@@ -86,20 +86,6 @@ class ParseWbemUriTest(unittest.TestCase):
         self.assertEqual(inst_name.get('abc'), 3)
         self.assertTrue(inst_name.has_key('def'))  # noqa: W601
         self.assertEqual(inst_name.get('def'), 'blah')
-
-
-# server, namespace, user=None, password=None, cert_file=None, key_file=None,
-# ca_certs=None,  no_verify_cert=False
-class CreateConnectionTest(unittest.TestCase):
-    """Test the create_connection function"""
-
-    def test_simple(self):
-        """Test simple creation of a connection"""
-        url = 'http://localhost'
-        conn = _create_connection(url, namespace='root/cimvxx', user='fred',
-                                  password='blah')
-        self.assertEqual(conn.url, url)
-        self.assertEqual(conn.default_namespace, 'root/cimvxx')
 
 
 class FilterNamelistTest(unittest.TestCase):
@@ -582,8 +568,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
     # Test compare with errors
 
     # test display functionality including table
-
-    # test Context class
 
 
 if __name__ == '__main__':

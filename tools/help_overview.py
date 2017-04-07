@@ -172,7 +172,15 @@ help_cmd("server namespaces")
 help_cmd("server interop")
 help_cmd("server profiles")
 
+help_cmd("connection")
 help_cmd("connection show")
+help_cmd("connection export")
+help_cmd("connection show")
+help_cmd("connection set")
+help_cmd("connection test")
+help_cmd("connection select")
+help_cmd("connection create")
+help_cmd("connection delete")
 
 if ERRORS != 0:
     print('%s ERRORS encountered in output' % ERRORS)

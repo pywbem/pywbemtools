@@ -20,16 +20,14 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import, unicode_literals
 
 import re
-import click_spinner
 from prompt_toolkit import prompt
 import click
 
-from pywbem import WBEMConnection, WBEMServer, CIMInstanceName, CIMInstance, \
+from pywbem import CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
-from .config import DEFAULT_CONNECTION_TIMEOUT
 from ._asciitable import print_ascii_table, fold_line
 
 
@@ -135,6 +133,7 @@ def pick_from_list(context, options, title):
     for str_ in options:
         index += 1
         print('%s: %s' % (index, str_))
+    selection = None
     while True:
         try:
             selection = int(prompt(
@@ -188,101 +187,6 @@ def filter_namelist(regex, name_list, ignore_case=True):
     new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
 
     return new_list
-
-
-def _create_connection(server, namespace, user=None, password=None,
-                       cert_file=None, key_file=None, ca_certs=None,
-                       no_verify_cert=False, debug=False):
-    """
-    Initiate a WBEB connection, via PyWBEM api. Arguments for
-    the request are the parameters required by the pywbem
-    WBEMConnection constructor.
-    See the pywbem WBEMConnection class for more details on the parameters.
-
-      Parameters:
-
-        server: (string):
-          uri of the WBEMServer to which connection is being made including
-          scheme, hostname/IPAddress, and optional port
-
-        namespace: (string):
-          Namespace which will be the default namespace for the connection.
-
-        user: (string):
-            Optional user name(credential) for the connection.
-
-        password: (string):
-            Optional password for the connection
-
-        cert_file: (string):
-            Optional cert_file path and name for the connection.
-
-        key_file: (string):
-            Optional key_file for the connection.
-
-        ca_certs: (string):
-            Optional ca_certs for the connection
-
-        no_verify_certs: (bool):
-            Optional boolean that determines if client verifys server
-            certificate.  If None or False, No verification is performed.
-
-        debug: (bool)
-            Optional boolean that is passed to connection. This attribute
-            defines whether the server saves output and input packets.
-            This functionality is NOT a feature of the WBEMConnection
-            constructor but is set after the connection is created.
-
-       Return:
-            pywbem WBEMConnection object that can be used to execute
-            other pywbem cim_operation requests
-
-       Exception:
-           ValueError: if server paramer is invalid or other issues with
-           the input values
-    """
-
-    if server[0] == '/':
-        url = server
-
-    elif re.match(r"^https{0,1}://", server) is not None:
-        url = server
-
-    elif re.match(r"^[a-zA-Z0-9]+://", server) is not None:
-        ValueError('Invalid scheme on server argument. %s'
-                   ' Use "http" or "https"' % server)
-
-    else:
-        url = '%s://%s' % ('https', server)
-
-    creds = None
-
-    if key_file is not None and cert_file is None:
-        ValueError('keyfile option requires certfile option')
-
-    if user is not None or password is not None:
-        creds = (user, password)
-
-    timeout = DEFAULT_CONNECTION_TIMEOUT
-    if timeout is not None and (timeout < 0 or timeout > 300):
-        ValueError('timeout option(%s) out of range %s to %s sec' %
-                   (timeout, 0, 300))
-
-    # if client cert and key provided, create dictionary for wbem connection
-    x509_dict = None
-    if cert_file is not None:
-        x509_dict = {"cert_file": cert_file}
-        if key_file is not None:
-            x509_dict.update({'key_file': key_file})
-    no_verify_cert = True
-    ca_certs = None
-    conn = WBEMConnection(url, creds, default_namespace=namespace,
-                          no_verification=no_verify_cert,
-                          x509=x509_dict, ca_certs=ca_certs,
-                          timeout=timeout)
-
-    conn.debug = debug
-    return conn
 
 
 def objects_sort(objects):
@@ -688,7 +592,6 @@ def display_table(objects, include_classes=False,
     if include_classes:
         header_line.append("classname")
     header_line.extend(prop_names)
-    lines.append(header_line)
 
     title = objects[0].classname
 
@@ -725,7 +628,8 @@ def display_table(objects, include_classes=False,
             line.append(val_str)
 
         lines.append(line)
-    print_ascii_table(lines, title=title, inner=True, outer=True)
+    print_ascii_table(lines, title=title, header=header_line,
+                      inner=True, outer=True)
 
 
 def _scalar_value(type_, value_, max_width=None):
@@ -780,152 +684,3 @@ def _array_value(type_, value_, fold=False, max_cell_width=None):
     str_ = enum_value(type_, value_, sep, max_cell_width)
 
     return str_
-
-
-class Context(object):
-    """
-        Manage the click context object. This is the object that communicates
-        between the cli commands and command groups. It contains the
-        information that is common to the multiple commands
-    """
-
-    def __init__(self, ctx, server, default_namespace, user, password, timeout,
-                 noverify, certfile, keyfile, output_format, verbose, debug,
-                 conn, wbem_server):
-        self._server = server
-        self._default_namespace = default_namespace
-        self._user = user
-        self._password = password
-        self._timeout = timeout
-        self._noverify = noverify
-        self._certfile = certfile
-        self._keyfile = keyfile
-        self._output_format = output_format
-        self._verbose = verbose
-        self._debug = debug
-        self._conn = conn
-        self._wbem_server = wbem_server
-        self._spinner = click_spinner.Spinner()
-
-    @property
-    def server(self):
-        """
-        :term:`string`: Scheme with Hostname or IP address of the WBEM Server.
-        """
-        return self._server
-
-    @property
-    def user(self):
-        """
-        :term:`string`: Username on the WBEM Server.
-        """
-        return self._user
-
-    @property
-    def output_format(self):
-        """
-        :term:`string`: Output format to be used.
-        """
-        return self._output_format
-
-    @property
-    def default_namespace(self):
-        """
-        :term:`string`: Namespace to be used as default  or requests.
-        """
-        return self._default_namespace
-
-    @property
-    def timeout(self):
-        """
-        :term: `int`: Connection timeout to be used on requests in seconds
-        """
-        return self._timeout
-
-    @property
-    def certfile(self):
-        """
-        :term: `int`: Connection timeout to be used on requests in seconds
-        """
-        return self._certfile
-
-    @property
-    def keyfile(self):
-        """
-        :term: `int`: Connection timeout to be used on requests in seconds
-        """
-        return self._keyfile
-
-    @property
-    def noverify(self):
-        """
-        :term: `bool`: Connection server verfication flag. If True
-        server cert not verified during connection.
-        """
-        return self._noverify
-
-    @property
-    def conn(self):
-        """
-        :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
-        """
-        # TODO. We always create wbemserver so not need wbemconnection
-        # object in context
-        return self._conn
-
-    @property
-    def wbem_server(self):
-        """
-        :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
-        requests.
-        """
-        return self._wbem_server
-
-    @property
-    def password(self):
-        """
-        :term:`string`: password to be used instead of logging on, or `None`.
-        """
-        return self._password
-
-    @property
-    def spinner(self):
-        """
-        :class:`~click_spinner.Spinner` object.
-        """
-        return self._spinner
-
-    @property
-    def verbose(self):
-        """
-        :bool:` '~click.verbose.
-        """
-        return self._verbose
-
-    @property
-    def debug(self):
-        """
-        :bool:` '~click.debug.
-        """
-        return self._debug
-
-    def execute_cmd(self, cmd):
-        """
-        Call the cmd executor defined by cmd with the spinner
-        """
-        if self._conn is None:
-            if self._server is None:
-                raise click.ClickException("No WBEM Server defined")
-            # TODO We do not cover the ca_certs parameter of wbemconnection
-            self._conn = _create_connection(self.server, self.default_namespace,
-                                            user=self.user,
-                                            password=self.password,
-                                            cert_file=self.certfile,
-                                            key_file=self.keyfile,
-                                            no_verify_cert=self.noverify)
-            self._wbem_server = WBEMServer(self.conn)
-        self.spinner.start()
-        try:
-            cmd()
-        finally:
-            self.spinner.stop()

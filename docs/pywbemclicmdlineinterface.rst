@@ -73,8 +73,8 @@ line arguments that would follow the ``pywbemcli`` command when used in
     . . . <MOF output of the class CIM_System from the WBEM Server>
     > :q
 
-For example, the pywbemcli shell command ``class get CIM_System`` in the example above has the
-same effect as the standalone command::
+For example, the pywbemcli shell command ``class get CIM_System`` in the example
+above has the same effect as the standalone command::
 
     $ pywbemcli -s http://localhost -u username class get CIM_System
     Enter password: <password>
@@ -82,7 +82,9 @@ same effect as the standalone command::
 
 TODO: This one is incorrect today
 However, the pywbemcli shell will prompt for a password only once during its
-invocation, while the standalone command will prompt for a password every time.
+invocation, while the standalone command will prompt for a password every time
+it is executed
+.
 See also `Environment variables and avoiding password prompts`_.
 
 The internal commands ``:?``, ``:h``, or ``:help`` display general help
@@ -242,11 +244,12 @@ command line options for specifying the general options to be used including:
 
 * PYWBEMCLI_SERVER - Corresponds to the general input option --server
 * PYWBEM_CLI_DEFAULT_NAMESPACE - Corresponds to the general input option  --namespace
-* PYWBEMCLI_USER - Corresponds to the general input opiton --user
-* PYWBEMCLI_PASSWORD - Corresponds to the general input opiton --password
-* PYWBEWCLI_NOVERIFY - Corresponds to the general input opiton -noverify
-* PYWBEMCLI_CERTFILE - Corresponds to the general input opiton --cerrtfile
-* PYWBEMCLI_KEYFILE - Corresponds to the general input opiton --keyfile
+* PYWBEMCLI_USER - Corresponds to the general input option --user
+* PYWBEMCLI_PASSWORD - Corresponds to the general input option --password
+* PYWBEWCLI_NOVERIFY - Corresponds to the general input option -noverify
+* PYWBEMCLI_CERTFILE - Corresponds to the general input option --cerrtfile
+* PYWBEMCLI_KEYFILE - Corresponds to the general input option --keyfile
+* PYWBEMCLI_KEYFILE - Corresponds to the general input option --cacerts
 
 If these environment variables are set, the corresponding general option on the
 command line is not required and the value of the environment variable is
@@ -260,10 +263,16 @@ http://localhost::
 
 If the WBEM operations performed by a particular pywbemcli command require a
 password, the password is prompted for if the --user option is set (in both
-modes of operation)::
+modes of operation) and the --pasword option is not set::
 
-      $ pywbemcli -s http://localhost -n root/cimv2 -u username class get
+      $ pywbemcli -s http://localhost -n root/cimv2 -u user class get
       Enter password: <password>
+      . . . <The display output from get class>
+
+If both the --user and --password options are set, the command is executed
+without a password prompt::
+
+      $ pywbemcli -s http://localhost -n root/cimv2 -u user -p blah class get
       . . . <The display output from get class>
 
 If the operations performed by a particular pywbemcli command do not
@@ -274,18 +283,17 @@ require a password or no user is supplied, no password is prompted for::
 
 For script integration, it is important to have a way to avoid the interactive
 password prompt. This can be done by storing the password string in an
-environment variable.
+environment variable or entering it on the command line.
 
-TODO: This is frought with issues and we need to change it
 
-The ``pywbemcli`` command supports a ``connection save`` (sub-)command that
+The ``pywbemcli`` command supports a ``connection export`` (sub-)command that
 outputs the (bash) shell commands to set all needed environment variables::
 
       $ pywbemcli -s http://localhost -n root/cimv2 -u fred
       Enter password: <password>
       export PYWBEMCLI_SERVER=http://localhost
       export PYWBEMCLI_NAMESPACE=root/cimv2
-      export PYWBEMCLI_CONNECTION_NAME=TODO
+
 
 This ability can be used to set those environment variables and thus to persist
 the connection name in the shell environment, from where it will be used in
