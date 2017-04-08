@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Common Functions applicable across multiple components of pywbemcli
+Click Context object. This is the common object for click command calls
+
+It contains data that is set in the top level and used in subcommand calls
 """
 
 from __future__ import absolute_import, unicode_literals
