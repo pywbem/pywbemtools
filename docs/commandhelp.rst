@@ -15,10 +15,16 @@ pywbemcli  --help
     
       Command line browser for WBEM Servers. This cli tool implements the
       CIM/XML client APIs as defined in pywbem to make requests to a WBEM
+      server. This browser uses subcommands to      * Explore the
+      characteristics of WBEM Servers based on using the       pywbem client
+      APIs.  It can manage/inspect CIM_Classes and       CIM_instanceson the
       server.
     
+          * In addition it can inspect namespaces and other server information
+            and inspect and manage WBEM indication subscriptions.
+    
       The options shown above that can also be specified on any of the
-      (sub-)commands.
+      (sub-)commands as well as the command line.
     
     Options:
       -s, --server TEXT               Hostname or IP address with scheme of the
@@ -116,7 +122,6 @@ pywbemcli class --help
       get           get and display a single CIM class from the...
       hierarchy     Display class inheritance hierarchy as a...
       invokemethod  Invoke the class method named methodname in...
-      names         Get and display classnames from the...
       references    Get the reference classes for the CLASSNAME.
 
 
@@ -178,37 +183,13 @@ pywbemcli class names --help
 
 ::
 
-    Usage: pywbemcli class names [COMMAND-OPTIONS] CLASSNAME
-    
-      Get and display classnames from the WBEMServer.
-    
-      Enumerates the classnames from the WBEMServer starting either at the top
-      of the class hierarchy or from  the position in the class hierarch defined
-      by the optional`classname` argument if provided.
-    
-      The output format is normally a list of the classnames
-    
-      This command corresponds to `class enumerate  -o`
-    
-      The deepinheritance option defines whether the complete hiearchy is
-      retrieved or just the next level in the hiearchy.
-    
-    Options:
-      -d, --deepinheritance           Return complete subclass hiearchy for this
-                                      class.
-      -d, --deepinheritance           Return complete subclass hiearchy for this
-                                      class.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
-      -c, --includeclassorigin        Include classorigin in the result.
-      -s, --sort                      Sort into alphabetical order by classname.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
-      --help                          Show this message and exit.
 
 
+**STDER:** Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
+
+Error: No such command "names".
+
+**ERROR:** cmd `pywbemcli class names --help`
 
 ********************************
 pywbemcli class enumerate --help
@@ -1097,3 +1078,4 @@ pywbemcli connection delete --help
       --help  Show this message and exit.
 
 
+1 ERRORS encountered in output

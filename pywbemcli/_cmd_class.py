@@ -118,36 +118,6 @@ def class_invokemethod(context, classname, methodname, **options):
                                                        options))
 
 
-@class_group.command('names', options_metavar=CMD_OPTS_TXT)
-@click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False,)
-@click.option('-d', '--deepinheritance', is_flag=True, required=False,
-              help='Return complete subclass hiearchy for this class.')
-@add_options(deepinheritance_option)
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
-@add_options(sort_option)
-@add_options(namespace_option)
-@click.pass_obj
-def class_names(context, classname, **options):
-    """
-    Get and display classnames from the WBEMServer.
-
-    Enumerates the classnames from the WBEMServer starting
-    either at the top of the class hierarchy or from  the position in the
-    class hierarch defined by the optional`classname` argument if provided.
-
-    The output format is normally a list of the classnames
-
-    This command corresponds to `class enumerate  -o`
-
-    The deepinheritance option defines whether the complete hiearchy is
-    retrieved or just the next level in the hiearchy.
-
-
-    """
-    context.execute_cmd(lambda: cmd_class_names(context, classname, options))
-
-
 @class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False)
 @click.option('-d', '--deepinheritance', is_flag=True, required=False,
@@ -347,21 +317,6 @@ def cmd_class_invokemethod(context, classname, methodname, options):
             params[name] = (name, value_)
 
         context.conn.InvokeMethod(classname, methodname, params)
-
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-
-def cmd_class_names(context, classname, options):
-    """ Execute the EnumerateClassNames operation."""
-    try:
-        result_classnames = context.conn.EnumerateClassNames(
-            ClassName=classname,
-            namespace=options['namespace'],
-            DeepInheritance=options['deepinheritance'])
-        if options['sort']:
-            result_classnames.sort()
-        display_cim_objects(context, result_classnames, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
