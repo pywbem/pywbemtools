@@ -51,29 +51,33 @@ def server_definitions_create_new(name, svr_definition):
     """Add a new connection to the repository and save it"""
     pywbemcli_servers = get_pywbemcli_servers()
     pywbemcli_servers[name] = svr_definition
-    server_definitions_file_save()
+    global CONNECTIONS_LOADED
+    CONNECTIONS_LOADED = True
+    server_definitions_file_save(pywbemcli_servers)
 
 
 def server_definitions_delete(name):
     """Add a new connection to the repository and save it"""
     pywbemcli_servers = get_pywbemcli_servers()
     del pywbemcli_servers[name]
-    server_definitions_file_save()
+    server_definitions_file_save(pywbemcli_servers)
 
 
-def server_definitions_file_save():
+def server_definitions_file_save(pywbemcli_servers):
     """Dump the connections pickle file if one has been loaded.
     If the dictionary is empty, it attempts to delete the file.
     """
+    print('enter connection save %s' % CONNECTIONS_LOADED)
+
     if CONNECTIONS_LOADED:
-        if len(PYWBEMCLI_SERVERS) == 0:
+        print('connections loaded')
+        if len(pywbemcli_servers) != 0:
             if os.path.isfile(CONNECTIONS_FILE):
                 os.remove(CONNECTIONS_FILE)
             # clear the wbem_server attribute
-            dict_copy = copy.deepcopy(PYWBEMCLI_SERVERS)
+            dict_copy = copy.deepcopy(pywbemcli_servers)
             for name, svr in dict_copy.iteritems():
                 # TODO we are accessing protected member here
                 svr._wbem_server = None
-
             with open(CONNECTIONS_FILE, "wb") as fh:
                 pickle.dump(dict_copy, fh)
