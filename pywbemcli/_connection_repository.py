@@ -70,7 +70,6 @@ def server_definitions_file_save(pywbemcli_servers):
     print('enter connection save %s' % CONNECTIONS_LOADED)
 
     if CONNECTIONS_LOADED:
-        print('connections loaded')
         if len(pywbemcli_servers) != 0:
             if os.path.isfile(CONNECTIONS_FILE):
                 os.remove(CONNECTIONS_FILE)
