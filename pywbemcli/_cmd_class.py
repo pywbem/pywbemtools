@@ -522,17 +522,16 @@ def cmd_class_hierarchy(context, classname, options):
             classname = None
 
         else:
-            # get the complete subclass hiearchy
+            # get the complete subclass hierarchy
             classes = context.conn.EnumerateClasses(
                 ClassName=classname,
                 namespace=options['namespace'],
                 DeepInheritance=True)
-        # display the list of classes as a tree. The classname is the top
-        # of the tree.
-        display_class_tree(classes, classname)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
+    # display the list of classes as a tree. The classname is the top
+    # of the tree.
     display_class_tree(classes, classname)
 
 
