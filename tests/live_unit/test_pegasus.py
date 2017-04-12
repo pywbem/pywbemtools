@@ -29,29 +29,37 @@ import shlex
 import six
 
 
-# default host
-HOST = 'http://localhost'
+class ClientTest(unittest.TestCase):
+    """Top level container. Performs any setup and teardown"""
 
-VERBOSE = False
+    def setUp(self):
+        """Setup the test
+        """
+        self.host = 'http://localhost'
+        self.verbose = False
 
-class TestsContainer(unittest.TestCase):
+
+class TestsContainer(ClientTest):
     """Container class for all tests"""
 
     def execute_cmd(self, cmd_str, shell=None):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
-        if VERBOSE:
+        if self.verbose:
             print('cmd %s' % cmd_str)
         args = shlex.split(cmd_str)
-        if VERBOSE:
+        if self.verbose:
             print('args %s' % args)
         proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
-        std_out_str, std_err_str = proc.communicate()
+        std_out, std_err = proc.communicate()
         exitcode = proc.returncode
-        if VERBOSE:
-            print('rtn %s\n%s\n%s' % (std_out_str, std_err_str, exitcode))
+        if six.PY3:
+            std_out = std_out.decode()
+            std_err = std_err.decode()
+        if self.verbose:
+            print('rtn %s\n%s\n%s' % (std_out, std_err, exitcode))
 
         # return tuple of exitcode, stdout, stderr
-        return exitcode, std_out_str, std_err_str
+        return exitcode, std_out, std_err
 
     def assert_not_found(self, regex, test_str):
         """ Test of find regex on multiline string.
@@ -96,17 +104,16 @@ class ClassTests(TestsContainer):
 
     def class_cmd(self, params):
         """Adds the cmd name prefix and executes"""
-        cmd = 'pywbemcli -s %s class %s' % (HOST, params)
+        cmd = 'pywbemcli -s %s class %s' % (self.host, params)
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
     def test_get_simple(self):
         """ """
-        print('get_simple')
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement')
 
         self.assertEqual(exitcode, 0)
-        self.assertEqual(err == '')
+        self.assertEqual(err, '', 'Expect no std_err. Found %s' % err)
         self.assert_found('CIM_ManagedElement', out)
 
     def test__get_localonly(self):
@@ -150,12 +157,21 @@ class ClassTests(TestsContainer):
         self.assert_found('class CIM_ManagedElement', out)
         self.assert_not_found(['InstanceID', 'Caption'], out)
 
+    def test_simple_invoke(self):
+        """Execute simple invoke method defined in pegasus"""
+        exitcode, out, err = self.class_cmd(
+            'invokemethod Test_IndicationProviderClass '
+            'SendTestIndicationsCount -p indicationSendCount=0 '
+            ' -n test/TestProvider')
+        self.assertEqual(exitcode, 0)
+
 
 # TODO finish this based on the test_ops in the tools directory
 
 # cmd "class get CIM_ManagedElement -c"
 # cmd "class get CIM_ManagedElement --includeclassorigin"
 # cmd "class get CIM_ManagedElement --namespace root/PG_Interop"
+# cmd "class get CIM_ManagedElement - root/PG_Interop"
 
 # TODO create tests for qualifier, server
 
@@ -164,7 +180,7 @@ class InstanceTests(TestsContainer):
 
     def instance_cmd(self, params):
         """Adds the instance cmd name prefix and executes"""
-        cmd = 'pywbemcli -s %s instance %s' % (HOST, params)
+        cmd = 'pywbemcli -s %s instance %s' % (self.host, params)
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
@@ -185,7 +201,7 @@ class InstanceTests(TestsContainer):
         self.assert_not_found('CreationClassName', out)
 
     def test_get_simple(self):
-        """ """
+        """Execute simple get of known instance """
         exitcode, out, err = self.instance_cmd(
             'get PyWBEM_Person.CreationClassname=PyWBEM_Person,Name=Bob')
 
@@ -264,7 +280,7 @@ class InstanceTests(TestsContainer):
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property BlahBool=True,False')
         print('err %s' % err)
-        self.assertEqual(exitcode, 1)        
+        self.assertEqual(exitcode, 1)
 
 
 if __name__ == '__main__':

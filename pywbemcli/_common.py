@@ -408,7 +408,7 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
         except KeyError as ke:
             raise click.ClickException('Error: property name %s not in class %s'
                                        '. Exception %s' %
-                                       (cim_class.classname, name, ke))
+                                       (name, cim_class.classname, ke))
 
         except ValueError as ve:
             raise click.ClickException('Error: property  %s value %s cannot be'

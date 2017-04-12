@@ -60,8 +60,9 @@ class ConnectionRepositoryTest(unittest.TestCase):
 
     def do_test(self, command, err=None, result_regex=None):
         """
-        Execute the command defined.  If err is not none, confirm that
-        error received.
+        Execute the command defined.  If err is not None, confirm that
+        error received.  If result_regex is not None, test the response
+        against the list of regex entries
         Return stdout
         """
         args = shlex.split(command)
