@@ -138,7 +138,7 @@ print('This is a display of the output of the pywbemcli commands define in '
     'command as sent to pywbemcli followed by the ouput returned by '
     'pywbemcli.'     )
 
-help_cmd("repl")ma
+help_cmd("repl")
 
 help_cmd("")
 help_cmd("class")
