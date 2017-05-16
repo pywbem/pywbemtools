@@ -34,9 +34,6 @@ from pywbemcli._connection_repository import CONNECTIONS_FILE
 SCRIPT_DIR = os.path.dirname(__file__)
 REPO_FILE = os.path.join(SCRIPT_DIR, CONNECTIONS_FILE)
 
-# TODO ks remove the print statements in some of the tests after we do
-# correct persistence
-
 
 class ConnectionRepositoryTest(unittest.TestCase):
     """
@@ -47,7 +44,6 @@ class ConnectionRepositoryTest(unittest.TestCase):
         """
         Setup for the test
         """
-        print('test file is %s' % REPO_FILE)
         if os.path.isfile(REPO_FILE):
             os.remove(REPO_FILE)
 
@@ -105,23 +101,23 @@ class ConnectionRepositoryTest(unittest.TestCase):
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection create blah http://junkhost',
                            err=False, result_regex=['blah', 'http://junkhost'])
-        print(out)
 
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection list',
                            err=False, result_regex=['blah', 'http://junkhost'])
-        print(out)
 
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection delete blah',
                            err=False,)
-        print('Did delete out = %s' % out)
 
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection list',
-                           err=False,)
-        print('list after delete\n%s' % out)
-        # self.assertEqual(findall('blah', out), [])
+                           err=False, result_regex=['default',
+                                                    'http://localhost',
+                                                    'User: None'])
+
+        # TODO this can be removed when correct persistence installed.
+        print('test_create_delete stdout result:\n%s' % out)
 
 
 if __name__ == '__main__':

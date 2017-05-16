@@ -40,10 +40,13 @@ class ContextObj(object):
         information that is common to the multiple commands
     """
     # pylint: disable=unused-argument
-    def __init__(self, ctx, pywbem_server, output_format, verbose):
+    def __init__(self, ctx, pywbem_server, output_format, use_pull,
+                 pull_max_cnt, verbose):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
+        self._pull_max_cnt = pull_max_cnt
+        self._use_pull = use_pull
         self._verbose = verbose
         self._spinner = click_spinner.Spinner()
         if not isinstance(pywbem_server, PywbemServer):
@@ -59,6 +62,22 @@ class ContextObj(object):
         :term:`string`: Output format to be used.
         """
         return self._output_format
+
+    @property
+    def use_pull(self):
+        """
+        :term:`string`: Choice of whether pull, traditional or either type
+        of operation is to be used for the instance enumerates, references,
+        or associator commands.
+        """
+        return self._use_pull
+
+    @property
+    def max_pull_cnt(self):
+        """
+        :term:`string`: Maximum number of objects to be returne for pull op.
+        """
+        return self._pull_max_cnt
 
     @property
     def conn(self):

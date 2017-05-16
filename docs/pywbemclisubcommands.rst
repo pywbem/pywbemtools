@@ -98,7 +98,7 @@ The ``pywbemcli`` command includes a number of general subcommand groups as foll
   * **invokemethod** to invoke a method defined for the class argument.
 
 * The **qualifier** group defines commands that act on CIMQualifierDeclarations 
- including:
+  including:
  
   * **get** to get a single qualifier declaration and display in the defined format.
   * **enumerate** to enumerate qualifierDeclarations within the

@@ -28,6 +28,7 @@ else:
     def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
         """Wrap textwrap function"""
         return textwrap.indent(text, amount * ch)
+import six
 
 
 ERRORS = 0
@@ -59,11 +60,15 @@ def execute_cmd(cmd_str, shell=False):
     args = shlex.split(cmd_str)
 
     proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
-    std_out_str, std_err_str = proc.communicate()
+    std_out, std_err = proc.communicate()
     exitcode = proc.returncode
 
+    if six.PY3:
+        std_out = std_out.decode()
+        std_err = std_err.decode()
+
     # return tuple of exitcode, stdout, stderr
-    return exitcode, std_out_str, std_err_str
+    return exitcode, std_out, std_err
 
 
 def rst_headline(title, level):
@@ -133,54 +138,67 @@ def help_cmd(cmd_str):
 print(rst_headline(
     'Overview of pywbemcli help with the multiple subcommands', 0))
 
-print('This is a display of the output of the pywbemcli commands define in '
-    'this file. Each help output is presented as a section title with the '
-    'command as sent to pywbemcli followed by the ouput returned by '
-    'pywbemcli.'     )
+print('Displays the output of the pywbemcli commands -- help.'
+      'Each help output is presented as a section with the '
+      'command as sent to pywbemcli followed by the ouput returned by '
+      'pywbemcli.')
 
-help_cmd("repl")
-
+# list of subcommands
+# Since the Display for each level presents the subcommands in alphebetical
+# order, this list is also in alphabetical order
 help_cmd("")
 help_cmd("class")
-help_cmd("class get")
-help_cmd("class invokemethod")
-help_cmd("class enumerate")
 help_cmd("class associators")
+help_cmd("class delete")
+help_cmd("class enumerate")
+help_cmd("class find")
+help_cmd("class get")
+help_cmd("class hierarchy")
+help_cmd("class invokemethod")
+help_cmd("class references")
+
 help_cmd("class references")
 help_cmd("class find")
 help_cmd("class hierarchy")
 
-help_cmd("instance get")
-help_cmd("instance delete")
+help_cmd("connection")
+help_cmd("connection create")
+help_cmd("connection delete")
+help_cmd("connection export")
+help_cmd("connection list")
+help_cmd("connection set")
+help_cmd("connection select")
+help_cmd("connection show")
+help_cmd("connection test")
+
+help_cmd("help")
+
+help_cmd("instance")
+help_cmd("instance associators")
+help_cmd("instance count")
 help_cmd("instance create")
+help_cmd("instance delete")
+help_cmd("instance enumerate")
+help_cmd("instance get")
 help_cmd("instance invokemethod")
 help_cmd("instance query")
-help_cmd("instance enumerate")
-help_cmd("instance count")
 help_cmd("instance references")
-help_cmd("instance associators")
 
 help_cmd("qualifier")
 help_cmd("qualifier enumerate")
 help_cmd("qualifier get")
 
+help_cmd("repl")
+
 help_cmd("server")
 help_cmd("server brand")
 help_cmd("server connection")
 help_cmd("server info")
-help_cmd("server namespaces")
 help_cmd("server interop")
+help_cmd("server namespaces")
 help_cmd("server profiles")
+help_cmd("server test_pull")
 
-help_cmd("connection")
-help_cmd("connection show")
-help_cmd("connection export")
-help_cmd("connection show")
-help_cmd("connection set")
-help_cmd("connection test")
-help_cmd("connection select")
-help_cmd("connection create")
-help_cmd("connection delete")
 
 if ERRORS != 0:
     print('%s ERRORS encountered in output' % ERRORS)

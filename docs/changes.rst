@@ -15,7 +15,7 @@ contains the `master` branch up to this commit:
    :revisions: 1
 
 
-pywbemcli v0.1.0.dev0
+pywbemcli v0.5.0.dev0
 ---------------------
 
 Released: Not yet

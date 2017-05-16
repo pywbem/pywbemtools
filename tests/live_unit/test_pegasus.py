@@ -280,6 +280,38 @@ class InstanceTests(TestsContainer):
         print('err %s' % err)
         self.assertEqual(exitcode, 1)
 
+    def test_references(self):
+        exitcode, out, err = self.instance_cmd(
+            'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
+            'Name=Bob')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found('instance of PyWBEM_MemberOfPersonCollection', out)
+
+    def test_reference_paths(self):
+        exitcode, out, err = self.instance_cmd(
+            'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
+            'Name=Bob -o')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found(':PyWBEM_MemberOfPersonCollection.Member', out)
+
+    def test_associators(self):
+        exitcode, out, err = self.instance_cmd(
+            'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
+            'Name=Bob')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found('instance of PyWBEM_PersonCollection', out)
+
+    def test_associator_paths(self):
+        exitcode, out, err = self.instance_cmd(
+            'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
+            'Name=Bob -o')
+
+        self.assertEqual(exitcode, 0)
+        self.assert_found(':PyWBEM_PersonCollection.InstanceID', out)  
+
 
 if __name__ == '__main__':
     unittest.main()

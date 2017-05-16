@@ -146,6 +146,22 @@ commands::
                                       PYWBEMCLI_KEYFILE environment variable).
       -o, --output-format [mof|xml|table|csv|text]
                                       Output format (Default: mof).
+      --use-pull_ops [yes|no|either]  Determines whether the pull operations are
+                                      used forthe EnumerateInstances,
+                                      associatorinstances,referenceinstances, and
+                                      ExecQuery operations. yes means that pull
+                                      will be used and if the server does not
+                                      support pull, the operation will fail. No
+                                      choice forces pywbemcli to try only the
+                                      traditional non-pull operations. either
+                                      allows pywbem to try both pull and then
+                                      traditional operations. This choice is
+                                      acomplished by using the Iter... operations
+                                      as the underlying pywbem api call.  The
+                                      default is either.
+      --pull-max-cnt INTEGER          MaxObjectCount of objects to be returned if
+                                      pull operations are used. This must be  a
+                                      positive non-zero integer. Default is 1000.                                     
       -v, --verbose                   Display extra information about the
                                       processing.
       --version                       Show the version of this command and exit.
@@ -250,6 +266,8 @@ command line options for specifying the general options to be used including:
 * PYWBEMCLI_CERTFILE - Corresponds to the general input option --cerrtfile
 * PYWBEMCLI_KEYFILE - Corresponds to the general input option --keyfile
 * PYWBEMCLI_KEYFILE - Corresponds to the general input option --cacerts
+* PYWBEMCLI_USE_PULL - corresponds to the general input option use_pull_ops
+* PYWBEMCLI_PULL_MAX_CNT - corresponds to the general input options max_object_cnt
 
 If these environment variables are set, the corresponding general option on the
 command line is not required and the value of the environment variable is

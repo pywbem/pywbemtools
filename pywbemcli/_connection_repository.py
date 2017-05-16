@@ -66,8 +66,8 @@ def server_definitions_delete(name):
 def server_definitions_file_save(pywbemcli_servers):
     """Dump the connections pickle file if one has been loaded.
     If the dictionary is empty, it attempts to delete the file.
+    This is a temporary solution to persisting connection information.
     """
-    print('enter connection save %s' % CONNECTIONS_LOADED)
 
     if CONNECTIONS_LOADED:
         if len(pywbemcli_servers) != 0:

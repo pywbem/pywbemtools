@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Makefile for pybemcli repository of pywbem project
+# Makefile for pybemtools repository of pywbem project
 #
 # Basic prerequisites for running this Makefile, to be provided manually:
 #   One of these OS platforms:
@@ -18,6 +18,11 @@
 #     uname
 # Additional prerequisites for running this Makefile are installed by running:
 #   make develop
+#
+# Optional environment ariables/command line variables
+#   COVERAGE_REPORT - When set, forces coverage to create temporary
+#   annotated html output html files showing lines covered and missed
+#   See the directory coverage_html for the html output. 
 # ------------------------------------------------------------------------------
 
 # Determine OS platform make runs on
@@ -27,6 +32,18 @@ else
   # Values: Linux, Darwin
   PLATFORM := $(shell uname -s)
 endif
+
+# Determine if coverage details report generated
+# The variable can be passed in as either an environment variable or
+# command line variable. When set, generates a set of reports of the
+# pywbem/*.py files showing line by line coverage.
+ifdef COVERAGE_REPORT
+  coverage_report := --cov-report=annotate --cov-report=html
+else
+  coverage_report :=
+endif
+# directory for coverage html output. 
+coverage_html_dir := coverage_html
 
 # Name of this Python package (top-level Python namespace + Pypi package name)
 package_name := pywbemcli
@@ -219,7 +236,7 @@ test: $(test_log_file)
 .PHONY: clobber
 clobber: uninstall clean
 	rm -fv pylint.log flake8.log test_*.log
-	rm -Rfv $(doc_build_dir) htmlcov .tox
+	rm -Rfv $(doc_build_dir) .tox $(coverage_html_dir)
 	rm -fv $(bdist_file) $(sdist_file) $(win64_dist_file)
 	@echo 'Done: Removed all build products to get to a fresh state.'
 	@echo '$@ done.'
@@ -283,7 +300,6 @@ else
 	@echo 'Info: PyLint requires Python 2; skipping this step on Python $(python_major_version)'
 endif
 
-# TODO: Once Flake8 has no more errors, remove the dash "-"
 flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 	rm -fv $@
 	bash -c 'set -o pipefail; flake8 $(check_py_files) 2>&1 |tee $@.tmp'
@@ -292,6 +308,12 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 
 $(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  coveragerc
 	rm -fv $@
-	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) --cov-config .coveragerc --cov-report=html $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
+	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'
+
+# update the pywbemclicmdshelp.rst if any file that defines click commands changes.
+$(doc_conf_dir)/pywbemclicmdshelp.rst: pywbemcli $(package_name)/pywbemcli.py $(package_name)/_cmd*.py
+	tools/help_overview.py >$@
+	cp $@ design/help_overview.rst
+	@echo 'Done: Created help command info for docs: $@'

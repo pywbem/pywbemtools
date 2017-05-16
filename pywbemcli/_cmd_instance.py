@@ -135,6 +135,7 @@ def instance_create(context, classname, **options):
 @click.option('-p', '--parameter', type=str, metavar='parameter',
               required=False, multiple=True,
               help='Optional multiple method parameters of form name=value')
+@add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
@@ -419,7 +420,7 @@ def cmd_instance_enumerate(context, classname, options):
             if options['sort']:
                 results.sort()
         else:
-            results = context.conn.EnumerateInstances(
+            results = context.conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
@@ -458,19 +459,16 @@ def cmd_instance_references(context, instancename, options):
         instancepath = parse_cim_namespace_str(instancename,
                                                options['namespace'])
 
-    # TODO the class and instance references and associators can go to a single
-    #      client processing function
-
     try:
         if options['names_only']:
-            results = context.conn.ReferenceNames(
+            results = context.conn.PyWbemcliReferenceInstancePaths(
                 instancepath,
                 ResultClass=options['resultclass'],
                 Role=options['role'])
             if options['sort']:
                 results.sort()
         else:
-            results = context.conn.References(
+            results = context.conn.PyWbemcliReferenceInstances(
                 instancepath,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
@@ -509,7 +507,7 @@ def cmd_instance_associators(context, instancename, options):
 
     try:
         if options['names_only']:
-            results = context.conn.AssociatorNames(
+            results = context.conn.PyWbemcliAssociatorInstancePaths(
                 instancepath,
                 AssocClass=options['assocclass'],
                 Role=options['role'],
@@ -518,7 +516,7 @@ def cmd_instance_associators(context, instancename, options):
             if options['sort']:
                 results.sort()
         else:
-            results = context.conn.Associators(
+            results = context.conn.PyWbemcliAssociatorInstances(
                 instancepath,
                 AssocClass=options['assocclass'],
                 Role=options['role'],
@@ -614,8 +612,9 @@ def cmd_instance_query(context, query, options):
     """Execute the query defined by the inputs"""
 
     try:
-        results = context.conn.execquery(options['querylanguage'],
-                                         query, options['namespace'])
+        results = context.conn.pyWbemcliQueryInstances(options['querylanguage'],
+                                                       query,
+                                                       options['namespace'])
 
         if options['sort']:
             results.sort(key=lambda x: x.classname)

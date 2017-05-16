@@ -1,4 +1,4 @@
-.. CopyrighODO
+.. Copyright  2017 IBM Corp. and Inova Development Inc.
 ..
 .. Licensed under the Apache License, Version 2.0 (the "License");
 .. you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ Introduction
 pywbemtools Features
 --------------------
 
-The pywbemtools package (part of the pywbem project) is a pure python package
+The pywbemtools package (part of the pywbem github project) is a pure python package
 that is a container for multiple client tools and applications that use the
 pywbem APIs defined by the pywbem package in the github pywbem project to
 interact with WBEM Servers.

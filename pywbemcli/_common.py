@@ -55,7 +55,7 @@ def resolve_propertylist(propertylist):
     # if cmdline was a single empty string, we set to empty list
     # This means send no propertylist and is a special case for the
     # cim/xml and pywbem interface.
-    elif len(propertylist) == 1 and len(propertylist[0]) == 0:
+    elif len(propertylist) == 1 and not propertylist[0]:
         propertylist = []
 
     # expand any comma separated entries in the list
@@ -90,8 +90,8 @@ def pick_instance(context, objectname, namespace=None):
     """
     if not is_classname(objectname):
         raise click.ClickException('%s must be a classname' % objectname)
-    instance_names = context.conn.EnumerateInstanceNames(objectname,
-                                                         namespace)
+    instance_names = context.conn.PyWbemcliEnumerateInstancePaths(objectname,
+                                                                  namespace)
 
     if not instance_names:
         click.echo('No instance paths found for %s', objectname)
@@ -470,7 +470,7 @@ def parse_kv_pair(pair):
     name, value = pair.partition("=")[::2]
 
     # if value has nothing in it, return None.
-    if len(value) == 0:
+    if not value:
         value = None
 
     return name, value

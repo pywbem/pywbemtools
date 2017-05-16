@@ -36,30 +36,37 @@ from pywbemcli._common import parse_cim_namespace_str, \
 
 class PropertyListResolveTest(unittest.TestCase):
     """
-    Test the propertylist resolve function"""
+    Test the propertylist resolve function
+    """
     def test_with_comma(self):
+        """Test with commma in string"""
         out = resolve_propertylist(("abc,def",))
         self.assertEqual(out, ['abc', 'def'])
 
     def test_simple(self):
+        """Test with single entry"""
         val = ("abc",)
         out = resolve_propertylist(val)
         self.assertEqual(out, ['abc'])
 
     def test_empty(self):
+        """Test empty string"""
         val = ("",)
         out = resolve_propertylist(val)
         self.assertEqual(out, [])
 
     def test_multiple(self):
+        """Test multiple entries"""
         out = resolve_propertylist(("abc", "def"))
         self.assertEqual(out, ['abc', 'def'])
 
     def test_combined(self):
+        """test with comma in one property entry"""
         out = resolve_propertylist(("abc", "def", "xyz,rst"))
         self.assertEqual(out, ['abc', 'def', 'xyz', 'rst'])
 
     def test_none(self):
+        """Test None"""
         out = resolve_propertylist(None)
         self.assertEqual(out, None)
 
@@ -269,8 +276,8 @@ class SplitTestNone(unittest.TestCase):
         self.do_split('abc,def,jhi,klm,nop',
                       ['abc', 'def', 'jhi', 'klm', 'nop'])
 
-        self.do_split('abc,def,jhi,klm,n\,op',
-                      ['abc', 'def', 'jhi', 'klm', 'n\,op'])
+        self.do_split('abc,def,jhi,klm,n\\,op',
+                      ['abc', 'def', 'jhi', 'klm', 'n\\,op'])
 
         # self.do_split('abc,de f', ['abc','de f'])
 

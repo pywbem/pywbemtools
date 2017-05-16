@@ -71,6 +71,8 @@ TESTS_MAP = {  # pylint: disable=invalid-name
     "serverns": ["server namespaces", []],
     "serverinterop": ["server interop", []],
     "serverprof": ["server profiles", []],
+    "servertestpull": ["server test_pull", []],
+
 
     "connection": ["connection", ['show', 'export', 'set']],
     "connectionshow": ["connection show", []],
