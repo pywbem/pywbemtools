@@ -25,7 +25,6 @@ from __future__ import print_function, absolute_import
 import unittest
 import re
 from subprocess import Popen, PIPE
-import shlex
 import six
 
 
@@ -42,14 +41,13 @@ class ClientTest(unittest.TestCase):
 class TestsContainer(ClientTest):
     """Container class for all tests"""
 
-    def execute_cmd(self, cmd_str, shell=None):  # pylint: disable=no-self-use
+    def execute_cmd(self, cmd_str):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
         if self.verbose:
             print('cmd %s' % cmd_str)
-        args = shlex.split(cmd_str)
-        if self.verbose:
-            print('args %s' % args)
-        proc = Popen(args, stdout=PIPE, stderr=PIPE, shell=shell)
+        # Disable python warnings for pywbemcli call.See issue #42
+        command = 'export PYTHONWARNINGS="" && %s' % cmd_str
+        proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
         std_out, std_err = proc.communicate()
         exitcode = proc.returncode
         if six.PY3:
