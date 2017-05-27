@@ -23,9 +23,9 @@
 from __future__ import print_function, absolute_import
 
 import unittest
-import shlex
 from re import findall
 from subprocess import Popen, PIPE
+import six
 
 
 # Map of all tests to be defined.
@@ -83,29 +83,33 @@ class ContainerMeta(type):
                 cmd_opt = '-s http://localhost -u fred -p pw -k keyfile.txt ' \
                           '-c certfile.txt -d root/blah'
                 command = 'pywbemcli %s %s' % (cmd_opt, cmd_str)
-                args = shlex.split(command)
-                proc = Popen(args, stdout=PIPE, stderr=PIPE)
-                out, err = proc.communicate()
+                # Disable python warnings for pywbemcli call.See issue #42
+                command = 'export PYTHONWARNINGS="" && %s' % command
+                proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+                std_out, std_err = proc.communicate()
                 exitcode = proc.returncode
 
-                # print(' out %s\n err: %s\n code %s' % (out, err, exitcode))
+                if six.PY3:
+                    std_out = std_out.decode()
+                    std_err = std_err.decode()
 
                 self.assertEqual(exitcode, 0, '%s: ExitCode Err, cmd="%s" '
                                  'exitcode %s' % (test_name, command, exitcode))
 
-                self.assertEqual(len(err), 0, '%s stderr not empty.'
+                self.assertEqual(len(std_err), 0, '%s stderr not empty.'
                                  % test_name)
                 for item in result_data:
-                    match_result = findall(item, out)
+                    match_result = findall(item, std_out)
                     self.assertIsNotNone(match_result,
                                          '%s: Expecting match for %s in '
                                          'output %s' %
-                                         (test_name, item, out))
+                                         (test_name, item, std_out))
             return test
 
         for tname, params in TESTS_MAP.iteritems():
             test_name = "test_%s" % tname
             dict[test_name] = gen_test(test_name, params[0], params[1])
+
         return type.__new__(mcs, name, bases, dict)
 
 

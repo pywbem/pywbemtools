@@ -21,11 +21,10 @@
 """
 
 from __future__ import print_function, absolute_import
-
 import unittest
-import shlex
 from re import findall
 from subprocess import Popen, PIPE
+import six
 
 
 # Map of all tests to be defined.
@@ -96,24 +95,28 @@ class ContainerMeta(type):
             """
             def test(self):  # pylint: disable=missing-docstring
                 command = 'pywbemcli -s http://blah %s --help' % (cmd_str)
-                args = shlex.split(command)
-                proc = Popen(args, stdout=PIPE, stderr=PIPE)
-                out, err = proc.communicate()
+                # Disable python warnings for pywbemcli call.See issue #42
+                command = 'export PYTHONWARNINGS="" && %s' % command
+                proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+                std_out, std_err = proc.communicate()
                 exitcode = proc.returncode
+                if six.PY3:
+                    std_out = std_out.decode()
+                    std_err = std_err.decode()
 
                 if exitcode != 0:
-                    print('exitcode %s, err %s' % (exitcode, err))
+                    print('exitcode %s, err %s' % (exitcode, std_err))
                 self.assertEqual(exitcode, 0, ('%s: ExitCode Err, cmd="%s" '
                                                'exitcode %s' %
                                                (test_name, command, exitcode)))
 
                 # issue 21. The following generates a deprecation warning
                 # during the coverage test. Fixed.
-                self.assertEqual(err, "", '%s stderr not empty. returned %s'
-                                 % (test_name, err))
+                self.assertEqual(std_err, "", '%s stderr not empty. returned %s'
+                                 % (test_name, std_err))
 
                 for item in result_data:
-                    match_result = findall(item, out)
+                    match_result = findall(item, std_out)
                     self.assertIsNotNone(match_result,
                                          "Expecting some result")
             return test
