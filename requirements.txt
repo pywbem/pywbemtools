@@ -2,18 +2,23 @@
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 
-six # MIT
+six>=1.10.0 # MIT
 pbr>=1.8 # Apache-2.0
--e git+https://gitlab.com/m2crypto/m2crypto.git@master#egg=M2Crypto
-click # BSD
-click-spinner>=0.1.5 # MIT
-click-repl # MIT
-asciitree # MIT
-terminaltables #  MIT
-pywbem # LGPL
+M2Crypto>=0.26.0
+
+click>=6.6 # BSD
+click-spinner>=0.1.6 # MIT
+click-repl>=0.1.0 # MIT
+asciitree>=0.3.3 # MIT
+terminaltables>=3.0.0 #  MIT
+
+# pywbem # LGPL
+# TODO: Reset to use released pywbem before release.  Right now this
+# is needed so we can use the new features in pywbem 0.11.0
+-e git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 # From click-repl
-prompt_toolkit>=1.0.0 # BSD
+prompt_toolkit>=1.0.9 # BSD
 
 # From prompt_toolkit
 wcwidth>=0.1.6 # MIT
