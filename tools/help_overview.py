@@ -138,11 +138,12 @@ print('This is a display of the output of the pywbemcli commands define in '
     'command as sent to pywbemcli followed by the ouput returned by '
     'pywbemcli.'     )
 
+help_cmd("repl")
+
 help_cmd("")
 help_cmd("class")
 help_cmd("class get")
 help_cmd("class invokemethod")
-help_cmd("class names")
 help_cmd("class enumerate")
 help_cmd("class associators")
 help_cmd("class references")
@@ -154,7 +155,6 @@ help_cmd("instance delete")
 help_cmd("instance create")
 help_cmd("instance invokemethod")
 help_cmd("instance query")
-help_cmd("instance names")
 help_cmd("instance enumerate")
 help_cmd("instance count")
 help_cmd("instance references")

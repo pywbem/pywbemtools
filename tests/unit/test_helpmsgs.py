@@ -37,6 +37,8 @@ import six
 #    it simple until code stabilizes.
 TESTS_MAP = {  # pylint: disable=invalid-name
     'top': ["", ['--server', '--default_namespace']],
+
+    'repl': ["repl", ["REPL"]],
     "class": ["class", ['get', 'invokemethod']],
     "classget": ["class get", ['localonly', 'propertylist']],
     "classenum": ["class enumerate", []],
@@ -53,7 +55,6 @@ TESTS_MAP = {  # pylint: disable=invalid-name
     "instdelete": ["instance delete", []],
     "instinvok": ["instance invokemethod", []],
     "instquery": ["instance query", []],
-    "instnames": ["instance names", []],
     "instenum": ["instance enumerate", []],
     "instcount": ["instance count", []],
     "instref": ["instance references", []],

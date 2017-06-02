@@ -151,20 +151,6 @@ def instance_invokemethod(context, instancename, methodname, **options):
                                                           options))
 
 
-@instance_group.command('names', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', required=False,)
-@add_options(namespace_option)
-@add_options(sort_option)
-@click.pass_obj
-def instance_names(context, classname, **options):
-    """
-    Get and display a list of instance names of the classname argument.
-
-    This is equivalent to pywbemcli instance enumerate -o
-    """
-    context.execute_cmd(lambda: cmd_instance_names(context, classname, options))
-
-
 @instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-l', '--localonly', is_flag=True, required=False,
@@ -415,24 +401,6 @@ def cmd_instance_invokemethod(context, instancename, methodname,
         params = create_params(cim_method, options['parameter'])
 
         context.conn.InvokeMethod(instancepath, methodname, params)
-
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-
-def cmd_instance_names(context, classname, options):
-    """
-    get and display a the instancenames of the instances of the class
-    classname
-    """
-    try:
-        inst_names = context.conn.EnumerateInstanceNames(
-            classname,
-            namespace=options['namespace'])
-
-        if options['sort']:
-            inst_names.sort()
-        display_cim_objects(context, inst_names, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

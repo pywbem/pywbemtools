@@ -17,4 +17,7 @@ exclude =
 #disable_noqa
     
 ignore =
+    # unable to detect undefined names (when using wildcard import)
+    F403
+
 
