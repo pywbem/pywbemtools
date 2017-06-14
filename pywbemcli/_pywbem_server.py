@@ -23,8 +23,10 @@ from __future__ import absolute_import, unicode_literals
 import re
 import click
 
-from pywbem import WBEMServer, WBEMConnection
-from .config import DEFAULT_URI_SCHEME, DEFAULT_CONNECTION_TIMEOUT
+from pywbem import WBEMServer
+from .config import DEFAULT_URI_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
+    DEFAULT_MAXPULLCNT
+from ._pywbemcli_operations import PYWBEMCLIConnection
 
 
 WBEM_SERVER_OBJ = None
@@ -74,6 +76,9 @@ class PywbemServer(object):
     WBEMServer objects only when required.  This allows parameters such
     as the password to be requested only when a connection is made.
 
+    This class also holds the variables that determine whether the connection
+    will use the pull operations or traditional operatios
+
     """
 
     # The following class level variables are the names for the env variables
@@ -88,10 +93,13 @@ class PywbemServer(object):
     certfile_envvar = 'PYWBEMCLI_CERTFILE'
     noverify_envvar = 'PYWBEMCLI_NOVERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
+    use_pull_envvar = 'PYWBEMCLI_USE_PULL'
+    pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
 
     def __init__(self, server, default_namespace, name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  noverify=True, certfile=None, keyfile=None, ca_certs=None,
+                 use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
                  verbose=False):
         """
             TODO
@@ -110,13 +118,17 @@ class PywbemServer(object):
         self._name = name
         self._wbem_server = None
         self._validate_timeout()
+        self._use_pull_ops = use_pull_ops
+        self._pull_max_cnt = pull_max_cnt
 
     def __repr__(self):
         return 'PywbemServer(uri=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
-               'noverify=%s certfile=%s keyfile=%s ca_certs=%s)' % \
+               'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
+               'use_pull_ops=%s, pull_max_cnt=%s)' % \
                (self.server_uri, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
-                self.certfile, self.keyfile, self.ca_certs)
+                self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
+                self.pull_max_cnt)
 
     @property
     def server_uri(self):
@@ -138,6 +150,22 @@ class PywbemServer(object):
         :term:`string`: Username on the WBEM Server.
         """
         return self._user
+
+    @property
+    def use_pull_ops(self):
+        """
+        :term:`bool`: Flag to define if pull operations are to be used.
+        True if pull operations are to be use. False if traditional operations
+        and None if the system will decide.
+        """
+        return self._use_pull_ops
+
+    @property
+    def pull_max_cnt(self):
+        """
+        :term:`string`: max object count for pull operations.
+        """
+        return self._pull_max_cnt
 
     @property
     def password(self):
@@ -279,10 +307,11 @@ class PywbemServer(object):
             if self.keyfile is not None:
                 x509_dict.update({'keyfile': self.keyfile})
 
-        conn = WBEMConnection(self.server_uri, creds,
-                              default_namespace=self.default_namespace,
-                              no_verification=self.noverify,
-                              x509=x509_dict, ca_certs=self.ca_certs,
-                              timeout=self.timeout)
+        # Create the WBEMConnection object and the _wbem_server object
+        conn = PYWBEMCLIConnection(self.server_uri, creds,
+                                   default_namespace=self.default_namespace,
+                                   no_verification=self.noverify,
+                                   x509=x509_dict, ca_certs=self.ca_certs,
+                                   timeout=self.timeout)
         # Save the connection object and create a WBEMServer object
         self._wbem_server = WBEMServer(conn)

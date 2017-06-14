@@ -55,7 +55,7 @@ def class_group():
 @click.pass_obj
 def server_namespaces(context, **options):
     """
-    Display the set of namespaces in the current WBEM server
+    Display the namespaces in the WBEM server
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
@@ -63,7 +63,7 @@ def server_namespaces(context, **options):
 
 @class_group.command('interop', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
-def server_interop(context, **options):
+def server_interop(context):
     """
     Display the interop namespace name in the WBEM Server.
     """
@@ -75,7 +75,7 @@ def server_interop(context, **options):
 @click.pass_obj
 def server_brand(context):
     """
-    Display the interop namespace name in the WBEM Server.
+    Display interop namespace name in the WBEM Server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_brand(context))
@@ -85,7 +85,7 @@ def server_brand(context):
 @click.pass_obj
 def server_info(context):
     """
-    Display the brand information on the current WBEM Server.
+    Display the brand information on theWBEM Server.
     """
     context.execute_cmd(lambda: cmd_server_info(context))
 
@@ -100,7 +100,7 @@ def server_info(context):
 @click.pass_obj
 def server_profiles(context, **options):
     """
-    Display profiles on the current WBEM Server.
+    Display profiles in the WBEM Server.
 
     This display may be filtered by the optional organization and profile
     name options
@@ -117,10 +117,29 @@ def server_connection(context):
     context.execute_cmd(lambda: cmd_server_connection(context))
 
 
+@class_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
+@click.pass_obj
+def server_test_pull(context):
+    """
+    Test whether pull opeations exist on the WBEM server.
+    """
+    context.execute_cmd(lambda: cmd_server_test_pull(context))
+
+
 ###############################################################
 #         Server cmds
 ###############################################################
-def cmd_server_namespaces(context, options):
+
+def cmd_server_test_pull(context):
+    """
+        Test the execution of pull operations against the target server.
+        Executes pull operations and reports whether pull is supported.
+
+    """
+    raise ValueError('Not implemented')
+
+
+def cmd_server_namespaces(context):
     """
     Display namespaces in the current WBEMServer
     """

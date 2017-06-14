@@ -29,9 +29,9 @@ from pywbem import DEFAULT_CA_CERT_PATHS
 from ._context_obj import ContextObj
 from ._common import GENERAL_OPTIONS_METAVAR
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_CONNECTION_TIMEOUT
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
-    PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE
+    PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
+    DEFAULT_CONNECTION_TIMEOUT
 
 from ._connection_repository import get_pywbemcli_servers
 
@@ -101,13 +101,34 @@ __all__ = ['cli']
                    'the format choice depending on the operation since not '
                    'all formats apply to all output data types'
               .format(of=DEFAULT_OUTPUT_FORMAT))
+@click.option('--use-pull_ops', envvar=PywbemServer.use_pull_envvar,
+              type=click.Choice(['yes', 'no', 'either']),
+              default='either',
+              help='Determines whether the pull operations are used for'
+                   'the EnumerateInstances, associatorinstances,'
+                   'referenceinstances, and ExecQuery operations. '
+                   'yes means that pull will be used and if the server '
+                   'does not support pull, the operation will fail. '
+                   'No choice forces pywbemcli to try only the '
+                   'traditional non-pull operations. '
+                   'either allows pywbem to try both pull and then '
+                   ' traditional operations. '
+                   'This choice is acomplished by using the Iter... operations '
+                   'as the underlying pywbem api call. '
+                   ' The default is either.')
+@click.option('--pull-max-cnt', type=int,
+              envvar=PywbemServer.pull_max_cnt_envvar,
+              default=DEFAULT_MAXPULLCNT,
+              help='MaxObjectCount of objects to be returned if pull '
+                   'operations are used. This must be  a positive non-zero '
+                   'integer. Default is {moc}.'.format(moc=DEFAULT_MAXPULLCNT))
 @click.option('-v', '--verbose', type=str, is_flag=True,
               help='Display extra information about the processing.')
 @click.version_option(help="Show the version of this command and exit.")
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
-        certfile, keyfile, ca_certs, output_format, verbose,
-        pywbem_server=None):
+        certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
+        verbose, pywbem_server=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
@@ -140,6 +161,18 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             output_format = DEFAULT_OUTPUT_FORMAT
         if default_namespace is None:
             default_namespace = DEFAULT_NAMESPACE
+        # TODO, clean this up
+        if use_pull_ops == 'either':
+            use_pull_ops = None
+        elif use_pull_ops == 'yes':
+            use_pull_ops = True
+        elif use_pull_ops == 'no':
+            use_pull_ops = False
+        else:
+            raise click.ClickException('Invalid choice for use_pull_ops %s' %
+                                       use_pull_ops)
+        if pull_max_cnt is None:
+            pull_max_cnt = DEFAULT_MAXPULLCNT
 
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
@@ -157,6 +190,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          certfile=certfile,
                                          keyfile=keyfile,
                                          ca_certs=ca_certs,
+                                         use_pull_ops=use_pull_ops,
+                                         pull_max_cnt=pull_max_cnt,
                                          verbose=verbose)
         else:
             if name:
@@ -168,8 +203,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             elif 'default' in pywbemcli_servers:
                 pywbem_server = pywbemcli_servers['default']
             else:
-                raise click.ClickException('No defined connection. Use -s '
-                                           'option to define a connection')
+                # if no server defined, set None. This allows --help to
+                # be executed without the server defined.  Each subcommand
+                # must confirm that server exists before trying to execute.
+                pywbem_server = None
 
     else:
         # Processing an interactive command.
@@ -185,7 +222,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # its own command context different from the command context for the
     # command line.
 
-    ctx.obj = ContextObj(ctx, pywbem_server, output_format, verbose)
+    ctx.obj = ContextObj(ctx, pywbem_server, output_format, use_pull_ops,
+                         pull_max_cnt, verbose)
 
     # Invoke default command
     if ctx.invoked_subcommand is None:

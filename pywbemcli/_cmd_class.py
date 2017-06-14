@@ -497,7 +497,7 @@ def cmd_class_delete(context, classname, options):
         classname = CIMClassName(classname, namespace=options['namespace'])
 
     if not options['force']:
-        insts = context.conn.EnumerateInstanceNames(classname)
+        insts = context.conn.PyWbemCLIEnumerateInstancePaths(classname)
         if len(insts) != 0:
             raise click.ClickException('Ignored; instances exist')
         # TODO test for subclasses
