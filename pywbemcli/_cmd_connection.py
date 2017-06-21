@@ -20,6 +20,7 @@ cmds to view, save, etc. connection information.
 from __future__ import absolute_import
 
 import click
+import six
 from pywbem import Error, DEFAULT_CA_CERT_PATHS
 
 from .pywbemcli import cli
@@ -379,7 +380,7 @@ def cmd_connection_list(context):
            'timeout', 'noverify', 'certfile', 'keyfile']
     lines = []
 
-    for name, svr in pywbemcli_servers.iteritems():
+    for name, svr in six.iteritems(pywbemcli_servers):
         line = [name, svr.server_uri, svr.default_namespace, svr.user,
                 svr.password, svr.timeout, svr.noverify, svr.certfile,
                 svr.keyfile]
