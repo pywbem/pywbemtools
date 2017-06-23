@@ -21,6 +21,7 @@
 """
 
 from __future__ import print_function, absolute_import
+
 import unittest
 from re import findall
 from subprocess import Popen, PIPE
@@ -88,7 +89,7 @@ class ContainerMeta(type):
 
     def __new__(mcs, name, bases, dict):  # pylint: disable=redefined-builtin
 
-        def gen_test(test_name, cmd_str, result_data):
+        def gen_test(test_name, cmd_str, expected_stdout):
             """
             Defines the test method that we generate for each test
             and returns the method.
@@ -118,18 +119,19 @@ class ContainerMeta(type):
                 self.assertEqual(std_err, "", '%s stderr not empty. returned %s'
                                  % (test_name, std_err))
 
-                for item in result_data:
+                for item in expected_stdout:
                     match_result = findall(item, std_out)
                     self.assertIsNotNone(match_result,
-                                         "Expecting some result")
+                                         "Expecting some result in std_out")
             return test
 
-        for tname, params in TESTS_MAP.iteritems():
-            test_name = "test_%s" % tname
+        for test_name, params in six.iteritems(TESTS_MAP):
+            test_name = "test_%s" % test_name
             dict[test_name] = gen_test(test_name, params[0], params[1])
         return type.__new__(mcs, name, bases, dict)
 
 
+@six.add_metaclass(ContainerMeta)
 class TestsContainer(unittest.TestCase):
     """Container class for all tests"""
     __metaclass__ = ContainerMeta

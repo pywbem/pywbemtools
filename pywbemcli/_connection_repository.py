@@ -25,6 +25,7 @@ from __future__ import absolute_import
 import os
 import pickle
 import copy
+import six
 
 CONNECTIONS_FILE = 'pywbemcliservers.p'
 CONNECTIONS_LOADED = False
@@ -75,7 +76,7 @@ def server_definitions_file_save(pywbemcli_servers):
                 os.remove(CONNECTIONS_FILE)
             # clear the wbem_server attribute
             dict_copy = copy.deepcopy(pywbemcli_servers)
-            for name, svr in dict_copy.iteritems():
+            for name, svr in six.iteritems(dict_copy):
                 # TODO we are accessing protected member here
                 svr._wbem_server = None
             with open(CONNECTIONS_FILE, "wb") as fh:

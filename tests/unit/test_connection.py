@@ -61,10 +61,10 @@ LIST_OUTPUT = ['default']
 # TODO figure out how to do create and delete since this is not an
 # ordered test
 TESTS_MAP = {  # pylint: disable=invalid-name
-    'export': ["connection export", EXPORT_OUTPUT],
-    "show": ["connection show", SHOW_OUTPUT],
-    "set": ["connection set", ['password']],
-    "list": ["connection list", LIST_OUTPUT]}
+    'export': ["connection export", EXPORT_OUTPUT, None],
+    "show": ["connection show", SHOW_OUTPUT, None],
+    "set": ["connection set", ['password'], None],
+    "list": ["connection list", LIST_OUTPUT, None]}
 
 
 class ContainerMeta(type):
@@ -72,7 +72,7 @@ class ContainerMeta(type):
 
     def __new__(mcs, name, bases, dict):  # pylint: disable=redefined-builtin
 
-        def gen_test(test_name, cmd_str, result_data):
+        def gen_test(test_name, cmd_str, expected_stdout, expected_stderr):
             """
             Defines the test method and returns the method.
 
@@ -98,7 +98,7 @@ class ContainerMeta(type):
 
                 self.assertEqual(len(std_err), 0, '%s stderr not empty.'
                                  % test_name)
-                for item in result_data:
+                for item in expected_stdout:
                     match_result = findall(item, std_out)
                     self.assertIsNotNone(match_result,
                                          '%s: Expecting match for %s in '
@@ -106,13 +106,15 @@ class ContainerMeta(type):
                                          (test_name, item, std_out))
             return test
 
-        for tname, params in TESTS_MAP.iteritems():
-            test_name = "test_%s" % tname
-            dict[test_name] = gen_test(test_name, params[0], params[1])
+        for test_name, params in six.iteritems(TESTS_MAP):
+            test_name = "test_%s" % test_name
+            dict[test_name] = gen_test(test_name, params[0], params[1],
+                                       params[2])
 
         return type.__new__(mcs, name, bases, dict)
 
 
+@six.add_metaclass(ContainerMeta)
 class TestsContainer(unittest.TestCase):
     """Container class for all tests"""
     __metaclass__ = ContainerMeta

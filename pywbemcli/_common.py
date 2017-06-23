@@ -22,6 +22,7 @@ from __future__ import absolute_import, unicode_literals
 import re
 from prompt_toolkit import prompt
 import click
+import six
 
 from pywbem import CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
@@ -452,7 +453,7 @@ def compare_instances(inst1, inst2):
             diff = keys1.symmetric_difference(keys2)
             print('Property Name differences %s' % diff)
             return False
-        for n1, v1 in inst1.iteritems():
+        for n1, v1 in six.iteritems(inst1):
             if v1 != inst2[n1]:
                 msg = 'property ' + n1
                 if not compare_obj(inst1.get(n1), inst2.get(n1), msg):
