@@ -24,8 +24,9 @@ from __future__ import absolute_import
 import click
 from pywbem import ValueMapping, Error
 from .pywbemcli import cli
-from ._common import display_cim_objects, CMD_OPTS_TXT
+from ._common import CMD_OPTS_TXT
 from ._common_options import sort_option, add_options
+from ._asciitable import print_ascii_table
 
 
 def print_profile_info(org_vm, inst):
@@ -144,10 +145,25 @@ def cmd_server_namespaces(context, options):
     Display namespaces in the current WBEMServer
     """
     try:
+<<<<<<< HEAD
         ns = context.wbem_server.namespaces
         if options['sort']:
             ns = ns.sort()
         display_cim_objects(context, ns, context.output_format)
+=======
+        namespaces = context.wbem_server.namespaces
+        if options['sort']:
+            sorted(namespaces)
+
+        # reformat as list of lists.
+        # TODO: list of strings with on col in header should actually format
+        # correctly for table
+        ns_lists = []
+        for ns in namespaces:
+            ns_lists.append([ns])
+        print_ascii_table(ns_lists, title=None, header=['Namespaces'],
+                          inner=True, outer=True)
+>>>>>>> 3192a93... Implement operation statistics with display
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -157,8 +173,9 @@ def cmd_server_interop(context):
     Display interop namespace in the current WBEMServer
     """
     try:
-        display_cim_objects(context, context.wbem_server.interop_ns,
-                            context.output_format)
+        interop_ns = [[context.wbem_server.interop_ns]]
+        print_ascii_table(interop_ns, title=None, header=['Interop Namespace'],
+                          inner=True, outer=True)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 

@@ -21,7 +21,10 @@ It contains data that is set in the top level and used in subcommand calls
 
 from __future__ import absolute_import, unicode_literals
 
+import click
 import click_spinner
+
+from ._asciitable import print_ascii_table
 
 # The current pywbem server object for subcommands.
 PYWBEM_SERVER_OBJ = None
@@ -39,13 +42,14 @@ class ContextObj(object):
     """
     # pylint: disable=unused-argument
     def __init__(self, ctx, pywbem_server, output_format, use_pull,
-                 pull_max_cnt, verbose):
+                 pull_max_cnt, timestats, verbose):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
         self._pull_max_cnt = pull_max_cnt
         self._use_pull = use_pull
         self._verbose = verbose
+        self._timestats = timestats
         self._spinner = click_spinner.Spinner()
 
     def __repr__(self):
@@ -58,6 +62,13 @@ class ContextObj(object):
         :term:`string`: String defining the output format requested.
         """
         return self._output_format
+
+    @property
+    def timestats(self):
+        """
+        :term:`string`: Output format to be used.
+        """
+        return self._timestats
 
     @property
     def use_pull(self):
@@ -126,11 +137,80 @@ class ContextObj(object):
         used for interactive commands.
         """
         self.connect_wbem_server()
+        if self.timestats:
+            # get time statistics from pywbem
+            self.conn.statistics.enable()
         self.spinner.start()
         try:
             cmd()
         finally:
             self.spinner.stop()
+            if self.timestats:
+                click.echo(self.format_statistics(self.conn.statistics))
+
+    def format_statistics(self, statistics):
+        """
+        table formatted output of statistics
+        """
+
+        def format_float3(avg, min_, max_):
+            if avg == min_ == max_:
+                return '{0:.3f}'.format(avg)
+            return '{0:.3f}/{1:.3f}/{2:.3f}'.format(avg, min_, max_)
+
+        def format_float0(avg, min_, max_):
+            if avg == min_ == max_:
+                return '{0:.0f}'.format(avg)
+            return '{0:.0f}/{1:.0f}/{2:.0f}'.format(avg, min_, max_)
+
+        snapshot = sorted(statistics.snapshot(),
+                          key=lambda item: item[1].avg_time,
+                          reverse=True)
+
+        # Test to see if any server time is non-zero
+        include_svr = False
+        for name, stats in snapshot:  # pylint: disable=unused-variable
+            # TODO: clean up pywbem stats so this is in pywbem, not here
+            if stats._server_time_stored:  # pylint: protected-access
+                include_svr = True
+
+        # build list of column names
+        hdr = ['Count', 'Exc', 'Time']
+        if include_svr:
+            hdr.append('SvrTime')
+        hdr.extend(['ReqLen', 'ReplyLen', 'Operation'])
+
+        # build table rows from snapshot of OperationStatistics
+        rows = []
+        for name, stats in snapshot:  # pylint: disable=unused-variable
+            time = format_float3(stats.avg_time,
+                                 stats.min_time,
+                                 stats.max_time)
+            req_len = format_float0(stats.avg_request_len,
+                                    stats.min_request_len,
+                                    stats.max_request_len)
+            reply_len = format_float0(stats.avg_reply_len,
+                                      stats.min_reply_len,
+                                      stats.max_reply_len)
+            if include_svr:
+                svrtime = format_float3(stats.avg_server_time,
+                                        stats.min_server_time,
+                                        stats.max_server_time)
+                row = [stats.count, stats.exception_count, time, svrtime,
+                       req_len, reply_len, stats.name]
+            else:
+                row = [stats.count, stats.exception_count, time,
+                       req_len, reply_len, stats.name]
+
+        # only add table description if verbose on.
+        if self.verbose:
+            title = 'Statistics: Time in sec. Time, ReqLen, etc are single ' \
+                    'value if average/min/max are the same'
+        else:
+            title = None
+
+        rows.append(row)
+        print_ascii_table(rows, header=hdr, title=title)
 
     def connect_wbem_server(self):
         """
