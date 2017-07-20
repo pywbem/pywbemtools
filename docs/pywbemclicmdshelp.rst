@@ -1,31 +1,34 @@
 
-########################################################
-Overview of pywbemcli help with the multiple subcommands
-########################################################
+.. _`pywbemcli Help Command Details`:
 
-Displays the output of the pywbemcli commands -- help.Each help output is presented as a section with the command as sent to pywbemcli followed by the ouput returned by pywbemcli.
+pywbemcli Help Command Details
+==============================
 
-*****************
-pywbemcli  --help
-*****************
+
+This section defines the help output for each pywbemcli command group and subcommand.
+
+
+
+The following defines the help output for the `pywbemcli  --help` subcommand
+
 
 ::
 
     Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
-
+    
       Command line browser for WBEM Servers. This cli tool implements the
       CIM/XML client APIs as defined in pywbem to make requests to a WBEM
       server. This browser uses subcommands to      * Explore the
       characteristics of WBEM Servers based on using the       pywbem client
       APIs.  It can manage/inspect CIM_Classes and       CIM_instanceson the
       server.
-
+    
           * In addition it can inspect namespaces and other server information
             and inspect and manage WBEM indication subscriptions.
-
+    
       The options shown above that can also be specified on any of the
       (sub-)commands as well as the command line.
-
+    
     Options:
       -s, --server TEXT               Hostname or IP address with scheme of the
                                       WBEMServer in  format
@@ -101,7 +104,7 @@ pywbemcli  --help
                                       processing.
       --version                       Show the version of this command and exit.
       --help                          Show this message and exit.
-
+    
     Commands:
       class       Command Group to manage CIM Classes.
       connection  Command group to manage WBEM connections.
@@ -113,23 +116,29 @@ pywbemcli  --help
 
 
 
-**********************
+.. _`pywbemcli class --help`:
+
 pywbemcli class --help
-**********************
+----------------------
+
+
+
+The following defines the help output for the `pywbemcli class --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
-
+    
       Command Group to manage CIM Classes.
-
+    
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
-
+    
     Options:
       --help  Show this message and exit.
-
+    
     Commands:
       associators   Get the associated classes for the CLASSNAME.
       delete        Delete the class defined by CLASSNAME from...
@@ -142,22 +151,28 @@ pywbemcli class --help
 
 
 
-**********************************
+.. _`pywbemcli class associators --help`:
+
 pywbemcli class associators --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class associators --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME
-
+    
       Get the associated classes for the CLASSNAME.
-
+    
       Get the classes(or classnames) that are associated with the CLASSNAME
       argument filtered by the assocclass, resultclass, role and resultrole
       arguments options.
-
+    
       Results are displayed as defined by the output format global option.
-
+    
     Options:
       -a, --assocclass <class name>   Filter by the associated class name
                                       provided.
@@ -185,20 +200,26 @@ pywbemcli class associators --help
 
 
 
-*****************************
+.. _`pywbemcli class delete --help`:
+
 pywbemcli class delete --help
-*****************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class delete --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
-
+    
       Delete the class defined by CLASSNAME from the WBEM Server. If the class
       has instances, the command is refused unless the --force option is used.
-
+    
       WARNING: Removing classes from a WBEM Server can cause damage to the
       server. Use this with caution.
-
+    
     Options:
       -f, --force             Force the delete request to be issued even if there
                               are instances in the server or subclasses to this
@@ -210,28 +231,34 @@ pywbemcli class delete --help
 
 
 
-********************************
+.. _`pywbemcli class enumerate --help`:
+
 pywbemcli class enumerate --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class enumerate --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
-
+    
       Enumerate classes from the WBEMServer.
-
+    
       Enumerates the classes (or classnames) from the WBEMServer starting either
       at the top of the class hierarchy or from  the position in the class
       hierarch defined by `classname` argument if provided.
-
+    
       The output format is defined by the output_format global option.
-
+    
       The includeclassqualifiers, includeclassorigin options define optional
       information to be included in the output.
-
+    
       The deepinheritance option defines whether the complete hiearchy is
       retrieved or just the next level in the hiearchy.
-
+    
     Options:
       -d, --deepinheritance           Return complete subclass hierarchy for this
                                       class if set. Otherwise retrieve only the
@@ -250,32 +277,38 @@ pywbemcli class enumerate --help
 
 
 
-***************************
+.. _`pywbemcli class find --help`:
+
 pywbemcli class find --help
-***************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class find --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME regex
-
+    
       Find all classes that match the CLASSNAME regex.
-
+    
       Find all of the classes in the namespace  of the defined WBEMServer that
       match the CLASSNAME  regular expression argument in the namespaces of the
       defined WBEMserver.
-
+    
       The CLASSNAME argument is required.
-
+    
       The CLASSNAME argument may be either a complete classname or a regular
       expression that can be matched to one or more classnames. To limit the
       filter to a single classname, terminate the classname with $.
-
+    
       The regular expression is anchored to the beginning of the classname and
       is case insensitive. Thus pywbem_ returns all classes that begin with
       PyWBEM_, pywbem_, etc.
-
+    
       The namespace option limits the search to the defined namespace
-
+    
     Options:
       -s, --sort              Sort into alphabetical order by classname.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
@@ -284,16 +317,22 @@ pywbemcli class find --help
 
 
 
-**************************
+.. _`pywbemcli class get --help`:
+
 pywbemcli class get --help
-**************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class get --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
-
+    
       get and display a single CIM class from the WBEM Server
-
+    
     Options:
       -l, --localonly                 Show only local properties of the class.
       --includequalifiers / --no_includequalifiers
@@ -315,20 +354,26 @@ pywbemcli class get --help
 
 
 
-********************************
+.. _`pywbemcli class hierarchy --help`:
+
 pywbemcli class hierarchy --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class hierarchy --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class hierarchy [COMMAND-OPTIONS] CLASSNAME
-
+    
       Display class inheritance hierarchy as a tree.
-
+    
       The classname option, if it exists defines the topmost class of the
       hierarchy to include in the display. This is a separate subcommand because
       it is tied specifically to displaying in a tree format.
-
+    
     Options:
       -s, --superclasses      Display the superclasses to CLASSNAME.  In this case
                               CLASSNAME is required
@@ -338,16 +383,22 @@ pywbemcli class hierarchy --help
 
 
 
-***********************************
+.. _`pywbemcli class invokemethod --help`:
+
 pywbemcli class invokemethod --help
-***********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class invokemethod --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] classname name
-
+    
       Invoke the class method named methodname in the class classname
-
+    
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
                                  name=value
@@ -358,20 +409,26 @@ pywbemcli class invokemethod --help
 
 
 
-*********************************
+.. _`pywbemcli class references --help`:
+
 pywbemcli class references --help
-*********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli class references --help` subcommand
+
 
 ::
 
     Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
-
+    
       Get the reference classes for the CLASSNAME.
-
+    
       Get the reference classes (or their classnames) for the CLASSNAME argument
       filtered by the role and result class options and modified  by the other
       options.
-
+    
     Options:
       -r, --resultclass <class name>  Filter by the classname provided.
       -x, --role <role name>          Filter by the role name provided.
@@ -396,120 +453,31 @@ pywbemcli class references --help
 
 
 
-*********************************
-pywbemcli class references --help
-*********************************
+.. _`pywbemcli connection --help`:
 
-::
-
-    Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
-
-      Get the reference classes for the CLASSNAME.
-
-      Get the reference classes (or their classnames) for the CLASSNAME argument
-      filtered by the role and result class options and modified  by the other
-      options.
-
-    Options:
-      -r, --resultclass <class name>  Filter by the classname provided.
-      -x, --role <role name>          Filter by the role name provided.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
-      -c, --includeclassorigin        Include classorigin in the result.
-      -p, --propertylist <property name>
-                                      Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
-      -o, --names_only                Show only local properties of the class.
-      -s, --sort                      Sort into alphabetical order by classname.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
-      --help                          Show this message and exit.
-
-
-
-***************************
-pywbemcli class find --help
-***************************
-
-::
-
-    Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME regex
-
-      Find all classes that match the CLASSNAME regex.
-
-      Find all of the classes in the namespace  of the defined WBEMServer that
-      match the CLASSNAME  regular expression argument in the namespaces of the
-      defined WBEMserver.
-
-      The CLASSNAME argument is required.
-
-      The CLASSNAME argument may be either a complete classname or a regular
-      expression that can be matched to one or more classnames. To limit the
-      filter to a single classname, terminate the classname with $.
-
-      The regular expression is anchored to the beginning of the classname and
-      is case insensitive. Thus pywbem_ returns all classes that begin with
-      PyWBEM_, pywbem_, etc.
-
-      The namespace option limits the search to the defined namespace
-
-    Options:
-      -s, --sort              Sort into alphabetical order by classname.
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
-      --help                  Show this message and exit.
-
-
-
-********************************
-pywbemcli class hierarchy --help
-********************************
-
-::
-
-    Usage: pywbemcli class hierarchy [COMMAND-OPTIONS] CLASSNAME
-
-      Display class inheritance hierarchy as a tree.
-
-      The classname option, if it exists defines the topmost class of the
-      hierarchy to include in the display. This is a separate subcommand because
-      it is tied specifically to displaying in a tree format.
-
-    Options:
-      -s, --superclasses      Display the superclasses to CLASSNAME.  In this case
-                              CLASSNAME is required
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
-      --help                  Show this message and exit.
-
-
-
-***************************
 pywbemcli connection --help
-***************************
+---------------------------
+
+
+
+The following defines the help output for the `pywbemcli connection --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
-
+    
       Command group to manage WBEM connections.
-
+    
       These command allow viewing and setting connection information.
-
+    
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
-
+    
     Options:
       --help  Show this message and exit.
-
+    
     Commands:
       create  Create a new named connection from the input...
       delete  Show the current connection information, i.e.
@@ -522,35 +490,41 @@ pywbemcli connection --help
 
 
 
-**********************************
+.. _`pywbemcli connection create --help`:
+
 pywbemcli connection create --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection create --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection create [COMMAND-OPTIONS] name SERVER
-
+    
       Create a new named connection from the input parameters.
-
+    
       This subcommand creates and saves a new named connection from the input
       parameters.
-
+    
       The name and server arguments MUST exist. They define the server uri and
       the unique name under which this server connection information will be
       stored. All other properties are optional.
-
+    
       It does NOT automatically set the pywbemcli to use that connection. Use
       `connection select` to set a particular stored connection definition as
       the current connection.
-
+    
       This is the alternative means of defining a new WBEM server to be accessed
       to supplying the parameters on the command line. and using the connection
       set command to put it into the connection repository.
-
+    
       Defines a new connection that can be referenced by the name argument in
       the future.  This connection object is capable of managing all of the
       properties defined for WBEMConnections.
-
+    
     Options:
       -d, --default_namespace TEXT  Default Namespace to use in the target
                                     WBEMServer if no namespace is defined in the
@@ -580,158 +554,212 @@ pywbemcli connection create --help
 
 
 
-**********************************
+.. _`pywbemcli connection delete --help`:
+
 pywbemcli connection delete --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection delete --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection delete [COMMAND-OPTIONS] name
-
+    
       Show the current connection information, i.e. all the variables that make
       up the current connection
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-**********************************
+.. _`pywbemcli connection export --help`:
+
 pywbemcli connection export --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection export --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection export [COMMAND-OPTIONS]
-
+    
       Export  the current connection information.
-
+    
       Creates an export statement for each connection variable and outputs the
       statement to the conole.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-********************************
+.. _`pywbemcli connection list --help`:
+
 pywbemcli connection list --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection list --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection list [COMMAND-OPTIONS]
-
+    
       Execute a simple wbem request to test that the connection exists and is
       working.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-*******************************
-pywbemcli connection set --help
-*******************************
+.. _`pywbemcli connection select --help`:
 
-::
-
-    Usage: pywbemcli connection set [COMMAND-OPTIONS] name
-
-      Set current connection into repository.
-
-      Sets the current wbem connection information into the repository of
-      connections. If the name does not already exist in the connection
-      information, the provided name is used.
-
-    Options:
-      --help  Show this message and exit.
-
-
-
-**********************************
 pywbemcli connection select --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection select --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection select [COMMAND-OPTIONS] name
-
+    
       Select a connection from the current defined connections
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-********************************
+.. _`pywbemcli connection set --help`:
+
+pywbemcli connection set --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection set --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection set [COMMAND-OPTIONS] name
+    
+      Set current connection into repository.
+    
+      Sets the current wbem connection information into the repository of
+      connections. If the name does not already exist in the connection
+      information, the provided name is used.
+    
+    Options:
+      --help  Show this message and exit.
+
+
+
+.. _`pywbemcli connection show --help`:
+
 pywbemcli connection show --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection show --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection show [COMMAND-OPTIONS] name
-
+    
       Show the current connection information, i.e. all the variables that make
       up the current connection
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-********************************
+.. _`pywbemcli connection test --help`:
+
 pywbemcli connection test --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection test --help` subcommand
+
 
 ::
 
     Usage: pywbemcli connection test [COMMAND-OPTIONS]
-
+    
       Execute a simple wbem request to test that the connection exists and is
       working.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-*********************
+.. _`pywbemcli help --help`:
+
 pywbemcli help --help
-*********************
+---------------------
+
+
+
+The following defines the help output for the `pywbemcli help --help` subcommand
+
 
 ::
 
     Usage: pywbemcli help [OPTIONS]
-
+    
       Show help message for interactive mode.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-*************************
+.. _`pywbemcli instance --help`:
+
 pywbemcli instance --help
-*************************
+-------------------------
+
+
+
+The following defines the help output for the `pywbemcli instance --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
-
+    
       Command Group to manage CIM instances.
-
+    
       This incudes functions to get, enumerate, create, modify, and delete
       instances in a namspace and additional functions to get more general
       information on instances (ex. counts) within the namespace
-
+    
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
-
+    
     Options:
       --help  Show this message and exit.
-
+    
     Commands:
       associators   Get the associated instances or instance...
       count         Get number of instances for each class in...
@@ -745,21 +773,27 @@ pywbemcli instance --help
 
 
 
-*************************************
+.. _`pywbemcli instance associators --help`:
+
 pywbemcli instance associators --help
-*************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance associators --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
-
+    
       Get the associated instances or instance names.
-
+    
       Returns the associated instances or names (names-only option) for the
       INSTANCENAME argument filtered by the assocclass, resultclass, role and
       resultrole arguments. This may be executed interactively by providing only
       a classname and the interactive option.
-
+    
     Options:
       -a, --assocclass <class name>   Filter by the associated instancename
                                       provided.
@@ -789,30 +823,36 @@ pywbemcli instance associators --help
 
 
 
-*******************************
+.. _`pywbemcli instance count --help`:
+
 pywbemcli instance count --help
-*******************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance count --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME regex
-
+    
       Get number of instances for each class in namespace.
-
+    
       The size of the response may be limited by CLASSNAME argument which
       defines a classname regular expression so that only those classes are
       counted
-
+    
       The CLASSNAME argument is optional.
-
+    
       The CLASSNAME argument may be either a complete classname or a regular
       expression that can be matched to one or more classnames. To limit the
       filter to a single classname, terminate the classname with $.
-
+    
       The regular expression is anchored to the beginning of the classname and
       is case insensitive. Thus pywbem_ returns all classes that begin with
       PyWBEM_, pywbem_, etc.
-
+    
     Options:
       -s, --sort              Sort by instance count. Otherwise sorted by
                               classname
@@ -822,16 +862,22 @@ pywbemcli instance count --help
 
 
 
-********************************
+.. _`pywbemcli instance create --help`:
+
 pywbemcli instance create --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance create --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance create [COMMAND-OPTIONS] classname
-
+    
       Create an instance of classname.
-
+    
     Options:
       -x, --property property         Optional multiple property definitions of
                                       form name=value
@@ -850,18 +896,24 @@ pywbemcli instance create --help
 
 
 
-********************************
+.. _`pywbemcli instance delete --help`:
+
 pywbemcli instance delete --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance delete --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
-
+    
       Delete a single instance defined by instancename from the WBEM server.
       This may be executed interactively by providing only a classname and the
       interactive option.
-
+    
     Options:
       -i, --interactive       If set, instancename argument must be a class and
                               user is provided with a list of instances of the
@@ -872,20 +924,26 @@ pywbemcli instance delete --help
 
 
 
-***********************************
+.. _`pywbemcli instance enumerate --help`:
+
 pywbemcli instance enumerate --help
-***********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance enumerate --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
-
+    
       Enumerate instances or instance names from the WBEMServer starting either
       at the top  of the hiearchy (if no classname provided) or from the
       classname argument provided.
-
+    
       Displays the returned instances or names
-
+    
     Options:
       -l, --localonly                 Show only local properties of the class.
       -d, --deepinheritance           Return properties in subclasses of defined
@@ -910,21 +968,27 @@ pywbemcli instance enumerate --help
 
 
 
-*****************************
+.. _`pywbemcli instance get --help`:
+
 pywbemcli instance get --help
-*****************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance get --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
-
+    
       Get a single CIMInstance.
-
+    
       Gets the instance defined by instancename.
-
+    
       This may be executed interactively by providing only a classname and the
       interactive option.
-
+    
     Options:
       -l, --localonly                 Show only local properties of the returned
                                       instance.
@@ -950,19 +1014,25 @@ pywbemcli instance get --help
 
 
 
-**************************************
+.. _`pywbemcli instance invokemethod --help`:
+
 pywbemcli instance invokemethod --help
-**************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance invokemethod --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] name name
-
+    
       Invoke the method defined by instancename and methodname with parameters.
-
+    
       This issues an instance level invokemethod request and displays the
       results.
-
+    
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
                                  name=value
@@ -977,16 +1047,22 @@ pywbemcli instance invokemethod --help
 
 
 
-*******************************
+.. _`pywbemcli instance query --help`:
+
 pywbemcli instance query --help
-*******************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance query --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance query [COMMAND-OPTIONS] <query string>
-
+    
       Execute the query defined by the query argument.
-
+    
     Options:
       -l, --querylanguage <query language>
                                       Use the query language defined. (Default:
@@ -999,21 +1075,27 @@ pywbemcli instance query --help
 
 
 
-************************************
+.. _`pywbemcli instance references --help`:
+
 pywbemcli instance references --help
-************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance references --help` subcommand
+
 
 ::
 
     Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
-
+    
       Get the reference instances or instance names.
-
+    
       For the INSTANCENAME argument provided return instances or instance names
       (names-only option) filtered by the role and result class options. This
       may be executed interactively by providing only a classname and the
       interactive option.
-
+    
     Options:
       -r, --resultclass <class name>  Filter by the result class name provided.
       -o, --role <role name>          Filter by the role name provided.
@@ -1040,47 +1122,59 @@ pywbemcli instance references --help
 
 
 
-**************************
+.. _`pywbemcli qualifier --help`:
+
 pywbemcli qualifier --help
-**************************
+--------------------------
+
+
+
+The following defines the help output for the `pywbemcli qualifier --help` subcommand
+
 
 ::
 
     Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
-
+    
       Command Group to manage CIM QualifierDeclarations.
-
+    
       Includes the capability to get and enumerate qualifier declarations.
-
+    
       This does not provide the capability to create or delete CIM
       QualifierDeclarations
-
+    
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
-
+    
     Options:
       --help  Show this message and exit.
-
+    
     Commands:
       enumerate  Enumerate CIMQualifierDeclaractions.
       get        Display CIMQualifierDeclaration.
 
 
 
-************************************
+.. _`pywbemcli qualifier enumerate --help`:
+
 pywbemcli qualifier enumerate --help
-************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli qualifier enumerate --help` subcommand
+
 
 ::
 
     Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
-
+    
       Enumerate CIMQualifierDeclaractions.
-
+    
       Displays all of the CIMQualifierDeclaration objects in the defined
       namespace in the current WBEM Server
-
+    
     Options:
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
@@ -1089,19 +1183,25 @@ pywbemcli qualifier enumerate --help
 
 
 
-******************************
+.. _`pywbemcli qualifier get --help`:
+
 pywbemcli qualifier get --help
-******************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli qualifier get --help` subcommand
+
 
 ::
 
     Usage: pywbemcli qualifier get [COMMAND-OPTIONS] NAME
-
+    
       Display CIMQualifierDeclaration.
-
+    
       Displays a single CIMQualifierDeclaration for the defined namespace in the
       current WBEMServer
-
+    
     Options:
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
@@ -1109,39 +1209,51 @@ pywbemcli qualifier get --help
 
 
 
-*********************
+.. _`pywbemcli repl --help`:
+
 pywbemcli repl --help
-*********************
+---------------------
+
+
+
+The following defines the help output for the `pywbemcli repl --help` subcommand
+
 
 ::
 
     Usage: pywbemcli repl [OPTIONS]
-
+    
       Enter interactive (REPL) mode (default) and load any existing history
       file.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-***********************
+.. _`pywbemcli server --help`:
+
 pywbemcli server --help
-***********************
+-----------------------
+
+
+
+The following defines the help output for the `pywbemcli server --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
-
+    
       Command Group for WBEM server operations.
-
+    
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
-
+    
     Options:
       --help  Show this message and exit.
-
+    
     Commands:
       brand       Display interop namespace name in the WBEM...
       connection  Display information on the connection used by...
@@ -1153,95 +1265,131 @@ pywbemcli server --help
 
 
 
-*****************************
+.. _`pywbemcli server brand --help`:
+
 pywbemcli server brand --help
-*****************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server brand --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server brand [COMMAND-OPTIONS]
-
+    
       Display interop namespace name in the WBEM Server.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-**********************************
+.. _`pywbemcli server connection --help`:
+
 pywbemcli server connection --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server connection --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server connection [COMMAND-OPTIONS]
-
+    
       Display information on the connection used by this server.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-****************************
+.. _`pywbemcli server info --help`:
+
 pywbemcli server info --help
-****************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server info --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server info [COMMAND-OPTIONS]
-
+    
       Display the brand information on theWBEM Server.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-*******************************
+.. _`pywbemcli server interop --help`:
+
 pywbemcli server interop --help
-*******************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server interop --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server interop [COMMAND-OPTIONS]
-
+    
       Display the interop namespace name in the WBEM Server.
-
+    
     Options:
       --help  Show this message and exit.
 
 
 
-**********************************
+.. _`pywbemcli server namespaces --help`:
+
 pywbemcli server namespaces --help
-**********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server namespaces --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
-
+    
       Display the namespaces in the WBEM server
-
+    
     Options:
       -s, --sort  Sort into alphabetical order by classname.
       --help      Show this message and exit.
 
 
 
-********************************
+.. _`pywbemcli server profiles --help`:
+
 pywbemcli server profiles --help
-********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server profiles --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server profiles [COMMAND-OPTIONS]
-
+    
       Display profiles in the WBEM Server.
-
+    
       This display may be filtered by the optional organization and profile name
       options
-
+    
     Options:
       -o, --organization <org name>   Filter by the defined organization. (ex. -o
                                       DMTF
@@ -1251,16 +1399,22 @@ pywbemcli server profiles --help
 
 
 
-*********************************
+.. _`pywbemcli server test_pull --help`:
+
 pywbemcli server test_pull --help
-*********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server test_pull --help` subcommand
+
 
 ::
 
     Usage: pywbemcli server test_pull [COMMAND-OPTIONS]
-
+    
       Test whether pull opeations exist on the WBEM server.
-
+    
     Options:
       --help  Show this message and exit.
 

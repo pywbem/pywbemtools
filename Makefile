@@ -314,6 +314,6 @@ $(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  coveragerc
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemclicmdshelp.rst: pywbemcli $(package_name)/pywbemcli.py $(package_name)/_cmd*.py
-	tools/help_overview.py >$@
+	tools/click_help_capture.py >$@
 	cp $@ design/help_overview.rst
-	@echo 'Done: Created help command info for docs: $@'
+	@echo 'Done: Created help command info for cmds: $@'
