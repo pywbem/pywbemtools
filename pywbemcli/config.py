@@ -52,7 +52,7 @@ DEFAULT_CONNECTION_TIMEOUT = 30
 #: Specifies the default output format selected if no output format is
 #: defined on the cmd line, environment variable, or a config file.
 
-DEFAULT_OUTPUT_FORMAT = 'mof'
+DEFAULT_OUTPUT_FORMAT = 'simple'
 
 #: Specifies the default namespace uses if no default namespace is defined
 #: on the cmd line, environment variable, or a config file.

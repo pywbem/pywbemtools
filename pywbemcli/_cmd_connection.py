@@ -24,10 +24,9 @@ import six
 from pywbem import Error, DEFAULT_CA_CERT_PATHS
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, pick_from_list
+from ._common import CMD_OPTS_TXT, pick_from_list, format_table
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
-from ._asciitable import print_ascii_table
 from ._connection_repository import get_pywbemcli_servers, \
     server_definitions_new, server_definitions_delete
 from .config import MAX_TIMEOUT
@@ -382,16 +381,16 @@ def cmd_connection_list(context):
     pywbemcli_servers = get_pywbemcli_servers()
 
     # build the table structure
-    hdr = ['name', 'server uri', 'namespace', 'user', 'password',
-           'timeout', 'noverify', 'certfile', 'keyfile']
-    lines = []
+    headers = ['name', 'server uri', 'namespace', 'user', 'password',
+               'timeout', 'noverify', 'certfile', 'keyfile']
+    rows = []
 
     for name, svr in six.iteritems(pywbemcli_servers):
-        line = [name, svr.server_uri, svr.default_namespace, svr.user,
-                svr.password, svr.timeout, svr.noverify, svr.certfile,
-                svr.keyfile]
-        lines.append(line)
+        row = [name, svr.server_uri, svr.default_namespace, svr.user,
+               svr.password, svr.timeout, svr.noverify, svr.certfile,
+               svr.keyfile]
+        rows.append(row)
 
     context.spinner.stop()
-    print_ascii_table(lines, header=hdr, title='WBEMServer Connections',
-                      inner=False, outer=False)
+    click.echo(format_table(rows, headers, title='WBEMServer Connections:',
+                            table_format=context.output_format))

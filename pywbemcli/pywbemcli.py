@@ -27,7 +27,7 @@ from prompt_toolkit.history import FileHistory
 from pywbem import DEFAULT_CA_CERT_PATHS
 
 from ._context_obj import ContextObj
-from ._common import GENERAL_OPTIONS_METAVAR
+from ._common import GENERAL_OPTIONS_METAVAR, OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
@@ -97,10 +97,12 @@ __all__ = ['cli']
                    'following system directories: ' +
                    ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @click.option('-o', '--output-format',
-              type=click.Choice(['mof', 'xml', 'table', 'csv', 'text']),
+              type=click.Choice(OUTPUT_FORMATS),
               help='Output format (Default: {of}). pywbemcli may override '
                    'the format choice depending on the operation since not '
-                   'all formats apply to all output data types'
+                   'all formats apply to all output data types. For CIM'
+                   'structured objects (ex. CIMInstance), the default output '
+                   'format is mof'
               .format(of=DEFAULT_OUTPUT_FORMAT))
 @click.option('--use-pull_ops', envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),

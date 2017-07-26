@@ -20,20 +20,24 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import, unicode_literals
 
 import re
+from textwrap import fill
 from prompt_toolkit import prompt
 import click
 import six
+from terminaltables import AsciiTable
 
 from pywbem import CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
-from ._asciitable import print_ascii_table, fold_line
+TABLE_FORMATS = ['table', 'plain', 'simple', 'grid']
+CIM_OBJECT_OUTPUT_FORMATS = ['mof', 'xml', 'txt', 'tree']
 
-
-# from ._debugtools import DumpArgs
-
+# TODO: ks for some reason extending one list with another causes a problem
+# in click with the help.
+OUTPUT_FORMATS = ['table', 'plain', 'simple', 'grid', 'mof', 'xml', 'txt',
+                  'tree']
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
@@ -527,13 +531,11 @@ def display_cim_objects(context, objects, output_format='mof'):
     in the str of the type.
     """
     context.spinner.stop()
-    if output_format == 'csv' or output_format == 'txt':
-        click.echo("Csv and txt formats not implemented. Using MOF.")
-        output_format = 'mof'
     # TODO this is very simplistic formatter and needs refinement.
     if isinstance(objects, (list, tuple)):
-        if output_format == 'table':
-            display_table(objects)
+        if output_format in TABLE_FORMATS:
+            if len(objects) > 0 and isinstance(objects[0], CIMInstance):
+                print_obj_as_table(context, objects)
         else:
             for item in objects:
                 display_cim_objects(context, item, output_format=output_format)
@@ -541,7 +543,9 @@ def display_cim_objects(context, objects, output_format='mof'):
     # display the item
     else:
         object_ = objects
-        if output_format == 'mof':
+        if output_format in TABLE_FORMATS and isinstance(object, CIMInstance):
+            print_obj_as_table(context, object)
+        elif output_format == 'mof':
             try:
                 click.echo(object_.tomof())
             except AttributeError:
@@ -558,16 +562,16 @@ def display_cim_objects(context, objects, output_format='mof'):
                 click.echo(object)
             except AttributeError:
                 click.echo('%r' % object)
-
         elif output_format == 'tree':
             raise click.ClickException("tree output format not allowed")
 
 
 # TODO how can we build the include_classes into the format requirements
 # TODO how can we set up the max_cell_width
-def display_table(objects, include_classes=False,
-                  max_cell_width=20):
-    """If possible display the list of object as a table.
+def print_obj_as_table(context, objects, include_classes=False,
+                       max_cell_width=20):
+    """
+    If possible display the list of object as a table.
     Currently this only works for instances where the table is a column
     per property.
 
@@ -625,12 +629,12 @@ def display_table(objects, include_classes=False,
                         val_str = _scalar_value(p.type, value)
             if max_cell_width:
                 if len(val_str) > max_cell_width:
-                    val_str = fold_line(val_str, max_cell_width)
+                    val_str = fold_string(val_str, max_cell_width)
             line.append(val_str)
-
         lines.append(line)
-    print_ascii_table(lines, title=title, header=header_line,
-                      inner=True, outer=True)
+
+    click.echo(format_table(lines, header_line, title=title,
+                            table_format=context.output_format))
 
 
 def _scalar_value(type_, value_, max_width=None):
@@ -658,7 +662,7 @@ def _scalar_value(type_, value_, max_width=None):
         _str = str(value_)
     if max_width:
         if len(str) > max_width:
-            _str = fold_line(_str, max_width)
+            _str = fold_string(_str, max_width)
     return _str
 
 
@@ -685,3 +689,118 @@ def _array_value(type_, value_, fold=False, max_cell_width=None):
     str_ = enum_value(type_, value_, sep, max_cell_width)
 
     return str_
+
+
+def format_table(rows, headers, table_format='simple', title=None):
+    """
+    General print table function.  Prints a list of lists in a
+    table format where each inner list is a row.
+    This code is temporary while the tabulate package is updated
+    to being  capable of supporting multiline cells.
+
+      Parameters:
+          headers (list strings) where each string is a
+           table column name or None if no header is to be attached
+
+          table_data - list of lists where:
+             each the top level iterables represents the list of rows
+             and each row is an iterable of strings for the data in that
+             row.
+
+          title (:term: `string`)
+             Optional title to be places io the output above the table.
+             No title is output if this parameter is None
+
+          table_format (:term: 'string')
+            Output format defined by the string and limited to one of the
+            choice of table formats defined in TABLE_FORMATS list
+
+          output_file (:term: 'string')
+            If not None, a file name to which the output formatted data
+            is sent.
+
+      Returns: (:term:`string`)
+        Returns the formatted table as a string
+
+      Exceptions:
+        Raises click.ClickException if invalid table format string
+    """
+
+    if table_format is None:
+        table_format = 'simple'
+    if table_format not in TABLE_FORMATS:
+        raise click.ClickException('Invalid table format %s.' % table_format)
+
+    # Future this line can be change to tabulate call.
+    result = _build_terminal_table(rows, headers, table_format=table_format)
+
+    if title:
+        result = '%s\n%s' % (title, result)
+    return result
+
+
+def _build_terminal_table(rows, headers, table_format='simple'):
+    """
+        Builds a table using the formatting characteristics of tabulate package
+        but using the terminaltable package since it supports folded cells.
+
+        This uses the formatting definitions of the tabulate package including:
+        plain, simple, grid to format tables that are similar to
+        tabulate.  In the future we may switch to tabulate when it supports
+        folded tables because it allows more output formats.
+
+        This is an internal function and is NOT intended to be used externally
+        since the format, etc. checking is in build_table, not here.
+
+        NOTE: This is a separate function because it can be replaced with
+        a call to tabulate in the future
+    """
+    if headers:
+        rows.insert(0, headers)
+
+    table = AsciiTable(rows)
+    # table with no borders
+    if table_format is None or table_format == 'plain':
+        table.inner_column_border = False
+        table.inner_heading_row_border = False
+        table.inner_row_border = False
+        table.outer_border = False
+    # table with only header/data separation border
+    elif table_format == 'simple' or table_format == 'table':
+        table.inner_heading_row_border = True
+        table.inner_column_border = False
+        table.outer_border = False
+    # table with borders around all cells
+    elif table_format == 'grid':
+        table.inner_column_border = True
+        table.outer_border = True
+        table.inner_row_border = True
+        table.inner_heading_row_border = True
+    else:
+        raise ValueError('Invalid table type %s. Folded tables have '
+                         ' limited formatting.' % table_format)
+
+    return(table.table)
+
+
+def fold_string(input_string, max_width):
+    """ Fold a string within a maximum width.
+
+        Parameters:
+
+          input_string:
+            The string of data to go into the cell
+          max_width:
+            Maximum width of cell.  Data is folded into multiple lines to
+            fit into this width.
+
+        Return:
+            String representing the folded string
+    """
+    new_string = input_string
+    if isinstance(input_string, six.string_types):
+        if max_width < len(input_string):
+            # use textwrap to fold the string
+            new_string = fill(input_string, max_width)
+
+    return new_string

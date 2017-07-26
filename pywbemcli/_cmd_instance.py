@@ -24,7 +24,7 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_cim_namespace_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
-    create_params, filter_namelist, CMD_OPTS_TXT
+    create_params, filter_namelist, CMD_OPTS_TXT, format_table
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from .config import DEFAULT_QUERY_LANGUAGE
@@ -594,19 +594,15 @@ def cmd_instance_count(context, classname, options):
     if options['sort']:
         display_data.sort(key=lambda x: x[1])
 
-    # set the max width of the count field based on the max integer to display
-    max_count = 0
-    for i in display_data:
-        if i[1] > max_count:
-            max_count = i[1]
-    max_int_len = len(str(max_count))
-
+    headers = ['Class', 'count']
+    rows = []
     if display_data:
-        print('')
         for item in display_data:
-            print('{0:<{width}} :{1:>{i_width}}'.format(item[0], item[1],
-                                                        width=maxlen,
-                                                        i_width=max_int_len))
+            rows.append([item[0], item[1]])
+    context.spinner.stop()
+    click.echo(format_table(rows, headers,
+                            table_format=context.output_format,
+                            title='Count of instances per class'))
 
 
 def cmd_instance_query(context, query, options):

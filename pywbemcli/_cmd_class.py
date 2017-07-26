@@ -31,6 +31,7 @@ from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
 
+
 #
 #   Common option definitions for class group
 #
@@ -221,23 +222,19 @@ def class_associators(context, classname, **options):
 @click.pass_obj
 def class_find(context, classname, **options):
     """
-    Find all classes that match the CLASSNAME regex.
+    Find all classes that match CLASSNAME.
 
-    Find all of the classes in the namespace  of the defined WBEMServer that
-     match the CLASSNAME  regular expression argument in the namespaces of
-    the defined WBEMserver.
+    Find all  class names in the namespace(s) of the defined WBEMServer that
+    match the CLASSNAME regular expression argument. The CLASSNAME argument may
+    be either a complete classname or a regular expression that can be matched
+    to one or more classnames. To limit the filter to a single classname,
+    terminate the classname with $.
 
-    The CLASSNAME argument is required.
-
-    The CLASSNAME argument may be either a complete classname or a regular
-    expression that can be matched to one or more classnames. To limit the
-    filter to a single classname, terminate the classname with $.
-
-    The regular expression is anchored to the beginning of the classname and
+    The regular expression is anchored to the beginning of CLASSNAME and
     is case insensitive. Thus pywbem_ returns all classes that begin with
     PyWBEM_, pywbem_, etc.
 
-    The namespace option limits the search to the defined namespace
+    The namespace option limits the search to the defined namespace.
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 
@@ -443,9 +440,16 @@ def cmd_class_find(context, classname, options):
 
         # Display function to display classnames returned with
         # their namespaces in the form <namespace>:<classname>
+        rows = []
         for ns_name in names_dict:
+            ns_rows = []
             for classname in names_dict[ns_name]:
-                print('  %s:%s' % (ns_name, classname))
+                ns_rows.append([ns_name, classname])
+            # sort the result by classname
+            ns_rows.sort(key=lambda x: x[1])
+            rows.extend(ns_rows)
+        for row in rows:
+            print('  %s:%s' % (row[0], row[1]))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
