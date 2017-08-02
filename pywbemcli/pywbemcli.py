@@ -146,13 +146,13 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     (sub-)commands as well as the command line.
     """
 
-    # in interactive mode, global options specified in cmd line are used as
+    # In interactive mode, global options specified in cmd line are used as
     # defaults for interactive commands.
     # This requires being able to determine for each option whether it has been
     # specified and is why global options don't define defaults in the
     # decorators that define them.
 
-    # Temp solution to get the persistent file of connections
+    # TODO: this is a temp solution to get the persistent file of connections
     pywbemcli_servers = get_pywbemcli_servers()
 
     if ctx.obj is None:
