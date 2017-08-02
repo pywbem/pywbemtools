@@ -222,19 +222,23 @@ def class_associators(context, classname, **options):
 @click.pass_obj
 def class_find(context, classname, **options):
     """
-    Find all classes that match CLASSNAME.
+    Find all classes that match the CLASSNAME regex.
 
-    Find all  class names in the namespace(s) of the defined WBEMServer that
-    match the CLASSNAME regular expression argument. The CLASSNAME argument may
-    be either a complete classname or a regular expression that can be matched
-    to one or more classnames. To limit the filter to a single classname,
-    terminate the classname with $.
+    Find all of the classes in the namespace  of the defined WBEMServer that
+     match the CLASSNAME  regular expression argument in the namespaces of
+    the defined WBEMserver.
 
-    The regular expression is anchored to the beginning of CLASSNAME and
+    The CLASSNAME argument is required.
+
+    The CLASSNAME argument may be either a complete classname or a regular
+    expression that can be matched to one or more classnames. To limit the
+    filter to a single classname, terminate the classname with $.
+
+    The regular expression is anchored to the beginning of the classname and
     is case insensitive. Thus pywbem_ returns all classes that begin with
     PyWBEM_, pywbem_, etc.
 
-    The namespace option limits the search to the defined namespace.
+    The namespace option limits the search to the defined namespace
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 

@@ -25,6 +25,7 @@ import click
 from pywbem import ValueMapping, Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, format_table
+from ._common_options import add_options, sort_option
 
 
 def print_profile_info(org_vm, inst):
@@ -48,15 +49,16 @@ def server_group():
     """
     pass
 
+
 @server_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
 @add_options(sort_option)
 @click.pass_obj
-def server_namespaces(context):
+def server_namespaces(context, **options):
     """
     Display the namespaces in the WBEM server
     """
     # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_namespaces(context))
+    context.execute_cmd(lambda: cmd_server_namespaces(context, options))
 
 
 @server_group.command('interop', options_metavar=CMD_OPTS_TXT)
@@ -143,11 +145,12 @@ def cmd_server_namespaces(context, options):
     """
     try:
         namespaces = context.wbem_server.namespaces
+        if options['sort']:
+            namespaces.sort()
         context.spinner.stop()
 
-        rows = []
-        for ns in namespaces:
-            rows.append([ns])
+        # create list for each row
+        rows = [[ns] for ns in namespaces]
 
         click.echo(format_table(rows, ['Namespace Name'],
                                 title='Server Namespaces:',
@@ -165,8 +168,8 @@ def cmd_server_interop(context):
         interop_ns = context.wbem_server.interop_ns
         context.spinner.stop()
 
-        rows = []
-        rows.append([interop_ns])
+        rows = [[interop_ns]]
+
         click.echo(format_table(rows, ['Namespace Name'],
                                 title='Server Interop Namespace:',
                                 table_format=context.output_format))
@@ -179,7 +182,13 @@ def cmd_server_brand(context):
     Display product and version info of the current WBEMServer
     """
     try:
-        click.echo(context.wbem_server.brand)
+        brand = context.wbem_server.brand
+        context.spinner.stop()
+
+        rows = [[brand]]
+        click.echo(format_table(rows, ['WBEM Server Brand'],
+                                title='Server Brand:',
+                                table_format=context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -198,8 +207,8 @@ def cmd_server_info(context):
         server = context.wbem_server
 
         rows = []
-        headers = ['Brand', 'version', 'Interop Namespace', 'Namespaces']
-        if len(server.namespaces) > 20:
+        headers = ['Brand', 'Version', 'Interop Namespace', 'Namespaces']
+        if len(server.namespaces) > 3:
             namespaces = '\n'.join(server.namespaces)
         else:
             namespaces = ', '.join(server.namespaces)
@@ -243,6 +252,8 @@ def cmd_server_profiles(context, options):
         for inst in found_server_profiles:
             row = get_profile_info(org_vm, inst)
             rows.append(row)
+        # sort by org
+        rows.sort(key=lambda x: (x[0], x[1]))
         headers = ['Organization', 'Registered Name', 'Version']
 
         click.echo(format_table(rows, headers,
