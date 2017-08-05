@@ -132,7 +132,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
-    server. This browser uses subcommands to
+    server. This browser uses subcommands to:
+
     \b
         * Explore the characteristics of WBEM Servers based on using the
           pywbem client APIs.  It can manage/inspect CIM_Classes and

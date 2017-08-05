@@ -84,15 +84,21 @@ def rst_headline(title, level):
 
 def print_rst_verbatum_text(text_str):
     """
-    Print the text on input surrounded by the back quotes defining
-    veratum text
+    Print the text on input proceeded by the rst literal block indicator
     """
     print('::\n')
     # indent text for rst. rst requires that block monospace test be
     # indented and preceeded by line with just '::' and followed by
-    # empty line. This indents by two char the complete test_str except
-    # the first line
-    print('%s\n' % indent(text_str, 4))
+    # empty line. Indent all lines with text
+
+    lines = text_str.split('\n')
+    new_lines = []
+    for line in lines:
+        if line:
+            new_lines.append(indent(line, 4))
+        else:
+            new_lines.append(line)
+    print('%s' % '\n'.join(new_lines))
 
 
 HELP_DICT = {}
@@ -134,7 +140,7 @@ def get_subcmd_group_names(script_name, cmd):
                            ' from %s call. stderr %s' % (script_name,
                                                          exitcode,
                                                          std_err))
-    if len(std_err):
+    if std_err:
         raise RuntimeError('Error. expected stderr (%s)returned from '
                            '%s call.' % (script_name, std_err))
 
@@ -145,7 +151,7 @@ def get_subcmd_group_names(script_name, cmd):
     group_list = []
     group_state = False
     for line in lines:
-        if group_state and len(line):
+        if group_state and line:
             # split line into list of words and get first word as subcommand
             words = line.split()
             group_list.append(words[0])
