@@ -145,12 +145,6 @@ def cmd_server_namespaces(context, options):
     Display namespaces in the current WBEMServer
     """
     try:
-<<<<<<< HEAD
-        ns = context.wbem_server.namespaces
-        if options['sort']:
-            ns = ns.sort()
-        display_cim_objects(context, ns, context.output_format)
-=======
         namespaces = context.wbem_server.namespaces
         if options['sort']:
             sorted(namespaces)
@@ -163,7 +157,6 @@ def cmd_server_namespaces(context, options):
             ns_lists.append([ns])
         print_ascii_table(ns_lists, title=None, header=['Namespaces'],
                           inner=True, outer=True)
->>>>>>> 3192a93... Implement operation statistics with display
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
