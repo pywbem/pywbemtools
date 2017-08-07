@@ -38,9 +38,9 @@ import six
 # result
 HELP_OUTPUT = ['Usage: pywbemcli',
                '--default_namespace',
-               '--timeout TEXT',
+               '--timeout INTEGER RANGE',
                'Commands:',
-               'class']
+               'class', 'connection', 'instance', 'qualifier', 'server']
 
 
 # pylint: disable=invalid-name
