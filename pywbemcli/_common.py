@@ -563,8 +563,8 @@ def display_cim_objects(context, objects, output_format='mof'):
             raise click.ClickException("tree output format not allowed")
 
 
-# TODO: how can we build the include_classes into the format requirements
-# TODO: how can we set up the max_cell_width
+# TODO how can we build the include_classes into the format requirements
+# TODO how can we set up the max_cell_width
 def display_table(objects, include_classes=False,
                   max_cell_width=20):
     """If possible display the list of object as a table.

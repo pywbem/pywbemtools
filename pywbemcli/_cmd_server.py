@@ -40,7 +40,7 @@ def print_profile_info(org_vm, inst):
 
 
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
-def server_group():
+def class_group():
     """
     Command Group for WBEM server operations.
 
@@ -51,7 +51,7 @@ def server_group():
     pass
 
 
-@server_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
+@class_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
 @add_options(sort_option)
 @click.pass_obj
 def server_namespaces(context, **options):
@@ -62,7 +62,7 @@ def server_namespaces(context, **options):
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
 
 
-@server_group.command('interop', options_metavar=CMD_OPTS_TXT)
+@class_group.command('interop', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_interop(context):
     """
@@ -72,7 +72,7 @@ def server_interop(context):
     context.execute_cmd(lambda: cmd_server_interop(context))
 
 
-@server_group.command('brand', options_metavar=CMD_OPTS_TXT)
+@class_group.command('brand', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_brand(context):
     """
@@ -82,7 +82,7 @@ def server_brand(context):
     context.execute_cmd(lambda: cmd_server_brand(context))
 
 
-@server_group.command('info', options_metavar=CMD_OPTS_TXT)
+@class_group.command('info', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_info(context):
     """
@@ -91,7 +91,7 @@ def server_info(context):
     context.execute_cmd(lambda: cmd_server_info(context))
 
 
-@server_group.command('profiles', options_metavar=CMD_OPTS_TXT)
+@class_group.command('profiles', options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, required=False,
               metavar='<org name>',
               help='Filter by the defined organization. (ex. -o DMTF')
@@ -109,7 +109,7 @@ def server_profiles(context, **options):
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
 
-@server_group.command('connection', options_metavar=CMD_OPTS_TXT)
+@class_group.command('connection', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_connection(context):
     """
@@ -118,7 +118,7 @@ def server_connection(context):
     context.execute_cmd(lambda: cmd_server_connection(context))
 
 
-@server_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
+@class_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_test_pull(context):
     """
@@ -145,18 +145,10 @@ def cmd_server_namespaces(context, options):
     Display namespaces in the current WBEMServer
     """
     try:
-        namespaces = context.wbem_server.namespaces
+        ns = context.wbem_server.namespaces
         if options['sort']:
-            sorted(namespaces)
-
-        # reformat as list of lists.
-        # TODO: list of strings with on col in header should actually format
-        # correctly for table
-        ns_lists = []
-        for ns in namespaces:
-            ns_lists.append([ns])
-        print_ascii_table(ns_lists, title=None, header=['Namespaces'],
-                          inner=True, outer=True)
+            ns = ns.sort()
+        display_cim_objects(context, ns, context.output_format)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -166,9 +158,8 @@ def cmd_server_interop(context):
     Display interop namespace in the current WBEMServer
     """
     try:
-        interop_ns = [[context.wbem_server.interop_ns]]
-        print_ascii_table(interop_ns, title=None, header=['Interop Namespace'],
-                          inner=True, outer=True)
+        display_cim_objects(context, context.wbem_server.interop_ns,
+                            context.output_format)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
