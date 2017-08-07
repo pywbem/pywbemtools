@@ -60,7 +60,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
                                       option.(EnvVar: PYWBEMCLI_PASSWORD ).
-      -t, --timeout TEXT              Operation timeout for the WBEM Server in
+      -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
                                       seconds. (EnvVar: PYWBEMCLI_TIMEOUT).
                                       Default: 30
       -n, --noverify                  If set, client does not verify server
@@ -470,77 +470,14 @@ The following defines the help output for the `pywbemcli connection --help` subc
       --help  Show this message and exit.
 
     Commands:
-      create  Create a new named connection from the input...
       delete  Show the current connection information, i.e.
       export  Export the current connection information.
       list    Execute a simple wbem request to test that...
+      new     Create a new named connection from the input...
+      save    Save current connection into repository.
       select  Select a connection from the current defined...
-      set     Set current connection into repository.
       show    Show the current connection information, i.e.
       test    Execute a simple wbem request to test that...
-
-
-.. _`pywbemcli connection create --help`:
-
-pywbemcli connection create --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection create --help` subcommand
-
-
-::
-
-    Usage: pywbemcli connection create [COMMAND-OPTIONS] name SERVER
-
-      Create a new named connection from the input parameters.
-
-      This subcommand creates and saves a new named connection from the input
-      parameters.
-
-      The name and server arguments MUST exist. They define the server uri and
-      the unique name under which this server connection information will be
-      stored. All other properties are optional.
-
-      It does NOT automatically set the pywbemcli to use that connection. Use
-      `connection select` to set a particular stored connection definition as
-      the current connection.
-
-      This is the alternative means of defining a new WBEM server to be accessed
-      to supplying the parameters on the command line. and using the connection
-      set command to put it into the connection repository.
-
-      Defines a new connection that can be referenced by the name argument in
-      the future.  This connection object is capable of managing all of the
-      properties defined for WBEMConnections.
-
-    Options:
-      -d, --default_namespace TEXT  Default Namespace to use in the target
-                                    WBEMServer if no namespace is defined in the
-                                    subcommand (Default: root/cimv2).
-      -u, --user TEXT               User name for the WBEM Server connection.
-      -p, --password TEXT           Password for the WBEM Server. Will be
-                                    requested as part  of initialization if user
-                                    name exists and it is not  provided by this
-                                    option.
-      -t, --timeout TEXT            Operation timeout for the WBEM Server in
-                                    seconds. Default: 30
-      -n, --noverify                If set, client does not verify server
-                                    certificate.
-      -c, --certfile TEXT           Server certfile. Ignored if noverify flag set.
-      -k, --keyfile TEXT            Client private key file.
-      --ca_certs TEXT               File or directory containing certificates that
-                                    will be matched against a certificate received
-                                    from the WBEM server. Set the --no-verify-cert
-                                    option to bypass client verification of the
-                                    WBEM server certificate. Default: Searches for
-                                    matching certificates in the following system
-                                    directories: /etc/pki/ca-
-                                    trust/extracted/openssl/ca-bundle.trust.crt
-                                    /etc/ssl/certs
-                                    /etc/ssl/certificates
-      --help                        Show this message and exit.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -608,6 +545,93 @@ The following defines the help output for the `pywbemcli connection list --help`
       --help  Show this message and exit.
 
 
+.. _`pywbemcli connection new --help`:
+
+pywbemcli connection new --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection new --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection new [COMMAND-OPTIONS] name SERVER
+
+      Create a new named connection from the input parameters.
+
+      This subcommand creates and saves a new named connection from the input
+      parameters.
+
+      The name and server arguments MUST exist. They define the server uri and
+      the unique name under which this server connection information will be
+      stored. All other properties are optional.
+
+      It does NOT automatically set the pywbemcli to use that connection. Use
+      `connection select` to set a particular stored connection definition as
+      the current connection.
+
+      This is the alternative means of defining a new WBEM server to be accessed
+      to supplying the parameters on the command line. and using the connection
+      set command to put it into the connection repository.
+
+      Defines a new connection that can be referenced by the name argument in
+      the future.  This connection object is capable of managing all of the
+      properties defined for WBEMConnections.
+
+    Options:
+      -d, --default_namespace TEXT  Default Namespace to use in the target
+                                    WBEMServer if no namespace is defined in the
+                                    subcommand (Default: root/cimv2).
+      -u, --user TEXT               User name for the WBEM Server connection.
+      -p, --password TEXT           Password for the WBEM Server. Will be
+                                    requested as part  of initialization if user
+                                    name exists and it is not  provided by this
+                                    option.
+      -t, --timeout INTEGER RANGE   Operation timeout for the WBEM Server in
+                                    seconds. Default: 30
+      -n, --noverify                If set, client does not verify server
+                                    certificate.
+      -c, --certfile TEXT           Server certfile. Ignored if noverify flag set.
+      -k, --keyfile TEXT            Client private key file.
+      --ca_certs TEXT               File or directory containing certificates that
+                                    will be matched against a certificate received
+                                    from the WBEM server. Set the --no-verify-cert
+                                    option to bypass client verification of the
+                                    WBEM server certificate. Default: Searches for
+                                    matching certificates in the following system
+                                    directories: /etc/pki/ca-
+                                    trust/extracted/openssl/ca-bundle.trust.crt
+                                    /etc/ssl/certs
+                                    /etc/ssl/certificates
+      --help                        Show this message and exit.
+
+
+.. _`pywbemcli connection save --help`:
+
+pywbemcli connection save --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection save --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection save [COMMAND-OPTIONS] name
+
+      Save current connection into repository.
+
+      Saves the current wbem connection information into the repository of
+      connections. If the name does not already exist in the connection
+      information, the provided name is used.
+
+    Options:
+      --help  Show this message and exit.
+
+
 .. _`pywbemcli connection select --help`:
 
 pywbemcli connection select --help
@@ -623,30 +647,6 @@ The following defines the help output for the `pywbemcli connection select --hel
     Usage: pywbemcli connection select [COMMAND-OPTIONS] name
 
       Select a connection from the current defined connections
-
-    Options:
-      --help  Show this message and exit.
-
-
-.. _`pywbemcli connection set --help`:
-
-pywbemcli connection set --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection set --help` subcommand
-
-
-::
-
-    Usage: pywbemcli connection set [COMMAND-OPTIONS] name
-
-      Set current connection into repository.
-
-      Sets the current wbem connection information into the repository of
-      connections. If the name does not already exist in the connection
-      information, the provided name is used.
 
     Options:
       --help  Show this message and exit.
@@ -857,8 +857,9 @@ The following defines the help output for the `pywbemcli instance create --help`
       Create an instance of classname.
 
     Options:
-      -x, --property property         Optional multiple property definitions of
-                                      form name=value
+      -P, --property property         Optional property definitions of form
+                                      name=value.Multiple definitions allowed, one
+                                      for each property
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       not included a Null property list is defined

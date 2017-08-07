@@ -75,13 +75,14 @@ TESTS_MAP = {  # pylint: disable=invalid-name
     "servertestpull": ["server test_pull", []],
 
 
-    "connection": ["connection", ['show', 'export', 'set']],
-    "connectionshow": ["connection show", []],
+    "connection": ["connection", ['show', 'delete', 'list', 'new', 'select',
+                                  'export', 'save', 'test']],
+    "connectionshow": ["connection show", ['connection show']],
     "connectionexport": ["connection export", []],
-    "connectionset": ["connection set", []],
-    "connectionlist": ["connection list", []],
-    "connectiondelete": ["connection delete", []],
-    "connectioncreate": ["connection create", []], }
+    "connectionset": ["connection save", ['connection save']],
+    "connectionlist": ["connection list", ['connection list']],
+    "connectiondelete": ["connection delete", ['connection delete']],
+    "connectioncreate": ["connection new", ['--default_namespace']], }
 
 
 class ContainerMeta(type):

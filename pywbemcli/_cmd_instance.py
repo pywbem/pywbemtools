@@ -114,9 +114,10 @@ def instance_delete(context, instancename, **options):
 
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='classname', required=True)
-@click.option('-x', '--property', type=str, metavar='property', required=False,
+@click.option('-P', '--property', type=str, metavar='property', required=False,
               multiple=True,
-              help='Optional multiple property definitions of form name=value')
+              help='Optional property definitions of form name=value.'
+              'Multiple definitions allowed, one for each property')
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @click.pass_obj

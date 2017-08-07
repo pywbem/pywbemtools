@@ -40,7 +40,7 @@ However, they should be used from the ``pywbemcli`` namespace.
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
-           'DEFAULT_MAXPULLCNT']
+           'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT']
 
 from pywbem import DEFAULT_ITER_MAXOBJECTCOUNT
 
@@ -89,3 +89,9 @@ DEFAULT_URI_SCHEME = 'https'
 #: etc. Set to the same default as used by pywbem.
 
 DEFAULT_MAXPULLCNT = DEFAULT_ITER_MAXOBJECTCOUNT
+
+#: Maximum allowed connection timeout in seconds.  The environment will not
+#: allow a connection timeout value larger than this on the command line or
+#: internal option for timeout.
+
+MAX_TIMEOUT = 300

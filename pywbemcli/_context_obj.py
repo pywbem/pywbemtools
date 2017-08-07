@@ -23,8 +23,6 @@ from __future__ import absolute_import, unicode_literals
 
 import click_spinner
 
-from ._pywbem_server import PywbemServer
-
 # The current pywbem server object for subcommands.
 PYWBEM_SERVER_OBJ = None
 
@@ -49,8 +47,6 @@ class ContextObj(object):
         self._use_pull = use_pull
         self._verbose = verbose
         self._spinner = click_spinner.Spinner()
-        if not isinstance(pywbem_server, PywbemServer):
-            print('Error, %s' % pywbem_server)
 
     def __repr__(self):
         return 'ContextObj(pywbem_server=%s, outputformat=%s, verbose=%s' % \
@@ -59,7 +55,7 @@ class ContextObj(object):
     @property
     def output_format(self):
         """
-        :term:`string`: Output format to be used.
+        :term:`string`: String defining the output format requested.
         """
         return self._output_format
 
@@ -160,18 +156,15 @@ class ContextObj(object):
 
         global PYWBEM_SERVER_OBJ  # pylint: disable=global-statement
         if PYWBEM_SERVER_OBJ is None:
-            # get the password if it is required.  This may involve a
-            # prompt. Ed delay the password get as long as possible so it
-            # does not become part of calls that do not need it.
 
-            self._pywbem_server.get_password(self)
-
-            self._pywbem_server.create_connection()
-
-            PYWBEM_SERVER_OBJ = self._pywbem_server
-            if not isinstance(self.pywbem_server, PywbemServer):
-                print('Error 3 , %s' % self.pywbem_server)
+            # if no server defined, do not try to connect. This allows
+            # commands like help, connection new, select to execute without
+            # a target server defined.
+            if self._pywbem_server:
+                # get the password if it is required.  This may involve a
+                # prompt.
+                self._pywbem_server.get_password(self)
+                self._pywbem_server.create_connection()
+                PYWBEM_SERVER_OBJ = self._pywbem_server
         else:
             self._pywbem_server = PYWBEM_SERVER_OBJ
-            if not isinstance(self.pywbem_server, PywbemServer):
-                print('Error 4, %s' % self.pywbem_server)
