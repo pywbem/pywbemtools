@@ -29,7 +29,8 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
 from ._asciitable import print_ascii_table
 from ._connection_repository import get_pywbemcli_servers, \
-    server_definitions_create_new, server_definitions_delete
+    server_definitions_new, server_definitions_delete
+from .config import MAX_TIMEOUT
 
 
 @cli.group('connection', options_metavar=CMD_OPTS_TXT)
@@ -92,24 +93,24 @@ def connection_select(context, name):
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
-@connection_group.command('set', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('save', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='name', required=False,)
 @click.pass_obj
-def connection_set(context, name):
+def connection_save(context, name):
     """
-    Set current connection into repository.
+    Save current connection into repository.
 
-    Sets the current wbem connection information into the repository of
+    Saves the current wbem connection information into the repository of
     connections. If the name does not already exist in the connection
     information, the provided name is used.
     """
-    context.execute_cmd(lambda: cmd_connection_set(context, name))
+    context.execute_cmd(lambda: cmd_connection_save(context, name))
 
 
 # TODO Maybe most of these options can be generalized for here and cli
 
 # pylint: disable=bad-continuation
-@connection_group.command('create', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('new', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='name', required=True,)
 @click.argument('server', type=str, envvar=PywbemServer.server_envvar,
                 required=True)
@@ -125,7 +126,7 @@ def connection_set(context, name):
               help="Password for the WBEM Server. Will be requested as part "
                    " of initialization if user name exists and it is not "
                    " provided by this option.")
-@click.option('-t', '--timeout', type=str,
+@click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               help="Operation timeout for the WBEM Server in seconds. "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
 @click.option('-n', '--noverify', type=str, is_flag=True,
@@ -143,7 +144,7 @@ def connection_set(context, name):
                    'following system directories: ' +
                    ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @click.pass_obj
-def connection_create(context, name, server, **options):
+def connection_new(context, name, server, **options):
     """
     Create a new named connection from the input parameters.
 
@@ -166,8 +167,8 @@ def connection_create(context, name, server, **options):
     the future.  This connection object is capable of managing all of the
     properties defined for WBEMConnections.
     """
-    context.execute_cmd(lambda: cmd_connection_create(context, name, server,
-                                                      options))
+    context.execute_cmd(lambda: cmd_connection_new(context, name, server,
+                                                   options))
 
 
 @connection_group.command('test', options_metavar=CMD_OPTS_TXT)
@@ -245,22 +246,25 @@ def cmd_connection_show(context, name):
     show_connection_information(context, svr)
 
 
-def cmd_connection_set(context, name):
+def cmd_connection_save(context, name):
     """
-    Set the current connection information into the dictionary of
+    Save the current connection information into the dictionary of
     servers.
     """
     svr = context.pywbem_server
     if svr.name and name:
         # TODO we are accessing a protected member of the dictionary
+        if svr.name != name:
+            click.echo('Warning: changing server name from %s to %s' %
+                       (svr._name, name))
         svr._name = name
     elif not svr.name and not name:
-        raise click.ClickException('No name definition' % name)
+        raise click.ClickException('No server name definition' % name)
         # TODO we can ask for name in this case in interactive mode
     elif svr.name:
         name = svr.name
 
-    server_definitions_create_new(name, svr)
+    server_definitions_new(name, svr)
 
     show_connection_information(context, context.pywbem_server)
 
@@ -283,13 +287,14 @@ def show_connection_information(context, svr, separate_line=True):
     could also have been part of the context object since this is just the
     info from that object.
     """
-    sep = '\n' if separate_line else ', '
+    sep = '\n  ' if separate_line else ', '
     context.spinner.stop()
 
-    click.echo('\nWBEMServer uri: %s%sDefault_namespace: %s%sUser: %s%s'
-               'Password: %s%sTimeout: %s%sNoverify: %s%s'
-               'Certfile: %s%sKeyfile: %s%sName: %s'
-               % (svr.server_uri, sep,
+    click.echo('\nName: %s%sWBEMServer uri: %s%sDefault_namespace: %s'
+               '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
+               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s'
+               % (svr.name, sep,
+                  svr.server_uri, sep,
                   svr.default_namespace, sep,
                   svr.user, sep,
                   svr.password, sep,
@@ -297,12 +302,12 @@ def show_connection_information(context, svr, separate_line=True):
                   sep, svr.noverify,
                   sep, svr.certfile, sep,
                   svr.keyfile, sep,
-                  svr.name))
+                  svr.use_pull_ops))
 
 
 def cmd_connection_select(context, name):
     """
-    Select and existing connection to use as the current WBEM Server
+    Select an existing connection to use as the current WBEM Server
     """
     pywbemcli_servers = get_pywbemcli_servers()
     if not name:
@@ -347,7 +352,8 @@ def cmd_connection_delete(context, name):
             '%s not a defined connection name' % name)
 
 
-def cmd_connection_create(context, name, server, options):
+# pylint: disable=unused-argument
+def cmd_connection_new(context, name, server, options):
     """
     Create a new connection object from the input arguments and options and
     put it into the PYWBEMCLI_SERVERS dictionary.
@@ -365,7 +371,7 @@ def cmd_connection_create(context, name, server, options):
                                  keyfile=options['keyfile'],
                                  ca_certs=options['ca_certs'])
 
-    server_definitions_create_new(name, pywbem_server)
+    server_definitions_new(name, pywbem_server)
 
 
 def cmd_connection_list(context):

@@ -28,7 +28,7 @@ Using pywbem Pull Operations from pywbemcli
 pywbem includes multiple ways to execute the enumerate instance type operations
 (associators, references, enumerateinstances, execquery):
 
-* The traditional operations (ex. EnumerateInstances_)
+* The traditional operations (ex. EnumerateInstances)
 * The pull operations (ex. the pull sequence OpenEnumerateInstances, etc.)
 * An overlay of the above two operations called the Iter... operations. Each
   iter operation executes either the traditional or pull depending on

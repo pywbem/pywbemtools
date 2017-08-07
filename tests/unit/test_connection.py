@@ -63,7 +63,7 @@ LIST_OUTPUT = ['default']
 TESTS_MAP = {  # pylint: disable=invalid-name
     'export': ["connection export", EXPORT_OUTPUT, None],
     "show": ["connection show", SHOW_OUTPUT, None],
-    "set": ["connection set", ['password'], None],
+    "set": ["connection save", ['password'], None],
     "list": ["connection list", LIST_OUTPUT, None]}
 
 

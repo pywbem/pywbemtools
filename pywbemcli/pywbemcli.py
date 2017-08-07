@@ -31,7 +31,7 @@ from ._common import GENERAL_OPTIONS_METAVAR
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
-    DEFAULT_CONNECTION_TIMEOUT
+    DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
 
 from ._connection_repository import get_pywbemcli_servers
 
@@ -73,12 +73,13 @@ __all__ = ['cli']
                    " of initialization if user name exists and it is not "
                    " provided by this option."
                    "(EnvVar: PYWBEMCLI_PASSWORD ).")
-@click.option('-t', '--timeout', type=str, envvar=PywbemServer.timeout_envvar,
+@click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
+              envvar=PywbemServer.timeout_envvar,
               help="Operation timeout for the WBEM Server in seconds. "
                    "(EnvVar: PYWBEMCLI_TIMEOUT). "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
 @click.option('-n', '--noverify', type=str, is_flag=True,
-              envvar=PywbemServer.timeout_envvar,
+              envvar=PywbemServer.noverify_envvar,
               help='If set, client does not verify server certificate.')
 @click.option('-c', '--certfile', type=str, envvar=PywbemServer.certfile_envvar,
               help="Server certfile. Ignored if noverify flag set. "
@@ -162,7 +163,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             output_format = DEFAULT_OUTPUT_FORMAT
         if default_namespace is None:
             default_namespace = DEFAULT_NAMESPACE
-        # TODO, clean this up
+
         if use_pull_ops == 'either':
             use_pull_ops = None
         elif use_pull_ops == 'yes':

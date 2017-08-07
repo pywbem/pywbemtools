@@ -220,6 +220,6 @@ if __name__ == '__main__':
     # script generates help and exits.
     if not cmd_exists('%s --help' % SCRIPT_NAME):
         print('%s does not exist as an executable. Please install.' %
-              SCRIPT_NAME)
+              SCRIPT_NAME, file=sys.stderr)
         sys.exit(1)
     create_help_cmd_list(SCRIPT_NAME)

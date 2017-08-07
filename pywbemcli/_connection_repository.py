@@ -15,7 +15,7 @@
 # limitations under the License.
 """
 Functions to persist and restore the connections table.  This works from
-a pickle file that maintains defined connections. If any exist they are
+a file that maintains defined connections. If any exist they are
 loaded at startup and available through an interactive session.  Functions
 are provided to create, delete, and view existing connections. A set function
 allows setting the current active connection into the repository.
@@ -23,19 +23,22 @@ allows setting the current active connection into the repository.
 from __future__ import absolute_import
 
 import os
-import pickle
-import copy
+import json
 import six
+# import pickle
+from ._pywbem_server import PywbemServer
 
-CONNECTIONS_FILE = 'pywbemcliservers.p'
+CONNECTIONS_FILE = 'pywbemcliservers.json'
 CONNECTIONS_LOADED = False
+
+# dictionary of known wbem servers
 PYWBEMCLI_SERVERS = {}
 
 # TODO make this into a class to clean up the code. This is a temp hack
 
 
 def get_pywbemcli_servers():
-    """Load the connections pickle file"""
+    """Load the connections file"""
     global CONNECTIONS_FILE  # pylint: disable=global-variable-not-assigned
     global CONNECTIONS_LOADED  # pylint: disable=global-statement
     global PYWBEMCLI_SERVERS  # pylint: disable=global-statement
@@ -43,41 +46,47 @@ def get_pywbemcli_servers():
         return PYWBEMCLI_SERVERS
     CONNECTIONS_LOADED = True
     if os.path.isfile(CONNECTIONS_FILE):
-        with open(CONNECTIONS_FILE, 'rb') as fh:
-            PYWBEMCLI_SERVERS = pickle.load(fh)
+        with open(CONNECTIONS_FILE, 'r') as fh:
+            try:
+                dict_ = json.load(fh)
+                try:
+                    for svr_name, svr in six.iteritems(dict_):
+                        PYWBEMCLI_SERVERS[svr_name] = \
+                            PywbemServer.create(**svr)
+                except KeyError as ke:
+                    raise KeyError("Items missing from json record %s" % ke)
+            except ValueError as ve:
+                raise ValueError("Invalid json file %s" % ve)
     return PYWBEMCLI_SERVERS
 
 
-def server_definitions_create_new(name, svr_definition):
+def server_definitions_new(name, svr_definition):
     """Add a new connection to the repository and save it"""
     pywbemcli_servers = get_pywbemcli_servers()
     pywbemcli_servers[name] = svr_definition
     global CONNECTIONS_LOADED
     CONNECTIONS_LOADED = True
-    server_definitions_file_save(pywbemcli_servers)
+    server_definitions_save(pywbemcli_servers)
 
 
 def server_definitions_delete(name):
     """Add a new connection to the repository and save it"""
     pywbemcli_servers = get_pywbemcli_servers()
     del pywbemcli_servers[name]
-    server_definitions_file_save(pywbemcli_servers)
+    server_definitions_save(pywbemcli_servers)
 
 
-def server_definitions_file_save(pywbemcli_servers):
-    """Dump the connections pickle file if one has been loaded.
+def server_definitions_save(pywbemcli_servers):
+    """Dump the connections file if one has been loaded.
     If the dictionary is empty, it attempts to delete the file.
     This is a temporary solution to persisting connection information.
     """
-
     if CONNECTIONS_LOADED:
-        if len(pywbemcli_servers) != 0:
+        if pywbemcli_servers:
             if os.path.isfile(CONNECTIONS_FILE):
                 os.remove(CONNECTIONS_FILE)
-            # clear the wbem_server attribute
-            dict_copy = copy.deepcopy(pywbemcli_servers)
-            for name, svr in six.iteritems(dict_copy):
-                # TODO we are accessing protected member here
-                svr._wbem_server = None
-            with open(CONNECTIONS_FILE, "wb") as fh:
-                pickle.dump(dict_copy, fh)
+            dict_ = {}
+            for svr_name in pywbemcli_servers:
+                dict_[svr_name] = pywbemcli_servers[svr_name].to_dict()
+            with open(CONNECTIONS_FILE, "w") as fh:
+                json.dump(dict_, fh)

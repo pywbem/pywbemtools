@@ -25,7 +25,7 @@ import click
 
 from pywbem import WBEMServer
 from .config import DEFAULT_URI_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
-    DEFAULT_MAXPULLCNT
+    DEFAULT_MAXPULLCNT, DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection
 
 
@@ -96,16 +96,21 @@ class PywbemServer(object):
     use_pull_envvar = 'PYWBEMCLI_USE_PULL'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
 
-    def __init__(self, server, default_namespace, name='default',
+    def __init__(self, server_uri=None, default_namespace=DEFAULT_NAMESPACE,
+                 name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  noverify=True, certfile=None, keyfile=None, ca_certs=None,
                  use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
                  verbose=False):
         """
-            TODO
+            Create a PywbemServer object. This contains the configuration
+            and operation information to create a connection to the server
+            and execute cim_operations on the server.
         """
-
-        self._server_uri = server
+        if not server_uri:
+            raise ValueError("server_uri required")
+        self._server_uri = server_uri
+        self._name = name
         self._default_namespace = default_namespace
         self._user = user
         self._password = password
@@ -114,12 +119,12 @@ class PywbemServer(object):
         self._certfile = certfile
         self._keyfile = keyfile
         self._ca_certs = ca_certs
-        self._verbose = verbose
-        self._name = name
-        self._wbem_server = None
         self._validate_timeout()
         self._use_pull_ops = use_pull_ops
         self._pull_max_cnt = pull_max_cnt
+
+        self._wbem_server = None
+        self._verbose = verbose
 
     def __repr__(self):
         return 'PywbemServer(uri=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
@@ -241,11 +246,11 @@ class PywbemServer(object):
         Exception: ValueError in Invalid
         """
         if not self.timeout:   # disallow None
-            ValueError('timout of None not allowed')
+            ValueError('Timout of None not allowed')
         if self.timeout is not None and (self.timeout < 0 or
-                                         self.timeout > 300):
-            ValueError('timeout option(%s) out of range %s to %s sec' %
-                       (self.timeout, 0, 300))
+                                         self.timeout > MAX_TIMEOUT):
+            ValueError('Timeout option(%s) out of range %s to %s sec' %
+                       (self.timeout, 0, MAX_TIMEOUT))
 
     # TODO this function can be merged into get_password below
     def password_prompt(self, ctx):
@@ -269,6 +274,26 @@ class PywbemServer(object):
         """Conditional password prompt function"""
         if self.user and not self.password:
             self.password_prompt(ctx)
+
+    def to_dict(self):
+        """Create dictionary from instance"""
+        dict_ = {"name": self.name, "server_uri": self.server_uri,
+                 "user": self.user,
+                 "password": self.password,
+                 "default_namespace": self.default_namespace,
+                 "timeout": self.timeout,
+                 "noverify": self.noverify,
+                 "certfile": self.certfile,
+                 "keyfile": self.keyfile,
+                 "ca_certs": self.ca_certs,
+                 "use_pull_ops": self.use_pull_ops,
+                 "pull_max_cnt": self.pull_max_cnt}
+        return dict_
+
+    @staticmethod
+    def create(**kwargs):
+        """Create PywbemServer object from kwargs"""
+        return PywbemServer(**kwargs)
 
     def create_connection(self):
         """
