@@ -47,7 +47,7 @@ TESTS_MAP = {  # pylint: disable=invalid-name
     "classref": ["class references", []],
     "classinvoke": ["class invokemethod", []],
     "classfind": ["class find", []],
-    "classhier": ["class hierarchy", []],
+    "classtree": ["class tree", []],
 
     "instance": ["instance", ['associators', 'references', 'get',
                               'create', 'delete', 'invoke', 'query']],
