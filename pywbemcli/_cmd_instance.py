@@ -187,10 +187,10 @@ def instance_enumerate(context, classname, **options):
 
 @instance_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('INSTANCENAME', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
-@click.option('-o', '--role', type=str, required=False,
+@click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includequalifiers_option)
@@ -224,13 +224,13 @@ def instance_references(context, instancename, **options):
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the associated instancename provided.')
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-c', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
-@click.option('-x', '--role', type=str, required=False,
+@click.option('-R', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
-@click.option('-o', '--resultrole', type=str, required=False,
+@click.option('-R', '--resultrole', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result role name provided.')
 @add_options(includequalifiers_option)
