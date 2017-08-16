@@ -141,7 +141,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
       command. These are NOT retained after the command is executed.
 
     Options:
-      -h, --help  Show this message and exit.
+      --help  Show this message and exit.
 
     Commands:
       associators   Get the associated classes for the CLASSNAME.
@@ -345,7 +345,7 @@ The following defines the help output for the `pywbemcli class get --help` subco
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                          Show this message and exit.
 
 
 .. _`pywbemcli class hierarchy --help`:
@@ -441,7 +441,7 @@ The following defines the help output for the `pywbemcli class references --help
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli connection --help`:
