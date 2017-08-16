@@ -37,6 +37,9 @@ from ._connection_repository import get_pywbemcli_servers
 
 __all__ = ['cli']
 
+# Defaults for some options
+DEFAULT_TIMESTATS = False
+
 
 # pylint: disable=bad-continuation
 @click.group(invoke_without_command=True,
@@ -123,13 +126,16 @@ __all__ = ['cli']
               help='MaxObjectCount of objects to be returned if pull '
                    'operations are used. This must be  a positive non-zero '
                    'integer. Default is {moc}.'.format(moc=DEFAULT_MAXPULLCNT))
-@click.option('-v', '--verbose', type=str, is_flag=True,
+@click.option('-T', '--timestats', is_flag=True,
+              help='Show time statistics of WBEM server operations after '
+                   ' each command execution.')
+@click.option('-v', '--verbose', is_flag=True,
               help='Display extra information about the processing.')
 @click.version_option(help="Show the version of this command and exit.")
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, pywbem_server=None):
+        verbose, pywbem_server=None, timestats=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
@@ -164,6 +170,9 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         if default_namespace is None:
             default_namespace = DEFAULT_NAMESPACE
 
+        if timestats is None:
+            timestats = DEFAULT_TIMESTATS
+
         if use_pull_ops == 'either':
             use_pull_ops = None
         elif use_pull_ops == 'yes':
@@ -194,6 +203,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          ca_certs=ca_certs,
                                          use_pull_ops=use_pull_ops,
                                          pull_max_cnt=pull_max_cnt,
+                                         enable_stats=timestats,
                                          verbose=verbose)
         else:
             if name:
@@ -219,13 +229,15 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             output_format = ctx.obj.output_format
         if verbose is None:
             verbose = ctx.obj.verbose
+        if timestats is None:
+            timestats = ctx.obj.timestats
 
     # Create a command context for each command: An interactive command has
     # its own command context different from the command context for the
     # command line.
 
     ctx.obj = ContextObj(ctx, pywbem_server, output_format, use_pull_ops,
-                         pull_max_cnt, verbose)
+                         pull_max_cnt, timestats, verbose)
 
     # Invoke default command
     if ctx.invoked_subcommand is None:

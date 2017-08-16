@@ -101,6 +101,8 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       --pull-max-cnt INTEGER          MaxObjectCount of objects to be returned if
                                       pull operations are used. This must be  a
                                       positive non-zero integer. Default is 1000.
+      -T, --timestats                 Show time statistics of WBEM server
+                                      operations after  each command execution.
       -v, --verbose                   Display extra information about the
                                       processing.
       --version                       Show the version of this command and exit.
