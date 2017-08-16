@@ -31,6 +31,7 @@ from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
 
+
 #
 #   Common option definitions for class group
 #
@@ -443,9 +444,16 @@ def cmd_class_find(context, classname, options):
 
         # Display function to display classnames returned with
         # their namespaces in the form <namespace>:<classname>
+        rows = []
         for ns_name in names_dict:
+            ns_rows = []
             for classname in names_dict[ns_name]:
-                print('  %s:%s' % (ns_name, classname))
+                ns_rows.append([ns_name, classname])
+            # sort the result by classname
+            ns_rows.sort(key=lambda x: x[1])
+            rows.extend(ns_rows)
+        for row in rows:
+            print('  %s:%s' % (row[0], row[1]))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

@@ -24,8 +24,8 @@ from __future__ import absolute_import
 import click
 from pywbem import ValueMapping, Error
 from .pywbemcli import cli
-from ._common import display_cim_objects, CMD_OPTS_TXT
-from ._common_options import sort_option, add_options
+from ._common import CMD_OPTS_TXT, format_table
+from ._common_options import add_options, sort_option
 
 
 def print_profile_info(org_vm, inst):
@@ -144,10 +144,18 @@ def cmd_server_namespaces(context, options):
     Display namespaces in the current WBEMServer
     """
     try:
-        ns = context.wbem_server.namespaces
+        namespaces = context.wbem_server.namespaces
         if options['sort']:
-            ns = ns.sort()
-        display_cim_objects(context, ns, context.output_format)
+            namespaces.sort()
+        context.spinner.stop()
+
+        # create list for each row
+        rows = [[ns] for ns in namespaces]
+
+        click.echo(format_table(rows, ['Namespace Name'],
+                                title='Server Namespaces:',
+                                table_format=context.output_format))
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -157,8 +165,14 @@ def cmd_server_interop(context):
     Display interop namespace in the current WBEMServer
     """
     try:
-        display_cim_objects(context, context.wbem_server.interop_ns,
-                            context.output_format)
+        interop_ns = context.wbem_server.interop_ns
+        context.spinner.stop()
+
+        rows = [[interop_ns]]
+
+        click.echo(format_table(rows, ['Namespace Name'],
+                                title='Server Interop Namespace:',
+                                table_format=context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -168,7 +182,13 @@ def cmd_server_brand(context):
     Display product and version info of the current WBEMServer
     """
     try:
-        click.echo(context.wbem_server.brand)
+        brand = context.wbem_server.brand
+        context.spinner.stop()
+
+        rows = [[brand]]
+        click.echo(format_table(rows, ['WBEM Server Brand'],
+                                title='Server Brand:',
+                                table_format=context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -178,38 +198,68 @@ def cmd_server_info(context):
     Display general overview of info from current WBEMServer
     """
     try:
+        # execute the namespaces to force contact with server before
+        # turning off the spinner.
+        server = context.wbem_server
+        server.namespaces  # pylint: disable=pointless-statement
         context.spinner.stop()
-        click.echo("Brand:\n  %s" % context.wbem_server.brand)
-        click.echo("Version:\n  %s" % context.wbem_server.version)
-        click.echo("Interop namespace:\n  %s" % context.wbem_server.interop_ns)
 
-        click.echo("All namespaces:")
-        for ns in context.wbem_server.namespaces:
-            click.echo("  %s" % ns)
+        server = context.wbem_server
+
+        rows = []
+        headers = ['Brand', 'Version', 'Interop Namespace', 'Namespaces']
+        if len(server.namespaces) > 3:
+            namespaces = '\n'.join(server.namespaces)
+        else:
+            namespaces = ', '.join(server.namespaces)
+        rows.append([server.brand, server.version,
+                     server.interop_ns,
+                     namespaces])
+        click.echo(format_table(rows, headers,
+                                title='Server General Information',
+                                table_format=context.output_format))
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def get_profile_info(org_vm, inst):
+    """
+    Get the org, name, and version from the profile instance and
+    return them as a tuple.
+    """
+    org = org_vm.tovalues(inst['RegisteredOrganization'])
+    name = inst['RegisteredName']
+    vers = inst['RegisteredVersion']
+    return org, name, vers
 
 
 def cmd_server_profiles(context, options):
     """
     Display general overview of info from current WBEMServer
     """
+    server = context.wbem_server
     try:
-        found_server_profiles = context.wbem_server.get_selected_profiles(
+        found_server_profiles = server.get_selected_profiles(
             registered_org=options['organization'],
             registered_name=options['profilename'])
 
-        org_vm = ValueMapping.for_property(context.wbem_server,
-                                           context.wbem_server.interop_ns,
+        org_vm = ValueMapping.for_property(server,
+                                           server.interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
-
-        print('Profiles for %s:%s' % (options['organization'],
-                                      options['profilename']))
-
-        context.spinner.stop()
+        rows = []
         for inst in found_server_profiles:
-            print_profile_info(org_vm, inst)
+            row = get_profile_info(org_vm, inst)
+            rows.append(row)
+        # sort by org
+        rows.sort(key=lambda x: (x[0], x[1]))
+        headers = ['Organization', 'Registered Name', 'Version']
+
+        click.echo(format_table(rows, headers,
+                                title='Advertised management profiles:',
+                                table_format=context.output_format))
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
