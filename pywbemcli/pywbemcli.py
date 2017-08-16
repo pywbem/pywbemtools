@@ -39,10 +39,13 @@ __all__ = ['cli']
 
 # Defaults for some options
 DEFAULT_TIMESTATS = False
+# enable -h as additional help option
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 # pylint: disable=bad-continuation
 @click.group(invoke_without_command=True,
+             context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTIONS_METAVAR)
 @click.option('-s', '--server', type=str, envvar=PywbemServer.server_envvar,
               help='Hostname or IP address with scheme of the WBEMServer in '
@@ -261,7 +264,7 @@ The following can be entered in interactive mode:
   <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
 
   <TAB>                       Tab completion (can be used anywhere).
-  --help                      Show pywbemcli general help message, including a
+  -h, --help                  Show pywbemcli general help message, including a
                               list of pywbemcli commands.
   <pywbemcli-cmd> --help      Show help message for pywbemcli command
                               <pywbemcli-cmd>.
