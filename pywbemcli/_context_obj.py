@@ -24,7 +24,7 @@ from __future__ import absolute_import, unicode_literals
 import click
 import click_spinner
 
-from ._asciitable import print_ascii_table
+from ._common import format_table
 
 # The current pywbem server object for subcommands.
 PYWBEM_SERVER_OBJ = None
@@ -210,7 +210,7 @@ class ContextObj(object):
             title = None
 
         rows.append(row)
-        print_ascii_table(rows, header=hdr, title=title)
+        click.echo(format_table(rows, header=hdr, title=title))
 
     def connect_wbem_server(self):
         """
