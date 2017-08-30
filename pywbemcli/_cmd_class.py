@@ -55,7 +55,7 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
-    Command Group to manage CIM Classes.
+    Command group to manage CIM Classes.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -75,7 +75,7 @@ def class_group():
 @click.pass_obj
 def class_get(context, classname, **options):
     """
-    get and display a single CIM class from the WBEM Server
+    Get and display a single CIM class.
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 
@@ -90,12 +90,19 @@ def class_get(context, classname, **options):
 @click.pass_obj
 def class_delete(context, classname, **options):
     """
-    Delete the class defined by CLASSNAME from the WBEM Server.
+    Delete the class defined by CLASSNAME.
+
+    Deletes the class from the  WBEM Server completely.
+
     If the class has instances, the command is refused unless the
-    --force option is used.
+    --force option is used. If --force is used, instances are also
+    deleted.
 
     WARNING: Removing classes from a WBEM Server can cause damage to the
-    server. Use this with caution.
+    server. Use this with caution.  It can impact instance providers and
+    other components in the server.
+
+    Some server may refuse the operation.
     """
     context.execute_cmd(lambda: cmd_class_delete(context, classname, options))
 
@@ -110,7 +117,13 @@ def class_delete(context, classname, **options):
 @click.pass_obj
 def class_invokemethod(context, classname, methodname, **options):
     """
-    Invoke the class method named methodname in the class classname
+    Invoke the class method named methodname.
+
+    This invokes the method named `methodname` on the class named `classname`.
+
+    This is the class level invokemethod and uses only the class name on the
+    invoke. The subcommand `instance invokemethod` invokes methods based
+    on instance name.
 
     """
     context.execute_cmd(lambda: cmd_class_invokemethod(context,
@@ -152,13 +165,12 @@ def class_enumerate(context, classname, **options):
                                                     options))
 
 
-# TODO the single char name for role is very poor
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=True)
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the classname provided.')
-@click.option('-x', '--role', type=str, required=False,
+@click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includeclassqualifiers_option)
@@ -206,8 +218,8 @@ def class_associators(context, classname, **options):
     Get the associated classes for the CLASSNAME.
 
     Get the classes(or classnames) that are associated with the CLASSNAME
-    argument filtered by the assocclass, resultclass, role and resultrole
-    arguments options.
+    argument filtered by the --assocclass, --resultclass, --role and
+    --resultrole options.
 
     Results are displayed as defined by the output format global option.
     """
@@ -216,55 +228,55 @@ def class_associators(context, classname, **options):
 
 
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
-@click.argument('CLASSNAME', type=str, metavar='CLASSNAME regex', required=True)
+@click.argument('CLASSNAME', type=str, metavar='CLASSNAME-regex', required=True)
 @add_options(sort_option)
 @add_options(namespace_option)
 @click.pass_obj
 def class_find(context, classname, **options):
     """
-    Find all classes that match the CLASSNAME regex.
+    Find all classes that match CLASSNAME-regex
 
-    Find all of the classes in the namespace  of the defined WBEMServer that
-     match the CLASSNAME  regular expression argument in the namespaces of
-    the defined WBEMserver.
-
-    The CLASSNAME argument is required.
+    Find all classes in the namespace(s) of the target WBEMServer that
+    match the CLASSNAME-regex regular expression argument. The CLASSNAME-regex
+    argument is required.
 
     The CLASSNAME argument may be either a complete classname or a regular
     expression that can be matched to one or more classnames. To limit the
     filter to a single classname, terminate the classname with $.
 
     The regular expression is anchored to the beginning of the classname and
-    is case insensitive. Thus pywbem_ returns all classes that begin with
-    PyWBEM_, pywbem_, etc.
+    is case insensitive. Thus, `pywbem_` returns all classes that begin with
+    `PyWBEM_`, `pywbem_`, etc.
 
-    The namespace option limits the search to the defined namespace
+    The namespace option limits the search to the defined namespace. Otherwise
+    all namespaces in the target server are searched.
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 
 
-@class_group.command('hierarchy', options_metavar=CMD_OPTS_TXT)
+@class_group.command('tree', options_metavar=CMD_OPTS_TXT)
 @click.argument('CLASSNAME', type=str, metavar='CLASSNAME', required=False)
 @click.option('-s', '--superclasses', is_flag=True, required=False,
               default=False,
-              help='Display the superclasses to CLASSNAME.  In this case '
-              'CLASSNAME is required')
+              help='Display the superclasses to CLASSNAME as a tree.  In this '
+                   'case CLASSNAME is required')
 @add_options(namespace_option)
 @click.pass_obj
-def class_hierarchy(context, classname, **options):
+def class_tree(context, classname, **options):
     """
-    Display class inheritance hierarchy as a tree.
+    Display CIM class inheritance hierarchy tree.
 
     The classname option, if it exists defines the topmost class of the
     hierarchy to include in the display. This is a separate subcommand because
     it is tied specifically to displaying in a tree format.
     """
-    context.execute_cmd(lambda: cmd_class_hierarchy(context, classname,
-                                                    options))
+    context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
+#####################################################################
 #
 #  Command functions for each of the subcommands in the class group
 #
+#####################################################################
 
 
 def cmd_class_get(context, classname, options):
@@ -459,7 +471,7 @@ def cmd_class_find(context, classname, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_class_hierarchy(context, classname, options):
+def cmd_class_tree(context, classname, options):
     """
     Execute the command to enumerate classes from the top or starting at the
     classname argument. Then format the results to be displayed as a

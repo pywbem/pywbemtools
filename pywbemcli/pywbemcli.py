@@ -277,8 +277,7 @@ The following can be entered in interactive mode:
 @click.pass_context
 def repl(ctx):
     """
-    Enter interactive (REPL) mode (default) and load any existing
-    history file.
+    Enter interactive (REPL) mode (default) and load history file.
     """
 
     history_file = PYWBEMCLI_HISTORY_FILE

@@ -80,13 +80,11 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       trust/extracted/openssl/ca-bundle.trust.crt
                                       /etc/ssl/certs
                                       /etc/ssl/certificates
-      -o, --output-format [table|plain|simple|grid|mof|xml|txt|tree]
-                                      Output format (Default: simple). pywbemcli
-                                      may override the format choice depending on
-                                      the operation since not all formats apply to
-                                      all output data types. For CIMstructured
-                                      objects (ex. CIMInstance), the default
-                                      output format is mof
+      -o, --output-format [mof|xml|table|csv|text]
+                                      Output format (Default: mof). pywbemcli may
+                                      override the format choice depending on the
+                                      operation since not all formats apply to all
+                                      output data types
       --use-pull_ops [yes|no|either]  Determines whether the pull operations are
                                       used forthe EnumerateInstances,
                                       associatorinstances,referenceinstances, and
@@ -103,8 +101,6 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       --pull-max-cnt INTEGER          MaxObjectCount of objects to be returned if
                                       pull operations are used. This must be  a
                                       positive non-zero integer. Default is 1000.
-      -T, --timestats                 Show time statistics of WBEM server
-                                      operations after  each command execution.
       -v, --verbose                   Display extra information about the
                                       processing.
       --version                       Show the version of this command and exit.
@@ -147,7 +143,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
       associators   Get the associated classes for the CLASSNAME.
       delete        Delete the class defined by CLASSNAME from...
       enumerate     Enumerate classes from the WBEMServer.
-      find          Find all classes that match CLASSNAME.
+      find          Find all classes that match the CLASSNAME...
       get           get and display a single CIM class from the...
       hierarchy     Display class inheritance hierarchy as a...
       invokemethod  Invoke the class method named methodname in...
@@ -291,19 +287,23 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
     Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME regex
 
-      Find all classes that match CLASSNAME.
+      Find all classes that match the CLASSNAME regex.
 
-      Find all  class names in the namespace(s) of the defined WBEMServer that
-      match the CLASSNAME regular expression argument. The CLASSNAME argument
-      may be either a complete classname or a regular expression that can be
-      matched to one or more classnames. To limit the filter to a single
-      classname, terminate the classname with $.
+      Find all of the classes in the namespace  of the defined WBEMServer that
+      match the CLASSNAME  regular expression argument in the namespaces of the
+      defined WBEMserver.
 
-      The regular expression is anchored to the beginning of CLASSNAME and is
-      case insensitive. Thus pywbem_ returns all classes that begin with
+      The CLASSNAME argument is required.
+
+      The CLASSNAME argument may be either a complete classname or a regular
+      expression that can be matched to one or more classnames. To limit the
+      filter to a single classname, terminate the classname with $.
+
+      The regular expression is anchored to the beginning of the classname and
+      is case insensitive. Thus pywbem_ returns all classes that begin with
       PyWBEM_, pywbem_, etc.
 
-      The namespace option limits the search to the defined namespace.
+      The namespace option limits the search to the defined namespace
 
     Options:
       -s, --sort              Sort into alphabetical order by classname.

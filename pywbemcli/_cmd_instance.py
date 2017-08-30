@@ -57,7 +57,7 @@ interactive_option = [              # pylint: disable=invalid-name
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
 def instance_group():
     """
-    Command Group to manage CIM instances.
+    Command group to manage CIM instances.
 
     This incudes functions to get, enumerate,
     create, modify, and delete instances in a namspace and additional functions
@@ -125,6 +125,11 @@ def instance_create(context, classname, **options):
     """
     Create an instance of classname.
 
+    Creates an instance of the class `classname` with the properties defined
+    in the property option.
+
+    The propertylist option limits the created instance to the properties
+    in the list. This parameter is NOT passed to the server
     """
     context.execute_cmd(lambda: cmd_instance_create(context, classname,
                                                     options))
@@ -168,9 +173,11 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
+    Enumerate instances or names of classname.
+
     Enumerate instances or instance names from the WBEMServer starting either
-    at the top  of the hiearchy (if no classname provided) or from the
-    classname argument provided.
+    at the top  of the hierarchy (if no classname provided) or from the
+    classname argument if provided.
 
     Displays the returned instances or names
     """
@@ -180,10 +187,10 @@ def instance_enumerate(context, classname, **options):
 
 @instance_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('INSTANCENAME', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
-@click.option('-o', '--role', type=str, required=False,
+@click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
 @add_options(includequalifiers_option)
@@ -196,12 +203,17 @@ def instance_enumerate(context, classname, **options):
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
-    Get the reference instances or instance names.
+    Get the reference instances or names.
+
+    Gets the reference instances or instance names (--names-only option) for a
+    target instance name in the target WBEM server.
 
     For the INSTANCENAME argument provided return instances or instance
-    names (names-only option) filtered by the role and result class options.
+    names filtered by the --role and --resultclass options.
+
     This may be executed interactively by providing only a classname and the
-    interactive option.
+    interactive option. Pywbemcli presents a list of instances in the class
+    from which one can be chosen as the target.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -212,13 +224,13 @@ def instance_references(context, instancename, **options):
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the associated instancename provided.')
-@click.option('-r', '--resultclass', type=str, required=False,
+@click.option('-c', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
-@click.option('-x', '--role', type=str, required=False,
+@click.option('-R', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided.')
-@click.option('-o', '--resultrole', type=str, required=False,
+@click.option('-R', '--resultrole', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result role name provided.')
 @add_options(includequalifiers_option)
@@ -231,13 +243,15 @@ def instance_references(context, instancename, **options):
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
-    Get the associated instances or instance names.
+    Get associated instances or names.
 
-    Returns the associated instances or names (names-only option) for the
-    INSTANCENAME argument filtered by the assocclass, resultclass, role and
-    resultrole arguments.
+    Returns the associated instances or names (--names-only option) for the
+    INSTANCENAME argument filtered by the --assocclass, --resultclass, --role
+    and --resultrole options.
+
     This may be executed interactively by providing only a classname and the
-    interactive option.
+    interactive option. Pywbemcli presents a list of instances in the class
+    from which one can be chosen as the target.
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))
@@ -256,12 +270,15 @@ def instance_query(context, query, **options):
     """
     Execute the query defined by the query argument.
 
+    Executes a query request on the target WBEM Server with the
+    query language and query string defined on input.
+
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
-@click.argument('CLASSNAME', type=str, metavar='CLASSNAME regex',
+@click.argument('CLASSNAME', type=str, metavar='CLASSNAME-regex',
                 required=False)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by classname')
@@ -269,21 +286,24 @@ def instance_query(context, query, **options):
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
-    Get number of instances for each class in namespace.
+    Get instance count for classes.
 
-    The size of the response may be limited by CLASSNAME argument which
+    Displays the count of instances for the classes defined by the
+    `classname-regex` argument in one or more namespaces.
+
+    The size of the response may be limited by CLASSNAME-regex argument which
     defines a classname regular expression so that only those classes are
-    counted
+    counted. The CLASSNAME-regex argument is optional.
 
-    The CLASSNAME argument is optional.
-
-    The CLASSNAME argument may be either a complete classname or a regular
+    The CLASSNAME-regex argument may be either a complete classname or a regular
     expression that can be matched to one or more classnames. To limit the
     filter to a single classname, terminate the classname with $.
 
     The regular expression is anchored to the beginning of the classname and
-    is case insensitive. Thus pywbem_ returns all classes that begin with
-    PyWBEM_, pywbem_, etc.
+    is case insensitive. Thus `pywbem_` returns all classes that begin with
+    `PyWBEM_`, `pywbem_`, etc.
+
+    This operation can take a long time to execute.
 
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
@@ -294,9 +314,15 @@ def instance_count(context, classname, **options):
 ####################################################################
 def cmd_instance_get(context, instancename, options):
     """
-    get and display an instance defined either by the instancename provided
-    or by the classname provided in instancename if the interactive flag
-    is provided
+    Get and display an instance of a CIM Class.
+
+    Gets the instance defined by instancename argument and displays in output
+    format defined.
+
+    If the interactive flag (-i) is set, only a classname is provided as
+    the instancename argument and pywbemcli presents a list of instances
+    to the console from which one can be picked to get from the server and
+    display.
     """
     try:
         if options['interactive']:
@@ -364,9 +390,8 @@ def cmd_instance_create(context, classname, options):
 
         # properties is a tuple of name,value pairs
         new_inst = create_ciminstance(class_, properties, property_list)
-        # context.conn.debug = True
+        # TODO create log of instance created.
         context.conn.CreateInstance(new_inst, namespace=options['namespace'])
-        # print('Request as debug shows\n%s' % context.conn.last_request)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

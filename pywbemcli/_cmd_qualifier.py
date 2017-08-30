@@ -30,9 +30,10 @@ from ._common_options import sort_option, namespace_option, add_options
 @cli.group('qualifier', options_metavar=CMD_OPTS_TXT)
 def qualifier_group():
     """
-    Command Group to manage CIM QualifierDeclarations.
+    Commands to view QualifierDeclarations.
 
-    Includes the capability to get and enumerate qualifier declarations.
+    Includes the capability to get and enumerate CIM qualifier declarations
+    defined in the WBEM Server.
 
     This does not provide the capability to create or delete CIM
     QualifierDeclarations
@@ -80,9 +81,6 @@ def cmd_qualifier_get(context, name, options):
     Execute the command for get qualifier and display result
     """
     try:
-        if context.verbose:
-            print('get qualifier name: %s ' % (name))
-
         qual_decl = context.conn.GetQualifier(name,
                                               namespace=options['namespace'])
 
