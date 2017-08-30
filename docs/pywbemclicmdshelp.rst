@@ -108,7 +108,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -v, --verbose                   Display extra information about the
                                       processing.
       --version                       Show the version of this command and exit.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
     Commands:
       class       Command Group to manage CIM Classes.
@@ -141,7 +141,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
       command. These are NOT retained after the command is executed.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
     Commands:
       associators   Get the associated classes for the CLASSNAME.
@@ -199,7 +199,7 @@ The following defines the help output for the `pywbemcli class associators --hel
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli class delete --help`:
@@ -229,7 +229,7 @@ The following defines the help output for the `pywbemcli class delete --help` su
                               request.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli class enumerate --help`:
@@ -274,7 +274,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli class find --help`:
@@ -309,7 +309,7 @@ The following defines the help output for the `pywbemcli class find --help` subc
       -s, --sort              Sort into alphabetical order by classname.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli class get --help`:
@@ -345,7 +345,7 @@ The following defines the help output for the `pywbemcli class get --help` subco
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli class hierarchy --help`:
@@ -373,7 +373,7 @@ The following defines the help output for the `pywbemcli class hierarchy --help`
                               CLASSNAME is required
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli class invokemethod --help`:
@@ -398,7 +398,7 @@ The following defines the help output for the `pywbemcli class invokemethod --he
       -n, --namespace <name>     Namespace to use for this operation. If defined
                                  that namespace overrides the general options
                                  namespace
-      --help                     Show this message and exit.
+      -h, --help                 Show this message and exit.
 
 
 .. _`pywbemcli class references --help`:
@@ -441,7 +441,7 @@ The following defines the help output for the `pywbemcli class references --help
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli connection --help`:
@@ -467,7 +467,7 @@ The following defines the help output for the `pywbemcli connection --help` subc
       command. These are NOT retained after the command is executed.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
     Commands:
       delete  Show the current connection information, i.e.
@@ -498,7 +498,7 @@ The following defines the help output for the `pywbemcli connection delete --hel
       up the current connection
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection export --help`:
@@ -521,7 +521,7 @@ The following defines the help output for the `pywbemcli connection export --hel
       statement to the conole.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection list --help`:
@@ -542,7 +542,7 @@ The following defines the help output for the `pywbemcli connection list --help`
       working.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection new --help`:
@@ -605,7 +605,7 @@ The following defines the help output for the `pywbemcli connection new --help` 
                                     trust/extracted/openssl/ca-bundle.trust.crt
                                     /etc/ssl/certs
                                     /etc/ssl/certificates
-      --help                        Show this message and exit.
+      -h, --help                    Show this message and exit.
 
 
 .. _`pywbemcli connection save --help`:
@@ -629,7 +629,7 @@ The following defines the help output for the `pywbemcli connection save --help`
       information, the provided name is used.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:
@@ -649,7 +649,7 @@ The following defines the help output for the `pywbemcli connection select --hel
       Select a connection from the current defined connections
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection show --help`:
@@ -670,7 +670,7 @@ The following defines the help output for the `pywbemcli connection show --help`
       up the current connection
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection test --help`:
@@ -691,7 +691,7 @@ The following defines the help output for the `pywbemcli connection test --help`
       working.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli help --help`:
@@ -711,7 +711,7 @@ The following defines the help output for the `pywbemcli help --help` subcommand
       Show help message for interactive mode.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli instance --help`:
@@ -739,7 +739,7 @@ The following defines the help output for the `pywbemcli instance --help` subcom
       command. These are NOT retained after the command is executed.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
     Commands:
       associators   Get the associated instances or instance...
@@ -799,7 +799,7 @@ The following defines the help output for the `pywbemcli instance associators --
                                       class and  user is provided with a list of
                                       instances of the  class from which the
                                       instance to delete is selected.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance count --help`:
@@ -837,7 +837,7 @@ The following defines the help output for the `pywbemcli instance count --help` 
                               classname
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli instance create --help`:
@@ -871,7 +871,7 @@ The following defines the help output for the `pywbemcli instance create --help`
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance delete --help`:
@@ -898,7 +898,7 @@ The following defines the help output for the `pywbemcli instance delete --help`
                               class from which the instance to delete is selected.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli instance enumerate --help`:
@@ -941,7 +941,7 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       options namespace
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance get --help`:
@@ -986,7 +986,7 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       class and  user is provided with a list of
                                       instances of the  class from which the
                                       instance to delete is selected.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance invokemethod --help`:
@@ -1018,7 +1018,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       -n, --namespace <name>     Namespace to use for this operation. If defined
                                  that namespace overrides the general options
                                  namespace
-      --help                     Show this message and exit.
+      -h, --help                 Show this message and exit.
 
 
 .. _`pywbemcli instance query --help`:
@@ -1045,7 +1045,7 @@ The following defines the help output for the `pywbemcli instance query --help` 
                                       defined that namespace overrides the general
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance references --help`:
@@ -1091,7 +1091,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       class and  user is provided with a list of
                                       instances of the  class from which the
                                       instance to delete is selected.
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli qualifier --help`:
@@ -1120,7 +1120,7 @@ The following defines the help output for the `pywbemcli qualifier --help` subco
       command. These are NOT retained after the command is executed.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
     Commands:
       enumerate  Enumerate CIMQualifierDeclaractions.
@@ -1150,7 +1150,7 @@ The following defines the help output for the `pywbemcli qualifier enumerate --h
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
       -s, --sort              Sort into alphabetical order by classname.
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli qualifier get --help`:
@@ -1175,7 +1175,7 @@ The following defines the help output for the `pywbemcli qualifier get --help` s
     Options:
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      --help                  Show this message and exit.
+      -h, --help              Show this message and exit.
 
 
 .. _`pywbemcli repl --help`:
@@ -1196,7 +1196,7 @@ The following defines the help output for the `pywbemcli repl --help` subcommand
       file.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server --help`:
@@ -1220,7 +1220,7 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       command. These are NOT retained after the command is executed.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
     Commands:
       brand       Display interop namespace name in the WBEM...
@@ -1249,7 +1249,7 @@ The following defines the help output for the `pywbemcli server brand --help` su
       Display interop namespace name in the WBEM Server.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server connection --help`:
@@ -1269,7 +1269,7 @@ The following defines the help output for the `pywbemcli server connection --hel
       Display information on the connection used by this server.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server info --help`:
@@ -1289,7 +1289,7 @@ The following defines the help output for the `pywbemcli server info --help` sub
       Display the brand information on theWBEM Server.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server interop --help`:
@@ -1309,7 +1309,7 @@ The following defines the help output for the `pywbemcli server interop --help` 
       Display the interop namespace name in the WBEM Server.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server namespaces --help`:
@@ -1330,7 +1330,7 @@ The following defines the help output for the `pywbemcli server namespaces --hel
 
     Options:
       -s, --sort  Sort into alphabetical order by classname.
-      --help      Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli server profiles --help`:
@@ -1357,7 +1357,7 @@ The following defines the help output for the `pywbemcli server profiles --help`
                                       DMTF
       -n, --profilename <profile name>
                                       Filter by the profile name. (ex. -n Array
-      --help                          Show this message and exit.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli server test_pull --help`:
@@ -1377,5 +1377,5 @@ The following defines the help output for the `pywbemcli server test_pull --help
       Test whether pull opeations exist on the WBEM server.
 
     Options:
-      --help  Show this message and exit.
+      -h, --help  Show this message and exit.
 
