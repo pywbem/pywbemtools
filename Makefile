@@ -22,7 +22,7 @@
 # Optional environment ariables/command line variables
 #   COVERAGE_REPORT - When set, forces coverage to create temporary
 #   annotated html output html files showing lines covered and missed
-#   See the directory coverage_html for the html output. 
+#   See the directory coverage_html for the html output.
 # ------------------------------------------------------------------------------
 
 # Determine OS platform make runs on
@@ -42,7 +42,7 @@ ifdef COVERAGE_REPORT
 else
   coverage_report :=
 endif
-# directory for coverage html output. 
+# directory for coverage html output.
 coverage_html_dir := coverage_html
 
 # Name of this Python package (top-level Python namespace + Pypi package name)
@@ -117,7 +117,7 @@ endif
 # Files the distribution archive depends upon.
 dist_dependent_files := \
     LICENSE \
-    README.md \
+    README.rst \
     requirements.txt \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
