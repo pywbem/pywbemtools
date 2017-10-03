@@ -56,6 +56,11 @@ namespace_option = [                     # pylint: disable=invalid-name
                       'namespace overrides the general options namespace')]
 
 
+summary_objects_option = [              # pylint: disable=invalid-name
+    click.option('-S', '--summary', is_flag=True, required=False,
+                 help='Return only summary of objects (count).')]
+
+
 def add_options(options):
     """
     Accumulate multiple options into a list. This list can be referenced as

@@ -353,8 +353,8 @@ def create_cimvalue(cim_type, value_str, is_array):
     else:
         cim_value = []
         values_list = split_array_value(value_str, ',')
-        for value_str in values_list:
-            cim_value.append(tocimobj(cim_type, value_str))
+        for value_ in values_list:
+            cim_value.append(tocimobj(cim_type, value_))
     return cim_value
 
 
@@ -518,7 +518,25 @@ def split_value_str(string, delimiter):
     yield string[i:j]
 
 
-def display_cim_objects(context, objects, output_format='mof'):
+def display_cim_objects_summary(context, objects):
+    """
+    Display a summary of the objects received. This only displays the
+    count.
+    TODO: We are trying to display only tables and cim structs.  This is simply
+    a text output and does not fit.
+    """
+    context.spinner.stop()
+    if objects:
+        if isinstance(objects[0], tuple):
+            cim_type = objects[0][0].__class__.__name__
+        else:
+            cim_type = objects[0].__class__.__name__
+        click.echo('%s %s(s) returned' % (len(objects), cim_type))
+
+
+def display_cim_objects(context, objects, output_format='mof', summary=False):
+    # pylint: disable=line-too-long
+
     """
     Input is either a list of cim objects or a single object. It may be
     any of the CIM types.  This is used to display:
@@ -528,20 +546,41 @@ def display_cim_objects(context, objects, output_format='mof'):
 
       Or list of the names of the above
 
-    output_format defines the proposed format for output of the objects.
-
-    Note: This function may override that choice in the case where the output
+    This function may override that choice in the case where the output
     choice is not avialable for the object type.  Thus, for example,
     mof output makes no sense for class names. In that case, the output is
     in the str of the type.
-    """
+
+    Parameters:
+      context (:class:`ContextObj`):
+        Click context contained in ContextObj object.
+
+      TODO This is not correct form for this doc.
+      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName, or CIMQualifier):
+        Iterable of CIM Objects to be displayed or a single object.
+
+      output_format(:term:`strng`):
+        String defining the preferred output format
+
+      summary(:class:`py:bool`):
+        Boolean that defines whether the data in objects should be displayed
+        or just a summary of the objects (ex. count of number of objects).
+    """    # noqa: E501
+    # pylint: enable=line-too-long
     context.spinner.stop()
+
+    if summary:
+        display_cim_objects_summary(context, objects)
+        return
+
     if isinstance(objects, (list, tuple)):
         if output_format in TABLE_FORMATS:
             if objects and isinstance(objects[0], CIMInstance):
                 print_insts_as_table(context, objects)
             elif objects and isinstance(objects[0], CIMClass):
                 print_classes_as_table(context, objects)
+            elif objects and isinstance(objects[0], CIMQualifierDeclaration):
+                print_qual_decls_as_table(context, objects)
             else:
                 if objects:
                     raise ValueError("Cannot print %s as table" %
@@ -550,7 +589,7 @@ def display_cim_objects(context, objects, output_format='mof'):
             for item in objects:
                 display_cim_objects(context, item, output_format=output_format)
 
-    # display the item
+    # display a single item.
     else:
         object_ = objects
         if output_format in TABLE_FORMATS and isinstance(object, CIMInstance):
@@ -587,12 +626,35 @@ def print_classes_as_table(context, classes, max_cell_width=20):
     properties for each class. This will display the properties that exist in
     subclasses
     """
-
+    # pylint: disable=unused-argument
+    # TODO this is not done.  Not sure how to do table output of classes.
     for class_ in classes:
         click.echo(class_.tomof())
 
 
-# TODO how can we build the include_classes into the format requirements
+def print_qual_decls_as_table(context, qual_decls, max_cell_width=20):
+    """
+    TODO: extend to display multiple classes at a table, showing the
+    properties for each class. This will display the properties that exist in
+    subclasses
+    """
+    rows = []
+    headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
+    for q in qual_decls:
+        scopes = '\n'.join([key for key in q.scopes if q.scopes[key]])
+        flavors = q.overridable and 'EnableOverride' or 'DisableOverride'
+        flavors += '\n'
+        flavors += q.tosubclass and 'ToSubclass' or 'Restricted'
+        if q.translatable:
+            flavors += '\nTranslatable'
+
+        row = [q.name, q.type, q.value, q.is_array, scopes, flavors]
+        rows.append(row)
+
+    click.echo(format_table(rows, headers, title='Qualifier Declarations',
+                            table_format=context.output_format))
+
+
 # TODO how can we set up the max_cell_width
 def print_insts_as_table(context, objects, include_classes=False,
                          max_cell_width=20):
