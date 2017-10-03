@@ -84,7 +84,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               help="Operation timeout for the WBEM Server in seconds. "
                    "(EnvVar: PYWBEMCLI_TIMEOUT). "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
-@click.option('-n', '--noverify', type=str, is_flag=True,
+@click.option('-n', '--noverify', is_flag=True,
               envvar=PywbemServer.noverify_envvar,
               help='If set, client does not verify server certificate.')
 @click.option('-c', '--certfile', type=str, envvar=PywbemServer.certfile_envvar,

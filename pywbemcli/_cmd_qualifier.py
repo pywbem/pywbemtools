@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import click
 from pywbem import Error
 from .pywbemcli import cli
-from ._common import display_cim_objects, CMD_OPTS_TXT
+from ._common import display_cim_objects, CMD_OPTS_TXT, output_format_is_table
 from ._common_options import sort_option, namespace_option, add_options
 
 
@@ -35,7 +35,7 @@ def qualifier_group():
     Includes the capability to get and enumerate CIM qualifier declarations
     defined in the WBEM Server.
 
-    This does not provide the capability to create or delete CIM
+    pywbemcli does not provide the capability to create or delete CIM
     QualifierDeclarations
 
     In addition to the command-specific options shown in this help text, the
@@ -76,6 +76,14 @@ def qualifier_enumerate(context, **options):
 ####################################################################
 #   Qualifier declaration command processing functions
 #####################################################################
+
+
+def qual_outputformat(output_format):
+    """ If output format is table type, force to mof"""
+
+    return 'mof' if output_format_is_table(output_format) else output_format
+
+
 def cmd_qualifier_get(context, name, options):
     """
     Execute the command for get qualifier and display result
@@ -84,7 +92,8 @@ def cmd_qualifier_get(context, name, options):
         qual_decl = context.conn.GetQualifier(name,
                                               namespace=options['namespace'])
 
-        display_cim_objects(context, qual_decl, context.output_format)
+        display_cim_objects(context, qual_decl,
+                            qual_outputformat(context.output_format))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -101,7 +110,8 @@ def cmd_qualifier_enumerate(context, options):
         if options['sort']:
             qual_decls.sort(key=lambda x: x.name)
 
-        display_cim_objects(context, qual_decls, context.output_format)
+        display_cim_objects(context, qual_decls,
+                            qual_outputformat(context.output_format))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
