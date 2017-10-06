@@ -42,6 +42,11 @@ GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
 
+def output_format_is_table(output_format):
+    """ Return True if output format is a table form"""
+    return True if output_format in TABLE_FORMATS else False
+
+
 # TODO Could this become a special click option type rather than a
 # separate function.
 def resolve_propertylist(propertylist):
@@ -271,7 +276,7 @@ def parse_cim_namespace_str(uri, namespace=None):
             # print('pmatch %s' % pmatch)
             pair = pmatch.group(1).split('=', 1)
             # print('pair %s' % pair)
-            if len(pair[0]):
+            if pair[0]:
                 if pair[1][0] == '"':
                     # if pair[1][:-1] != '"'
                     #    ValueError('Mismatched quotes %s' % pmatch.group(1))
@@ -531,11 +536,16 @@ def display_cim_objects(context, objects, output_format='mof'):
     in the str of the type.
     """
     context.spinner.stop()
-    # TODO this is very simplistic formatter and needs refinement.
     if isinstance(objects, (list, tuple)):
         if output_format in TABLE_FORMATS:
-            if len(objects) > 0 and isinstance(objects[0], CIMInstance):
-                print_obj_as_table(context, objects)
+            if objects and isinstance(objects[0], CIMInstance):
+                print_insts_as_table(context, objects)
+            elif objects and isinstance(objects[0], CIMClass):
+                print_classes_as_table(context, objects)
+            else:
+                if objects:
+                    raise ValueError("Cannot print %s as table" %
+                                     type(objects[0]))
         else:
             for item in objects:
                 display_cim_objects(context, item, output_format=output_format)
@@ -544,34 +554,50 @@ def display_cim_objects(context, objects, output_format='mof'):
     else:
         object_ = objects
         if output_format in TABLE_FORMATS and isinstance(object, CIMInstance):
-            print_obj_as_table(context, object)
+            print_insts_as_table(context, object)
         elif output_format == 'mof':
             try:
                 click.echo(object_.tomof())
             except AttributeError:
                 # no tomof functionality
-                click.echo(object_)
+                click.echo('Output Format %s not supported. Default to\n%r' %
+                           (output_format, object))
         elif output_format == 'xml':
             try:
-                click.echo(object_.toxmlstr())
+                click.echo(object_.tocimxmlstr(indent=4))
             except AttributeError:
-                # no toxmlstr functionality
-                click.echo(object)
+                # no tocimxmlstr functionality
+                click.echo('Output Format %s not supported. Default to\n%r' %
+                           (output_format, object))
         elif output_format == 'txt':
             try:
                 click.echo(object)
             except AttributeError:
                 click.echo('%r' % object)
         elif output_format == 'tree':
-            raise click.ClickException("tree output format not allowed")
+            raise click.ClickException('Tree output format not allowed')
+        else:
+            raise click.ClickException('Invalid output format %s' %
+                                       output_format)
+
+
+def print_classes_as_table(context, classes, max_cell_width=20):
+    """
+    TODO: extend to display multiple classes at a table, showing the
+    properties for each class. This will display the properties that exist in
+    subclasses
+    """
+
+    for class_ in classes:
+        click.echo(class_.tomof())
 
 
 # TODO how can we build the include_classes into the format requirements
 # TODO how can we set up the max_cell_width
-def print_obj_as_table(context, objects, include_classes=False,
-                       max_cell_width=20):
+def print_insts_as_table(context, objects, include_classes=False,
+                         max_cell_width=20):
     """
-    If possible display the list of object as a table.
+    If possible display the list of instances as a table.
     Currently this only works for instances where the table is a column
     per property.
 
@@ -608,7 +634,8 @@ def print_obj_as_table(context, objects, include_classes=False,
             if name in inst.properties:
                 p = inst.properties[name]
                 if p.embedded_object:
-                    raise ValueError('Cannot process embeddedObject')
+                    raise ValueError('Cannot process embeddedObject property '
+                                     ' %s' % name)
 
         line = [inst.classname] if include_classes else []
         # get value for each property in this object

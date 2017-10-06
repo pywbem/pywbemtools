@@ -26,7 +26,7 @@ from pywbem.cim_obj import NocaseDict
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
-    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT
+    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT, output_format_is_table
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options
 from ._displaytree import display_class_tree
@@ -279,11 +279,16 @@ def class_tree(context, classname, **options):
 #####################################################################
 
 
+def class_outputformat(output_format):
+    """ If output format is table type, force to mof"""
+
+    return 'mof' if output_format_is_table(output_format) else output_format
+
+
 def cmd_class_get(context, classname, options):
     """
     Get the class defined by the argument and display.
     """
-
     try:
         result_class = context.conn.GetClass(
             classname,
@@ -292,8 +297,8 @@ def cmd_class_get(context, classname, options):
             IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
-        display_cim_objects(context, result_class, context.output_format)
-
+        display_cim_objects(context, result_class,
+                            class_outputformat(context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -359,7 +364,8 @@ def cmd_class_enumerate(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(context, results, context.output_format)
+        display_cim_objects(context, results,
+                            class_outputformat(context.output_format))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -391,7 +397,8 @@ def cmd_class_references(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x[1].classname)
 
-        display_cim_objects(context, results, context.output_format)
+        display_cim_objects(context, results,
+                            class_outputformat(context.output_format))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -426,7 +433,8 @@ def cmd_class_associators(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x[1].classname)
-        display_cim_objects(context, results, context.output_format)
+        display_cim_objects(context, results,
+                            class_outputformat(context.output_format))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -518,7 +526,7 @@ def cmd_class_delete(context, classname, options):
 
     if not options['force']:
         insts = context.conn.PyWbemCLIEnumerateInstancePaths(classname)
-        if len(insts) != 0:
+        if insts:
             raise click.ClickException('Ignored; instances exist')
         # TODO test for subclasses
 

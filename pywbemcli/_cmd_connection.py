@@ -128,7 +128,7 @@ def connection_save(context, name):
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               help="Operation timeout for the WBEM Server in seconds. "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
-@click.option('-n', '--noverify', type=str, is_flag=True,
+@click.option('-n', '--noverify', is_flag=True,
               help='If set, client does not verify server certificate.')
 @click.option('-c', '--certfile', type=str,
               help="Server certfile. Ignored if noverify flag set. ")
