@@ -28,7 +28,9 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT, output_format_is_table
 from ._common_options import propertylist_option, names_only_option, \
-    sort_option, includeclassorigin_option, namespace_option, add_options
+    sort_option, includeclassorigin_option, namespace_option, add_options, \
+    summary_objects_option
+
 from ._displaytree import display_class_tree
 
 
@@ -144,6 +146,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(names_only_option)
 @add_options(sort_option)
 @add_options(namespace_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
@@ -179,6 +182,7 @@ def class_enumerate(context, classname, **options):
 @add_options(names_only_option)
 @add_options(sort_option)
 @add_options(namespace_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def class_references(context, classname, **options):
     """
@@ -212,6 +216,7 @@ def class_references(context, classname, **options):
 @add_options(names_only_option)
 @add_options(sort_option)
 @add_options(namespace_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
@@ -364,8 +369,8 @@ def cmd_class_enumerate(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(context, results,
-                            class_outputformat(context.output_format))
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -397,8 +402,8 @@ def cmd_class_references(context, classname, options):
             if options['sort']:
                 results.sort(key=lambda x: x[1].classname)
 
-        display_cim_objects(context, results,
-                            class_outputformat(context.output_format))
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -433,8 +438,9 @@ def cmd_class_associators(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x[1].classname)
-        display_cim_objects(context, results,
-                            class_outputformat(context.output_format))
+
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

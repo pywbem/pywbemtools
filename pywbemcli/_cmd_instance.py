@@ -26,7 +26,8 @@ from ._common import display_cim_objects, parse_cim_namespace_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
     create_params, filter_namelist, CMD_OPTS_TXT, format_table
 from ._common_options import propertylist_option, names_only_option, \
-    sort_option, includeclassorigin_option, namespace_option, add_options
+    sort_option, includeclassorigin_option, namespace_option, add_options, \
+    summary_objects_option
 from .config import DEFAULT_QUERY_LANGUAGE
 
 
@@ -170,6 +171,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @add_options(namespace_option)
 @add_options(names_only_option)
 @add_options(sort_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
@@ -200,6 +202,7 @@ def instance_enumerate(context, classname, **options):
 @add_options(namespace_option)
 @add_options(sort_option)
 @add_options(interactive_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
@@ -240,6 +243,7 @@ def instance_references(context, instancename, **options):
 @add_options(namespace_option)
 @add_options(sort_option)
 @add_options(interactive_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
@@ -265,6 +269,7 @@ def instance_associators(context, instancename, **options):
                    '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
 @add_options(sort_option)
+@add_options(summary_objects_option)
 @click.pass_obj
 def instance_query(context, query, **options):
     """
@@ -344,7 +349,9 @@ def cmd_instance_get(context, instancename, options):
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, instance, context.output_format)
+        display_cim_objects(context, instance, context.output_format,
+                            summary=options['summary'])
+
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -371,7 +378,7 @@ def cmd_instance_delete(context, instancename, options):
     try:
         context.conn.DeleteInstance(instancepath)
 
-        print('Deleted %s', instancepath)
+        click.echo('Deleted %s', instancepath)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -458,7 +465,8 @@ def cmd_instance_enumerate(context, classname, options):
             if options['sort']:
                 results = objects_sort(results)
 
-        display_cim_objects(context, results, context.output_format)
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -506,7 +514,8 @@ def cmd_instance_references(context, instancename, options):
         if options['sort']:
             results = objects_sort(results)
 
-        display_cim_objects(context, results, context.output_format)
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -554,7 +563,8 @@ def cmd_instance_associators(context, instancename, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(context, results)
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -592,7 +602,7 @@ def cmd_instance_count(context, classname, options):
     maxlen = maxlen(classlist)    # get max classname size for display
 
     display_data = []
-    for classname in classlist:
+    for classname_ in classlist:
 
         # Try block allows issues where enumerate does not properly execute
         # in some cases. The totals may be wrong but at least it gets what
@@ -600,11 +610,11 @@ def cmd_instance_count(context, classname, options):
         # are providers that return errors from the enumerate.
         try:
             inst_names = context.conn.EnumerateInstanceNames(
-                classname,
+                classname_,
                 namespace=namespace)
         except Error as er:
-            print('Server Error %s with %s:%s. Continuing' % (er, namespace,
-                                                              classname))
+            click.echo('Server Error %s with %s:%s. Continuing' %
+                       (er, namespace, classname))
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
@@ -641,7 +651,8 @@ def cmd_instance_query(context, query, options):
         if options['sort']:
             results.sort(key=lambda x: x.classname)
 
-        display_cim_objects(context, results)
+        display_cim_objects(context, results, context.output_format,
+                            summary=options['summary'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
