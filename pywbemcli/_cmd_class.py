@@ -26,7 +26,8 @@ from pywbem.cim_obj import NocaseDict
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
-    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT, output_format_is_table
+    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT, TABLE_FORMATS, \
+    format_table
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option
@@ -255,6 +256,9 @@ def class_find(context, classname, **options):
 
     The namespace option limits the search to the defined namespace. Otherwise
     all namespaces in the target server are searched.
+
+    Output is in table format if table output specified. Otherwise it is in the
+    form <namespace>:<classname>
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname, options))
 
@@ -274,6 +278,9 @@ def class_tree(context, classname, **options):
     The classname option, if it exists defines the topmost class of the
     hierarchy to include in the display. This is a separate subcommand because
     it is tied specifically to displaying in a tree format.
+
+    Output is displayed as a tree to the console independent of the
+    output_format type.
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
@@ -282,12 +289,6 @@ def class_tree(context, classname, **options):
 #  Command functions for each of the subcommands in the class group
 #
 #####################################################################
-
-
-def class_outputformat(output_format):
-    """ If output format is table type, force to mof"""
-
-    return 'mof' if output_format_is_table(output_format) else output_format
 
 
 def cmd_class_get(context, classname, options):
@@ -302,8 +303,9 @@ def cmd_class_get(context, classname, options):
             IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
+
         display_cim_objects(context, result_class,
-                            class_outputformat(context.output_format))
+                            output_format=context.output_format)
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
@@ -468,18 +470,25 @@ def cmd_class_find(context, classname, options):
                 filtered_classnames.sort()
             names_dict[ns] = filtered_classnames
 
-        # Display function to display classnames returned with
-        # their namespaces in the form <namespace>:<classname>
+        # TODO we sort twice (above and below)
+
         rows = []
         for ns_name in names_dict:
-            ns_rows = []
-            for classname in names_dict[ns_name]:
-                ns_rows.append([ns_name, classname])
+            ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
             # sort the result by classname
             ns_rows.sort(key=lambda x: x[1])
             rows.extend(ns_rows)
-        for row in rows:
-            print('  %s:%s' % (row[0], row[1]))
+
+        if context.output_format in TABLE_FORMATS:
+            headers = ['Namespace', 'Classname']
+            click.echo(format_table(rows, headers,
+                                    table_format=context.output_format,
+                                    title='Find class %s' % classname))
+        else:
+            # Display function to display classnames returned with
+            # their namespaces in the form <namespace>:<classname>
+            for row in rows:
+                print('  %s:%s' % (row[0], row[1]))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
