@@ -199,6 +199,7 @@ The following defines the help output for the `pywbemcli class associators --hel
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -281,6 +282,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -429,6 +431,7 @@ The following defines the help output for the `pywbemcli class references --help
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -818,6 +821,7 @@ The following defines the help output for the `pywbemcli instance associators --
                                       class and  user is provided with a list of
                                       instances of the  class from which the
                                       instance to delete is selected.
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -971,6 +975,7 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       options namespace
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -1078,6 +1083,7 @@ The following defines the help output for the `pywbemcli instance query --help` 
                                       defined that namespace overrides the general
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -1129,6 +1135,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       class and  user is provided with a list of
                                       instances of the  class from which the
                                       instance to delete is selected.
+      -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
 
@@ -1188,7 +1195,7 @@ The following defines the help output for the `pywbemcli qualifier enumerate --h
     Options:
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
-      -s, --sort              Sort into alphabetical order by classname.
+      -S, --summary           Return only summary of objects (count).
       -h, --help              Show this message and exit.
 
 

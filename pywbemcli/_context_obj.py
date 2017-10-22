@@ -59,7 +59,9 @@ class ContextObj(object):
     @property
     def output_format(self):
         """
-        :term:`string`: String defining the output format requested.
+        :term:`string`: String defining the output format requested.  This may
+        be None meaning that the default format should be used or may be
+        one of the values in the TABLE_FORMATS variable.
         """
         return self._output_format
 

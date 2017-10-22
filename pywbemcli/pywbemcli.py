@@ -170,8 +170,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
     if ctx.obj is None:
         # Apply the documented option defaults.
-        if output_format is None:
-            output_format = DEFAULT_OUTPUT_FORMAT
+        # default for output_format is applied in processing since it depends
+        # on request (ex. mof for get class vs table for many)
         if default_namespace is None:
             default_namespace = DEFAULT_NAMESPACE
 

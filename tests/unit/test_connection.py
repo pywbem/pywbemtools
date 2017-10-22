@@ -81,7 +81,7 @@ class ContainerMeta(type):
             """
             def test(self):  # pylint: disable=missing-docstring
                 cmd_opt = '-s http://localhost -u fred -p pw -k keyfile.txt ' \
-                          '-c certfile.txt -d root/blah'
+                          '-c certfile.txt -d root/cimv2'
                 command = 'pywbemcli %s %s' % (cmd_opt, cmd_str)
                 # Disable python warnings for pywbemcli call.See issue #42
                 command = 'export PYTHONWARNINGS="" && %s' % command

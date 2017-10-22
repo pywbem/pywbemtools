@@ -27,7 +27,7 @@ import six
 from terminaltables import AsciiTable
 
 from pywbem import CIMInstanceName, CIMInstance, \
-    CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty
+    CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty, CIMClassName
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
@@ -138,11 +138,12 @@ def pick_from_list(context, options, title):
     curses for the selection process.
     """
     context.spinner.stop()
-    print(title)
+
+    click.echo(title)
     index = -1
     for str_ in options:
         index += 1
-        print('%s: %s' % (index, str_))
+        click.echo('%s: %s' % (index, str_))
     selection = None
     while True:
         try:
@@ -154,8 +155,8 @@ def pick_from_list(context, options, title):
             pass
         except KeyboardInterrupt:
             raise ValueError
-        print('%s Invalid. Input integer between 0 and %s or Ctrl-C to '
-              'stop selection.' % (selection, index))
+        click.echo('%s Invalid. Input integer between 0 and %s or Ctrl-C to '
+                   'stop selection.' % (selection, index))
     context.spinner.start()
 
 
@@ -437,7 +438,8 @@ def compare_obj(obj1, obj2, msg):
     match or False if different
     """
     if obj1 != obj2:
-        print('OOPS %s: compare mismatch:\n%r\n%r' % (msg, obj1, obj2))
+        click.echo('Obj Compare %s: compare mismatch:\n%r\n%r' %
+                   (msg, obj1, obj2))
         return False
     return True
 
@@ -455,12 +457,12 @@ def compare_instances(inst1, inst2):
         if not compare_obj(inst1.qualifiers, inst2.qualifiers, "qualifiers"):
             return False
         if len(inst1.properties) != len(inst2.properties):
-            print('Different number of properties %s vs %s' %
-                  (len(inst1.properties, len(inst2.properties))))
+            click.echo('Different number of properties %s vs %s' %
+                       (len(inst1.properties, len(inst2.properties))))
             keys1 = set(inst1.keys())
             keys2 = set(inst2.keys())
             diff = keys1.symmetric_difference(keys2)
-            print('Property Name differences %s' % diff)
+            click.echo('Property Name differences %s' % diff)
             return False
         for n1, v1 in six.iteritems(inst1):
             if v1 != inst2[n1]:
@@ -518,23 +520,58 @@ def split_value_str(string, delimiter):
     yield string[i:j]
 
 
+def get_cimtype(objects):
+    """
+        Get the cim_type for any returned cim object.  Normally this is the
+        name of the class name except that the classname return from
+        getclass and enumerate class is just unicode string
+    """
+    # associators and references return tuple
+    if isinstance(objects, list):
+        test_object = objects[0]
+    elif objects:
+        test_object = object
+    else:
+        cim_type = 'unknown'
+        return
+
+    if isinstance(test_object, tuple):
+        # associator or reference class level return is tuple
+        cim_type = test_object[1].__class__.__name__
+    else:
+        cim_type = test_object.__class__.__name__
+
+    # account for fact the enumerate class name operation returns uniicode.
+    if isinstance(test_object, six.string_types):
+        cim_type = 'CIMClassName'
+    return cim_type
+
+
 def display_cim_objects_summary(context, objects):
     """
     Display a summary of the objects received. This only displays the
     count.
-    TODO: We are trying to display only tables and cim structs.  This is simply
-    a text output and does not fit.
     """
     context.spinner.stop()
+
+    output_format = 'table' if context.output_format is 'None' else \
+        context.output_format
+
     if objects:
-        if isinstance(objects[0], tuple):
-            cim_type = objects[0][0].__class__.__name__
-        else:
-            cim_type = objects[0].__class__.__name__
+        cim_type = get_cimtype(objects)
+
+        if output_format_is_table(output_format):
+            rows = [[len(objects), cim_type]]
+            click.echo(format_table(rows, ['Count', 'CIM Type'],
+                                    table_format=context.output_format,
+                                    title='Summary of %s returned'))
+            return
         click.echo('%s %s(s) returned' % (len(objects), cim_type))
+    else:
+        click.echo('0 objects returned')
 
 
-def display_cim_objects(context, objects, output_format='mof', summary=False):
+def display_cim_objects(context, objects, output_format=None, summary=False):
     # pylint: disable=line-too-long
 
     """
@@ -556,7 +593,7 @@ def display_cim_objects(context, objects, output_format='mof', summary=False):
         Click context contained in ContextObj object.
 
       TODO This is not correct form for this doc.
-      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName, or CIMQualifier):
+      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName,or CIMQualifier):
         Iterable of CIM Objects to be displayed or a single object.
 
       output_format(:term:`strng`):
@@ -572,19 +609,27 @@ def display_cim_objects(context, objects, output_format='mof', summary=False):
     if summary:
         display_cim_objects_summary(context, objects)
         return
+    # default when displaying cim objects is mof
+    if output_format is None:
+        output_format = 'mof'
+
+    if not objects:
+        click.echo("Return empty.")
+        return
 
     if isinstance(objects, (list, tuple)):
         if output_format in TABLE_FORMATS:
-            if objects and isinstance(objects[0], CIMInstance):
+            if isinstance(objects[0], CIMInstance):
                 print_insts_as_table(context, objects)
-            elif objects and isinstance(objects[0], CIMClass):
+            elif isinstance(objects[0], CIMClass):
                 print_classes_as_table(context, objects)
-            elif objects and isinstance(objects[0], CIMQualifierDeclaration):
+            elif isinstance(objects[0], CIMQualifierDeclaration):
                 print_qual_decls_as_table(context, objects)
+            elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
+                                         six.string_types)):
+                print_paths_as_table(context, objects)
             else:
-                if objects:
-                    raise ValueError("Cannot print %s as table" %
-                                     type(objects[0]))
+                raise ValueError("Cannot print %s as table" % type(objects[0]))
         else:
             for item in objects:
                 display_cim_objects(context, item, output_format=output_format)
@@ -592,27 +637,35 @@ def display_cim_objects(context, objects, output_format='mof', summary=False):
     # display a single item.
     else:
         object_ = objects
-        if output_format in TABLE_FORMATS and isinstance(object, CIMInstance):
-            print_insts_as_table(context, object)
+        if output_format in TABLE_FORMATS:
+            if isinstance(object_, CIMInstance):
+                print_insts_as_table(context, object_)
+            elif isinstance(object_, CIMClass):
+                print_classes_as_table(context, [object_])
+            else:
+                raise ValueError('No table formatter for %s' % type(object_))
         elif output_format == 'mof':
             try:
                 click.echo(object_.tomof())
             except AttributeError:
-                # no tomof functionality
-                click.echo('Output Format %s not supported. Default to\n%r' %
-                           (output_format, object))
+                if isinstance(object_, (CIMInstanceName, CIMClassName,
+                                        six.string_types)):
+                    click.echo(object_)
+                else:
+                    raise ValueError('output_format %s invalid for %s '
+                                     % (output_format, type(object_)))
         elif output_format == 'xml':
             try:
                 click.echo(object_.tocimxmlstr(indent=4))
             except AttributeError:
                 # no tocimxmlstr functionality
                 click.echo('Output Format %s not supported. Default to\n%r' %
-                           (output_format, object))
+                           (output_format, object_))
         elif output_format == 'txt':
             try:
-                click.echo(object)
+                click.echo(object_)
             except AttributeError:
-                click.echo('%r' % object)
+                click.echo('%r' % object_)
         elif output_format == 'tree':
             raise click.ClickException('Tree output format not allowed')
         else:
@@ -620,16 +673,38 @@ def display_cim_objects(context, objects, output_format='mof', summary=False):
                                        output_format)
 
 
+def print_class_as_table(context, class_, max_cell_width=20):
+    """
+        TODO add code here to display a class as a table.  The temp output
+        so we could create the function is to just output as mof
+    """
+    click.echo(class_.tomof())
+
+
 def print_classes_as_table(context, classes, max_cell_width=20):
     """
-    TODO: extend to display multiple classes at a table, showing the
+    TODO: extend to display classes as a table, showing the
     properties for each class. This will display the properties that exist in
     subclasses
     """
     # pylint: disable=unused-argument
-    # TODO this is not done.  Not sure how to do table output of classes.
+
     for class_ in classes:
-        click.echo(class_.tomof())
+        print_class_as_table(context, class_, max_cell_width=20)
+
+
+def print_paths_as_table(context, objects, max_cell_width=20):
+    """
+        Display paths as a table. This include CIMInstanceName, ClassPath,
+        and unicode (the return type for enumerateClasses).
+    """
+    headers = ['path']
+
+    rows = [[obj] for obj in objects]
+
+    title = '%s paths' % get_cimtype(objects)
+    click.echo(format_table(rows, headers, title=title,
+                            table_format=context.output_format))
 
 
 def print_qual_decls_as_table(context, qual_decls, max_cell_width=20):
@@ -642,6 +717,8 @@ def print_qual_decls_as_table(context, qual_decls, max_cell_width=20):
     headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
     for q in qual_decls:
         scopes = '\n'.join([key for key in q.scopes if q.scopes[key]])
+        # TODO this is messy code.  Should we use something like:
+        flavors = 'EnableOverride' if q.overridable else 'DisableOverride'
         flavors = q.overridable and 'EnableOverride' or 'DisableOverride'
         flavors += '\n'
         flavors += q.tosubclass and 'ToSubclass' or 'Restricted'
@@ -755,7 +832,7 @@ def _scalar_value(type_, value_, max_width=None):
     return _str
 
 
-# TODO We do not know how to handle the fold mechanism
+# TODO We do not know how to handle the fold mechanism here
 def _array_value(type_, value_, fold=False, max_cell_width=None):
     """
     Output array of values either on single line or one line per value.
