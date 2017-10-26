@@ -218,7 +218,8 @@ flake8: flake8.log
 	@echo '$@ done.'
 
 .PHONY: install
-install:
+install: requirements.txt
+	pip install --upgrade -r requirements.txt
 	pip install --upgrade .
 	python -c "import pywbemcli; print('Import: ok')"
 	@echo 'Done: Installed $(package_name) into current Python environment.'
