@@ -60,40 +60,47 @@ def connection_export(context):
 
 
 @connection_group.command('show', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_show(context, name):
     """
     Show the current connection information, i.e. all the variables that
-    make up the current connection
+    make up the current connection.
+
+    If the optional NAME argument is provided, only the information on the
+    connection with that name is displayed
     """
     context.execute_cmd(lambda: cmd_connection_show(context, name))
 
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=True,)
+@click.argument('name', type=str, metavar='NAME', required=True,)
 @click.pass_obj
 def connection_delete(context, name):
     """
     Show the current connection information, i.e. all the variables that
-    make up the current connection
+    make up the current connection,
+
+    TODO
     """
     context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
 
 @connection_group.command('select', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_select(context, name):
     """
-    Select a connection from the current defined connections
+    Select a connection from the current defined connections.
+
+    This becomes the connection for TODO
     """
 
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
 @connection_group.command('save', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_save(context, name):
     """
@@ -110,9 +117,9 @@ def connection_save(context, name):
 
 # pylint: disable=bad-continuation
 @connection_group.command('new', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=True,)
-@click.argument('server', type=str, envvar=PywbemServer.server_envvar,
-                required=True)
+@click.argument('name', type=str, metavar='NAME', required=True,)
+@click.argument('server', type=str, metavar='SERVER',
+                envvar=PywbemServer.server_envvar, required=True)
 @click.option('-d', '--default_namespace', type=str,
               default=DEFAULT_NAMESPACE,
               help="Default Namespace to use in the target WBEMServer if no "
@@ -148,9 +155,9 @@ def connection_new(context, name, server, **options):
     Create a new named connection from the input parameters.
 
     This subcommand creates and saves a new named connection from the
-    input parameters.
+    input arguments (NAME and SERVER) and options
 
-    The name and server arguments MUST exist. They define the server uri
+    The NAME and SERVER arguments MUST exist. They define the server uri
     and the unique name under which this server connection information
     will be stored. All other properties are optional.
 

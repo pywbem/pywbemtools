@@ -48,17 +48,19 @@ def qualifier_group():
 
 
 @qualifier_group.command('get', options_metavar=CMD_OPTS_TXT)
-@click.argument('NAME', type=str, metavar='NAME', required=True,)
+@click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
+                required=True,)
 @add_options(namespace_option)
 @click.pass_obj
-def qualifier_get(context, name, **options):
+def qualifier_get(context, qualifiername, **options):
     """
     Display CIMQualifierDeclaration.
 
-    Displays a single CIMQualifierDeclaration for the defined namespace in
+    Displays CIMQualifierDeclaration QUALIFIERNAME for the defined namespace in
     the current WBEMServer
     """
-    context.execute_cmd(lambda: cmd_qualifier_get(context, name, options))
+    context.execute_cmd(lambda: cmd_qualifier_get(context, qualifiername,
+                                                  options))
 
 
 @qualifier_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
@@ -86,12 +88,12 @@ def qual_outputformat(output_format):
     return 'mof' if output_format_is_table(output_format) else output_format
 
 
-def cmd_qualifier_get(context, name, options):
+def cmd_qualifier_get(context, qualifiername, options):
     """
     Execute the command for get qualifier and display result
     """
     try:
-        qual_decl = context.conn.GetQualifier(name,
+        qual_decl = context.conn.GetQualifier(qualifiername,
                                               namespace=options['namespace'])
 
         display_cim_objects(context, qual_decl,
