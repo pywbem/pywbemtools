@@ -40,4 +40,9 @@ twine>=1.8.1  # Apache-2.0
 jupyter>=1.0.0 # BSD
 notebook>=4.3.1
 
+# temporary fix to get around problem introduced by pyzmq 16.03 release 30
+# Oct 2017.  See issue #80
+# TODO retest this in the future so we can remove this limitation
+pyzmq==16.0.2
+
 
