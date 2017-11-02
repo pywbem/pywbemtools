@@ -66,7 +66,7 @@ project = u'pywbemtools'
 author = u'pywbem team'
 
 # The short description of the package.
-_short_description = u'Pywbemtools - Pywbem command line browser tools'
+_short_description = u'Pywbemtools - A set of tools using pywbem'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -74,8 +74,7 @@ _short_description = u'Pywbemtools - Pywbem command line browser tools'
 
 # The short X.Y version.
 # Note: We use the full version in both cases (e.g. 'M.N.U' or 'M.N.U.dev0').
-vi = VersionInfo('pywbemtools')
-version = vi.version_string_with_vcs()
+version = VersionInfo('pywbemtools').version_string_with_vcs()
 
 # The full version, including alpha/beta/rc tags.
 release = version
