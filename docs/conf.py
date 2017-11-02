@@ -15,6 +15,7 @@
 import sys
 import os
 import re
+from pbr.version import VersionInfo
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -60,28 +61,21 @@ else:
     master_doc = 'docs/index'
 
 # General information about the project.
-project = u'pywbemcli'
+project = u'pywbemtools'
 #copyright = u''
 author = u'pywbem team'
 
 # The short description of the package.
-_short_description = u'Pywbemcli - a WBEM client browser written in pure Python'
+_short_description = u'Pywbemtools - Pywbem command line browser tools'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-def package_version(filename, varname):
-    """Return package version string by reading `filename` and retrieving its
-       module-global variable `varnam`."""
-    _locals = {}
-    with open(filename) as fp:
-        exec(fp.read(), None, _locals)
-    return _locals[varname]
-
 # The short X.Y version.
 # Note: We use the full version in both cases (e.g. 'M.N.U' or 'M.N.U.dev0').
-version = package_version('../pywbemcli/_version.py', '__version__')
+vi = VersionInfo('pywbemtools')
+version = vi.version_string_with_vcs()
 
 # The full version, including alpha/beta/rc tags.
 release = version
