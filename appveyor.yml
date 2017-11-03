@@ -1,6 +1,9 @@
 # Control file for Appveyor CI (https://www.appveyor.com/)
 # Must be located in the root directory of the Git repository.
 
+# see issue 78.  Turns off appveyor until setup fixed.
+test: off
+
 environment:
   matrix:
     - PYTHON_VERSION: 2.7
