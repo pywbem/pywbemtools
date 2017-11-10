@@ -5,8 +5,7 @@ pywbemcli Help Command Details
 ==============================
 
 
-This section defines the help output for each pywbemcli command group and
-subcommand.
+This section defines the help output for each pywbemcli command group and subcommand.
 
 
 
@@ -343,9 +342,9 @@ The following defines the help output for the `pywbemcli class get --help` subco
 
       Get and display a single CIM class.
 
-      Get a single class defined by the CLASSNAME argument from the WBEM server
-      and display it. Normally it is retrieved from the default namespace in the
-      server.
+      Get a single CIM class defined by the CLASSNAME argument from the WBEM
+      server and display it. Normally it is retrieved from the default namespace
+      in the server.
 
       If the class is not found in the WBEM Server, the server returns an
       exception.
@@ -516,14 +515,14 @@ The following defines the help output for the `pywbemcli connection --help` subc
       -h, --help  Show this message and exit.
 
     Commands:
-      delete  Show the current connection information, i.e.
+      delete  Delete connection information.
       export  Export the current connection information.
-      list    Execute a simple wbem request to test that...
-      new     Create a new named connection from the input...
+      list    Execute a predefined wbem request.
+      new     Create a new named WBEM connection.
       save    Save current connection into repository.
-      select  Select a connection from the current defined...
-      show    Show the current connection information, i.e.
-      test    Execute a simple wbem request to test that...
+      select  Select a connection from defined connections.
+      show    Show current or NAME connection information.
+      test    Execute a predefined wbem request.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -540,10 +539,10 @@ The following defines the help output for the `pywbemcli connection delete --hel
 
     Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
 
-      Show the current connection information, i.e. all the variables that make
-      up the current connection,
+      Delete connection information.
 
-      TODO
+      Delete connection information from the persistent store for the connection
+      defined by NAME.
 
     Options:
       -h, --help  Show this message and exit.
@@ -586,8 +585,10 @@ The following defines the help output for the `pywbemcli connection list --help`
 
     Usage: pywbemcli connection list [COMMAND-OPTIONS]
 
-      Execute a simple wbem request to test that the connection exists and is
-      working.
+      Execute a predefined wbem request.
+
+      This provides a simple test to determine if the defined connection exists
+      and is working.
 
     Options:
       -h, --help  Show this message and exit.
@@ -605,28 +606,29 @@ The following defines the help output for the `pywbemcli connection new --help` 
 
 ::
 
-    Usage: pywbemcli connection new [COMMAND-OPTIONS] NAME SERVER
+    Usage: pywbemcli connection new [COMMAND-OPTIONS] NAME uri
 
-      Create a new named connection from the input parameters.
+      Create a new named WBEM connection.
 
       This subcommand creates and saves a new named connection from the input
-      arguments (NAME and SERVER) and options
+      arguments (NAME and URI) and options
 
-      The NAME and SERVER arguments MUST exist. They define the server uri and
-      the unique name under which this server connection information will be
-      stored. All other properties are optional.
+      The new connection that can be referenced by the name argument in the
+      future.  This connection object is capable of managing all of the
+      properties defined for WBEMConnections.
+
+      The NAME and URI arguments MUST exist. They define the server uri and the
+      unique name under which this server connection information will be stored.
+      All other properties are optional.
 
       It does NOT automatically set the pywbemcli to use that connection. Use
       `connection select` to set a particular stored connection definition as
       the current connection.
 
-      This is the alternative means of defining a new WBEM server to be accessed
-      to supplying the parameters on the command line. and using the connection
-      set command to put it into the connection repository.
-
-      Defines a new connection that can be referenced by the name argument in
-      the future.  This connection object is capable of managing all of the
-      properties defined for WBEMConnections.
+      This is the alternative means of defining a new WBEM server to be
+      accessed. A server can also be defined by supplying the parameters on the
+      command line and using the `connection set` command to put it into the
+      connection repository.
 
     Options:
       -d, --default_namespace TEXT  Default Namespace to use in the target
@@ -694,9 +696,10 @@ The following defines the help output for the `pywbemcli connection select --hel
 
     Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
 
-      Select a connection from the current defined connections.
+      Select a connection from defined connections.
 
-      This becomes the connection for TODO
+      Selects a connection from the persistently stored set of named connections
+      if NAME exists in the store.
 
     Options:
       -h, --help  Show this message and exit.
@@ -716,11 +719,14 @@ The following defines the help output for the `pywbemcli connection show --help`
 
     Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
-      Show the current connection information, i.e. all the variables that make
-      up the current connection.
+      Show current or NAME connection information.
 
-      If the optional NAME argument is provided, only the information on the
-      connection with that name is displayed
+      This subcommand displays  all the variables that make up the current WBEM
+      connection if the optional NAME argument is NOT provided
+
+      If the optional NAME argument is provided, the information on the
+      connection with that name is displayed if that name is in the persistent
+      repository.
 
     Options:
       -h, --help  Show this message and exit.
@@ -740,8 +746,12 @@ The following defines the help output for the `pywbemcli connection test --help`
 
     Usage: pywbemcli connection test [COMMAND-OPTIONS]
 
-      Execute a simple wbem request to test that the connection exists and is
-      working.
+      Execute a predefined wbem request.
+
+      This executes a predefined request against the  currently defined WBEM
+      server to tconfirm that the connection exists and is working.
+
+      It executes getclass on CIM_ManagedElement as the standard test.
 
     Options:
       -h, --help  Show this message and exit.
@@ -798,11 +808,11 @@ The following defines the help output for the `pywbemcli instance --help` subcom
       associators   Get associated instances or names.
       count         Get instance count for classes.
       create        Create an instance of classname.
-      delete        Delete a single instance defined by...
+      delete        Delete a single CIM instance.
       enumerate     Enumerate instances or names of CLASSNAME.
       get           Get a single CIMInstance.
-      invokemethod  Invoke the method defined by INSTANCENAME and...
-      query         Execute the query defined by the query...
+      invokemethod  Invoke a CIM method.
+      query         Execute an execquery request.
       references    Get the reference instances or names.
 
 
@@ -955,8 +965,10 @@ The following defines the help output for the `pywbemcli instance delete --help`
 
     Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
 
-      Delete a single instance defined by INSTANCENAME from the WBEM server.
-      This may be executed interactively by providing only a class name and the
+      Delete a single CIM instance.
+
+      Delete the instanced defined by INSTANCENAME from the WBEM server. This
+      may be executed interactively by providing only a class name and the
       interactive option.
 
     Options:
@@ -1033,7 +1045,7 @@ The following defines the help output for the `pywbemcli instance get --help` su
       Gets the instance defined by INSTANCENAME.
 
       This may be executed interactively by providing only a classname and the
-      interactive option.
+      interactive option (-i).
 
     Options:
       -l, --localonly                 Show only local properties of the returned
@@ -1074,10 +1086,16 @@ The following defines the help output for the `pywbemcli instance invokemethod -
     Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
                                            METHODNAME
 
-      Invoke the method defined by INSTANCENAME and METHODNAME with parameters.
+      Invoke a CIM method.
+
+      Invoke the method defined by INSTANCENAME and METHODNAME arguments with
+      parameters defined by the --parameter options.
 
       This issues an instance level invokemethod request and displays the
       results.
+
+      A class level invoke method is available as `pywbemcli class
+      invokemethod`.
 
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
@@ -1104,12 +1122,14 @@ The following defines the help output for the `pywbemcli instance query --help` 
 
 ::
 
-    Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY STRING
+    Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY_STRING
 
-      Execute the query defined by the query argument.
+      Execute an execquery request.
 
-      Executes a query request on the target WBEM Server with the query language
-      and query string defined on input.
+      Executes a query request on the target WBEM Server with the QUERY_STRING
+      argument and query language options.
+
+      The results of the query are displayed as mof or xml.
 
     Options:
       -l, --querylanguage QUERY LANGUAGE
@@ -1139,15 +1159,15 @@ The following defines the help output for the `pywbemcli instance references --h
 
       Get the reference instances or names.
 
-      Gets the reference instances or instance names (--names-only option) for a
+      Gets the reference instances or instance names(--names-only option) for a
       target instance name in the target WBEM server.
 
       For the INSTANCENAME argument provided return instances or instance names
       filtered by the --role and --resultclass options.
 
       This may be executed interactively by providing only a class name and the
-      interactive option. Pywbemcli presents a list of instances names in the
-      class from which one can be chosen as the target.
+      interactive option(-i). Pywbemcli presents a list of instances names in
+      the class from which one can be chosen as the target.
 
     Options:
       -R, --resultclass <class name>  Filter by the result class name provided.
@@ -1313,10 +1333,10 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       -h, --help  Show this message and exit.
 
     Commands:
-      brand       Display interop namespace name in the WBEM...
-      connection  Display information on the connection used by...
-      info        Display the brand information on theWBEM...
-      interop     Display the interop namespace name in the...
+      brand       Display information on the server.
+      connection  Display connection info used by this server.
+      info        Display general information on the Server.
+      interop     Display the interop namespace name.
       namespaces  Display the namespaces in the WBEM server
       profiles    Display profiles in the WBEM Server.
       test_pull   Test whether pull opeations exist on the WBEM...
@@ -1336,7 +1356,10 @@ The following defines the help output for the `pywbemcli server brand --help` su
 
     Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
-      Display interop namespace name in the WBEM Server.
+      Display information on the server.
+
+      Display brand information on the current server if it is available. This
+      is typically the definition of the server implementor.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1356,7 +1379,10 @@ The following defines the help output for the `pywbemcli server connection --hel
 
     Usage: pywbemcli server connection [COMMAND-OPTIONS]
 
-      Display information on the connection used by this server.
+      Display connection info used by this server.
+
+      Displays the connection information for the WBEM connection attached to
+      this server.  This includes uri, default namespace, etc.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1376,7 +1402,10 @@ The following defines the help output for the `pywbemcli server info --help` sub
 
     Usage: pywbemcli server info [COMMAND-OPTIONS]
 
-      Display the brand information on theWBEM Server.
+      Display general information on the Server.
+
+      Displays general information on the current server includeing brand,
+      namespaces, etc.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1396,7 +1425,9 @@ The following defines the help output for the `pywbemcli server interop --help` 
 
     Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
-      Display the interop namespace name in the WBEM Server.
+      Display the interop namespace name.
+
+      Displays the name of the interop namespace defined for the WBEM Server.
 
     Options:
       -h, --help  Show this message and exit.
