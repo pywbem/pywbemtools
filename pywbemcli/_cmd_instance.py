@@ -104,10 +104,11 @@ def instance_get(context, instancename, **options):
 @click.pass_obj
 def instance_delete(context, instancename, **options):
     """
-    Delete a single instance defined by INSTANCENAME from the WBEM server.
+    Delete a single CIM instance.
+
+    Delete the instanced defined by INSTANCENAME from the WBEM server.
     This may be executed interactively by providing only a class name and the
     interactive option.
-
     """
     context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
                                                     options))
@@ -147,10 +148,16 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
-    Invoke the method defined by INSTANCENAME and METHODNAME with parameters.
+    Invoke a CIM method.
+
+    Invoke the method defined by INSTANCENAME and METHODNAME arguments with
+    parameters defined by the --parameter options.
 
     This issues an instance level invokemethod request and displays the
     results.
+
+    A class level invoke method is available as `pywbemcli class invokemethod`.
+
 
     """
     context.execute_cmd(lambda: cmd_instance_invokemethod(context,
@@ -262,7 +269,7 @@ def instance_associators(context, instancename, **options):
 
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)
-@click.argument('query', type=str, required=True, metavar='QUERY STRING')
+@click.argument('query', type=str, required=True, metavar='QUERY_STRING')
 @click.option('-l', '--querylanguage', type=str, required=False,
               metavar='QUERY LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
               help='Use the query language defined. '
@@ -273,10 +280,12 @@ def instance_associators(context, instancename, **options):
 @click.pass_obj
 def instance_query(context, query, **options):
     """
-    Execute the query defined by the query argument.
+    Execute an execquery request.
 
-    Executes a query request on the target WBEM Server with the
-    query language and query string defined on input.
+    Executes a query request on the target WBEM Server with the QUERY_STRING
+    argument and query language options.
+
+    The results of the query are displayed as mof or xml.
 
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))

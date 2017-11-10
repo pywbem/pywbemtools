@@ -65,7 +65,10 @@ def server_namespaces(context, **options):
 @click.pass_obj
 def server_interop(context):
     """
-    Display the interop namespace name in the WBEM Server.
+    Display the interop namespace name.
+
+    Displays the name of the interop namespace defined for the
+    WBEM Server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_interop(context))
@@ -75,7 +78,10 @@ def server_interop(context):
 @click.pass_obj
 def server_brand(context):
     """
-    Display interop namespace name in the WBEM Server.
+    Display information on the server.
+
+    Display brand information on the current server if it is available.
+    This is typically the definition of the server implementor.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_brand(context))
@@ -85,7 +91,10 @@ def server_brand(context):
 @click.pass_obj
 def server_info(context):
     """
-    Display the brand information on theWBEM Server.
+    Display general information on the Server.
+
+    Displays general information on the current server includeing brand,
+    namespaces, etc.
     """
     context.execute_cmd(lambda: cmd_server_info(context))
 
@@ -112,7 +121,10 @@ def server_profiles(context, **options):
 @click.pass_obj
 def server_connection(context):
     """
-    Display information on the connection used by this server.
+    Display connection info used by this server.
+
+    Displays the connection information for the WBEM connection
+    attached to this server.  This includes uri, default namespace, etc.
     """
     context.execute_cmd(lambda: cmd_server_connection(context))
 
@@ -121,7 +133,9 @@ def server_connection(context):
 @click.pass_obj
 def server_test_pull(context):
     """
-    Test whether pull opeations exist on the WBEM server.
+    Test existence of pull opeations.
+
+    Test whether the pull operations exist on the WBEM server.
     """
     context.execute_cmd(lambda: cmd_server_test_pull(context))
 
