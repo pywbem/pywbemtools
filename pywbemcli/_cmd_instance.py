@@ -50,7 +50,7 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='If set, instancename argument must be a class and '
+                 help='If set, INSTANCENAME argument must be a class and '
                       ' user is provided with a list of instances of the '
                       ' class from which the instance to delete is selected.')]
 
@@ -87,10 +87,10 @@ def instance_get(context, instancename, **options):
     """
     Get a single CIMInstance.
 
-    Gets the instance defined by instancename.
+    Gets the instance defined by INSTANCENAME.
 
     This may be executed interactively by providing only a classname and the
-    interactive option.
+    interactive option (-i).
 
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
@@ -104,17 +104,18 @@ def instance_get(context, instancename, **options):
 @click.pass_obj
 def instance_delete(context, instancename, **options):
     """
-    Delete a single instance defined by instancename from the WBEM server.
-    This may be executed interactively by providing only a classname and the
-    interactive option.
+    Delete a single CIM instance.
 
+    Delete the instanced defined by INSTANCENAME from the WBEM server.
+    This may be executed interactively by providing only a class name and the
+    interactive option.
     """
     context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
                                                     options))
 
 
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', type=str, metavar='classname', required=True)
+@click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-P', '--property', type=str, metavar='property', required=False,
               multiple=True,
               help='Optional property definitions of form name=value.'
@@ -126,7 +127,7 @@ def instance_create(context, classname, **options):
     """
     Create an instance of classname.
 
-    Creates an instance of the class `classname` with the properties defined
+    Creates an instance of the class `CLASSNAME` with the properties defined
     in the property option.
 
     The propertylist option limits the created instance to the properties
@@ -137,8 +138,8 @@ def instance_create(context, classname, **options):
 
 
 @instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
-@click.argument('instancename', type=str, metavar='name', required=True)
-@click.argument('methodname', type=str, metavar='name', required=True)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@click.argument('methodname', type=str, metavar='METHODNAME', required=True)
 @click.option('-p', '--parameter', type=str, metavar='parameter',
               required=False, multiple=True,
               help='Optional multiple method parameters of form name=value')
@@ -147,10 +148,16 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
-    Invoke the method defined by instancename and methodname with parameters.
+    Invoke a CIM method.
+
+    Invoke the method defined by INSTANCENAME and METHODNAME arguments with
+    parameters defined by the --parameter options.
 
     This issues an instance level invokemethod request and displays the
     results.
+
+    A class level invoke method is available as `pywbemcli class invokemethod`.
+
 
     """
     context.execute_cmd(lambda: cmd_instance_invokemethod(context,
@@ -175,11 +182,11 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
-    Enumerate instances or names of classname.
+    Enumerate instances or names of CLASSNAME.
 
     Enumerate instances or instance names from the WBEMServer starting either
-    at the top  of the hierarchy (if no classname provided) or from the
-    classname argument if provided.
+    at the top  of the hierarchy (if no CLASSNAME provided) or from the
+    CLASSNAME argument if provided.
 
     Displays the returned instances or names
     """
@@ -188,7 +195,7 @@ def instance_enumerate(context, classname, **options):
 
 
 @instance_group.command('references', options_metavar=CMD_OPTS_TXT)
-@click.argument('INSTANCENAME', type=str, metavar='INSTANCENAME', required=True)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided.')
@@ -208,22 +215,22 @@ def instance_references(context, instancename, **options):
     """
     Get the reference instances or names.
 
-    Gets the reference instances or instance names (--names-only option) for a
+    Gets the reference instances or instance names(--names-only option) for a
     target instance name in the target WBEM server.
 
     For the INSTANCENAME argument provided return instances or instance
     names filtered by the --role and --resultclass options.
 
-    This may be executed interactively by providing only a classname and the
-    interactive option. Pywbemcli presents a list of instances in the class
-    from which one can be chosen as the target.
+    This may be executed interactively by providing only a class name and the
+    interactive option(-i). Pywbemcli presents a list of instances names in the
+    class from which one can be chosen as the target.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
 
 
 @instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
-@click.argument('INSTANCENAME', type=str, metavar='INSTANCENAME', required=True)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the associated instancename provided.')
@@ -262,9 +269,9 @@ def instance_associators(context, instancename, **options):
 
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)
-@click.argument('query', type=str, required=True, metavar='<query string>')
+@click.argument('query', type=str, required=True, metavar='QUERY_STRING')
 @click.option('-l', '--querylanguage', type=str, required=False,
-              metavar='<query language>', default=DEFAULT_QUERY_LANGUAGE,
+              metavar='QUERY LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
               help='Use the query language defined. '
                    '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
@@ -273,17 +280,19 @@ def instance_associators(context, instancename, **options):
 @click.pass_obj
 def instance_query(context, query, **options):
     """
-    Execute the query defined by the query argument.
+    Execute an execquery request.
 
-    Executes a query request on the target WBEM Server with the
-    query language and query string defined on input.
+    Executes a query request on the target WBEM Server with the QUERY_STRING
+    argument and query language options.
+
+    The results of the query are displayed as mof or xml.
 
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
-@click.argument('CLASSNAME', type=str, metavar='CLASSNAME-regex',
+@click.argument('classname', type=str, metavar='CLASSNAME-REGEX',
                 required=False)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by classname')
@@ -294,19 +303,20 @@ def instance_count(context, classname, **options):
     Get instance count for classes.
 
     Displays the count of instances for the classes defined by the
-    `classname-regex` argument in one or more namespaces.
+    `CLASSNAME-REGEX` argument in one or more namespaces.
 
-    The size of the response may be limited by CLASSNAME-regex argument which
-    defines a classname regular expression so that only those classes are
-    counted. The CLASSNAME-regex argument is optional.
+    The size of the response may be limited by CLASSNAME-REGEX argument which
+    defines a regular expression based on the desired class names so that only
+    classes that match the regex are counted. The CLASSNAME-regex argument is
+    optional.
 
     The CLASSNAME-regex argument may be either a complete classname or a regular
     expression that can be matched to one or more classnames. To limit the
     filter to a single classname, terminate the classname with $.
 
-    The regular expression is anchored to the beginning of the classname and
-    is case insensitive. Thus `pywbem_` returns all classes that begin with
-    `PyWBEM_`, `pywbem_`, etc.
+    The CLASSNAME-REGEX regular expression is anchored to the beginning of the
+    classname and is case insensitive. Thus `pywbem_` returns all classes that
+    begin with `PyWBEM_`, `pywbem_`, etc.
 
     This operation can take a long time to execute.
 

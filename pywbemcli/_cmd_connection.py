@@ -60,40 +60,52 @@ def connection_export(context):
 
 
 @connection_group.command('show', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_show(context, name):
     """
-    Show the current connection information, i.e. all the variables that
-    make up the current connection
+    Show current or NAME connection information.
+
+    This subcommand displays  all the variables that make up the current
+    WBEM connection if the optional NAME argument is NOT provided
+
+    If the optional NAME argument is provided, the information on the
+    connection with that name is displayed if that name is in the persistent
+    repository.
     """
     context.execute_cmd(lambda: cmd_connection_show(context, name))
 
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=True,)
+@click.argument('name', type=str, metavar='NAME', required=True,)
+# TODO add verify
 @click.pass_obj
 def connection_delete(context, name):
     """
-    Show the current connection information, i.e. all the variables that
-    make up the current connection
+    Delete connection information.
+
+    Delete connection information from the persistent store
+    for the connection defined by NAME.
     """
     context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
 
 @connection_group.command('select', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_select(context, name):
     """
-    Select a connection from the current defined connections
+    Select a connection from defined connections.
+
+    Selects a connection from the persistently stored set of named connections
+    if NAME exists in the store.
     """
 
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
 @connection_group.command('save', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 @click.pass_obj
 def connection_save(context, name):
     """
@@ -110,9 +122,9 @@ def connection_save(context, name):
 
 # pylint: disable=bad-continuation
 @connection_group.command('new', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='name', required=True,)
-@click.argument('server', type=str, envvar=PywbemServer.server_envvar,
-                required=True)
+@click.argument('name', type=str, metavar='NAME', required=True,)
+@click.argument('uri', type=str, metavar='uri',
+                envvar=PywbemServer.server_envvar, required=True)
 @click.option('-d', '--default_namespace', type=str,
               default=DEFAULT_NAMESPACE,
               help="Default Namespace to use in the target WBEMServer if no "
@@ -145,12 +157,16 @@ def connection_save(context, name):
 @click.pass_obj
 def connection_new(context, name, server, **options):
     """
-    Create a new named connection from the input parameters.
+    Create a new named WBEM connection.
 
     This subcommand creates and saves a new named connection from the
-    input parameters.
+    input arguments (NAME and URI) and options
 
-    The name and server arguments MUST exist. They define the server uri
+    The new connection that can be referenced by the name argument in
+    the future.  This connection object is capable of managing all of the
+    properties defined for WBEMConnections.
+
+    The NAME and URI arguments MUST exist. They define the server uri
     and the unique name under which this server connection information
     will be stored. All other properties are optional.
 
@@ -158,13 +174,10 @@ def connection_new(context, name, server, **options):
     Use `connection select` to set a particular stored connection definition
     as the current connection.
 
-    This is the alternative means of defining a new WBEM server to be accessed
-    to supplying the parameters on the command line. and using the
-    connection set command to put it into the connection repository.
-
-    Defines a new connection that can be referenced by the name argument in
-    the future.  This connection object is capable of managing all of the
-    properties defined for WBEMConnections.
+    This is the alternative means of defining a new WBEM server to be accessed.
+    A server can also be defined by supplying the parameters on the command
+    line and using the `connection set` command to put it into the connection
+    repository.
     """
     context.execute_cmd(lambda: cmd_connection_new(context, name, server,
                                                    options))
@@ -174,8 +187,13 @@ def connection_new(context, name, server, **options):
 @click.pass_obj
 def connection_test(context):
     """
-    Execute a simple wbem request to test that the connection exists
+    Execute a predefined wbem request.
+
+    This executes a predefined request against the  currently defined
+    WBEM server to tconfirm that the connection exists
     and is working.
+
+    It executes getclass on CIM_ManagedElement as the standard test.
     """
     context.execute_cmd(lambda: cmd_connection_test(context))
 
@@ -184,7 +202,9 @@ def connection_test(context):
 @click.pass_obj
 def connection_list(context):
     """
-    Execute a simple wbem request to test that the connection exists
+    Execute a predefined wbem request.
+
+    This provides a simple test to determine if the defined connection exists
     and is working.
     """
     context.execute_cmd(lambda: cmd_connection_list(context))

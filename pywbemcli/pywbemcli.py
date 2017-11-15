@@ -277,7 +277,17 @@ The following can be entered in interactive mode:
 @click.pass_context
 def repl(ctx):
     """
-    Enter interactive (REPL) mode (default) and load history file.
+    Enter interactive (REPL) mode (default).
+
+    Enters the interactive mode where subcommands can be entered interactively
+    and load the command history file.
+
+    If no options are specified on the command line,  the interactive mode
+    is entered. The prompt is changed to `pywbemcli>' in the interactive
+    mode.
+
+    Pywbemcli may be terminated form this mode by entering
+    <CTRL-D>, :q, :quit, :exit
     """
 
     history_file = PYWBEMCLI_HISTORY_FILE

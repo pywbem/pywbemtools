@@ -276,7 +276,7 @@ ifneq ($(PLATFORM),Windows)
 	python setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
 	@echo 'Done: Created distribution files: $@'
 else
-	@echo 'Error: Creating distribution archives requires to run on Linux or OSX'
+	@echo 'Error: Creating distribution archives requires Linux or OSX'
 	@false
 endif
 
@@ -286,7 +286,7 @@ ifeq ($(PLATFORM),Windows)
 	python setup.py bdist_wininst -d $(dist_dir) -o -t "$(package_name) v$(package_version)"
 	@echo 'Done: Created Windows installable: $@'
 else
-	@echo 'Error: Creating Windows installable requires to run on Windows'
+	@echo 'Error: Creating Windows installable requires Windows'
 	@false
 endif
 
