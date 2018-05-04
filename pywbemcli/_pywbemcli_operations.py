@@ -14,43 +14,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Subclass of pywbem cim_operations.py to capture the specialized functions
-for pywbemcli.
+Mixin class that adds methods to WBEMConnection and FakeWBEMConnection for
+pywbemcli usage
 
-This contains only those classes that use the inter functions and actually
-do the complete operation to emulate the original enumerate operations
+This contains only methods that use the iter<...> operations  but also execute
+the complete iterations so that we can use these as common operations for
+pywbemcli instead of having to execute an algorithm of pull vs non-pull
+everywhere a WBEMConnection possible pull operation is called.
+
+It also adds a method to FakeWBEMConnection to build the repository.
 """
 from __future__ import absolute_import
+import os
 
-from pywbem import WBEMConnection, DEFAULT_NAMESPACE
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
+from pywbem import WBEMConnection
+import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
 
-__all__ = ['PYWBEMCLIConnection']
+#  __all__ = ['PYWBEMCLIConnection', 'PYWBEMCLIFakedConnection']
 
 
-class PYWBEMCLIConnection(WBEMConnection):
+class PYWBEMCLIConnectionMixin(object):
     """
-    Subclass WBEM_Connection to build the specialized operations needed
-    by pywbemcli,
+    Mixin class to extend WBEMConnection with a set of methods that use the
+    iter<...> methods as the basis for getting Instances, etc. but add the
+    generator processing to retrieve the instances.  These can be used within
+    pywbemcli to allow one method call to ack as either a pull or traditional
+    operation pushing the differences into this mixin.
 
+    These methods do not resolve the core issues between the traditional and
+    pull operations such as the fact that only the pull operations pass
+    the FilterQuery parameter.
+
+    They are a pywbemcli convience to simplify the individual action processing
+    methods to a single call.
     """
-
-    def __init__(self, url, creds=None, default_namespace=DEFAULT_NAMESPACE,
-                 x509=None, verify_callback=None, ca_certs=None,
-                 no_verification=False, timeout=None, use_pull_operations=None,
-                 enable_stats=False):
-
-        super(PYWBEMCLIConnection, self).__init__(
-            url, creds=creds,
-            default_namespace=default_namespace,
-            x509=x509,
-            verify_callback=verify_callback,
-            ca_certs=ca_certs,
-            no_verification=no_verification,
-            timeout=timeout,
-            use_pull_operations=use_pull_operations,
-            enable_stats=enable_stats)
 
     def PyWbemcliEnumerateInstancePaths(self, ClassName, namespace=None,
                                         FilterQueryLanguage=None,
@@ -253,11 +257,11 @@ class PYWBEMCLIConnection(WBEMConnection):
             MaxObjectCount=MaxObjectCount)]
         return result
 
-    def IterQueryInstances(self, FilterQueryLanguage, FilterQuery,
-                           namespace=None, ReturnQueryResultClass=None,
-                           OperationTimeout=None, ContinueOnError=None,
-                           MaxObjectCount=DEFAULT_MAXPULLCNT,
-                           **extra):
+    def PyWbemcliQueryInstances(self, FilterQueryLanguage, FilterQuery,
+                                namespace=None, ReturnQueryResultClass=None,
+                                OperationTimeout=None, ContinueOnError=None,
+                                MaxObjectCount=DEFAULT_MAXPULLCNT,
+                                **extra):
         # pylint: disable=invalid-name
         """
         Execute IterQueryInstances and retrieve the instances. Returns
@@ -278,3 +282,105 @@ class PYWBEMCLIConnection(WBEMConnection):
             ContinueOnError=ContinueOnError,
             MaxObjectCount=MaxObjectCount)]
         return result
+
+
+class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
+    """
+    Builds the mock repository from the pywbemcli url input.
+
+    The input url defines:
+
+    An action as the netloc(the text  between :// and the next //) which could
+    be:
+
+    1. A file reference if netloc == 'file'
+
+    2. A callback to a method if netloc == 'callback' and the callback is in
+       the same process.
+
+    TODO expand this if necessary
+
+    If the netloc == 'file'" the path component of the url is interpreted as
+    a path name where:
+
+    1. If it has the extension .mof is compiled into the repository using the
+       :meth:`~pywbem_mock.FakedWBEMConnection.compile_mof_file` method.
+
+    2. if it has the extension .py. NOTE: There are two possibilities with this
+       type, a) execute it b) limit the .py extension to just objects that
+       will be compiled using the
+       :meth:`~pywbem_mock.FakedWBEMConnection.add_cimobjects`
+
+    Known issues with what we have:
+
+    1. The direct execution of a method a security hole.
+
+    2. In order to compile dmtf schema and also add objects or other files
+       at least two files are needed. Today we are providing for only one
+       file
+    """
+    def build_repository(self, conn, fake_url, verbose):
+        """
+        Build the repository from the input url.
+        """
+        # assume path is a directory and file name
+
+        url_components = urlparse(fake_url)
+
+        if url_components.netloc == 'file':
+            file_path = url_components.path
+            ext = os.path.splitext(file_path)[1]
+            if not os.path.exists(file_path):
+                raise ValueError('File name %s does not exit' % file_path)
+            if ext == '.mof':
+                conn.compile_mof_file(file_path)
+            elif ext == '.py':
+                with open(file_path) as myfile:
+                    objs = myfile.readlines()
+                conn.add_cimobjects(objs)
+            else:
+                ValueError('Invalid extension %s on file %s' % (ext, file_path))
+        elif url_components.netloc == 'callback':
+            methodname = url_components.path
+            # TODO do we do anything with result or expect any result back
+            # from the method?
+            result = bound_method(self, methodname)
+        except Exception as ex:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            tb = repr(traceback.format_exception(exc_type, exc_value,
+                                                 exc_traceback))
+
+        else:
+            raise ValueError('Fake URL netloc must be "file" or "callback". '
+                             ' "%s" found' %
+                             url_components.netloc)
+
+        if verbose:
+            self.display_repository()
+
+
+class PYWBEMCLIConnection(WBEMConnection, PYWBEMCLIConnectionMixin):
+    """
+    PyWBEMCLIConnection subclass adds the methods added by
+    PYWBEMCLIConnectionMixin
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        ctor passes all input parameters to superclass
+        """
+        super(PYWBEMCLIConnection, self).__init__(*args, **kwargs)
+
+
+class PYWBEMCLIFakedConnection(pywbem_mock.FakedWBEMConnection,
+                               PYWBEMCLIConnectionMixin,
+                               BuildRepositoryMixin):
+    """
+    PyWBEMCLIFakedConnection subclass adds the methods added by
+    PYWBEMCLIConnectionMixin
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        ctor passes all input parameters to superclass
+        """
+        super(PYWBEMCLIFakedConnection, self).__init__(*args, **kwargs)

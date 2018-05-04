@@ -24,25 +24,26 @@ import re
 import click
 
 from pywbem import WBEMServer
-from .config import DEFAULT_URI_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
+
+from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_MAXPULLCNT, DEFAULT_NAMESPACE, MAX_TIMEOUT
-from ._pywbemcli_operations import PYWBEMCLIConnection
+from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
 
 WBEM_SERVER_OBJ = None
 
 
-def _validate_server_uri(server):
+def _validate_server_url(server):
     """
     Validate  and possibly complete the wbemserver uri provided.
 
       Parameters:
 
         server: (string):
-          uri of the WBEMServer to which connection is being made including
+          url of the WBEMServer to which connection is being made including
           scheme, hostname/IPAddress, and optional port
       Returns:
-        The input uri or uri extended to use DEFAULT_SCHEME as the
+        The input url or uri extended to use DEFAULT_SCHEME as the
         scheme if not is provided
 
       Exceptions:
@@ -60,8 +61,8 @@ def _validate_server_uri(server):
                                    ' Use "http" or "https"' % server)
     else:
         url = "{scheme}://{host}".format(
-            scheme=DEFAULT_URI_SCHEME,
-            host=DEFAULT_URI_SCHEME)
+            scheme=DEFAULT_URL_SCHEME,
+            host=DEFAULT_URL_SCHEME)
 
     return url
 
@@ -77,8 +78,7 @@ class PywbemServer(object):
     as the password to be requested only when a connection is made.
 
     This class also holds the variables that determine whether the connection
-    will use the pull operations or traditional operatios
-
+    will use the pull operations or traditional operations
     """
 
     # The following class level variables are the names for the env variables
@@ -94,23 +94,27 @@ class PywbemServer(object):
     noverify_envvar = 'PYWBEMCLI_NOVERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
     use_pull_envvar = 'PYWBEMCLI_USE_PULL'
-    enable_stats_envvar = 'PYWBEMCLI_ENABLE_STATS'
+    stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
 
-    def __init__(self, server_uri=None, default_namespace=DEFAULT_NAMESPACE,
+    def __init__(self, server_url=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  noverify=True, certfile=None, keyfile=None, ca_certs=None,
                  use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
-                 enable_stats=False, verbose=False):
+                 stats_enabled=False, verbose=False):
         """
             Create a PywbemServer object. This contains the configuration
             and operation information to create a connection to the server
             and execute cim_operations on the server.
         """
-        if not server_uri:
-            raise ValueError("server_uri required")
-        self._server_uri = server_uri
+        self._fake_connection = None
+        if not server_url:
+            raise ValueError("Server_url parameter required")
+        self._server_url = server_url
+
+        if self.server_url.startswith('fake'):
+            self._fake_server_url = server_url
         self._name = name
         self._default_namespace = default_namespace
         self._user = user
@@ -120,7 +124,7 @@ class PywbemServer(object):
         self._certfile = certfile
         self._keyfile = keyfile
         self._ca_certs = ca_certs
-        self._enable_stats = enable_stats
+        self._stats_enabled = stats_enabled
         self._verbose = verbose
         self._wbem_server = None
         self._validate_timeout()
@@ -133,18 +137,18 @@ class PywbemServer(object):
     def __repr__(self):
         return 'PywbemServer(uri=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
                'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
-               'use_pull_ops=%s, pull_max_cnt=%s, enable_stats=%s)' % \
-               (self.server_uri, self.name, self.default_namespace,
+               'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s)' % \
+               (self.server_url, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
-                self.pull_max_cnt, self.enable_stats)
+                self.pull_max_cnt, self.stats_enabled)
 
     @property
-    def server_uri(self):
+    def server_url(self):
         """
         :term:`string`: Scheme with Hostname or IP address of the WBEM Server.
         """
-        return self._server_uri
+        return self._server_url
 
     @property
     def name(self):
@@ -177,11 +181,11 @@ class PywbemServer(object):
         return self._pull_max_cnt
 
     @property
-    def enable_stats(self):
+    def stats_enabled(self):
         """
         :term:`bool`: if set, statistics are enabled for this connection
         """
-        return self._enable_stats
+        return self._stats_enabled
 
     @property
     def password(self):
@@ -288,7 +292,7 @@ class PywbemServer(object):
 
     def to_dict(self):
         """Create dictionary from instance"""
-        dict_ = {"name": self.name, "server_uri": self.server_uri,
+        dict_ = {"name": self.name, "server_url": self.server_url,
                  "user": self.user,
                  "password": self.password,
                  "default_namespace": self.default_namespace,
@@ -306,7 +310,7 @@ class PywbemServer(object):
         """Create PywbemServer object from kwargs"""
         return PywbemServer(**kwargs)
 
-    def create_connection(self):
+    def create_connection(self, verbose):
         """
         Initiate a WBEB connection, via PyWBEM api. Arguments for
         the request are the parameters required by the pywbem
@@ -321,34 +325,50 @@ class PywbemServer(object):
                ValueError: if server paramer is invalid or other issues with
                the input values
         """
-        if not self._server_uri:
-            raise click.ClickException('Server URI is empty. Cannot connect.')
+        if not self.server_url:
+            raise click.ClickException('Server URL is empty. Cannot connect.')
 
-        self._server_uri = _validate_server_uri(self._server_uri)
-        if self.keyfile is not None and self.certfile is None:
-            ValueError('keyfile option requires certfile option')
+        if self.server_url.startswith('fake'):
+            conn = PYWBEMCLIFakedConnection(
+                default_namespace=self.default_namespace)
 
-        # If supplied by connect request, save the password
-        # if password:
-        #   self._password = password
+            # where can we get the fake repository without putting it into
+            # the pywbemcli code. This should probably be the name of a
+            # callback that would build the repo.  Thus the callback could be
+            # either in the code or in the tests.
+            # TODO clean up we are using conn twice because the one that
+            # is supposed to be in pywem_server is not yet set..
+            conn.build_repository(conn, self._fake_server_url, verbose)
+        else:
+            # TODO should we make server_url writable?
+            self._server_url = _validate_server_url(self._server_url)
+            if self.keyfile is not None and self.certfile is None:
+                ValueError('keyfile option requires certfile option')
 
-        creds = (self.user, self.password) if self.user or \
-            self.password else None
+            # If supplied by connect request, save the password
+            # if password:
+            #   self._password = password
 
-        # If client cert and key provided, create dictionary for
-        # wbem connection certs (WBEMConnection takes dictionary for this info)
-        x509_dict = None
-        if self.certfile is not None:
-            x509_dict = {"certfile": self.certfile}
-            if self.keyfile is not None:
-                x509_dict.update({'keyfile': self.keyfile})
+            creds = (self.user, self.password) if self.user or \
+                self.password else None
 
-        # Create the WBEMConnection object and the _wbem_server object
-        conn = PYWBEMCLIConnection(self.server_uri, creds,
-                                   default_namespace=self.default_namespace,
-                                   no_verification=self.noverify,
-                                   x509=x509_dict, ca_certs=self.ca_certs,
-                                   timeout=self.timeout,
-                                   enable_stats=self.enable_stats)
+            # If client cert and key provided, create dictionary for
+            # wbem connection certs (WBEMConnection takes dictionary for this
+            #  info)
+            x509_dict = None
+            if self.certfile is not None:
+                x509_dict = {"certfile": self.certfile}
+                if self.keyfile is not None:
+                    x509_dict.update({'keyfile': self.keyfile})
+
+            # Create the WBEMConnection object and the _wbem_server object
+
+            conn = PYWBEMCLIConnection(self.server_url, creds,
+                                       default_namespace=self.default_namespace,
+                                       no_verification=self.noverify,
+                                       x509=x509_dict, ca_certs=self.ca_certs,
+                                       timeout=self.timeout,
+                                       stats_enabled=self.stats_enabled)
+
         # Save the connection object and create a WBEMServer object
         self._wbem_server = WBEMServer(conn)

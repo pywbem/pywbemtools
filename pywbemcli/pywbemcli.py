@@ -208,7 +208,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          ca_certs=ca_certs,
                                          use_pull_ops=use_pull_ops,
                                          pull_max_cnt=pull_max_cnt,
-                                         enable_stats=timestats,
+                                         stats_enabled=timestats,
                                          verbose=verbose)
         else:
             if name:

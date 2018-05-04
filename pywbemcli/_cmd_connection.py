@@ -238,7 +238,7 @@ def cmd_connection_export(context):
     context.spinner.stop()
     svr = context.pywbem_server
 
-    export_statement(PywbemServer.server_envvar, svr.server_uri)
+    export_statement(PywbemServer.server_envvar, svr.server_url)
 
     if_export_statement(PywbemServer.defaultnamespace_envvar,
                         svr.default_namespace)
@@ -313,7 +313,7 @@ def show_connection_information(context, svr, separate_line=True):
                '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
                'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s'
                % (svr.name, sep,
-                  svr.server_uri, sep,
+                  svr.server_url, sep,
                   svr.default_namespace, sep,
                   svr.user, sep,
                   svr.password, sep,
@@ -406,7 +406,7 @@ def cmd_connection_list(context):
     rows = []
 
     for name, svr in six.iteritems(pywbemcli_servers):
-        row = [name, svr.server_uri, svr.default_namespace, svr.user,
+        row = [name, svr.server_url, svr.default_namespace, svr.user,
                svr.password, svr.timeout, svr.noverify, svr.certfile,
                svr.keyfile]
         rows.append(row)

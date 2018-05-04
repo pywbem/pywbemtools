@@ -39,7 +39,7 @@ class PywbemServerTests(unittest.TestCase):
         pw = 'blah'
         svr = PywbemServer(server, ns, user=user, password=pw)
 
-        self.assertEqual(svr.server_uri, server)
+        self.assertEqual(svr.server_url, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
@@ -47,6 +47,9 @@ class PywbemServerTests(unittest.TestCase):
         print(svr)
 
     def test_all_parms(self):
+        """
+        Test that all of the input parameters are correctly putinto properties
+        """
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'
@@ -61,7 +64,7 @@ class PywbemServerTests(unittest.TestCase):
                            noverify=noverify, certfile=certfile,
                            keyfile=keyfile, verbose=verbose)
 
-        self.assertEqual(svr.server_uri, server)
+        self.assertEqual(svr.server_url, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
@@ -70,6 +73,9 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.keyfile, keyfile)
 
     def test_all_connect(self):
+        """
+        Test the create_connection method.
+        """
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'
@@ -84,7 +90,7 @@ class PywbemServerTests(unittest.TestCase):
                            noverify=noverify, certfile=certfile,
                            keyfile=keyfile, verbose=verbose)
 
-        self.assertEqual(svr.server_uri, server)
+        self.assertEqual(svr.server_url, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
@@ -93,7 +99,7 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.keyfile, keyfile)
 
         # connect and test connection results
-        svr.create_connection()
+        svr.create_connection(False)
         self.assertEqual(svr.conn.url, server)
         self.assertEqual(svr.wbem_server.conn.url, svr.conn.url)
 
