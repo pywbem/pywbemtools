@@ -108,6 +108,15 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -v, --verbose                   Display extra information about the
                                       processing.
       --version                       Show the version of this command and exit.
+      --mock_server FILENAME          If this option is defined, a mock WBEM
+                                      server is constructed as the target WBEM
+                                      server and the option value defines a MOF or
+                                      Python file to be used to populate the mock
+                                      repository. This option may be used multiple
+                                      times where each use defines a single file
+                                      or file_path.See the pywbemcli documentation
+                                      for more information.
+      --version                       Show the version of this command and exit.
       -h, --help                      Show this message and exit.
 
     Commands:
