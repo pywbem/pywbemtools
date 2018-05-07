@@ -210,7 +210,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          use_pull_ops=use_pull_ops,
                                          pull_max_cnt=pull_max_cnt,
                                          stats_enabled=timestats,
-                                         verbose=verbose)
+                                         verbose=verbose,
+                                         mock_server=mock_server)
         else:
             if name:
                 if name in pywbemcli_servers:
