@@ -39,7 +39,7 @@ class PYWBEMCLIConnection(WBEMConnection):
     def __init__(self, url, creds=None, default_namespace=DEFAULT_NAMESPACE,
                  x509=None, verify_callback=None, ca_certs=None,
                  no_verification=False, timeout=None, use_pull_operations=None,
-                 enable_stats=False):
+                 stats_enabled=False):
 
         super(PYWBEMCLIConnection, self).__init__(
             url, creds=creds,
@@ -50,7 +50,7 @@ class PYWBEMCLIConnection(WBEMConnection):
             no_verification=no_verification,
             timeout=timeout,
             use_pull_operations=use_pull_operations,
-            enable_stats=enable_stats)
+            stats_enabled=stats_enabled)
 
     def PyWbemcliEnumerateInstancePaths(self, ClassName, namespace=None,
                                         FilterQueryLanguage=None,

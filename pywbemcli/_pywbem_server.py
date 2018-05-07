@@ -94,7 +94,7 @@ class PywbemServer(object):
     noverify_envvar = 'PYWBEMCLI_NOVERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
     use_pull_envvar = 'PYWBEMCLI_USE_PULL'
-    enable_stats_envvar = 'PYWBEMCLI_ENABLE_STATS'
+    stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
 
     def __init__(self, server_uri=None, default_namespace=DEFAULT_NAMESPACE,
@@ -102,7 +102,7 @@ class PywbemServer(object):
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  noverify=True, certfile=None, keyfile=None, ca_certs=None,
                  use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
-                 enable_stats=False, verbose=False):
+                 stats_enabled=False, verbose=False):
         """
             Create a PywbemServer object. This contains the configuration
             and operation information to create a connection to the server
@@ -120,7 +120,7 @@ class PywbemServer(object):
         self._certfile = certfile
         self._keyfile = keyfile
         self._ca_certs = ca_certs
-        self._enable_stats = enable_stats
+        self._stats_enabled = stats_enabled
         self._verbose = verbose
         self._wbem_server = None
         self._validate_timeout()
@@ -133,11 +133,11 @@ class PywbemServer(object):
     def __repr__(self):
         return 'PywbemServer(uri=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
                'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
-               'use_pull_ops=%s, pull_max_cnt=%s, enable_stats=%s)' % \
+               'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s)' % \
                (self.server_uri, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
-                self.pull_max_cnt, self.enable_stats)
+                self.pull_max_cnt, self.stats_enabled)
 
     @property
     def server_uri(self):
@@ -177,11 +177,11 @@ class PywbemServer(object):
         return self._pull_max_cnt
 
     @property
-    def enable_stats(self):
+    def stats_enabled(self):
         """
         :term:`bool`: if set, statistics are enabled for this connection
         """
-        return self._enable_stats
+        return self._stats_enabled
 
     @property
     def password(self):
@@ -263,7 +263,7 @@ class PywbemServer(object):
             ValueError('Timeout option(%s) out of range %s to %s sec' %
                        (self.timeout, 0, MAX_TIMEOUT))
 
-    # TODO this function can be merged into get_password below
+    # TODO ks Can this function can be merged into get_password below?
     def password_prompt(self, ctx):
         """
         Request password from console.
@@ -349,6 +349,6 @@ class PywbemServer(object):
                                    no_verification=self.noverify,
                                    x509=x509_dict, ca_certs=self.ca_certs,
                                    timeout=self.timeout,
-                                   enable_stats=self.enable_stats)
+                                   stats_enabled=self.stats_enabled)
         # Save the connection object and create a WBEMServer object
         self._wbem_server = WBEMServer(conn)
