@@ -32,10 +32,14 @@ except ImportError:
 
 from pywbemcli._common import format_table, fold_string
 
-VERBOSE = True
+VERBOSE = False
+
+# TODO ks rewrite this test for pytest.  Note that the capture IO
+#      may be different in that they have fixtures such as capsys
+#      to capture output that may eplace StringIO used below.
 
 
-class TableTests(unittest.TestCase):
+class BaseTableTests(unittest.TestCase):
     """Base class for testing table output"""
     @staticmethod
     def create_simple_table(table_format=None, title=True):
@@ -85,8 +89,8 @@ class TableTests(unittest.TestCase):
             line += 1
 
 
-class FormatTableTests(TableTests):
-    """Tests on the asciitable module"""
+class FormatTableTests(BaseTableTests):
+    """Tests on the table_format function in _common.py"""
     def test_table_simple_hdr(self):
         """Test a simple table with header"""
 
@@ -100,20 +104,20 @@ class FormatTableTests(TableTests):
             print(actual)
 
         expected = ('test simple table\n'
-                    ' col1       col2        col3        \n'
-                    '------------------------------------\n'
-                    ' row1col1   row1col2    row1col3    \n'
-                    ' row2col1   row2col2    row2col3    \n'
-                    ' row3 col1  row3  col2  row3   col3 \n'
-                    ' 0          999         9999999     \n'
-                    ' 1.1432     1.2         0           \n')
+                    'col1       col2        col3\n'
+                    '---------  ----------  -----------\n'
+                    'row1col1   row1col2    row1col3\n'
+                    'row2col1   row2col2    row2col3\n'
+                    'row3 col1  row3  col2  row3   col3\n'
+                    '0          999         9999999\n'
+                    '1.1432     1.2         0\n')
 
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
                          'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
 
-    def test_table_simple_print_no_header(self):
+    def test_table_simple_no_hdr(self):
         """Test print a simple table no header"""
 
         captured_output = StringIO()          # Create StringIO object
@@ -125,13 +129,13 @@ class FormatTableTests(TableTests):
         if VERBOSE:
             print(actual)
 
-        expected = (' col1       col2        col3        \n'
-                    '------------------------------------\n'
-                    ' row1col1   row1col2    row1col3    \n'
-                    ' row2col1   row2col2    row2col3    \n'
-                    ' row3 col1  row3  col2  row3   col3 \n'
-                    ' 0          999         9999999     \n'
-                    ' 1.1432     1.2         0           \n')
+        expected = ('col1       col2        col3\n'
+                    '---------  ----------  -----------\n'
+                    'row1col1   row1col2    row1col3\n'
+                    'row2col1   row2col2    row2col3\n'
+                    'row3 col1  row3  col2  row3   col3\n'
+                    '0          999         9999999\n'
+                    '1.1432     1.2         0\n')
 
         self.compare_results(actual, expected)
 
@@ -153,18 +157,18 @@ class FormatTableTests(TableTests):
             print(actual)
 
         expected = ('test simple table\n'
-                    ' col1       col2        col3        \n'
-                    ' row1col1   row1col2    row1col3    \n'
-                    ' row2col1   row2col2    row2col3    \n'
-                    ' row3 col1  row3  col2  row3   col3 \n'
-                    ' 0          999         9999999     \n'
-                    ' 1.1432     1.2         0           \n')
+                    'col1       col2        col3\n'
+                    'row1col1   row1col2    row1col3\n'
+                    'row2col1   row2col2    row2col3\n'
+                    'row3 col1  row3  col2  row3   col3\n'
+                    '0          999         9999999\n'
+                    '1.1432     1.2         0\n')
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
                          'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
 
-    def test_table_grid_print(self):
+    def test_table_grid(self):
         """Test printing a plain table with borders and header"""
         captured_output = StringIO()          # Create StringIO object
         sys.stdout = captured_output                   # and redirect stdout.
@@ -180,7 +184,7 @@ class FormatTableTests(TableTests):
         expected = ('test simple table\n'
                     '+-----------+------------+-------------+\n'
                     '| col1      | col2       | col3        |\n'
-                    '+-----------+------------+-------------+\n'
+                    '+===========+============+=============+\n'
                     '| row1col1  | row1col2   | row1col3    |\n'
                     '+-----------+------------+-------------+\n'
                     '| row2col1  | row2col2   | row2col3    |\n'
@@ -196,6 +200,35 @@ class FormatTableTests(TableTests):
         self.assertEqual(actual, expected,
                          'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
 
+    def test_table_rst_hdr(self):
+        """Test a none table borders with header"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+
+        table = self.create_simple_table(table_format='rst', title=True)
+        print(table)
+
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test simple table\n'
+                    '=========  ==========  ===========\n'
+                    'col1       col2        col3\n'
+                    '=========  ==========  ===========\n'
+                    'row1col1   row1col2    row1col3\n'
+                    'row2col1   row2col2    row2col3\n'
+                    'row3 col1  row3  col2  row3   col3\n'
+                    '0          999         9999999\n'
+                    '1.1432     1.2         0\n'
+                    '=========  ==========  ===========\n')
+
+        self.compare_results(actual, expected)
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
     def test_folded_cell_plain(self):
         """Test building a folded cell table plain with header"""
         actual = self.create_folded_table(table_format='plain', title=True)
@@ -204,13 +237,13 @@ class FormatTableTests(TableTests):
             print(actual)
 
         expected = ('test folded table\n'
-                    ' col1       col2      col3      \n'
-                    ' row1col1   row2col2  this is a \n'
-                    '                      folded    \n'
-                    '                      cell      \n'
-                    ' this is a  row2col2  row2col3  \n'
-                    ' folded                         \n'
-                    ' cell                           ')
+                    'col1       col2      col3\n'
+                    'row1col1   row2col2  this is a\n'
+                    '                     folded\n'
+                    '                     cell\n'
+                    'this is a  row2col2  row2col3\n'
+                    'folded\n'
+                    'cell')
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
@@ -230,14 +263,14 @@ class FormatTableTests(TableTests):
             print(actual)
 
         expected = ('test folded table\n'
-                    ' col1       col2      col3      \n'
-                    '--------------------------------\n'
-                    ' row1col1   row2col2  this is a \n'
-                    '                      folded    \n'
-                    '                      cell      \n'
-                    ' this is a  row2col2  row2col3  \n'
-                    ' folded                         \n'
-                    ' cell                           \n')
+                    'col1       col2      col3\n'
+                    '---------  --------  ---------\n'
+                    'row1col1   row2col2  this is a\n'
+                    '                     folded\n'
+                    '                     cell\n'
+                    'this is a  row2col2  row2col3\n'
+                    'folded\n'
+                    'cell\n')
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
@@ -253,7 +286,7 @@ class FormatTableTests(TableTests):
         expected = ('test folded table\n'
                     '+-----------+----------+-----------+\n'
                     '| col1      | col2     | col3      |\n'
-                    '+-----------+----------+-----------+\n'
+                    '+===========+==========+===========+\n'
                     '| row1col1  | row2col2 | this is a |\n'
                     '|           |          | folded    |\n'
                     '|           |          | cell      |\n'

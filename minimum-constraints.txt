@@ -52,7 +52,7 @@ click===6.6
 click-spinner===0.1.6
 click-repl===0.1.0
 asciitree===0.3.3
-terminaltables===3.0.0
+tabulate===0.8.2
 prompt-toolkit===1.0.9
 
 
