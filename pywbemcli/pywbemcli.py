@@ -165,7 +165,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # specified and is why global options don't define defaults in the
     # decorators that define them.
 
-    # TODO: this is a temp solution to get the persistent file of connections
+    # TODO: ks this is a temp solution to get the persistent file of connections
+    #       Review to see if there is a better solution.
     pywbemcli_servers = get_pywbemcli_servers()
 
     if ctx.obj is None:
@@ -208,7 +209,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          ca_certs=ca_certs,
                                          use_pull_ops=use_pull_ops,
                                          pull_max_cnt=pull_max_cnt,
-                                         enable_stats=timestats,
+                                         stats_enabled=timestats,
                                          verbose=verbose)
         else:
             if name:
