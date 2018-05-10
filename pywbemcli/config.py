@@ -38,11 +38,11 @@ However, they should be used from the ``pywbemcli`` namespace.
 
 # This module is meant to be safe for 'import *'.
 
+from pywbem import DEFAULT_ITER_MAXOBJECTCOUNT
+
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
            'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT']
-
-from pywbem import DEFAULT_ITER_MAXOBJECTCOUNT
 
 #: Default value in seconds for a WBEMConnection to timeout if the value
 #: is not set by an input parameter.
