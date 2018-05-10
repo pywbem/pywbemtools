@@ -28,8 +28,14 @@ sudo: required
 # not work. Also, on OS-X, it needs to be invoked with language=generic
 # and an empty 'python' variable in order to prevent that Travis attempts
 # to install Python.
+# Note: pypy is excluded because M2Crypto does not install.
 matrix:
   include:
+#    - os: linux
+#      language: python
+#      python: "2.7"
+#      env:
+#        - PACKAGE_LEVEL=minimum
     - os: linux
       language: python
       python: "2.7"
@@ -65,17 +71,6 @@ matrix:
       python: "3.6"
       env:
         - PACKAGE_LEVEL=latest
-# Note: pywbem does not install on pypy, because M2Crypto does not install.
-#    - os: linux
-#      language: python
-#      python: "pypy-5.3.1"  # Python 2.7.10
-#      env:
-#        - PACKAGE_LEVEL=minimum
-#    - os: linux
-#      language: python
-#      python: "pypy-5.3.1"  # Python 2.7.10
-#      env:
-#        - PACKAGE_LEVEL=latest
 #    - os: osx
 #      language: generic
 #      python:
