@@ -2,6 +2,7 @@
 /.settings/
 .pydevproject
 /.cache/
+/.pytest_cache/
 /.tox/
 /htmlcov/
 /build/
@@ -13,6 +14,7 @@ ChangeLog
 *.pyc
 *.log
 *.tmp
+*.done
 tmp.*
 pywbemcli.egg-info
 MANIFEST

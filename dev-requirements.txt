@@ -1,48 +1,60 @@
-# Pip requirements file for development dependencies.
+# Additional pip requirements file for pywbem development dependencies.
 #
 # The order of packages is significant, because pip processes them in the order
-# of appearance. Changing the order has an impact on the overall integration
-# process, which may cause wedges in the gate later.
+# of appearance.
 
-# Runtime dependencies:
--r requirements.txt
+# Make sure that the package versions in minimum-constraints.txt are also
+# the minimum versions required in requirements.txt and dev-requirements.txt.
 
-# Unit test:
-pytest>=3.0.5 # MIT
-pytest-cov>=2.4.0 # BSD
-mock>=2.0.0 # BSD
-requests-mock>=1.2.0 # Apache-2.0
-testfixtures>=4.13.3 # Apache-2.0
-coverage >=4.3 # Apache-2.0
-nose>=1.3.7
 
-# Unit test(no imports, invoked via py.test script)
-pytest-cov>=2.4.0 # BSD
+# Direct dependencies:
 
-# Coverage reporting (no imports, invoked via coveralls script):
-python-coveralls>=2.9.0 # Apache-2.0
+# Unit test (imports into testcases):
+#testfixtures>=4.3.3
+
+# Coverage reporting (no imports, invoked via coveralls script, only used on py27):
+# Note: python-coveralls 2.9.1 has requirement coverage==4.0.3, and therefore
+# must be stated before pytest-cov, whose 2.5.1 specifies requirement
+# coverage>=3.7.1 and thus would get coverage 4.5 1 if processed first.
+python-coveralls>=2.8.0; python_version == '2.7'
+
+# Unit test (no imports, invoked via py.test script)
+pytest>=3.3.0
+pytest-cov>=2.4.0
 
 # Sphinx (no imports, invoked via sphinx-build script):
-Sphinx>=1.5.1 # BSD
-GitPython>=2.1.3 # BSD
-sphinx-git>=10.0.0  # GPL
+Sphinx>=1.5.1
+sphinx-git>=10.0.0
+GitPython>=2.1.3
 
 # PyLint:
-pylint>=1.6.4 ; python_version == '2.7'
+pylint>=1.6.4; python_version == '2.7'
 
 # Flake8:
-flake8>=3.2.1 # MIT
+flake8>=3.2.1
 
 # Twine: Needed for uploading to Pypi (no imports, invoked via twine script)
-twine>=1.8.1  # Apache-2.0
+twine>=1.8.1
 
-# Jupyter Notebook
-jupyter>=1.0.0 # BSD
-notebook>=4.3.1
+# Jupyter Notebook (no imports, invoked via jupyter script)
+jupyter>=1.0.0
+# notebook>=4.3.1  # XXX: Check if used
+
+# The tornado package is used by ipykernel which is used by jupyter.
+# Tornado 5.0.0 and 5.0.1 rejects installation if the Python ssl module
+# does not have certain symbols required by Tornado. This issue exists for
+# example with Python 2.7.6 on Ubuntu 14.04, but not with Python 2.7.5 on
+# RHEL 7.4. This can be checked with:
+#   python -c "import ssl; ssl.SSLContext; ssl.create_default_context; ssl.match_hostname"
+# Other projects have the same issue:
+#   https://github.com/floydhub/dl-docker/issues/84
+# The following is a circumvention of this issue that nails the tornado
+# version to below 5.0 on Python 2.
+# TODO: Follow up on resolution of this issue.
+tornado<5.0; python_version <= '2.7'
 
 # temporary fix to get around problem introduced by pyzmq 16.03 release 30
 # Oct 2017.  See issue #80
-# TODO retest this in the future so we can remove this limitation
+# TODO: retest this in the future so we can remove this limitation
 pyzmq==16.0.2
-
 

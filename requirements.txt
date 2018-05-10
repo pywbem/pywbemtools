@@ -1,25 +1,22 @@
+# Pip requirements file for pywbem runtime dependencies.
+#
 # The order of packages is significant, because pip processes them in the order
-# of appearance. Changing the order has an impact on the overall integration
-# process, which may cause wedges in the gate later.
+# of appearance.
 
-six==1.10.0 # MIT     Fix this to version 1.10. See issue # 67
-pbr>=1.8 # Apache-2.0
+# Make sure that the package versions in minimum-constraints.txt are also
+# the minimum versions required in requirements.txt and dev-requirements.txt.
 
-# TODO: Remove temp fix to nail M2Crypto to 0.26.0 per issue #69
-M2Crypto==0.26.0; sys_platform not in "win32 win64" # MIT
-M2CryptoWin32>=0.21; sys_platform == "win32" # MIT
-M2CryptoWin64>=0.21; sys_platform == "win64" # MIT
 
-click>=6.6 # BSD
-click-spinner>=0.1.6 # MIT
-click-repl>=0.1.0 # MIT
-asciitree>=0.3.3 # MIT
-terminaltables>=3.0.0 #  MIT
-pywbem # LGPL
+# Direct dependencies (except pip, setuptools, wheel):
 
-# From click-repl
-prompt_toolkit>=1.0.9 # BSD
+pywbem>=0.12.0
 
-# From prompt_toolkit
-wcwidth>=0.1.6 # MIT
+pbr>=1.10.0
+six>=1.10.0
+click>=6.6
+click-spinner>=0.1.6
+click-repl>=0.1.0
+asciitree>=0.3.3
+terminaltables>=3.0.0
+prompt-toolkit>=1.0.9
 
