@@ -185,7 +185,7 @@ install:
 # commands to run builds & tests
 script:
   - if [[ -n $_MANUAL_CI_RUN ]]; then make build; fi
-  - if [[ -n $_MANUAL_CI_RUN ]]; then make builddoc; fi
+  - make builddoc
   - make check
   - if [[ -n $_MANUAL_CI_RUN ]]; then make pylint; fi
   - make test
