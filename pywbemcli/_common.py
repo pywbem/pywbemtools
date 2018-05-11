@@ -24,20 +24,20 @@ from textwrap import fill
 from prompt_toolkit import prompt
 import click
 import six
-from terminaltables import AsciiTable
+import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, \
     CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty, CIMClassName
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
-TABLE_FORMATS = ['table', 'plain', 'simple', 'grid']
+TABLE_FORMATS = ['table', 'plain', 'simple', 'grid', 'rst']
 CIM_OBJECT_OUTPUT_FORMATS = ['mof', 'xml', 'txt', 'tree']
 
 # TODO: ks for some reason extending one list with another causes a problem
 # in click with the help.
-OUTPUT_FORMATS = ['table', 'plain', 'simple', 'grid', 'mof', 'xml', 'txt',
-                  'tree']
+OUTPUT_FORMATS = ['table', 'plain', 'simple', 'grid', 'rst', 'mof', 'xml',
+                  'txt', 'tree']
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
@@ -593,7 +593,8 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
         Click context contained in ContextObj object.
 
       TODO This is not correct form for this doc.
-      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName,or CIMQualifier):
+      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName,
+      or CIMQualifier):
         Iterable of CIM Objects to be displayed or a single object.
 
       output_format(:term:`strng`):
@@ -897,56 +898,11 @@ def format_table(rows, headers, table_format='simple', title=None):
     if table_format not in TABLE_FORMATS:
         raise click.ClickException('Invalid table format %s.' % table_format)
 
-    # Future this line can be change to tabulate call.
-    result = _build_terminal_table(rows, headers, table_format=table_format)
+    result = tabulate.tabulate(rows, headers, tablefmt=table_format)
 
     if title:
         result = '%s\n%s' % (title, result)
     return result
-
-
-def _build_terminal_table(rows, headers, table_format='simple'):
-    """
-        Builds a table using the formatting characteristics of tabulate package
-        but using the terminaltable package since it supports folded cells.
-
-        This uses the formatting definitions of the tabulate package including:
-        plain, simple, grid to format tables that are similar to
-        tabulate.  In the future we may switch to tabulate when it supports
-        folded tables because it allows more output formats.
-
-        This is an internal function and is NOT intended to be used externally
-        since the format, etc. checking is in build_table, not here.
-
-        NOTE: This is a separate function because it can be replaced with
-        a call to tabulate in the future
-    """
-    if headers:
-        rows.insert(0, headers)
-
-    table = AsciiTable(rows)
-    # table with no borders
-    if table_format is None or table_format == 'plain':
-        table.inner_column_border = False
-        table.inner_heading_row_border = False
-        table.inner_row_border = False
-        table.outer_border = False
-    # table with only header/data separation border
-    elif table_format == 'simple' or table_format == 'table':
-        table.inner_heading_row_border = True
-        table.inner_column_border = False
-        table.outer_border = False
-    # table with borders around all cells
-    elif table_format == 'grid':
-        table.inner_column_border = True
-        table.outer_border = True
-        table.inner_row_border = True
-        table.inner_heading_row_border = True
-    else:
-        raise ValueError('Invalid table type %s. Folded tables have '
-                         ' limited formatting.' % table_format)
-
-    return(table.table)
 
 
 def fold_string(input_string, max_width):
