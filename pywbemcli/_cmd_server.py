@@ -135,7 +135,11 @@ def server_test_pull(context):
     """
     Test existence of pull opeations.
 
-    Test whether the pull operations exist on the WBEM server.
+    Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
+    exist on the WBEM server.
+
+    This command tests all of the pull operations and reports any that
+    return a NOT_SUPPORTED response.
     """
     context.execute_cmd(lambda: cmd_server_test_pull(context))
 
