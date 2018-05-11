@@ -177,6 +177,9 @@ install:
     fi
 # End of m2crypto quick fix.
   - pip list
+# Begin of fix for build_clib issue.
+  - $PYTHON_CMD remove_duplicate_setuptools.py
+# End of fix for build_clib issue.
   - make install
   - pip list
   - make develop
