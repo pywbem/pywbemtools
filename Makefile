@@ -171,7 +171,16 @@ help:
 install: install.done
 	@echo '$@ done.'
 
-install.done: requirements.txt win32-requirements.txt win64-requirements.txt setup.py setup.cfg
+pywbem_os_setup.sh:
+	wget -q http://pywbem.readthedocs.io/en/latest/_downloads/pywbem_os_setup.sh
+	chmod 755 pywbem_os_setup.sh
+
+install_os_pywbem.done: pywbem_os_setup.sh
+	./pywbem_os_setup.sh
+	touch install_os_pywbem.done
+	@echo 'Done: Installed prerequisite OS-level packages for pywbem.'
+
+install.done: install_os_pywbem.done requirements.txt win32-requirements.txt win64-requirements.txt setup.py setup.cfg
 	$(PYTHON_CMD) -m pip install $(pip_level_opts) pip setuptools wheel
 	$(PIP_CMD) install $(pip_level_opts) -r requirements.txt
 ifeq ($(PYTHON_ARCH),32)

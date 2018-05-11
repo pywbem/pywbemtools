@@ -28,6 +28,7 @@ setuptools-*.zip
 /tmp_*/
 /dist/pywbemcli*.tar.gz
 /dist/pywbemcli*.whl
+/pywbem_os_setup.sh
 tmp_*
 *,cover
 cover
