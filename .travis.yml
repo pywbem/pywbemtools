@@ -187,7 +187,6 @@ script:
   - if [[ -n $_MANUAL_CI_RUN ]]; then make build; fi
   - make builddoc
   - make check
-  - if [[ -n $_MANUAL_CI_RUN ]]; then make pylint; fi
   - make test
 
 after_success:
