@@ -175,25 +175,25 @@ pywbem_os_setup.sh:
 	wget -q http://pywbem.readthedocs.io/en/latest/_downloads/pywbem_os_setup.sh
 	chmod 755 pywbem_os_setup.sh
 
-install_os_pywbem.done: pywbem_os_setup.sh
-	./pywbem_os_setup.sh
+pywbem_os_setup.bat:
+	wget -q http://pywbem.readthedocs.io/en/latest/_downloads/pywbem_os_setup.bat
+	chmod 755 pywbem_os_setup.bat
+
+install_os_pywbem.done: pywbem_os_setup.sh pywbem_os_setup.bat
+ifeq ($(PLATFORM),Windows)
+	cmd /c pywbem_os_setup.bat install
+else
+	./pywbem_os_setup.sh install
+endif
 	touch install_os_pywbem.done
 	@echo 'Done: Installed prerequisite OS-level packages for pywbem.'
 
-install.done: install_os_pywbem.done requirements.txt win32-requirements.txt win64-requirements.txt setup.py setup.cfg
+install.done: install_os_pywbem.done requirements.txt setup.py setup.cfg
 	$(PYTHON_CMD) -m pip install $(pip_level_opts) pip setuptools wheel
 	$(PIP_CMD) install $(pip_level_opts) -r requirements.txt
-ifeq ($(PYTHON_ARCH),32)
-	$(PIP_CMD) install $(pip_level_opts) -r win32-requirements.txt
-endif
-ifeq ($(PYTHON_ARCH),64)
-	$(PIP_CMD) install $(pip_level_opts) -r win64-requirements.txt
-endif
 	$(PIP_CMD) install $(pip_level_opts) -e .
 	$(PYTHON_CMD) -c "import pywbemcli; print('Import: ok')"
-	@echo "TODO #103: Examine pywbemcli command not found on Windows"
-	sh -c 'f=$$(which pywbemcli); echo "pywbemcli: $$f"; if [ -n "$$f" ]; then echo "------"; cat $$f; echo "------"; fi'
-	@echo "TODO #103: Disabled for now: pywbemcli --version"
+	pywbemcli --version
 	touch install.done
 	@echo 'Done: Installed $(package_name) and its installation and runtime prereqs.'
 

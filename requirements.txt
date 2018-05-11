@@ -10,6 +10,7 @@
 # Direct dependencies (except pip, setuptools, wheel):
 
 pywbem>=0.12.0
+# git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 pbr>=1.10.0
 six>=1.10.0
