@@ -31,26 +31,26 @@ sudo: required
 # Note: pypy is excluded because M2Crypto does not install.
 matrix:
   include:
-#    - os: linux
-#      language: python
-#      python: "2.7"
-#      env:
-#        - PACKAGE_LEVEL=minimum
+    - os: linux
+      language: python
+      python: "2.7"
+      env:
+        - PACKAGE_LEVEL=minimum
     - os: linux
       language: python
       python: "2.7"
       env:
         - PACKAGE_LEVEL=latest
-    - os: linux
-      language: python
-      python: "3.4"
-      env:
-        - PACKAGE_LEVEL=minimum
 #    - os: linux
 #      language: python
 #      python: "3.4"
 #      env:
-#        - PACKAGE_LEVEL=latest
+#        - PACKAGE_LEVEL=minimum
+    - os: linux
+      language: python
+      python: "3.4"
+      env:
+        - PACKAGE_LEVEL=latest
 #    - os: linux
 #      language: python
 #      python: "3.5"
@@ -61,11 +61,11 @@ matrix:
 #      python: "3.5"
 #      env:
 #        - PACKAGE_LEVEL=latest
-#    - os: linux
-#      language: python
-#      python: "3.6"
-#      env:
-#        - PACKAGE_LEVEL=minimum
+    - os: linux
+      language: python
+      python: "3.6"
+      env:
+        - PACKAGE_LEVEL=minimum
     - os: linux
       language: python
       python: "3.6"
