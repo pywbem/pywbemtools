@@ -25,6 +25,28 @@
 #   See the directory coverage_html for the html output.
 # ------------------------------------------------------------------------------
 
+# Python / Pip commands
+ifndef PYTHON_CMD
+  PYTHON_CMD := python
+endif
+ifndef PIP_CMD
+  PIP_CMD := pip
+endif
+
+# Package level
+ifndef PACKAGE_LEVEL
+  PACKAGE_LEVEL := latest
+endif
+ifeq ($(PACKAGE_LEVEL),minimum)
+  pip_level_opts := -c minimum-constraints.txt
+else
+  ifeq ($(PACKAGE_LEVEL),latest)
+    pip_level_opts := --upgrade
+  else
+    $(error Error: Invalid value for PACKAGE_LEVEL variable: $(PACKAGE_LEVEL))
+  endif
+endif
+
 # Determine OS platform make runs on
 ifeq ($(OS),Windows_NT)
   PLATFORM := Windows
@@ -45,14 +67,14 @@ endif
 # directory for coverage html output.
 coverage_html_dir := coverage_html
 
-# Name of this Python package (top-level Python namespace + Pypi package name)
-package_name := pywbemcli
+# Name of this package on Pypi
+package_name := pywbemtools
 
-# Name of the Python namespace for the CLI
+# Name of the Python packages for the single tools
 cli_package_name := pywbemcli
 
 # Package version (full version, including any pre-release suffixes, e.g. "0.1.0-alpha1")
-package_version := $(shell python -c "import sys, $(package_name); sys.stdout.write($(package_name).__version__)")
+package_version := $(shell $(PYTHON_CMD) -c "from pbr.version import VersionInfo; print(VersionInfo('$(package_name)').release_string())")
 
 # Python major version
 python_major_version := $(shell python -c "import sys; sys.stdout.write('%s'%sys.version_info[0])")
@@ -86,10 +108,10 @@ doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) .
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
     $(doc_conf_dir)/conf.py \
+    $(doc_conf_dir)/pywbemclicmdshelp.rst \
     $(wildcard $(doc_conf_dir)/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
-    $(wildcard $(package_name)/*.py) \
-
+    $(wildcard $(cli_package_name)/*.py) \
 
 # Flake8 config file
 flake8_rc_file := .flake8
@@ -100,10 +122,9 @@ pylint_rc_file := .pylintrc
 # Source files for check (with PyLint and Flake8)
 check_py_files := \
     setup.py \
-    $(wildcard $(package_name)/*.py) \
     $(wildcard $(cli_package_name)/*.py) \
     $(wildcard tests/unit/*.py) \
-    $(wildcard docs/notebooks/*.py) \
+    $(wildcard $(doc_conf_dir)/notebooks/*.py) \
 
 # Test log
 test_log_file := test_$(python_version_fn).log
@@ -132,25 +153,58 @@ help:
 	@echo 'Package version will be: $(package_version)'
 	@echo 'Uses the currently active Python environment: Python $(python_version_fn)'
 	@echo 'Valid targets are (they do just what is stated, i.e. no automatic prereq targets):'
-	@echo '  develop    - Prepare the development environment by installing prerequisites'
-	@echo '  build      - Build the distribution files in: $(dist_dir) (requires Linux or OSX)'
+	@echo '  install    - Install $(package_name) and its Python installation and runtime prereqs'
+	@echo '  develop    - install + Install Python development prereqs'
+	@echo '  build      - Build the distribution archive files in: $(dist_dir) (requires Linux or OSX)'
 	@echo '  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)'
 	@echo '  builddoc   - Build documentation in: $(doc_build_dir)'
 	@echo '  check      - Run PyLint and Flake8 on sources and save results in: pylint.log and flake8.log'
-	@echo '  install    - Install package in active Python environment and test import (includes build)'
 	@echo '  test       - Run unit tests (and test coverage) and save results in: $(test_log_file)'
 	@echo '               Env.var TESTCASES can be used to specify a py.test expression for its -k option'
 	@echo '  all        - Do all of the above (except buildwin when not on Windows)'
 	@echo '  uninstall  - Uninstall package from active Python environment'
-	@echo '  upload     - Upload the distribution files to PyPI (includes uninstall+build)'
+	@echo '  upload     - build + Upload the distribution archive files to PyPI'
 	@echo '  clean      - Remove any temporary files'
-	@echo '  clobber    - Remove any build products (includes uninstall+clean)'
+	@echo '  clobber    - Remove everything created to ensure clean start'
+
+.PHONY: install
+install: install.done
+	@echo '$@ done.'
+
+pywbem_os_setup.sh:
+	wget -q http://pywbem.readthedocs.io/en/latest/_downloads/pywbem_os_setup.sh
+	chmod 755 pywbem_os_setup.sh
+
+install_os_pywbem.done: pywbem_os_setup.sh
+	./pywbem_os_setup.sh
+	touch install_os_pywbem.done
+	@echo 'Done: Installed prerequisite OS-level packages for pywbem.'
+
+install.done: install_os_pywbem.done requirements.txt win32-requirements.txt win64-requirements.txt setup.py setup.cfg
+	$(PYTHON_CMD) -m pip install $(pip_level_opts) pip setuptools wheel
+	$(PIP_CMD) install $(pip_level_opts) -r requirements.txt
+ifeq ($(PYTHON_ARCH),32)
+	$(PIP_CMD) install $(pip_level_opts) -r win32-requirements.txt
+endif
+ifeq ($(PYTHON_ARCH),64)
+	$(PIP_CMD) install $(pip_level_opts) -r win64-requirements.txt
+endif
+	$(PIP_CMD) install $(pip_level_opts) -e .
+	$(PYTHON_CMD) -c "import pywbemcli; print('Import: ok')"
+	@echo "TODO #103: Examine pywbemcli command not found on Windows"
+	sh -c 'f=$$(which pywbemcli); echo "pywbemcli: $$f"; if [ -n "$$f" ]; then echo "------"; cat $$f; echo "------"; fi'
+	@echo "TODO #103: Disabled for now: pywbemcli --version"
+	touch install.done
+	@echo 'Done: Installed $(package_name) and its installation and runtime prereqs.'
 
 .PHONY: develop
-develop:
-	pip install --upgrade pip
-	pip install --upgrade -r dev-requirements.txt
+develop: develop.done
 	@echo '$@ done.'
+
+develop.done: install.done dev-requirements.txt
+	$(PIP_CMD) install $(pip_level_opts) -r dev-requirements.txt
+	touch develop.done
+	@echo 'Done: Installed Python development prereqs for $(package_name).'
 
 .PHONY: build
 build: $(bdist_file) $(sdist_file)
@@ -213,21 +267,13 @@ doccoverage:
 check: pylint.log flake8.log
 	@echo '$@ done.'
 
-PHONY: flake8
+.PHONY: flake8
 flake8: flake8.log
-	@echo '$@ done.'
-
-.PHONY: install
-install: requirements.txt
-	pip install --upgrade -r requirements.txt
-	pip install --upgrade .
-	python -c "import pywbemcli; print('Import: ok')"
-	@echo 'Done: Installed $(package_name) into current Python environment.'
 	@echo '$@ done.'
 
 .PHONY: uninstall
 uninstall:
-	bash -c 'pip show $(package_name) >/dev/null; rc=$$?; if [[ $$rc == 0 ]]; then pip uninstall -y $(package_name); fi'
+	bash -c '$(PIP_CMD) show $(package_name) >/dev/null; rc=$$?; if [[ $$rc == 0 ]]; then $(PIP_CMD) uninstall -y $(package_name); fi'
 	@echo '$@ done.'
 
 .PHONY: test
@@ -236,7 +282,7 @@ test: $(test_log_file)
 
 .PHONY: clobber
 clobber: uninstall clean
-	rm -fv pylint.log flake8.log test_*.log
+	rm -fv *.done pylint.log flake8.log test_*.log
 	rm -Rfv $(doc_build_dir) .tox $(coverage_html_dir)
 	rm -fv $(bdist_file) $(sdist_file) $(win64_dist_file)
 	@echo 'Done: Removed all build products to get to a fresh state.'
@@ -252,7 +298,7 @@ clean:
 	@echo '$@ done.'
 
 .PHONY: all
-all: develop check build builddoc install test
+all: install develop build builddoc check test
 	@echo '$@ done.'
 
 .PHONY: upload
@@ -271,19 +317,14 @@ endif
 
 # Distribution archives.
 $(bdist_file) $(sdist_file): Makefile setup.py $(dist_dependent_files)
-ifneq ($(PLATFORM),Windows)
-	rm -Rfv $(package_name).egg-info .eggs
-	python setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
+	rm -Rfv $(package_name).egg-info .eggs build
+	$(PYTHON_CMD) setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
 	@echo 'Done: Created distribution files: $@'
-else
-	@echo 'Error: Creating distribution archives requires Linux or OSX'
-	@false
-endif
 
 $(win64_dist_file): Makefile setup.py $(dist_dependent_files)
 ifeq ($(PLATFORM),Windows)
-	rm -Rfv $(package_name).egg-info .eggs
-	python setup.py bdist_wininst -d $(dist_dir) -o -t "$(package_name) v$(package_version)"
+	rm -Rfv $(package_name).egg-info .eggs build
+	$(PYTHON_CMD) setup.py bdist_wininst -d $(dist_dir) -o -t "$(package_name) v$(package_version)"
 	@echo 'Done: Created Windows installable: $@'
 else
 	@echo 'Error: Creating Windows installable requires Windows'
@@ -307,13 +348,14 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 	mv -f $@.tmp $@
 	@echo 'Done: Created Flake8 log file: $@'
 
-$(test_log_file): Makefile $(package_name)/*.py tests/unit/*.py  coveragerc
+$(test_log_file): Makefile $(cli_package_name)/*.py tests/unit/*.py coveragerc
 	rm -fv $@
-	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic --ignore=releases -s 2>&1 |tee $@.tmp'
+	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(cli_package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
-$(doc_conf_dir)/pywbemclicmdshelp.rst: pywbemcli $(package_name)/pywbemcli.py $(package_name)/_cmd*.py
-	tools/click_help_capture.py >$@
+$(doc_conf_dir)/pywbemclicmdshelp.rst: install.done tools/click_help_capture.py $(cli_package_name)/pywbemcli.py $(cli_package_name)/_cmd*.py
+	tools/click_help_capture.py >$@.tmp
+	mv -f $@.tmp $@
 	@echo 'Done: Created help command info for cmds: $@'

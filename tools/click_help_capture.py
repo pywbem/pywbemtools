@@ -33,7 +33,7 @@ pure formatted text.
 from __future__ import print_function, absolute_import
 
 import sys
-from subprocess import Popen, PIPE, call
+import subprocess
 try:
     import textwrap
     textwrap.indent  # pylint: disable=pointless-statement
@@ -53,6 +53,10 @@ import six
 # format
 USE_RST = True
 SCRIPT_NAME = 'pywbemcli'
+
+# SCRIPT_CMD = SCRIPT_NAME  # TODO #103: Reactivate once pywbemcli works on Windows
+SCRIPT_CMD = 'python -c "import sys; from pywbemcli.pywbemcli import cli; ' \
+    'sys.argv[0]=\'pywbemcli\'; sys.exit(cli())"'
 
 ERRORS = 0
 VERBOSE = False
@@ -106,26 +110,49 @@ HELP_DICT = {}
 
 def cmd_exists(cmd):
     """
-    Determine if the command defined by cmd exists as an executable
+    Determine if the command defined by cmd can be executed in a shell.
 
-    Returns True if it exists. Otherwise returns false.
+    Returns a tuple (rc, msg), where rc==0 indicates that the command can be
+    executed, and otherwise rc is the command (or shell) return code and
+    msg is an error message.
     """
-    return call(cmd, shell=True, stdout=PIPE, stderr=PIPE) == 0
+
+    if True:  # TODO #103: Debug PATH for pywbemcli not found issue on Windows
+        if sys.platform == 'win32':
+            echo_cmd = 'echo %PATH%'
+        else:
+            echo_cmd = 'echo $PATH'
+        proc = subprocess.Popen(echo_cmd, shell=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+        out, _ = proc.communicate()
+        print("Debug: %s: %s" % (echo_cmd, out), file=sys.stderr)
+
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT)
+    out, _ = proc.communicate()
+    rc = proc.returncode
+    if rc == 0:
+        msg = None
+    else:
+        msg = out.strip()
+    return rc, msg
 
 
-def get_subcmd_group_names(script_name, cmd):
+def get_subcmd_group_names(script_cmd, script_name, cmd):
     """
     Execute the script with defined subcommand and help and get the
     groups defined for that help.
 
     returns list of subcommands/groups
     """
-    command = '%s %s --help' % (script_name, cmd)
+    command = '%s %s --help' % (script_cmd, cmd)
     # Disable python warnings for script call.
-    command = 'export PYTHONWARNINGS="" && %s' % command
+    if sys.platform != 'win32':
+        command = 'export PYTHONWARNINGS="" && %s' % command
     if VERBOSE:
         print('command %s' % command)
-    proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
     std_out, std_err = proc.communicate()
     exitcode = proc.returncode
 
@@ -136,13 +163,11 @@ def get_subcmd_group_names(script_name, cmd):
         std_err = std_err.decode()
 
     if exitcode:
-        raise RuntimeError('Error, unexpected non-zero exit code %s'
-                           ' from %s call. stderr %s' % (script_name,
-                                                         exitcode,
-                                                         std_err))
+        raise RuntimeError("Error: Shell execution of command %r failed with "
+                           "rc=%s: %s" % (command, exitcode, std_err))
     if std_err:
-        raise RuntimeError('Error. expected stderr (%s)returned from '
-                           '%s call.' % (script_name, std_err))
+        raise RuntimeError("Error: Unexpected stderr from command %r:\n"
+                           "%s" % (command, std_err))
 
     # Split stdout into list of lines
     lines = std_out.split('\n')
@@ -162,18 +187,18 @@ def get_subcmd_group_names(script_name, cmd):
     return group_list
 
 
-def get_subgroup_names(group_name, script_name):
+def get_subgroup_names(group_name, script_cmd, script_name):
     """
     Get all the subcommands for the help_group_name defined on input.
     Executes script and extracts groups after line with 'Commands'
     """
-    subcmds_list = get_subcmd_group_names(script_name, group_name)
+    subcmds_list = get_subcmd_group_names(script_cmd, script_name, group_name)
     space = ' ' if group_name else ''
 
     return ['%s%s%s' % (group_name, space, name) for name in subcmds_list]
 
 
-def create_help_cmd_list(script_name):
+def create_help_cmd_list(script_cmd, script_name):
     """
     Create the command list.
     """
@@ -186,7 +211,7 @@ def create_help_cmd_list(script_name):
 
     help_groups_result.extend(group_names)
     for name in group_names:
-        return_cmds = get_subgroup_names(name, script_name)
+        return_cmds = get_subgroup_names(name, script_cmd, script_name)
         help_groups_result.extend(return_cmds)
         # extend input list with returned assembled groups
         group_names.extend(return_cmds)
@@ -198,18 +223,19 @@ def create_help_cmd_list(script_name):
               'command group and subcommand.\n' % script_name)
 
     for name in help_groups_result:
-        command = '%s %s --help' % (script_name, name)
+        command = '%s %s --help' % (script_cmd, name)
+        command_name = '%s %s --help' % (script_name, name)
         out = HELP_DICT[name]
         if USE_RST:
-            level = len(command.split())
+            level = len(command_name.split())
             # Don't put the top level in a separate section
-            if level > 2:
-                print(rst_headline(command, level))
+            if name:
+                print(rst_headline(command_name, level))
             print('\n%s\n' % '\nThe following defines the help output for the '
-                  '`%s` subcommand\n' % command)
+                  '`%s` subcommand\n' % command_name)
             print_rst_verbatum_text(out.decode())
         else:
-            print('%s\n%s COMMAND: %s' % (('=' * 50), script_name, command))
+            print('%s\n%s COMMAND: %s' % (('=' * 50), script_name, command_name))
             print(out.decode())
 
     return help_groups_result
@@ -218,8 +244,10 @@ def create_help_cmd_list(script_name):
 if __name__ == '__main__':
     # Verify that the script exists. Executing with --help loads click
     # script generates help and exits.
-    if not cmd_exists('%s --help' % SCRIPT_NAME):
-        print('%s does not exist as an executable. Please install.' %
-              SCRIPT_NAME, file=sys.stderr)
+    check_cmd = '%s --help' % SCRIPT_CMD
+    rc, msg = cmd_exists(check_cmd)
+    if rc != 0:
+        print("Error: Shell execution of %r returns rc=%s: %s" %
+              (check_cmd, rc, msg), file=sys.stderr)
         sys.exit(1)
-    create_help_cmd_list(SCRIPT_NAME)
+    create_help_cmd_list(SCRIPT_CMD, SCRIPT_NAME)

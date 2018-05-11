@@ -1339,7 +1339,7 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       interop     Display the interop namespace name.
       namespaces  Display the namespaces in the WBEM server
       profiles    Display profiles in the WBEM Server.
-      test_pull   Test whether pull opeations exist on the WBEM...
+      test_pull   Test existence of pull opeations.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1495,7 +1495,9 @@ The following defines the help output for the `pywbemcli server test_pull --help
 
     Usage: pywbemcli server test_pull [COMMAND-OPTIONS]
 
-      Test whether pull opeations exist on the WBEM server.
+      Test existence of pull opeations.
+
+      Test whether the pull operations exist on the WBEM server.
 
     Options:
       -h, --help  Show this message and exit.
