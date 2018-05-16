@@ -42,7 +42,7 @@ from pywbem import DEFAULT_ITER_MAXOBJECTCOUNT
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
-           'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT']
+           'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT', 'DEFAULT_URL_SCHEME']
 
 #: Default value in seconds for a WBEMConnection to timeout if the value
 #: is not set by an input parameter.
@@ -51,47 +51,40 @@ DEFAULT_CONNECTION_TIMEOUT = 30
 
 #: Specifies the default output format selected if no output format is
 #: defined on the cmd line, environment variable, or a config file.
-
 DEFAULT_OUTPUT_FORMAT = 'simple'
 
 #: Specifies the default namespace uses if no default namespace is defined
 #: on the cmd line, environment variable, or a config file.
-
 DEFAULT_NAMESPACE = 'root/cimv2'
 
 #: Specifies the default query language to be used for exedquery operations
 #: when a query language is not specified in the request or config
-
 DEFAULT_QUERY_LANGUAGE = 'DMTF:CQL'
 
 #: Characters for cmdline prompt when the pywbemcli repl is executing.
 #: The prompt is presented at the beginning of a line awaiting a command
 #: input.
 #: The prompt MUST BE Unicode (prompt-toolkit requirement)
-
 PYWBEMCLI_PROMPT = u'pywbemcli> '
 
 #: File path of history file for interactive mode.
 #: If the file name starts with tilde (which is handled by the shell, not by
 #: the file system), it is properly expanded.
-
 PYWBEMCLI_HISTORY_FILE = '~/.pywbemcli_history'
 
 #: Default uri scheme if none is provided.  Thus if a server uri without
 #: scheme component is provided, this is the default prepended to the
 #: uri.
 
-DEFAULT_URI_SCHEME = 'https'
+DEFAULT_URL_SCHEME = 'https'
 
 #: Default pull MaxObjectCount if none is provided.  This is the maximum
 #: number of objects per request that will be returned if the server
 #: uses the pull operations for EnumerateInstances, AssociatorInstances,
 #: etc. Set to the same default as used by pywbem.
-
 DEFAULT_MAXPULLCNT = DEFAULT_ITER_MAXOBJECTCOUNT
 
 #: Maximum allowed connection timeout in seconds.  The environment will not
 #: allow a connection timeout value larger than this on the command line or
 #: internal option for timeout.
-
 MAX_TIMEOUT = 300

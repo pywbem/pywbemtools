@@ -19,8 +19,7 @@ The general pywbem web site is: http://pywbem.github.io/pywbemtools/index.html.
    pywbemclisubcommands.rst
    pywbemclicmdshelp.rst
    pywbemclispecificfeatures.rst
+   mock_support.rst
    appendix.rst
    changes.rst
-
-   
 

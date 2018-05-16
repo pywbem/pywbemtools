@@ -14,44 +14,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Subclass of pywbem cim_operations.py to capture the specialized functions
-for pywbemcli.
+Mixin class that adds methods to WBEMConnection and FakeWBEMConnection for
+pywbemcli usage
 
-This contains only those classes that use the inter functions and actually
-do the complete operation to emulate the original enumerate operations
+This contains only methods that use the iter<...> operations  but also execute
+the complete iterations so that we can use these as common operations for
+pywbemcli instead of having to execute an algorithm of pull vs non-pull
+everywhere a WBEMConnection possible pull operation is called.
+
+It also adds a method to FakeWBEMConnection to build the repository.
 """
 from __future__ import absolute_import
+import os
+import sys
+import traceback
 
-from pywbem import WBEMConnection, DEFAULT_NAMESPACE
+from pywbem import WBEMConnection, CIMError, CIM_ERR_FAILED
+import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
 
-__all__ = ['PYWBEMCLIConnection']
+#  __all__ = ['PYWBEMCLIConnection', 'PYWBEMCLIFakedConnection']
 
 
-class PYWBEMCLIConnection(WBEMConnection):
+class PYWBEMCLIConnectionMixin(object):
     """
-    Subclass WBEM_Connection to build the specialized operations needed
-    by pywbemcli,
+    Mixin class to extend WBEMConnection with a set of methods that use the
+    iter<...> methods as the basis for getting Instances, etc. but add the
+    generator processing to retrieve the instances.  These can be used within
+    pywbemcli to allow one method call to ack as either a pull or traditional
+    operation pushing the differences into this mixin.
 
+    These methods do not resolve the core issues between the traditional and
+    pull operations such as the fact that only the pull operations pass
+    the FilterQuery parameter.
+
+    They are a pywbemcli convience to simplify the individual action processing
+    methods to a single call.
     """
-
-    def __init__(self, url, creds=None, default_namespace=DEFAULT_NAMESPACE,
-                 x509=None, verify_callback=None, ca_certs=None,
-                 no_verification=False, timeout=None, use_pull_operations=None,
-                 stats_enabled=False):
-
-        super(PYWBEMCLIConnection, self).__init__(
-            url, creds=creds,
-            default_namespace=default_namespace,
-            x509=x509,
-            verify_callback=verify_callback,
-            ca_certs=ca_certs,
-            no_verification=no_verification,
-            timeout=timeout,
-            use_pull_operations=use_pull_operations,
-            stats_enabled=stats_enabled)
-
     def PyWbemcliEnumerateInstancePaths(self, ClassName, namespace=None,
                                         FilterQueryLanguage=None,
                                         FilterQuery=None,
@@ -253,11 +253,11 @@ class PYWBEMCLIConnection(WBEMConnection):
             MaxObjectCount=MaxObjectCount)]
         return result
 
-    def IterQueryInstances(self, FilterQueryLanguage, FilterQuery,
-                           namespace=None, ReturnQueryResultClass=None,
-                           OperationTimeout=None, ContinueOnError=None,
-                           MaxObjectCount=DEFAULT_MAXPULLCNT,
-                           **extra):
+    def PyWbemcliQueryInstances(self, FilterQueryLanguage, FilterQuery,
+                                namespace=None, ReturnQueryResultClass=None,
+                                OperationTimeout=None, ContinueOnError=None,
+                                MaxObjectCount=DEFAULT_MAXPULLCNT,
+                                **extra):
         # pylint: disable=invalid-name
         """
         Execute IterQueryInstances and retrieve the instances. Returns
@@ -278,3 +278,80 @@ class PYWBEMCLIConnection(WBEMConnection):
             ContinueOnError=ContinueOnError,
             MaxObjectCount=MaxObjectCount)]
         return result
+
+
+class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
+    """
+    Builds the mock repository from the definitions in self._mock_server.
+
+    Each item in the iterable in self._mock_server must be a file path
+    identifying a file to be used to prepare for the mock test.
+
+    Each file path may be:
+
+      a python file if the suffix is 'mof'. A mof file is compiled into the
+      repository with the method TODO
+    """
+    def build_repository(self, conn, file_path_list, verbose):
+        """
+        Build the repository from the input url.
+        """
+        for file_path in file_path_list:
+            ext = os.path.splitext(file_path)[1]
+            if not os.path.exists(file_path):
+                raise ValueError('File name %s does not exit' % file_path)
+            if ext == '.mof':
+                conn.compile_mof_file(file_path)
+            elif ext == '.py':
+                try:
+                    with open(file_path) as fp:
+                        # the exec includes CONN and VERBOSE
+                        globalparams = {'CONN': conn, 'VERBOSE': verbose}
+                        # pylint: disable=exec-used
+                        exec(fp.read(), globalparams, None)
+
+                except Exception as ex:
+                    exc_type, exc_value, exc_traceback = sys.exc_info()
+                    tb = repr(traceback.format_exception(exc_type, exc_value,
+                                                         exc_traceback))
+                    # TODO this is not correct exception at this point.
+                    raise CIMError(
+                        CIM_ERR_FAILED,
+                        'Exception failure of "--mock_server" python script %r '
+                        'with conn %r Exception: %r\nTraceback\n%s' %
+                        (file_path, conn, ex, tb))
+
+            else:
+                raise ValueError('Invalid suffix %s on "--mock_server" '
+                                 'global parameter %s. Must be "py" or "mof".'
+                                 % (ext, file_path))
+
+        if verbose:
+            self.display_repository()
+
+
+class PYWBEMCLIConnection(WBEMConnection, PYWBEMCLIConnectionMixin):
+    """
+    PyWBEMCLIConnection subclass adds the methods added by
+    PYWBEMCLIConnectionMixin
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        ctor passes all input parameters to superclass
+        """
+        super(PYWBEMCLIConnection, self).__init__(*args, **kwargs)
+
+
+class PYWBEMCLIFakedConnection(pywbem_mock.FakedWBEMConnection,
+                               PYWBEMCLIConnectionMixin,
+                               BuildRepositoryMixin):
+    """
+    PyWBEMCLIFakedConnection subclass adds the methods added by
+    PYWBEMCLIConnectionMixin
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        ctor passes all input parameters to superclass
+        """
+        super(PYWBEMCLIFakedConnection, self).__init__(*args, **kwargs)

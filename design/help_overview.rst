@@ -3,4 +3,4 @@ documentation
 
 To see what was originally in this file look at
 
-docs/pybemclicmdshelp.rst
+docs/pybwemclicmdshelp.rst

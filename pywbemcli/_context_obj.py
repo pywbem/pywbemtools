@@ -53,8 +53,10 @@ class ContextObj(object):
         self._spinner = click_spinner.Spinner()
 
     def __repr__(self):
-        return 'ContextObj(pywbem_server=%s, outputformat=%s, verbose=%s' % \
-               (self.pywbem_server, self.output_format, self.verbose)
+        return 'ContextObj(pywbem_server=%s, outputformat=%s, ' \
+               'pull_max_cnt=%s, use_pull=%s, timestats=%s, verbose=%s' % \
+               (self.pywbem_server, self.output_format, self.pull_max_cnt,
+                self.use_pull, self.timestats, self.verbose)
 
     @property
     def output_format(self):
@@ -82,7 +84,7 @@ class ContextObj(object):
         return self._use_pull
 
     @property
-    def max_pull_cnt(self):
+    def pull_max_cnt(self):
         """
         :term:`string`: Maximum number of objects to be returne for pull op.
         """
@@ -237,6 +239,7 @@ class ContextObj(object):
         # TODO investigate putting this into parent context instead of global
 
         global PYWBEM_SERVER_OBJ  # pylint: disable=global-statement
+
         if PYWBEM_SERVER_OBJ is None:
 
             # if no server defined, do not try to connect. This allows
@@ -246,7 +249,7 @@ class ContextObj(object):
                 # get the password if it is required.  This may involve a
                 # prompt.
                 self._pywbem_server.get_password(self)
-                self._pywbem_server.create_connection()
+                self._pywbem_server.create_connection(self.verbose)
                 PYWBEM_SERVER_OBJ = self._pywbem_server
         else:
             self._pywbem_server = PYWBEM_SERVER_OBJ

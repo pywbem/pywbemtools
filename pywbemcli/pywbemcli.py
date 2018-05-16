@@ -137,10 +137,19 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-v', '--verbose', is_flag=True,
               help='Display extra information about the processing.')
 @click.version_option(help="Show the version of this command and exit.")
+@click.option('--mock_server', type=str, multiple=True,
+              metavar="FILENAME",
+              help='If this option is defined, a mock WBEM server is '
+                   'constructed as the target WBEM server and the option value '
+                   'defines a MOF or Python file to be used to populate the '
+                   'mock repository. This option may be used multiple times '
+                   'where each use defines a single file or file_path.'
+                   'See the pywbemcli documentation for more information.')
+@click.version_option(help="Show the version of this command and exit.")
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, pywbem_server=None, timestats=None):
+        verbose, pywbem_server=None, timestats=None, mock_server=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
@@ -179,6 +188,18 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         if timestats is None:
             timestats = DEFAULT_TIMESTATS
 
+        # Set cwd as path if only filename in mock_server option
+        # The click multiple type returns a tuple of strings
+        if mock_server:
+            assert isinstance(mock_server, tuple)
+            new_mock_server = []
+            for fn in mock_server:
+                if fn == os.path.basename(fn):
+                    new_mock_server.append(os.path.join(os.getcwd(), fn))
+                else:
+                    new_mock_server.append(fn)
+            mock_server = new_mock_server
+
         if use_pull_ops == 'either':
             use_pull_ops = None
         elif use_pull_ops == 'yes':
@@ -194,7 +215,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
 
-        if server:
+        if server or mock_server:
             if not name:
                 name = 'default'
             pywbem_server = PywbemServer(server,
@@ -210,7 +231,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          use_pull_ops=use_pull_ops,
                                          pull_max_cnt=pull_max_cnt,
                                          stats_enabled=timestats,
-                                         verbose=verbose)
+                                         verbose=verbose,
+                                         mock_server=mock_server)
         else:
             if name:
                 if name in pywbemcli_servers:
