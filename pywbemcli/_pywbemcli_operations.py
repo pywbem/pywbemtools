@@ -294,12 +294,12 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
     """
     def build_repository(self, conn, file_path_list, verbose):
         """
-        Build the repository from the input url.
+        Build the repository from the file_path list
         """
         for file_path in file_path_list:
             ext = os.path.splitext(file_path)[1]
             if not os.path.exists(file_path):
-                raise ValueError('File name %s does not exit' % file_path)
+                raise ValueError('File name %s does not exist' % file_path)
             if ext == '.mof':
                 conn.compile_mof_file(file_path)
             elif ext == '.py':

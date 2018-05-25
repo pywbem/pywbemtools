@@ -638,7 +638,6 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
         return
 
     # display a single item.
-    assert isinstance(objects, (CIMInstance, CIMClass, CIMQualifierDeclaration))
     object_ = objects
     if output_format in TABLE_FORMATS:
         if isinstance(object_, CIMInstance):

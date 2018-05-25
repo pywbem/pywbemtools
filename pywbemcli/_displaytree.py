@@ -80,7 +80,7 @@ def display_class_tree(classes, top_class=None):
     # build dictionary of classname : superclassname
     cn_supercn = {cl.classname: cl.superclass for cl in classes}
 
-    # if top_Class is none, create artifical root
+    # if top_class is none, create artifical root
     if top_class is None:
         for cn in cn_supercn:
             if not cn_supercn[cn]:
