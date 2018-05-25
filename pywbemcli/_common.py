@@ -22,8 +22,8 @@ from __future__ import absolute_import, unicode_literals
 import re
 from textwrap import fill
 from prompt_toolkit import prompt
-import click
 import six
+import click
 import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, \
@@ -581,7 +581,7 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
       instances
       qualifiertypes
 
-      Or list of the names of the above
+      Or list of the names of the above or of the above classes
 
     This function may override that choice in the case where the output
     choice is not avialable for the object type.  Thus, for example,
@@ -630,48 +630,52 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
                                          six.string_types)):
                 print_paths_as_table(context, objects)
             else:
-                raise ValueError("Cannot print %s as table" % type(objects[0]))
+                raise click.ClickException("Cannot print %s as table" %
+                                           type(objects[0]))
         else:
-            for item in objects:
-                display_cim_objects(context, item, output_format=output_format)
+            for obj in objects:
+                display_cim_objects(context, obj, output_format=output_format)
+        return
 
     # display a single item.
-    else:
-        object_ = objects
-        if output_format in TABLE_FORMATS:
-            if isinstance(object_, CIMInstance):
-                print_insts_as_table(context, object_)
-            elif isinstance(object_, CIMClass):
-                print_classes_as_table(context, [object_])
-            else:
-                raise ValueError('No table formatter for %s' % type(object_))
-        elif output_format == 'mof':
-            try:
-                click.echo(object_.tomof())
-            except AttributeError:
-                if isinstance(object_, (CIMInstanceName, CIMClassName,
-                                        six.string_types)):
-                    click.echo(object_)
-                else:
-                    raise ValueError('output_format %s invalid for %s '
-                                     % (output_format, type(object_)))
-        elif output_format == 'xml':
-            try:
-                click.echo(object_.tocimxmlstr(indent=4))
-            except AttributeError:
-                # no tocimxmlstr functionality
-                click.echo('Output Format %s not supported. Default to\n%r' %
-                           (output_format, object_))
-        elif output_format == 'txt':
-            try:
-                click.echo(object_)
-            except AttributeError:
-                click.echo('%r' % object_)
-        elif output_format == 'tree':
-            raise click.ClickException('Tree output format not allowed')
+    assert isinstance(objects, (CIMInstance, CIMClass, CIMQualifierDeclaration))
+    object_ = objects
+    if output_format in TABLE_FORMATS:
+        if isinstance(object_, CIMInstance):
+            print_insts_as_table(context, object_)
+        elif isinstance(object_, CIMClass):
+            print_classes_as_table(context, [object_])
         else:
-            raise click.ClickException('Invalid output format %s' %
-                                       output_format)
+            raise click.ClickException('No table formatter for %s' %
+                                       type(object_))
+    elif output_format == 'mof':
+        try:
+            click.echo(object_.tomof())
+        except AttributeError:
+            if isinstance(object_, (CIMInstanceName, CIMClassName,
+                                    six.string_types)):
+                click.echo(object_)
+            else:
+                raise click.ClickException('output_format %s invalid for %s '
+                                           % (output_format, type(object_)))
+    elif output_format == 'xml':
+        try:
+            click.echo(object_.tocimxmlstr(indent=4))
+        except AttributeError:
+            # no tocimxmlstr functionality
+            raise click.ClickException('Output Format %s not supported. '
+                                       'Default to\n%r' %
+                                       (output_format, object_))
+    elif output_format == 'txt':
+        try:
+            click.echo(object_)
+        except AttributeError:
+            raise click.ClickException('"xt" display of %r failed' % object_)
+    elif output_format == 'tree':
+        raise click.ClickException('Tree output format not allowed')
+    else:
+        raise click.ClickException('Invalid output format %s' %
+                                   output_format)
 
 
 def print_class_as_table(context, class_, max_cell_width=20):

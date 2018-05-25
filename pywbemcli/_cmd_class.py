@@ -166,7 +166,7 @@ def class_enumerate(context, classname, **options):
 
     Enumerates the classes (or classnames) from the WBEMServer starting
     either at the top of the class hierarchy or from  the position in the
-    class hierarch defined by `CLASSNAME` argument if provided.
+    class hierarchy defined by `CLASSNAME` argument if provided.
 
     The output format is defined by the output-format global option.
 
@@ -389,7 +389,7 @@ def cmd_class_enumerate(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
-                Deepinheritance=options['deepinheritance'],
+                DeepInheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'])
             if options['sort']:

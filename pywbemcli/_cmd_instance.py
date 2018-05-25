@@ -467,7 +467,7 @@ def cmd_instance_enumerate(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
-                Deepinheritance=options['deepinheritance'],
+                DeepInheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))

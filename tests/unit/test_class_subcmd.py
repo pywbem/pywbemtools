@@ -55,7 +55,6 @@ class TestClassGeneral(object):
                                                 'class', 'get', 'CIM_blah'])
 
         assert_rc(1, rc, stdout, stderr)
-        print('stderr %s' % stderr)
 
         assert stdout == ""
         assert stderr.startswith(
@@ -76,7 +75,6 @@ class TestClassEnumerate(object):
         rc, stdout, stderr = execute_pywbemcli(['class', 'enumerate', '--help'])
 
         assert_rc(0, rc, stdout, stderr)
-        print('stdout=%s' % stdout)
         assert stdout.startswith(
             "Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME\n"), \
             "stdout={!r}".format(stdout)
@@ -120,4 +118,4 @@ class TestClassEnumerate(object):
 
         assert_rc(0, rc, stdout, stderr)
         assert stderr == ""
-        assert stdout.startswith('   [Description ( "Simple CIM Class" )]\n')
+        assert stdout.startswith(exp_result_start)
