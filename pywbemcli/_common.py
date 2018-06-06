@@ -104,7 +104,7 @@ def pick_instance(context, objectname, namespace=None):
                                                                   namespace)
 
     if not instance_names:
-        click.echo('No instance paths found for %s', objectname)
+        click.echo('No instance paths found for %s' % objectname)
         return None
 
     try:
@@ -145,18 +145,17 @@ def pick_from_list(context, options, title):
         index += 1
         click.echo('%s: %s' % (index, str_))
     selection = None
+    msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' % index
     while True:
         try:
-            selection = int(prompt(
-                'Select an entry by index or hit enter to exit command>'))
+            selection = int(prompt(msg))
             if selection >= 0 and selection <= index:
                 return selection
         except ValueError:
             pass
         except KeyboardInterrupt:
             raise ValueError
-        click.echo('%s Invalid. Input integer between 0 and %s or Ctrl-C to '
-                   'stop selection.' % (selection, index))
+        click.echo('%s Invalid. %s' % (selection, msg))
     context.spinner.start()
 
 
@@ -232,6 +231,7 @@ def objects_sort(objects):
     return rtn_objs
 
 
+<<<<<<< HEAD
 def parse_wbemuri_str(wbemuri_str, namespace=None):
     """
     Parse a string that is a wbemuri into a CIMInstanceName object.

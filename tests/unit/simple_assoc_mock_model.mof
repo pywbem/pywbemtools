@@ -1,0 +1,121 @@
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+class TST_Person{
+        [Key, Description ("This is key prop")]
+    string name;
+    string extraProperty = "defaultvalue";
+};
+
+class TST_Personsub : TST_Person{
+    string secondProperty = "empty";
+    uint32 counter;
+};
+
+[Association, Description(" Lineage defines the relationship "
+    "between parents and children.") ]
+class TST_Lineage {
+    [key] string InstanceID;
+    TST_Person ref parent;
+    TST_Person ref child;
+};
+
+[Association, Description(" Family gathers person to family.") ]
+class TST_MemberOfFamilyCollection {
+   [key] TST_Person ref family;
+   [key] TST_Person ref member;
+};
+
+[ Description("Collection of Persons into a Family") ]
+class TST_FamilyCollection {
+        [Key, Description ("This is key prop and family name")]
+    string name;
+};
+
+instance of TST_Person as $Mike { name = "Mike"; };
+instance of TST_Person as $Saara { name = "Saara"; };
+instance of TST_Person as $Sofi { name = "Sofi"; };
+instance of TST_Person as $Gabi{ name = "Gabi"; };
+
+instance of TST_PersonSub as $Mikesub{ name = "Mikesub";
+                            secondProperty = "one" ;
+                            counter = 1; };
+
+instance of TST_PersonSub as $Saarasub { name = "Saarasub";
+                            secondProperty = "two" ;
+                            counter = 2; };
+
+instance of TST_PersonSub as $Sofisub{ name = "Sofisub";
+                            secondProperty = "three" ;
+                            counter = 3; };
+
+instance of TST_PersonSub as $Gabisub{ name = "Gabisub";
+                            secondProperty = "four" ;
+                            counter = 4; };
+
+instance of TST_Lineage as $MikeSofi
+{
+    InstanceID = "MikeSofi";
+    parent = $Mike;
+    child = $Sofi;
+};
+
+instance of TST_Lineage as $MikeGabi
+{
+    InstanceID = "MikeGabi";
+    parent = $Mike;
+    child = $Gabi;
+};
+
+instance of TST_Lineage  as $SaaraSofi
+{
+    InstanceID = "SaaraSofi";
+    parent = $Saara;
+    child = $Sofi;
+};
+
+instance of TST_FamilyCollection as $Family1
+{
+    name = "family1";
+};
+
+instance of TST_FamilyCollection as $Family2
+{
+    name = "Family2";
+};
+
+
+instance of TST_MemberOfFamilyCollection as $SofiMember
+{
+    family = $Family1;
+    member = $Sofi;
+};
+
+instance of TST_MemberOfFamilyCollection as $GabiMember
+{
+    family = $Family1;
+    member = $Gabi;
+};
+
+instance of TST_MemberOfFamilyCollection as $MikeMember
+{
+    family = $Family2;
+    member = $Mike;
+};

@@ -404,7 +404,7 @@ def cmd_instance_delete(context, instancename, options):
     try:
         context.conn.DeleteInstance(instancepath)
 
-        click.echo('Deleted %s', instancepath)
+        click.echo('Deleted %s' % instancepath)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -616,10 +616,10 @@ def cmd_instance_count(context, classname, options):
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
         # subclasses
-        count = sum(1 for inst in inst_names if (inst.classname == classname))
+        count = sum(1 for inst in inst_names if (inst.classname == classname_))
 
         if count != 0:
-            display_tuple = (classname, count)
+            display_tuple = (classname_, count)
             display_data.append(display_tuple)
 
     # If sort set, resort by count size
