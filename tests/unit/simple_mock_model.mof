@@ -67,6 +67,16 @@ class CIM_Foo_sub : CIM_Foo {
     string cimfoo_sub;
 };
 
+    [Description ("Subclass of CIM_Foo_sub")]
+class CIM_Foo_sub_sub : CIM_Foo_sub {
+    string cimfoo_sub_sub;
+        [Description("Sample method with input and output parameters")]
+    uint32 Method1(
+        [IN ( false), OUT, Description("Response param 2")]
+      string OutputParam2);
+};
+
+
 class CIM_Foo_sub2 : CIM_Foo {
     string cimfoo_sub2;
 };

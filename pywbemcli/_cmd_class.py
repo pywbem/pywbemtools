@@ -42,10 +42,11 @@ from ._displaytree import display_class_tree
 # the default is True which is what we want.
 # TODO: We need to document all these defaults.
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
-    click.option('--includequalifiers/--no_includequalifiers',
+    click.option('--no-qualifiers', is_flag=True,
                  required=False, default=True,
-                 help='Include qualifiers in the result. Default is to'
-                      ' include qualifiers')]
+                 help='Do not include qualifiers in the response.'
+                      'The default behavior is to include'
+                      'qualifiers in the returned class.')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
@@ -324,7 +325,7 @@ def cmd_class_get(context, classname, options):
             classname,
             namespace=options['namespace'],
             LocalOnly=options['localonly'],
-            IncludeQualifiers=options['includequalifiers'],
+            IncludeQualifiers=options['no_qualifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
@@ -390,7 +391,7 @@ def cmd_class_enumerate(context, classname, options):
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
                 DeepInheritance=options['deepinheritance'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['includeclassorigin'])
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
@@ -544,7 +545,8 @@ def cmd_class_tree(context, classname, options):
             classname = None
 
         else:
-            # get the complete subclass hierarchy
+            # get the subclass hierarchy either complete or starting at the
+            # optional CLASSNAME
             classes = context.conn.EnumerateClasses(
                 ClassName=classname,
                 namespace=options['namespace'],
@@ -554,6 +556,7 @@ def cmd_class_tree(context, classname, options):
 
     # display the list of classes as a tree. The classname is the top
     # of the tree.
+    context.spinner.stop()
     display_class_tree(classes, classname)
 
 

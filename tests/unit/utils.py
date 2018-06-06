@@ -139,7 +139,7 @@ def assert_rc(exp_rc, rc, stdout, stderr):
         format(exp_rc, rc, stdout, stderr)
 
 
-def assert_patterns(exp_patterns, lines, meaning):
+def assert_patterns(exp_patterns, act_lines, meaning):
     """
     Assert that the specified lines match the specified patterns.
 
@@ -151,30 +151,66 @@ def assert_patterns(exp_patterns, lines, meaning):
       exp_patterns (iterable of string): regexp patterns defining the expected
         value for each line.
 
-      lines (iterable of string): the lines to be matched.
+      act_lines (iterable of string): the lines to be matched.
 
       meaning (string): A short descriptive text that identifies the meaning
         of the lines that are matched, e.g. 'stderr'.
     """
-
-    assert len(lines) == len(exp_patterns), \
+    assert len(act_lines) == len(exp_patterns), \
         "Unexpected number of lines in {}:\n" \
-        "  expected patterns:\n" \
+        "Expected lines cnt={}:\n" \
         "{}\n" \
-        "  actual lines:\n" \
+        "Actual lines cnt={}:\n" \
         "{}\n". \
-        format(meaning,
-               '\n'.join(exp_patterns),
-               '\n'.join(lines))
+        format(meaning, len(act_lines),
+               '\n'.join(exp_patterns), len(exp_patterns),
+               '\n'.join(act_lines))
 
-    for i, line in enumerate(lines):
-        pattern = exp_patterns[i]
-        if not pattern.endswith('$'):
-            pattern += '$'
-        assert re.match(pattern, line), \
+    for i, act_line in enumerate(act_lines):
+        exp_line = exp_patterns[i]
+        # if not exp_line.endswith('$'):
+        #    exp_line += '$'
+        assert re.match(exp_line, act_line), \
             "Unexpected line {} in {}:\n" \
-            "  expected pattern:\n" \
+            "  expected line vs. actual line:\n" \
             "{}\n" \
-            "  actual line:\n" \
             "{}\n". \
-            format(i, meaning, pattern, line)
+            format(i, meaning, exp_line, act_line)
+
+
+def assert_lines(exp_lines, act_lines, meaning):
+    """
+    Assert that the specified lines match exactly the lines specified in
+    exp_lines. This does not require that the pattern lines escape any
+    special characters, etc.
+
+    The exp_lines are matched against the complete line from begin to end. The
+    test stops at the first difference
+
+    Parameters:
+
+      exp_lines (iterable of string): the expected string for each line.
+
+      act_lines (iterable of string): the lines to be matched.
+
+      meaning (string): A short descriptive text that identifies the meaning
+        of the lines that are matched, e.g. 'stderr'.
+    """
+    assert len(act_lines) == len(exp_lines), \
+        "Unexpected number of lines in {}:\n" \
+        "Expected lines cnt={}:\n" \
+        "{}\n" \
+        "Actual lines cnt={}:\n" \
+        "{}\n". \
+        format(meaning, len(act_lines),
+               '\n'.join(exp_lines), len(exp_lines),
+               '\n'.join(act_lines))
+
+    for i, act_line in enumerate(act_lines):
+        exp_line = exp_lines[i]
+        assert exp_line == act_line, \
+            "Unexpected line {} in {}:\n" \
+            "  expected line vs. actual line:\n" \
+            "{}\n" \
+            "{}\n". \
+            format(i, meaning, exp_line, act_line)
