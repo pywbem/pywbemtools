@@ -83,6 +83,93 @@ Options:
   -h, --help                Show this message and exit.
 """
 
+CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
+
+  Find all classes that match CLASSNAME-REGEX.
+
+  Find all classes in the namespace(s) of the target WBEMServer that match
+  the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
+  argument is required.
+
+  The CLASSNAME-REGEX argument may be either a complete classname or a
+  regular expression that can be matched to one or more classnames. To limit
+  the filter to a single classname, terminate the classname with $.
+
+  The regular expression is anchored to the beginning of the classname and
+  is case insensitive. Thus, `pywbem_` returns all classes that begin with
+  `PyWBEM_`, `pywbem_`, etc.
+
+  The namespace option limits the search to the defined namespace. Otherwise
+  all namespaces in the target server are searched.
+
+  Output is in table format if table output specified. Otherwise it is in
+  the form <namespace>:<classname>
+
+Options:
+  -s, --sort              Sort into alphabetical order by classname.
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -h, --help              Show this message and exit.
+"""
+
+CLASS_TREE_HELP = """Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
+
+  Display CIM class inheritance hierarchy tree.
+
+  Displays a tree of the class hiearchy to show superclasses and subclasses.
+
+  CLASSNAMe is an optional argument that defines the starting point for the
+  hiearchy display
+
+  If the --superclasses option not specified the hiearchy starting either at
+  the top most classes of the class hiearchy or at the class defined by
+  CLASSNAME is displayed.
+
+  if the --superclasses options is specified and a CLASSNAME is defined the
+  class hiearchy of superclasses leading to CLASSNAME is displayed.
+
+  This is a separate subcommand because t is tied specifically to displaying
+  in a tree format.so that the --output-format global option is ignored.
+
+Options:
+  -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
+                          When this option is set, the CLASSNAME argument is
+                          required
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -h, --help              Show this message and exit.
+"""
+
+CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
+
+  Find all classes that match CLASSNAME-REGEX.
+
+  Find all classes in the namespace(s) of the target WBEMServer that match
+  the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
+  argument is required.
+
+  The CLASSNAME-REGEX argument may be either a complete classname or a
+  regular expression that can be matched to one or more classnames. To limit
+  the filter to a single classname, terminate the classname with $.
+
+  The regular expression is anchored to the beginning of the classname and
+  is case insensitive. Thus, `pywbem_` returns all classes that begin with
+  `PyWBEM_`, `pywbem_`, etc.
+
+  The namespace option limits the search to the defined namespace. Otherwise
+  all namespaces in the target server are searched.
+
+  Output is in table format if table output specified. Otherwise it is in
+  the form <namespace>:<classname>
+
+Options:
+  -s, --sort              Sort into alphabetical order by classname.
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -h, --help              Show this message and exit.
+
+"""
+
 MOCK_TEST_CASES = [
     # desc - Description of test
     # args - List of arguments or string of arguments
@@ -303,30 +390,30 @@ MOCK_TEST_CASES = [
                  '};', '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, False],
-    ['class subcommand find --help, . ',
-     ['find', '--help'],
-     {'stdout': ['Usage: pywbemcli class find [COMMAND-OPTIONS] '
-                 'CLASSNAME-REGEX',
-                 'Find all classes that match CLASSNAME-REGEX.',
-                 '-s, --sort              Sort into alphabetical order by '
-                 'classname.'],
-      'test': 'in'},
-     None, True],
     #
     # find subcommand
     #
-    # TODO find subcommand. This one requires server so we need another
-    # mof example that has namespace in it
+    ['class subcommand find -h, ',
+     ['find', '-h'],
+     {'stdout': CLASS_FIND_HELP,
+      'test': 'lines'},
+     None, False],
+
+    ['class subcommand find  --help',
+     ['find', '--help'],
+     {'stdout': CLASS_FIND_HELP,
+      'test': 'lines'},
+     None, False],
+    # TODO Add detailed tests for find
     #
     # subcommand "class tree"
     #
-    ['class subcommand get  --help response',
+    ['class subcommand tree --help response',
      ['tree', '--help'],
-     {'stdout': ['Usage: pywbemcli class tree [COMMAND-OPTIONS]',
-                 '--superclasses', ],
-      'test': 'in'},
+     {'stdout': CLASS_TREE_HELP,
+      'test': 'lines'},
      None, True],
-    # TODO this test occasiona\ly includeing | in output as if spinner not
+    # TODO this test occasionally includeing | in output as if spinner not
     # stopped. For now removed the extra spaces.
     ['class subcommand tree top down. Order uncertain so use "in" test ',
      ['tree'],
@@ -426,7 +513,7 @@ MOCK_TEST_CASES = [
 # other tests.  Test lo on top level
 
 
-class TestSubcmdMock(CLITestsBase):
+class TestSubcmdClass(CLITestsBase):
     """
     Test all of the class subcommand variations.
     """
@@ -437,6 +524,13 @@ class TestSubcmdMock(CLITestsBase):
         MOCK_TEST_CASES)
     def test_class(self, desc, args, exp_response, mock, condition):
         """
+        Common test method for those subcommands and options in the
+        class subcmd that can be tested.  This includes:
+
+          * Subcommands like help that do not require access to a server
+
+          * Subcommands that can be tested with a single execution of a
+            pywbemcli command.
         """
         env = None
         self.mock_subcmd_test(desc, self.subcmd, args, env, exp_response,
@@ -447,19 +541,6 @@ class TestClassGeneral(object):
     """
     Test class using pytest for the subcommands of the class subcommand
     """
-    def test_help(self):
-        """Test 'pywbemcli --help'"""
-
-        # Invoke the command to be tested
-        rc, stdout, stderr = execute_pywbemcli(['class', '--help'])
-
-        assert_rc(0, rc, stdout, stderr)
-        assert stdout.startswith(
-            "Usage: pywbemcli class [COMMAND-OPTIONS]"), \
-            "stdout={!r}".format(stdout)
-
-        assert stderr == ""
-
     # @pytest.mark.skip(reason="Unfinished test")
     def test_class_error_no_server(self):
         """Test 'pywbemcli ... class getclass' when no host is provided
@@ -484,21 +565,6 @@ class TestClassEnumerate(object):
     """
     Test the options of the pywbemcli class enumerate' subcommand
     """
-    def test_help(self):
-        """
-        Test 'pywbemcli class enumerate --help'
-        """
-
-        # Invoke the command to be tested
-        rc, stdout, stderr = execute_pywbemcli(['class', 'enumerate', '--help'])
-
-        assert_rc(0, rc, stdout, stderr)
-        assert stdout.startswith(
-            "Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME\n"), \
-            "stdout={!r}".format(stdout)
-
-        assert stderr == ""
-
     # TODO remap this to use the same test_funct decorator as pywbem when
     # that code is committed.
     @pytest.mark.parametrize(
