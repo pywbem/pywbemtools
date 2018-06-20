@@ -231,75 +231,23 @@ def objects_sort(objects):
         rtn_objs.append(sort_dict[key])
     return rtn_objs
 
-# TODO if namespace element, it should go back to context. I think.
-# TODO: I do not like the name.  This is really cimnamespacename parser
 
-
-def parse_cim_namespace_str(uri, namespace=None):
+def parse_wbemuri_str(wbemuri_str, namespace=None):
     """
-    Create and return a CIMObjectPath from a string input.
-    For now we do not allow the host element.  The uri is of the form
-    namespace:className.<name=value>*
-
-    This differs from wbemuri in that it does not require quotes around
-    value elements unless they include commas or quotation marks
-
-    Exceptions:
-        ValueError
+    Parse a string that is a wbemuri into a CIMInstanceName object.
     """
-    # print('parse uri %s' % uri)
-    host = None
-    # if matches re.match(r"^//(.*)/".uri,re.I):
-    #    # host =  matches.group(1))
-    #    # span = matches.span())
+    if namespace:
+        wbemuri_str = '/%s:%s' % (namespace, wbemuri_str)
+    try:
+        instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
+        # if instance_name.host:
+        #    raise click.ClickException('Host name component not allowed. '
+        #                               'Rcvd %s' % wbemuri_str)
 
-    # namespace = None
-    key_bindings = {}
-    classname = None
-    # if not uri.startswith('//'):
-    #     host = None
-    # TODO implement host component of parse.
-    uri_pattern = r'''(?x)
-              ([a-zA-Z0-9_]*).      # classname
-'''
-    match = re.match(uri_pattern, uri, re.VERBOSE)
-    # print('uri match %s' % match)
-    if match:
-        # namespace = match.group(1)
-        classname = match.group(1)
-        if host and not namespace:
-            raise ValueError('HostName with no namespace is invalid')
-        next_char = match.end()
-
-        kb_pattern = r'([a-zA-Z0-9_]*=[^",][^,]*)'
-
-        for pmatch in re.finditer(kb_pattern, uri[next_char:]):
-            # print('pmatch %s' % pmatch)
-            pair = pmatch.group(1).split('=', 1)
-            # print('pair %s' % pair)
-            if pair[0]:
-                if pair[1][0] == '"':
-                    # if pair[1][:-1] != '"'
-                    #    ValueError('Mismatched quotes %s' % pmatch.group(1))
-                    key_bindings[pair[0]] = pair[1][1:-1]
-                else:
-                    try:
-                        key_bindings[pair[0]] = int(pair[1])
-                    except ValueError:
-                        key_bindings[pair[0]] = pair[1]
-                    except TypeError:
-                        key_bindings[pair[0]] = pair[1]
-            else:
-                # Value Error when name component empty
-                ValueError('Cannot parse keybinding %s' % pair)
-    else:
-        ValueError('Cannot parse wbemuri %s' % uri)
-
-    inst_name = CIMInstanceName(classname, keybindings=key_bindings, host=host,
-                                namespace=namespace)
-    # print('CIMInstanceName %s' % inst_name)
-
-    return inst_name
+        return instance_name
+    except ValueError as ve:
+        raise click.ClickException('Invalid wbem uri input %s. Error %s' %
+                                   (wbemuri_str, ve))
 
 
 def create_params(cim_method, kv_params):
