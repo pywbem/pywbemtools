@@ -74,7 +74,7 @@ package_name := pywbemtools
 cli_package_name := pywbemcli
 
 # Package version (full version, including any pre-release suffixes, e.g. "0.1.0-alpha1")
-package_version := $(shell $(PYTHON_CMD) -c "from pbr.version import VersionInfo; print(VersionInfo('$(package_name)').release_string())")
+package_version := $(shell $(PYTHON_CMD) -c $$'try:\n from pbr.version import VersionInfo\nexcept ImportError:\n pass\nelse:\n print(VersionInfo("$(package_name)").release_string())\n')
 
 # Python major version
 python_major_version := $(shell python -c "import sys; sys.stdout.write('%s'%sys.version_info[0])")
