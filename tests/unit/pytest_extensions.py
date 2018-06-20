@@ -1,7 +1,8 @@
 """
 Extensions for pytest module.  This is a direct copy of the corresponding
 pytest_extensions module in the pywbem tests. If there are any changes to
-that code, please update this code also.
+that code, please update this code also. It should have no differences from
+that code.
 """
 
 from __future__ import absolute_import

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -23,76 +21,165 @@ Tests for _common functions.
 from __future__ import absolute_import, print_function
 
 import unittest
-# from pprint import pprint as pp  # noqa: F401
+import pytest
 import click
-
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMInstanceName, Uint32
-from pywbemcli._common import parse_cim_namespace_str, \
+from pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
     create_ciminstance, compare_instances, resolve_propertylist
 
+# import pytest_extensions  # TODO cannot find this import
 
-class PropertyListResolveTest(unittest.TestCase):
+
+class PropertyListResolveTest(object):
     """
     Test the propertylist resolve function
     """
     def test_with_comma(self):
         """Test with commma in string"""
         out = resolve_propertylist(("abc,def",))
-        self.assertEqual(out, ['abc', 'def'])
+        assert out == ['abc', 'def']
 
     def test_simple(self):
         """Test with single entry"""
         val = ("abc",)
         out = resolve_propertylist(val)
-        self.assertEqual(out, ['abc'])
+        assert out == ['abc']
 
     def test_empty(self):
         """Test empty string"""
         val = ("",)
         out = resolve_propertylist(val)
-        self.assertEqual(out, [])
+        assert out == []
 
     def test_multiple(self):
         """Test multiple entries"""
         out = resolve_propertylist(("abc", "def"))
-        self.assertEqual(out, ['abc', 'def'])
+        assert out == ['abc', 'def']
 
     def test_combined(self):
         """test with comma in one property entry"""
         out = resolve_propertylist(("abc", "def", "xyz,rst"))
-        self.assertEqual(out, ['abc', 'def', 'xyz', 'rst'])
+        assert out == ['abc', 'def', 'xyz', 'rst']
 
     def test_none(self):
         """Test None"""
         out = resolve_propertylist(None)
-        self.assertEqual(out, None)
+        assert out is None
 
 
-class ParseWbemUriTest(unittest.TestCase):
-    """test the fparse_wbem_uri function"""
+class TestParseWbemUri(object):
+    # pylint: disable=too-few-public-methods
+    """
+    Test CIMClassName.from_wbem_uri().
+    """
 
-    def test_one(self):
-        """test simple uri input"""
-        uri = 'testclass.abc=3'
-        inst_name = parse_cim_namespace_str(uri)
-        # test resulting ciminstancename object
-        self.assertEqual(inst_name.classname, 'testclass')
-        self.assertTrue(inst_name.has_key('abc'))  # noqa: W601
-        self.assertEqual(inst_name.get('abc'), 3)
+    testcases = [
+        # Testcases for CIMClassName.from_wbem_uri().
+        # Each testcase has these items:
+        # * desc: Short testcase description.
+        # * uri: WBEM URI string to be tested.
+        # * ns: namespace parameter or None
+        # * exp_result: Dict of all expected attributes of resulting object,
+        #     if expected to succeed. Exception type, if expected to fail.
+        # * exp_warn_type: Expected warning type.
+        #     None, if no warning expected.
+        # * condition: Condition for testcase to run.
+        (
+            "class and keys only case",
+            '/root/cimv2:CIM_Foo.k1="v1"',
+            None,
+            dict(
+                classname=u'CIM_Foo',
+                namespace='root/cimv2',
+                keys={'k1': 'v1'},
+                host=None),
+            None, True
+        ),
+        (
+            "all components, normal case",
+            'https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
+            None,
+            dict(
+                classname=u'CIM_Foo',
+                namespace=u'root/cimv2',
+                keys={'k1': 'v1'},
+                host=u'10.11.12.13:5989'),
+            None, False
+        ),
+    ]
 
-    def test_two(self):
-        """test simple uri input"""
-        uri = 'testclass2.abc=3,def=blah'
-        inst_name = parse_cim_namespace_str(uri)
-        # test resulting ciminstancename object
-        self.assertEqual(inst_name.classname, 'testclass2')
-        self.assertTrue(inst_name.has_key('abc'))  # noqa: W601
-        self.assertEqual(inst_name.get('abc'), 3)
-        self.assertTrue(inst_name.has_key('def'))  # noqa: W601
-        self.assertEqual(inst_name.get('def'), 'blah')
+    @pytest.mark.parametrize(
+        "desc, uri, ns, exp_result, exp_warn_type, condition",
+        testcases)
+    def test_parse_wbemuri_str(
+            self, desc, uri, ns, exp_result, exp_warn_type, condition):
+        # pylint: disable=unused-argument
+        """Test function for parse_wbemuri_str."""
+
+        if not condition:
+            pytest.skip("Condition for test case not met")
+
+        if isinstance(exp_result, type) and issubclass(exp_result, Exception):
+            # We expect an exception
+            exp_exc_type = exp_result
+            exp_attrs = None
+        else:
+            # We expect the code to return
+            exp_exc_type = None
+            exp_attrs = exp_result
+
+        if condition == 'pdb':
+            import pdb
+            pdb.set_trace()
+
+        if exp_warn_type:
+            with pytest.warns(exp_warn_type) as rec_warnings:
+                if exp_exc_type:
+                    with pytest.raises(exp_exc_type):
+
+                        # The code to be tested
+                        obj = parse_wbemuri_str(uri)
+
+                else:
+
+                    # The code to be tested
+                    obj = parse_wbemuri_str(uri)
+
+            assert len(rec_warnings) == 1
+
+        else:
+            if exp_exc_type:
+                with pytest.raises(exp_exc_type):
+
+                    # The code to be tested
+                    obj = parse_wbemuri_str(uri)
+
+            else:
+
+                # The code to be tested
+                obj = parse_wbemuri_str(uri)
+
+        if exp_attrs:
+            exp_classname = exp_attrs['classname']
+            exp_namespace = exp_attrs['namespace']
+            exp_host = exp_attrs['host']
+            exp_keybindings = exp_attrs['keys']
+
+            assert isinstance(obj, CIMInstanceName)
+
+            assert obj.classname == exp_classname
+            assert isinstance(obj.classname, type(exp_classname))
+
+            assert obj.namespace == exp_namespace
+
+            assert obj.keybindings == exp_keybindings
+
+
+            assert obj.host == exp_host
+            assert isinstance(obj.host, type(exp_host))
 
 
 class FilterNamelistTest(unittest.TestCase):
@@ -575,7 +662,3 @@ class CreateCIMInstanceTest(unittest.TestCase):
     # Test compare with errors
 
     # test display functionality including table
-
-
-if __name__ == '__main__':
-    unittest.main()

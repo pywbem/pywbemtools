@@ -22,7 +22,7 @@ from __future__ import absolute_import, print_function
 import click
 from pywbem import Error
 from .pywbemcli import cli
-from ._common import display_cim_objects, parse_cim_namespace_str, \
+from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
     create_params, filter_namelist, CMD_OPTS_TXT, format_table
 from ._common_options import propertylist_option, names_only_option, \
@@ -107,6 +107,7 @@ def instance_delete(context, instancename, **options):
     Delete a single CIM instance.
 
     Delete the instanced defined by INSTANCENAME from the WBEM server.
+
     This may be executed interactively by providing only a class name and the
     interactive option.
     """
@@ -184,11 +185,11 @@ def instance_enumerate(context, classname, **options):
     """
     Enumerate instances or names of CLASSNAME.
 
-    Enumerate instances or instance names from the WBEMServer starting either
-    at the top  of the hierarchy (if no CLASSNAME provided) or from the
-    CLASSNAME argument if provided.
+    Enumerate instances or instance names (the --name_only option) from the
+    WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
+    provided) or from the CLASSNAME argument if provided.
 
-    Displays the returned instances or names
+    Displays the returned instances (mof, xml, or table formats) or names
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -216,14 +217,12 @@ def instance_references(context, instancename, **options):
     Get the reference instances or names.
 
     Gets the reference instances or instance names(--names-only option) for a
-    target instance name in the target WBEM server.
+    target INSTANCENAME in the target WBEM server filtered by the
+    --role and --resultclass options.
 
-    For the INSTANCENAME argument provided return instances or instance
-    names filtered by the --role and --resultclass options.
-
-    This may be executed interactively by providing only a class name and the
-    interactive option(-i). Pywbemcli presents a list of instances names in the
-    class from which one can be chosen as the target.
+   This may be executed interactively by providing only a class name for
+   INSTANCENAME and the interactive option(-i). Pywbemcli presents a list of
+   instances names in the class from which one can be chosen as the target.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -327,6 +326,37 @@ def instance_count(context, classname, **options):
 ####################################################################
 #  cmd_instance_<action> processors
 ####################################################################
+
+def get_instancename(context, instancename, options):
+    """
+    Common function to get the instancename from either the input or the user
+    """
+    if 'namespace' in options:
+        ns = options['namespace']
+    else:
+        ns = None
+
+    if ns is None:
+        ns = context.conn.default_namespace
+
+    try:
+        if options['interactive']:
+            try:
+                instancepath = pick_instance(context, instancename,
+                                             namespace=ns)
+                return instancepath
+            except ValueError:
+                click.echo('Function aborted')
+                return None
+
+        else:
+            instancepath = parse_wbemuri_str(instancename, ns)
+        return instancepath
+
+    except ValueError as ve:
+        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
+
+
 def cmd_instance_get(context, instancename, options):
     """
     Get and display an instance of a CIM Class.
@@ -339,17 +369,9 @@ def cmd_instance_get(context, instancename, options):
     to the console from which one can be picked to get from the server and
     display.
     """
-    try:
-        if options['interactive']:
-            instancepath = pick_instance(context, instancename,
-                                         namespace=options['namespace'])
-            if not instancepath:
-                return
-        else:
-            instancepath = parse_cim_namespace_str(instancename,
-                                                   options['namespace'])
-    except ValueError as ve:
-        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
+    instancepath = get_instancename(context, instancename, options)
+    if instancepath is None:
+        return
 
     try:
         instance = context.conn.GetInstance(
@@ -359,8 +381,7 @@ def cmd_instance_get(context, instancename, options):
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, instance, context.output_format,
-                            summary=options['summary'])
+        display_cim_objects(context, instance, context.output_format)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -373,17 +394,9 @@ def cmd_instance_delete(context, instancename, options):
         delete.
         Otherwise attempt to delete the instance defined by instancename
     """
-    try:
-        if options['interactive']:
-            instancepath = pick_instance(context, instancename,
-                                         namespace=options['namespace'])
-            if not instancepath:
-                return
-        else:
-            instancepath = parse_cim_namespace_str(instancename,
-                                                   options['namespace'])
-    except ValueError as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    instancepath = get_instancename(context, instancename, options)
+    if instancepath is None:
+        return
 
     try:
         context.conn.DeleteInstance(instancepath)
@@ -417,18 +430,9 @@ def cmd_instance_create(context, classname, options):
 def cmd_instance_invokemethod(context, instancename, methodname,
                               options):
     """Create an instance and submit to wbemserver"""
-
-    try:
-        if options['interactive']:
-            instancepath = pick_instance(context, instancename,
-                                         options['namespace'])
-            if not instancepath:
-                return
-        else:
-            instancepath = parse_cim_namespace_str(instancename,
-                                                   options['namespace'])
-    except ValueError as ve:
-        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
+    instancepath = get_instancename(context, instancename, options)
+    if instancepath is None:
+        return
 
     try:
         cim_class = context.conn.GetClass(
@@ -490,18 +494,9 @@ def cmd_instance_references(context, instancename, options):
        If the interactive option is selected, the instancename MUST BE
        a classname.
     """
-    if options['interactive']:
-        try:
-            instancepath = pick_instance(context, instancename,
-                                         options['namespace'])
-            if not instancepath:
-                return
-        except ValueError:
-            print('Function aborted')
-            return
-    else:
-        instancepath = parse_cim_namespace_str(instancename,
-                                               options['namespace'])
+    instancepath = get_instancename(context, instancename, options)
+    if instancepath is None:
+        return
 
     try:
         if options['names_only']:
@@ -536,19 +531,10 @@ def cmd_instance_associators(context, instancename, options):
     Execute the references request operation to get references for
     the classname defined
     """
+    instancepath = get_instancename(context, instancename, options)
 
-    # TODO, this could be common code between assoc and ref
-    if options['interactive']:
-        try:
-            instancepath = pick_instance(context, instancename,
-                                         options['namespace'])
-            if not instancepath:
-                return
-        except ValueError as ve:
-            raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
-    else:
-        instancepath = parse_cim_namespace_str(instancename,
-                                               options['namespace'])
+    if instancepath is None:
+        return
 
     try:
         if options['names_only']:

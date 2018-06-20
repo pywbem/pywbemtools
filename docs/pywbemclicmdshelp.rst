@@ -80,7 +80,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       trust/extracted/openssl/ca-bundle.trust.crt
                                       /etc/ssl/certs
                                       /etc/ssl/certificates
-      -o, --output-format [table|plain|simple|grid|mof|xml|txt|tree]
+      -o, --output-format [table|plain|simple|grid|rst|mof|xml|txt|tree]
                                       Output format (Default: simple). pywbemcli
                                       may override the format choice depending on
                                       the operation since not all formats apply to
@@ -190,9 +190,9 @@ The following defines the help output for the `pywbemcli class associators --hel
       -c, --resultclass <class name>  Filter by the result class name provided.
       -r, --role <role name>          Filter by the role name provided.
       -R, --resultrole <role name>    Filter by the role name provided.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
+      --no-qualifiers                 Do not include qualifiers in the
+                                      response.The default behavior is to
+                                      includequalifiers in the returned class.
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -265,7 +265,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
 
       Enumerates the classes (or classnames) from the WBEMServer starting either
       at the top of the class hierarchy or from  the position in the class
-      hierarch defined by `CLASSNAME` argument if provided.
+      hierarchy defined by `CLASSNAME` argument if provided.
 
       The output format is defined by the output-format global option.
 
@@ -276,21 +276,21 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       retrieved or just the next level in the hiearchy.
 
     Options:
-      -d, --deepinheritance           Return complete subclass hierarchy for this
-                                      class if set. Otherwise retrieve only the
-                                      next hierarchy level.
-      -l, --localonly                 Show only local properties of the class.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
-      -c, --includeclassorigin        Include classorigin in the result.
-      -o, --names_only                Show only local properties of the class.
-      -s, --sort                      Sort into alphabetical order by classname.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
-      -S, --summary                   Return only summary of objects (count).
-      -h, --help                      Show this message and exit.
+      -d, --deepinheritance     Return complete subclass hierarchy for this class
+                                if set. Otherwise retrieve only the next hierarchy
+                                level.
+      -l, --localonly           Show only local properties of the class.
+      --no-qualifiers           Do not include qualifiers in the response.The
+                                default behavior is to includequalifiers in the
+                                returned class.
+      -c, --includeclassorigin  Include classorigin in the result.
+      -o, --names_only          Show only local properties of the class.
+      -s, --sort                Sort into alphabetical order by classname.
+      -n, --namespace <name>    Namespace to use for this operation. If defined
+                                that namespace overrides the general options
+                                namespace
+      -S, --summary             Return only summary of objects (count).
+      -h, --help                Show this message and exit.
 
 
 .. _`pywbemcli class find --help`:
@@ -364,9 +364,9 @@ The following defines the help output for the `pywbemcli class get --help` subco
 
     Options:
       -l, --localonly                 Show only local properties of the class.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
+      --no-qualifiers                 Do not include qualifiers in the
+                                      response.The default behavior is to
+                                      includequalifiers in the returned class.
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -436,9 +436,9 @@ The following defines the help output for the `pywbemcli class references --help
     Options:
       -R, --resultclass <class name>  Filter by the classname provided.
       -r, --role <role name>          Filter by the role name provided.
-      --includequalifiers / --no_includequalifiers
-                                      Include qualifiers in the result. Default is
-                                      to include qualifiers
+      --no-qualifiers                 Do not include qualifiers in the
+                                      response.The default behavior is to
+                                      includequalifiers in the returned class.
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -551,7 +551,6 @@ The following defines the help output for the `pywbemcli connection delete --hel
 
       Delete connection information from the persistent store for the connection
       defined by NAME.
-
 
     Options:
       -h, --help  Show this message and exit.
@@ -1519,7 +1518,11 @@ The following defines the help output for the `pywbemcli server test_pull --help
 
       Test existence of pull opeations.
 
-      Test whether the pull operations exist on the WBEM server.
+      Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
+      exist on the WBEM server.
+
+      This command tests all of the pull operations and reports any that return
+      a NOT_SUPPORTED response.
 
     Options:
       -h, --help  Show this message and exit.
