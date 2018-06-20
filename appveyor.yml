@@ -56,7 +56,7 @@ install:
   # The installation in pywbem_os_setup.bat installs swig but without generating
   # the swig.exe shim file (using GenShim).
   # Therefore, we install swig here in order to create the swig.exe shim file.
-  - choco install -r -y swig
+  - choco install -r -y --allow-empty-checksums swig
 
   # Set PACKAGE_LEVEL for make
   - set PACKAGE_LEVEL=%configuration%
