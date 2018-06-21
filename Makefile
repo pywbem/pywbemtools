@@ -1,28 +1,25 @@
 # ------------------------------------------------------------------------------
 # Makefile for pybemtools repository of pywbem project
 #
-# Basic prerequisites for running this Makefile, to be provided manually:
-#   One of these OS platforms:
-#     Windows with CygWin
-#     Linux (any)
+# Supported OS platforms for this makefile:
+#     Linux (any distro)
 #     OS-X
-#   These commands on all OS platforms:
+#     Windows with UNIX-like env such as CygWin (with Python in UNIX-like env)
+#     native Windows (with Python in Windows)
+#
+# Prerequisites for running this makefile:
+#   These commands are used on all supported OS platforms:
 #     make (GNU make)
 #     bash
-#     rm, mv, find, xargs, tee
+#     echo, rm, mv, find, xargs, tee, touch, chmod, wget
 #     python (This Makefile uses the active Python environment, virtual Python
 #        environments are supported)
 #     pip (in the active Python environment)
 #     twine (in the active Python environment)
-#   These commands on Linux and OS-X:
+#   These additional commands are used on Linux, OS-X and Windows with UNIX env:
 #     uname
-# Additional prerequisites for running this Makefile are installed by running:
-#   make develop
-#
-# Optional environment ariables/command line variables
-#   COVERAGE_REPORT - When set, forces coverage to create temporary
-#   annotated html output html files showing lines covered and missed
-#   See the directory coverage_html for the html output.
+#   These additional commands are used on native Windows:
+#     cmd
 # ------------------------------------------------------------------------------
 
 # Python / Pip commands
@@ -76,11 +73,14 @@ cli_package_name := pywbemcli
 # Package version (full version, including any pre-release suffixes, e.g. "0.1.0-alpha1")
 package_version := $(shell $(PYTHON_CMD) -c $$'try:\n from pbr.version import VersionInfo\nexcept ImportError:\n pass\nelse:\n print(VersionInfo("$(package_name)").release_string())\n')
 
+# Python full version
+python_version := $(shell $(PYTHON_CMD) -c "import sys; sys.stdout.write('%s.%s.%s'%sys.version_info[0:3])")
+
 # Python major version
-python_major_version := $(shell python -c "import sys; sys.stdout.write('%s'%sys.version_info[0])")
+python_major_version := $(shell $(PYTHON_CMD) -c "import sys; sys.stdout.write('%s'%sys.version_info[0])")
 
 # Python major+minor version for use in file names
-python_version_fn := $(shell python -c "import sys; sys.stdout.write('%s%s'%(sys.version_info[0],sys.version_info[1]))")
+python_version_fn := $(shell $(PYTHON_CMD) -c "import sys; sys.stdout.write('%s%s'%(sys.version_info[0],sys.version_info[1]))")
 
 # Directory for the generated distribution files
 dist_dir := dist
@@ -149,23 +149,42 @@ dist_dependent_files := \
 
 .PHONY: help
 help:
-	@echo 'Makefile for $(package_name) project'
-	@echo 'Package version will be: $(package_version)'
-	@echo 'Uses the currently active Python environment: Python $(python_version_fn)'
-	@echo 'Valid targets are (they do just what is stated, i.e. no automatic prereq targets):'
-	@echo '  install    - Install $(package_name) and its Python installation and runtime prereqs'
-	@echo '  develop    - install + Install Python development prereqs'
-	@echo '  build      - Build the distribution archive files in: $(dist_dir) (requires Linux or OSX)'
-	@echo '  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)'
-	@echo '  builddoc   - Build documentation in: $(doc_build_dir)'
-	@echo '  check      - Run PyLint and Flake8 on sources and save results in: pylint.log and flake8.log'
-	@echo '  test       - Run unit tests (and test coverage) and save results in: $(test_log_file)'
-	@echo '               Env.var TESTCASES can be used to specify a py.test expression for its -k option'
-	@echo '  all        - Do all of the above (except buildwin when not on Windows)'
-	@echo '  uninstall  - Uninstall package from active Python environment'
-	@echo '  upload     - build + Upload the distribution archive files to PyPI'
-	@echo '  clean      - Remove any temporary files'
-	@echo '  clobber    - Remove everything created to ensure clean start'
+	@echo "Makefile for $(package_name) repository of pywbem project"
+	@echo "Package version will be: $(package_version)"
+	@echo "Uses the currently active Python environment: Python $(python_version)"
+	@echo ""
+	@echo "Make targets:"
+	@echo "  install    - Install $(package_name) and its Python installation and runtime prereqs"
+	@echo "  develop    - install + Install Python development prereqs"
+	@echo "  build      - Build the distribution archive files in: $(dist_dir) (requires Linux or OSX)"
+	@echo "  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)"
+	@echo "  builddoc   - Build documentation in: $(doc_build_dir)"
+	@echo "  check      - Run PyLint and Flake8 on sources and save results in: pylint.log and flake8.log"
+	@echo "  test       - Run unit tests (and test coverage) and save results in: $(test_log_file)"
+	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
+	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
+	@echo "  uninstall  - Uninstall package from active Python environment"
+	@echo "  upload     - build + Upload the distribution archive files to PyPI"
+	@echo "  clean      - Remove any temporary files"
+	@echo "  clobber    - Remove everything created to ensure clean start"
+	@echo ""
+	@echo "Environment variables:"
+	@echo "  COVERAGE_REPORT - When set, the 'test' target creates a coverage report as"
+	@echo "      annotated html files showing lines covered and missed, in the directory:"
+	@echo "      $(coverage_html_dir)"
+	@echo "      Optional, defaults to no such coverage report."
+	@echo "  TESTCASES - When set, 'test' target runs only the specified test cases. The"
+	@echo "      value is used for the -k option of pytest (see 'pytest --help')."
+	@echo "      Optional, defaults to running all tests."
+	@echo "  PACKAGE_LEVEL - Package level to be used for installing dependent Python"
+	@echo "      packages in 'install' and 'develop' targets:"
+	@echo "        latest - Latest package versions available on Pypi"
+	@echo "        minimum - A minimum version as defined in minimum-constraints.txt"
+	@echo "      Optional, defaults to 'latest'."
+	@echo "  PYTHON_CMD - Python command to be used. Useful for Python 3 in some envs."
+	@echo "      Optional, defaults to 'python'."
+	@echo "  PIP_CMD - Pip command to be used. Useful for Python 3 in some envs."
+	@echo "      Optional, defaults to 'pip'."
 
 .PHONY: install
 install: install.done
