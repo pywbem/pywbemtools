@@ -7,6 +7,7 @@
 /htmlcov/
 /build/
 /build_doc/
+/coverage_html/
 /dist/
 AUTHORS
 ChangeLog
@@ -20,9 +21,6 @@ pywbemcli.egg-info
 MANIFEST
 pylint_done
 .coverage
-/build/
-/build_doc/
-/htmlcov/
 setuptools-*.egg
 setuptools-*.zip
 /tmp_*/
@@ -30,6 +28,7 @@ setuptools-*.zip
 /dist/pywbemcli*.whl
 /pywbem_os_setup.sh
 /pywbem_os_setup.bat
+/pywbemcliservers.json
 tmp_*
 *,cover
 cover
