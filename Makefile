@@ -74,7 +74,11 @@ package_name := pywbemtools
 cli_package_name := pywbemcli
 
 # Package version (full version, including any pre-release suffixes, e.g. "0.1.0-alpha1")
-package_version := $(shell $(PYTHON_CMD) -c $$'try:\n from pbr.version import VersionInfo\nexcept ImportError:\n pass\nelse:\n print(VersionInfo("$(package_name)").release_string())\n')
+# Note: Some make actions (such as clobber) cause the package version to change,
+# e.g. because the pywbem.egg-info directory or the PKG-INFO file are deleted,
+# when a new version tag has been assigned. Therefore, this variable is assigned with
+# "=" so that it is evaluated every time it is used.
+package_version = $(shell $(PYTHON_CMD) -c "$$(printf 'try:\n from pbr.version import VersionInfo\nexcept ImportError:\n pass\nelse:\n print(VersionInfo(\042$(package_name)\042).release_string())\n')")
 
 # Python major version
 python_major_version := $(shell python -c "import sys; sys.stdout.write('%s'%sys.version_info[0])")
@@ -86,14 +90,15 @@ python_version_fn := $(shell python -c "import sys; sys.stdout.write('%s%s'%(sys
 dist_dir := dist
 
 # Distribution archives (as built by setup.py)
-bdist_file := $(dist_dir)/$(package_name)-$(package_version)-py2.py3-none-any.whl
-sdist_file := $(dist_dir)/$(package_name)-$(package_version).tar.gz
+# These variables are set with "=" for the same reason as package_version.
+bdist_file = $(dist_dir)/$(package_name)-$(package_version)-py2.py3-none-any.whl
+sdist_file = $(dist_dir)/$(package_name)-$(package_version).tar.gz
 
 # Windows installable (as built by setup.py)
-win64_dist_file := $(dist_dir)/$(package_name)-$(package_version).win-amd64.exe
+win64_dist_file = $(dist_dir)/$(package_name)-$(package_version).win-amd64.exe
 
-# dist_files := $(bdist_file) $(sdist_file) $(win64_dist_file)
-dist_files := $(bdist_file) $(sdist_file)
+# dist_files = $(bdist_file) $(sdist_file) $(win64_dist_file)
+dist_files = $(bdist_file) $(sdist_file)
 
 # Directory for generated API documentation
 doc_build_dir := build_doc
@@ -166,6 +171,15 @@ help:
 	@echo '  upload     - build + Upload the distribution archive files to PyPI'
 	@echo '  clean      - Remove any temporary files'
 	@echo '  clobber    - Remove everything created to ensure clean start'
+
+.PHONY: _check_version
+_check_version:
+ifeq (,$(package_version))
+	@echo 'Error: Package version could not be determined (requires pbr; run "make install")'
+	@false
+else
+	@true
+endif
 
 .PHONY: install
 install: install.done
@@ -302,7 +316,7 @@ all: install develop build builddoc check test
 	@echo '$@ done.'
 
 .PHONY: upload
-upload: uninstall $(dist_files)
+upload: _check_version uninstall $(dist_files)
 ifeq (,$(findstring .dev,$(package_version)))
 	@echo '==> This will upload $(package_name) version $(package_version) to PyPI!'
 	@echo -n '==> Continue? [yN] '
@@ -316,12 +330,12 @@ else
 endif
 
 # Distribution archives.
-$(bdist_file) $(sdist_file): Makefile setup.py $(dist_dependent_files)
+$(bdist_file) $(sdist_file): _check_version Makefile setup.py $(dist_dependent_files)
 	rm -Rfv $(package_name).egg-info .eggs build
 	$(PYTHON_CMD) setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
 	@echo 'Done: Created distribution files: $@'
 
-$(win64_dist_file): Makefile setup.py $(dist_dependent_files)
+$(win64_dist_file): _check_version Makefile setup.py $(dist_dependent_files)
 ifeq ($(PLATFORM),Windows)
 	rm -Rfv $(package_name).egg-info .eggs build
 	$(PYTHON_CMD) setup.py bdist_wininst -d $(dist_dir) -o -t "$(package_name) v$(package_version)"

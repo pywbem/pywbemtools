@@ -187,7 +187,8 @@ install:
 
 # commands to run builds & tests
 script:
-  - if [[ -n $_MANUAL_CI_RUN ]]; then make build; fi
+# make build is always run in order to verify the package version determination
+  - make build
   - make builddoc
   - make check
   - make test
