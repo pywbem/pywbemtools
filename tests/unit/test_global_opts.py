@@ -77,16 +77,16 @@ class TestGlobalOptions(object):
             ]
         ]
     )
-    def test_mock_server_mock_server(self, desc, tst_files, exp_result_start,
-                                     exp_result_end, exp_rc, exp_stderr):
+    def test_mock_server(self, desc, tst_files, exp_result_start,
+                         exp_result_end, exp_rc, exp_stderr):
         """
-        Test 'pywbemcli -s http://blah --mock_server <filename>.mof.
+        Test 'pywbemcli -s http://blah --mock-server <filename>.mof.
         Tests that the option is accepted. Does not test that the mof
         file is compiled.
         """
         cmd_line = []
         for tst_file in tst_files:
-            cmd_line.append('--mock_server')
+            cmd_line.append('--mock-server')
             cmd_line.append(os.path.join(TEST_DIR, tst_file))
         # Because there is no quit subcommand, some command must be issued
         # to avoid going into repl mode.

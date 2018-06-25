@@ -317,12 +317,12 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
                     # TODO this is not correct exception at this point.
                     raise CIMError(
                         CIM_ERR_FAILED,
-                        'Exception failure of "--mock_server" python script %r '
+                        'Exception failure of "--mock-server" python script %r '
                         'with conn %r Exception: %r\nTraceback\n%s' %
                         (file_path, conn, ex, tb))
 
             else:
-                raise ValueError('Invalid suffix %s on "--mock_server" '
+                raise ValueError('Invalid suffix %s on "--mock-server" '
                                  'global parameter %s. Must be "py" or "mof".'
                                  % (ext, file_path))
 

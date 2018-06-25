@@ -87,12 +87,12 @@ class CLITestsBase(object):
 
                'mock' If this key exists, the value is a list of files that
                represent the mock data. In this case, the connection is
-               made with the --mock_server input parameter and the name
+               made with the --mock-server input parameter and the name
                of the mock files as data.
 
           mock_file (:term:`string` or None):
             If this is a string, this test will be executed using the
-            --mock_server pywbemcl option with this file as the name of the
+            --mock-server pywbemcl option with this file as the name of the
             objects to be compiled. This should be just a file name and
             this method assumes it is in the testsuite directory.
 
@@ -112,7 +112,7 @@ class CLITestsBase(object):
 
         cmd_line = ['-s', 'http:/blah']
         if mock_file:
-            cmd_line.extend(['--mock_server',
+            cmd_line.extend(['--mock-server',
                              os.path.join(TEST_DIR, mock_file)])
 
         cmd_line.append(subcmd)

@@ -136,8 +136,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    ' each command execution.')
 @click.option('-v', '--verbose', is_flag=True,
               help='Display extra information about the processing.')
-@click.version_option(help="Show the version of this command and exit.")
-@click.option('--mock_server', type=str, multiple=True,
+@click.option('-m', '--mock-server', type=str, multiple=True,
+              # envvar=PywbemServer.mock_server_envvar,
               metavar="FILENAME",
               help='If this option is defined, a mock WBEM server is '
                    'constructed as the target WBEM server and the option value '
@@ -149,7 +149,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, pywbem_server=None, timestats=None, mock_server=None):
+        verbose, mock_server, pywbem_server=None, timestats=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
@@ -174,8 +174,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # specified and is why global options don't define defaults in the
     # decorators that define them.
 
-    # TODO: ks this is a temp solution to get the persistent file of connections
-    #       Review to see if there is a better solution.
+    # TODO: ks Review to see if there is a better solution.
     pywbemcli_servers = get_pywbemcli_servers()
 
     if ctx.obj is None:
@@ -188,11 +187,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         if timestats is None:
             timestats = DEFAULT_TIMESTATS
 
-        # Set cwd as path if only filename in mock_server option
-        # The click multiple type returns a tuple of strings
         if mock_server:
             assert isinstance(mock_server, tuple)
             new_mock_server = []
+            # allow relative or absolute paths
             for fn in mock_server:
                 if fn == os.path.basename(fn):
                     new_mock_server.append(os.path.join(os.getcwd(), fn))
@@ -312,6 +310,11 @@ def repl(ctx):
 
     Pywbemcli may be terminated form this mode by entering
     <CTRL-D>, :q, :quit, :exit
+
+    Parameters:
+
+      ctx (:class:`click.Context`): The click context object. Created by the
+        ``@click.pass_context`` decorator.
     """
 
     history_file = PYWBEMCLI_HISTORY_FILE

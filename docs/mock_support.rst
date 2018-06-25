@@ -4,22 +4,22 @@ Mock WBEM server support
 ========================
 
 Support for mocking a WBEM server is integrated into pywbemcli using the
-pywbem ``pywbem_mock`` subpackage and the pywbemcli ``--mock_server``
+pywbem ``pywbem_mock`` subpackage and the pywbemcli ``--mock-server``
 global command line option.  This allows executing the pywbemcli subcommands
 against a mock WBEM server rather than a real WBEM server.
 
 The pywbem mock support uses :class:`pywbem\pywbem_mock.FakedWBEMConnection`
 to define a mock server and build a mock repository that contains data for
-responses to the pywbemcli subcommands from the values of the ``--mock_server``
+responses to the pywbemcli subcommands from the values of the ``--mock-server``
 option.
 
 This option constructs an instance of
 :class:`~pywbem\pywbem_mock.FakedWBEMConnection` in place of
 :class:`~pywbem\pywbem.WBEMConnection` and allows building the mock repository
 of CIMQualifierDeclarations, CIMClasses, and CIMInstances in the mock
-repository from the files defined with the ``--mock_server``.
+repository from the files defined with the ``--mock-server``.
 
-Each instance of the ``--mock_server`` option defines a file or file path:
+Each instance of the ``--mock-server`` option defines a file or file path:
 
 * MOF file (file extension ``mof``) - If the option value is a MOF file,
   pywbemcli compiles the MOF and inserts the CIM objects into the mock

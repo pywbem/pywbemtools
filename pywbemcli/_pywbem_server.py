@@ -96,6 +96,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
     use_pull_envvar = 'PYWBEMCLI_USE_PULL'
     stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
+    mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
 
     def __init__(self, server_url=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default',
@@ -109,7 +110,8 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
             and execute cim_operations on the server.
         """
         if not server_url and not mock_server:
-            raise ValueError("Server_url parameter required")
+            raise ValueError('Server_url parameter required unless '
+                             '--mock-server set')
         self._server_url = server_url
         self._mock_server = mock_server
 
@@ -135,11 +137,12 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
     def __repr__(self):
         return 'PywbemServer(url=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
                'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
-               'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s)' % \
+               'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s ' \
+               ' mock_server=%r)' % \
                (self.server_url, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
-                self.pull_max_cnt, self.stats_enabled)
+                self.pull_max_cnt, self.stats_enabled, self._mock_server)
 
     @property
     def server_url(self):
@@ -315,7 +318,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
         the request are the parameters required by the pywbem
         WBEMConnection constructor.
 
-        If self._mock_server is set, a mock conneciton is created instead
+        If self.mock_server is set, a mock connection is created instead
         of a genuine connection to a server.
         See the pywbem WBEMConnection class for more details on the parameters.
 

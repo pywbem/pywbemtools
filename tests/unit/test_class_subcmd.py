@@ -593,8 +593,8 @@ class TestClassEnumerate(object):
         """
         mock_mof_path = os.path.join(TEST_DIR, 'simple_mock_model.mof')
 
-        # build basic cmd line, server, mock_server def, basic enum command
-        cmd_line = ['-s', 'http:/blah', '--mock_server',
+        # build basic cmd line, server, mock-server def, basic enum command
+        cmd_line = ['-s', 'http:/blah', '--mock-server',
                     mock_mof_path, 'class', 'enumerate']
 
         if tst_args:
