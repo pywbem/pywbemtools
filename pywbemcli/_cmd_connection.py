@@ -146,6 +146,14 @@ def connection_save(context, name):
               help="Server certfile. Ignored if noverify flag set. ")
 @click.option('-k', '--keyfile', type=str,
               help="Client private key file. ")
+@click.option('-m', '--mock-server', type=str, multiple=True,
+              metavar="FILENAME",
+              help='If this option is defined, a mock WBEM server is '
+                   'constructed as the target WBEM server and the option value '
+                   'defines a MOF or Python file to be used to populate the '
+                   'mock repository. This option may be used multiple times '
+                   'where each use defines a single file or file_path.'
+                   'See the pywbemcli documentation for more information.')
 @click.option('--ca_certs', type=str,
               help='File or directory containing certificates that will be '
                    'matched against a certificate received from the WBEM '
@@ -293,7 +301,7 @@ def cmd_connection_test(context):
     Show the parameters that make up the current connection information
     """
     try:
-        context.conn.GetClass('CIM_ManagedElement')
+        context.conn.EnumerateClassNames()
         context.spinner.stop()
         click.echo('Connection successful')
     except Error as er:
@@ -311,7 +319,7 @@ def show_connection_information(context, svr, separate_line=True):
 
     click.echo('\nName: %s%sWBEMServer uri: %s%sDefault_namespace: %s'
                '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
-               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s'
+               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s mock: %r'
                % (svr.name, sep,
                   svr.server_url, sep,
                   svr.default_namespace, sep,
@@ -321,7 +329,11 @@ def show_connection_information(context, svr, separate_line=True):
                   sep, svr.noverify,
                   sep, svr.certfile, sep,
                   svr.keyfile, sep,
-                  svr.use_pull_ops))
+                  svr.use_pull_ops,
+                  svr._mock_server))
+
+    if svr._mock_server and context.verbose:
+        click.echo(context.conn.display_repository())
 
 
 def cmd_connection_select(context, name):
@@ -388,7 +400,8 @@ def cmd_connection_new(context, name, server, options):
                                  noverify=options['noverify'],
                                  certfile=options['certfile'],
                                  keyfile=options['keyfile'],
-                                 ca_certs=options['ca_certs'])
+                                 ca_certs=options['ca_certs'],
+                                 mock_server=options['mock_server'])
 
     server_definitions_new(name, pywbem_server)
 

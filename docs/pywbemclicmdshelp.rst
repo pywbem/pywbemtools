@@ -107,8 +107,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       operations after  each command execution.
       -v, --verbose                   Display extra information about the
                                       processing.
-      --version                       Show the version of this command and exit.
-      --mock_server FILENAME          If this option is defined, a mock WBEM
+      -m, --mock-server FILENAME      If this option is defined, a mock WBEM
                                       server is constructed as the target WBEM
                                       server and the option value defines a MOF or
                                       Python file to be used to populate the mock
@@ -655,6 +654,14 @@ The following defines the help output for the `pywbemcli connection new --help` 
                                     certificate.
       -c, --certfile TEXT           Server certfile. Ignored if noverify flag set.
       -k, --keyfile TEXT            Client private key file.
+      -m, --mock-server FILENAME    If this option is defined, a mock WBEM server
+                                    is constructed as the target WBEM server and
+                                    the option value defines a MOF or Python file
+                                    to be used to populate the mock repository.
+                                    This option may be used multiple times where
+                                    each use defines a single file or
+                                    file_path.See the pywbemcli documentation for
+                                    more information.
       --ca_certs TEXT               File or directory containing certificates that
                                     will be matched against a certificate received
                                     from the WBEM server. Set the --no-verify-cert
@@ -1314,6 +1321,11 @@ The following defines the help output for the `pywbemcli repl --help` subcommand
 
       Pywbemcli may be terminated form this mode by entering <CTRL-D>, :q,
       :quit, :exit
+
+      Parameters:
+
+        ctx (:class:`click.Context`): The click context object. Created by the
+        ``@click.pass_context`` decorator.
 
     Options:
       -h, --help  Show this message and exit.
