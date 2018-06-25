@@ -621,7 +621,6 @@ The following defines the help output for the `pywbemcli connection new --help` 
       Create a new named WBEM connection.
 
       This subcommand creates and saves a new named connection from the input
-
       arguments (NAME and URI) and options
 
       The new connection that can be referenced by the name argument in the
