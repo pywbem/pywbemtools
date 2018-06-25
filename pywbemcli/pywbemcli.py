@@ -293,6 +293,7 @@ The following can be entered in interactive mode:
                               <pywbemcli-cmd>.
   help                        Show this help message.
   :?, :h, :help               Show help message about interactive mode.
+  <up-arrow, down-arrow>      View pwbemcli command history:
 """)
 
 
