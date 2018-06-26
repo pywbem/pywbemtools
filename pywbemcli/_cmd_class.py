@@ -39,20 +39,18 @@ from ._displaytree import display_class_tree
 #   Common option definitions for class group
 #
 
-# The default is True which is what we want.
-# TODO: We need to document all these defaults.
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
     click.option('--no-qualifiers', is_flag=True,
                  required=False, default=True,
-                 help='Do not include qualifiers in the result. '
-                      'The default behavior is to include '
-                      'qualifiers in the returned objects.')]
+                 help='If set, request server to not include qualifiers in '
+                      'the returned class(s). The default behavior is to '
+                      'request include qualifiers in the returned class(s).')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
-                 help='Return complete subclass hiearchy for this class. The '
-                      'default is False which returns only one level of '
-                      'subclasses.')]
+                 help='If set, request server to return complete subclass '
+                      'hiearchy for this class. The default is False which '
+                      'requests only one level of subclasses.')]
 
 # TODO add a case sensitive option for those things that use regex
 
@@ -165,7 +163,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Enumerate classes from the WBEMServer.
+    Enumerate classes from the WBEM Server.
 
     Enumerates the classes (or classnames) from the WBEMServer starting
     either at the top of the class hierarchy or from  the position in the

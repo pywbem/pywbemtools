@@ -30,9 +30,8 @@ from pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
     create_ciminstance, compare_instances, resolve_propertylist
 
-# import pytest_extensions  # TODO cannot find this import
 
-
+# TODO pytestify this test.
 class PropertyListResolveTest(object):
     """
     Test the propertylist resolve function
@@ -181,6 +180,7 @@ class TestParseWbemUri(object):
             assert isinstance(obj.host, type(exp_host))
 
 
+# TODO pytestify this test and the others in this file
 class FilterNamelistTest(unittest.TestCase):
     """Test the common filter_namelist function."""
 

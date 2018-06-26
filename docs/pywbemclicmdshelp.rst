@@ -154,7 +154,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
     Commands:
       associators   Get the associated classes for CLASSNAME.
       delete        Delete a single class.
-      enumerate     Enumerate classes from the WBEMServer.
+      enumerate     Enumerate classes from the WBEM Server.
       find          Find all classes that match CLASSNAME-REGEX.
       get           Get and display a single CIM class.
       invokemethod  Invoke the class method named methodname.
@@ -190,9 +190,10 @@ The following defines the help output for the `pywbemcli class associators --hel
       -c, --resultclass <class name>  Filter by the result class name provided.
       -r, --role <role name>          Filter by the role name provided.
       -R, --resultrole <role name>    Filter by the role name provided.
-      --no-qualifiers                 Do not include qualifiers in the
-                                      response.The default behavior is to
-                                      includequalifiers in the returned class.
+      --no-qualifiers                 If set, request server to not include
+                                      qualifiers in the returned class(s). The
+                                      default behavior is to request include
+                                      qualifiers in the returned class(s).
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -261,7 +262,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
 
     Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
-      Enumerate classes from the WBEMServer.
+      Enumerate classes from the WBEM Server.
 
       Enumerates the classes (or classnames) from the WBEMServer starting either
       at the top of the class hierarchy or from  the position in the class
@@ -280,9 +281,10 @@ The following defines the help output for the `pywbemcli class enumerate --help`
                                 if set. Otherwise retrieve only the next hierarchy
                                 level.
       -l, --localonly           Show only local properties of the class.
-      --no-qualifiers           Do not include qualifiers in the response.The
-                                default behavior is to includequalifiers in the
-                                returned class.
+      --no-qualifiers           If set, request server to not include qualifiers
+                                in the returned class(s). The default behavior is
+                                to request include qualifiers in the returned
+                                class(s).
       -c, --includeclassorigin  Include classorigin in the result.
       -o, --names_only          Show only local properties of the class.
       -s, --sort                Sort into alphabetical order by classname.
@@ -364,9 +366,10 @@ The following defines the help output for the `pywbemcli class get --help` subco
 
     Options:
       -l, --localonly                 Show only local properties of the class.
-      --no-qualifiers                 Do not include qualifiers in the
-                                      response.The default behavior is to
-                                      includequalifiers in the returned class.
+      --no-qualifiers                 If set, request server to not include
+                                      qualifiers in the returned class(s). The
+                                      default behavior is to request include
+                                      qualifiers in the returned class(s).
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -436,9 +439,10 @@ The following defines the help output for the `pywbemcli class references --help
     Options:
       -R, --resultclass <class name>  Filter by the classname provided.
       -r, --role <role name>          Filter by the role name provided.
-      --no-qualifiers                 Do not include qualifiers in the
-                                      response.The default behavior is to
-                                      includequalifiers in the returned class.
+      --no-qualifiers                 If set, request server to not include
+                                      qualifiers in the returned class(s). The
+                                      default behavior is to request include
+                                      qualifiers in the returned class(s).
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -862,7 +866,8 @@ The following defines the help output for the `pywbemcli instance associators --
       -c, --resultclass <class name>  Filter by the result class name provided.
       -R, --role <role name>          Filter by the role name provided.
       -R, --resultrole <class name>   Filter by the result role name provided.
-      -q, --includequalifiers         Include qualifiers in the result.
+      -q, --includequalifiers         If set, requests server to include
+                                      qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -878,9 +883,10 @@ The following defines the help output for the `pywbemcli instance associators --
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, INSTANCENAME argument must be a
-                                      class and  user is provided with a list of
-                                      instances of the  class from which the
-                                      instance to delete is selected.
+                                      class rather than an instance and user is
+                                      presented with a list of instances of the
+                                      class from which the instance to process is
+                                      selected.
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
@@ -952,7 +958,8 @@ The following defines the help output for the `pywbemcli instance create --help`
     Options:
       -P, --property property         Optional property definitions of form
                                       name=value.Multiple definitions allowed, one
-                                      for each property
+                                      for each property to be included in the new
+                                      instance.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       not included a Null property list is defined
@@ -983,14 +990,16 @@ The following defines the help output for the `pywbemcli instance delete --help`
 
       Delete a single CIM instance.
 
-      Delete the instanced defined by INSTANCENAME from the WBEM server. This
-      may be executed interactively by providing only a class name and the
+      Delete the instanced defined by INSTANCENAME from the WBEM server.
+
+      This may be executed interactively by providing only a class name and the
       interactive option.
 
     Options:
-      -i, --interactive       If set, INSTANCENAME argument must be a class and
-                              user is provided with a list of instances of the
-                              class from which the instance to delete is selected.
+      -i, --interactive       If set, INSTANCENAME argument must be a class rather
+                              than an instance and user is presented with a list
+                              of instances of the class from which the instance to
+                              process is selected.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
       -h, --help              Show this message and exit.
@@ -1012,18 +1021,20 @@ The following defines the help output for the `pywbemcli instance enumerate --he
 
       Enumerate instances or names of CLASSNAME.
 
-      Enumerate instances or instance names from the WBEMServer starting either
-      at the top  of the hierarchy (if no CLASSNAME provided) or from the
-      CLASSNAME argument if provided.
+      Enumerate instances or instance names (the --name_only option) from the
+      WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
+      provided) or from the CLASSNAME argument if provided.
 
-      Displays the returned instances or names
+      Displays the returned instances (mof, xml, or table formats) or names
 
     Options:
       -l, --localonly                 Show only local properties of the class.
-      -d, --deepinheritance           Return properties in subclasses of defined
-                                      target.  If not specified only properties in
+      -d, --deepinheritance           If set, requests server to return properties
+                                      in subclasses of the target instances class.
+                                      If option not specified only properties from
                                       target class are returned
-      -q, --includequalifiers         Include qualifiers in the result.
+      -q, --includequalifiers         If set, requests server to include
+                                      qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include ClassOrigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -1066,7 +1077,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
     Options:
       -l, --localonly                 Show only local properties of the returned
                                       instance.
-      -q, --includequalifiers         Include qualifiers in the result.
+      -q, --includequalifiers         If set, requests server to include
+                                      qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include Class Origin in the returned
                                       instance.
       -p, --propertylist <property name>
@@ -1081,9 +1093,10 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       defined that namespace overrides the general
                                       options namespace
       -i, --interactive               If set, INSTANCENAME argument must be a
-                                      class and  user is provided with a list of
-                                      instances of the  class from which the
-                                      instance to delete is selected.
+                                      class rather than an instance and user is
+                                      presented with a list of instances of the
+                                      class from which the instance to process is
+                                      selected.
       -h, --help                      Show this message and exit.
 
 
@@ -1116,10 +1129,10 @@ The following defines the help output for the `pywbemcli instance invokemethod -
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
                                  name=value
-      -i, --interactive          If set, INSTANCENAME argument must be a class and
-                                 user is provided with a list of instances of the
-                                 class from which the instance to delete is
-                                 selected.
+      -i, --interactive          If set, INSTANCENAME argument must be a class
+                                 rather than an instance and user is presented
+                                 with a list of instances of the class from which
+                                 the instance to process is selected.
       -n, --namespace <name>     Namespace to use for this operation. If defined
                                  that namespace overrides the general options
                                  namespace
@@ -1173,22 +1186,22 @@ The following defines the help output for the `pywbemcli instance references --h
 
     Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
-      Get the reference instances or names.
+       Get the reference instances or names.
 
-      Gets the reference instances or instance names(--names-only option) for a
-      target instance name in the target WBEM server.
+       Gets the reference instances or instance names(--names-only option) for a
+       target `INSTANCENAME` in the target WBEM server filtered by the  `role`
+       and `resultclass` options.
 
-      For the INSTANCENAME argument provided return instances or instance names
-      filtered by the --role and --resultclass options.
-
-      This may be executed interactively by providing only a class name and the
-      interactive option(-i). Pywbemcli presents a list of instances names in
-      the class from which one can be chosen as the target.
+      This may be executed interactively by providing only a class name for
+      `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
+      of instances names in the class from which one can be chosen as the
+      target.
 
     Options:
       -R, --resultclass <class name>  Filter by the result class name provided.
       -r, --role <role name>          Filter by the role name provided.
-      -q, --includequalifiers         Include qualifiers in the result.
+      -q, --includequalifiers         If set, requests server to include
+                                      qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
@@ -1204,9 +1217,10 @@ The following defines the help output for the `pywbemcli instance references --h
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, INSTANCENAME argument must be a
-                                      class and  user is provided with a list of
-                                      instances of the  class from which the
-                                      instance to delete is selected.
+                                      class rather than an instance and user is
+                                      presented with a list of instances of the
+                                      class from which the instance to process is
+                                      selected.
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
