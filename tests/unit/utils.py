@@ -133,7 +133,7 @@ def assert_rc(exp_rc, rc, stdout, stderr):
     assert exp_rc == rc, \
         "Unexpected exit code (expected {}, got {})\n" \
         "  stdout:\n" \
-        "{}\n" \
+        "{}\n\n" \
         "  stderr:\n" \
         "{}". \
         format(exp_rc, rc, stdout, stderr)
@@ -157,24 +157,26 @@ def assert_patterns(exp_patterns, act_lines, meaning):
         of the lines that are matched, e.g. 'stderr'.
     """
     assert len(act_lines) == len(exp_patterns), \
-        "Unexpected number of lines in {}:\n" \
-        "Expected lines cnt={}:\n" \
-        "{}\n" \
-        "Actual lines cnt={}:\n" \
+        "Unexpected number of lines in test desc: {}:\n" \
+        "Expected line cnt={}:\n" \
+        "{}\n\n" \
+        "Actual line cnt={}:\n" \
         "{}\n". \
-        format(meaning, len(act_lines),
-               '\n'.join(exp_patterns), len(exp_patterns),
-               '\n'.join(act_lines))
+        format(meaning, len(act_lines), '\n'.join(act_lines),
+               len(exp_patterns), '\n'.join(exp_patterns))
 
     for i, act_line in enumerate(act_lines):
         exp_line = exp_patterns[i]
         # if not exp_line.endswith('$'):
         #    exp_line += '$'
         assert re.match(exp_line, act_line), \
-            "Unexpected line {} in {}:\n" \
-            "  expected line vs. actual line:\n" \
+            "Unexpected line {} in test desc:{}:\n" \
+            "Expected line vs. actual line:\n" \
+            "------------\n" \
             "{}\n" \
-            "{}\n". \
+            "------------\n" \
+            "{}\n" \
+            "------------\n". \
             format(i, meaning, exp_line, act_line)
 
 
@@ -202,15 +204,17 @@ def assert_lines(exp_lines, act_lines, meaning):
         "{}\n" \
         "Actual lines cnt={}:\n" \
         "{}\n". \
-        format(meaning, len(act_lines),
-               '\n'.join(exp_lines), len(exp_lines),
-               '\n'.join(act_lines))
+        format(meaning, len(exp_lines), '\n'.join(exp_lines),
+               len(act_lines), '\n'.join(act_lines))
 
     for i, act_line in enumerate(act_lines):
         exp_line = exp_lines[i]
         assert exp_line == act_line, \
             "Unexpected line {} in {}:\n" \
             "  expected line vs. actual line:\n" \
+            "------------\n" \
             "{}\n" \
-            "{}\n". \
+            "------------\n" \
+            "{}\n" \
+            "------------\n". \
             format(i, meaning, exp_line, act_line)
