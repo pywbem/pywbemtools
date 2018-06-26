@@ -40,7 +40,7 @@ from .config import DEFAULT_QUERY_LANGUAGE
 # on instances but True on classes
 includequalifiers_option = [              # pylint: disable=invalid-name
     click.option('-q', '--includequalifiers', is_flag=True, required=False,
-                 help='Include qualifiers in the result.')]
+                 help='Include qualifiers in the returned objects.')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
@@ -420,7 +420,7 @@ def cmd_instance_create(context, classname, options):
 
         # properties is a tuple of name,value pairs
         new_inst = create_ciminstance(class_, properties, property_list)
-        # TODO create log of instance created.
+        # TODO: Future Possibly create log of instance created.
         context.conn.CreateInstance(new_inst, namespace=options['namespace'])
 
     except Error as er:
@@ -578,7 +578,6 @@ def cmd_instance_count(context, classname, options):
                 maxlen = len(item)
         return maxlen
 
-    # TODO Am I handling the namespace correctly? What about default?
     namespace = options['namespace']
 
     # Get all classes in Namespace

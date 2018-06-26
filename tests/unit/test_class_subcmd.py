@@ -71,7 +71,7 @@ Options:
                             level.
   -l, --localonly           Show only local properties of the class.
   --no-qualifiers           Do not include qualifiers in the response.The
-                            default behavior is to includequalifiers in the
+                            default behavior is to include qualifiers in the
                             returned class.
   -c, --includeclassorigin  Include classorigin in the result.
   -o, --names_only          Show only local properties of the class.
