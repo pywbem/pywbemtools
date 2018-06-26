@@ -41,7 +41,7 @@ Options:
 Commands:
   associators   Get the associated classes for CLASSNAME.
   delete        Delete a single class.
-  enumerate     Enumerate classes from the WBEMServer.
+  enumerate     Enumerate classes from the WBEM Server.
   find          Find all classes that match CLASSNAME-REGEX.
   get           Get and display a single CIM class.
   invokemethod  Invoke the class method named methodname.
@@ -51,7 +51,7 @@ Commands:
 
 CLS_ENUM_HELP = """Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
-  Enumerate classes from the WBEMServer.
+  Enumerate classes from the WBEM Server.
 
   Enumerates the classes (or classnames) from the WBEMServer starting either
   at the top of the class hierarchy or from  the position in the class
@@ -70,9 +70,10 @@ Options:
                             if set. Otherwise retrieve only the next hierarchy
                             level.
   -l, --localonly           Show only local properties of the class.
-  --no-qualifiers           Do not include qualifiers in the response.The
-                            default behavior is to include qualifiers in the
-                            returned class.
+  --no-qualifiers           If set, request server to not include qualifiers
+                            in the returned class(s). The default behavior is
+                            to request include qualifiers in the returned
+                            class(s).
   -c, --includeclassorigin  Include classorigin in the result.
   -o, --names_only          Show only local properties of the class.
   -s, --sort                Sort into alphabetical order by classname.
@@ -138,36 +139,6 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   -h, --help              Show this message and exit.
-"""
-
-CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
-
-  Find all classes that match CLASSNAME-REGEX.
-
-  Find all classes in the namespace(s) of the target WBEMServer that match
-  the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
-  argument is required.
-
-  The CLASSNAME-REGEX argument may be either a complete classname or a
-  regular expression that can be matched to one or more classnames. To limit
-  the filter to a single classname, terminate the classname with $.
-
-  The regular expression is anchored to the beginning of the classname and
-  is case insensitive. Thus, `pywbem_` returns all classes that begin with
-  `PyWBEM_`, `pywbem_`, etc.
-
-  The namespace option limits the search to the defined namespace. Otherwise
-  all namespaces in the target server are searched.
-
-  Output is in table format if table output specified. Otherwise it is in
-  the form <namespace>:<classname>
-
-Options:
-  -s, --sort              Sort into alphabetical order by classname.
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
-  -h, --help              Show this message and exit.
-
 """
 
 MOCK_TEST_CASES = [

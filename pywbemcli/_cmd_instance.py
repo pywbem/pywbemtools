@@ -40,19 +40,22 @@ from .config import DEFAULT_QUERY_LANGUAGE
 # on instances but True on classes
 includequalifiers_option = [              # pylint: disable=invalid-name
     click.option('-q', '--includequalifiers', is_flag=True, required=False,
-                 help='Include qualifiers in the returned objects.')]
+                 help='If set, requests server to include qualifiers in the '
+                 'returned instance(s).')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
-                 help='Return properties in subclasses of defined target. '
-                      ' If not specified only properties in target class are '
+                 help='If set, requests server to return properties in '
+                      'subclasses of the target instances class. If option not '
+                      'specified only properties from target class are '
                       'returned')]
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='If set, INSTANCENAME argument must be a class and '
-                      ' user is provided with a list of instances of the '
-                      ' class from which the instance to delete is selected.')]
+                 help='If set, INSTANCENAME argument must be a class rather '
+                      'than an instance and user is presented with a list of '
+                      'instances of the class from which the instance to '
+                      'process is selected.')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
@@ -60,10 +63,9 @@ def instance_group():
     """
     Command group to manage CIM instances.
 
-    This incudes functions to get, enumerate,
-    create, modify, and delete instances in a namspace and additional functions
-    to get more general information on instances (ex. counts) within the
-    namespace
+    This incudes functions to get, enumerate, create, modify, and delete
+    instances in a namspace and additional functions to get more general
+    information on instances (ex. counts) within the namespace
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -120,7 +122,8 @@ def instance_delete(context, instancename, **options):
 @click.option('-P', '--property', type=str, metavar='property', required=False,
               multiple=True,
               help='Optional property definitions of form name=value.'
-              'Multiple definitions allowed, one for each property')
+              'Multiple definitions allowed, one for each property to be '
+              'included in the new instance.')
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -217,11 +220,11 @@ def instance_references(context, instancename, **options):
     Get the reference instances or names.
 
     Gets the reference instances or instance names(--names-only option) for a
-    target INSTANCENAME in the target WBEM server filtered by the
-    --role and --resultclass options.
+    target `INSTANCENAME` in the target WBEM server filtered by the
+    `role` and `resultclass` options.
 
    This may be executed interactively by providing only a class name for
-   INSTANCENAME and the interactive option(-i). Pywbemcli presents a list of
+   `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list of
    instances names in the class from which one can be chosen as the target.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
@@ -532,7 +535,6 @@ def cmd_instance_associators(context, instancename, options):
     the classname defined
     """
     instancepath = get_instancename(context, instancename, options)
-
     if instancepath is None:
         return
 
