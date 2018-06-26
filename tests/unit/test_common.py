@@ -177,7 +177,6 @@ class TestParseWbemUri(object):
 
             assert obj.keybindings == exp_keybindings
 
-
             assert obj.host == exp_host
             assert isinstance(obj.host, type(exp_host))
 

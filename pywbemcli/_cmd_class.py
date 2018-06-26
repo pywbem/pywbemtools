@@ -39,18 +39,20 @@ from ._displaytree import display_class_tree
 #   Common option definitions for class group
 #
 
-# the default is True which is what we want.
+# The default is True which is what we want.
 # TODO: We need to document all these defaults.
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
     click.option('--no-qualifiers', is_flag=True,
                  required=False, default=True,
-                 help='Do not include qualifiers in the response.'
-                      'The default behavior is to include'
-                      'qualifiers in the returned class.')]
+                 help='Do not include qualifiers in the result. '
+                      'The default behavior is to include '
+                      'qualifiers in the returned objects.')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
-                 help='Return complete subclass hiearchy for this class.')]
+                 help='Return complete subclass hiearchy for this class. The '
+                      'default is False which returns only one level of '
+                      'subclasses.')]
 
 # TODO add a case sensitive option for those things that use regex
 
