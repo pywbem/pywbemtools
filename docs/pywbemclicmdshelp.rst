@@ -123,7 +123,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       connection  Command group to manage WBEM connections.
       help        Show help message for interactive mode.
       instance    Command group to manage CIM instances.
-      qualifier   Commands to view QualifierDeclarations.
+      qualifier   Command group to view QualifierDeclarations.
       repl        Enter interactive (REPL) mode (default).
       server      Command Group for WBEM server operations.
 
@@ -1239,7 +1239,7 @@ The following defines the help output for the `pywbemcli qualifier --help` subco
 
     Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Commands to view QualifierDeclarations.
+      Command group to view QualifierDeclarations.
 
       Includes the capability to get and enumerate CIM qualifier declarations
       defined in the WBEM Server.
