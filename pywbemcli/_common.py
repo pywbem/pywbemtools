@@ -51,21 +51,26 @@ def output_format_is_table(output_format):
 # separate function.
 def resolve_propertylist(propertylist):
     """
-    Correct property list received from options.  Click options produces an
+    resolve property list received from options.  Click options produces an
     empty list when there is no property list.  Pywbem requires None
     when there is no propertylist
 
     Further, property lists can be input as a comma separated list so this
-    function also splits these.
+    function also splits any string with embedded commas.
     """
     # If no property list, return None which means all properties
+    # print('\nRESOLVE_PL=%s repl=%r, len=%s, 0=%s' % (propertylist,
+    # propertylist, len(propertylist), propertylist[0]))
+    # TODO determine how to produce an empty string in property list.
+    # Right now '""' on cmd line produces '""' here which is defined as
+    # a string with len 1
     if not propertylist:
         propertylist = None
 
-    # if cmdline was a single empty string, we set to empty list
-    # This means send no propertylist and is a special case for the
-    # cim/xml and pywbem interface.
-    elif len(propertylist) == 1 and not propertylist[0]:
+    # If propertylist is a single empty string, we set to empty list.
+    elif len(propertylist) == 0:
+        propertylist = []
+    elif len(propertylist) == 1 and propertylist[0] == '"':
         propertylist = []
 
     # expand any comma separated entries in the list
@@ -78,6 +83,7 @@ def resolve_propertylist(propertylist):
                 pl.append(item)
         propertylist = pl
 
+    # print('RESOLVEDPL %r' % propertylist)
     return propertylist
 
 
@@ -231,7 +237,6 @@ def objects_sort(objects):
     return rtn_objs
 
 
-<<<<<<< HEAD
 def parse_wbemuri_str(wbemuri_str, namespace=None):
     """
     Parse a string that is a wbemuri into a CIMInstanceName object.

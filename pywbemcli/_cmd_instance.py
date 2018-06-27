@@ -80,7 +80,7 @@ def instance_group():
               help='Show only local properties of the returned instance.')
 @add_options(includequalifiers_option)
 @click.option('-c', '--includeclassorigin', is_flag=True, required=False,
-              help='Include Class Origin in the returned instance.')
+              help='Include class origin attribute in returned instance(s).')
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
@@ -423,6 +423,7 @@ def cmd_instance_create(context, classname, options):
 
         # properties is a tuple of name,value pairs
         new_inst = create_ciminstance(class_, properties, property_list)
+
         # TODO: Future Possibly create log of instance created.
         context.conn.CreateInstance(new_inst, namespace=options['namespace'])
 

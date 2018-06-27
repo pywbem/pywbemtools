@@ -110,7 +110,8 @@ class CLITestsBase(object):
         if isinstance(args, six.string_types):
             args = args.split(" ")
 
-        cmd_line = ['-s', 'http:/blah']
+        # TODO -s option not needed if mock file
+        cmd_line = ['-s', 'http://blah']
         if mock_file:
             cmd_line.extend(['--mock-server',
                              os.path.join(TEST_DIR, mock_file)])
@@ -119,6 +120,8 @@ class CLITestsBase(object):
 
         if args:
             cmd_line.extend(args)
+
+        # print('\nCMDLINE %s' % cmd_line)
 
         rc, stdout, stderr = execute_pywbemcli(cmd_line)
 
