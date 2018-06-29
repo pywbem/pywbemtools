@@ -34,9 +34,9 @@ class CLITestsBase(object):
             pywbemcli subcommand inserted for this test.  This is the first
             level subcommand (ex. class).
 
-          args (:term: dict or list or string):
+          args (:term: dict, list of term"`string` or term"`string`):
 
-            if it is a dictionary arguments to be inserted into the command
+            If it is a dictionary arguments to be inserted into the command
             line after the subcommand name. This is a dictionary with two
             possible key names
 

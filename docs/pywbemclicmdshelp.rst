@@ -197,12 +197,13 @@ The following defines the help output for the `pywbemcli class associators --hel
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -373,12 +374,13 @@ The following defines the help output for the `pywbemcli class get --help` subco
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -446,12 +448,13 @@ The following defines the help output for the `pywbemcli class references --help
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -871,12 +874,13 @@ The following defines the help output for the `pywbemcli instance associators --
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -o, --names_only                Show only local properties of the class.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -962,12 +966,13 @@ The following defines the help output for the `pywbemcli instance create --help`
                                       instance.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1038,12 +1043,13 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -c, --includeclassorigin        Include ClassOrigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1083,12 +1089,13 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1205,12 +1212,13 @@ The following defines the help output for the `pywbemcli instance references --h
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not included a Null property list is defined
-                                      and the server returns all properties. If
-                                      defined as empty string the server returns
-                                      no properties. ex: -p propertyname1 -p
-                                      propertyname2 or -p
-                                      propertyname1,propertyname2
+                                      not defined a Null property list is defined
+                                      and the server returns all properties.
+                                      Multiple properties may be defined either a
+                                      comma separated list defing the option
+                                      multipletimes (ex: -p pn1 -p pn22 or -p
+                                      pn1,pn2). If defined as empty string the
+                                      server returns no properties.
       -o, --names_only                Show only local properties of the class.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general

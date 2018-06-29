@@ -73,13 +73,14 @@ Options:
   -c, --includeclassorigin        Include ClassOrigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  not defined a Null property list is defined
-                                  and the server returns all properties.
-                                  Multiple properties may be defined either a
-                                  comma separated list defing the option
-                                  multipletimes (ex: -p pn1 -p pn22 or -p
-                                  pn1,pn2). If defined as empty string the
-                                  server returns no properties.
+                                  option not specified a Null property
+                                  list is created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  defing the option multiple times. (ex: -p
+                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -107,13 +108,14 @@ Options:
                                   instance(s).
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  not defined a Null property list is defined
-                                  and the server returns all properties.
-                                  Multiple properties may be defined either a
-                                  comma separated list defing the option
-                                  multipletimes (ex: -p pn1 -p pn22 or -p
-                                  pn1,pn2). If defined as empty string the
-                                  server returns no properties.
+                                  option not specified a Null property
+                                  list is created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  defing the option multiple times. (ex: -p
+                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -142,13 +144,14 @@ Options:
                                   instance.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  not defined a Null property list is defined
-                                  and the server returns all properties.
-                                  Multiple properties may be defined either a
-                                  comma separated list defing the option
-                                  multipletimes (ex: -p pn1 -p pn22 or -p
-                                  pn1,pn2). If defined as empty string the
-                                  server returns no properties.
+                                  option not specified a Null property
+                                  list is created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  defing the option multiple times. (ex: -p
+                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -225,13 +228,14 @@ Options:
   -c, --includeclassorigin        Include classorigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  not defined a Null property list is defined
-                                  and the server returns all properties.
-                                  Multiple properties may be defined either a
-                                  comma separated list defing the option
-                                  multipletimes (ex: -p pn1 -p pn22 or -p
-                                  pn1,pn2). If defined as empty string the
-                                  server returns no properties.
+                                  option not specified a Null property
+                                  list is created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  defing the option multiple times. (ex: -p
+                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
   -o, --names_only                Show only local properties of the class.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
@@ -269,13 +273,14 @@ Options:
   -c, --includeclassorigin        Include classorigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  not defined a Null property list is defined
-                                  and the server returns all properties.
-                                  Multiple properties may be defined either a
-                                  comma separated list defing the option
-                                  multipletimes (ex: -p pn1 -p pn22 or -p
-                                  pn1,pn2). If defined as empty string the
-                                  server returns no properties.
+                                  option not specified a Null property
+                                  list is created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  defing the option multiple times. (ex: -p
+                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
   -o, --names_only                Show only local properties of the class.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
@@ -601,20 +606,49 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
-    ['Verify instance subcommand references, returns data',
+    ['Verify instance subcommand references, returns instances',
      ['references', 'TST_Person.name="Mike"'],
      {'stdout': REF_INSTS,
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns data',
+    ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
                  '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
                  '="/root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member'
                  '="/root/cimv2:TST_Person.name=\\"Mike\\""'],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'valid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-o',
+      '--resultclass', 'TST_Lineage'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short formvalid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-o',
+      '-R', 'TST_Lineage'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'not a real ref returns no paths',
+     ['references', 'TST_Person.name="Mike"', '-o',
+      '--resultclass', 'TST_Lineagex'],
+     {'stdout': [],
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -648,7 +682,7 @@ MOCK_TEST_CASES = [
      None, OK],
     # TODO  add valid associators tests
 
-    ['Verify instance subcommand associators, returns data',
+    ['Verify instance subcommand associators, returns iinstances',
      ['associators', 'TST_Person.name="Mike"'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,

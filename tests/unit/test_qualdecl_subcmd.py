@@ -160,6 +160,16 @@ QD_TBL_OUT = """Qualifier Declarations
 +-------------+---------+---------+---------+-------------+-----------------+
 """
 
+QD_STATS_OUT = """Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+  Count    Exc    Time    ReqLen    ReplyLen  Operation
+-------  -----  ------  --------  ----------  ------------
+      1      0       0         0           0  GetQualifier
+
+"""
+
 OK = True
 RUN = True
 FAIL = False
@@ -255,6 +265,21 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify qualifier subcommand -T (statistics) gets stats output',
+     {'args': ['get', 'IN'],
+      'global': ['-T']},
+     {'stdout': QD_STATS_OUT,
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify qualifier subcommand --timestats gets stats output',
+     {'args': ['get', 'IN'],
+      'global': ['--timestats']},
+     {'stdout': QD_STATS_OUT,
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
 ]
 
 

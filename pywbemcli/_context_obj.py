@@ -214,7 +214,7 @@ class ContextObj(object):
             title = None
 
         rows.append(row)
-        click.echo(format_table(rows, header=hdr, title=title))
+        click.echo(format_table(rows, hdr, title=title))
 
     def connect_wbem_server(self):
         """
