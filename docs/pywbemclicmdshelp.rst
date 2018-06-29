@@ -1079,8 +1079,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       instance.
       -q, --includequalifiers         If set, requests server to include
                                       qualifiers in the returned instance(s).
-      -c, --includeclassorigin        Include Class Origin in the returned
-                                      instance.
+      -c, --includeclassorigin        Include class origin attribute in returned
+                                      instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       not included a Null property list is defined

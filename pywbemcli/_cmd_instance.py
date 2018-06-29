@@ -80,7 +80,7 @@ def instance_group():
               help='Show only local properties of the returned instance.')
 @add_options(includequalifiers_option)
 @click.option('-c', '--includeclassorigin', is_flag=True, required=False,
-              help='Include Class Origin in the returned instance.')
+              help='Include class origin attribute in returned instance(s).')
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
@@ -404,7 +404,7 @@ def cmd_instance_delete(context, instancename, options):
     try:
         context.conn.DeleteInstance(instancepath)
 
-        click.echo('Deleted %s', instancepath)
+        click.echo('Deleted %s' % instancepath)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -423,6 +423,7 @@ def cmd_instance_create(context, classname, options):
 
         # properties is a tuple of name,value pairs
         new_inst = create_ciminstance(class_, properties, property_list)
+
         # TODO: Future Possibly create log of instance created.
         context.conn.CreateInstance(new_inst, namespace=options['namespace'])
 
@@ -616,10 +617,10 @@ def cmd_instance_count(context, classname, options):
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
         # subclasses
-        count = sum(1 for inst in inst_names if (inst.classname == classname))
+        count = sum(1 for inst in inst_names if (inst.classname == classname_))
 
         if count != 0:
-            display_tuple = (classname, count)
+            display_tuple = (classname_, count)
             display_data.append(display_tuple)
 
     # If sort set, resort by count size
