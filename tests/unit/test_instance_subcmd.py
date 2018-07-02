@@ -73,8 +73,8 @@ Options:
   -c, --includeclassorigin        Include ClassOrigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  option not specified a Null property
-                                  list is created and the server returns all
+                                  option not specified a Null property list is
+                                  created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
                                   defing the option multiple times. (ex: -p
@@ -108,8 +108,8 @@ Options:
                                   instance(s).
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  option not specified a Null property
-                                  list is created and the server returns all
+                                  option not specified a Null property list is
+                                  created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
                                   defing the option multiple times. (ex: -p
@@ -144,8 +144,8 @@ Options:
                                   instance.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  option not specified a Null property
-                                  list is created and the server returns all
+                                  option not specified a Null property list is
+                                  created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
                                   defing the option multiple times. (ex: -p
@@ -228,8 +228,8 @@ Options:
   -c, --includeclassorigin        Include classorigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  option not specified a Null property
-                                  list is created and the server returns all
+                                  option not specified a Null property list is
+                                  created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
                                   defing the option multiple times. (ex: -p
@@ -273,8 +273,8 @@ Options:
   -c, --includeclassorigin        Include classorigin in the result.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
-                                  option not specified a Null property
-                                  list is created and the server returns all
+                                  option not specified a Null property list is
+                                  created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
                                   defing the option multiple times. (ex: -p
