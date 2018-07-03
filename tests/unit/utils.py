@@ -92,7 +92,7 @@ def execute_pywbemcli(args, env=None):
             arg = arg.decode('utf-8')
         cmd_args.append(arg)
 
-    # print('cmd_args %s' % cmd_args)
+    # print('CMD_ARGS %s' % cmd_args)
 
     # Note that the click package on Windows writes '\n' at the Python level
     # as '\r\n' at the level of the shell. Some other layer (presumably the
