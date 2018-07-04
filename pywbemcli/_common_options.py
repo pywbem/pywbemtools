@@ -29,12 +29,13 @@ import click
 propertylist_option = [                      # pylint: disable=invalid-name
     click.option('-p', '--propertylist', multiple=True, type=str,
                  default=None, metavar='<property name>',
-                 help='Define a propertylist for the request. If not defined '
-                      'a Null property list is defined and the server '
-                      'returns all properties. Multiple properties may be '
-                      'defined either a comma separated list defing the option '
-                      'multipletimes (ex: -p pn1 -p pn22 or -p pn1,pn2). '
-                      'If defined as empty string the server returns no '
+                 help='Define a propertylist for the request. If option '
+                      'not specified a Null property list is created and the '
+                      'server returns all properties. Multiple properties may '
+                      'be defined with either a comma separated list defing '
+                      'the option multiple times. '
+                      '(ex: -p pn1 -p pn22 or -p pn1,pn2). '
+                      'If defined as empty string the server should return no '
                       'properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name

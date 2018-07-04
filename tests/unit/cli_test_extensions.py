@@ -34,10 +34,20 @@ class CLITestsBase(object):
             pywbemcli subcommand inserted for this test.  This is the first
             level subcommand (ex. class).
 
-          args (:term:`py:iterable` of :term:`string`):
-            Arguments to be inserted into the command line after the
-            subcommand name. This must be a list of the individual works
-            to be appended after the subcmd.
+          args (:term: dict, list of term"`string` or term"`string`):
+
+            If it is a dictionary arguments to be inserted into the command
+            line after the subcommand name. This is a dictionary with two
+            possible key names
+
+              * args: defines local aruments to append to the command after
+                    the subcommand name
+
+              * globals: defines global arguments that will be inserted
+                  into the command line before the subcommand name.
+
+            If it is a list or string it s the set of arguments  to append
+            after the subcommand name
 
           exp_response ( (dict): Keyword arguments for the expected response.):
             Includes the following keys:
@@ -107,19 +117,36 @@ class CLITestsBase(object):
         if not condition:
             pytest.skip("Condition for test case %s not met" % desc)
 
-        if isinstance(args, six.string_types):
-            args = args.split(" ")
+        global_args = []
+        local_args = []
+        if isinstance(args, dict):
+            global_args = args.get("global", None)
+            local_args = args.get("args", None)
+        elif isinstance(args, six.string_types):
+            local_args = args.split(" ")
+        elif isinstance(args, (list, tuple)):
+            local_args = args
+        else:
+            assert "Invalid args input to test %r" % args
 
-        # TODO -s option not needed if mock file
-        cmd_line = ['-s', 'http://blah']
+        if isinstance(local_args, six.string_types):
+            local_args = local_args.split(" ")
+
+        if isinstance(global_args, six.string_types):
+            global_args = global_args.split(" ")
+
+        cmd_line = ['-s', 'http:/blah']
+        if global_args:
+            cmd_line.extend(global_args)
+
         if mock_file:
             cmd_line.extend(['--mock-server',
                              os.path.join(TEST_DIR, mock_file)])
 
         cmd_line.append(subcmd)
 
-        if args:
-            cmd_line.extend(args)
+        if local_args:
+            cmd_line.extend(local_args)
 
         # print('\nCMDLINE %s' % cmd_line)
 

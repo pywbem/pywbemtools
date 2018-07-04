@@ -32,7 +32,7 @@ from ._common_options import namespace_option, add_options, \
 @cli.group('qualifier', options_metavar=CMD_OPTS_TXT)
 def qualifier_group():
     """
-    Commands to view QualifierDeclarations.
+    Command group to view QualifierDeclarations.
 
     Includes the capability to get and enumerate CIM qualifier declarations
     defined in the WBEM Server.
