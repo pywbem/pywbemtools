@@ -25,7 +25,7 @@ from __future__ import absolute_import
 import os
 import json
 import six
-# import pickle
+import codecs
 from ._pywbem_server import PywbemServer
 
 CONNECTIONS_FILE = 'pywbemcliservers.json'
@@ -56,12 +56,13 @@ def get_pywbemcli_servers():
                 except KeyError as ke:
                     raise KeyError("Items missing from json record %s" % ke)
             except ValueError as ve:
-                raise ValueError("Invalid json file %s" % ve)
+                raise ValueError("Invalid json file %s. exception %s" %
+                                 (CONNECTIONS_FILE, ve))
     return PYWBEMCLI_SERVERS
 
 
 def server_definitions_new(name, svr_definition):
-    """Add a new connection to the repository and save it"""
+    """Add a new connection to the connections repository."""
     pywbemcli_servers = get_pywbemcli_servers()
     pywbemcli_servers[name] = svr_definition
     global CONNECTIONS_LOADED
@@ -70,7 +71,7 @@ def server_definitions_new(name, svr_definition):
 
 
 def server_definitions_delete(name):
-    """Add a new connection to the repository and save it"""
+    """Delete a definition from the connections repository"""
     pywbemcli_servers = get_pywbemcli_servers()
     del pywbemcli_servers[name]
     server_definitions_save(pywbemcli_servers)
@@ -79,14 +80,30 @@ def server_definitions_delete(name):
 def server_definitions_save(pywbemcli_servers):
     """Dump the connections file if one has been loaded.
     If the dictionary is empty, it attempts to delete the file.
-    This is a temporary solution to persisting connection information.
     """
     if CONNECTIONS_LOADED:
         if pywbemcli_servers:
             if os.path.isfile(CONNECTIONS_FILE):
                 os.remove(CONNECTIONS_FILE)
-            dict_ = {}
+            jsondata = {}
             for svr_name in pywbemcli_servers:
-                dict_[svr_name] = pywbemcli_servers[svr_name].to_dict()
+                jsondata[svr_name] = pywbemcli_servers[svr_name].to_dict()
             with open(CONNECTIONS_FILE, "w") as fh:
-                json.dump(dict_, fh)
+                json.dump(jsondata, fh)
+            tmpfile = "%s.tmp" % CONNECTIONS_FILE
+            with open(tmpfile, 'w') as fh:
+                if six.PY2:
+                    json.dump(jsondata, codecs.getwriter('utf-8')(fh),
+                              ensure_ascii=True, indent=4, sort_keys=True)
+                else:
+                    json.dump(jsondata, fh, ensure_ascii=True, indent=4,
+                              sort_keys=True)
+
+            if os.path.isfile(CONNECTIONS_FILE):
+                bakfile = "%s.bak" % CONNECTIONS_FILE
+                if os.path.isfile(bakfile):
+                    os.remove(bakfile)
+                if os.path.isfile(CONNECTIONS_FILE):
+                    os.rename(CONNECTIONS_FILE, bakfile)
+
+            os.rename(tmpfile, CONNECTIONS_FILE)

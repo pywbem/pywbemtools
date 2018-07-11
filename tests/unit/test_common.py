@@ -193,7 +193,6 @@ class TestParseWbemUri(object):
             else:
 
                 # The code to be tested
-                print('BEFORE uri=%s' % uri)
                 obj = parse_wbemuri_str(uri)
 
         if exp_attrs:
