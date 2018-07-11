@@ -529,7 +529,9 @@ The following defines the help output for the `pywbemcli connection --help` subc
 
       Command group to manage WBEM connections.
 
-      These command allow viewing and setting connection information.
+      These command allow viewing and setting persistent connection definitions.
+      The connections are normally defined in the file pywbemcliconnections.json
+      in the current directory.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
@@ -541,7 +543,7 @@ The following defines the help output for the `pywbemcli connection --help` subc
     Commands:
       delete  Delete connection information.
       export  Export the current connection information.
-      list    Execute a predefined wbem request.
+      list    List the entries in the connection file.
       new     Create a new named WBEM connection.
       save    Save current connection into repository.
       select  Select a connection from defined connections.
@@ -567,6 +569,11 @@ The following defines the help output for the `pywbemcli connection delete --hel
 
       Delete connection information from the persistent store for the connection
       defined by NAME.
+
+      If NAME not supplied, a select list presents the list of connection
+      definitions for selection.
+
+      Example:   connection delete blah
 
     Options:
       -h, --help  Show this message and exit.
@@ -609,7 +616,7 @@ The following defines the help output for the `pywbemcli connection list --help`
 
     Usage: pywbemcli connection list [COMMAND-OPTIONS]
 
-      Execute a predefined wbem request.
+      List the entries in the connection file.
 
       This provides a simple test to determine if the defined connection exists
       and is working.
@@ -739,6 +746,12 @@ The following defines the help output for the `pywbemcli connection select --hel
 
       Selects a connection from the persistently stored set of named connections
       if NAME exists in the store.
+
+      Examples:
+
+         connection select <name>    # select the defined <name>
+
+         connection select       # presents select list to pick connection
 
     Options:
       -h, --help  Show this message and exit.

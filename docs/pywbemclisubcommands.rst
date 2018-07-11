@@ -13,7 +13,7 @@
 .. limitations under the License.
 ..
 
-.. _`pywbemcli subcommands`:
+.. _`pywbemcli subcommand options`:
 
 pywbemcli subcommand options
 ============================
@@ -40,8 +40,9 @@ the following:
 
   $ pywbemcli class enumerate       # displays the mof of all classes
 
-  $ pywbemcli class enumerte -o     # displays only the names of the classes
-  
+  $ pywbemcli class enumerate -o     # displays only the names of the classes
+
+.. _`pywbemcli subcommands`:
 
 pywbemcli subcommands
 =====================
@@ -67,49 +68,134 @@ what exists in any current version of the tool.
 
 The ``pywbemcli`` command includes a number of general subcommand groups as follows:
 
-* The **class** group defines commands that act on CIMClasses including:
+.. _`class subcommand group`:
 
-  * **get** to get a single class and display in the defined format
-  * **enumerate** to enumerate classes or their classnames within the
-      current namespace or the namespace defined with this subcommand
-  * **associators** to get the class level associators for a class defined
-      as an input argument
-  * **references** to get the class level reference classes or classnames for a
-      class defined as an input argument
-  * **find** to find classes in the target wbem server.  In this case the
-      input argument is a regex which is used to search all namespaces for
-      matching class names
-  * **hiearchy** to display the class hierarchy as a tree
-  * **invokemethod** to invoke a method defined for the class argument.
+class subcommand group
+----------------------
 
-* The **instance** group defines commands that act on CIMInstances including:
+The **class** group defines subcommands that act on CIMClasses including:
 
-  * **get** to get a single instance and display in the defined format.
-  * **enumerate** to enumerate instances or their paths within the
-      current namespace or the namespace defined with this subcommand.
-  * **associators** to get the associator instances for an instance defined
-      as an input argument.
-  * **references** to get the reference instances or paths for a
-      instance defined as an input argument.
-  * **find** to find classes in the target wbem server.  In this case the
-      input argument is a regex which is used to search all namespaces for
-      matching class names.
-  * **query** to execute an execquery with query string defined as an argument.
-  * **invokemethod** to invoke a method defined for the class argument.
+* **get** to get a single class and display in the defined format.
+* **enumerate** to enumerate classes or their classnames within the
+  current namespace or the namespace defined with this subcommand.
+* **associators** to get the class level associators for a class defined
+  as an input argument.
+* **references** to get the class level reference classes or classnames for a
+  class defined as an input argument.
+* **find** to find classes in the target wbem server.  In this case the
+  input argument is a regex which is used to search all namespaces for
+  matching class names.
+* **hiearchy** to display the class hierarchy as a tree.
+* **invokemethod** to invoke a method defined for the class argument.
 
-* The **qualifier** group defines commands that act on CIMQualifierDeclarations 
-  including:
- 
-  * **get** to get a single qualifier declaration and display in the defined format.
-  * **enumerate** to enumerate qualifierDeclarations within the
-      current namespace or the namespace defined with this subcommand.
+.. _`instance subcommand group`:
 
-* The **server** group defines commands that act on a WBEM Server including:
+instance subcommand group
+-------------------------
 
-  * **brand** to get general information on the server.
-  * **connection** to display information on the connection defined for this
-      server.
-  * **info** to get general information on the server.
-  * **namespaces** to get a list of the namespaces defined in the target server.
-  * **profiles** to get overall information on the profiles defined in the
-      target wbem server.
+The **instance** group defines subcommands that act on CIMInstances including:
+
+* **get** to get a single instance and display in the defined format.
+* **enumerate** to enumerate instances or their paths within the
+  current namespace or the namespace defined with this subcommand.
+* **associators** to get the associator instances for an instance defined
+  as an input argument.
+* **references** to get the reference instances or paths for a
+  instance defined as an input argument.
+* **find** to find classes in the target wbem server.  In this case the
+  input argument is a regex which is used to search all namespaces for
+  matching class names.
+* **query** to execute an execquery with query string defined as an argument.
+* **invokemethod** to invoke a method defined for the class argument.
+
+.. _`qualifier subcommand group`:
+
+qualifier subcommand group
+--------------------------
+
+The **qualifier** group defines subcommands that act on CIMQualifierDeclarations
+including:
+
+* **get** to get a single qualifier declaration and display in the defined format.
+* **enumerate** to enumerate qualifierDeclarations within the
+  current namespace or the namespace defined with this subcommand.
+
+.. _`server subcommand group`:
+
+server subcommand group
+-----------------------
+
+The **server** group defines subcommands that act on a WBEM Server through
+the pywbem WBEMServer class. This includes command to access general
+information about the server including:
+
+* **brand** to get general information on the server.
+* **connection** to display information on the connection defined for this
+  server.
+* **info** to get general information on the server.
+* **namespaces** to get a list of the namespaces defined in the target server.
+* **profiles** to get overall information on the profiles defined in the
+  target wbem server.
+
+.. _`connection subcommand group`:
+
+connection subcommand group
+---------------------------
+
+The **connection** group defines subcommands that provide for a persistent file
+of connection definitons and allow selecting entries in this file as well as
+adding entries to the file, deleting from the file an viewing the file. This
+allows multiple connections to be defined and then used by name rather than
+through the detailed information about the connection.
+
+Connections in the connection file can be created by:
+
+* Using the new subcommand. This allows defining the parameters of a connection
+  as a subcommand
+* Using the save subcommand with the current connection. This options uses the
+  parameters from the pywbemcli for the connection to define and save a
+  connection.
+
+The connection information for each connection is based on the information
+used to create a connection and is largely the same information as is in the
+options for pywbemcli. For more detailed information on these The data includes:
+
+* **name** name of the connection (required).
+* **server_url** the url for the defined connection (required).
+* **default_namespace** the default namespace defined for the connection
+  (required).
+* **user** the user name for the connection (optional).
+* **password** the password for the connection (optional).
+* **noverify** the boolean value of the certificate noverify options.  The
+  default is False.
+* **certfile** optional server certificate filename.
+* **keyfile** optional client private keyfile filename.
+* **use_pull_ops** optional parameter that defines whether pull operations are
+  the default is to use pull operations if they exist in the server.
+* **pull_max_cnt** optional count of object per pull operation.
+* **timeout** optional timeout value.
+* **timestats** boolean that determines if time stats are captured.
+* **log** optional log configuration.
+* **verbose** optional boolean that enables the verbose mode.
+* **output-format** optional output format.
+
+The default connections file is named named ``pywbemcliservers.json`` and the
+data is stored in JSON format within this file. It must be in the current
+working directory where pywbemcli is called.
+
+The subcommands include:
+
+* **delete** delete a specific connection by name or by selection.
+* **export** export the current connection information to environment variables.
+* **list** list the connections in the connection file as a table.
+* **new** create a new connection using the parameters.
+* **save** create a new connection by saving the current connection information
+  to the connection file.  If the current connection does not have a name
+  a console request asks for a name for the connection.
+* **select** select a connection from the connection table.  A connection
+  may be selected either by using the name argument or if no argument is
+  provided by selecting from a list presented on the console.
+* **show** show information in the current connection.
+* **test** execute a single predefined operation on the current connection
+  to determine if it is a WBEM Server. It executes a single EnumerateClasses
+  with WBEM operation in the default namespace.

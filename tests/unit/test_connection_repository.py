@@ -34,6 +34,21 @@ from pywbemcli._connection_repository import CONNECTIONS_FILE
 SCRIPT_DIR = os.path.dirname(__file__)
 REPO_FILE = os.path.join(SCRIPT_DIR, CONNECTIONS_FILE)
 
+EXP_SIMPLE_SCRIPT = """
+Name: default
+  WBEMServer uri: http://localhost
+  Default_namespace: root/cimv2
+  User: None
+  Password: None
+  Timeout: None
+  Noverify: False
+  Certfile: None
+  Keyfile: None
+  use_pull_ops: None
+  mock: ()
+  log: None
+"""
+
 
 class ConnectionRepositoryTest(unittest.TestCase):
     """
@@ -78,12 +93,20 @@ class ConnectionRepositoryTest(unittest.TestCase):
 
             self.assertEqual(err, "", 'stderr not empty. returned %s'
                              % (err))
-        if result_regex:
-            for item in result_regex:
-                match_result = findall(item, out)
-                self.assertIsNotNone(match_result,
-                                     "Expecting some result")
-        return out
+
+            if result_regex:
+                for item in result_regex:
+                    match_result = findall(item, out)
+                    self.assertIsNotNone(match_result,
+                                         "Expecting some result")
+            return out
+        else:
+            self.assertTrue(exitcode != 0)
+            if result_regex:
+                for item in result_regex:
+                    match_result = findall(item, err)
+                    self.assertIsNotNone(match_result,
+                                         "Expecting some result")
 
     def test_simple_script(self):
         """
@@ -92,11 +115,12 @@ class ConnectionRepositoryTest(unittest.TestCase):
         result = ['WBEMServer uri: http://localhost']
         out = self.do_test('pywbemcli -s http://localhost connection show',
                            err=False, result_regex=result)
-        print(out)
+        self.assertEqual(out, EXP_SIMPLE_SCRIPT)
 
     def test_create_delete(self):
         """
-        Test the creation of a connection and deletion
+        Test the creation of a connection and deletion. This set of tests is
+        run as a specific sequence creating and deleting connections.
         """
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection create blah http://junkhost',
@@ -106,18 +130,43 @@ class ConnectionRepositoryTest(unittest.TestCase):
                            'connection list',
                            err=False, result_regex=['blah', 'http://junkhost'])
 
+        out = self.do_test('pywbemcli -s http://fred.com -N hoho'
+                           'connection list',
+                           err=False, result_regex=['blah', 'http://junkhost',
+                                                    'hoho', 'http://fred.com'])
+
         out = self.do_test('pywbemcli -s http://localhost '
                            'connection delete blah',
                            err=False,)
 
         out = self.do_test('pywbemcli -s http://localhost '
-                           'connection list',
-                           err=False, result_regex=['default',
-                                                    'http://localhost',
-                                                    'User: None'])
+                           'connection delete hoho',
+                           err=False,)
 
-        # TODO this can be removed when correct persistence installed.
-        print('test_create_delete stdout result:\n%s' % out)
+        out = self.do_test('pywbemcli -s http://localhost '
+                           'connection list',
+                           err=False, result_regex=['default'])
+
+        # test delete unknown
+        out = self.do_test('pywbemcli -s http://localhost '
+                           'connection delete hoho',
+                           err=True,
+                           result_regex=['Error:', 'hoho',
+                                         'not a defined connection name'])
+
+        # test create duplicate
+        out = self.do_test('pywbemcli -s http://localhost '
+                           'connection create blah http://junkhost',
+                           err=False, result_regex=['blah', 'http://junkhost'])
+
+        out = self.do_test('pywbemcli -s http://localhost '
+                           'connection create blah http://junkhost',
+                           err=True, result_regex=['Error', 'blah'])
+        out = self.do_test('pywbemcli -s http://localhost '
+                           'connection delete blah',
+                           err=False,)
+        if False:
+            print(out)
 
 
 if __name__ == '__main__':

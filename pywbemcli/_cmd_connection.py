@@ -39,7 +39,9 @@ def connection_group():
     """
     Command group to manage WBEM connections.
 
-    These command allow viewing and setting connection information.
+    These command allow viewing and setting persistent connection definitions.
+    The connections are normally defined in the file pywbemcliconnections.json
+    in the current directory.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -79,7 +81,7 @@ def connection_show(context, name):
 
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=True,)
+@click.argument('name', type=str, metavar='NAME', required=False,)
 # TODO add verify
 @click.pass_obj
 def connection_delete(context, name):
@@ -88,6 +90,12 @@ def connection_delete(context, name):
 
     Delete connection information from the persistent store
     for the connection defined by NAME.
+
+    If NAME not supplied, a select list presents the list of connection
+    definitions for selection.
+
+    Example:
+      connection delete blah
     """
     context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
@@ -101,6 +109,12 @@ def connection_select(context, name):
 
     Selects a connection from the persistently stored set of named connections
     if NAME exists in the store.
+
+    Examples:
+
+       connection select <name>    # select the defined <name>
+
+       connection select       # presents select list to pick connection
     """
 
     context.execute_cmd(lambda: cmd_connection_select(context, name))
@@ -116,6 +130,7 @@ def connection_save(context, name):
     Saves the current wbem connection information into the repository of
     connections. If the name does not already exist in the connection
     information, the provided name is used.
+
     """
     context.execute_cmd(lambda: cmd_connection_save(context, name))
 
@@ -224,7 +239,7 @@ def connection_test(context):
 @click.pass_obj
 def connection_list(context):
     """
-    Execute a predefined wbem request.
+    List the entries in the connection file.
 
     This provides a simple test to determine if the defined connection exists
     and is working.
@@ -297,7 +312,7 @@ def cmd_connection_save(context, name):
         # TODO we are accessing a protected member of the dictionary
         if svr.name != name:
             click.echo('Warning: changing server name from %s to %s' %
-                       (svr._name, name))
+                       (svr.name, name))
         svr._name = name
     elif not svr.name and not name:
         raise click.ClickException('No server name definition' % name)
@@ -312,7 +327,7 @@ def cmd_connection_save(context, name):
 
 def cmd_connection_test(context):
     """
-    Show the parameters that make up the current connection information
+    Test the current connection with a single command on the default_namespace
     """
     try:
         context.conn.EnumerateClassNames()
@@ -386,17 +401,28 @@ def cmd_connection_delete(context, name):
     """
     pywbemcli_servers = get_pywbemcli_servers()
 
-    if name in pywbemcli_servers:
-        # TODO test for same as current connection. Error if it is
-        if pywbemcli_servers[name] == context.pywbem_server:
+    if not name:
+        # get all names from dictionary
+        conn_names = pywbemcli_servers.keys()
+        if conn_names:
+            name = pick_from_list(context, conn_names, "Select a connection")
+            server_definitions_delete(name)
+
+        else:
             raise click.ClickException(
-                'Please do not delete current connection %s' % name)
-
-        server_definitions_delete(name)
-
+                'Connection repository empty' % name)
     else:
-        raise click.ClickException(
-            '%s not a defined connection name' % name)
+        if name in pywbemcli_servers:
+            # TODO test for same as current connection. Error if it is
+            if pywbemcli_servers[name] == context.pywbem_server:
+                raise click.ClickException(
+                    'Please do not delete current connection %s' % name)
+
+            server_definitions_delete(name)
+
+        else:
+            raise click.ClickException(
+                '%s not a defined connection name' % name)
 
 
 # pylint: disable=unused-argument
@@ -442,5 +468,6 @@ def cmd_connection_list(context):
         rows.append(row)
 
     context.spinner.stop()
-    click.echo(format_table(rows, headers, title='WBEMServer Connections:',
+    click.echo(format_table(sorted(rows), headers,
+                            title='WBEMServer Connections:',
                             table_format=context.output_format))

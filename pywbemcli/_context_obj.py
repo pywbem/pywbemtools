@@ -129,9 +129,10 @@ class ContextObj(object):
         return self._verbose
 
     def set_connection(self, connection):
-        """ Set the connection parameter as the current connection object"""
-        global PYWBEM_SERVER_OBJ
-        PYWBEM_SERVER_OBJ = connection
+        """ Set the connection parameter as the current connection object and
+            establish the new connection
+        """
+        self._pywbem_server = connection
 
     def execute_cmd(self, cmd):
         """
@@ -158,11 +159,13 @@ class ContextObj(object):
         """
 
         def format_float3(avg, min_, max_):
+            """Display float statistics with 3 places"""
             if avg == min_ == max_:
                 return '{0:.3f}'.format(avg)
             return '{0:.3f}/{1:.3f}/{2:.3f}'.format(avg, min_, max_)
 
         def format_float0(avg, min_, max_):
+            """Display float statistics with 0 places"""
             if avg == min_ == max_:
                 return '{0:.0f}'.format(avg)
             return '{0:.0f}/{1:.0f}/{2:.0f}'.format(avg, min_, max_)
