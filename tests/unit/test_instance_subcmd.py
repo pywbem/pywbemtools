@@ -15,6 +15,8 @@
 """
 Tests the class subcommand
 """
+from __future__ import absolute_import, print_function
+
 import os
 import pytest
 from .cli_test_extensions import CLITestsBase
@@ -23,6 +25,7 @@ TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
+ALLTYPES_MOCK_FILE = 'all_types.mof'
 
 INST_HELP = """Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
 
@@ -42,9 +45,9 @@ Options:
 Commands:
   associators   Get associated instances or names.
   count         Get instance count for classes.
-  create        Create an instance of classname.
+  create        Create an instance of CLASSNAME.
   delete        Delete a single CIM instance.
-  enumerate     Enumerate instances or names of CLASSNAME.
+  enumerate     Enumerate CIMInstances or names of CLASSNAME.
   get           Get a single CIMInstance.
   invokemethod  Invoke a CIM method.
   query         Execute an execquery request.
@@ -54,13 +57,14 @@ Commands:
 # pylint: disable=line-too-long
 INST_ENUM_HELP = """Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
-  Enumerate instances or names of CLASSNAME.
+  Enumerate CIMInstances or names of CLASSNAME.
 
-  Enumerate instances or instance names (the --name_only option) from the
-  WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
-  provided) or from the CLASSNAME argument if provided.
+  Enumerate CIMInstances or CIMInstanceNames (the --name_only option) from
+  the WBEMServer starting either at the top  of the hierarchy (if no
+  CLASSNAME provided) or from the CLASSNAME argument if provided.
 
-  Displays the returned instances (mof, xml, or table formats) or names
+  Displays the returned instances in mof, xml, or table formats or names if
+  --names-only option.
 
 Options:
   -l, --localonly                 Show only local properties of the class.
@@ -129,33 +133,29 @@ Options:
 
 INST_CREATE_HELP = """Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
 
-  Create an instance of classname.
+  Create an instance of CLASSNAME.
 
-  Creates an instance of the class `CLASSNAME` with the properties defined
-  in the property option.
+  Creates an instance of the class CLASSNAME with the properties defined in
+  the property option.
 
-  The propertylist option limits the created instance to the properties in
-  the list. This parameter is NOT passed to the server
+  Pywbemcli creates the new instance using CLASSNAME retrieved from the
+  current WBEM server as a template for property characteristics. Therefore
+  pywbemcli will generate an exception if CLASSNAME does not exist in the
+  current WBEM Server or if the data definition in the properties options
+  does not match the properties characteristics defined the returned class.
+
+  ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
 Options:
-  -P, --property property         Optional property definitions of form
-                                  name=value.Multiple definitions allowed, one
-                                  for each property to be included in the new
-                                  instance.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  defing the option multiple times. (ex: -p
-                                  pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
-  -h, --help                      Show this message and exit.
+  -P, --property name=value  Optional property definitions of form
+                             name=value.Multiple definitions allowed, one for
+                             each property to be included in the new instance.
+                             Array property values defined by comma-separated-
+                             values. EmbeddedInstance not allowed.
+  -n, --namespace <name>     Namespace to use for this operation. If defined
+                             that namespace overrides the general options
+                             namespace
+  -h, --help                 Show this message and exit.
 """
 
 INST_DELETE_HELP = """Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
@@ -311,6 +311,38 @@ instance of CIM_Foo {
 
 """
 
+GET_INST_ALL_TYPES = """instance of PyWBEM_AllTypes {
+   InstanceId = "test_instance";
+   scalBool = true;
+   scalUint8 = 8;
+   scalSint8 = -8;
+   scalUint16 = 45;
+   scalSint16 = -45;
+   scalUint32 = 9999;
+   scalSint32 = -9999;
+   scalUint64 = 99999;
+   scalSint64 = -99999;
+   scalReal32 = 1.9;
+   scalReal64 = 1.9;
+   scalString = "This is a test string";
+   scalDateTime = "19991224120000.000000+360";
+   arrayBool = { true, false };
+   arrayUint8 = { 0, 8, 125 };
+   arraySint8 = { -8 };
+   arrayUint16 = { 0, 45 };
+   arraySint16 = { 0, 45 };
+   arrayUint32 = { 0, 9999 };
+   arraySint32 = { 0, -9999 };
+   arrayUint64 = { 0, 99999 };
+   arraySint64 = { -99999, 0, 99999 };
+   arrayReal32 = { 0.0, 1.9 };
+   arrayReal64 = { 0.0, 1.9 };
+   arrayString = { "This is a test string", "Second String" };
+   arrayDateTime = { "19991224120000.000000+360", "19991224120000.000000+360" };
+};
+
+"""
+
 REF_INSTS = """instance of TST_Lineage {
    InstanceID = "MikeSofi";
    parent = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
@@ -346,9 +378,9 @@ instance of TST_FamilyCollection {
 
 # pylint: enable=line-too-long
 
-OK = True
-RUN = True
-FAIL = False
+OK = True  # mark tests OK when they execute correctly
+RUN = True  # Mark OK = False and current test case being created RUN
+FAIL = False  # Any test currently FAILING or not tested yet
 
 MOCK_TEST_CASES = [
     # desc, args, exp_response, mock, condition
@@ -516,6 +548,14 @@ MOCK_TEST_CASES = [
      SIMPLE_MOCK_FILE, FAIL],
     # TODO: This should return an empty instance not the statement Return empty
 
+    ['Verify instance subcommand get with instancename PyWBEM_AllTypes'
+     ' returns innstance with all property types',
+     ['get', 'PyWBEM_AllTypes.InstanceID="test_instance"'],
+     {'stdout': GET_INST_ALL_TYPES,
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
     #
     #  get subcommand errors
     #
@@ -553,7 +593,35 @@ MOCK_TEST_CASES = [
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
-     None, FAIL],
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO test datetime
+    ['Verify instance subcommand create, new instance of all_types'
+     'with scalar types',
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
+      '-P', 'scalBool=true', '-P', 'scalUint8=1',
+      '-P', 'scalUint16=9', '-P', 'scalSint16=-9',
+      '-P', 'scalUint32=999', '-P', 'scalSint32=-999',
+      '-P', 'scalSint64=-9999',
+      '-P', 'scalUint64=9999', '-P', 'scalString="test\"embedded\"quote"'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of all_types'
+     "with array values",
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
+      '-P', 'arrayBool=true,false', '-P', 'arrayUint8=1,2,3',
+      '-P', 'arraySint8=-1,-2,-3',
+      '-P', 'arrayUint16=9,19',
+      '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
+      '-P', 'arrayUint64=0,999,9999', '-P', 'arraySint64=-9999,0,9999',
+      '-P', 'scalString="abc", "def", "jhijk"'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, FAIL],
 
     # TODO create more valid create instance tests
     # TODO create invaid create instance tests
@@ -571,7 +639,7 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand delete, valid delete',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"'],
      {'stdout': ''
-         'Deleted root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                'Deleted root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],

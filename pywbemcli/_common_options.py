@@ -57,7 +57,6 @@ namespace_option = [                     # pylint: disable=invalid-name
                  help='Namespace to use for this operation. If defined that '
                       'namespace overrides the general options namespace')]
 
-
 summary_objects_option = [              # pylint: disable=invalid-name
     click.option('-S', '--summary', is_flag=True, required=False,
                  help='Return only summary of objects (count).')]
