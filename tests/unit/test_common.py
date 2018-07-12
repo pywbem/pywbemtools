@@ -30,43 +30,68 @@ from pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
     create_ciminstance, compare_instances, resolve_propertylist
 
+from tests.unit.pytest_extensions import simplified_test_function
 
-# TODO pytestify this test.
-class PropertyListResolveTest(object):
-    """
-    Test the propertylist resolve function
-    """
-    def test_with_comma(self):
-        """Test with commma in string"""
-        out = resolve_propertylist(("abc,def",))
-        assert out == ['abc', 'def']
 
-    def test_simple(self):
-        """Test with single entry"""
-        val = ("abc",)
-        out = resolve_propertylist(val)
-        assert out == ['abc']
+TESTCASES_RESOLVE_PROPERTYLIST = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * pl_str: tuple of strings defining properties
+    #   * exp_pl: expected list return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    def test_empty(self):
-        """Test empty string"""
-        val = ("",)
-        out = resolve_propertylist(val)
-        assert out == []
+    ('verify simple property list with 2 entries',
+     dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
+     None, None, True),
 
-    def test_multiple(self):
-        """Test multiple entries"""
-        out = resolve_propertylist(("abc", "def"))
-        assert out == ['abc', 'def']
+    ('verify propertylist with single property entry',
+     dict(pl_str=("abc",), exp_pl=['abc']),
+     None, None, True),
 
-    def test_combined(self):
-        """test with comma in one property entry"""
-        out = resolve_propertylist(("abc", "def", "xyz,rst"))
-        assert out == ['abc', 'def', 'xyz', 'rst']
+    ('verify multiple properties',
+     dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
+     None, None, True),
 
-    def test_none(self):
-        """Test None"""
-        out = resolve_propertylist(None)
-        assert out is None
+    ('verify multiple properties and both multiple in on option and multiple '
+     'options.',
+     dict(pl_str=None, exp_pl=None),
+     None, None, True),
+
+    ('verify multiple properties and both multiple in on option and multiple '
+     'options.',
+     dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
+     None, None, True),
+
+
+    ('verify empty propertylist',
+     dict(pl_str=("",), exp_pl=[]),
+     None, None, False),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_RESOLVE_PROPERTYLIST)
+@simplified_test_function
+def test_propertylist(testcase, pl_str, exp_pl):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    # wraps the test string in a tuple because that is the way the
+    # propertylist option returns the list since it is a multiple type
+    # option
+    plist = resolve_propertylist(pl_str)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert plist == exp_pl
 
 
 class TestParseWbemUri(object):
@@ -115,7 +140,7 @@ class TestParseWbemUri(object):
         testcases)
     def test_parse_wbemuri_str(
             self, desc, uri, ns, exp_result, exp_warn_type, condition):
-        # pylint: disable=unused-argument
+        # pylint: disable=unused-argument, no-self-use
         """Test function for parse_wbemuri_str."""
 
         if not condition:
@@ -138,12 +163,10 @@ class TestParseWbemUri(object):
             with pytest.warns(exp_warn_type) as rec_warnings:
                 if exp_exc_type:
                     with pytest.raises(exp_exc_type):
-
                         # The code to be tested
                         obj = parse_wbemuri_str(uri)
 
                 else:
-
                     # The code to be tested
                     obj = parse_wbemuri_str(uri)
 
@@ -181,71 +204,108 @@ class TestParseWbemUri(object):
 
 
 # TODO pytestify this test and the others in this file
-class FilterNamelistTest(unittest.TestCase):
+class FilterNamelistTest(object):
     """Test the common filter_namelist function."""
 
+    name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
+
+    @pytest.mark.parametrize(
+        "desc, regex, nl, match, ign_case",
+
+        ['Verify TST_ case insensitive',
+         'TST_', name_list, ['TST_abc'], True],
+
+        ['Verify TSt_ case insensitive',
+         'TSt_', name_list, ['TST_abc'], True],
+
+        ['Verify TSt_ case insensitive',
+         'TXST_', name_list, [], True],
+
+        ['Verify TSt_ case insensitive',
+         'CIM_', name_list, ['CIM_abc', 'CIM_def', 'CIM_123'], True],
+
+        ['Verify TSt_ case sensitive',
+         'TSt__', name_list, [], False],
+
+        ['Verify wildcard filters',
+         r'.*abc$', name_list, ['CIM_abc', 'TST_abc'], True],
+
+        ['Verify wildcard filters',
+         r'.*def', name_list, ['CIM_def'], True],
+    )
+    def test_filter_nameslist(self, desc, regex, nl, match, ign_case):
+        # pylint: disable=no-self-use
+        """
+        Test filter_namelist function.
+        """
+        assert (filter_namelist(regex, nl, ignore_case=ign_case) == match), desc
+
     def test_case_insensitive(self):
+        # pylint: disable=no-self-use
         """Test case insensitive match"""
         name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
 
-        self.assertEqual(filter_namelist('TST_', name_list), ['TST_abc'])
-        self.assertEqual(filter_namelist('TSt_', name_list), ['TST_abc'])
-        self.assertEqual(filter_namelist('XST_', name_list), [])
-        self.assertEqual(filter_namelist('CIM_', name_list), ['CIM_abc',
-                                                              'CIM_def',
-                                                              'CIM_123'])
+        assert filter_namelist('TST_', name_list) == ['TST_abc']
+        assert filter_namelist('TSt_', name_list) == ['TST_abc']
+        assert filter_namelist('XST_', name_list) == []
+        assert filter_namelist('CIM_', name_list) == ['CIM_abc',
+                                                      'CIM_def',
+                                                      'CIM_123']
 
     def test_case_sensitive(self):
+        # pylint: disable=no-self-use
         """Test case sensitive matches"""
         name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
 
-        self.assertEqual(filter_namelist('TSt_', name_list,
-                                         ignore_case=False), [])
+        assert filter_namelist('TSt_', name_list,
+                               ignore_case=False) == []
 
     def test_wildcard_filters(self):
+        # pylint: disable=no-self-use
         """Test more complex regex"""
         name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
-        self.assertEqual(filter_namelist(r'.*abc$', name_list), ['CIM_abc',
-                                                                 'TST_abc'])
-        self.assertEqual(filter_namelist(r'.*def', name_list), ['CIM_def'])
+        assert filter_namelist(r'.*abc$', name_list) == ['CIM_abc',
+                                                         'TST_abc']
+        assert filter_namelist(r'.*def', name_list) == ['CIM_def']
 
 
-class NameValuePairTest(unittest.TestCase):
+class NameValuePairTest(object):  # pylint: disable=too-few-public-methods
     """Test simple name value pair parser"""
 
     def test_simple_pairs(self):
+        # pylint: disable=no-self-use
         """Test simple pair parsing"""
-        name, value = parse_kv_pair('abc=test')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, 'test')
+        pname, value = parse_kv_pair('abc=test')
+        assert pname == 'abc'
+        assert value == 'test'
 
-        name, value = parse_kv_pair('abc=')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, None)
+        pname, value = parse_kv_pair('abc=')
+        assert pname == 'abc'
+        assert value is None
 
-        name, value = parse_kv_pair('abc')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, None)
+        pname, value = parse_kv_pair('abc')
+        assert pname == 'abc'
+        assert value is None
 
-        name, value = parse_kv_pair('abc=12345')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, '12345')
+        pname, value = parse_kv_pair('abc=12345')
+        assert pname == 'abc'
+        assert value == '12345'
 
-        name, value = parse_kv_pair('abc="fred"')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, '"fred"')
+        pname, value = parse_kv_pair('abc="fred"')
+        assert pname == 'abc'
+        assert value == '"fred"'
 
-        name, value = parse_kv_pair('abc="fr ed"')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, '"fr ed"')
+        pname, value = parse_kv_pair('abc="fr ed"')
+        assert pname == 'abc'
+        assert value == '"fr ed"'
 
-        name, value = parse_kv_pair('abc="fre\"d"')
-        self.assertEqual(name, 'abc')
-        self.assertEqual(value, '"fre"d"')
+        pname, value = parse_kv_pair('abc="fre\"d"')
+        assert pname == 'abc'
+        assert value == '"fre"d"'
 
-        name, value = parse_kv_pair('=def')
-        self.assertEqual(name, '')
-        self.assertEqual(value, 'def')
+        pname, value = parse_kv_pair('=def')
+        assert pname == ''
+        assert value == 'def'
 
 
 class SorterTest(unittest.TestCase):
@@ -336,64 +396,66 @@ class SorterTest(unittest.TestCase):
                           path=path)
         instances.append(obj)
         instances_sorted = objects_sort(instances)
-
         self.assertEqual(len(instances), len(instances_sorted))
         self.assertEqual(instances_sorted[0].classname, 'CIM_Boo')
         # TODO create multiple and test result
 
 
-class SplitTestNone(unittest.TestCase):
+class SplitTestNone(object):
     """Test splitting input parameters"""
 
-    def do_split(self, input_str, exp_result):
+    def split_test(self, input_str, exp_result):
+        # pylint: disable=no-self-use
         """
         Common function to do the split and compare input to expected
         result.
         """
         act_result = split_array_value(input_str, ',')
         # print('split input %s result %s' % (input_str, result))
-        self.assertEqual(exp_result, act_result)
+        assert (exp_result == act_result) % \
+            'Failed split test exp %r, act %r' % (exp_result, act_result)
 
     def test_split(self):
+        # pylint: disable=no-self-use
         """Define strings to split and call test function"""
-        self.do_split('0,1,2,3,4,5,6',
-                      ['0', '1', '2', '3', '4', '5', '6'])
+        self.split_test('0,1,2,3,4,5,6',
+                        ['0', '1', '2', '3', '4', '5', '6'])
 
-        self.do_split('abc,def,jhi,klm,nop',
-                      ['abc', 'def', 'jhi', 'klm', 'nop'])
+        self.split_test('abc,def,jhi,klm,nop',
+                        ['abc', 'def', 'jhi', 'klm', 'nop'])
 
-        self.do_split('abc,def,jhi,klm,n\\,op',
-                      ['abc', 'def', 'jhi', 'klm', 'n\\,op'])
+        self.split_test('abc,def,jhi,klm,n\\,op',
+                        ['abc', 'def', 'jhi', 'klm', 'n\\,op'])
 
-        # self.do_split('abc,de f', ['abc','de f'])
+        # self.split_test('abc,de f', ['abc','de f'])
 
 
-class KVPairParsingTest(unittest.TestCase):
+class KVPairParsingTest(object):
     "Test parsing key/value pairs on input"
 
     def execute_test(self, test_string, exp_name, exp_value):
+        # pylint: disable=no-self-use
         """Execute the function and test result"""
 
         act_name, act_value = parse_kv_pair(test_string)
 
-        self.assertEqual(exp_name, act_name, ' KVPairParsing. Expected '
-                         ' name=%s, function returned %s' % (exp_name,
-                                                             act_name))
-        self.assertEqual(exp_value, act_value, ' KVPairParsing. Expected '
-                         ' value=%s, act value=%s' % (exp_value, act_value))
+        assert (exp_name == act_name), \
+            ' KVPairParsing. Expected ' \
+            ' name=%s, function returned %s' % (exp_name, act_name)
+        assert (exp_value == act_value), \
+            ' KVPairParsing. Expected ' \
+            ' value=%s, act value=%s' % (exp_value, act_value)
 
     def test_scalar_int(self):
+        # pylint: disable=no-self-use
         """Test for scalar integer value"""
         self.execute_test('prop_name=1', 'prop_name', str(1))
         self.execute_test('prop_name=91999', 'prop_name', str(91999))
 
 
+# TODO cvt to pytest
 class CreateCIMInstanceTest(unittest.TestCase):
     """Test the function that creates a CIMInstance from cli args"""
-
-    def execute_test(self, test_string, exp_inst):
-        """Creates instance from input and compares with exp_inst"""
-        pass
 
     @staticmethod
     def create_scalar_class():
@@ -512,15 +574,15 @@ class CreateCIMInstanceTest(unittest.TestCase):
                           'Sint64p': CIMProperty('Sint64p', -99, type='sint64'),
 
                           'Strp': CIMProperty('Strp', 'hoho', type='string')}
-        # pp(exp_properties)
+
         exp_inst = CIMInstance('CIM_Foo',
                                properties=exp_properties)
-        # pp(exp_inst)
+
         kv_properties = ['ID=Testid', 'Boolp=true', 'Uint8p=220', 'Sint8p=-120',
                          'Uint32p=999', 'Sint32p=-99', 'Uint64p=999',
                          'Sint64p=-99', 'Strp=hoho']
         act_inst = create_ciminstance(cls, kv_properties)
-        # pp(act_inst)
+
         self.assertTrue(compare_instances(exp_inst, act_inst))
 
         self.assertEqual(exp_inst, act_inst)
@@ -539,8 +601,9 @@ class CreateCIMInstanceTest(unittest.TestCase):
         self.assertTrue(compare_instances(exp_inst, act_inst))
         self.assertEqual(exp_inst, act_inst)
 
+    # TODO expand this to test errors for other types
     def test_simple_scalar_type_err(self):
-        """Test scalar with two property"""
+        """Test scalar with type error"""
         cls = CreateCIMInstanceTest.create_scalar_class()
 
         try:
@@ -569,7 +632,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
                                properties=exp_properties)
         kv_properties = ['ID=Testid', 'Real32p=1.99']
         act_inst = create_ciminstance(cls, kv_properties)
-        # pp(act_inst)
         self.assertTrue(compare_instances(exp_inst, act_inst))
         self.assertEqual(exp_inst, act_inst)
 
@@ -631,7 +693,7 @@ class CreateCIMInstanceTest(unittest.TestCase):
                          'test_array_instance failed compare')
 
     def test_scalar_no_value(self):
-        """Test scalar with one property"""
+        """Test scalar with one property with no value component"""
         cls = CreateCIMInstanceTest.create_array_class()
 
         exp_properties = {'ID': CIMProperty('ID', None, type='string')}
@@ -643,7 +705,7 @@ class CreateCIMInstanceTest(unittest.TestCase):
         self.assertEqual(exp_inst, act_inst)
 
     def test_scalar_empty_str(self):
-        """Test scalar with one property"""
+        """Test scalar with one property where value is empty string"""
         cls = CreateCIMInstanceTest.create_array_class()
 
         exp_properties = {'ID': CIMProperty('ID', '""', type='string')}
@@ -654,10 +716,19 @@ class CreateCIMInstanceTest(unittest.TestCase):
         self.assertTrue(compare_instances(exp_inst, act_inst))
         self.assertEqual(exp_inst, act_inst)
 
-    # TODO create one that causes keyerror
+    def test_invalid_propname(self):
+        """Test scalar where input is property name not in class"""
+        cls = CreateCIMInstanceTest.create_scalar_class()
 
-    # Test compare and failure in compare_obj
+        try:
+            kv_properties = ['Boolpxxx=True']
+            create_ciminstance(cls, kv_properties)
+            self.fail('Expected exception to create_instance property type err')
+        except click.ClickException:
+            pass
 
-    # Test compare with errors
+# TODO Test compare and failure in compare_obj
 
-    # test display functionality including table
+# TODO Test compare with errors
+
+# NOTE: Format table is in test_tableformat.py

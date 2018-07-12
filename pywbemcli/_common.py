@@ -26,8 +26,8 @@ import six
 import click
 import tabulate
 
-from pywbem import CIMInstanceName, CIMInstance, \
-    CIMClass, CIMQualifierDeclaration, tocimobj, CIMProperty, CIMClassName
+from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
+    CIMQualifierDeclaration, CIMProperty, CIMClassName, cimvalue
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
@@ -282,12 +282,14 @@ def create_cimvalue(cim_type, value_str, is_array):
     CIMValue or list of CIMValue elements.
 
     Parameters:
-      CIM_Type: TODO
-        CIMType for this value.
+      CIM_Type: (:term: `string`)
+        CIMType for this value. The CIM data type name for the CIM object.
+        See :ref:`CIM data types` for valid type names.
 
       Value_str (:term: `string`):
-        String defining the input to be parsed.
-        TODO cover escapes
+        String defining the input to be parsed. This may be a quoted string
+        to provide for space characters in the string in which case the
+        quote character used must be excaped if used within the string.
 
       is_array (:class:`py:bool`):
         The value_str is to be treated as a comma separated set of values.
@@ -300,19 +302,38 @@ def create_cimvalue(cim_type, value_str, is_array):
         ValueError if the value_str cannot be parsed consistent with
         the cim_type and is_array attributes of the call.
     """
+    def str_2_bool(value):
+        """
+        Convert the value input to boolean based on text or
+        raise ValueError if strings are not 'true' or 'false'.
+        """
+        if isinstance(value, bool):
+            return value
+        elif isinstance(value, six.string_types):
+            if value.lower() == 'true':
+                return True
+            elif value.lower() == 'false':
+                return False
+        raise ValueError('Invalid boolean value: "%s"' % value)
+
     cim_value = None
 
     if not is_array:
-        cim_value = tocimobj(cim_type, value_str)
+        # cimvalue does not handle strings for bool
+        if cim_type == 'boolean':
+            value_str = str_2_bool(value_str)
+        cim_value = cimvalue(value_str, cim_type)
     else:
         cim_value = []
         values_list = split_array_value(value_str, ',')
-        for value_ in values_list:
-            cim_value.append(tocimobj(cim_type, value_))
+        for val in values_list:
+            if cim_type == 'boolean':
+                val = str_2_bool(val)
+            cim_value.append(cimvalue(val, cim_type))
     return cim_value
 
 
-def create_cim_property(cim_class, name, value_str):
+def create_cimproperty(cim_type, is_array, name, value_str):
     """
     Create and return a CIMProperty from the input parameters and the
     information in cim_class.
@@ -332,15 +353,11 @@ def create_cim_property(cim_class, name, value_str):
         value_str and property information from the class
 
       Exception:
-        KeyError if name not in class or ValueError if the value in
-        value_str cannot be mapped to a CIMValue
+        ValueError if value_str, cim_type and is_array mismatch.
     """
+    cim_value = create_cimvalue(cim_type, value_str, is_array)
 
-    cl_prop = cim_class.properties[name]
-
-    cim_value = create_cimvalue(cl_prop.type, value_str, cl_prop.is_array)
-
-    return CIMProperty(name, cim_value, cl_prop.type)
+    return CIMProperty(name, cim_value, cim_type)
 
 
 def create_ciminstance(cim_class, kv_properties, property_list=None):
@@ -368,16 +385,23 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
     for kv_property in kv_properties:
         name, value_str = parse_kv_pair(kv_property)
         try:
-            properties[name] = create_cim_property(cim_class, name, value_str)
+            cl_prop = cim_class.properties[name]
         except KeyError as ke:
             raise click.ClickException('Error: property name %s not in class %s'
                                        '. Exception %s' %
                                        (name, cim_class.classname, ke))
 
+        try:
+            properties[name] = create_cimproperty(cl_prop.type,
+                                                  cl_prop.is_array,
+                                                  name,
+                                                  value_str)
         except ValueError as ve:
-            raise click.ClickException('Error: property  %s value %s cannot be'
-                                       ' parsed. Exception %s' %
-                                       (name, value_str, ve))
+            raise click.ClickException('Type mismatch property %r between '
+                                       'expected type=%r, array=%r and input '
+                                       'value=%r. Exception %s' %
+                                       (name, cl_prop.type, cl_prop.is_array,
+                                        value_str, ve))
 
     new_inst = CIMInstance(cim_class.classname, properties=properties,
                            property_list=property_list)
@@ -427,7 +451,7 @@ def compare_instances(inst1, inst2):
 
 def parse_kv_pair(pair):
     """
-    Parse a single key value pair separated by = and return the key
+    Parse a single key/value pair separated by = and return the key
     and value components.
 
     If the value component is empty, returns None
@@ -449,9 +473,10 @@ def split_array_value(string, delimiter):
 
 
 def split_value_str(string, delimiter):
-    """Spit a string based on a delimiter character bypassing escaped
-       instances of the delimiter.  This is a generator function in that
-       it yields each time it separates a value.
+    """
+   Spit a string based on a delimiter character bypassing escaped
+   instances of the delimiter.  This is a generator function in that
+   it yields each time it separates a value.
 
        Delimiter must be single character.
     """
@@ -475,9 +500,9 @@ def split_value_str(string, delimiter):
 
 def get_cimtype(objects):
     """
-        Get the cim_type for any returned cim object.  Normally this is the
-        name of the class name except that the classname return from
-        getclass and enumerate class is just unicode string
+    Get the cim_type for any returned cim object.  Normally this is the
+    name of the class name except that the classname return from
+    getclass and enumerate class is just unicode string
     """
     # associators and references return tuple
     if isinstance(objects, list):
@@ -526,20 +551,28 @@ def display_cim_objects_summary(context, objects):
 
 def display_cim_objects(context, objects, output_format=None, summary=False):
     # pylint: disable=line-too-long
-
     """
+    Display CIM objects in form determined by input parameters.
+
     Input is either a list of cim objects or a single object. It may be
     any of the CIM types.  This is used to display:
-      classes
-      instances
-      qualifiertypes
 
-      Or list of the names of the above or of the above classes
+      * CIMClass
 
-    This function may override that choice in the case where the output
-    choice is not avialable for the object type.  Thus, for example,
+      * CIMClassName:
+
+      * CIMInstance
+
+      * CIMInstanceName
+
+      * CIMQualifierDeclaration
+
+      * Or list of the above
+
+    This function may override output type choice in cases where the output
+    choice is not available for the object type.  Thus, for example,
     mof output makes no sense for class names. In that case, the output is
-    in the str of the type.
+    the str of the type.
 
     Parameters:
       context (:class:`ContextObj`):
@@ -547,11 +580,12 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
 
       TODO This is not correct form for this doc.
       objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName,
-      or CIMQualifier):
-        Iterable of CIM Objects to be displayed or a single object.
+      or CIMQualifierDeclaration):
+        Iterable of CIM objects to be displayed or a single object.
 
       output_format(:term:`strng`):
-        String defining the preferred output format
+        String defining the preferred output format. This may be overridden
+        if the output format cannot be used for the object type
 
       summary(:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
@@ -632,15 +666,15 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
 
 def print_class_as_table(context, class_, max_cell_width=20):
     """
-        TODO add code here to display a class as a table.  The temp output
-        so we could create the function is to just output as mof
+    TODO: Future add code here to display a class as a table.  The temp output
+    so we could create the function is to just output as mof
     """
     click.echo(class_.tomof())
 
 
 def print_classes_as_table(context, classes, max_cell_width=20):
     """
-    TODO: extend to display classes as a table, showing the
+    TODO: Future extend to display classes as a table, showing the
     properties for each class. This will display the properties that exist in
     subclasses
     """
@@ -652,8 +686,8 @@ def print_classes_as_table(context, classes, max_cell_width=20):
 
 def print_paths_as_table(context, objects, max_cell_width=20):
     """
-        Display paths as a table. This include CIMInstanceName, ClassPath,
-        and unicode (the return type for enumerateClasses).
+    Display paths as a table. This include CIMInstanceName, ClassPath,
+    and unicode (the return type for enumerateClasses).
     """
     headers = ['path']
 
@@ -666,9 +700,7 @@ def print_paths_as_table(context, objects, max_cell_width=20):
 
 def print_qual_decls_as_table(context, qual_decls, max_cell_width=20):
     """
-    TODO: extend to display multiple classes at a table, showing the
-    properties for each class. This will display the properties that exist in
-    subclasses
+    Display the elements of qualifier declarations as a table
     """
     rows = []
     headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
@@ -689,7 +721,7 @@ def print_qual_decls_as_table(context, qual_decls, max_cell_width=20):
                             table_format=context.output_format))
 
 
-# TODO how can we set up the max_cell_width
+# TODO: Future provide way to set up max table and cell width more logically
 def print_insts_as_table(context, objects, include_classes=False,
                          max_cell_width=20):
     """
@@ -862,18 +894,19 @@ def format_table(rows, headers, table_format='simple', title=None):
 
 
 def fold_string(input_string, max_width):
-    """ Fold a string within a maximum width.
+    """
+    Fold a string within a maximum width.
 
-        Parameters:
+      Parameters:
 
-          input_string:
-            The string of data to go into the cell
-          max_width:
-            Maximum width of cell.  Data is folded into multiple lines to
-            fit into this width.
+        input_string:
+          The string of data to go into the cell
+        max_width:
+          Maximum width of cell.  Data is folded into multiple lines to
+          fit into this width.
 
-        Return:
-            String representing the folded string
+      Return:
+          String representing the folded string
     """
     new_string = input_string
     if isinstance(input_string, six.string_types):
