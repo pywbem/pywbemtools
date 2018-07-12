@@ -160,19 +160,11 @@ QD_TBL_OUT = """Qualifier Declarations
 +-------------+---------+---------+---------+-------------+-----------------+
 """
 
-QD_STATS_OUT = """Qualifier In : boolean = true,
-    Scope(parameter),
-    Flavor(DisableOverride, ToSubclass);
-
-  Count    Exc    Time    ReqLen    ReplyLen  Operation
--------  -----  ------  --------  ----------  ------------
-      1      0       0         0           0  GetQualifier
-
-"""
-
-OK = True
-RUN = True
-FAIL = False
+# The following variables are used to control tests executed during
+# development of tests
+OK = True      # set to OK for tests passed. Set OK = False to execute one test
+RUN = True     # set RUN condition in test being run
+FAIL = False   # flag any tests that fail
 MOCK_TEST_CASES = [
     # desc - Description of test
     # args - Dictionary defining input to the command. There are two possible
@@ -265,20 +257,17 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand -T (statistics) gets stats output',
-     {'args': ['get', 'IN'],
-      'global': ['-T']},
-     {'stdout': QD_STATS_OUT,
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify qualifier subcommand --timestats gets stats output',
+    ['Verify qualifier subcommand --timestats gets stats output. Cannot test'
+     'with lines because execution time is variable.',
      {'args': ['get', 'IN'],
       'global': ['--timestats']},
-     {'stdout': QD_STATS_OUT,
+     {'stdout': ['Qualifier In : boolean = true,',
+                 'Scope(parameter),',
+                 'Count    Exc    Time    ReqLen    ReplyLen  Operation',
+                 '      1      0',
+                 '0           0  GetQualifier'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 ]
 
