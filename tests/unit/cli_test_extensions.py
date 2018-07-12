@@ -17,14 +17,19 @@ TEST_DIR = os.path.dirname(__file__)
 
 class CLITestsBase(object):
     """
-        Standard methods used for all tests
-        TODO these should be moved to common file since we want to create
-        a test file for each major subcommand.
+        Defines methods to execute tests on pywbemcli
+
     """
     def mock_subcmd_test(self, desc, subcmd, args, env, exp_response,
                          mock_file, condition):
+        # pylint: disable=line-too-long
         """
-        Standard test for pywbemcli commands using pytest
+        Test method to execute test on pywbemcli by calling the executable
+        pywbemcli for the command defined by subcmd with arguments defined
+        by args. This can execute pywbemcli either with a mock environment
+        by using the mock_file variable or without mock if the mock_file
+        parameter is None. The method tests the results of the execution
+        of pywbemcli using the exp_response parameter.
 
         Parameters:
           desc (:term:`string`):
@@ -34,11 +39,12 @@ class CLITestsBase(object):
             pywbemcli subcommand inserted for this test.  This is the first
             level subcommand (ex. class).
 
-          args (:term: dict, list of term"`string` or term"`string`):
+          args (:class:`py:dict` or :class:`py:list` of :term:`string` or :term:`string`):
 
-            If it is a dictionary arguments to be inserted into the command
-            line after the subcommand name. This is a dictionary with two
-            possible key names
+            If it is a dictionary, arguments to be inserted into the command
+            line both as local (after the subcommand name) and global (before
+            the subcommand name) options may be defined. The dictionary may
+            contain two possible key keys:
 
               * args: defines local aruments to append to the command after
                     the subcommand name
@@ -46,11 +52,14 @@ class CLITestsBase(object):
               * globals: defines global arguments that will be inserted
                   into the command line before the subcommand name.
 
-            If it is a list or string it s the set of arguments  to append
+            If args is a list or string it is the set of arguments to append
             after the subcommand name
 
-          exp_response ( (dict): Keyword arguments for the expected response.):
-            Includes the following keys:
+          exp_response (:class:`py:dict`)
+
+            Keyword arguments for expected response.
+
+            Includes the following possible keys:
 
                'stdout' or 'stderr' - Defines which return is expected (the
                expected response). The value is a string or iterable defining
@@ -59,9 +68,9 @@ class CLITestsBase(object):
                of expected data for the test selected.
                Only one of these keys may exist.
 
-               'test' - if it exists defines the test used to compare the
+               'test' - If it exists defines the test used to compare the
                returned data with the expected returned data defined as the
-               value of 'stdout'/'stderr'
+               value of 'stdout'/'stderr'.
 
                The tests define are:
 
@@ -95,16 +104,11 @@ class CLITestsBase(object):
                'rc' expected exit_code from pywbemcli.  If None, code 0
                is expected.
 
-               'mock' If this key exists, the value is a list of files that
-               represent the mock data. In this case, the connection is
-               made with the --mock-server input parameter and the name
-               of the mock files as data.
-
           mock_file (:term:`string` or None):
             If this is a string, this test will be executed using the
             --mock-server pywbemcl option with this file as the name of the
             objects to be compiled. This should be just a file name and
-            this method assumes it is in the testsuite directory.
+            this method assumes the file is in the testsuite directory.
 
             If None, test is executed without the --mock-server input parameter
             and defines an artificial server name  Used to test subcommands
@@ -113,7 +117,9 @@ class CLITestsBase(object):
 
           condition (None or False):
             If False, the test is skipped
-        """
+        """  # noqa: E501
+        # pylint: enable=line-too-long
+
         if not condition:
             pytest.skip("Condition for test case %s not met" % desc)
 
@@ -127,7 +133,8 @@ class CLITestsBase(object):
         elif isinstance(args, (list, tuple)):
             local_args = args
         else:
-            assert "Invalid args input to test %r" % args
+            assert 'Invalid args input to test %r . Allowed types are dict, ' \
+                   'string, list, tuple.' % args
 
         if isinstance(local_args, six.string_types):
             local_args = local_args.split(" ")
@@ -166,8 +173,8 @@ class CLITestsBase(object):
             rtn_value = stderr
             component = 'stderr'
         else:
-            assert False, 'Expected "stdout" or "stderr" key. One of keys ' \
-                          'required in exp_response.'
+            assert False, 'Expected "stdout" or "stderr" key. One of these ' \
+                          'keys required in exp_response.'
 
         if test_value:
             if 'test' in exp_response:
