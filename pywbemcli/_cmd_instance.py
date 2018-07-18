@@ -135,7 +135,7 @@ def instance_delete(context, instancename, **options):
 @click.pass_obj
 def instance_create(context, classname, **options):
     """
-    Create an instance of CLASSNAME.
+    Create a CIM instance of CLASSNAME.
 
     Creates an instance of the class CLASSNAME with the properties defined
     in the property option.
@@ -208,14 +208,14 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
-    Enumerate CIMInstances or names of CLASSNAME.
+    Enumerate instances or names of CLASSNAME.
 
-    Enumerate CIMInstances or CIMInstanceNames (the --name_only option) from the
-    WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
-    provided) or from the CLASSNAME argument if provided.
+    Get CIMInstance or CIMInstanceName (--name_only option) objects from
+    the WBEMServer starting either at the top  of the hierarchy (if no
+    CLASSNAME provided) or from the CLASSNAME argument if provided.
 
-    Displays the returned instances in mof, xml, or table formats or names if
-    --names-only option.
+    Displays the returned instances in mof, xml, or table formats or the
+    instance names as a string or XML formats (--names-only option).
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -343,7 +343,8 @@ def instance_count(context, classname, **options):
     classname and is case insensitive. Thus `pywbem_` returns all classes that
     begin with `PyWBEM_`, `pywbem_`, etc.
 
-    This operation can take a long time to execute.
+    This operation can take a long time to execute since it enumerates all
+    classes in the namespace.
 
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))

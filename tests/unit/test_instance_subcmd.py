@@ -45,9 +45,9 @@ Options:
 Commands:
   associators   Get associated instances or names.
   count         Get instance count for classes.
-  create        Create an instance of CLASSNAME.
+  create        Create a CIM instance of CLASSNAME.
   delete        Delete a single CIM instance.
-  enumerate     Enumerate CIMInstances or names of CLASSNAME.
+  enumerate     Enumerate instances or names of CLASSNAME.
   get           Get a single CIMInstance.
   invokemethod  Invoke a CIM method.
   query         Execute an execquery request.
@@ -57,14 +57,14 @@ Commands:
 # pylint: disable=line-too-long
 INST_ENUM_HELP = """Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
-  Enumerate CIMInstances or names of CLASSNAME.
+  Enumerate instances or names of CLASSNAME.
 
-  Enumerate CIMInstances or CIMInstanceNames (the --name_only option) from
-  the WBEMServer starting either at the top  of the hierarchy (if no
-  CLASSNAME provided) or from the CLASSNAME argument if provided.
+  Get CIMInstance or CIMInstanceName (--name_only option) objects from the
+  WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
+  provided) or from the CLASSNAME argument if provided.
 
-  Displays the returned instances in mof, xml, or table formats or names if
-  --names-only option.
+  Displays the returned instances in mof, xml, or table formats or the
+  instance names as a string or XML formats (--names-only option).
 
 Options:
   -l, --localonly                 Show only local properties of the class.
@@ -133,7 +133,7 @@ Options:
 
 INST_CREATE_HELP = """Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
 
-  Create an instance of CLASSNAME.
+  Create a CIM instance of CLASSNAME.
 
   Creates an instance of the class CLASSNAME with the properties defined in
   the property option.
@@ -197,7 +197,8 @@ INST_COUNT_HELP = """Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME
   classname and is case insensitive. Thus `pywbem_` returns all classes that
   begin with `PyWBEM_`, `pywbem_`, etc.
 
-  This operation can take a long time to execute.
+  This operation can take a long time to execute since it enumerates all
+  classes in the namespace.
 
 Options:
   -s, --sort              Sort by instance count. Otherwise sorted by
