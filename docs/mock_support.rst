@@ -49,6 +49,10 @@ Each instance of the ``--mock-server`` option defines a file or file path:
   (define in pywbem as ``method_callback_interface``) to define server methods
   that will process InvokeMethod calls from pywbemcli.
 
+pywbemcli logging can be enabled when the `--mock-server` option is enabled.
+However, since the mock support does not use http, the `http` option will
+generate no output.
+
 
 Defining files for the mock respository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

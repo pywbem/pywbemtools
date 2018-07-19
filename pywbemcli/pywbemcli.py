@@ -137,6 +137,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               help='Show time statistics of WBEM server operations after '
                    ' each command execution.')
 @ click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
+               envvar=PywbemServer.log_envvar,
                help='Enable logging of CIM Operations and set a component to '
                     'a log level, destination, and detail level\n'
                     '(COMP: [{c}], Default: {cd}) '
