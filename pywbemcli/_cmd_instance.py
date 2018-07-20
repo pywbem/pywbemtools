@@ -20,7 +20,7 @@ cmds for get, enumerate, list of classes.
 from __future__ import absolute_import, print_function
 
 import click
-from pywbem import Error
+from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
@@ -32,7 +32,7 @@ from .config import DEFAULT_QUERY_LANGUAGE
 
 
 #
-#   Common option definitions for class group
+#   Common option definitions for instance group
 #
 
 
@@ -43,6 +43,8 @@ includequalifiers_option = [              # pylint: disable=invalid-name
                  help='If set, requests server to include qualifiers in the '
                  'returned instance(s).')]
 
+# specific to instance because deepinheritance differs between class and
+# instance operations.
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
                  help='If set, requests server to return properties in '
@@ -56,6 +58,15 @@ interactive_option = [              # pylint: disable=invalid-name
                       'than an instance and user is presented with a list of '
                       'instances of the class from which the instance to '
                       'process is selected.')]
+
+instance_property_option = [              # pylint: disable=invalid-name
+    click.option('-P', '--property', type=str, metavar='name=value',
+                 required=False,
+                 multiple=True,
+                 help='Optional property definitions of form name=value.'
+                 'Multiple definitions allowed, one for each property to be '
+                 'included in the new instance. Array property values defined '
+                 'by comma-separated-values. EmbeddedInstance not allowed.')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
@@ -119,23 +130,23 @@ def instance_delete(context, instancename, **options):
 
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-P', '--property', type=str, metavar='property', required=False,
-              multiple=True,
-              help='Optional property definitions of form name=value.'
-              'Multiple definitions allowed, one for each property to be '
-              'included in the new instance.')
-@add_options(propertylist_option)
+@add_options(instance_property_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_create(context, classname, **options):
     """
-    Create an instance of classname.
+    Create a CIM instance of CLASSNAME.
 
-    Creates an instance of the class `CLASSNAME` with the properties defined
+    Creates an instance of the class CLASSNAME with the properties defined
     in the property option.
 
-    The propertylist option limits the created instance to the properties
-    in the list. This parameter is NOT passed to the server
+    Pywbemcli creates the new instance using CLASSNAME retrieved from the
+    current WBEM server as a template for property characteristics. Therefore
+    pywbemcli will generate an exception if CLASSNAME does not exist in the
+    current WBEM Server or if the data definition in the properties options
+    does not match the properties characteristics defined the returned class.
+
+    ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
     """
     context.execute_cmd(lambda: cmd_instance_create(context, classname,
                                                     options))
@@ -144,9 +155,13 @@ def instance_create(context, classname, **options):
 @instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
-@click.option('-p', '--parameter', type=str, metavar='parameter',
+@click.option('-p', '--parameter', type=str, metavar='name=value',
               required=False, multiple=True,
-              help='Optional multiple method parameters of form name=value')
+              help='Multiple definitions allowed, one for each parameter to be '
+                   'included in the new instance. Array parameter values '
+                   'defined by comma-separated-values. EmbeddedInstance not '
+                   'allowed.'
+              )
 @add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -159,6 +174,13 @@ def instance_invokemethod(context, instancename, methodname, **options):
 
     This issues an instance level invokemethod request and displays the
     results.
+
+    Pywbemcli creates the method call using the class in INSTANCENAME retrieved
+    from the current WBEM server as a template for parameter characteristics.
+    Therefore pywbemcli will generate an exception if CLASSNAME does not exist
+    in the current WBEM Server or if the data definition in the parameter
+    options does not match the parameter characteristics defined the returned
+    class.
 
     A class level invoke method is available as `pywbemcli class invokemethod`.
 
@@ -188,11 +210,12 @@ def instance_enumerate(context, classname, **options):
     """
     Enumerate instances or names of CLASSNAME.
 
-    Enumerate instances or instance names (the --name_only option) from the
-    WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
-    provided) or from the CLASSNAME argument if provided.
+    Get CIMInstance or CIMInstanceName (--name_only option) objects from
+    the WBEMServer starting either at the top  of the hierarchy (if no
+    CLASSNAME provided) or from the CLASSNAME argument if provided.
 
-    Displays the returned instances (mof, xml, or table formats) or names
+    Displays the returned instances in mof, xml, or table formats or the
+    instance names as a string or XML formats (--names-only option).
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -320,7 +343,8 @@ def instance_count(context, classname, **options):
     classname and is case insensitive. Thus `pywbem_` returns all classes that
     begin with `PyWBEM_`, `pywbem_`, etc.
 
-    This operation can take a long time to execute.
+    This operation can take a long time to execute since it enumerates all
+    classes in the namespace.
 
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
@@ -411,24 +435,36 @@ def cmd_instance_delete(context, instancename, options):
 
 
 def cmd_instance_create(context, classname, options):
-    """Create an instance and submit to wbemserver"""
+    """Create an instance and submit to wbemserver.
+       If successful, this operation returns the new instance name. Otherwise
+       it raises an exception
+    """
 
     try:
         class_ = context.conn.GetClass(
             classname, namespace=options['namespace'], LocalOnly=False)
+    except CIMError as ce:
+        if ce.status_code == CIM_ERR_NOT_FOUND:
+            raise click.ClickException('CIMClass %r does not exist in WEB '
+                                       'server %s'
+                                       % (classname, context.conn))
 
-        property_list = resolve_propertylist(options['propertylist'])
+    properties = options['property']
 
-        properties = options['property']
-
+    try:
         # properties is a tuple of name,value pairs
-        new_inst = create_ciminstance(class_, properties, property_list)
+        new_inst = create_ciminstance(class_, properties)
 
         # TODO: Future Possibly create log of instance created.
-        context.conn.CreateInstance(new_inst, namespace=options['namespace'])
+        name = context.conn.CreateInstance(new_inst,
+                                           namespace=options['namespace'])
+
+        context.spinner.stop()
+        click.echo("%s" % name)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise click.ClickException("Error creating instance %s: %s" %
+                                   (er.__class__.__name__, er))
 
 
 def cmd_instance_invokemethod(context, instancename, methodname,
@@ -460,7 +496,7 @@ def cmd_instance_invokemethod(context, instancename, methodname,
 
 def cmd_instance_enumerate(context, classname, options):
     """
-    Enumerate instances or instance names (names_only option)
+    Enumerate CIM instances or CIM instance names
 
     """
     try:
