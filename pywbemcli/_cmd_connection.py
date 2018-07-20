@@ -21,7 +21,9 @@ from __future__ import absolute_import
 
 import click
 import six
-from pywbem import Error, DEFAULT_CA_CERT_PATHS
+from pywbem import Error, DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
+    LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
+    DEFAULT_LOG_DETAIL_LEVEL
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, pick_from_list, format_table
@@ -146,6 +148,18 @@ def connection_save(context, name):
               help="Server certfile. Ignored if noverify flag set. ")
 @click.option('-k', '--keyfile', type=str,
               help="Client private key file. ")
+@click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
+              help='Enable logging of CIM Operations and set a component '
+                   'to destination, and detail level\n'
+                   '(COMP: [{c}], Default: {cd}) '
+                   'DEST: [{d}], Default: {dd}) '
+                   'DETAIL:[{dl}], Default: {dll})'
+                   .format(c='|'.join(LOGGER_SIMPLE_NAMES),
+                           cd='all',
+                           d='|'.join(LOG_DESTINATIONS),
+                           dd=DEFAULT_LOG_DESTINATION,
+                           dl='|'.join(LOG_DETAIL_LEVELS),
+                           dll=DEFAULT_LOG_DETAIL_LEVEL))
 @click.option('-m', '--mock-server', type=str, multiple=True,
               metavar="FILENAME",
               help='If this option is defined, a mock WBEM server is '
@@ -163,7 +177,7 @@ def connection_save(context, name):
                    'following system directories: ' +
                    ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @click.pass_obj
-def connection_new(context, name, server, **options):
+def connection_new(context, name, uri, **options):
     """
     Create a new named WBEM connection.
 
@@ -187,7 +201,7 @@ def connection_new(context, name, server, **options):
     line and using the `connection set` command to put it into the connection
     repository.
     """
-    context.execute_cmd(lambda: cmd_connection_new(context, name, server,
+    context.execute_cmd(lambda: cmd_connection_new(context, name, uri,
                                                    options))
 
 
@@ -319,7 +333,8 @@ def show_connection_information(context, svr, separate_line=True):
 
     click.echo('\nName: %s%sWBEMServer uri: %s%sDefault_namespace: %s'
                '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
-               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s mock: %r'
+               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s%smock: %r%s'
+               'log: %s'
                % (svr.name, sep,
                   svr.server_url, sep,
                   svr.default_namespace, sep,
@@ -329,8 +344,9 @@ def show_connection_information(context, svr, separate_line=True):
                   sep, svr.noverify,
                   sep, svr.certfile, sep,
                   svr.keyfile, sep,
-                  svr.use_pull_ops,
-                  svr._mock_server))
+                  svr.use_pull_ops, sep,
+                  svr._mock_server, sep,
+                  svr.log))
 
     if svr._mock_server and context.verbose:
         click.echo(context.conn.display_repository())
@@ -384,7 +400,7 @@ def cmd_connection_delete(context, name):
 
 
 # pylint: disable=unused-argument
-def cmd_connection_new(context, name, server, options):
+def cmd_connection_new(context, name, uri, options):
     """
     Create a new connection object from the input arguments and options and
     put it into the PYWBEMCLI_SERVERS dictionary.
@@ -393,7 +409,7 @@ def cmd_connection_new(context, name, server, options):
     if name in pywbemcli_servers:
         raise click.ClickException('%s is already defined as a server' % name)
 
-    pywbem_server = PywbemServer(server, options['default_namespace'], name,
+    pywbem_server = PywbemServer(uri, options['default_namespace'], name,
                                  user=options['user'],
                                  password=options['password'],
                                  timeout=options['timeout'],
@@ -401,7 +417,8 @@ def cmd_connection_new(context, name, server, options):
                                  certfile=options['certfile'],
                                  keyfile=options['keyfile'],
                                  ca_certs=options['ca_certs'],
-                                 mock_server=options['mock_server'])
+                                 mock_server=options['mock_server'],
+                                 log=options['log'])
 
     server_definitions_new(name, pywbem_server)
 
@@ -415,13 +432,13 @@ def cmd_connection_list(context):
 
     # build the table structure
     headers = ['name', 'server uri', 'namespace', 'user', 'password',
-               'timeout', 'noverify', 'certfile', 'keyfile']
+               'timeout', 'noverify', 'certfile', 'keyfile', 'log']
     rows = []
 
     for name, svr in six.iteritems(pywbemcli_servers):
         row = [name, svr.server_url, svr.default_namespace, svr.user,
                svr.password, svr.timeout, svr.noverify, svr.certfile,
-               svr.keyfile]
+               svr.keyfile, svr.log]
         rows.append(row)
 
     context.spinner.stop()

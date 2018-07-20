@@ -23,7 +23,7 @@ from __future__ import absolute_import, unicode_literals
 import re
 import click
 
-from pywbem import WBEMServer
+from pywbem import WBEMServer, configure_loggers_from_string
 
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_MAXPULLCNT, DEFAULT_NAMESPACE, MAX_TIMEOUT
@@ -31,6 +31,8 @@ from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
 
 WBEM_SERVER_OBJ = None
+
+PYWBEMCLI_LOG = 'pywbemcli.log'
 
 
 def _validate_server_url(server):
@@ -97,13 +99,15 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
     stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
+    log_envvar = 'PYWBEMCLI_LOG'
 
     def __init__(self, server_url=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  noverify=True, certfile=None, keyfile=None, ca_certs=None,
                  use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
-                 stats_enabled=False, verbose=False, mock_server=None):
+                 stats_enabled=False, verbose=False, mock_server=None,
+                 log=None):
         """
             Create a PywbemServer object. This contains the configuration
             and operation information to create a connection to the server
@@ -133,16 +137,18 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
 
         self._wbem_server = None
         self._verbose = verbose
+        self._log = log
 
     def __repr__(self):
         return 'PywbemServer(url=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
                'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
                'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s ' \
-               ' mock_server=%r)' % \
+               ' mock_server=%r, log=%r)' % \
                (self.server_url, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
-                self.pull_max_cnt, self.stats_enabled, self._mock_server)
+                self.pull_max_cnt, self.stats_enabled, self._mock_server,
+                self._log)
 
     @property
     def server_url(self):
@@ -231,6 +237,13 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
         :term: `string`: keyfile or None if no keyfile parameter input
         """
         return self._keyfile
+
+    @property
+    def log(self):
+        """
+        :term: `string`: log config or None if no log parameter input
+        """
+        return self._log
 
     @property
     def ca_certs(self):
@@ -334,13 +347,6 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
             conn = PYWBEMCLIFakedConnection(
                 default_namespace=self.default_namespace)
 
-            # where can we get the fake repository without putting it into
-            # the pywbemcli code. This should probably be the name of a
-            # callback that would build the repo.  Thus the callback could be
-            # either in the code or in the tests.
-            # TODO clean up we are using conn twice because the one that
-            # is supposed to be in pywem_server is not yet set.
-
             conn.build_repository(conn, self._mock_server, verbose)
         else:
             if not self.server_url:
@@ -359,7 +365,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
 
             # If client cert and key provided, create dictionary for
             # wbem connection certs (WBEMConnection takes dictionary for this
-            #  info)
+            # info)
             x509_dict = None
             if self.certfile is not None:
                 x509_dict = {"certfile": self.certfile}
@@ -375,5 +381,13 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
                                        timeout=self.timeout,
                                        stats_enabled=self.stats_enabled)
 
+        if self.log:
+            try:
+                configure_loggers_from_string(self.log,
+                                              log_filename=PYWBEMCLI_LOG,
+                                              connection=conn, propagate=True)
+            except ValueError as ve:
+                raise click.ClickException('Logger configuration error. input'
+                                           '%s. Exception %s' % (self.log, ve))
         # Save the connection object and create a WBEMServer object
         self._wbem_server = WBEMServer(conn)

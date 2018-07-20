@@ -24,7 +24,9 @@ import click_repl
 import click
 from prompt_toolkit.history import FileHistory
 
-from pywbem import DEFAULT_CA_CERT_PATHS
+from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
+    LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
+    DEFAULT_LOG_DETAIL_LEVEL
 
 from ._context_obj import ContextObj
 from ._common import GENERAL_OPTIONS_METAVAR, OUTPUT_FORMATS
@@ -134,6 +136,19 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-T', '--timestats', is_flag=True,
               help='Show time statistics of WBEM server operations after '
                    ' each command execution.')
+@ click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
+               envvar=PywbemServer.log_envvar,
+               help='Enable logging of CIM Operations and set a component to '
+                    'a log level, destination, and detail level\n'
+                    '(COMP: [{c}], Default: {cd}) '
+                    'DEST: [{d}], Default: {dd}) '
+                    'DETAIL:[{dl}], Default: {dll})'
+                    .format(c='|'.join(LOGGER_SIMPLE_NAMES),
+                            cd='all',
+                            d='|'.join(LOG_DESTINATIONS),
+                            dd=DEFAULT_LOG_DESTINATION,
+                            dl='|'.join(LOG_DETAIL_LEVELS),
+                            dll=DEFAULT_LOG_DETAIL_LEVEL))
 @click.option('-v', '--verbose', is_flag=True,
               help='Display extra information about the processing.')
 @click.option('-m', '--mock-server', type=str, multiple=True,
@@ -149,7 +164,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, mock_server, pywbem_server=None, timestats=None):
+        verbose, mock_server, pywbem_server=None, timestats=None, log=None):
     """
     Command line browser for WBEM Servers. This cli tool implements the
     CIM/XML client APIs as defined in pywbem to make requests to a WBEM
@@ -230,7 +245,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          pull_max_cnt=pull_max_cnt,
                                          stats_enabled=timestats,
                                          verbose=verbose,
-                                         mock_server=mock_server)
+                                         mock_server=mock_server,
+                                         log=log)
         else:
             if name:
                 if name in pywbemcli_servers:

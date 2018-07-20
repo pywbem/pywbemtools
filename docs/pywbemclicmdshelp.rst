@@ -105,6 +105,12 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       positive non-zero integer. Default is 1000.
       -T, --timestats                 Show time statistics of WBEM server
                                       operations after  each command execution.
+      -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
+                                      component to a log level, destination, and
+                                      detail level
+                                      (COMP: [api|http|all], Default:
+                                      all) DEST: [file|stderr], Default: file)
+                                      DETAIL:[all|paths|summary], Default: all)
       -v, --verbose                   Display extra information about the
                                       processing.
       -m, --mock-server FILENAME      If this option is defined, a mock WBEM
@@ -197,13 +203,14 @@ The following defines the help output for the `pywbemcli class associators --hel
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -374,13 +381,14 @@ The following defines the help output for the `pywbemcli class get --help` subco
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -448,13 +456,14 @@ The following defines the help output for the `pywbemcli class references --help
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -646,39 +655,46 @@ The following defines the help output for the `pywbemcli connection new --help` 
       connection repository.
 
     Options:
-      -d, --default_namespace TEXT  Default Namespace to use in the target
-                                    WBEMServer if no namespace is defined in the
-                                    subcommand (Default: root/cimv2).
-      -u, --user TEXT               User name for the WBEM Server connection.
-      -p, --password TEXT           Password for the WBEM Server. Will be
-                                    requested as part  of initialization if user
-                                    name exists and it is not  provided by this
-                                    option.
-      -t, --timeout INTEGER RANGE   Operation timeout for the WBEM Server in
-                                    seconds. Default: 30
-      -n, --noverify                If set, client does not verify server
-                                    certificate.
-      -c, --certfile TEXT           Server certfile. Ignored if noverify flag set.
-      -k, --keyfile TEXT            Client private key file.
-      -m, --mock-server FILENAME    If this option is defined, a mock WBEM server
-                                    is constructed as the target WBEM server and
-                                    the option value defines a MOF or Python file
-                                    to be used to populate the mock repository.
-                                    This option may be used multiple times where
-                                    each use defines a single file or
-                                    file_path.See the pywbemcli documentation for
-                                    more information.
-      --ca_certs TEXT               File or directory containing certificates that
-                                    will be matched against a certificate received
-                                    from the WBEM server. Set the --no-verify-cert
-                                    option to bypass client verification of the
-                                    WBEM server certificate. Default: Searches for
-                                    matching certificates in the following system
-                                    directories: /etc/pki/ca-
-                                    trust/extracted/openssl/ca-bundle.trust.crt
-                                    /etc/ssl/certs
-                                    /etc/ssl/certificates
-      -h, --help                    Show this message and exit.
+      -d, --default_namespace TEXT    Default Namespace to use in the target
+                                      WBEMServer if no namespace is defined in the
+                                      subcommand (Default: root/cimv2).
+      -u, --user TEXT                 User name for the WBEM Server connection.
+      -p, --password TEXT             Password for the WBEM Server. Will be
+                                      requested as part  of initialization if user
+                                      name exists and it is not  provided by this
+                                      option.
+      -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
+                                      seconds. Default: 30
+      -n, --noverify                  If set, client does not verify server
+                                      certificate.
+      -c, --certfile TEXT             Server certfile. Ignored if noverify flag
+                                      set.
+      -k, --keyfile TEXT              Client private key file.
+      -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
+                                      component to destination, and detail level
+                                      (COMP: [api|http|all], Default: all) DEST:
+                                      [file|stderr], Default: file)
+                                      DETAIL:[all|paths|summary], Default: all)
+      -m, --mock-server FILENAME      If this option is defined, a mock WBEM
+                                      server is constructed as the target WBEM
+                                      server and the option value defines a MOF or
+                                      Python file to be used to populate the mock
+                                      repository. This option may be used multiple
+                                      times where each use defines a single file
+                                      or file_path.See the pywbemcli documentation
+                                      for more information.
+      --ca_certs TEXT                 File or directory containing certificates
+                                      that will be matched against a certificate
+                                      received from the WBEM server. Set the --no-
+                                      verify-cert option to bypass client
+                                      verification of the WBEM server certificate.
+                                      Default: Searches for matching certificates
+                                      in the following system directories:
+                                      /etc/pki/ca-trust/extracted/openssl/ca-
+                                      bundle.trust.crt
+                                      /etc/ssl/certs
+                                      /etc/ssl/certificates
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli connection save --help`:
@@ -874,13 +890,14 @@ The following defines the help output for the `pywbemcli instance associators --
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -o, --names_only                Show only local properties of the class.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -966,13 +983,14 @@ The following defines the help output for the `pywbemcli instance create --help`
                                       instance.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1043,13 +1061,14 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -c, --includeclassorigin        Include ClassOrigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1089,13 +1108,14 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1212,13 +1232,14 @@ The following defines the help output for the `pywbemcli instance references --h
       -c, --includeclassorigin        Include classorigin in the result.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
-                                      not defined a Null property list is defined
-                                      and the server returns all properties.
-                                      Multiple properties may be defined either a
-                                      comma separated list defing the option
-                                      multipletimes (ex: -p pn1 -p pn22 or -p
-                                      pn1,pn2). If defined as empty string the
-                                      server returns no properties.
+                                      option not specified a Null property list is
+                                      created and the server returns all
+                                      properties. Multiple properties may be
+                                      defined with either a comma separated list
+                                      defing the option multiple times. (ex: -p
+                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      empty string the server should return no
+                                      properties.
       -o, --names_only                Show only local properties of the class.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
