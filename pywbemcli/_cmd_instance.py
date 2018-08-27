@@ -500,9 +500,12 @@ def cmd_instance_create(context, classname, options):
             classname, namespace=options['namespace'], LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            raise click.ClickException('CIMClass %r does not exist in WEB '
-                                       'server %s'
-                                       % (classname, context.conn))
+            ns = options['namespace'] if options['namespace'] else \
+                context.conn.default_namespace
+            raise click.ClickException('CIMClass: "%s" does not exist in '
+                                       'namespace "%s" in WEB '
+                                       'server: %s.'
+                                       % (classname, ns, context.conn))
 
     properties = options['property']
 

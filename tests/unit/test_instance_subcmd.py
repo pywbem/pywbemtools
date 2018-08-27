@@ -654,6 +654,32 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '-n', 'root/cimv2'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--namespace',
+      'root/cimv2'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '--property', 'InstanceID=blah', '--namespace',
+      'root/cimv2'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     # TODO test datetime
     ['Verify instance subcommand create, new instance of all_types'
      'with scalar types',
@@ -703,20 +729,39 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand create, new instance already exists',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance'],
-     {'stderr': "Error: CIMClass 'PyWBEM_AllTypes' does not exist in WEB "
-                "server PYWBEMCLIFakedConnection(url='http://FakedUrl', "
-                "creds=None, default_namespace='root/cimv2')",
+     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
+                 'namespace "root/cimv2" in WEB ',
+                 "server: PYWBEMCLIFakedConnection\\(url=",
+                 'http://FakedUrl',
+                 "creds=None, default_namespace=",
+                 "'root/cimv2'\\)"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance invalid ns',
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
+      'blah'],
+     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
+                 'namespace "root/cimv2" in WEB ',
+                 "server: PYWBEMCLIFakedConnection\\(url=",
+                 'http://FakedUrl',
+                 "creds=None, default_namespace=",
+                 "'root/cimv2'\\)"
+                 ],
+      'rc': 1,
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance invalid class',
      ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
-     {'stderr': "Error: CIMClass 'CIM_blah' does not exist in WEB server "
-                "PYWBEMCLIFakedConnection(url='http://FakedUrl', creds=None, "
-                "default_namespace='root/cimv2')",
+     {'stderr': ["Error: CIMClass 'CIM_blah' does not exist in ",
+                 'namespace "root/cimv2" in "WEB server "',
+                 "PYWBEMCLIFakedConnection\\(url="
+                 "'http://FakedUrl', creds=None, default_namespace="
+                 "'root/cimv2'\\)"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
     # NOTE: Since the instance creation logic is the same for modify and
     # create instance. The error tests in modify also test the error logic.
@@ -740,6 +785,22 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
+    ['Verify instance subcommand modify, single good change, explicit ns',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
+      'root/cimv2', '-P', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single good change, explicit ns',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '--namespace',
+      'root/cimv2', '--property', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
     ['Verify instance subcommand modify, multiple good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-P', 'scalBool=False',
@@ -752,7 +813,7 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single property, Type Error',
+    ['Verify instance subcommand modify, single property, Type Error bool',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-P', 'scalBool=9'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
@@ -762,14 +823,15 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single property, Type Error',
+    ['Verify instance subcommand modify, single property, Type Error uint32. '
+     'Uses regex because Exception msg different between python 2 and 3',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-P', 'scalUint32=Fred'],
-     {'stderr': "Error: Type mismatch property 'scalUint32' between expected "
-                "type='uint32', array=False and input value='Fred'. "
-                "Exception: invalid literal for int() with base 10: 'Fred'",
+     {'stderr': ["Error: Type mismatch property 'scalUint32' between expected ",
+                 "type='uint32', array=False and input value='Fred'. ",
+                 "Exception: invalid literal for", "with base 10: 'Fred'"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'regex'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand modify, single Property arrayness error',
@@ -817,8 +879,7 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand modify, Error property not in class',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-P', 'blah=9'],
-     {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes". '
-                "Exception: \"Key 'blah' not found\"",
+     {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes".',
       'rc': 1,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
@@ -838,6 +899,20 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand delete, valid delete',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stdout': '',
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand delete, valid delete, explicit ns',
+     ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '-n', 'root/cimv2'],
+     {'stdout': '',
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand delete, valid delete, explicit ns',
+     ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
@@ -880,6 +955,13 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance subcommand references, returns instances, explicit ns',
+     ['references', 'TST_Person.name="Mike"', '-n', 'root/cimv2'],
+     {'stdout': REF_INSTS,
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
@@ -902,11 +984,39 @@ MOCK_TEST_CASES = [
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short formvalid returns paths',
+     'valid returns paths sorted',
+     ['references', 'TST_Person.name="Mike"', '-o', '-s',
+      '--resultclass', 'TST_Lineage'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short formvalid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-o', '--summary',
+      '-R', 'TST_Lineage'],
+     {'stdout': ['2 CIMInstanceName(s) returned'],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short formvalid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-S',
+      '-R', 'TST_Lineage'],
+     {'stdout': ['2 CIMInstance(s) returned'],
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -920,7 +1030,7 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO add invalid references tests
+    # TODO add more invalid references tests
     ['Verify instance subcommand references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
@@ -1011,7 +1121,7 @@ MOCK_TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-    # TODO add subclass instances to the test.
+    # TODO add subclass instances to the count test.
 
     #
     #  instance invokemethod subcommand

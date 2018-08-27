@@ -268,6 +268,7 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
         ClickException: if the input wbemuri_str is an invalid wbemuri.
 
     """
+    # TODO documented in issue # 131
     # TODO remove this code when we resolve issue with pywbem issue #1359
     # Issue is that 0.13.0 does not allow the form classname.keybindings
     # without the : before the classname
@@ -423,22 +424,21 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
         name, value_str = parse_kv_pair(kv_property)
         try:
             cl_prop = cim_class.properties[name]
-        except KeyError as ke:
-            raise click.ClickException('Property name "%s" not in class "%s"'
-                                       '. Exception: %s' %
-                                       (name, cim_class.classname, ke))
+        except KeyError:
+            raise click.ClickException('Property name "%s" not in class "%s".'
+                                       % (name, cim_class.classname))
 
         try:
             properties[name] = create_cimproperty(cl_prop.type,
                                                   cl_prop.is_array,
                                                   name,
                                                   value_str)
-        except ValueError as ve:
-            raise click.ClickException('Type mismatch property %r between '
-                                       'expected type=%r, array=%r and input '
-                                       'value=%r. Exception: %s' %
+        except ValueError as ex:
+            raise click.ClickException("Type mismatch property '%s' between "
+                                       "expected type='%s', array=%s and input "
+                                       "value='%s'. Exception: %s" %
                                        (name, cl_prop.type, cl_prop.is_array,
-                                        value_str, ve))
+                                        value_str, ex))
 
     new_inst = CIMInstance(cim_class.classname, properties=properties,
                            property_list=property_list)
