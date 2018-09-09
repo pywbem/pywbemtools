@@ -207,7 +207,7 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -385,7 +385,7 @@ The following defines the help output for the `pywbemcli class get --help` subco
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -460,7 +460,7 @@ The following defines the help output for the `pywbemcli class references --help
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -846,11 +846,12 @@ The following defines the help output for the `pywbemcli instance --help` subcom
     Commands:
       associators   Get associated instances or names.
       count         Get instance count for classes.
-      create        Create an instance of classname.
+      create        Create a CIM instance of CLASSNAME.
       delete        Delete a single CIM instance.
       enumerate     Enumerate instances or names of CLASSNAME.
       get           Get a single CIMInstance.
       invokemethod  Invoke a CIM method.
+      modify        Modify an existing instance.
       query         Execute an execquery request.
       references    Get the reference instances or names.
 
@@ -894,7 +895,7 @@ The following defines the help output for the `pywbemcli instance associators --
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -944,7 +945,8 @@ The following defines the help output for the `pywbemcli instance count --help` 
       classname and is case insensitive. Thus `pywbem_` returns all classes that
       begin with `PyWBEM_`, `pywbem_`, etc.
 
-      This operation can take a long time to execute.
+      This operation can take a long time to execute since it enumerates all
+      classes in the namespace.
 
     Options:
       -s, --sort              Sort by instance count. Otherwise sorted by
@@ -968,33 +970,32 @@ The following defines the help output for the `pywbemcli instance create --help`
 
     Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
 
-      Create an instance of classname.
+      Create a CIM instance of CLASSNAME.
 
-      Creates an instance of the class `CLASSNAME` with the properties defined
-      in the property option.
+      Creates an instance of the class CLASSNAME with the properties defined in
+      the property option.
 
-      The propertylist option limits the created instance to the properties in
-      the list. This parameter is NOT passed to the server
+      Pywbemcli creates the new instance using CLASSNAME retrieved from the
+      current WBEM server as a template for property characteristics. Therefore
+      pywbemcli will generate an exception if CLASSNAME does not exist in the
+      current WBEM Server or if the data definition in the properties options
+      does not match the properties characteristics defined the returned class.
+
+      ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
     Options:
-      -P, --property property         Optional property definitions of form
-                                      name=value.Multiple definitions allowed, one
-                                      for each property to be included in the new
-                                      instance.
-      -p, --propertylist <property name>
-                                      Define a propertylist for the request. If
-                                      option not specified a Null property list is
-                                      created and the server returns all
-                                      properties. Multiple properties may be
-                                      defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
-                                      empty string the server should return no
-                                      properties.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
-      -h, --help                      Show this message and exit.
+      -P, --property name=value  Optional property definitions of the form
+                                 name=value.Multiple definitions allowed, one for
+                                 each property to be included in the
+                                 createdinstance. Array property values defined by
+                                 comma-separated-values. EmbeddedInstance not
+                                 allowed.
+      -V, --verify               If set, The change is displayed and verification
+                                 requested before the change is executed
+      -n, --namespace <name>     Namespace to use for this operation. If defined
+                                 that namespace overrides the general options
+                                 namespace
+      -h, --help                 Show this message and exit.
 
 
 .. _`pywbemcli instance delete --help`:
@@ -1044,11 +1045,12 @@ The following defines the help output for the `pywbemcli instance enumerate --he
 
       Enumerate instances or names of CLASSNAME.
 
-      Enumerate instances or instance names (the --name_only option) from the
+      Get CIMInstance or CIMInstanceName (--name_only option) objects from the
       WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
       provided) or from the CLASSNAME argument if provided.
 
-      Displays the returned instances (mof, xml, or table formats) or names
+      Displays the returned instances in mof, xml, or table formats or the
+      instance names as a string or XML formats (--names-only option).
 
     Options:
       -l, --localonly                 Show only local properties of the class.
@@ -1065,7 +1067,7 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -1094,10 +1096,16 @@ The following defines the help output for the `pywbemcli instance get --help` su
 
       Get a single CIMInstance.
 
-      Gets the instance defined by INSTANCENAME.
+      Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
+      to the instance name of the desired instance. This may be supplied
+      directly as an untyped wbem_uri formatted string or through the
+      --interactive option. The wbemuri may contain the namespace or the
+      namespace can be supplied with the --namespace option. If no namespace is
+      supplied, the connection default namespace is used.  Any host name in the
+      wbem_uri is ignored.
 
-      This may be executed interactively by providing only a classname and the
-      interactive option (-i).
+      This method may be executed interactively by providing only a classname
+      and the interactive option (-i).
 
     Options:
       -l, --localonly                 Show only local properties of the returned
@@ -1112,7 +1120,7 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
@@ -1150,20 +1158,90 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       This issues an instance level invokemethod request and displays the
       results.
 
+      Pywbemcli creates the method call using the class in INSTANCENAME
+      retrieved from the current WBEM server as a template for parameter
+      characteristics. Therefore pywbemcli will generate an exception if
+      CLASSNAME does not exist in the current WBEM Server or if the data
+      definition in the parameter options does not match the parameter
+      characteristics defined the returned class.
+
       A class level invoke method is available as `pywbemcli class
       invokemethod`.
 
     Options:
-      -p, --parameter parameter  Optional multiple method parameters of form
-                                 name=value
-      -i, --interactive          If set, INSTANCENAME argument must be a class
-                                 rather than an instance and user is presented
-                                 with a list of instances of the class from which
-                                 the instance to process is selected.
-      -n, --namespace <name>     Namespace to use for this operation. If defined
-                                 that namespace overrides the general options
-                                 namespace
-      -h, --help                 Show this message and exit.
+      -p, --parameter name=value  Multiple definitions allowed, one for each
+                                  parameter to be included in the new instance.
+                                  Array parameter values defined by comma-
+                                  separated-values. EmbeddedInstance not allowed.
+      -i, --interactive           If set, INSTANCENAME argument must be a class
+                                  rather than an instance and user is presented
+                                  with a list of instances of the class from which
+                                  the instance to process is selected.
+      -n, --namespace <name>      Namespace to use for this operation. If defined
+                                  that namespace overrides the general options
+                                  namespace
+      -h, --help                  Show this message and exit.
+
+
+.. _`pywbemcli instance modify --help`:
+
+pywbemcli instance modify --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli instance modify --help` subcommand
+
+
+::
+
+    Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
+
+      Modify an existing instance.
+
+      Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
+      property names and values defined by the property option and the CIM class
+      defined by the instance name.  The propertylist option if provided is
+      passed to the WBEM server as part of the ModifyInstance operation
+      (normally the WBEM server limits modifications) to just those properties
+      defined in the property list.
+
+      Pywbemcli builds only the properties defined with the --property option
+      into an instance based on the CIMClass and forwards that to the WBEM
+      server with the ModifyInstance method.
+
+      ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+
+    Options:
+      -P, --property name=value       Optional property definitions of the form
+                                      name=value.Multiple definitions allowed, one
+                                      for each property to be included in the
+                                      createdinstance. Array property values
+                                      defined by comma-separated-values.
+                                      EmbeddedInstance not allowed.
+      -p, --propertylist <property name>
+                                      Define a propertylist for the request. If
+                                      option not specified a Null property list is
+                                      created. Multiple properties may be defined
+                                      with either a comma separated list defining
+                                      the option multiple times. (ex: -p pn1 -p
+                                      pn22 or -p pn1,pn2). If defined as empty
+                                      string an empty propertylist is created. The
+                                      server uses the propertylist to limit
+                                      changes made to the instance to properties
+                                      in the propertylist.
+      -i, --interactive               If set, INSTANCENAME argument must be a
+                                      class rather than an instance and user is
+                                      presented with a list of instances of the
+                                      class from which the instance to process is
+                                      selected.
+      -V, --verify                    If set, The change is displayed and
+                                      verification requested before the change is
+                                      executed
+      -n, --namespace <name>          Namespace to use for this operation. If
+                                      defined that namespace overrides the general
+                                      options namespace
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance query --help`:
@@ -1236,7 +1314,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defing the option multiple times. (ex: -p
+                                      defining the option multiple times. (ex: -p
                                       pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.

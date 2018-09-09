@@ -24,7 +24,8 @@ from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
-    create_params, filter_namelist, CMD_OPTS_TXT, format_table
+    create_params, filter_namelist, CMD_OPTS_TXT, format_table, \
+    verify_operation
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option
@@ -63,10 +64,16 @@ instance_property_option = [              # pylint: disable=invalid-name
     click.option('-P', '--property', type=str, metavar='name=value',
                  required=False,
                  multiple=True,
-                 help='Optional property definitions of form name=value.'
+                 help='Optional property definitions of the form name=value.'
                  'Multiple definitions allowed, one for each property to be '
-                 'included in the new instance. Array property values defined '
-                 'by comma-separated-values. EmbeddedInstance not allowed.')]
+                 'included in the createdinstance. Array property values '
+                 'defined by comma-separated-values. EmbeddedInstance not '
+                 'allowed.')]
+
+verify_option = [              # pylint: disable=invalid-name
+    click.option('-V', '--verify', is_flag=True, required=False,
+                 help='If set, The change is displayed and verification '
+                      'requested before the change is executed')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
@@ -100,10 +107,16 @@ def instance_get(context, instancename, **options):
     """
     Get a single CIMInstance.
 
-    Gets the instance defined by INSTANCENAME.
+    Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
+    to the instance name of the desired instance. This may be supplied directly
+    as an untyped wbem_uri formatted string or through the --interactive
+    option. The wbemuri may contain the namespace or the namespace can be
+    supplied with the --namespace option. If no namespace is supplied, the
+    connection default namespace is used.  Any host name in the wbem_uri is
+    ignored.
 
-    This may be executed interactively by providing only a classname and the
-    interactive option (-i).
+    This method may be executed interactively by providing only a classname and
+    the interactive option (-i).
 
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
@@ -131,6 +144,7 @@ def instance_delete(context, instancename, **options):
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @add_options(instance_property_option)
+@add_options(verify_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_create(context, classname, **options):
@@ -149,6 +163,44 @@ def instance_create(context, classname, **options):
     ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
     """
     context.execute_cmd(lambda: cmd_instance_create(context, classname,
+                                                    options))
+
+
+@instance_group.command('modify', options_metavar=CMD_OPTS_TXT)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@add_options(instance_property_option)
+@click.option('-p', '--propertylist', multiple=True, type=str,
+              default=None, metavar='<property name>',
+              help='Define a propertylist for the request. If option '
+                   'not specified a Null property list is created. Multiple '
+                   'properties may be defined with either a comma '
+                   'separated list defining the option multiple times. '
+                   '(ex: -p pn1 -p pn22 or -p pn1,pn2). If defined as '
+                   'empty string an empty propertylist is created. The '
+                   'server uses the propertylist to limit changes made to '
+                   'the instance to properties in the propertylist.')
+@add_options(interactive_option)
+@add_options(verify_option)
+@add_options(namespace_option)
+@click.pass_obj
+def instance_modify(context, instancename, **options):
+    """
+    Modify an existing instance.
+
+    Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
+    property names and values defined by the property option and the CIM class
+    defined by the instance name.  The propertylist option if provided is
+    passed to the WBEM server as part of the ModifyInstance operation (normally
+    the WBEM server limits modifications) to just those properties defined in
+    the property list.
+
+    Pywbemcli builds only the properties defined with the --property option
+    into an instance based on the CIMClass and forwards that to the WBEM
+    server with the ModifyInstance method.
+
+    ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+    """
+    context.execute_cmd(lambda: cmd_instance_modify(context, instancename,
                                                     options))
 
 
@@ -356,18 +408,21 @@ def instance_count(context, classname, **options):
 
 def get_instancename(context, instancename, options):
     """
-    Common function to get the instancename from either the input or the user
+    Common function to get the instancename from either the input or the user.
+
+    Returns:
+     CIMInstanceName with namespace retrieved either from the namespace option
+     in options dictionary or the connection default_namespace.
     """
-    if 'namespace' in options:
-        ns = options['namespace']
-    else:
-        ns = None
-
-    if ns is None:
-        ns = context.conn.default_namespace
-
     try:
         if options['interactive']:
+            if 'namespace' in options:
+                ns = options['namespace']
+            else:
+                ns = None
+
+            if ns is None:
+                ns = context.conn.default_namespace
             try:
                 instancepath = pick_instance(context, instancename,
                                              namespace=ns)
@@ -377,7 +432,7 @@ def get_instancename(context, instancename, options):
                 return None
 
         else:
-            instancepath = parse_wbemuri_str(instancename, ns)
+            instancepath = parse_wbemuri_str(instancename, options['namespace'])
         return instancepath
 
     except ValueError as ve:
@@ -428,7 +483,8 @@ def cmd_instance_delete(context, instancename, options):
     try:
         context.conn.DeleteInstance(instancepath)
 
-        click.echo('Deleted %s' % instancepath)
+        if context.verbose:
+            click.echo('Deleted %s' % instancepath)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -439,31 +495,88 @@ def cmd_instance_create(context, classname, options):
        If successful, this operation returns the new instance name. Otherwise
        it raises an exception
     """
-
     try:
         class_ = context.conn.GetClass(
             classname, namespace=options['namespace'], LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            raise click.ClickException('CIMClass %r does not exist in WEB '
-                                       'server %s'
-                                       % (classname, context.conn))
+            ns = options['namespace'] if options['namespace'] else \
+                context.conn.default_namespace
+            raise click.ClickException('CIMClass: "%s" does not exist in '
+                                       'namespace "%s" in WEB '
+                                       'server: %s.'
+                                       % (classname, ns, context.conn))
 
     properties = options['property']
 
-    try:
-        # properties is a tuple of name,value pairs
-        new_inst = create_ciminstance(class_, properties)
+    # properties is a tuple of name,value pairs
+    new_inst = create_ciminstance(class_, properties)
 
+    if options['verify']:
+        context.spinner.stop()
+        click.echo(new_inst.tomof())
+        if not verify_operation("Execute CreateInstance operation"):
+            return
+    try:
         # TODO: Future Possibly create log of instance created.
         name = context.conn.CreateInstance(new_inst,
                                            namespace=options['namespace'])
 
         context.spinner.stop()
         click.echo("%s" % name)
-
     except Error as er:
-        raise click.ClickException("Error creating instance %s: %s" %
+        raise click.ClickException("Server Error creating instance. Exception: "
+                                   "%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_instance_modify(context, instancename, options):
+    """
+    Build an instance defined by the options and submit to wbemserver
+    as a ModifyInstance method.
+
+    In order to make a correct instance, this method first gets the
+    corresponding class and uses that as the template for creating the intance.
+    The class provides property names, types, array flags, etc. to assure
+    that the instance is correctly built.
+
+    If successful, this operation returns nothing.
+    """
+    # This function resolves any issues between namespace in instancename and
+    # the namespace option.
+    instancepath = get_instancename(context, instancename, options)
+    if instancepath is None:
+        return
+
+    try:
+        class_ = context.conn.GetClass(
+            instancepath.classname, LocalOnly=False)
+    except CIMError as ce:
+        if ce.status_code == CIM_ERR_NOT_FOUND:
+            raise click.ClickException('CIMClass: %r does not exist in WEB '
+                                       'server: %s namespace: %s'
+                                       % (instancepath.classname,
+                                          context.conn.uri))
+
+    property_list = resolve_propertylist(options['propertylist'])
+
+    # properties is a tuple of name,value pairs
+    modified_inst = create_ciminstance(class_, options['property'])
+
+    modified_inst.path = instancepath
+
+    if options['verify']:
+        context.spinner.stop()
+        click.echo(modified_inst.tomof())
+        if not verify_operation("Execute ModifyInstance operation", msg=True):
+            return
+
+    try:
+        # TODO: Future Possibly create log of instance modified.
+        context.conn.ModifyInstance(modified_inst,
+                                    PropertyList=property_list)
+    except Error as er:
+        raise click.ClickException("Server Error modifying instance. "
+                                   "Exception: %s: %s" %
                                    (er.__class__.__name__, er))
 
 

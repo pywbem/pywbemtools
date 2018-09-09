@@ -50,6 +50,7 @@ Commands:
   enumerate     Enumerate instances or names of CLASSNAME.
   get           Get a single CIMInstance.
   invokemethod  Invoke a CIM method.
+  modify        Modify an existing instance.
   query         Execute an execquery request.
   references    Get the reference instances or names.
 """
@@ -81,7 +82,7 @@ Options:
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defing the option multiple times. (ex: -p
+                                  defining the option multiple times. (ex: -p
                                   pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
@@ -98,10 +99,16 @@ INST_GET_HELP = """Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
 
-  Gets the instance defined by INSTANCENAME.
+  Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
+  to the instance name of the desired instance. This may be supplied
+  directly as an untyped wbem_uri formatted string or through the
+  --interactive option. The wbemuri may contain the namespace or the
+  namespace can be supplied with the --namespace option. If no namespace is
+  supplied, the connection default namespace is used.  Any host name in the
+  wbem_uri is ignored.
 
-  This may be executed interactively by providing only a classname and the
-  interactive option (-i).
+  This method may be executed interactively by providing only a classname
+  and the interactive option (-i).
 
 Options:
   -l, --localonly                 Show only local properties of the returned
@@ -116,7 +123,7 @@ Options:
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defing the option multiple times. (ex: -p
+                                  defining the option multiple times. (ex: -p
                                   pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
@@ -147,11 +154,14 @@ INST_CREATE_HELP = """Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNA
   ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
 Options:
-  -P, --property name=value  Optional property definitions of form
+  -P, --property name=value  Optional property definitions of the form
                              name=value.Multiple definitions allowed, one for
-                             each property to be included in the new instance.
-                             Array property values defined by comma-separated-
-                             values. EmbeddedInstance not allowed.
+                             each property to be included in the
+                             createdinstance. Array property values defined by
+                             comma-separated-values. EmbeddedInstance not
+                             allowed.
+  -V, --verify               If set, The change is displayed and verification
+                             requested before the change is executed
   -n, --namespace <name>     Namespace to use for this operation. If defined
                              that namespace overrides the general options
                              namespace
@@ -233,7 +243,7 @@ Options:
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defing the option multiple times. (ex: -p
+                                  defining the option multiple times. (ex: -p
                                   pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
@@ -248,6 +258,55 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
+  -h, --help                      Show this message and exit.
+"""
+
+INST_MODIFY_HELP = """Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
+
+  Modify an existing instance.
+
+  Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
+  property names and values defined by the property option and the CIM class
+  defined by the instance name.  The propertylist option if provided is
+  passed to the WBEM server as part of the ModifyInstance operation
+  (normally the WBEM server limits modifications) to just those properties
+  defined in the property list.
+
+  Pywbemcli builds only the properties defined with the --property option
+  into an instance based on the CIMClass and forwards that to the WBEM
+  server with the ModifyInstance method.
+
+  ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+
+Options:
+  -P, --property name=value       Optional property definitions of the form
+                                  name=value.Multiple definitions allowed, one
+                                  for each property to be included in the
+                                  createdinstance. Array property values
+                                  defined by comma-separated-values.
+                                  EmbeddedInstance not allowed.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  option not specified a Null property list is
+                                  created. Multiple properties may be defined
+                                  with either a comma separated list defining
+                                  the option multiple times. (ex: -p pn1 -p
+                                  pn22 or -p pn1,pn2). If defined as empty
+                                  string an empty propertylist is created. The
+                                  server uses the propertylist to limit
+                                  changes made to the instance to properties
+                                  in the propertylist.
+  -i, --interactive               If set, INSTANCENAME argument must be a
+                                  class rather than an instance and user is
+                                  presented with a list of instances of the
+                                  class from which the instance to process is
+                                  selected.
+  -V, --verify                    If set, The change is displayed and
+                                  verification requested before the change is
+                                  executed
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
   -h, --help                      Show this message and exit.
 """
 
@@ -278,7 +337,7 @@ Options:
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defing the option multiple times. (ex: -p
+                                  defining the option multiple times. (ex: -p
                                   pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
@@ -546,8 +605,7 @@ MOCK_TEST_CASES = [
                  ''],
       'rc': 0,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, FAIL],
-    # TODO: This should return an empty instance not the statement Return empty
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with instancename PyWBEM_AllTypes'
      ' returns innstance with all property types',
@@ -589,8 +647,34 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo',
+    ['Verify instance subcommand create, new instance of CIM_Foo  one property',
      ['create', 'CIM_Foo', '-P', 'InstanceID=blah'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '-n', 'root/cimv2'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--namespace',
+      'root/cimv2'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo, '
+     'one property, explicit namespace definition',
+     ['create', 'CIM_Foo', '--property', 'InstanceID=blah', '--namespace',
+      'root/cimv2'],
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
@@ -613,7 +697,8 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand create, new instance of all_types'
      "with array values",
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
-      '-P', 'arrayBool=true,false', '-P', 'arrayUint8=1,2,3',
+      '-P', 'arrayBool=true,false',
+      '-P', 'arrayUint8=1,2,3',
       '-P', 'arraySint8=-1,-2,-3',
       '-P', 'arrayUint16=9,19',
       '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
@@ -622,10 +707,185 @@ MOCK_TEST_CASES = [
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
-     ALLTYPES_MOCK_FILE, FAIL],
+     ALLTYPES_MOCK_FILE, OK],
+    # TODO create more valid create instance tests, i.e. datetime
 
-    # TODO create more valid create instance tests
-    # TODO create invaid create instance tests
+    ['Verify instance subcommand create, new instance Error in Property Type'
+     "with array values",
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
+      '-P', 'arrayBool=8,9',
+      '-P', 'arrayUint8=1,2,3',
+      '-P', 'arraySint8=-1,-2,-3',
+      '-P', 'arrayUint16=9,19',
+      '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
+      '-P', 'arrayUint64=0,999,9999', '-P', 'arraySint64=-9999,0,9999',
+      '-P', 'scalString="abc", "def", "jhijk"'],
+     {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
+                "type='boolean', array=True and input value='8,9'. "
+                'Exception: Invalid boolean value: "8"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance already exists',
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance'],
+     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
+                 'namespace "root/cimv2" in WEB ',
+                 "server: PYWBEMCLIFakedConnection\\(url=",
+                 'http://FakedUrl',
+                 "creds=None, default_namespace=",
+                 "'root/cimv2'\\)"],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance invalid ns',
+     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
+      'blah'],
+     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
+                 'namespace "root/cimv2" in WEB ',
+                 "server: PYWBEMCLIFakedConnection\\(url=",
+                 'http://FakedUrl',
+                 "creds=None, default_namespace=",
+                 "'root/cimv2'\\)"
+                 ],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand create, new instance invalid class',
+     ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
+     {'stderr': ["Error: CIMClass 'CIM_blah' does not exist in ",
+                 'namespace "root/cimv2" in "WEB server "',
+                 "PYWBEMCLIFakedConnection\\(url="
+                 "'http://FakedUrl', creds=None, default_namespace="
+                 "'root/cimv2'\\)"],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+    # NOTE: Since the instance creation logic is the same for modify and
+    # create instance. The error tests in modify also test the error logic.
+    # We have not repeated a bunch of those in for the CreateInstance
+
+    #
+    #  instance modify subcommand
+    #
+    ['Verify instance subcommand modify, --help response',
+     ['modify', '--help'],
+     {'stdout': INST_MODIFY_HELP,
+      'rc': 0,
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify instance subcommand modify, single good change',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single good change, explicit ns',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
+      'root/cimv2', '-P', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single good change, explicit ns',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '--namespace',
+      'root/cimv2', '--property', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, multiple good change',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=False',
+      '-P', 'arrayBool=true,false,true',
+      '-P', 'arrayUint32=0,99,999, 3', '-P', 'arraySint32=0,-999,-999,9',
+      '-P', 'arrayUint64=0,999,9999,3000', '-P', 'arraySint64=-9999,0,9999,4',
+      '-P', 'scalString="abc", "def", "jhijk"'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single property, Type Error bool',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=9'],
+     {'stderr': "Error: Type mismatch property 'scalBool' between expected "
+                "type='boolean', array=False and input value='9'. "
+                'Exception: Invalid boolean value: "9"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single property, Type Error uint32. '
+     'Uses regex because Exception msg different between python 2 and 3',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalUint32=Fred'],
+     {'stderr': ["Error: Type mismatch property 'scalUint32' between expected ",
+                 "type='uint32', array=False and input value='Fred'. ",
+                 "Exception: invalid literal for", "with base 10: 'Fred'"],
+      'rc': 1,
+      'test': 'regex'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single Property arrayness error',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=False,True'],
+     {'stderr': "Error: Type mismatch property 'scalBool' between expected "
+                "type='boolean', array=False and input value='False,True'. "
+                'Exception: Invalid boolean value: "False,True"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, Error value types mismatch with array',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'arrayBool=9,8'],
+     {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
+                "type='boolean', array=True and input value='9,8'. "
+                'Exception: Invalid boolean value: "9"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, Error different value types',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'arrayBool=true,8'],
+     {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
+                "type='boolean', array=True and input value='true,8'. "
+                'Exception: Invalid boolean value: "8"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, Error integer out of range',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'arrayUint32=99999999999999999999999'],
+     {'stderr': "Error: Type mismatch property 'arrayUint32' between expected "
+                "type='uint32', array=True and input "
+                "value='99999999999999999999999'. "
+                "Exception: Integer value 99999999999999999999999 is out of "
+                "range for CIM datatype uint32",
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, Error property not in class',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'blah=9'],
+     {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes".',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    # TODO additional error tests required
+
 
     #
     #  instance delete subcommand
@@ -639,8 +899,21 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand delete, valid delete',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"'],
-     {'stdout': ''
-                'Deleted root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+     {'stdout': '',
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand delete, valid delete, explicit ns',
+     ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '-n', 'root/cimv2'],
+     {'stdout': '',
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand delete, valid delete, explicit ns',
+     ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
+     {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -682,6 +955,13 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance subcommand references, returns instances, explicit ns',
+     ['references', 'TST_Person.name="Mike"', '-n', 'root/cimv2'],
+     {'stdout': REF_INSTS,
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
@@ -704,11 +984,39 @@ MOCK_TEST_CASES = [
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short formvalid returns paths',
+     'valid returns paths sorted',
+     ['references', 'TST_Person.name="Mike"', '-o', '-s',
+      '--resultclass', 'TST_Lineage'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short formvalid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-o', '--summary',
+      '-R', 'TST_Lineage'],
+     {'stdout': ['2 CIMInstanceName(s) returned'],
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short formvalid returns paths',
+     ['references', 'TST_Person.name="Mike"', '-S',
+      '-R', 'TST_Lineage'],
+     {'stdout': ['2 CIMInstance(s) returned'],
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -722,7 +1030,7 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO add invalid references tests
+    # TODO add more invalid references tests
     ['Verify instance subcommand references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
@@ -735,7 +1043,7 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand references, invalid instance name',
      ['references', 'TST_Blah.blah="abc"'],
-     {'stdout': ['Return empty.'],
+     {'stdout': "",
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -780,7 +1088,7 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand associators, invalid instance name',
      ['associators', 'TST_Blah.blah="abc"'],
-     {'stdout': ['Return empty.'],
+     {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -813,7 +1121,7 @@ MOCK_TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-    # TODO add subclass instances to the test.
+    # TODO add subclass instances to the count test.
 
     #
     #  instance invokemethod subcommand

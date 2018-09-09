@@ -47,8 +47,6 @@ def output_format_is_table(output_format):
     return True if output_format in TABLE_FORMATS else False
 
 
-# TODO Could this become a special click option type rather than a
-# separate function.
 def resolve_propertylist(propertylist):
     """
     resolve property list received from options.  Click options produces an
@@ -59,18 +57,11 @@ def resolve_propertylist(propertylist):
     function also splits any string with embedded commas.
     """
     # If no property list, return None which means all properties
-    # print('\nRESOLVE_PL=%s repl=%r, len=%s, 0=%s' % (propertylist,
-    # propertylist, len(propertylist), propertylist[0]))
-    # TODO determine how to produce an empty string in property list.
-    # Right now '""' on cmd line produces '""' here which is defined as
-    # a string with len 1
     if not propertylist:
-        propertylist = None
+        return None
 
-    # If propertylist is a single empty string, we set to empty list.
-    elif len(propertylist) == 0:
-        propertylist = []
-    elif len(propertylist) == 1 and propertylist[0] == '"':
+    # If propertylist is an single empty string, we set to empty list.
+    elif len(propertylist) == 1 and len(propertylist[0]) == 0:
         propertylist = []
 
     # expand any comma separated entries in the list
@@ -83,7 +74,6 @@ def resolve_propertylist(propertylist):
                 pl.append(item)
         propertylist = pl
 
-    # print('RESOLVEDPL %r' % propertylist)
     return propertylist
 
 
@@ -205,6 +195,31 @@ def filter_namelist(regex, name_list, ignore_case=True):
     return new_list
 
 
+def verify_operation(txt, msg=None):
+    """
+    Issue prompt to verify the execution of the request and test the response
+    for y or n.  Repeat until one of them is received.
+
+      Parameters
+        txt(:term:`string`):
+        String that it prefixed to the prompt text.
+
+      msg (:class:`py:bool`)
+        Optional parameter that if True causes an abort msg on the console.
+
+      Returns:
+        (:class:`py:bool`) where true corresponds to 'y' prompt response
+    """
+    value = 'x'
+    while value not in ('y', 'n'):
+        value = click.prompt('%s Verify y/n ' % txt, default='n').lower()
+    if value == 'y':
+        if msg:
+            click.echo('Request aborted')
+        return True
+    return False
+
+
 def objects_sort(objects):
     """
     Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names.
@@ -239,15 +254,36 @@ def objects_sort(objects):
 
 def parse_wbemuri_str(wbemuri_str, namespace=None):
     """
-    Parse a string that is a wbemuri into a CIMInstanceName object.
+    Parse a string that is a wbemuri into a CIMInstanceName object.  This method
+    parses a string consistent with a wbemuri into a CIMInstanceName object.
+
+    If the wbem_uri includes a namespace that is parsed also.  If both
+    the namespace optional parameter exists and the wbemuri_str parameter
+    includes a namespace (and they are not the same), an exception is returned.
+
+    Returns:
+        CIMInstanceName instance object
+
+    Raises:
+        ClickException: if the input wbemuri_str is an invalid wbemuri.
+
     """
-    if namespace:
-        wbemuri_str = '/%s:%s' % (namespace, wbemuri_str)
+    # TODO documented in issue # 131
+    # TODO remove this code when we resolve issue with pywbem issue #1359
+    # Issue is that 0.13.0 does not allow the form classname.keybindings
+    # without the : before the classname
+    if wbemuri_str and wbemuri_str[0] != ":":
+        if re.match(r"^[a-zA-Z0-9_]+\.", wbemuri_str):
+            wbemuri_str = ':%s' % wbemuri_str
     try:
         instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
-        # if instance_name.host:
-        #    raise click.ClickException('Host name component not allowed. '
-        #                               'Rcvd %s' % wbemuri_str)
+        if instance_name.namespace and namespace:
+            if instance_name.namespace != namespace:
+                raise click.ClickException('Conflicting namespaces between '
+                                           'wbemuri %s and option %s' %
+                                           (instance_name.namespace, namespace))
+        elif instance_name.namespace is None and namespace:
+            instance_name.namespace = namespace
 
         return instance_name
     except ValueError as ve:
@@ -263,7 +299,7 @@ def create_params(cim_method, kv_params):
     for p in kv_params:
         name, value_str = parse_kv_pair(p)
         if name not in cim_method.parameters:
-            raise click.ClickException('Error. Parameter %s not in method '
+            raise click.ClickException('Parameter: %s not in method: '
                                        ' %s' % (name, cim_method.name))
 
         cl_param = cim_method.parameters[name]
@@ -379,29 +415,30 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
 
       Returns: CIMInstance
 
-      Exceptions: KeyError if Property name not found in class.
+      Exceptions:
+        click.ClickException if Property name not found in class or if mismatch
+          of property type in class vs value component of kv pair
     """
     properties = NocaseDict()
     for kv_property in kv_properties:
         name, value_str = parse_kv_pair(kv_property)
         try:
             cl_prop = cim_class.properties[name]
-        except KeyError as ke:
-            raise click.ClickException('Error: property name %s not in class %s'
-                                       '. Exception %s' %
-                                       (name, cim_class.classname, ke))
+        except KeyError:
+            raise click.ClickException('Property name "%s" not in class "%s".'
+                                       % (name, cim_class.classname))
 
         try:
             properties[name] = create_cimproperty(cl_prop.type,
                                                   cl_prop.is_array,
                                                   name,
                                                   value_str)
-        except ValueError as ve:
-            raise click.ClickException('Type mismatch property %r between '
-                                       'expected type=%r, array=%r and input '
-                                       'value=%r. Exception %s' %
+        except ValueError as ex:
+            raise click.ClickException("Type mismatch property '%s' between "
+                                       "expected type='%s', array=%s and input "
+                                       "value='%s'. Exception: %s" %
                                        (name, cl_prop.type, cl_prop.is_array,
-                                        value_str, ve))
+                                        value_str, ex))
 
     new_inst = CIMInstance(cim_class.classname, properties=properties,
                            property_list=property_list)
@@ -600,10 +637,6 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
     # default when displaying cim objects is mof
     if output_format is None:
         output_format = 'mof'
-
-    if not objects:
-        click.echo("Return empty.")
-        return
 
     if isinstance(objects, (list, tuple)):
         if output_format in TABLE_FORMATS:
