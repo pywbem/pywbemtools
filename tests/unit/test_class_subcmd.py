@@ -26,6 +26,7 @@ TEST_DIR = os.path.dirname(__file__)
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 
 CLS_HELP = """Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
@@ -84,6 +85,7 @@ Options:
   -h, --help                Show this message and exit.
 """
 
+# pylint: disable=line-too-long
 CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
 
   Find all classes that match CLASSNAME-REGEX.
@@ -111,7 +113,7 @@ Options:
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   -h, --help              Show this message and exit.
-"""
+"""  # pylint: enable=line-too-long
 
 CLASS_TREE_HELP = """Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
 
@@ -145,6 +147,7 @@ OK = True
 RUN = True
 FAIL = False
 
+# pylint: enable=line-too-long
 MOCK_TEST_CASES = [
     # desc - Description of test
     # args - List of arguments or string of arguments
@@ -165,72 +168,85 @@ MOCK_TEST_CASES = [
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
      None, OK],
+
     ['class subcommand enumerate  -h response.',
      ['enumerate', '-h'],
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
      None, OK],
+
     ['class subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
      {'stdout': '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo local only',
      ['enumerate', 'CIM_Foo', '-l'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo localonly',
      ['enumerate', 'CIM_Foo', '--localonly'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo --deepinheritance',
      ['enumerate', 'CIM_Foo', '--deepinheritance'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo -c',
      ['enumerate', 'CIM_Foo', '-c'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo --includeclassorigin',
      ['enumerate', 'CIM_Foo', '--includeclassorigin'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo -o names only',
      ['enumerate', 'CIM_Foo', '-o'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo --names_only',
      ['enumerate', 'CIM_Foo', '--names_only'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '-S'],
      {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand enumerate CIM_Foo names and deepinheritance',
      ['enumerate', 'CIM_Foo', '-do'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
@@ -242,6 +258,7 @@ MOCK_TEST_CASES = [
      {'stdout': ['Key ( true )', '[Description (', 'class CIM_Foo'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
+
     #
     # Test class get
     #
@@ -258,6 +275,7 @@ MOCK_TEST_CASES = [
                  'Key ( true )', 'IN ( false )'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -267,6 +285,7 @@ MOCK_TEST_CASES = [
                  '};', '', ],
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--localonly'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -276,22 +295,32 @@ MOCK_TEST_CASES = [
                  '};', '', ],
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
+
     # includequalifiers. Test the flag that excludes qualifiers
     ['class subcommand get without qualifiers, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '--no-qualifiers'],
-     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
-                 '   string cimfoo_sub2;', '',
-                 '   string InstanceID;', '',
-                 '   uint32 IntegerProp;', '',
+     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
+                 '',
+                 '   string cimfoo_sub2;',
+                 '',
+                 '   string InstanceID;',
+                 '',
+                 '   uint32 IntegerProp;',
+                 '',
                  '   uint32 Fuzzy(',
-                 '      string FuzzyParameter,',
-                 '      CIM_Foo REF Foo,',
-                 '      string OutputParam);', '',
-                 '   uint32 DeleteNothing();', '',
-                 '};', '', ],
+                 '      string TestInOutParameter,',
+                 '      CIM_Foo REF TestRef,',
+                 '      string OutputParam,',
+                 '      uint32 OutputRtnValue);',
+                 '',
+                 '   uint32 DeleteNothing();',
+                 '',
+                 '};',
+                 '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-    # test class get with propert list
+
+    # pylint: disable=line-too-long
     ['class subcommand get with propertylist, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
@@ -302,21 +331,29 @@ MOCK_TEST_CASES = [
                  ']',
                  '   uint32 Fuzzy(',
                  '         [IN ( true ),',
-                 '          Description ( "FuzzyMethod Param" )]',
-                 '      string FuzzyParameter,',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
+                 '      string TestInOutParameter,',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF Foo,',
+                 '      CIM_Foo REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
-                 '          Description ( "TestMethod Param" )]',
-                 '      string OutputParam);', '',
+                 '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
+                 '      string OutputParam,',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if provided." )]',  # noqa: E501
+                 '      uint32 OutputRtnValue);',
+                 '',
                  '      [Description ( "Method with no Parameters" )]',
-                 '   uint32 DeleteNothing();', '',
-                 '};', '', ],
+                 '   uint32 DeleteNothing();',
+                 '',
+                 '};',
+                 '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand get with empty propertylist, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', '""'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
@@ -324,21 +361,30 @@ MOCK_TEST_CASES = [
                  ']',
                  '   uint32 Fuzzy(',
                  '         [IN ( true ),',
-                 '          Description ( "FuzzyMethod Param" )]',
-                 '      string FuzzyParameter,',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
+                 '      string TestInOutParameter,',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF Foo,',
+                 '      CIM_Foo REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
-                 '          Description ( "TestMethod Param" )]',
-                 '      string OutputParam);', '',
+                 '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
+                 '      string OutputParam,',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if provided." )]',  # noqa: E501
+                 '      uint32 OutputRtnValue);',
+                 '',
                  '      [Description ( "Method with no Parameters" )]',
-                 '   uint32 DeleteNothing();', '',
-                 '};', '', ],
+                 '   uint32 DeleteNothing();',
+                 '',
+                 '};',
+                 '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    # pylint: enable=line-too-long
     # TODO include class origin. TODO not returning class origin correctly.
     ['class subcommand get with propertylist and classorigin,',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID', '-c'],
@@ -359,12 +405,15 @@ MOCK_TEST_CASES = [
                  '         [IN ( false ),',
                  '          OUT ( true ),',
                  '          Description ( "TestMethod Param" )]',
-                 '      string OutputParam);', '',
+                 '      string OutputParam,',
+                 '',
                  '      [Description ( "Method with no Parameters" )]',
+                 '',
                  '   uint32 DeleteNothing();', '',
                  '};', '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, FAIL],
+
     #
     # find subcommand
     #
@@ -379,7 +428,9 @@ MOCK_TEST_CASES = [
      {'stdout': CLASS_FIND_HELP,
       'test': 'lines'},
      None, OK],
+
     # TODO Add detailed tests for find
+
     #
     # subcommand "class tree"
     #
@@ -419,6 +470,7 @@ MOCK_TEST_CASES = [
                  ' +-- CIM_Foo_sub_sub', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand tree bottom up. Ordering guaranteed here',
      ['tree', '-s', 'CIM_Foo_sub_sub'],
      {'stdout': ['root',
@@ -427,12 +479,14 @@ MOCK_TEST_CASES = [
                  '         +-- CIM_Foo_sub_sub', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
     ['class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
      {'stderr': ['CIMError:', 'Class CIM_Foo_subx not found in namespace',
                  'root/cimv2.'],
       'rc': 1,
       'test': 'regex'},
+
      SIMPLE_MOCK_FILE, OK],
     #
     # associators subcommand tests
@@ -474,6 +528,7 @@ MOCK_TEST_CASES = [
       'test': 'in'},
      None, OK],
     # TODO add detailed reference tests
+
     #
     # invokemethod subcommand tests
     #
@@ -486,15 +541,55 @@ MOCK_TEST_CASES = [
                  'parameters of form', ],
       'test': 'in'},
      None, OK],
-    # TODO add detailed invokemethod tests. Requires invokemethod in
-    # mock repo
+
+    #
+    #  class invokemethod subcommand without parameters
+    #
+    ['Verify class subcommand invokemethod',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+     {'stdout': [],
+      'rc': 0,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    ['Verify class subcommand invokemethod',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
+     {'stdout': ["ReturnValue=0"],
+      'rc': 0,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    ['Verify class subcommand invokemethod fails Invalid Class',
+     ['invokemethod', 'CIM_Foox', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
+     {'stderr': ["Error: CIMError: 6: Class CIM_Foox not found in namespace "
+                 "root/cimv2."],
+      'rc': 1,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    ['Verify class subcommand invokemethod fails Invalid Method',
+     ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
+     {'stderr': ["Error: CIMError: 17: Method Fuzzyx not in class CIM_Foo in "
+                 "server"],
+      'rc': 1,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+
+    ['Verify class subcommand invokemethod fails Method not registered',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+     {'stderr': ["Error: CIMError: 17: Method Fuzzy in namespace root/cimv2 "
+                 "not registered in repository"],
+      'rc': 1,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE], OK],
 ]
 
 # TODO subcommand class delete. NOTE: cannot really test this with current
 # code since each test reloads repository
 # namespace
-# TODO errors class invalid, namespace invalid
-# other tests.  Test lo on top level
+# TODO: add test for  errors: class invalid, namespace invalid
+# other tests.  Test localonly on top level
 
 
 class TestSubcmdClass(CLITestsBase):
@@ -521,12 +616,12 @@ class TestSubcmdClass(CLITestsBase):
                               mock, condition)
 
 
-class TestClassGeneral(object):
+class TestClassGeneral(object):  # pylint: disable=too-few-public-methods
     """
     Test class using pytest for the subcommands of the class subcommand
     """
     # @pytest.mark.skip(reason="Unfinished test")
-    def test_class_error_no_server(self):
+    def test_class_error_no_server(self):  # pylint: disable=no-self-use
         """Test 'pywbemcli ... class getclass' when no host is provided
 
         This test runs against a real url so we set timeout to the mininum
@@ -545,7 +640,7 @@ class TestClassGeneral(object):
             "stderr={!r}".format(stderr)
 
 
-class TestClassEnumerate(object):
+class TestClassEnumerate(object):  # pylint: disable=too-few-public-methods
     """
     Test the options of the pywbemcli class enumerate' subcommand
     """
@@ -571,6 +666,7 @@ class TestClassEnumerate(object):
     # pylint: disable=unused-argument
     def test_enumerate_simple_mock(self, desc, tst_args, exp_result_start,
                                    exp_result_end):
+        # pylint: disable=no-self-use
         """
         Test 'pywbemcli class enumerate subcommand based on a simple set of
         classes defined in the file simple_mock_model.mof

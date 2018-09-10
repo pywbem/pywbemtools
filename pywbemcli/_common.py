@@ -27,7 +27,8 @@ import click
 import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
-    CIMQualifierDeclaration, CIMProperty, CIMClassName, cimvalue
+    CIMQualifierDeclaration, CIMProperty, CIMClassName, cimvalue, \
+    CIM_ERR_METHOD_NOT_FOUND, CIMError
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
@@ -49,19 +50,29 @@ def output_format_is_table(output_format):
 
 def resolve_propertylist(propertylist):
     """
-    resolve property list received from options.  Click options produces an
-    empty list when there is no property list.  Pywbem requires None
-    when there is no propertylist
+    Resolve property list received from click options.  Click options produces
+    an empty list when there is no property list.
+
+    Pywbem requires None when there is no propertylist
 
     Further, property lists can be input as a comma separated list so this
     function also splits any string with embedded commas.
+
+    Parameters (list of :term:`string` or None):
+        Each item in list may be a single property name or a collection of
+        property names separated by commas.
+
+    Returns:
+        list of property names resulting from parsing input or empty list
+        or None
+
     """
     # If no property list, return None which means all properties
     if not propertylist:
         return None
 
-    # If propertylist is an single empty string, we set to empty list.
-    elif len(propertylist) == 1 and len(propertylist[0]) == 0:
+    # If propertylist is a single empty string, set to empty list.
+    elif len(propertylist) == 1 and not propertylist[0]:
         propertylist = []
 
     # expand any comma separated entries in the list
@@ -272,9 +283,11 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
     # TODO remove this code when we resolve issue with pywbem issue #1359
     # Issue is that 0.13.0 does not allow the form classname.keybindings
     # without the : before the classname
+    # print('PARSE_WBEMURI_STR1 %s' % wbemuri_str)
     if wbemuri_str and wbemuri_str[0] != ":":
         if re.match(r"^[a-zA-Z0-9_]+\.", wbemuri_str):
             wbemuri_str = ':%s' % wbemuri_str
+    # print('PARSE_WBEMURI_STR2 %s' % wbemuri_str)
 
     try:
         instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
@@ -295,6 +308,13 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
 def create_params(cim_method, kv_params):
     """
     Create a parameter values from the input arguments and class.
+
+    Parameters:
+
+      cim_method():
+        CIM Method that is the template for the parameters.  It is used to
+        evaluate the kv_params and generate corresponding CIM_Parameter
+        objects to be passed to the InvokeMethod
     """
     params = NocaseDict()
     for p in kv_params:
@@ -307,8 +327,8 @@ def create_params(cim_method, kv_params):
         is_array = cl_param.is_array
 
         cim_value = create_cimvalue(cl_param.type, value_str, is_array)
-
-        params[name] = (name, cim_value)
+        params = []
+        params.append((name, cim_value))
     return params
 
 
@@ -319,14 +339,12 @@ def create_cimvalue(cim_type, value_str, is_array):
     CIMValue or list of CIMValue elements.
 
     Parameters:
-      CIM_Type: (:term: `string`)
+      cim_type: (:term: `string`)
         CIMType for this value. The CIM data type name for the CIM object.
         See :ref:`CIM data types` for valid type names.
 
-      Value_str (:term: `string`):
-        String defining the input to be parsed. This may be a quoted string
-        to provide for space characters in the string in which case the
-        quote character used must be excaped if used within the string.
+      value_str (:term: `string`):
+        String defining the input to be parsed.
 
       is_array (:class:`py:bool`):
         The value_str is to be treated as a comma separated set of values.
@@ -512,11 +530,11 @@ def split_array_value(string, delimiter):
 
 def split_value_str(string, delimiter):
     """
-   Spit a string based on a delimiter character bypassing escaped
-   instances of the delimiter.  This is a generator function in that
-   it yields each time it separates a value.
+    Split a string based on a delimiter character bypassing escaped
+    instances of the delimiter.  This is a generator function in that
+    it yields each time it separates a value.
 
-       Delimiter must be single character.
+    Delimiter must be single character.
     """
     if len(delimiter) != 1:
         raise ValueError('Invalid delimiter: ' + delimiter)
@@ -561,6 +579,48 @@ def get_cimtype(objects):
     if isinstance(test_object, six.string_types):
         cim_type = 'CIMClassName'
     return cim_type
+
+
+def process_invokemethod(context, objectname, methodname, options):
+    # pylint: disable=line-too-long
+    """
+    Process the parameters for invokemethod at either the class or instance
+    level and execute the invokemethod.
+
+    Parameters:
+
+      objectname (:term:`string` or :class:`~pywbem.CIMInstanceName` or :class:`~pywbem.CIMInstanceName`)  # noqa: E501
+
+      methodname (:term:`string`):
+        The name of the method to be executed
+
+    """  # pylint: enable=line-too-long
+
+    classname = objectname.classname \
+        if isinstance(objectname, (CIMClassName, CIMInstanceName)) \
+        else objectname
+
+    cim_class = context.conn.GetClass(
+        classname,
+        namespace=options['namespace'], LocalOnly=False)
+
+    cim_methods = cim_class.methods
+    if methodname not in cim_methods:
+        # TODO: This really is a client error and probably should not use
+        # CIMError
+        raise CIMError(CIM_ERR_METHOD_NOT_FOUND, 'Method %s not in class %s '
+                       'in server' % (methodname, classname))
+    cim_method = cim_methods[methodname]
+
+    params = create_params(cim_method, options['parameter'])
+
+    rtn = context.conn.InvokeMethod(methodname, objectname, params)
+
+    click.echo("ReturnValue=%s" % rtn[0])
+    if rtn[1]:
+        params = rtn[1]
+        for param in params:
+            click.echo("%s=%s" % (param, params[param]))
 
 
 def display_cim_objects_summary(context, objects):

@@ -21,13 +21,12 @@ from __future__ import absolute_import
 
 import click
 
-from pywbem import Error, CIMClassName, tocimobj
-from pywbem.cim_obj import NocaseDict
+from pywbem import Error, CIMClassName
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
-    resolve_propertylist, parse_kv_pair, CMD_OPTS_TXT, TABLE_FORMATS, \
-    format_table
+    resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
+    format_table, process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option
@@ -137,9 +136,12 @@ def class_invokemethod(context, classname, methodname, **options):
     This invokes the method named METHODNAME on the class named CLASSNAME.
 
     This is the class level invokemethod and uses only the class name on the
-    invoke.The subcommand `instance invokemethod`
-    invokes methods based on instance name.
+    invoke.The subcommand `instance invokemethod` invokes methods based on
+    class name.
 
+    Examples:
+
+      pywbemcli invokemethod CIM_Foo methodx -p param1=9 -p param2=Fred
     """
     context.execute_cmd(lambda: cmd_class_invokemethod(context,
                                                        classname,
@@ -336,40 +338,13 @@ def cmd_class_get(context, classname, options):
 
 
 def cmd_class_invokemethod(context, classname, methodname, options):
-    """Create an instance and submit to wbemserver"""
-
+    """
+    Create an instance and submit to wbemserver
+    """
     try:
-        work_class = context.conn.GetClass(
-            classname,
-            namespace=options['namespace'], LocalOnly=False)
-
-        methods = work_class.methods
-        if methodname not in methods:
-            raise click.ClickException('Error. Method %s not in '
-                                       'class %s' %
-                                       (methodname, classname))
-        method = work_class.methods[methodname]
-
-        params = NocaseDict()
-        for p in options['parameter']:
-            name, value_str = parse_kv_pair(p)
-            if name not in method.parameters:
-                raise click.ClickException('Error. Parameter %s not in '
-                                           'method %s' %
-                                           (name, methodname))
-
-            cl_param = work_class.parameters[name]
-
-            # isarray = cl_param.is_array
-            # TODO account for arrays of parameters
-
-            value_ = tocimobj(cl_param.type, value_str)
-            params[name] = (name, value_)
-
-        context.conn.InvokeMethod(classname, methodname, params)
-
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        process_invokemethod(context, classname, methodname, options)
+    except Exception as ex:
+        raise click.ClickException("%s: %s" % (ex.__class__.__name__, ex))
 
 
 def cmd_class_enumerate(context, classname, options):
