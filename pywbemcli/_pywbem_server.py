@@ -374,6 +374,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
 
             # Create the WBEMConnection object and the _wbem_server object
 
+            # pylint: disable=redefined-variable-type
             conn = PYWBEMCLIConnection(self.server_url, creds,
                                        default_namespace=self.default_namespace,
                                        no_verification=self.noverify,

@@ -49,14 +49,17 @@ class CIM_Foo {
 
         [Description ("Method with in and out parameters")]
     uint32 Fuzzy(
-        [IN, Description("FuzzyMethod Param")]
-      string FuzzyParameter,
+        [IN, OUT, Description("Define data to be returned in output parameter")]
+      string TestInOutParameter,
 
         [IN, OUT, Description ( "Test of ref in/out parameter")]
-      CIM_Foo REF Foo,
+      CIM_Foo REF TestRef,
 
-        [IN ( false ), OUT, Description("TestMethod Param")]
-      string OutputParam);
+        [IN ( false ), OUT, Description("Rtns method name if exists on input")]
+      string OutputParam,
+
+        [IN , Description("Defines return value if provided.")]
+      uint32 OutputRtnValue);
 
         [ Description("Method with no Parameters") ]
     uint32 DeleteNothing();

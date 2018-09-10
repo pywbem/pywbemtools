@@ -107,8 +107,11 @@ class CLITestsBase(object):
           mock_file (:term:`string` or None):
             If this is a string, this test will be executed using the
             --mock-server pywbemcl option with this file as the name of the
-            objects to be compiled. This should be just a file name and
-            this method assumes the file is in the testsuite directory.
+            objects to be compiled or executed. This should be just a file name
+            and this method assumes the file is in the tests/unit directory.
+
+            If it is a list, the same rules apply to each entry in the list.
+
 
             If None, test is executed without the --mock-server input parameter
             and defines an artificial server name  Used to test subcommands
@@ -147,8 +150,15 @@ class CLITestsBase(object):
             cmd_line.extend(global_args)
 
         if mock_file:
-            cmd_line.extend(['--mock-server',
-                             os.path.join(TEST_DIR, mock_file)])
+            if isinstance(mock_file, (list, tuple)):
+                for item in mock_file:
+                    cmd_line.extend(['--mock-server',
+                                     os.path.join(TEST_DIR, item)])
+            elif isinstance(mock_file, six.string_types):
+                cmd_line.extend(['--mock-server',
+                                 os.path.join(TEST_DIR, mock_file)])
+            else:
+                assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_file)
 
         cmd_line.append(subcmd)
 

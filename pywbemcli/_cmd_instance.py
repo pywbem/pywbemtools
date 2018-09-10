@@ -24,8 +24,8 @@ from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
-    create_params, filter_namelist, CMD_OPTS_TXT, format_table, \
-    verify_operation
+    filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
+    process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option
@@ -212,14 +212,13 @@ def instance_modify(context, instancename, **options):
               help='Multiple definitions allowed, one for each parameter to be '
                    'included in the new instance. Array parameter values '
                    'defined by comma-separated-values. EmbeddedInstance not '
-                   'allowed.'
-              )
+                   'allowed.')
 @add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
-    Invoke a CIM method.
+    Invoke a CIM method on a CIMInstance.
 
     Invoke the method defined by INSTANCENAME and METHODNAME arguments with
     parameters defined by the --parameter options.
@@ -235,6 +234,10 @@ def instance_invokemethod(context, instancename, methodname, **options):
     class.
 
     A class level invoke method is available as `pywbemcli class invokemethod`.
+
+    Example:
+
+    pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
 
 
     """
@@ -553,7 +556,7 @@ def cmd_instance_modify(context, instancename, options):
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException('CIMClass: %r does not exist in WEB '
-                                       'server: %s namespace: %s'
+                                       'server: %s'
                                        % (instancepath.classname,
                                           context.conn.uri))
 
@@ -588,23 +591,9 @@ def cmd_instance_invokemethod(context, instancename, methodname,
         return
 
     try:
-        cim_class = context.conn.GetClass(
-            instancepath.classname,
-            namespace=options['namespace'], LocalOnly=False)
-
-        cim_methods = cim_class.methods
-        if methodname not in cim_methods:
-            raise click.ClickException('Error. Method %s not in '
-                                       'class %s' %
-                                       (methodname, instancepath.classname))
-        cim_method = cim_class.methods[methodname]
-
-        params = create_params(cim_method, options['parameter'])
-
-        context.conn.InvokeMethod(instancepath, methodname, params)
-
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        process_invokemethod(context, instancepath, methodname, options)
+    except Exception as ex:
+        raise click.ClickException("%s: %s" % (ex.__class__.__name__, ex))
 
 
 def cmd_instance_enumerate(context, classname, options):

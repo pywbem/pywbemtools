@@ -415,7 +415,11 @@ The following defines the help output for the `pywbemcli class invokemethod --he
 
       This is the class level invokemethod and uses only the class name on the
       invoke.The subcommand `instance invokemethod` invokes methods based on
-      instance name.
+      class name.
+
+      Examples:
+
+        pywbemcli invokemethod CIM_Foo methodx -p param1=9 -p param2=Fred
 
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
@@ -850,7 +854,7 @@ The following defines the help output for the `pywbemcli instance --help` subcom
       delete        Delete a single CIM instance.
       enumerate     Enumerate instances or names of CLASSNAME.
       get           Get a single CIMInstance.
-      invokemethod  Invoke a CIM method.
+      invokemethod  Invoke a CIM method on a CIMInstance.
       modify        Modify an existing instance.
       query         Execute an execquery request.
       references    Get the reference instances or names.
@@ -1150,7 +1154,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
     Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
                                            METHODNAME
 
-      Invoke a CIM method.
+      Invoke a CIM method on a CIMInstance.
 
       Invoke the method defined by INSTANCENAME and METHODNAME arguments with
       parameters defined by the --parameter options.
@@ -1167,6 +1171,10 @@ The following defines the help output for the `pywbemcli instance invokemethod -
 
       A class level invoke method is available as `pywbemcli class
       invokemethod`.
+
+      Example:
+
+      pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
 
     Options:
       -p, --parameter name=value  Multiple definitions allowed, one for each
