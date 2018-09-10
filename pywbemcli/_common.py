@@ -268,7 +268,7 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
         ClickException: if the input wbemuri_str is an invalid wbemuri.
 
     """
-    # TODO documented in issue # 131
+    # TODO documented in issue #131
     # TODO remove this code when we resolve issue with pywbem issue #1359
     # Issue is that 0.13.0 does not allow the form classname.keybindings
     # without the : before the classname

@@ -131,7 +131,18 @@ class TestParseWbemUri(object):
                 namespace=u'root/cimv2',
                 keys={'k1': 'v1'},
                 host=u'10.11.12.13:5989'),
-            None, False
+            None, True
+        ),
+        (
+            "class and keybinding only",
+            'CIM_Foo.k1="v1"',
+            None,
+            dict(
+                classname=u'CIM_Foo',
+                namespace=None,
+                keys={'k1': 'v1'},
+                host=None,),
+            None, True
         ),
     ]
 
@@ -182,6 +193,7 @@ class TestParseWbemUri(object):
             else:
 
                 # The code to be tested
+                print('BEFORE uri=%s' % uri)
                 obj = parse_wbemuri_str(uri)
 
         if exp_attrs:
