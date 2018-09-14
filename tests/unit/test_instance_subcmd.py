@@ -488,8 +488,8 @@ MOCK_TEST_CASES = [
     #
     ['Verify instance subcommand enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
-     {'stderr': 'Error: CIMError: 5: Class CIM_Foox not found in namespace'
-                ' root/cimv2',
+     {'stderr': 'Error: CIMError: 6: Class CIM_Foox not found in namespace'
+                ' root/cimv2.',
       'rc': 1,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],

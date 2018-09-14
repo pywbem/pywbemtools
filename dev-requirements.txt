@@ -1,4 +1,4 @@
-# Additional pip requirements file for pywbem development dependencies.
+# Additional pip requirements file for pywbemtools development dependencies.
 #
 # The order of packages is significant, because pip processes them in the order
 # of appearance.
@@ -20,7 +20,9 @@ python-coveralls>=2.8.0; python_version == '2.7'
 
 # Unit test (no imports, invoked via py.test script)
 pytest>=3.3.0
-pytest-cov>=2.4.0
+# This is a temporary fix to cover iconflicts caused by versions of pytest-cov gt
+# 2.6. 
+pytest-cov>=2.4.0,<2.6
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx>=1.5.1
@@ -57,4 +59,3 @@ tornado<5.0; python_version <= '2.7'
 # Oct 2017.  See issue #80
 # TODO: retest this in the future so we can remove this limitation
 pyzmq==16.0.2
-

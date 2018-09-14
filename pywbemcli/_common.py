@@ -275,6 +275,7 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
     if wbemuri_str and wbemuri_str[0] != ":":
         if re.match(r"^[a-zA-Z0-9_]+\.", wbemuri_str):
             wbemuri_str = ':%s' % wbemuri_str
+
     try:
         instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
         if instance_name.namespace and namespace:

@@ -141,6 +141,10 @@ Options:
   -h, --help              Show this message and exit.
 """
 
+OK = True
+RUN = True
+FAIL = False
+
 MOCK_TEST_CASES = [
     # desc - Description of test
     # args - List of arguments or string of arguments
@@ -152,7 +156,7 @@ MOCK_TEST_CASES = [
      '--help',
      {'stdout': CLS_HELP,
       'test': 'lines'},
-     None, True],
+     None, OK],
     #
     # Enumerate subcommand and its options
     #
@@ -160,84 +164,84 @@ MOCK_TEST_CASES = [
      ['enumerate', '--help'],
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
-     None, True],
+     None, OK],
     ['class subcommand enumerate  -h response.',
      ['enumerate', '-h'],
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
-     None, True],
+     None, OK],
     ['class subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
-     {'stdout': '   [Description ( "Simple CIM Class" )]',
+     {'stdout': '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo local only',
      ['enumerate', 'CIM_Foo', '-l'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo localonly',
      ['enumerate', 'CIM_Foo', '--localonly'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo --deepinheritance',
      ['enumerate', 'CIM_Foo', '--deepinheritance'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo -c',
      ['enumerate', 'CIM_Foo', '-c'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo --includeclassorigin',
      ['enumerate', 'CIM_Foo', '--includeclassorigin'],
      {'stdout':
-      '   [Description ( "Simple CIM Class" )]',
+      '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo -o names only',
      ['enumerate', 'CIM_Foo', '-o'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo --names_only',
      ['enumerate', 'CIM_Foo', '--names_only'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '-S'],
-     {'stdout': '1 CIMClass(s) returned',
+     {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '--summary'],
-     {'stdout': '1 CIMClass(s) returned',
+     {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand enumerate CIM_Foo names and deepinheritance',
      ['enumerate', 'CIM_Foo', '-do'],
-     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
+     {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'patterns'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
 
     ['class subcommand enumerate CIM_Foo include qualifiers',
      ['enumerate', 'CIM_Foo'],
      {'stdout': ['Key ( true )', '[Description (', 'class CIM_Foo'],
       'test': 'in'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     #
     # Test class get
     #
@@ -245,7 +249,7 @@ MOCK_TEST_CASES = [
      ['get', '--help'],
      {'stdout': 'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
       'test': 'startswith'},
-     None, True],
+     None, OK],
 
     # subcommand get localonly option
     ['class subcommand get not localonly. Tests for property names',
@@ -253,7 +257,7 @@ MOCK_TEST_CASES = [
      {'stdout': ['string cimfoo_sub2;', 'InstanceID', 'IntegerProp', 'Fuzzy',
                  'Key ( true )', 'IN ( false )'],
       'test': 'in'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -262,7 +266,7 @@ MOCK_TEST_CASES = [
                  '',
                  '};', '', ],
       'test': 'patterns'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--localonly'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -271,7 +275,7 @@ MOCK_TEST_CASES = [
                  '',
                  '};', '', ],
       'test': 'patterns'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     # includequalifiers. Test the flag that excludes qualifiers
     ['class subcommand get without qualifiers, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '--no-qualifiers'],
@@ -286,7 +290,7 @@ MOCK_TEST_CASES = [
                  '   uint32 DeleteNothing();', '',
                  '};', '', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     # test class get with propert list
     ['class subcommand get with propertylist, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID'],
@@ -312,7 +316,7 @@ MOCK_TEST_CASES = [
                  '   uint32 DeleteNothing();', '',
                  '};', '', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand get with empty propertylist, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', '""'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
@@ -334,7 +338,7 @@ MOCK_TEST_CASES = [
                  '   uint32 DeleteNothing();', '',
                  '};', '', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     # TODO include class origin. TODO not returning class origin correctly.
     ['class subcommand get with propertylist and classorigin,',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID', '-c'],
@@ -360,7 +364,7 @@ MOCK_TEST_CASES = [
                  '   uint32 DeleteNothing();', '',
                  '};', '', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, False],
+     SIMPLE_MOCK_FILE, FAIL],
     #
     # find subcommand
     #
@@ -368,13 +372,13 @@ MOCK_TEST_CASES = [
      ['find', '-h'],
      {'stdout': CLASS_FIND_HELP,
       'test': 'lines'},
-     None, False],
+     None, FAIL],
 
     ['class subcommand find  --help',
      ['find', '--help'],
      {'stdout': CLASS_FIND_HELP,
       'test': 'lines'},
-     None, False],
+     None, FAIL],
     # TODO Add detailed tests for find
     #
     # subcommand "class tree"
@@ -383,29 +387,26 @@ MOCK_TEST_CASES = [
      ['tree', '--help'],
      {'stdout': CLASS_TREE_HELP,
       'test': 'lines'},
-     None, True],
-    # TODO this test occasionally includeing | in output as if spinner not
+     None, OK],
+    # TODO this test occasionally including | in output as if spinner not
     # stopped. For now removed the extra spaces.
     ['class subcommand tree top down. Order uncertain so use "in" test ',
      ['tree'],
      {'stdout': ['root',
                  ' +-- CIM_Foo',
-                 '+-- CIM_Foo_sub2',
-                 '+-- CIM_Foo_sub',
-                 '+-- CIM_Foo_sub_sub', ],
+                 '     +-- CIM_Foo_sub2',
+                 '     +-- CIM_Foo_sub',
+                 '         +-- CIM_Foo_sub_sub', ],
       'test': 'in'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
 
     # TODO The following test fails right now completely.
     ['class subcommand tree top down starting at defined class ',
      ['tree', 'CIM_Foo_sub'],
-     {'stdout': ['root',
-                 ' +-- CIM_Foo',
-                 '     +-- CIM_Foo_sub2',
-                 '     +-- CIM_Foo_sub',
-                 '         +-- CIM_Foo_sub_sub', ],
+     {'stdout': ['CIM_Foo_sub',
+                 ' +-- CIM_Foo_sub_sub', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, False],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand tree bottom up',
      ['tree', '-s', 'CIM_Foo_sub_sub'],
      {'stdout': ['root',
@@ -413,14 +414,14 @@ MOCK_TEST_CASES = [
                  '     +-- CIM_Foo_sub',
                  '         +-- CIM_Foo_sub_sub', ],
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, False],
+     SIMPLE_MOCK_FILE, OK],
     ['class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
      {'stderr': 'Error: CIMError: 6: Class CIM_Foo_subx not found in namespace '
                 'root/cimv2.',
       'rc': 1,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, True],
+     SIMPLE_MOCK_FILE, OK],
     #
     # associators subcommand tests
     #
@@ -440,7 +441,7 @@ MOCK_TEST_CASES = [
                  '--no-qualifiers',
                  '-c, --includeclassorigin', ],
       'test': 'in'},
-     None, True],
+     None, OK],
 
     # TODO add detailed associators tests.  Need new mock file with
     # associations to do this
@@ -459,7 +460,7 @@ MOCK_TEST_CASES = [
                  '--no-qualifiers',
                  '-c, --includeclassorigin', ],
       'test': 'in'},
-     None, True],
+     None, OK],
     # TODO add detailed reference tests
     #
     # invokemethod subcommand tests
@@ -472,7 +473,7 @@ MOCK_TEST_CASES = [
                  '-p, --parameter parameter  Optional multiple method '
                  'parameters of form', ],
       'test': 'in'},
-     None, True],
+     None, OK],
     # TODO add detailed invokemethod tests. Requires invokemethod in
     # mock repo
 ]
@@ -550,7 +551,7 @@ class TestClassEnumerate(object):
             [
                 ["Class parameter"],
                 ['CIM_Foo'],
-                '   [Description ( "Simple CIM Class" )]\n',
+                '   [Description ( "Subclass of CIM_Foo" )]\n',
                 None
             ]
         ]
