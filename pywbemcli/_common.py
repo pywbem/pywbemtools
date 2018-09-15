@@ -268,13 +268,14 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
         ClickException: if the input wbemuri_str is an invalid wbemuri.
 
     """
-    # TODO documented in issue # 131
+    # TODO documented in issue #131
     # TODO remove this code when we resolve issue with pywbem issue #1359
     # Issue is that 0.13.0 does not allow the form classname.keybindings
     # without the : before the classname
     if wbemuri_str and wbemuri_str[0] != ":":
         if re.match(r"^[a-zA-Z0-9_]+\.", wbemuri_str):
             wbemuri_str = ':%s' % wbemuri_str
+
     try:
         instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
         if instance_name.namespace and namespace:
