@@ -20,6 +20,4 @@ click-spinner>=0.1.6
 click-repl>=0.1.0
 asciitree>=0.3.3
 tabulate>=0.8.2
-# Issue # 117 prompt_toolkit is available but is incompatible.
-#   The repl cmd fails
-prompt-toolkit>=1.0.15,<2.0.0
+prompt-toolkit>=1.0.15
