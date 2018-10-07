@@ -539,8 +539,9 @@ MOCK_TEST_CASES = [
      ['enumerate'],
      {'stderr':
       ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME',
+       'Try "pywbemcli instance enumerate -h" for help.',
        '',
-       'Error: Missing argument "classname".'],
+       'Error: Missing argument "CLASSNAME".'],
       'rc': 2,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -663,8 +664,9 @@ MOCK_TEST_CASES = [
      ['get'],
      {'stderr':
       ['Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
+       'Try "pywbemcli instance get -h" for help.',
        '',
-       'Error: Missing argument "instancename".'],
+       'Error: Missing argument "INSTANCENAME".'],
       'rc': 2,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -963,8 +965,9 @@ MOCK_TEST_CASES = [
      ['delete'],
      {'stderr':
       ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
+       'Try "pywbemcli instance delete -h" for help.',
        '',
-       'Error: Missing argument "instancename".'],
+       'Error: Missing argument "INSTANCENAME".'],
       'rc': 2,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -973,11 +976,12 @@ MOCK_TEST_CASES = [
      ['delete'],
      {'stderr':
       ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
+       'Try "pywbemcli instance delete -h" for help.',
        '',
-       'Error: Missing argument "instancename".'],
+       'Error: Missing argument "INSTANCENAME".'],
       'rc': 2,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_FILE, RUN],
 
     #
     #  instance references subcommand
@@ -1076,8 +1080,9 @@ MOCK_TEST_CASES = [
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
                  'INSTANCENAME',
+                 'Try "pywbemcli instance references -h" for help.',
                  '',
-                 'Error: Missing argument "instancename".'],
+                 'Error: Missing argument "INSTANCENAME".'],
       'rc': 2,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
@@ -1121,8 +1126,9 @@ MOCK_TEST_CASES = [
      ['associators'],
      {'stderr': ['Usage: pywbemcli instance associators [COMMAND-OPTIONS] '
                  'INSTANCENAME',
+                 'Try "pywbemcli instance associators -h" for help.',
                  '',
-                 'Error: Missing argument "instancename".'],
+                 'Error: Missing argument "INSTANCENAME".'],
       'rc': 2,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
