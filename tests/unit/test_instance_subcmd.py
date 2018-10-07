@@ -538,11 +538,9 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand enumerate error, no classname fails',
      ['enumerate'],
      {'stderr':
-      ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME',
-       '',
-       'Error: Missing argument "classname".'],
+      ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -662,11 +660,9 @@ MOCK_TEST_CASES = [
     ['instance subcommand get error. no classname',
      ['get'],
      {'stderr':
-      ['Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
-       '',
-       'Error: Missing argument "instancename".'],
+      ['Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get error. no classname',
@@ -787,9 +783,7 @@ MOCK_TEST_CASES = [
                  'namespace "root/cimv2" in WEB ',
                  "server: PYWBEMCLIFakedConnection\\(url=",
                  'http://FakedUrl',
-                 "creds=None, default_namespace=",
-                 "'root/cimv2'\\)"
-                 ],
+                 "creds=None, default_namespace=", ],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -962,21 +956,17 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand delete, missing instance name',
      ['delete'],
      {'stderr':
-      ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
-       '',
-       'Error: Missing argument "instancename".'],
+      ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand delete, instance name not in repo',
      ['delete'],
      {'stderr':
-      ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
-       '',
-       'Error: Missing argument "instancename".'],
+      ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -1075,11 +1065,9 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
-                 'INSTANCENAME',
-                 '',
-                 'Error: Missing argument "instancename".'],
+                 'INSTANCENAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references, invalid instance name',
@@ -1120,11 +1108,9 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand associators, no instance name',
      ['associators'],
      {'stderr': ['Usage: pywbemcli instance associators [COMMAND-OPTIONS] '
-                 'INSTANCENAME',
-                 '',
-                 'Error: Missing argument "instancename".'],
+                 'INSTANCENAME', ],
       'rc': 2,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators, invalid instance name',
