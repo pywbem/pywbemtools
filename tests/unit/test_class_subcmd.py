@@ -143,19 +143,21 @@ Options:
   -h, --help              Show this message and exit.
 """
 
-OK = True
-RUN = True
-FAIL = False
+OK = True  # mark tests OK when they execute correctly
+RUN = True  # Mark OK = False and current test case being created RUN
+FAIL = False  # Any test currently FAILING or not tested yet
 
 # pylint: enable=line-too-long
-MOCK_TEST_CASES = [
+TEST_CASES = [
     # desc - Description of test
-    # args - List of arguments or string of arguments
+    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    #          detailed documentation
     # exp_response - Dictionary of expected responses,
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['class subcommand help response',
+    ['Verify class subcommand help response',
      '--help',
      {'stdout': CLS_HELP,
       'test': 'lines'},
@@ -163,97 +165,97 @@ MOCK_TEST_CASES = [
     #
     # Enumerate subcommand and its options
     #
-    ['class subcommand enumerate  --help response',
+    ['Verify class subcommand enumerate  --help response',
      ['enumerate', '--help'],
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
      None, OK],
 
-    ['class subcommand enumerate  -h response.',
+    ['Verify class subcommand enumerate  -h response.',
      ['enumerate', '-h'],
      {'stdout': CLS_ENUM_HELP,
       'test': 'lines'},
      None, OK],
 
-    ['class subcommand enumerate CIM_Foo',
+    ['Verify class subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
      {'stdout': '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo local only',
+    ['Verify class subcommand enumerate CIM_Foo local only',
      ['enumerate', 'CIM_Foo', '-l'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo localonly',
+    ['Verify class subcommand enumerate CIM_Foo localonly',
      ['enumerate', 'CIM_Foo', '--localonly'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo -d',
+    ['Verify class subcommand enumerate CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo --deepinheritance',
+    ['Verify class subcommand enumerate CIM_Foo --deepinheritance',
      ['enumerate', 'CIM_Foo', '--deepinheritance'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo -c',
+    ['Verify class subcommand enumerate CIM_Foo -c',
      ['enumerate', 'CIM_Foo', '-c'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo --includeclassorigin',
+    ['Verify class subcommand enumerate CIM_Foo --includeclassorigin',
      ['enumerate', 'CIM_Foo', '--includeclassorigin'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo -o names only',
+    ['Verify class subcommand enumerate CIM_Foo -o names only',
      ['enumerate', 'CIM_Foo', '-o'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo --names_only',
+    ['Verify class subcommand enumerate CIM_Foo --names_only',
      ['enumerate', 'CIM_Foo', '--names_only'],
      {'stdout': 'CIM_Foo',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo summary',
+    ['Verify class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '-S'],
      {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo summary',
+    ['Verify class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': '2 CIMClass(s) returned',
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo names and deepinheritance',
+    ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
      ['enumerate', 'CIM_Foo', '-do'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand enumerate CIM_Foo include qualifiers',
+    ['Verify class subcommand enumerate CIM_Foo include qualifiers',
      ['enumerate', 'CIM_Foo'],
      {'stdout': ['Key ( true )', '[Description (', 'class CIM_Foo'],
       'test': 'in'},
@@ -262,21 +264,21 @@ MOCK_TEST_CASES = [
     #
     # Test class get
     #
-    ['class subcommand get  --help response',
+    ['Verify class subcommand get  --help response',
      ['get', '--help'],
      {'stdout': 'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
       'test': 'startswith'},
      None, OK],
 
     # subcommand get localonly option
-    ['class subcommand get not localonly. Tests for property names',
+    ['Verify class subcommand get not localonly. Tests for property names',
      ['get', 'CIM_Foo_sub2'],
      {'stdout': ['string cimfoo_sub2;', 'InstanceID', 'IntegerProp', 'Fuzzy',
                  'Key ( true )', 'IN ( false )'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand get localonly. Tests whole response',
+    ['Verify class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -286,7 +288,7 @@ MOCK_TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand get localonly. Tests whole response',
+    ['Verify class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--localonly'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -297,7 +299,7 @@ MOCK_TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # includequalifiers. Test the flag that excludes qualifiers
-    ['class subcommand get without qualifiers, . Tests whole response',
+    ['Verify class subcommand get without qualifiers, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '--no-qualifiers'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -321,7 +323,7 @@ MOCK_TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # pylint: disable=line-too-long
-    ['class subcommand get with propertylist, . Tests whole response',
+    ['Verify class subcommand get with propertylist, . Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Key ( true ),',
@@ -386,7 +388,7 @@ MOCK_TEST_CASES = [
 
     # pylint: enable=line-too-long
     # TODO include class origin. TODO not returning class origin correctly.
-    ['class subcommand get with propertylist and classorigin,',
+    ['Verify class subcommand get with propertylist and classorigin,',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID', '-c'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Key ( true ),',
@@ -453,25 +455,25 @@ MOCK_TEST_CASES = [
     #      +-- CIM_Foo_sub
     #      |   +-- CIM_Foo_sub_sub
     #      +-- CIM_Foo_sub2
-    ['class subcommand tree top down. Order uncertain so use "in" test ',
+    ['Verify class subcommand tree top down. Order uncertain.',
      ['tree'],
-     {'stdout': ['root',
-                 ' +-- CIM_Foo',
-                 '     +-- CIM_Foo_sub2',
-                 '     +-- CIM_Foo_sub',
-                 '[| ]*  +-- CIM_Foo_sub_sub', ],  # account for ordering issue
+     {'stdout': [r'root',
+                 r' \+-- CIM_Foo',
+                 r'     \+-- CIM_Foo_sub2',
+                 r'     \+-- CIM_Foo_sub',
+                 r'[| ]*\+-- CIM_Foo_sub_sub', ],  # account for ordering issue
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     # TODO The following test fails right now completely.
-    ['class subcommand tree top down starting at defined class ',
+    ['Verify class subcommand tree top down starting at defined class ',
      ['tree', 'CIM_Foo_sub'],
      {'stdout': ['CIM_Foo_sub',
                  ' +-- CIM_Foo_sub_sub', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand tree bottom up. Ordering guaranteed here',
+    ['Verify class subcommand tree bottom up. Ordering guaranteed here',
      ['tree', '-s', 'CIM_Foo_sub_sub'],
      {'stdout': ['root',
                  ' +-- CIM_Foo',
@@ -480,7 +482,7 @@ MOCK_TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand tree with invalid class',
+    ['Verify class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
      {'stderr': ['CIMError:', 'Class CIM_Foo_subx not found in namespace',
                  'root/cimv2.'],
@@ -491,7 +493,7 @@ MOCK_TEST_CASES = [
     #
     # associators subcommand tests
     #
-    ['class subcommand associators --help, . ',
+    ['Verify class subcommand associators --help, . ',
      ['associators', '--help'],
      {'stdout': ['Usage: pywbemcli class associators [COMMAND-OPTIONS] '
                  'CLASSNAME',
@@ -514,7 +516,7 @@ MOCK_TEST_CASES = [
     #
     # references subcommand tests
     #
-    ['class subcommand reference --help, . ',
+    ['Verify class subcommand reference --help, . ',
      ['references', '--help'],
      {'stdout': ['Usage: pywbemcli class references [COMMAND-OPTIONS] '
                  'CLASSNAME',
@@ -532,7 +534,7 @@ MOCK_TEST_CASES = [
     #
     # invokemethod subcommand tests
     #
-    ['class subcommand invokemethod --help, . ',
+    ['Verify class subcommand invokemethod --help, . ',
      ['invokemethod', '--help'],
      {'stdout': ['Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] '
                  'CLASSNAME METHODNAME',
@@ -547,7 +549,7 @@ MOCK_TEST_CASES = [
     #
     ['Verify class subcommand invokemethod',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stdout': [],
+     {'stdout': ["ReturnValue=0"],
       'rc': 0,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
@@ -583,10 +585,30 @@ MOCK_TEST_CASES = [
       'rc': 1,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE], OK],
+
+    ['Verify  --timestats gets stats output. Cannot test '
+     'with lines because execution time is variable.',
+     {'args': ['get', 'CIM_Foo'],
+      'global': ['--timestats']},
+     {'stdout': ['class CIM_Foo {',
+                 'string InstanceID;',
+                 'Count    Exc    Time    ReqLen    ReplyLen  Operation',
+                 '      1      0',
+                 '0           0  GetClass'],
+      'rc': 0,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify  multiple subcommands with stdin work ',
+     {'stdin': ['class get -h', 'class enumerate -h']},
+     {'stdout': ['Usage: pywbemcli  class enumerate ',
+                 'Usage: pywbemcli  class get '],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
 ]
 
-# TODO subcommand class delete. NOTE: cannot really test this with current
-# code since each test reloads repository
+# TODO subcommand class delete. Extend this test to use stdin (delete, test)
 # namespace
 # TODO: add test for  errors: class invalid, namespace invalid
 # other tests.  Test localonly on top level
@@ -599,9 +621,9 @@ class TestSubcmdClass(CLITestsBase):
     subcmd = 'class'
 
     @pytest.mark.parametrize(
-        "desc, args, exp_response, mock, condition",
-        MOCK_TEST_CASES)
-    def test_class(self, desc, args, exp_response, mock, condition):
+        "desc, inputs, exp_response, mock, condition",
+        TEST_CASES)
+    def test_class(self, desc, inputs, exp_response, mock, condition):
         """
         Common test method for those subcommands and options in the
         class subcmd that can be tested.  This includes:
@@ -611,9 +633,8 @@ class TestSubcmdClass(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        env = None
-        self.mock_subcmd_test(desc, self.subcmd, args, env, exp_response,
-                              mock, condition)
+        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
+                         mock, condition)
 
 
 class TestClassGeneral(object):  # pylint: disable=too-few-public-methods
@@ -644,8 +665,6 @@ class TestClassEnumerate(object):  # pylint: disable=too-few-public-methods
     """
     Test the options of the pywbemcli class enumerate' subcommand
     """
-    # TODO remap this to use the same test_funct decorator as pywbem when
-    # that code is committed.
     @pytest.mark.parametrize(
         "desc, tst_args, exp_result_start, exp_result_end",
         [

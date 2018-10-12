@@ -26,7 +26,7 @@ from subprocess import Popen, PIPE
 import six
 
 
-def execute_pywbemcli(args, env=None):
+def execute_pywbemcli(args, env=None, stdin=None):
     """
     Invoke the 'pywbemcli' command as a child process.
 
@@ -35,17 +35,20 @@ def execute_pywbemcli(args, env=None):
 
     Parameters:
 
-      args (iterable of :term:`string`): Command line arguments, without the
-        command name.
+      args (iterable of :term:`string`): Command line arguments and subcommand,
+        without the command name.
         Each single argument must be its own item in the iterable; combining
         the arguments into a string does not work.
-        The arguments may be binary strings encoded in UTF-8, or unicode
+        The arguments may be binary strings, encoded in UTF-8, or unicode
         strings.
 
       env (dict): Environment variables to be put into the environment when
         calling the command. May be `None`. Dict key is the variable name as a
         :term:`string`; dict value is the variable value as a :term:`string`
         (without any shell escaping needed).
+
+      stdin: (:term:`string` or None):
+        Passed to the executable as stdin.
 
     Returns:
 
@@ -68,8 +71,8 @@ def execute_pywbemcli(args, env=None):
         env = copy(env)
 
     # Unset pywbemcli env variables
-    if 'PYWBEMCLI_HOST' not in env:
-        env['PYWBEMCLI_HOST'] = None
+    # if 'PYWBEMCLI_HOST' not in env:
+    #    env['PYWBEMCLI_HOST'] = None
 
     env['PYTHONPATH'] = '.'  # Use local files
     env['PYTHONWARNINGS'] = ''  # Disable for parsing output
@@ -92,15 +95,13 @@ def execute_pywbemcli(args, env=None):
             arg = arg.decode('utf-8')
         cmd_args.append(arg)
 
-    # print('CMD_ARGS %s' % cmd_args)
-
     # Note that the click package on Windows writes '\n' at the Python level
     # as '\r\n' at the level of the shell. Some other layer (presumably the
     # Windows shell) contriubutes another such translation, so we end up with
     # '\r\r\n' for each '\n'. Using universal_newlines=True undoes all of that.
-    proc = Popen(cmd_args, shell=False, stdout=PIPE, stderr=PIPE,
+    proc = Popen(cmd_args, shell=False, stdout=PIPE, stderr=PIPE, stdin=PIPE,
                  universal_newlines=True)
-    stdout_str, stderr_str = proc.communicate()
+    stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
 
     if isinstance(stdout_str, six.binary_type):

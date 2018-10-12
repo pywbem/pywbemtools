@@ -388,7 +388,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
                                               log_filename=PYWBEMCLI_LOG,
                                               connection=conn, propagate=True)
             except ValueError as ve:
-                raise click.ClickException('Logger configuration error. input'
-                                           '%s. Exception %s' % (self.log, ve))
+                raise click.ClickException('Logger configuration error. input: '
+                                           '%s. Exception: %s' % (self.log, ve))
         # Save the connection object and create a WBEMServer object
         self._wbem_server = WBEMServer(conn)

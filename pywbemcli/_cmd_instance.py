@@ -509,6 +509,10 @@ def cmd_instance_create(context, classname, options):
                                        'namespace "%s" in WEB '
                                        'server: %s.'
                                        % (classname, ns, context.conn))
+        else:
+            raise click.ClickException('Exception %s' % ce)
+    except Error as er:
+        raise click.ClickException('Exception %s' % er)
 
     properties = options['property']
 
@@ -559,6 +563,10 @@ def cmd_instance_modify(context, instancename, options):
                                        'server: %s'
                                        % (instancepath.classname,
                                           context.conn.uri))
+        else:
+            raise click.ClickException('Exception %s' % ce)
+    except Error as er:
+        raise click.ClickException('Exception %s' % er)
 
     property_list = resolve_propertylist(options['propertylist'])
 
