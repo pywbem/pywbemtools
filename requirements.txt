@@ -13,7 +13,8 @@ pywbem>=0.12.6
 
 pbr>=1.10.0
 six>=1.10.0
-# Issue # 137 defined a problem where the click update to 7.0 causes failures
+# TODO: Issue #137 defined a problem where the click update to 7.0 causes
+#       failures
 click>=6.6,<7.0
 click-spinner>=0.1.6
 click-repl>=0.1.0
