@@ -165,15 +165,12 @@ QD_TBL_OUT = """Qualifier Declarations
 OK = True      # set to OK for tests passed. Set OK = False to execute one test
 RUN = True     # set RUN condition in test being run
 FAIL = False   # flag any tests that fail
-MOCK_TEST_CASES = [
+
+TEST_CASES = [
     # desc - Description of test
-    # args - Dictionary defining input to the command. There are two possible
-    #        keywords:
-    #        args: List of arguments or string of arguments to append to the
-    #            command line after the subcommand
-    #        globals - List of arguments or string of arguments to prepend to
-    #            the subcommand name.  This allows including global options on
-    #            each command.
+    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    #          detailed documentation
     # exp_response - Dictionary of expected responses,
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
@@ -279,9 +276,8 @@ class TestSubcmdQualifiers(CLITestsBase):
     subcmd = 'qualifier'
 
     @pytest.mark.parametrize(
-        "desc, args, exp_response, mock, condition",
-        MOCK_TEST_CASES)
-    def test_qualdecl(self, desc, args, exp_response, mock, condition):
+        "desc, inputs, exp_response, mock, condition", TEST_CASES)
+    def test_qualdecl(self, desc, inputs, exp_response, mock, condition):
         """
         Common test method for those subcommands and options in the
         class subcmd that can be tested.  This includes:
@@ -291,6 +287,5 @@ class TestSubcmdQualifiers(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        env = None
-        self.mock_subcmd_test(desc, self.subcmd, args, env, exp_response,
-                              mock, condition)
+        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
+                         mock, condition)

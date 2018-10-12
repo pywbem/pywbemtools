@@ -23,50 +23,33 @@ TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 
-OK = False
+OK = True
 RUN = True
 FAIL = False
 
-MOCK_TEST_CASES = [
+TEST_CASES = [
     # desc - Description of test
-    # args - List of arguments or string of arguments. For this test,
-    #        list includes subcommand unless there is only one argument
+    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    #          detailed documentation. This test processor includes an
+    #          additional key, `subcmd`
     # exp_response - Dictionary of expected responses,
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['verify pywbemcl --help command. Just test for log help',
-     {'subcmd': None,
-      'args': ['--help']},
-     {'stdout': ['-l, --log COMP=DEST:DETAIL,...',
-                 '(COMP: [api|http|all], Default:',
-                 'DETAIL:[all|paths|summary], Default: all)'],
-      'test': 'in'},
-     None, OK],
-
-    ['verify pywbemcl -o all=stderr class get blah. class get that fails',
+    ['Verify log of class get blah. class get that fails',
      {'global': ['-l', 'all=stderr'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
-     {'stderr': ['-pywbem.api', 'PYWBEMCLIConnection(url',
-                 "GetClass(ClassName=\'blah\'",
+     {'stderr': ['-pywbem.api',
+                 'PYWBEMCLIFakedConnection',
+                 r'GetClass\(ClassName=', r'blah',
                  '-Exception:'],
-      'test': 'in',
+      'test': 'regex',
       'rc': 1},
-     None, OK],
+     SIMPLE_MOCK_FILE, OK],
 
-    ['verify log of class get blah. class get that fails',
-     {'global': ['-l', 'all=stderr'],
-      'subcmd': 'class',
-      'args': ['get', 'blah']},
-     {'stderr': ['-pywbem.api', 'PYWBEMCLIConnection(url',
-                 "GetClass(ClassName=\'blah\'",
-                 '-Exception:'],
-      'test': 'in',
-      'rc': 1},
-     None, OK],
-
-    ['Verify log of class subcommand get localonly. Tests whole response',
+    ['Verify log of class subcommand get localonly. Test stdpit',
      {'global': ['-l', 'all=stderr:summary'],
       'subcmd': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--localonly']},
@@ -79,32 +62,30 @@ MOCK_TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify Log of class subcommand get localonly. Tests whole response.'
+    ['Verify Log of class subcommand get localonly. test stderr'
      'Cannot test stderr and stdout in same test.',
      {'global': ['-l', 'all=stderr:summary'],
       'subcmd': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--localonly']},
-     {'stderr': ['-pywbem.api.',
-                 'PYWBEMCLIFakedConnection(url',
-                 '-Request:',
-                 "GetClass(ClassName='CIM_Foo_sub2', IncludeClassOrigin=False",
-                 '-Return:',
-                 'GetClass(CIMClass CIM_Foo_sub2'],
-      'test': 'in'},
+     {'stderr': [r'-pywbem.api.',
+                 r'PYWBEMCLIFakedConnection',
+                 r'-Request:',
+                 r'-Return:',
+                 r'GetClass\(CIMClass ', r'CIM_Foo_sub2'],
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log of class subcommand get localonly. Tests whole response.'
+    ['Verify log of class subcommand get localonly. Test stderr'
      'Cannot test stderr and stdout in same test.',
      {'global': ['-l', 'api=stderr:summary'],
       'subcmd': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--localonly']},
-     {'stderr': ['-pywbem.api.',
-                 'PYWBEMCLIFakedConnection(url',
-                 '-Request:',
-                 "GetClass(ClassName='CIM_Foo_sub2', IncludeClassOrigin=False",
-                 '-Return:',
-                 'GetClass(CIMClass CIM_Foo_sub2'],
-      'test': 'in'},
+     {'stderr': [r'-pywbem.api.',
+                 r'PYWBEMCLIFakedConnection',
+                 r'-Request:',
+                 r'-Return:',
+                 r'GetClass\(CIMClass ', r'CIM_Foo_sub2'],
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify log http class subcommand get localonly. Should be no log because '
@@ -122,10 +103,31 @@ MOCK_TEST_CASES = [
      {'global': ['-l', 'httpx=stderr'],
       'subcmd': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--localonly']},
-     {'stderr': ["Error: Logger configuration error. inputhttpx=stderr."],
+     {'stderr': ["Error: Logger configuration error. input: "],
       'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify log with error in definition. invalid type',
+     {'global': ['-l', 'allx=stderr'],
+      'subcmd': 'class',
+      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+     {'stderr': ["Error: Logger configuration error. input: allx=stderr. "
+                 "Exception: Invalid simple logger name:"],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify invalid log parameter fails (no value) '
+     'same test.',
+     {'global': ['-l'],
+      'subcmd': 'class',
+      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+     {'stderr': ["Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]"],
+      'rc': 2,
       'test': 'in'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
 ]
 
@@ -138,9 +140,8 @@ class TestLogOption(CLITestsBase):
     """
 
     @pytest.mark.parametrize(
-        "desc, args, exp_response, mock, condition",
-        MOCK_TEST_CASES)
-    def test_class(self, desc, args, exp_response, mock, condition):
+        "desc, inputs, exp_response, mock, condition", TEST_CASES)
+    def test_log_option(self, desc, inputs, exp_response, mock, condition):
         """
         Common test method for those subcommands and options in the
         class subcmd that can be tested.  This includes:
@@ -150,10 +151,7 @@ class TestLogOption(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        env = None
-        subcmd = ""  # Do not supply a subcommand with these requests
-        if args['subcmd']:
-            subcmd = args['subcmd']
+        subcmd = inputs['subcmd'] if inputs['subcmd'] else ''
 
-        self.mock_subcmd_test(desc, subcmd, args, env, exp_response,
-                              mock, condition)
+        self.subcmd_test(desc, subcmd, inputs, exp_response,
+                         mock, condition)

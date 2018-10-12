@@ -483,9 +483,14 @@ OK = True  # mark tests OK when they execute correctly
 RUN = True  # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
-MOCK_TEST_CASES = [
-    # desc, args, exp_response, mock, condition
-
+TEST_CASES = [
+    # desc - Description of test
+    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    #          detailed documentation
+    # exp_response - Dictionary of expected responses,
+    # mock - None or name of files (mof or .py),
+    # condition - If True, the test is executed,  Otherwise it is skipped.
     #
     #   instance --help
     #
@@ -686,7 +691,7 @@ MOCK_TEST_CASES = [
 
     ['Verify instance subcommand create, new instance of CIM_Foo  one property',
      ['create', 'CIM_Foo', '-P', 'InstanceID=blah'],
-     {'stdout': "",
+     {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -694,31 +699,13 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
      ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '-n', 'root/cimv2'],
-     {'stdout': "",
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance subcommand create, new instance of CIM_Foo, '
-     'one property, explicit namespace definition',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--namespace',
-      'root/cimv2'],
-     {'stdout': "",
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance subcommand create, new instance of CIM_Foo, '
-     'one property, explicit namespace definition',
-     ['create', 'CIM_Foo', '--property', 'InstanceID=blah', '--namespace',
-      'root/cimv2'],
-     {'stdout': "",
+     {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     # TODO test datetime
-    ['Verify instance subcommand create, new instance of all_types'
+    ['Verify instance subcommand create, new instance of all_types '
      'with scalar types',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
       '-P', 'scalBool=true', '-P', 'scalUint8=1',
@@ -726,12 +713,12 @@ MOCK_TEST_CASES = [
       '-P', 'scalUint32=999', '-P', 'scalSint32=-999',
       '-P', 'scalSint64=-9999',
       '-P', 'scalUint64=9999', '-P', 'scalString="test\"embedded\"quote"'],
-     {'stdout': "",
+     {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="blah"',
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance of all_types'
+    ['Verify instance subcommand create, new instance of all_types '
      "with array values",
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
       '-P', 'arrayBool=true,false',
@@ -741,14 +728,14 @@ MOCK_TEST_CASES = [
       '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
       '-P', 'arrayUint64=0,999,9999', '-P', 'arraySint64=-9999,0,9999',
       '-P', 'scalString="abc", "def", "jhijk"'],
-     {'stdout': "",
+     {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="blah"',
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
     # TODO create more valid create instance tests, i.e. datetime
 
     ['Verify instance subcommand create, new instance Error in Property Type'
-     "with array values",
+     " with array values",
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
       '-P', 'arrayBool=8,9',
       '-P', 'arrayUint8=1,2,3',
@@ -779,24 +766,21 @@ MOCK_TEST_CASES = [
     ['Verify instance subcommand create, new instance invalid ns',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
       'blah'],
-     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
-                 'namespace "root/cimv2" in WEB ',
-                 "server: PYWBEMCLIFakedConnection\\(url=",
-                 'http://FakedUrl',
-                 "creds=None, default_namespace=", ],
+     {'stderr': ['Exception 3: Namespace blah not found for classes', ],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance invalid class',
      ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
-     {'stderr': ["Error: CIMClass 'CIM_blah' does not exist in ",
-                 'namespace "root/cimv2" in "WEB server "',
-                 "PYWBEMCLIFakedConnection\\(url="
-                 "'http://FakedUrl', creds=None, default_namespace="
-                 "'root/cimv2'\\)"],
+     {'stderr': ['Error: CIMClass: "CIM_blah" does not exist in ',
+                 'namespace "root/cimv2" in WEB server',
+                 'PYWBEMCLIFakedConnection(url=',
+                 "'http://FakedUrl', creds=None, default_namespace=",
+                 "'root/cimv2\')"
+                 ],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
     # NOTE: Since the instance creation logic is the same for modify and
     # create instance. The error tests in modify also test the error logic.
@@ -1204,7 +1188,7 @@ MOCK_TEST_CASES = [
 ]
 
 
-class TestSubcmdMock(CLITestsBase):
+class TestSubcmd(CLITestsBase):
     """
     Test all of the class subcommand variations.
     """
@@ -1212,12 +1196,11 @@ class TestSubcmdMock(CLITestsBase):
     # mock_mof_file = 'simple_mock_model.mof'
 
     @pytest.mark.parametrize(
-        "desc, args, exp_response, mock, condition",
-        MOCK_TEST_CASES)
-    def test_execute_pywbemcli(self, desc, args, exp_response, mock, condition):
+        "desc, inputs, exp_response, mock, condition", TEST_CASES)
+    def test_execute_pywbemcli(self, desc, inputs, exp_response, mock,
+                               condition):
         """
         Execute pybemcli with the defined input and test output.
         """
-        env = None
-        self.mock_subcmd_test(desc, self.subcmd, args, env, exp_response,
-                              mock, condition)
+        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
+                         mock, condition)

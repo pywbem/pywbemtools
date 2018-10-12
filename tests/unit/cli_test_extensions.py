@@ -6,8 +6,8 @@ through pywbemcli execution
 
 from __future__ import absolute_import, print_function
 import re
-import pytest
 import os
+import pytest
 import six
 
 from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
@@ -15,14 +15,14 @@ from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
 TEST_DIR = os.path.dirname(__file__)
 
 
-class CLITestsBase(object):
+class CLITestsBase(object):  # pylint: disable=too-few-public-methods
     """
-        Defines methods to execute tests on pywbemcli
+        Defines methods to execute tests on pywbemcli.
 
     """
-    def mock_subcmd_test(self, desc, subcmd, args, env, exp_response,
-                         mock_file, condition):
-        # pylint: disable=line-too-long
+    def subcmd_test(self, desc, subcmd, inputs, exp_response, mock_file,
+                    condition, verbose=None):
+        # pylint: disable=line-too-long, no-self-use
         """
         Test method to execute test on pywbemcli by calling the executable
         pywbemcli for the command defined by subcmd with arguments defined
@@ -39,21 +39,44 @@ class CLITestsBase(object):
             pywbemcli subcommand inserted for this test.  This is the first
             level subcommand (ex. class).
 
-          args (:class:`py:dict` or :class:`py:list` of :term:`string` or :term:`string`):
+          inputs (:class:`py:dict` or :class:`py:list` of :term:`string` or :term:`string`):
 
-            If it is a dictionary, arguments to be inserted into the command
-            line both as local (after the subcommand name) and global (before
-            the subcommand name) options may be defined. The dictionary may
-            contain two possible key keys:
+            If inputs is a list of strings, it contains the command
+            line arguments, without the command name.
 
-              * args: defines local aruments to append to the command after
-                    the subcommand name
+            Each single argument must be its own item in the iterable; combining
+            the arguments into a string does not work.
+            The arguments may be binary strings encoded in UTF-8, or unicode
+            strings.
 
-              * globals: defines global arguments that will be inserted
-                  into the command line before the subcommand name.
+            If inputs is a dict it can contain the following possible keys:
 
-            If args is a list or string it is the set of arguments to append
-            after the subcommand name
+              * 'args': defines local arguments to append to the command after
+                  the subcommand name. Each single argument must be its own
+                  item in the iterable.
+
+              * 'globals': defines global arguments that will be inserted
+                  into the command line before the subcommand name. Each
+                  single argument must be its own item in the iterable.
+
+              * 'env': Dictionary of environment variables where  key is the
+                variable name as a :term:`string`; dict value is the variable
+                value as a :term:`string` (without any shell escaping needed).
+                If None, no environment variables are set for the test.
+
+              * 'stdin': If the key is `stdin`, the value is either a string or
+                list of strings. If `stdin` is a list or tuple of strings, each
+                string defines a line of text that will be included as stdin to
+                the call to pywbemcli. The iterable is mapped to a single string
+                with each line separated by an EOL char. This becomes the stdin
+                parameter for the call to pywbemcli. Each line is processed
+                as a separate repl line by the pybemcli executable.
+                If `stdin` is a single string it is passed  to the stdin
+                parameter for the call to pywbemcli. If `stdin` is defined, the
+                `subcmd` parameter is ignored and the full subcommand must be in
+                the `stdin` iterable.
+
+                If None, no stdin input is defined for the test.
 
           exp_response (:class:`py:dict`)
 
@@ -91,11 +114,15 @@ class CLITestsBase(object):
                  a regex expression and a regex match is executed for each line.
 
                  'regex' - Expected response is a single string or list of
-                 strings. Each string is considered a regex expression.
+                 strings. Each string is considered a regex expression. The
+                 regex expression is tested against each line in the output
+                 using regex search. All strings in the expected response must
+                 be found in actual response to pass the test
 
                  'in' - Expected response is string or list of strings.
-                 Tests the complete response to determine if each entry
-                 in expected response is in the response data as a single test.
+                 Tests the complete response line by line to determine if each
+                 entry in expected response is in the response data as a single
+                 test.
 
                  Executes a single regex search of the entire
                  response data to match with each entry in the expected
@@ -112,7 +139,6 @@ class CLITestsBase(object):
 
             If it is a list, the same rules apply to each entry in the list.
 
-
             If None, test is executed without the --mock-server input parameter
             and defines an artificial server name  Used to test subcommands
             and options that do not communicate with a server.  It is faster
@@ -120,24 +146,34 @@ class CLITestsBase(object):
 
           condition (None or False):
             If False, the test is skipped
+
+          verbose (:class:`py:bool`):
+            If `True` the assembled command line will be displayed
         """  # noqa: E501
         # pylint: enable=line-too-long
 
         if not condition:
             pytest.skip("Condition for test case %s not met" % desc)
 
-        global_args = []
-        local_args = []
-        if isinstance(args, dict):
-            global_args = args.get("global", None)
-            local_args = args.get("args", None)
-        elif isinstance(args, six.string_types):
-            local_args = args.split(" ")
-        elif isinstance(args, (list, tuple)):
-            local_args = args
+        env = None
+        stdin = None
+        if isinstance(inputs, dict):
+            global_args = inputs.get("global", None)
+            local_args = inputs.get("args", None)
+            env = inputs.get("env", None)
+            stdin = inputs.get('stdin', None)
+            if stdin:
+                if isinstance(stdin, (tuple, list)):
+                    stdin = '\n'.join(stdin)
+        elif isinstance(inputs, six.string_types):
+            local_args = inputs.split(" ")
+            global_args = None
+        elif isinstance(inputs, (list, tuple)):
+            local_args = inputs
+            global_args = None
         else:
-            assert 'Invalid args input to test %r . Allowed types are dict, ' \
-                   'string, list, tuple.' % args
+            assert 'Invalid inputs param to test %r . Allowed types are ' \
+                   'dict, string, list, tuple.' % inputs
 
         if isinstance(local_args, six.string_types):
             local_args = local_args.split(" ")
@@ -145,7 +181,7 @@ class CLITestsBase(object):
         if isinstance(global_args, six.string_types):
             global_args = global_args.split(" ")
 
-        cmd_line = ['-s', 'http:/blah']
+        cmd_line = []
         if global_args:
             cmd_line.extend(global_args)
 
@@ -160,86 +196,90 @@ class CLITestsBase(object):
             else:
                 assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_file)
 
-        cmd_line.append(subcmd)
+        if not stdin:
+            cmd_line.append(subcmd)
 
         if local_args:
             cmd_line.extend(local_args)
 
-        # print('\nCMDLINE %s' % cmd_line)
+        if verbose:
+            print('\nCMDLINE %s' % cmd_line)
 
-        rc, stdout, stderr = execute_pywbemcli(cmd_line)
+        rc, stdout, stderr = execute_pywbemcli(cmd_line, env=env, stdin=stdin)
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr)
 
-        test_value = None
-        component = None
+        if verbose:
+            print('RC=%s\nSTDOUT=%s\nSTDERR=%s' % (rc, stdout, stderr))
+
+        if exp_response['test']:
+            test_definition = exp_response['test']
+        else:
+            test_definition = None
+
         if 'stdout' in exp_response:
             test_value = exp_response['stdout']
             rtn_value = stdout
-            component = 'stdout'
+            rtn_type = 'stdout'
         elif 'stderr' in exp_response:
             test_value = exp_response['stderr']
             rtn_value = stderr
-            component = 'stderr'
+            rtn_type = 'stderr'
         else:
             assert False, 'Expected "stdout" or "stderr" key. One of these ' \
                           'keys required in exp_response.'
 
-        if test_value:
+        if test_definition:
             if 'test' in exp_response:
-                test = exp_response['test']
+                test_definition = exp_response['test']
                 # test that rtn_value starts with test_value
-                if test == 'startswith':
+                if test_definition == 'startswith':
                     assert isinstance(test_value, six.string_types)
                     assert rtn_value.startswith(test_value), \
-                        "{}\n{}={!r}".format(desc, component, rtn_value)
+                        "{}\n{}={!r}".format(desc, rtn_type, rtn_value)
                 # test that lines match between test_value and rtn_value
                 # base on regex match
-                elif test == 'patterns':
+                elif test_definition == 'patterns':
                     if isinstance(test_value, six.string_types):
                         test_value = test_value.splitlines()
                     assert isinstance(test_value, (list, tuple))
                     assert_patterns(test_value, rtn_value.splitlines(),
-                                    "{}\n{}={!r}".format(desc, component,
+                                    "{}\n{}={!r}".format(desc, rtn_type,
                                                          rtn_value))
                 # test that each line in the test value matches the
                 # corresponding line in the rtn_value exactly
-                elif test == 'lines':
+                elif test_definition == 'lines':
                     if isinstance(test_value, six.string_types):
                         test_value = test_value.splitlines()
                     if isinstance(test_value, (list, tuple)):
                         assert_lines(test_value, rtn_value.splitlines(),
-                                     "{}\n{}={!r}".format(desc, component,
+                                     "{}\n{}={!r}".format(desc, rtn_type,
                                                           rtn_value))
                     else:
                         assert(isinstance(test_value, six.string_types))
                         assert_lines(test_value.splitlines(),
                                      rtn_value.splitlines(),
-                                     "{}\n{}={!r}".format(desc, component,
+                                     "{}\n{}={!r}".format(desc, rtn_type,
                                                           rtn_value))
                 # test with a regex search that all values in list exist in
-                # the return
-                elif test == 'regex':
-                    if isinstance(test_value, (tuple, list)):
-                        rtn_value = rtn_value.join("\n")
-                    elif isinstance(test_value, six.string_types):
-                        rtn_value = [rtn_value]
-                    else:
-                        assert False, "regex expected response must be string" \
-                                      "or list of strings. %s found" % \
-                                      type(rtn_value)
+                # the return. Build rtn_value into single string and do
+                # re.search against it for each test_value
+                elif test_definition == 'regex':
+                    assert(isinstance(rtn_value, six.string_types))
 
                     for regex in test_value:
                         assert isinstance(regex, six.string_types)
-                        match_result = re.search(regex, rtn_value)
-                        assert not match_result, \
-                            "{}\n{}={!r}".format(desc, re, rtn_value)
-                elif test == 'in':
+                        match_result = re.search(regex, rtn_value, re.MULTILINE)
+                        assert match_result, \
+                            "Desc: {}\nRegex: {}\nNot in\n{!r}".format(
+                                desc, regex, rtn_value)
+                elif test_definition == 'in':
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert test_str in rtn_value, \
-                            "{}\n{}={!r}".format(desc, test_str, rtn_value)
+                            "Desc: {}\nString: {}\nNot in:\n{!r}".format(
+                                desc, test_str, rtn_value)
                 else:
-                    assert 'test %s is invalid. Skipped' % test
+                    assert 'test %s is invalid. Skipped' % test_definition
