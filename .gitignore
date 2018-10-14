@@ -21,6 +21,7 @@ pywbemcli.egg-info
 MANIFEST
 pylint_done
 .coverage
+.DS_Store
 setuptools-*.egg
 setuptools-*.zip
 /tmp_*/
