@@ -15,9 +15,11 @@ exclude =
 
 # remove the comment and it will ignore noga entries at least in files.
 #disable_noqa
-    
+
 ignore =
     # unable to detect undefined names (when using wildcard import)
-    F403
-
+    F403,
+    # line break after binary operator: is issued since 10/2018 in situations
+    # that are ok (e.g. within brackets).
+    W504
 
