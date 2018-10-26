@@ -56,7 +56,6 @@ jupyter>=1.0.0
 # TODO: Follow up on resolution of this issue.
 tornado<5.0; python_version <= '2.7'
 
-# temporary fix to get around problem introduced by pyzmq 16.03 release 30
-# Oct 2017.  See issue #80
-# TODO: retest this in the future so we can remove this limitation
-pyzmq==16.0.2
+# Excluding pymq 16.0.3 to get around problem; see issue #80.
+pyzmq>=16.0.2,!=16.0.3
+
