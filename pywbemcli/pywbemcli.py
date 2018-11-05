@@ -37,6 +37,7 @@ from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
 
 from ._connection_repository import get_pywbemcli_servers
 
+
 __all__ = ['cli']
 
 # Defaults for some options
@@ -57,21 +58,21 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    ' IPV4 address (dotted) or a literal IPV6 address'
                    ' Port (optional) defines a '
                    ' WBEM server protocol to be used (Defaults 5988(HTTP) and '
-                   ' 5989 (HTTPS). ' +
-                   ' (EnvVar: {ev}).'.format(ev=PywbemServer.server_envvar))
+                   ' 5989 (HTTPS). ' +  # noqa: W504
+                   '(EnvVar: {ev}).'.format(ev=PywbemServer.server_envvar))
 @click.option('-N', '--name', type=str,
               help='Optional name for the connection.  If the name option '
                    'is not set, the name "default" is used. If the name '
                    'option exists and the server option does not exist '
                    'pywbemcli attempts to retrieve the connection information '
                    'from persistent storage. If the server option exists '
-                   'that is used as the connection')
+                   'that is used as the connection name')
 @click.option('-d', '--default_namespace', type=str,
               envvar=PywbemServer.defaultnamespace_envvar,
               help="Default Namespace to use in the target WBEMServer if no "
                    "namespace is defined in the subcommand"
-                   "(EnvVar: PYWBEMCLI_DEFAULT_NAMESPACE)." +
-                   " (Default: {of}).".format(of=DEFAULT_NAMESPACE))
+                   "(EnvVar: PYWBEMCLI_DEFAULT_NAMESPACE)."
+                   " " + "(Default: {of}).".format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str, envvar=PywbemServer.user_envvar,
               help="User name for the WBEM Server connection. "
                    "(EnvVar: PYWBEMCLI_USER).")
@@ -102,8 +103,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'client verification of the WBEM server certificate. '
                    ' (EnvVar: PYWBEMCLI_CA_CERTS).'
                    'Default: Searches for matching certificates in the '
-                   'following system directories: ' +
-                   ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
+                   'following system directories:'
+                   ' ' + ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @click.option('-o', '--output-format',
               type=click.Choice(OUTPUT_FORMATS),
               help='Output format (Default: {of}). pywbemcli may override '
@@ -189,12 +190,13 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # specified and is why global options don't define defaults in the
     # decorators that define them.
 
-    # TODO: ks Review to see if there is a better solution.
+    # TODO: ks This should be lazy load.
     pywbemcli_servers = get_pywbemcli_servers()
 
     if ctx.obj is None:
-        # Apply the documented option defaults.
-        # default for output_format is applied in processing since it depends
+        # In command mode or processing the command line options in
+        # interactive mode. Apply the documented option defaults.
+        # Default for output_format is applied in processing since it depends
         # on request (ex. mof for get class vs table for many)
         if default_namespace is None:
             default_namespace = DEFAULT_NAMESPACE
@@ -227,7 +229,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
-
         if server or mock_server:
             if not name:
                 name = 'default'
@@ -247,7 +248,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          verbose=verbose,
                                          mock_server=mock_server,
                                          log=log)
-        else:
+        else:  # no server and mock_server are None
             if name:
                 if name in pywbemcli_servers:
                     pywbem_server = pywbemcli_servers[name]
@@ -257,12 +258,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             elif 'default' in pywbemcli_servers:
                 pywbem_server = pywbemcli_servers['default']
             else:
-                # if no server defined, set None. This allows --help to
-                # be executed without the server defined.  Each subcommand
-                # must confirm that server exists before trying to execute.
+                # If no server defined, set None. This allows subcmds that do
+                # not require a server executed without the server defined.
                 pywbem_server = None
 
-    else:
+    else:  # ctx.obj exists
         # Processing an interactive command.
         # Apply the option defaults from the command line options.
         if pywbem_server is None:
@@ -278,7 +278,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # its own command context different from the command context for the
     # command line.
 
-    ctx.obj = ContextObj(ctx, pywbem_server, output_format, use_pull_ops,
+    ctx.obj = ContextObj(pywbem_server, output_format, use_pull_ops,
                          pull_max_cnt, timestats, verbose)
 
     # Invoke default command

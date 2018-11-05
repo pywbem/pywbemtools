@@ -34,7 +34,7 @@ CONNECTIONS_LOADED = False
 # dictionary of known wbem servers
 PYWBEMCLI_SERVERS = {}
 
-# TODO make this into a class to clean up the code. This is a temp hack
+# TODO make this into a class to clean up the code. This was a temp hack
 
 
 def get_pywbemcli_servers():
@@ -65,8 +65,6 @@ def server_definitions_new(name, svr_definition):
     """Add a new connection to the connections repository."""
     pywbemcli_servers = get_pywbemcli_servers()
     pywbemcli_servers[name] = svr_definition
-    global CONNECTIONS_LOADED
-    CONNECTIONS_LOADED = True
     server_definitions_save(pywbemcli_servers)
 
 
@@ -83,8 +81,6 @@ def server_definitions_save(pywbemcli_servers):
     """
     if CONNECTIONS_LOADED:
         if pywbemcli_servers:
-            if os.path.isfile(CONNECTIONS_FILE):
-                os.remove(CONNECTIONS_FILE)
             jsondata = {}
             for svr_name in pywbemcli_servers:
                 jsondata[svr_name] = pywbemcli_servers[svr_name].to_dict()
@@ -107,3 +103,11 @@ def server_definitions_save(pywbemcli_servers):
                     os.rename(CONNECTIONS_FILE, bakfile)
 
             os.rename(tmpfile, CONNECTIONS_FILE)
+
+        else:
+            if os.path.isfile(CONNECTIONS_FILE):
+                bakfile = "%s.bak" % CONNECTIONS_FILE
+                if os.path.isfile(bakfile):
+                    os.remove(bakfile)
+                if os.path.isfile(CONNECTIONS_FILE):
+                    os.rename(CONNECTIONS_FILE, bakfile)

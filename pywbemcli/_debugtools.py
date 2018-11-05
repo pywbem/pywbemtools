@@ -19,8 +19,8 @@ def DumpArgs(func):  # pylint: disable=invalid-name
         arg_names = func.func_code.co_varnames[:func.func_code.co_argcount]
         args = func_args[:len(arg_names)]
         defaults = func.func_defaults or ()
-        args = args + defaults[len(defaults) - (func.func_code.co_argcount -
-                                                len(args)):]
+        args = args + defaults[len(defaults) -  # noqa: W504
+                               (func.func_code.co_argcount - len(args)):]
         params = zip(arg_names, args)
         args = func_args[len(arg_names):]
         if args:

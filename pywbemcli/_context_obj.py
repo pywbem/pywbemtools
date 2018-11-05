@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Context object. This is the common object for click command calls
+pybemcli context object. This is the common object for click command calls for
+pywbemcli context information.
 
 It contains data that is set in the top level and used in subcommand calls
+
+This object is attached to the Click Context in pywbemcli.py
 """
 
 from __future__ import absolute_import, unicode_literals
@@ -29,19 +32,20 @@ from ._common import format_table
 # The current pywbem server object for subcommands.
 PYWBEM_SERVER_OBJ = None
 
-# dictionary of defined servers. They key is the names for each
-# server.
+# dictionary of defined servers. The key is the name for each
+# server. the value is a PywbemServer object
 PYWBEM_SERVERS = {}
 
 
 class ContextObj(object):
     """
-        Manage the click context object. This is the object that communicates
-        between the cli commands and command groups. It contains the
-        information that is common to the multiple commands
+        Manage the pywbemcli context that is carried within the Click
+        context object in the obj parameter. This is the object that
+        communicates between the cli commands and command groups. It contains
+        the information that is common to the multiple click subcommands
     """
     # pylint: disable=unused-argument
-    def __init__(self, ctx, pywbem_server, output_format, use_pull,
+    def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, verbose):
 
         self._pywbem_server = pywbem_server
@@ -53,10 +57,10 @@ class ContextObj(object):
         self._spinner = click_spinner.Spinner()
 
     def __repr__(self):
-        return 'ContextObj(pywbem_server=%s, outputformat=%s, ' \
+        return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
                'pull_max_cnt=%s, use_pull=%s, timestats=%s, verbose=%s' % \
-               (self.pywbem_server, self.output_format, self.pull_max_cnt,
-                self.use_pull, self.timestats, self.verbose)
+               (id(self), self.pywbem_server, self.output_format,
+                self.pull_max_cnt, self.use_pull, self.timestats, self.verbose)
 
     @property
     def output_format(self):
@@ -140,18 +144,24 @@ class ContextObj(object):
         WBEMServer object has not been created it is created and the
         result stored in global storage so that this wbem server can be
         used for interactive commands.
+
+        This method is called by every subcommand execution to setup and
+        execute the command. Thus, each subcommand has the line similar to:
+
+        context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
         self.connect_wbem_server()
-        if self.timestats:
-            # get time statistics from pywbem
-            self.conn.statistics.enable()
+        if self.timestats:  # Enable statistics gathering if required
+            if self.conn:
+                self.conn.statistics.enable()
         self.spinner.start()
         try:
             cmd()
         finally:
             self.spinner.stop()
             if self.timestats:
-                click.echo(self.format_statistics(self.conn.statistics))
+                if self.conn:
+                    click.echo(self.format_statistics(self.conn.statistics))
 
     def format_statistics(self, statistics):
         """
@@ -241,18 +251,13 @@ class ContextObj(object):
         """
         # TODO investigate putting this into parent context instead of global
 
-        global PYWBEM_SERVER_OBJ  # pylint: disable=global-statement
-
-        if PYWBEM_SERVER_OBJ is None:
-
-            # if no server defined, do not try to connect. This allows
-            # commands like help, connection new, select to execute without
-            # a target server defined.
-            if self._pywbem_server:
-                # get the password if it is required.  This may involve a
-                # prompt.
-                self._pywbem_server.get_password(self)
-                self._pywbem_server.create_connection(self.verbose)
-                PYWBEM_SERVER_OBJ = self._pywbem_server
-        else:
-            self._pywbem_server = PYWBEM_SERVER_OBJ
+        # if no server defined, do not try to connect. This allows
+        # commands like help, connection new, select to execute without
+        # a target server defined.
+        if self._pywbem_server:
+            # get the password if it is required.  This may involve a
+            # prompt.
+            self._pywbem_server.get_password(self)
+            self._pywbem_server.create_connection(self.verbose)
+        # else:
+        #    #raise click.ClickException('No server name definition')
