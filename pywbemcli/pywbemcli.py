@@ -262,8 +262,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 # not require a server executed without the server defined.
                 pywbem_server = None
 
-    else:  # ctx.obj exists
-        # Processing an interactive command.
+    else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options.
         if pywbem_server is None:
             pywbem_server = ctx.obj.pywbem_server
