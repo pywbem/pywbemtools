@@ -109,6 +109,10 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
                  string is is split into lines separated at each new line
                  before the match
 
+                 'linesnows' - Expected response may be either list of strings
+                 or single string. Compares as with lines except that all
+                 whitespace is removed from the strings before the compare.
+
                  'patterns' - Expected response must be same as lines test
                  except that each line in the expected response is treated as
                  a regex expression and a regex match is executed for each line.
@@ -262,6 +266,14 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
                                      rtn_value.splitlines(),
                                      "{}\n{}={!r}".format(desc, rtn_type,
                                                           rtn_value))
+                # compress test_value and rtn_value into whitespace single
+                # strings and assert_lines.
+                elif test_definition == 'linesnows':
+                    assert_lines([remove_ws(test_value)],
+                                 [remove_ws(rtn_value)],
+                                 "{}\n{}={!r}".format(desc, rtn_type,
+                                                      rtn_value))
+
                 # test with a regex search that all values in list exist in
                 # the return. Build rtn_value into single string and do
                 # re.search against it for each test_value
@@ -283,3 +295,16 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
                                 desc, test_str, rtn_value)
                 else:
                     assert 'test %s is invalid. Skipped' % test_definition
+
+
+def remove_ws(inputs):
+    """
+    Remove all whitespace from a tuple or list of strings or a single
+    string and return the result as a single string. Whitespace is
+    defined as spaces, tabs, newlines
+    """
+    if isinstance(inputs, (tuple, list)):
+        inputs = "".join(inputs)
+
+    # return inputs.replace(" ", "").replace("\t", "").replace("\n", "")
+    return re.sub(r"\s", "", inputs)

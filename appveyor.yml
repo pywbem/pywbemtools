@@ -1,38 +1,67 @@
 # Control file for Appveyor CI (https://www.appveyor.com/)
-# Must be located in the root directory of the Git repository.
+# Must be located in the root directory of the Git repository
+# Based on appveyor.yml in pywbem
 
 environment:
   matrix:
-    - PYTHON_VERSION: 2.7
-      PYTHON_ARCH: 32
-      PYTHON_HOME: C:\Python27
-#    - PYTHON_VERSION: 2.7
-#      PYTHON_ARCH: 64
-#      PYTHON_HOME: C:\Python27-x64
-#    - PYTHON_VERSION: 3.4
-#      PYTHON_ARCH: 32
-#      PYTHON_HOME: C:\Python34
-#    - PYTHON_VERSION: 3.4
-#      PYTHON_ARCH: 64
-#      PYTHON_HOME: C:\Python34-x64
-#    - PYTHON_VERSION: 3.5
-#      PYTHON_ARCH: 32
-#      PYTHON_HOME: C:\Python35
-#    - PYTHON_VERSION: 3.5
-#      PYTHON_ARCH: 64
-#      PYTHON_HOME: C:\Python35-x64
-#    - PYTHON_VERSION: 3.6
-#      PYTHON_ARCH: 32
-#      PYTHON_HOME: C:\Python36
-#    - PYTHON_VERSION: 3.6
-#      PYTHON_ARCH: 64
-#      PYTHON_HOME: C:\Python36-x64
-#    - PYTHON_VERSION: 3.7
-#      PYTHON_ARCH: 32
-#      PYTHON_HOME: C:\Python37
-    - PYTHON_VERSION: 3.7
-      PYTHON_ARCH: 64
-      PYTHON_HOME: C:\Python37-x64
+
+    - TOX_ENV: win64_py27_32
+      UNIX_PATH: none
+      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py27_64
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py34_32
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py34_64
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py35_32
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py35_64
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py36_32
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+    - TOX_ENV: win64_py36_64
+      UNIX_PATH: none
+      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py37_32
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+#    - TOX_ENV: win64_py37_64
+#      UNIX_PATH: none
+#      PYTHON_CMD: python
+
+# TODO: Disabled because python2.7 with cygwin 32-bit fails with:
+#       "virtualenv is not compatible with this system or executable"
+#    - TOX_ENV: cygwin32_py27
+#      UNIX_PATH: C:\cygwin\bin
+#      PYTHON_CMD: python2.7
+#      PIP_CMD: pip
+
+#    - TOX_ENV: cygwin64_py27
+#      UNIX_PATH: C:\cygwin64\bin
+#      PYTHON_CMD: python2.7
+#      PIP_CMD: pip
+
+# TODOKS - TEMP CMT FOR TESTS
+#    - TOX_ENV: cygwin64_py36
+#      UNIX_PATH: C:\cygwin64\bin
+#      PYTHON_CMD: python3.6m
+#      PIP_CMD: pip
 
 configuration:
 # These values will become the values of the PACKAGE_LEVEL env.var.
@@ -40,6 +69,12 @@ configuration:
   - latest
 
 install:
+
+  # Examine the environment
+  - ver
+  - set
+  - dir
+  - dir C:\
 
   - git --version
   - if %APPVEYOR_REPO_BRANCH%.==manual-ci-run. set _NEED_REBASE=true
@@ -54,119 +89,48 @@ install:
   - if %APPVEYOR_REPO_BRANCH%.==manual-ci-run. set _MANUAL_CI_RUN=true
   - if %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%.==manual-ci-run. set _MANUAL_CI_RUN=true
 
-  # Verify that the commands used in this file are available
-  - where where
-  - where choco
-  - choco --version
-
-  # The installation in pywbem_os_setup.bat installs swig but without generating
-  # the swig.exe shim file (using GenShim).
-  # Therefore, we install swig here in order to create the swig.exe shim file.
-  - choco install -r -y --allow-empty-checksums swig
-
   # Set PACKAGE_LEVEL for make
   - set PACKAGE_LEVEL=%configuration%
 
-  # Examine the initial environment
-  - ver
-  - 'echo "%PATH%"'
-  - 'echo "%PYTHONPATH%"'
-  - 'echo "%INCLUDE%"'
-  - 'echo "%LIB%"'
-  - choco source list
-  - dir C:\
-  - dir
-  - set
+  # For UNIX, reduce the PATH to a minimum (to avoid blanks in directory names)
+  - if not "%UNIX_PATH%"=="none" set PATH=C:\Windows\system32;C:\Windows;C:\ProgramData\chocolatey\bin
 
-  # Remove Python 2.7 from PATH.
-  # Note that YAML interprets some characters in a special way (including '!' and '#')
-  # so we have to use single quotes to protect some CMD commands from YAML.
-  # Note that for some reason, "setlocal EnableDelayedExpansion" needs to be on the
-  # same line as the command you want to execute under that setting. Using !abc! variable
-  # expansion requires EnableDelayedExpansion.
-  - 'set $line=%PATH%'
-  - 'set $line=%$line: =#%'
-  - 'set $line=%$line:;= %'
-  - 'set $line=%$line:)=^^)%'
-  - 'setlocal EnableDelayedExpansion & for %%a in (%$line%) do echo %%a | find /i "Python27" || set $newpath=!$newpath!;%%a'
-  - 'set $newpath=%$newpath:#= %'
-  - 'set $newpath=%$newpath:^^=%'
-  - 'set PATH=%$newpath%'
+  # Add UNIX commands to the path (used for bash)
+  - if not "%UNIX_PATH%"=="none" set PATH=%UNIX_PATH%;%PATH%
 
-  # Add CygWin
-  - set PATH=C:\cygwin\bin;%PATH%
+  # Verify that Chocolatey is available
+  - where choco
+  - choco --version
 
-  # Verify that the commands provided by CygWin and used in this file are available
-  - where wget
-  - wget --version
-  - where unzip
-  - unzip --help
-  - where 7z
-  - 7z --help
+  # Install GNU make
+  - if "%UNIX_PATH%"=="none" tools\retry choco install -y make
+  - if "%UNIX_PATH%"=="none" where make
+  - if "%UNIX_PATH%"=="none" make --version
 
-  # Add Python
-  - reg ADD HKCU\Software\Python\PythonCore\%PYTHON_VERSION%\InstallPath /ve /d "%PYTHON_HOME%" /t REG_SZ /f
-  - reg ADD HKLM\Software\Python\PythonCore\%PYTHON_VERSION%\InstallPath /ve /d "%PYTHON_HOME%" /t REG_SZ /f
-  - set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
+  # Install wget. Used by make to install pywbem scripts
+  - if "%UNIX_PATH%"=="none" tools\retry choco install -y wget
+  - if "%UNIX_PATH%"=="none" where wget
+  - if "%UNIX_PATH%"=="none" wget --version
 
-  ## Install InnoSetup - disabled because it is not needed
-  #- choco install -y InnoSetup
-  #- set PATH="C:\Program Files (x86)\Inno Setup 5";%PATH%
+  # Install Pip, where needed
+  - if "%UNIX_PATH%"=="C:\cygwin\bin" ( bash --noprofile --norc -c "set -e; %PYTHON_CMD% -m ensurepip; %PYTHON_CMD% -m pip install --upgrade pip setuptools wheel" )
+  - if "%UNIX_PATH%"=="C:\cygwin64\bin" ( bash --noprofile --norc -c "set -e; %PYTHON_CMD% -m ensurepip; %PYTHON_CMD% -m pip install --upgrade pip setuptools wheel" )
 
-  ## Install pip - disabled because pip is already installed
-  #- ps: (new-object System.Net.WebClient).Downloadfile('https://bootstrap.pypa.io/get-pip.py', 'C:\Users\appveyor\get-pip.py')
-  #- ps: Start-Process -FilePath "C:\Python27\python.exe" -ArgumentList "C:\Users\appveyor\get-pip.py" -Wait -Passthru
+  # Install Tox
+  - if "%UNIX_PATH%"=="none" ( cmd /c "pip install tox & where tox & tox --version" )
+  - if "%UNIX_PATH%"=="C:\cygwin\bin" ( bash --noprofile --norc -c "set -e; %PYTHON_CMD% -m pip install tox; which -a tox; tox --version" )
+  - if "%UNIX_PATH%"=="C:\cygwin64\bin" ( bash --noprofile --norc -c "set -e; %PYTHON_CMD% -m pip install tox; which -a tox; tox --version" )
 
-  # Examine the final environment
-  - 'echo "%PATH%"'
-  - 'echo "%PYTHONPATH%"'
-  - 'echo "%INCLUDE%"'
-  - 'echo "%LIB%"'
+  # Initialize CygWin updates (must be done outside of CygWin bash in case it updates cygwin.dll)
+  - 'if "%UNIX_PATH%"=="C:\cygwin\bin" ( C:\cygwin\setup-x86.exe --no-shortcuts --quiet-mode )'
+  - 'if "%UNIX_PATH%"=="C:\cygwin64\bin" ( C:\cygwin64\setup-x86_64.exe --no-shortcuts --quiet-mode )'
 
-  # Install tox
-  - where pip
-  - pip --version
-  - pip install tox==2.0.0
-
-  # Verify that the commands used in tox.ini are available
-  - where tox
-  - tox --version
-  - where make
-  - make --version
-  - where pip
-  - pip --version
-  - where python
-  - python --version
-
-
-  # Verify that the commands used in makefile are available
-  - where sh
-  - sh --version
-  - where bash
-  - bash --version
-  - where rm
-  - rm --version
-  - where mv
-  - mv --version
-  - where xargs
-  - xargs --version
-  - where grep
-  - grep --version
-  - where sed
-  - sed --version
-  - where tar
-  - tar --version
-  - where find
-  - find --version
-
-  # Verify that the commands used in the pywbem testsuite are available
-  - where xmllint
-  - xmllint --version
-
-# Not a C# project, build stuff at the test step instead.
 build: false
 
 before_test:
 
 test_script:
-  - tox -e pywin
+  - 'if "%UNIX_PATH%"=="none" ( where tox & tox -vv -e %TOX_ENV% & echo appveyor.yml: tox rc=%errorlevel% )'
+  - 'if "%UNIX_PATH%"=="C:\cygwin\bin" ( bash -c "which tox && tox -vv -e %TOX_ENV% && echo appveyor.yml: tox rc=$?" )'
+  - 'if "%UNIX_PATH%"=="C:\cygwin64\bin" ( bash -c "which tox && tox -vv -e %TOX_ENV% && echo appveyor.yml: tox rc=$?" )'
+  - 'echo appveyor.yml: done'

@@ -49,7 +49,8 @@ flake8>=3.2.1;
 twine>=1.8.1
 
 # Jupyter Notebook (no imports, invoked via jupyter script)
-jupyter>=1.0.0
+# TODO Future: currently jupyter not used by pywbemtools
+# jupyter>=1.0.0
 
 
 # Temporary workarounds on indirectly used packages:
@@ -65,4 +66,4 @@ jupyter>=1.0.0
 # The following is a circumvention of this issue that nails the tornado
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
-tornado<5.0; python_version <= '2.7'
+# TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
