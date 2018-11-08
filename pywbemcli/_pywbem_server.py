@@ -29,7 +29,6 @@ from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_MAXPULLCNT, DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
-
 WBEM_SERVER_OBJ = None
 
 PYWBEMCLI_LOG = 'pywbemcli.log'

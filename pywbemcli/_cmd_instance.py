@@ -28,7 +28,7 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
     process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
     sort_option, includeclassorigin_option, namespace_option, add_options, \
-    summary_objects_option
+    summary_objects_option, verify_option
 from .config import DEFAULT_QUERY_LANGUAGE
 
 
@@ -69,11 +69,6 @@ instance_property_option = [              # pylint: disable=invalid-name
                  'included in the createdinstance. Array property values '
                  'defined by comma-separated-values. EmbeddedInstance not '
                  'allowed.')]
-
-verify_option = [              # pylint: disable=invalid-name
-    click.option('-V', '--verify', is_flag=True, required=False,
-                 help='If set, The change is displayed and verification '
-                      'requested before the change is executed')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)

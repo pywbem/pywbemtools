@@ -61,6 +61,11 @@ summary_objects_option = [              # pylint: disable=invalid-name
     click.option('-S', '--summary', is_flag=True, required=False,
                  help='Return only summary of objects (count).')]
 
+verify_option = [              # pylint: disable=invalid-name
+    click.option('-V', '--verify', is_flag=True, required=False,
+                 help='If set, The change is displayed and verification '
+                      'requested before the change is executed')]
+
 
 def add_options(options):
     """

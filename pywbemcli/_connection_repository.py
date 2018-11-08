@@ -24,69 +24,180 @@ from __future__ import absolute_import
 
 import os
 import json
-import six
 import codecs
+import six
 from ._pywbem_server import PywbemServer
 
-CONNECTIONS_FILE = 'pywbemcliservers.json'
-CONNECTIONS_LOADED = False
+DEFAULT_CONNECTIONS_FILE = 'pywbemcliservers.json'
 
-# dictionary of known wbem servers
-PYWBEMCLI_SERVERS = {}
-
-# TODO make this into a class to clean up the code. This was a temp hack
+DEFAULT_CONNECTIONS_PATH = os.path.join(os.getcwd(), DEFAULT_CONNECTIONS_FILE)
 
 
-def get_pywbemcli_servers():
-    """Load the connections file"""
-    global CONNECTIONS_FILE  # pylint: disable=global-variable-not-assigned
-    global CONNECTIONS_LOADED  # pylint: disable=global-statement
-    global PYWBEMCLI_SERVERS  # pylint: disable=global-statement
-    if CONNECTIONS_LOADED:
-        return PYWBEMCLI_SERVERS
-    CONNECTIONS_LOADED = True
-    if os.path.isfile(CONNECTIONS_FILE):
-        with open(CONNECTIONS_FILE, 'r') as fh:
-            try:
-                dict_ = json.load(fh)
-                try:
-                    for svr_name, svr in six.iteritems(dict_):
-                        PYWBEMCLI_SERVERS[svr_name] = \
-                            PywbemServer.create(**svr)
-                except KeyError as ke:
-                    raise KeyError("Items missing from json record %s" % ke)
-            except ValueError as ve:
-                raise ValueError("Invalid json file %s. exception %s" %
-                                 (CONNECTIONS_FILE, ve))
-    return PYWBEMCLI_SERVERS
-
-
-def server_definitions_new(name, svr_definition):
-    """Add a new connection to the connections repository."""
-    pywbemcli_servers = get_pywbemcli_servers()
-    pywbemcli_servers[name] = svr_definition
-    server_definitions_save(pywbemcli_servers)
-
-
-def server_definitions_delete(name):
-    """Delete a definition from the connections repository"""
-    pywbemcli_servers = get_pywbemcli_servers()
-    del pywbemcli_servers[name]
-    server_definitions_save(pywbemcli_servers)
-
-
-def server_definitions_save(pywbemcli_servers):
-    """Dump the connections file if one has been loaded.
-    If the dictionary is empty, it attempts to delete the file.
+class ConnectionRepository(object):
     """
-    if CONNECTIONS_LOADED:
-        if pywbemcli_servers:
-            jsondata = {}
-            for svr_name in pywbemcli_servers:
-                jsondata[svr_name] = pywbemcli_servers[svr_name].to_dict()
-            with open(CONNECTIONS_FILE, "w") as fh:
-                json.dump(jsondata, fh)
-            tmpfile = "%s.tmp" % CONNECTIONS_FILE
+    Manage the set of connections defined.  The data for the predefined
+    connection exists on disk between pywbemcli sessions and within an
+    instance of ConnectionRepository while pywbemcli is running.
+    """
+    # class variables
+    _pywbemcli_servers = {}
+    _loaded = False
+    _connections_file = None
+
+    # class level variable so
+    def __init__(self, connections_file=None):
+        """
+        Initialize the object instance if it has not already been initialized
+        (class level variable is not None)by reading the connection file.
+        """
+        if not ConnectionRepository._loaded:
+            if connections_file is None:
+                ConnectionRepository._connections_file = \
+                    DEFAULT_CONNECTIONS_PATH
+            else:
+                ConnectionRepository._connections_file = connections_file
+            self._read_json_file()
+
+        else:
+            if connections_file is not None and \
+                    connections_file != self._connections_file:
+                raise ValueError("Cannot change connection file name after"
+                                 "initalization original {} new {}".
+                                 format(self._connections_file,
+                                        connections_file))
+        # print("CONNREPO FILE %s" % self.connections_file)
+
+    @property
+    def connections_file(self):
+        """
+        Return the current connections file
+        """
+        return self._connections_file
+
+    def __repr__(self):
+        """
+        Return a string representation of the
+        servers dictionary that is suitable for debugging.
+
+        The order of items in the result is the preserved order of
+        adding or deleting items.
+
+        The lexical case of the keys in the result is the preserved lexical
+        case.
+        """
+        # items = [_format("{0!A}: {1!A}", key, value)
+        #         for key, value in self._pywbemcli_servers.iteritems()]
+        items = []
+        for key, value in self._pywbemcli_servers.items():
+            items.append("%s: %s" % (key, value))
+        items_str = ', '.join(items)
+        return "{0.__class__.__name__}({{{1}}})".format(self, items_str)
+
+    def __contains__(self, key):
+        return key in self._pywbemcli_servers
+
+    def __getitem__(self, key):
+        return self._pywbemcli_servers[key]
+
+    def __delitem__(self, key):
+        print("DELETE key %s dict %s" % (key, self._pywbemcli_servers))
+        del self._pywbemcli_servers[key]
+        print("DELETE dict %s" % self._pywbemcli_servers)
+
+        self.save()
+
+    def __len__(self):
+        return len(ConnectionRepository._pywbemcli_servers)
+
+    def __iter__(self):
+        return six.iterkeys(ConnectionRepository._pywbemcli_servers)
+
+    def items(self):
+        """
+        Return a list of the items in the server repo
+        """
+        return list(self.__iteritems__())
+
+    def keys(self):
+        """
+        Return a copied list of the dictionary keys, in their original case.
+        """
+        return list(self.iterkeys())
+
+    def __iteritems__(self):  # pylint: disable=no-self-use
+        return six.iteritems(self._pywbemcli_servers)
+
+    def iterkeys(self):
+        """
+        Return an iterator through the dictionary keys in their original
+        case, preserving the original order of items.
+        """
+        for item in six.iterkeys(self._pywbemcli_servers):
+            yield item
+
+    def iteritems(self):
+        """
+        Return an iterator through the dictionary items, where each item is a
+        tuple of its original key and its value, preserving the original order
+        of items.
+        """
+        for item in six.iteritems(self._pywbemcli_servers):
+            yield item[1]
+
+    def _read_json_file(self):
+        """
+        If there is a file, read it in and install into the dictionary.
+
+        """
+        if os.path.isfile(self._connections_file):
+            with open(self._connections_file, 'r') as fh:
+                try:
+                    dict_ = json.load(fh)
+                    try:
+                        for name, svr in six.iteritems(dict_):
+                            ConnectionRepository._pywbemcli_servers[name] = \
+                                PywbemServer.create(**svr)
+                            ConnectionRepository._loaded = True
+                    except KeyError as ke:
+                        raise KeyError("Items missing from json record %s in "
+                                       "connection file %s" %
+                                       (ke, self._connections_file))
+                except ValueError as ve:
+                    raise ValueError("Invalid json in connection file %s. "
+                                     "Exception %s" %
+                                     (self._connections_file, ve))
+
+    def add(self, name, svr_definition):
+        """
+        Add a new connection to the connections repository or replace an
+        existing connection.  User should check before add if they do not
+        want to replace an existing entry.
+        """
+        ConnectionRepository._pywbemcli_servers[name] = svr_definition
+        self._write_file()
+
+    def delete(self, name):  # pylint: disable=no-self-use
+        """Delete a definition from the connections repository"""
+        del ConnectionRepository._pywbemcli_servers[name]
+        self._write_file()
+
+    def _write_file(self):  # pylint: disable=no-self-use
+        """
+        Write the connections file if one has been loaded.
+        If the dictionary is empty, it attempts to delete the file.
+
+        If there is an existing file it is moved to filename.bak
+        """
+        jsondata = {}
+        if self._pywbemcli_servers:
+            if ConnectionRepository._pywbemcli_servers:
+                for name in ConnectionRepository._pywbemcli_servers:
+                    jsondata[name] = \
+                        ConnectionRepository._pywbemcli_servers[name].to_dict()
+
+            # Write to tmp file and if successful create backup file and move
+            # the tmpfile to be the new connections file contents.
+            tmpfile = "%s.tmp" % self._connections_file
             with open(tmpfile, 'w') as fh:
                 if six.PY2:
                     json.dump(jsondata, codecs.getwriter('utf-8')(fh),
@@ -95,19 +206,13 @@ def server_definitions_save(pywbemcli_servers):
                     json.dump(jsondata, fh, ensure_ascii=True, indent=4,
                               sort_keys=True)
 
-            if os.path.isfile(CONNECTIONS_FILE):
-                bakfile = "%s.bak" % CONNECTIONS_FILE
-                if os.path.isfile(bakfile):
-                    os.remove(bakfile)
-                if os.path.isfile(CONNECTIONS_FILE):
-                    os.rename(CONNECTIONS_FILE, bakfile)
+        # create bak file and then rename tmp file
+        if os.path.isfile(self._connections_file):
+            bakfile = "%s.bak" % self._connections_file
+            if os.path.isfile(bakfile):
+                os.remove(bakfile)
+            if os.path.isfile(self._connections_file):
+                os.rename(self._connections_file, bakfile)
 
-            os.rename(tmpfile, CONNECTIONS_FILE)
-
-        else:
-            if os.path.isfile(CONNECTIONS_FILE):
-                bakfile = "%s.bak" % CONNECTIONS_FILE
-                if os.path.isfile(bakfile):
-                    os.remove(bakfile)
-                if os.path.isfile(CONNECTIONS_FILE):
-                    os.rename(CONNECTIONS_FILE, bakfile)
+        if self._pywbemcli_servers:
+            os.rename(tmpfile, self._connections_file)
