@@ -35,7 +35,7 @@ from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
 
-from ._connection_repository import get_pywbemcli_servers
+from ._connection_repository import ConnectionRepository
 
 
 __all__ = ['cli']
@@ -190,9 +190,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # specified and is why global options don't define defaults in the
     # decorators that define them.
 
-    # TODO: ks This should be lazy load.
-    pywbemcli_servers = get_pywbemcli_servers()
-
     if ctx.obj is None:
         # In command mode or processing the command line options in
         # interactive mode. Apply the documented option defaults.
@@ -249,7 +246,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          mock_server=mock_server,
                                          log=log)
         else:  # no server and mock_server are None
+            # if name cmd line option, get connection repo and
+            # search for name
             if name:
+                pywbemcli_servers = ConnectionRepository()
                 if name in pywbemcli_servers:
                     pywbem_server = pywbemcli_servers[name]
                     # NOTE: The log definition is only for this session.
@@ -258,12 +258,15 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 else:
                     raise click.ClickException('%s named connection does not '
                                                'exist' % name)
-            elif 'default' in pywbemcli_servers:
-                pywbem_server = pywbemcli_servers['default']
             else:
-                # If no server defined, set None. This allows subcmds that do
-                # not require a server executed without the server defined.
-                pywbem_server = None
+                pywbemcli_servers = ConnectionRepository()
+                if 'default' in pywbemcli_servers:
+                    pywbem_server = pywbemcli_servers['default']
+                else:
+                    # If no server defined, set None. This allows subcmds that
+                    # donot require a server executed without the server
+                    # defined.
+                    pywbem_server = None
 
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options.

@@ -575,123 +575,48 @@ The following defines the help output for the `pywbemcli connection --help` subc
       -h, --help  Show this message and exit.
 
     Commands:
+      add     Create a new named WBEM connection.
       delete  Delete connection information.
       export  Export the current connection information.
       list    List the entries in the connection file.
-      new     Create a new named WBEM connection.
-      save    Save current connection into repository.
+      save    Save current connection to repository.
       select  Select a connection from defined connections.
       show    Show current or NAME connection information.
       test    Execute a predefined wbem request.
 
 
-.. _`pywbemcli connection delete --help`:
+.. _`pywbemcli connection add --help`:
 
-pywbemcli connection delete --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection delete --help` subcommand
-
-
-::
-
-    Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
-
-      Delete connection information.
-
-      Delete connection information from the persistent store for the connection
-      defined by NAME.
-
-      If NAME not supplied, a select list presents the list of connection
-      definitions for selection.
-
-      Example:   connection delete blah
-
-    Options:
-      -h, --help  Show this message and exit.
-
-
-.. _`pywbemcli connection export --help`:
-
-pywbemcli connection export --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection export --help` subcommand
-
-
-::
-
-    Usage: pywbemcli connection export [COMMAND-OPTIONS]
-
-      Export  the current connection information.
-
-      Creates an export statement for each connection variable and outputs the
-      statement to the conole.
-
-    Options:
-      -h, --help  Show this message and exit.
-
-
-.. _`pywbemcli connection list --help`:
-
-pywbemcli connection list --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection list --help` subcommand
-
-
-::
-
-    Usage: pywbemcli connection list [COMMAND-OPTIONS]
-
-      List the entries in the connection file.
-
-      This provides a simple test to determine if the defined connection exists
-      and is working.
-
-    Options:
-      -h, --help  Show this message and exit.
-
-
-.. _`pywbemcli connection new --help`:
-
-pywbemcli connection new --help
+pywbemcli connection add --help
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
-The following defines the help output for the `pywbemcli connection new --help` subcommand
+The following defines the help output for the `pywbemcli connection add --help` subcommand
 
 
 ::
 
-    Usage: pywbemcli connection new [COMMAND-OPTIONS] NAME uri
+    Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri
 
       Create a new named WBEM connection.
 
-      This subcommand creates and saves a new named connection from the input
-      arguments (NAME and URI) and options
+      This subcommand creates and saves a named connection from the input
+      arguments (NAME and URI) and options in the connections file.
 
-      The new connection that can be referenced by the name argument in the
-      future.  This connection object is capable of managing all of the
-      properties defined for WBEMConnections.
+      The new connection can be referenced by the name argument in the future.
+      This connection object is capable of managing all of the properties
+      defined for WBEMConnections.
 
       The NAME and URI arguments MUST exist. They define the server uri and the
       unique name under which this server connection information will be stored.
       All other properties are optional.
 
-      It does NOT automatically set the pywbemcli to use that connection. Use
-      `connection select` to set a particular stored connection definition as
-      the current connection.
+      Adding a connection does not the new connection as the current connection.
+      Use `connection select` to set a particular stored connection definition
+      as the current connection.
 
-      This is the alternative means of defining a new WBEM server to be
-      accessed. A server can also be defined by supplying the parameters on the
+      A new connection can also be defined by supplying the parameters on the
       command line and using the `connection set` command to put it into the
       connection repository.
 
@@ -735,7 +660,88 @@ The following defines the help output for the `pywbemcli connection new --help` 
                                       bundle.trust.crt
                                       /etc/ssl/certs
                                       /etc/ssl/certificates
+      -V, --verify                    If set, The change is displayed and
+                                      verification requested before the change is
+                                      executed
       -h, --help                      Show this message and exit.
+
+
+.. _`pywbemcli connection delete --help`:
+
+pywbemcli connection delete --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection delete --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
+
+      Delete connection information.
+
+      Delete connection information from the persistent store for the connection
+      defined by NAME. The NAME argument is optional.
+
+      If NAME not supplied, a select list presents the list of connection
+      definitions for selection.
+
+      Example:   connection delete blah
+
+    Options:
+      -V, --verify  If set, The change is displayed and verification requested
+                    before the change is executed
+      -h, --help    Show this message and exit.
+
+
+.. _`pywbemcli connection export --help`:
+
+pywbemcli connection export --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection export --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection export [COMMAND-OPTIONS]
+
+      Export  the current connection information.
+
+      Creates an export statement for each connection variable and outputs the
+      statement to the conole.
+
+    Options:
+      -h, --help  Show this message and exit.
+
+
+.. _`pywbemcli connection list --help`:
+
+pywbemcli connection list --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli connection list --help` subcommand
+
+
+::
+
+    Usage: pywbemcli connection list [COMMAND-OPTIONS]
+
+      List the entries in the connection file.
+
+      This subcommand displays all entries in the connection file as a table
+      using the command line output_format to define the table format.
+
+      An "*" after the name indicates the currently selected connection.
+
+    Options:
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection save --help`:
@@ -750,16 +756,20 @@ The following defines the help output for the `pywbemcli connection save --help`
 
 ::
 
-    Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME
+    Usage: pywbemcli connection save [COMMAND-OPTIONS]
 
-      Save current connection into repository.
+      Save current connection to repository.
 
-      Saves the current wbem connection information into the repository of
-      connections. If the name does not already exist in the connection
-      information, the provided name is used.
+      Saves the current connection to the connections file if it does not
+      already exist in that file.
+
+      This is useful when you have defined a connection on the command line and
+      want to set it into the connections file.
 
     Options:
-      -h, --help  Show this message and exit.
+      -V, --verify  If set, The change is displayed and verification requested
+                    before the change is executed
+      -h, --help    Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:
@@ -779,9 +789,11 @@ The following defines the help output for the `pywbemcli connection select --hel
       Select a connection from defined connections.
 
       Selects a connection from the persistently stored set of named connections
-      if NAME exists in the store. The name argument is optional.  If not
+      if NAME exists in the store. The NAME argument is optional.  If NAME not
       supplied, a list of connections from the connections definition file is
-      presented with a prompt for the user to select a name
+      presented with a prompt for the user to select a NAME.
+
+      Select state is not persistent.
 
       Examples:
 
@@ -810,11 +822,12 @@ The following defines the help output for the `pywbemcli connection show --help`
       Show current or NAME connection information.
 
       This subcommand displays  all the variables that make up the current WBEM
-      connection if the optional NAME argument is NOT provided
+      connection if the optional NAME argument is NOT provided. If NAME not
+      supplied, a list of connections from the connections definition file is
+      presented with a prompt for the user to select a NAME.
 
-      If the optional NAME argument is provided, the information on the
-      connection with that name is displayed if that name is in the persistent
-      repository.
+      The information on the     connection named is displayed if that name is
+      in the persistent repository.
 
     Options:
       -h, --help  Show this message and exit.
@@ -836,10 +849,10 @@ The following defines the help output for the `pywbemcli connection test --help`
 
       Execute a predefined wbem request.
 
-      This executes a predefined request against the  currently defined WBEM
-      server to tconfirm that the connection exists and is working.
+      This executes a predefined request against the currente WBEM server to
+      confirm that the connection exists and is working.
 
-      It executes getclass on CIM_ManagedElement as the standard test.
+      It executes getclass on CIM_ManagedElement as the test.
 
     Options:
       -h, --help  Show this message and exit.

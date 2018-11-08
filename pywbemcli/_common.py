@@ -143,7 +143,7 @@ def pick_instance(context, objectname, namespace=None):
         raise click.ClickException('Command Aborted')
 
 
-def pick_from_list(context, options, title):
+def _pick_from_list(context, options, title):
     """
     Interactive component that displays a set of options (strings) and asks
     the user to select one.  Returns the item and index of the selected string.
@@ -185,6 +185,36 @@ def pick_from_list(context, options, title):
             raise click.ClickException("Pick Aborted.")
         click.echo('%s Invalid. %s' % (selection, msg))
     context.spinner.start()
+
+
+def pick_from_list(context, options_list, title):
+    """
+    Interactive component that displays a set of options (strings) and asks
+    the user to select one.  Returns the item and index of the selected string.
+
+    Parameters:
+      options_list:
+        List of strings to select
+
+      title:
+        Title to display before selection
+
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl_C ends even the REPL.
+
+    Returns: Index of selected item
+
+    Exception: Returns ValueError if Ctrl-c input from console.
+
+    TODO: This could be replaced by the python pick library that would use
+    curses for the selection process.
+    """
+    try:
+        index = _pick_from_list(context, options_list,
+                                'Pick Instance name to process')
+        return options_list[index]
+    except Exception:
+        raise click.ClickException('Command Aborted')
 
 
 def is_classname(str_):
