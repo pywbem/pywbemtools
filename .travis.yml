@@ -61,16 +61,28 @@ matrix:
 #      python: "3.5"
 #      env:
 #        - PACKAGE_LEVEL=latest
+#    - os: linux
+#      language: python
+#      python: "3.6"
+#      env:
+#        - PACKAGE_LEVEL=minimum
+#    - os: linux
+#      language: python
+#      python: "3.6"
+#      env:
+#        - PACKAGE_LEVEL=latest
     - os: linux
       language: python
-      python: "3.6"
+      python: "3.7"
+      dist: xenial
       env:
         - PACKAGE_LEVEL=minimum
-    - os: linux
-      language: python
-      python: "3.6"
-      env:
-        - PACKAGE_LEVEL=latest
+#    - os: linux
+#      language: python
+#      python: "3.7"
+#      dist: xenial
+#      env:
+#        - PACKAGE_LEVEL=latest
 #    - os: osx
 #      language: generic
 #      python:

@@ -60,6 +60,3 @@ jupyter>=1.0.0
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
 tornado>=4.4.2,<5.0; python_version == '2.7'
-
-# Excluding pyzmq 16.0.3 to get around problem; see issue #80.
-pyzmq>=16.0.2,!=16.0.3
