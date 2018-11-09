@@ -119,7 +119,7 @@ def pick_instance(context, objectname, namespace=None):
                                'Pick Instance name to process')
         return instance_names[index]
     except Exception:
-        raise click.ClickException('Command terminated')
+        raise click.ClickException('Command Aborted')
 
 
 def pick_from_list(context, options, title):
@@ -158,10 +158,10 @@ def pick_from_list(context, options, title):
             selection = int(prompt(msg))
             if selection >= 0 and selection <= index:
                 return selection
-        except ValueError:
+        except ValueError:  # This causes the retry of the request
             pass
         except KeyboardInterrupt:
-            raise ValueError
+            raise click.ClickException("Pick Aborted.")
         click.echo('%s Invalid. %s' % (selection, msg))
     context.spinner.start()
 

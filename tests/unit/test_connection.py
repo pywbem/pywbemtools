@@ -1,8 +1,4 @@
-#!/usr/bin/env python
-
-# (C) Copyright 2017 IBM Corp.
-# (C) Copyright 2017 Inova Development Inc.
-# All Rights Reserved
+# Copyright 2018 IBM Corp. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,127 +13,344 @@
 # limitations under the License.
 
 """
-    Execute and test the validity of the help output from pywbemcli
+Test the connection command group and it subcommands
 """
 
-from __future__ import print_function, absolute_import
+import os
+import pytest
+from .cli_test_extensions import CLITestsBase
 
-import unittest
-from re import findall
-from subprocess import Popen, PIPE
-import six
+from pywbemcli._connection_repository import CONNECTIONS_FILE
 
-
-# Map of all tests to be defined.
-# each test is defined as
-#   name,
-#   list of:
-#       list of components of pywbemcli help function to execute
-#       list of text pieces that must be in result
-# TODO ks Mar 17 Some day we should match the entire test result but lets keep
-#    it simple until code stabilizes.
-
-SHOW_OUTPUT = ['Default-namespace: root/cimv2',
-               'User: fred',
-               'Password: password',
-               'Timeout: 10',
-               'Noverify: True',
-               'Certfile: certfile.txt',
-               'Certfile: certfile.txt',
-               'Name: default']
-
-EXPORT_OUTPUT = ['export PYWBEMCLI_SERVER=http://localhost',
-                 'export PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2',
-                 'export PYWBEMCLI_user=fred',
-                 'export PYWBEMCLI_user=fred',
-                 'export PYWBEMCLI_user=fred',
-                 'export PYWBEMCLI_NOVERIFY=True',
-                 'export PYWBEMCLI_NOVERIFY=True',
-                 'export PYWBEMCLI_KEYFILE=keyfile.txt']
-LIST_OUTPUT = ['default']
-
-# the options part is common.  This is just the variable by command part
-# NOTE: This is not an ordered test
-# TODO figure out how to do create and delete since this is not an
-# ordered test
-TESTS_MAP = {  # pylint: disable=invalid-name
-    'export': ["connection export", EXPORT_OUTPUT, None],
-    "show": ["connection show", SHOW_OUTPUT, None],
-    "set": ["connection save", ['password'], None],
-    "list": ["connection list", LIST_OUTPUT, None]}
+TEST_DIR = os.path.dirname(__file__)
 
 
-class ContainerMeta(type):
-    """Class to define the function to generate test instances"""
+# A mof file that defines basic qualifier decls, classes, and instances
+# but not tied to the DMTF classes.
+SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 
-    def __new__(mcs, name, bases, dict):  # pylint: disable=redefined-builtin
+CONN_HELP = """Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-        def gen_test(test_name, cmd_str, expected_stdout, expected_stderr):
-            """
-            Defines the test method and returns the method.
+  Command group to manage WBEM connections.
 
-            Test is the method for each test. Each test builds the pywbemcli
-            command executes it and tests the results
-            """
-            def test(self):  # pylint: disable=missing-docstring
-                cmd_opt = '-s http://localhost -u fred -p pw -k keyfile.txt ' \
-                          '-c certfile.txt -d root/cimv2'
-                command = 'pywbemcli %s %s' % (cmd_opt, cmd_str)
-                # Disable python warnings for pywbemcli call.See issue #42
-                command = 'export PYTHONWARNINGS="" && %s' % command
-                proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
-                std_out, std_err = proc.communicate()
-                exitcode = proc.returncode
+  These command allow viewing and setting persistent connection definitions.
+  The connections are normally defined in the file pywbemcliconnections.json
+  in the current directory.
 
-                if six.PY3:
-                    std_out = std_out.decode()
-                    std_err = std_err.decode()
+  In addition to the command-specific options shown in this help text, the
+  general options (see 'pywbemcli --help') can also be specified before the
+  command. These are NOT retained after the command is executed.
 
-                self.assertEqual(exitcode, 0, '%s: ExitCode Err, cmd="%s" '
-                                 'exitcode %s' % (test_name, command, exitcode))
+Options:
+  -h, --help  Show this message and exit.
 
-                self.assertEqual(len(std_err), 0, '%s stderr not empty.'
-                                 % test_name)
-                for item in expected_stdout:
-                    match_result = findall(item, std_out)
-                    self.assertIsNotNone(match_result,
-                                         '%s: Expecting match for %s in '
-                                         'output %s' %
-                                         (test_name, item, std_out))
-            return test
+Commands:
+  delete  Delete connection information.
+  export  Export the current connection information.
+  list    List the entries in the connection file.
+  new     Create a new named WBEM connection.
+  save    Save current connection into repository.
+  select  Select a connection from defined connections.
+  show    Show current or NAME connection information.
+  test    Execute a predefined wbem request.
+"""
 
-        for test_name, params in six.iteritems(TESTS_MAP):
-            test_name = "test_%s" % test_name
-            dict[test_name] = gen_test(test_name, params[0], params[1],
-                                       params[2])
+CONN_SHOW_HELP = """Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
-        return type.__new__(mcs, name, bases, dict)
+  Show current or NAME connection information.
+
+  This subcommand displays  all the variables that make up the current WBEM
+  connection if the optional NAME argument is NOT provided
+
+  If the optional NAME argument is provided, the information on the
+  connection with that name is displayed if that name is in the persistent
+  repository.
+
+Options:
+  -h, --help  Show this message and exit.
+"""
+
+CONN_DEL_HELP = """Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
+
+  Delete connection information.
+
+  Delete connection information from the persistent store for the connection
+  defined by NAME.
+
+  If NAME not supplied, a select list presents the list of connection
+  definitions for selection.
+
+  Example:   connection delete blah
+
+Options:
+  -h, --help  Show this message and exit.
+"""
+
+CONN_SAVE_HELP = """Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME
+
+  Save current connection into repository.
+
+  Saves the current wbem connection information into the repository of
+  connections. If the name does not already exist in the connection
+  information, the provided name is used.
+
+Options:
+  -h, --help  Show this message and exit.
+"""
+
+CONN_NEW_HELP = """Usage: pywbemcli connection new [COMMAND-OPTIONS] NAME uri
+
+  Create a new named WBEM connection.
+
+  This subcommand creates and saves a new named connection from the required
+  input arguments (NAME and URI) and the options defined below.
+
+  The new connection that can be referenced by the name argument in the
+  future.  This connection object is capable of managing all of the
+  properties defined for WBEMConnections.
+
+  The NAME and URI arguments MUST exist. They define the server uri and the
+  unique name under which this server connection information will be stored.
+
+  It does NOT automatically set pywbemcli to use that connection. Use
+  `connection select` to set a particular stored connection definition as
+  the current connection.
+
+  This is the alternative means of defining a new WBEM server to be
+  accessed. A server can also be defined by supplying the parameters on the
+  command line and using the `connection set` command to put it into the
+  connection repository.
+
+Options:
+  -d, --default_namespace TEXT    Default Namespace to use in the target
+                                  WBEMServer if no namespace is defined in the
+                                  subcommand (Default: root/cimv2).
+  -u, --user TEXT                 User name for the WBEM Server connection.
+  -p, --password TEXT             Password for the WBEM Server. Will be
+                                  requested as part  of initialization if user
+                                  name exists and it is not  provided by this
+                                  option.
+  -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
+                                  seconds. Default: 30
+  -n, --noverify                  If set, client does not verify server
+                                  certificate.
+  -c, --certfile TEXT             Server certfile. Ignored if noverify flag
+                                  set.
+  -k, --keyfile TEXT              Client private key file.
+  -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
+                                  component to destination, and detail level
+                                  (COMP: [api|http|all], Default: all) DEST:
+                                  [file|stderr], Default: file)
+                                  DETAIL:[all|paths|summary], Default: all)
+  -m, --mock-server FILENAME      If this option is defined, a mock WBEM
+                                  server is constructed as the target WBEM
+                                  server and the option value defines a MOF or
+                                  Python file to be used to populate the mock
+                                  repository. This option may be used multiple
+                                  times where each use defines a single file
+                                  or file_path.See the pywbemcli documentation
+                                  for more information.
+  --ca_certs TEXT                 File or directory containing certificates
+                                  that will be matched against a certificate
+                                  received from the WBEM server. Set the --no-
+                                  verify-cert option to bypass client
+                                  verification of the WBEM server certificate.
+                                  Default: Searches for matching certificates
+                                  in the following system directories:
+                                  /etc/pki/ca-trust/extracted/openssl/ca-
+                                  bundle.trust.crt
+                                  /etc/ssl/certs
+                                  /etc/ssl/certificates
+  -h, --help                      Show this message and exit.
+"""
 
 
-@six.add_metaclass(ContainerMeta)
-class TestsContainer(unittest.TestCase):
-    """Container class for all tests"""
-    __metaclass__ = ContainerMeta
+OK = False  # mark tests OK when they execute correctly
+RUN = True  # Mark OK = False and current test case being created RUN
+FAIL = False  # Any test currently FAILING or not tested yet
+
+# pylint: enable=line-too-long
+TEST_CASES = [
+    # desc - Description of test
+    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    #          detailed documentation
+    # exp_response - Dictionary of expected responses,
+    #                This test adds a new dict entry to exp_response: "file"
+    #                that allows the test to determine if the json output file
+    #                exists and to remove it.
+    # mock - None or name of files (mof or .py),
+    # condition - If True, the test is executed,  Otherwise it is skipped.
 
 
-class OrderedTest(unittest.TestCase):
-    """ Some tests must be ordered (create, delete, etc.)
+    ['Verify connection subcommand help response',
+     '--help',
+     {'stdout': CONN_HELP,
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify connection subcommand show  --help response',
+     ['show', '--help'],
+     {'stdout': CONN_SHOW_HELP,
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify connection subcommand delete  --help response',
+     ['delete', '--help'],
+     {'stdout': CONN_DEL_HELP,
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify connection subcommand save  --help response',
+     ['save', '--help'],
+     {'stdout': CONN_SAVE_HELP,
+      'test': 'lines',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, RUN],
+
+    # TODO: help not done for select, new, export, list, test
+
+    # ['Verify connection subcommand new. test with show and delete  ',
+    # # {'stdin': ['connection new test1 http://blah', 'connection show test1',
+    #            # 'connection delete test1']},
+    # # {'stdout': ["Name: test1", "  WBEMServer uri: http://blah",
+    #  # "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+    #  # "  Timeout: None", "  Noverify: False", "  Certfile: None",
+    #  # "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+    #  # "  log: None"],
+    #  # 'test': 'in'},
+    # # None, RUN],
+
+    ['Verify connection subcommand list empty repository.',
+     ['list'],
+     {'stdout': [
+         "WBEMServer Connections:",
+         "name    server uri    namespace    user    password    "
+         "timeout    noverify    certfile    keyfile    log",
+         "------  ------------  -----------  ------  ----------  ---------  "
+         "----------  ----------  ---------  -----"],
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify connection subcommand delete, empty repo fails.',
+     ['delete', 'blah'],
+     {'stderr': "Error: blah not a defined connection name",
+      'rc': 1,
+      'test': 'lines'},
+     None, OK],
+
+    # The following 3 tests are a sequence. Each depends on the previous.
+    ['Verify connection subcommand new with simple arguments only.',
+     ['new', 'test1', 'http://blah'],
+     {'stdout': "",
+      'test': 'lines',
+      'file': {'before': 'none', 'after': 'exists'}},
+     None, RUN],
+
+    ['Verify connection subcommand show  ',
+     ['show', 'test1'],
+     {'stdout': [
+         "Name: test1", "  WBEMServer uri: http://blah",
+         "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+         "  Timeout: None", "  Noverify: False", "  Certfile: None",
+         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  log: None"],
+      'test': 'in'},
+     None, RUN],
+
+    ['Verify connection subcommand new with complex options.',
+     ['new', 'test2', 'http://blahblah', '-u', 'fred', '-p', 'argh', '-t',
+      '18', '-n', '-l', 'api=file,all'],
+     {'stdout': "",
+      'test': 'lines',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     None, RUN],
+
+    ['Verify connection subcommand show  ',
+     ['show', 'test1'],
+     {'stdout': [
+         "Name: test1", "  WBEMServer uri: http://blah",
+         "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+         "  Timeout: None", "  Noverify: False", "  Certfile: None",
+         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  log: None"],
+      'test': 'in'},
+     None, RUN],
+
+    ['Verify connection subcommand show  ',
+     ['show', 'test2'],
+     {'stdout': [
+         "Name: test2", "  WBEMServer uri: http://blahblah",
+         "  Default_namespace: root/cimv2", "  User: fred", "  Password: argh",
+         "  Timeout: 18", "  Noverify: True", "  Certfile: None",
+         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  log: api=file,all"],
+      'test': 'in'},
+     None, RUN],
+
+    ['Verify connection subcommand list  ',
+     ['list'],
+     {'stdout': ["test1   http://blah      root/cimv2"
+                 "                                  False",
+                 "test2   http://blahblah  root/cimv2   fred    argh"
+                 "               18  True"],
+      'test': 'in'},
+     None, RUN],
+
+    ['Verify connection subcommand delete ',
+     ['delete', 'test1'],
+     {'stdout': "",
+      'test': 'lines',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     None, RUN],
+
+    ['Verify connection subcommand delete ',
+     ['delete', 'test2'],
+     {'stdout': "",
+      'test': 'lines',
+      'file': {'before': 'exists', 'after': 'None'}},
+     None, RUN],
+
+    # TODO additional tests
+]
+
+
+class TestSubcmdClass(CLITestsBase):
     """
+    Test all of the class subcommand variations.
+    """
+    subcmd = 'connection'
 
-    def test_create_delete(self):
-        """ Test create a connection see if it exists and then delete it
+    @pytest.mark.parametrize(
+        "desc, inputs, exp_response, mock, condition",
+        TEST_CASES)
+    def test_connection(self, desc, inputs, exp_response, mock, condition):
         """
-        pass
+        Common test method for those subcommands and options in the
+        class subcmd that can be tested.
 
-        # Test creating a new connection
+        """
+        # Where is this file to be located for tests.
+        pywbemserversfile = CONNECTIONS_FILE
 
-        # test show of the new connection
+        def test_file(file_test):
+            """Local function to execute tests on servers file."""
+            if file_test == 'exists':
+                assert os.path.isfile(pywbemserversfile) and \
+                    os.path.getsize(pywbemserversfile) > 0, \
+                    "Fail. File  %s should exist" % pywbemserversfile
+            elif file_test == 'none':
+                assert not os.path.isfile(pywbemserversfile), \
+                    "Fail. File %s should exist" % pywbemserversfile
 
-        # test delete the connection
+        if 'file' in exp_response:
+            if 'before' in exp_response['file']:
+                test_file(exp_response['file']['before'])
 
-        # test that the connection does not exist
+        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
+                         mock, condition, verbose=False)
 
-
-if __name__ == '__main__':
-
-    unittest.main()
+        if 'file' in exp_response:
+            if 'after' in exp_response['file']:
+                test_file(exp_response['file']['after'])

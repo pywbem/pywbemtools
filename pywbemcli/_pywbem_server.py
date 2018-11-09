@@ -139,6 +139,9 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
         self._verbose = verbose
         self._log = log
 
+    def __str__(self):
+        return 'PywbemServer(url=%s name=%s)' % (self.server_url, self.name)
+
     def __repr__(self):
         return 'PywbemServer(url=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
                'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
@@ -276,7 +279,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
         """
         if not self.timeout:   # disallow None
             ValueError('Timout of None not allowed')
-        if self.timeout is not None and (self.timeout < 0 or
+        if self.timeout is not None and (self.timeout < 0 or  # noqa: W504
                                          self.timeout > MAX_TIMEOUT):
             ValueError('Timeout option(%s) out of range %s to %s sec' %
                        (self.timeout, 0, MAX_TIMEOUT))
@@ -300,13 +303,17 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
                                        .format(cmd=ctx.invoked_subcommand))
 
     def get_password(self, ctx):
-        """Conditional password prompt function"""
+        """
+        Conditional password prompt function  Prompts for password only if
+        there  is a defined user and no password.
+        """
         if self.user and not self.password:
             self.password_prompt(ctx)
 
     def to_dict(self):
         """Create dictionary from instance"""
-        dict_ = {"name": self.name, "server_url": self.server_url,
+        dict_ = {"name": self.name,
+                 "server_url": self.server_url,
                  "user": self.user,
                  "password": self.password,
                  "default_namespace": self.default_namespace,
@@ -317,7 +324,8 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
                  "ca_certs": self.ca_certs,
                  "use_pull_ops": self.use_pull_ops,
                  "pull_max_cnt": self.pull_max_cnt,
-                 "mock_server": self._mock_server}
+                 "mock_server": self._mock_server,
+                 "log": self.log}
         return dict_
 
     @staticmethod

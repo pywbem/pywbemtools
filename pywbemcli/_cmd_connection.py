@@ -32,6 +32,7 @@ from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
 from ._connection_repository import get_pywbemcli_servers, \
     server_definitions_new, server_definitions_delete
 from .config import MAX_TIMEOUT
+from ._context_obj import ContextObj
 
 
 @cli.group('connection', options_metavar=CMD_OPTS_TXT)
@@ -108,13 +109,15 @@ def connection_select(context, name):
     Select a connection from defined connections.
 
     Selects a connection from the persistently stored set of named connections
-    if NAME exists in the store.
+    if NAME exists in the store. The name argument is optional.  If not
+    supplied, a list of connections from the connections definition file
+    is presented with a prompt for the user to select a name
 
     Examples:
 
        connection select <name>    # select the defined <name>
 
-       connection select       # presents select list to pick connection
+       connection select           # presents select list to pick connection
     """
 
     context.execute_cmd(lambda: cmd_connection_select(context, name))
@@ -140,8 +143,7 @@ def connection_save(context, name):
 # pylint: disable=bad-continuation
 @connection_group.command('new', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True,)
-@click.argument('uri', type=str, metavar='uri',
-                envvar=PywbemServer.server_envvar, required=True)
+@click.argument('uri', type=str, metavar='uri', required=True)
 @click.option('-d', '--default_namespace', type=str,
               default=DEFAULT_NAMESPACE,
               help="Default Namespace to use in the target WBEMServer if no "
@@ -189,8 +191,8 @@ def connection_save(context, name):
                    'server. Set the --no-verify-cert option to bypass '
                    'client verification of the WBEM server certificate. '
                    'Default: Searches for matching certificates in the '
-                   'following system directories: ' +
-                   ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
+                   'following system directories:'
+                   ' ' + ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @click.pass_obj
 def connection_new(context, name, uri, **options):
     """
@@ -313,9 +315,10 @@ def cmd_connection_save(context, name):
         if svr.name != name:
             click.echo('Warning: changing server name from %s to %s' %
                        (svr.name, name))
-        svr._name = name
+        svr._name = name  # pylint: disable=protected-access
     elif not svr.name and not name:
-        raise click.ClickException('No server name definition' % name)
+        raise click.ClickException('No server name definition for name %s' %
+                                   name)
         # TODO we can ask for name in this case in interactive mode
     elif svr.name:
         name = svr.name
@@ -369,25 +372,50 @@ def show_connection_information(context, svr, separate_line=True):
 
 def cmd_connection_select(context, name):
     """
-    Select an existing connection to use as the current WBEM Server
+    Select an existing connection to use as the current WBEM Server. This
+    command accepts the click_context since it updates that context.
     """
+    print('SEL CONTEXT %s' % context)
     pywbemcli_servers = get_pywbemcli_servers()
     if not name:
         # get all names from dictionary
-        conn_names = pywbemcli_servers.keys()
+        conn_names = list(six.viewkeys(pywbemcli_servers))
+        conn_names = sorted(conn_names)
         if conn_names:
-            name = pick_from_list(context, conn_names, "Select a connection")
+            index = pick_from_list(context, conn_names,
+                                   "Select a connection or Ctrl_C to abort.")
+            name = conn_names[index]
         else:
             raise click.ClickException(
                 'Connection repository empty' % name)
 
+    # set this name as the defined connection name for any other
+    # repl cmds.
+    # if name in pywbemcli_servers:
+        # INTER_CMD_VARIABLES['name'] = name
+        # print('INTER_CMD2 %s' % INTER_CMD_VARIABLES)
+
+    # else:
+        # raise click.ClickException(
+            # '%s not a defined connection name' % name)
+    if name in pywbemcli_servers:
+        pywbem_server = pywbemcli_servers[name]
+        new_ctx = ContextObj(pywbem_server,
+                             context.output_format,
+                             pywbem_server.use_pull_ops,
+                             pywbem_server.pull_max_cnt,
+                             context.timestats,
+                             context.verbose)
+        ctx = click.get_current_context()
+        ctx.obj = new_ctx
+        # update all contexts with new ContextObj
+        parent_ctx = ctx.parent
+        while parent_ctx is not None:
+            parent_ctx.obj = ctx.obj
+            parent_ctx = parent_ctx.parent
     else:
-        if name in pywbemcli_servers:
-            connection = pywbemcli_servers[name]
-            context.set_connection(connection)
-        else:
-            raise click.ClickException(
-                '%s not a defined connection name' % name)
+        raise click.ClickException(
+            '%s not a defined connection name' % name)
 
 
 def cmd_connection_delete(context, name):
@@ -403,9 +431,11 @@ def cmd_connection_delete(context, name):
 
     if not name:
         # get all names from dictionary
-        conn_names = pywbemcli_servers.keys()
+        conn_names = list(six.viewkeys(pywbemcli_servers))
+        conn_names = sorted(conn_names)
         if conn_names:
-            name = pick_from_list(context, conn_names, "Select a connection")
+            name = pick_from_list(context, conn_names,
+                                  "Select a connection or CTRL_C to abort.")
             server_definitions_delete(name)
 
         else:
