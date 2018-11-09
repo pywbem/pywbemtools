@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.3'
+needs_sphinx = '1.7'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -468,4 +468,3 @@ extlinks = {
   'nbview': ('http://nbviewer.jupyter.org/github/pywbem/pywbemcli/blob/master/docs/notebooks/%s', ''),
   'nbdown': ('https://github.com/pywbem/pywbemcli/raw/master/docs/notebooks/%s', '')
 }
-
