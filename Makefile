@@ -297,7 +297,7 @@ doccoverage:
 	@echo '$@ done.'
 
 .PHONY: check
-check: pylint.log flake8.log
+check: pylint.log flake8.log safety.log
 	@echo '$@ done.'
 
 .PHONY: flake8
@@ -386,6 +386,13 @@ $(test_log_file): Makefile $(cli_package_name)/*.py tests/unit/*.py coveragerc
 	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(cli_package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'
+
+safety.log: Makefile minimum-constraints.txt
+	@echo "Running pyup.io safety check"
+	rm -f $@
+	-bash -c "set -o pipefail; safety check -r minimum-constraints.txt --full-report |tee $@.tmp"
+	mv -f $@.tmp $@
+	@echo "Done: Created pyup.io safety log file: $@"
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemclicmdshelp.rst: install.done tools/click_help_capture.py $(cli_package_name)/pywbemcli.py $(cli_package_name)/_cmd*.py
