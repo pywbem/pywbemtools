@@ -91,8 +91,8 @@ CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REG
   Find all classes that match CLASSNAME-REGEX.
 
   Find all classes in the namespace(s) of the target WBEMServer that match
-  the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
-  argument is required.
+  the CLASSNAME-REGEX regular expression argument and return the classnames.
+  The CLASSNAME-REGEX argument is required.
 
   The CLASSNAME-REGEX argument may be either a complete classname or a
   regular expression that can be matched to one or more classnames. To limit
@@ -100,7 +100,8 @@ CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REG
 
   The regular expression is anchored to the beginning of the classname and
   is case insensitive. Thus, `pywbem_` returns all classes that begin with
-  `PyWBEM_`, `pywbem_`, etc.
+  `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include the
+  case insensitive string `system`.
 
   The namespace option limits the search to the defined namespace. Otherwise
   all namespaces in the target server are searched.
@@ -431,7 +432,43 @@ TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
-    # TODO Add detailed tests for find
+    ['class subcommand find simple name in known namespace',
+     ['find', 'CIM_', '-n', 'root/cimv2'],
+     {'stdout': ["  root/cimv2:CIM_Foo",
+                 "  root/cimv2:CIM_Foo_sub",
+                 "  root/cimv2:CIM_Foo_sub2",
+                 "  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['class subcommand find simple name in known namespace with sort',
+     ['find', 'CIM_', '-n', 'root/cimv2', '-s'],
+     {'stdout': ["  root/cimv2:CIM_Foo",
+                 "  root/cimv2:CIM_Foo_sub",
+                 "  root/cimv2:CIM_Foo_sub2",
+                 "  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['class subcommand verify nothing found for BLAH_ regex',
+     ['find', 'BLAH_', '-n', 'root/cimv2'],
+     {'stdout': "",
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['class subcommand find simple name in known namespace with wildcard',
+     ['find', '.*sub2', '-n', 'root/cimv2'],
+     {'stdout': "  root/cimv2:CIM_Foo_sub2",
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['class subcommand verify bad regex',
+     ['find', '.**sub2', '-n', 'root/cimv2'],
+     {'stderr': "Error: Regex Compile Error: error: multiple repeat",
+      'rc': 1,
+      'test': 'regex'},  # regex because re message text changes with py version
+     SIMPLE_MOCK_FILE, OK],
+
 
     #
     # subcommand "class tree"

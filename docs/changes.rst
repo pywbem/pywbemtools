@@ -44,12 +44,12 @@ Bug fixes
   connections so the user can maintain a list of WBEM servers that can be easily
   referenced rather than having to type them in.(issue # 6))
 
+* Fix issues with `class find`. Failed when namespace specified with -n,
+  did not turn off spinner, double sorted output.
+
 
 Build, test, quality
 ^^^^^^^^^^^^^^^^^^^^
 
 Documentation
 ^^^^^^^^^^^^^
-
-
-
