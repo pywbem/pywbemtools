@@ -55,7 +55,7 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='If set, INSTANCENAME argument must be a class rather '
+                 help='If set, `INSTANCENAME` argument must be a class rather '
                       'than an instance and user is presented with a list of '
                       'instances of the class from which the instance to '
                       'process is selected.')]
@@ -107,17 +107,18 @@ def instance_get(context, instancename, **options):
     """
     Get a single CIMInstance.
 
-    Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
-    to the instance name of the desired instance. This may be supplied directly
-    as an untyped wbem_uri formatted string or through the --interactive
-    option. The wbemuri may contain the namespace or the namespace can be
-    supplied with the --namespace option. If no namespace is supplied, the
-    connection default namespace is used.  Any host name in the wbem_uri is
+    Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
+    resolve to the instance name of the desired instance. This may be supplied
+    directly as an untyped wbem_uri formatted string or through the
+    --interactive option. The wbemuri may contain the namespace or the namespace
+    can be supplied with the --namespace option. If no namespace is supplied,
+    the connection default namespace is used.  Any host name in the wbem_uri is
     ignored.
 
     This method may be executed interactively by providing only a classname and
     the interactive option (-i).
 
+    Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
                                                  options))
@@ -238,8 +239,6 @@ def instance_invokemethod(context, instancename, methodname, **options):
     Example:
 
     pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
-
-
     """
     context.execute_cmd(lambda: cmd_instance_invokemethod(context,
                                                           instancename,
@@ -271,6 +270,9 @@ def instance_enumerate(context, classname, **options):
 
     Displays the returned instances in mof, xml, or table formats or the
     instance names as a string or XML formats (--names-only option).
+
+    Results are formatted as defined by the output format global option.
+
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -280,10 +282,15 @@ def instance_enumerate(context, classname, **options):
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the result class name provided.')
+              help='Filter by the result class name provided. Each returned '
+                   'instance (or instance name) should be a member of this '
+                   'class or its subclasses. Optional')
 @click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
-              help='Filter by the role name provided.')
+              help='Filter by the role name provided. Each returned instance '
+                   '(or instance name) should refer to the target instance '
+                   'through a property with aname that matches the value of '
+                   'this parameter. Optional.')
 @add_options(includequalifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -301,9 +308,11 @@ def instance_references(context, instancename, **options):
     target `INSTANCENAME` in the target WBEM server filtered by the
     `role` and `resultclass` options.
 
-   This may be executed interactively by providing only a class name for
-   `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list of
-   instances names in the class from which one can be chosen as the target.
+    This may be executed interactively by providing only a class name for
+    `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
+    of instances names in the class from which you can be chosen as the target.
+
+    Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -313,16 +322,28 @@ def instance_references(context, instancename, **options):
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the associated instancename provided.')
+              help='Filter by the association class name provided.Each '
+                   'returned instance (or instance name) should be associated '
+                   'to the source instance through this class or its '
+                   'subclasses. Optional.')
 @click.option('-c', '--resultclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the result class name provided.')
-@click.option('-R', '--role', type=str, required=False,
+              help='Filter by the result class name provided. Each '
+                   'returned instance (or instance name) should be a member '
+                   'of this class or one of its subclasses. Optional')
+@click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
-              help='Filter by the role name provided.')
+              help='Filter by the role name provided. Each returned instance '
+              '(or instance name)should be associated with the source instance '
+              '(INSTANCENAME) through an association with this role (property '
+              'name in the association that matches this parameter). Optional.')
 @click.option('-R', '--resultrole', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the result role name provided.')
+              metavar='<role name>',
+              help='Filter by the result role name provided. Each returned '
+              'instance (or instance name)should be associated with the source '
+              ' instance name (`INSTANCENAME`) through an association with '
+              'returned object having this role (property name in the '
+              'association that matches this parameter). Optional.')
 @add_options(includequalifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -337,12 +358,14 @@ def instance_associators(context, instancename, **options):
     Get associated instances or names.
 
     Returns the associated instances or names (--names-only option) for the
-    INSTANCENAME argument filtered by the --assocclass, --resultclass, --role
+    `INSTANCENAME` argument filtered by the --assocclass, --resultclass, --role
     and --resultrole options.
 
     This may be executed interactively by providing only a classname and the
     interactive option. Pywbemcli presents a list of instances in the class
     from which one can be chosen as the target.
+
+    Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))
@@ -366,6 +389,8 @@ def instance_query(context, query, **options):
     argument and query language options.
 
     The results of the query are displayed as mof or xml.
+
+    Results are formatted as defined by the output format global option.
 
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
@@ -400,7 +425,6 @@ def instance_count(context, classname, **options):
 
     This operation can take a long time to execute since it enumerates all
     classes in the namespace.
-
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
