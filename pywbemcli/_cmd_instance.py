@@ -23,7 +23,7 @@ import click
 from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
-    pick_instance, objects_sort, resolve_propertylist, create_ciminstance, \
+    pick_instance, sort_cimobjects, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
     process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
@@ -646,7 +646,7 @@ def cmd_instance_enumerate(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
             if options['sort']:
-                results = objects_sort(results)
+                results = sort_cimobjects(results)
 
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'])
@@ -686,7 +686,7 @@ def cmd_instance_references(context, instancename, options):
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
         if options['sort']:
-            results = objects_sort(results)
+            results = sort_cimobjects(results)
 
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'])

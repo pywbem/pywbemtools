@@ -55,7 +55,7 @@ CIM_OBJECT_OUTPUT_FORMATS = ['mof', 'xml', 'txt', 'tree']
 
 
 # TODO: ks for some reason extending one list with another causes a problem
-# in click with the help.
+# in click with the help. Review with future versions
 OUTPUT_FORMATS = ['table', 'plain', 'simple', 'grid', 'rst', 'mof', 'xml',
                   'txt', 'repr', 'tree']
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
@@ -66,7 +66,7 @@ DEFAULT_MAX_CELL_WIDTH = 100
 
 def output_format_is_table(output_format):
     """ Return True if output format is a table form"""
-    return True if output_format in TABLE_FORMATS else False
+    return output_format in TABLE_FORMATS
 
 
 def resolve_propertylist(propertylist):
@@ -93,7 +93,7 @@ def resolve_propertylist(propertylist):
         return None
 
     # If propertylist is a single empty string, set to empty list.
-    elif len(propertylist) == 1 and not propertylist[0]:
+    if len(propertylist) == 1 and not propertylist[0]:
         propertylist = []
 
     # expand any comma separated entries in the list
@@ -117,7 +117,7 @@ def pywbemcli_prompt(msg):
     return prompt(msg)
 
 
-def pick_from_list(context, options, title):
+def pick_one_from_list(context, options, title):
     """
     Interactive component that displays a set of options (strings) and asks
     the user to select one.  Returns the item and index of the selected string.
@@ -140,7 +140,8 @@ def pick_from_list(context, options, title):
     that would use curses for the selection process.
     """
     try:
-        context.spinner.stop()
+        if context:
+            context.spinner.stop()
 
         click.echo(title)
         index = -1
@@ -155,7 +156,8 @@ def pick_from_list(context, options, title):
                 selection_txt = pywbemcli_prompt(msg)
                 selection = int(selection_txt)
                 if 0 <= selection <= index:
-                    context.spinner.start()
+                    if context:
+                        context.spinner.start()
                     return options[selection]
             except ValueError:  # This causes the retry of the request
                 pass
@@ -173,7 +175,7 @@ def pick_instance(context, objectname, namespace=None):
 
       Parameters:
         context:
-            Current click context
+            Current click context or None
 
         classname:
             Classname to use to get instance names from server
@@ -193,22 +195,80 @@ def pick_instance(context, objectname, namespace=None):
         return None
 
     try:
-        return pick_from_list(context, instance_names,
-                              'Pick Instance name to process')
+        return pick_one_from_list(context, instance_names,
+                                  'Pick Instance name to process')
     except Exception as ex:
         raise click.ClickException('Command Aborted. Exception %s' % ex)
+
+
+def pick_multiple_from_list(context, options, title):
+    """
+    Interactive component that displays a set of options (strings) and asks
+    the user to select multiple entries from that list.  Returns a list of
+    the items selected.
+
+    Parameters:
+      context:
+        If not None, the ContextObj which is used to stop and start the
+        spinner.
+      options:
+        List of strings to select
+
+      title:
+        Title to display before selection
+
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl_C ends even the REPL.
+
+    Returns: list of index of selected items
+
+    Exception: Returns ValueError if Ctrl-c input from console.
+
+    TODO: This could be replaced by the python pick library that would use
+    curses for the selection process.
+    """
+    if context:
+        context.spinner.stop()
+
+    click.echo(title)
+    index = -1
+    for str_ in options:
+        index += 1
+        click.echo('%s: %s' % (index, str_))
+    selection = None
+    selection_list = []
+    msg = 'Select entry by index or hit enter to end selection>'
+    while True:
+        try:
+            selection_txt = pywbemcli_prompt(msg)
+            if not selection_txt:
+                if context:
+                    context.spinner.start()
+                return selection_list
+
+            selection = int(selection_txt)
+            if 0 <= selection <= index:
+                selection_list.append(options[selection])
+            continue
+        except ValueError:
+            pass
+        except KeyboardInterrupt:
+            raise ValueError
+        click.echo('%s Invalid. Input integer between 0 and %s hit enter to '
+                   'stop selection.' % (selection, index))
 
 
 def is_classname(str_):
     """
     Test if the str_ input is a classname or contains instance name
     components.  The existence of a period at the end of the name component
+    determines if it is a classname or instance name.
 
     Returns:
         True if classname. Otherwise it returns False
     """
-    match = re.match(r'[a-zA_Z0-9_].*\.', str_)
-    return False if match else True
+    assert isinstance(str_, six.string_types)
+    return not re.match(r'[a-zA_Z0-9_].*\.', str_)
 
 
 def filter_namelist(regex, name_list, ignore_case=True):
@@ -238,13 +298,17 @@ def filter_namelist(regex, name_list, ignore_case=True):
     """
 
     flags = re.IGNORECASE if ignore_case else None
+    # compile the regex since it used multiple times
     try:
-        cmpiled_regex = re.compile(regex, flags) if flags else re.compile(regex)
-    except re.error as er:
-        raise click.ClickException("Regex Compile Error: %s: %s" %
-                                   (er.__class__.__name__, er))
+        compiled_regex = re.compile(regex, flags) if flags \
+            else re.compile(regex)
 
-    new_list = [n for n in name_list for m in[cmpiled_regex.match(n)] if m]
+    except Exception as ex:
+        raise click.ClickException('Regex compile error. '
+                                   'Regex=%s. Er: %s: %s' %
+                                   (regex, ex.__class__.__name__, ex))
+
+    new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
 
     return new_list
 
@@ -274,7 +338,7 @@ def verify_operation(txt, msg=None):
     return False
 
 
-def objects_sort(objects):
+def sort_cimobjects(objects):
     """
     Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names.
     Returns new list with the sorted objects.
@@ -405,10 +469,11 @@ def create_cimvalue(cim_type, value_str, is_array):
         """
         if isinstance(value, bool):
             return value
-        elif isinstance(value, six.string_types):
+
+        if isinstance(value, six.string_types):
             if value.lower() == 'true':
                 return True
-            elif value.lower() == 'false':
+            if value.lower() == 'false':
                 return False
         raise ValueError('Invalid boolean value: "%s"' % value)
 
@@ -531,14 +596,20 @@ def compare_instances(inst1, inst2):
             return False
         if not compare_obj(inst1.qualifiers, inst2.qualifiers, "qualifiers"):
             return False
+        if inst1.properties == inst2.properties:
+            return True
         if len(inst1.properties) != len(inst2.properties):
-            click.echo('Different number of properties %s vs %s' %
-                       (len(inst1.properties, len(inst2.properties))))
-            keys1 = set(inst1.keys())
-            keys2 = set(inst2.keys())
+            click.echo('Different number of properties %s vs %s\n%s\n%s' %
+                       (len(inst1.properties), len(inst2.properties),
+                        inst1.keys(), inst2.keys()))
+            return False
+        keys1 = set(inst1.keys())
+        keys2 = set(inst2.keys())
+        if keys1 != keys2:
             diff = keys1.symmetric_difference(keys2)
             click.echo('Property Name differences %s' % diff)
             return False
+
         for n1, v1 in six.iteritems(inst1):
             if v1 != inst2[n1]:
                 msg = 'property ' + n1
@@ -819,22 +890,22 @@ def _print_paths_as_table(objects, table_width, table_format):
     Display paths as a table. This include CIMInstanceName, ClassPath,
     and unicode (the return type for enumerateClasses).
     """
-    cim_type = get_cimtype(objects)
     if objects:
-        if isinstance(cim_type, six.stringtypes):
-            headers = ['path']
+        if isinstance(objects[0], six.string_types):
+            headers = ('path')
             rows = [obj for obj in objects]
-        elif isinstance(cim_type, CIMClass, CIMInstanceName):
-            headers = ['host', 'namespace', 'keybindings']
+            print('HDR %s\nROWS %r' % (headers, rows))
+        elif isinstance(objects[0], (CIMInstanceName, CIMClassName)):
+            headers = ('host', 'namespace', 'keybindings')
             rows = [[obj.host, obj.namespace, obj.keybindings]
                     for obj in objects]
         else:
             raise click.ClickException("{0} invalid type ({1})for path display".
-                                       format(objects[0], cim_type))
+                                       format(objects[0], type(objects[0])))
 
-    title = '{} paths'.format(cim_type)
-    click.echo(format_table(rows, headers, title=title,
-                            table_format=table_format))
+        title = 'InstanceNames: %s' % objects[0].classname
+        click.echo(format_table(rows, headers, title=title,
+                                table_format=table_format))
 
 
 def _print_qual_decls_as_table(qual_decls, table_width, table_format):
@@ -915,6 +986,8 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
         # get value for each property in this object
         for name in prop_names:
             # Account for possible instances without all properties
+            # Outputs empty  string.  Note that instance with no value
+            # results in same output as not instance name.
             if name not in inst.properties:
                 val_str = ''
             else:
@@ -979,16 +1052,15 @@ def _print_instances_as_table(insts, table_width, table_format,
         else:
             new_header_line.append(header)
 
-    title = insts[0].classname
-
     for inst in insts:
         if not isinstance(inst, CIMInstance):
             raise ValueError('Only CIMInstance display allows table output')
 
-    lines = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
-                                      include_classes=include_classes)
+    rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
+                                     include_classes=include_classes)
 
-    click.echo(format_table(lines, new_header_line, title=title,
+    title = 'Instances: %s' % insts[0].classname
+    click.echo(format_table(rows, new_header_line, title=title,
                             table_format=table_format))
 
 
@@ -1005,18 +1077,19 @@ def _print_objects_as_table(context, objects):
         table_width = DEFAULT_TABLE_WIDTH
 
     output_format = context.output_format
-    if isinstance(objects[0], CIMInstance):
-        _print_instances_as_table(objects, table_width, output_format)
-    elif isinstance(objects[0], CIMClass):
-        _print_classes_as_table(objects, table_width, output_format)
-    elif isinstance(objects[0], CIMQualifierDeclaration):
-        _print_qual_decls_as_table(objects, table_width, output_format)
-    elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
-                                 six.string_types)):
-        _print_paths_as_table(objects, table_width, output_format)
-    else:
-        raise click.ClickException("Cannot print %s as table" %
-                                   type(objects[0]))
+    if objects:
+        if isinstance(objects[0], CIMInstance):
+            _print_instances_as_table(objects, table_width, output_format)
+        elif isinstance(objects[0], CIMClass):
+            _print_classes_as_table(objects, table_width, output_format)
+        elif isinstance(objects[0], CIMQualifierDeclaration):
+            _print_qual_decls_as_table(objects, table_width, output_format)
+        elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
+                                     six.string_types)):
+            _print_paths_as_table(objects, table_width, output_format)
+        else:
+            raise click.ClickException("Cannot print %s as table" %
+                                       type(objects[0]))
 
 
 def _indent_str(indent):

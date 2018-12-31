@@ -104,9 +104,6 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     if stdin and six.PY3:
         stdin = stdin.encode('utf-8')
 
-    if stdin:
-        print('stdin %r' % stdin)
-
     # The click package on Windows writes NL at the Python level
     # as '\r\r\n' at the level of the shell under some cases. This is
     # documented in Click issue #1271 for Click 7.0 The Popen universal_newlines
@@ -118,7 +115,8 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     # proc = Popen(cmd_args, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE,
     #             universal_newlines=True)
     # stout_str, stderr_str = proc.communicate(input=stdin)
-    # Temp alternative is the following line and the second change
+    # Temp alternative is the following line with universal_newlines=False
+    # and the second change to fix the EOLs ourself.
     proc = Popen(cmd_args, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
                  universal_newlines=False)
 
@@ -126,7 +124,6 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     rc = proc.returncode
 
     if verbose:
-        print("executed_pywbemcli rc = %s" % rc)
         print('output type %s\nstdout:%r\nstderr:%r' % (type(stdout_str),
                                                         stdout_str,
                                                         stderr_str))
@@ -140,16 +137,12 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     # Second part of temp patch for CRCRNL. Does what popen does and
     # CRCRNL replacement.
     if sys.platform == 'win32':
-        # print('STDOUTBeforeReplace type %s\n%r' %
-        #      (type(stdout_str), stdout_str))
         stdout_str = stdout_str.replace('\r\r\n', '\n')  \
                                .replace('\r\n', '\n')  \
                                .replace('\r', '')
         stderr_str = stderr_str.replace('\r\r\n', '\n')  \
                                .replace('\r\n', '\n')  \
                                .replace('\r', '')
-        # print('STDOUTAfterReplace type %s\n%r' % (type(stdout_str),
-        #                                                 stdout_str))
 
     return rc, stdout_str, stderr_str
 

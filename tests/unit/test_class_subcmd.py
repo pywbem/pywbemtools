@@ -469,7 +469,7 @@ TEST_CASES = [
 
     ['class subcommand verify bad regex',
      ['find', '.**sub2', '-n', 'root/cimv2'],
-     {'stderr': "Error: Regex Compile Error: error: multiple repeat",
+     {'stderr': ["Error:", "Regex compile error", "multiple", "sub2"],
       'rc': 1,
       'test': 'regex'},  # regex because re message text changes with py version
      SIMPLE_MOCK_FILE, OK],
