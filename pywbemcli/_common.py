@@ -21,6 +21,7 @@ from __future__ import absolute_import, unicode_literals
 
 import re
 from textwrap import fill
+from operator import itemgetter
 from prompt_toolkit import prompt
 import six
 import click
@@ -944,7 +945,8 @@ def _array_value(type_, value_, fold=False, max_cell_width=None):
     return str_
 
 
-def format_table(rows, headers, table_format='simple', title=None):
+def format_table(rows, headers, table_format='simple', title=None,
+                 sort_columns=None):
     """
     General print table function.  Prints a list of lists in a
     table format where each inner list is a row.
@@ -960,17 +962,24 @@ def format_table(rows, headers, table_format='simple', title=None):
              and each row is an iterable of strings for the data in that
              row.
 
-          title (:term: `string`)
+          title (:term: `string`):
              Optional title to be places io the output above the table.
              No title is output if this parameter is None
 
-          table_format (:term: 'string')
+          table_format (:term: 'string'):
             Output format defined by the string and limited to one of the
             choice of table formats defined in TABLE_FORMATS list
 
-          output_file (:term: 'string')
+          output_file (:term: 'string'):
             If not None, a file name to which the output formatted data
             is sent.
+
+          sort_columns (int or list of int that defines sort):
+            Defines the cols that will be sorted. If int, it defines the column
+            that will be sorted. If list of int, the sort is in sort order of
+            cols in the list (i.e. minor sorts to the left, major sorts to the
+            right). Note that entries in each row of the columns to be sorted
+            must be of the same type (int, str, etc.) to be sortable.
 
       Returns: (:term:`string`)
         Returns the formatted table as a string
@@ -978,6 +987,13 @@ def format_table(rows, headers, table_format='simple', title=None):
       Exceptions:
         Raises click.ClickException if invalid table format string
     """
+    if sort_columns is not None:
+        if isinstance(sort_columns, int):
+            rows = sorted(rows, key=itemgetter(sort_columns))
+        elif isinstance(sort_columns, (list, tuple)):
+            rows = sorted(rows, key=itemgetter(*sort_columns))
+        else:
+            assert False, "Sort_columns must be int or list/tuple of int"
 
     if table_format is None:
         table_format = 'simple'

@@ -36,7 +36,7 @@ VERBOSE = False
 
 # TODO ks rewrite this test for pytest.  Note that the capture IO
 #      may be different in that they have fixtures such as capsys
-#      to capture output that may eplace StringIO used below.
+#      to capture output that may replace StringIO used below.
 
 
 class BaseTableTests(unittest.TestCase):
@@ -53,6 +53,21 @@ class BaseTableTests(unittest.TestCase):
         title_txt = 'test simple table' if title else None
         table = format_table(rows, headers, title=title_txt,
                              table_format=table_format)
+        return table
+
+    @staticmethod
+    def create_sortable_table(table_format=None, title=True, sort_columns=None):
+        """Create a standard table"""
+        headers = ['col1', 'col2', 'col3']
+        rows = [['row1col1', 'row1col2', 1],
+                ['row2col1', 'row2col2', 99],
+                ['row3 col1', 'row3  col2', 0],
+                ['anotherrow', 'middle', 9999999],
+                ['xorerow', 'anuts', 0]]
+        title_txt = 'test sortable table' if title else None
+        table = format_table(rows, headers, title=title_txt,
+                             table_format=table_format,
+                             sort_columns=sort_columns)
         return table
 
     @staticmethod
@@ -111,6 +126,87 @@ class FormatTableTests(BaseTableTests):
                     'row3 col1  row3  col2  row3   col3\n'
                     '0          999         9999999\n'
                     '1.1432     1.2         0\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
+    def test_table_simple_hdr_sort1(self):
+        """Test a simple table with header and the sort option"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_sortable_table(table_format='simple', title=True,
+                                           sort_columns=0)
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test sortable table\n'
+                    'col1        col2           col3\n'
+                    '----------  ----------  -------\n'
+                    'anotherrow  middle      9999999\n'
+                    'row1col1    row1col2          1\n'
+                    'row2col1    row2col2         99\n'
+                    'row3 col1   row3  col2        0\n'
+                    'xorerow     anuts             0\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
+    def test_table_simple_hdr_sort2(self):
+        """Test a simple table with header and the sort option"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_sortable_table(table_format='simple', title=True,
+                                           sort_columns=[1, 0])
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test sortable table\n'
+                    'col1        col2           col3\n'
+                    '----------  ----------  -------\n'
+                    'xorerow     anuts             0\n'
+                    'anotherrow  middle      9999999\n'
+                    'row1col1    row1col2          1\n'
+                    'row2col1    row2col2         99\n'
+                    'row3 col1   row3  col2        0\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
+    def test_table_simple_hdr_sort3(self):
+        """Test a simple table with header and the sort option"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_sortable_table(table_format='simple', title=True,
+                                           sort_columns=2)
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test sortable table\n'
+                    'col1        col2           col3\n'
+                    '----------  ----------  -------\n'
+                    'row3 col1   row3  col2        0\n'
+                    'xorerow     anuts             0\n'
+                    'row1col1    row1col2          1\n'
+                    'row2col1    row2col2         99\n'
+                    'anotherrow  middle      9999999\n')
 
         self.compare_results(actual, expected)
 
