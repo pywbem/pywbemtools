@@ -478,7 +478,7 @@ GET_INST_ALL_TYPES = """instance of PyWBEM_AllTypes {
 
 """
 
-ENUM_INST_TABLE_RESP = """CIM_Foo
+ENUM_INST_TABLE_RESP = """Instances: CIM_Foo
 +--------------+---------------+
 | InstanceID   | IntegerProp   |
 +==============+===============+
@@ -490,7 +490,19 @@ ENUM_INST_TABLE_RESP = """CIM_Foo
 +--------------+---------------+
 """
 
-ENUM_INST_GET_TABLE_RESP = """CIM_Foo
+ENUM_INSTNAME_TABLE_RESP = """InstanceNames: CIM_Foo
++--------+-------------+----------------------------------------+
+| host   | namespace   | keybindings                            |
++========+=============+========================================+
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo1'}) |
++--------+-------------+----------------------------------------+
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo2'}) |
++--------+-------------+----------------------------------------+
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo3'}) |
++--------+-------------+----------------------------------------+
+"""
+
+ENUM_INST_GET_TABLE_RESP = """Instances: CIM_Foo
 InstanceID      IntegerProp
 ------------  -------------
 "CIM_Foo1"                1
@@ -584,10 +596,25 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand enumerate deepinheritance CIM_Foo '
+     '--deepinheritance',
+     ['enumerate', 'CIM_Foo', '--deepinheritance'],
+     {'stdout': ENUM_INST_RESP,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify instance subcommand -o grid enumerate deepinheritance CIM_Foo -d',
      {'args': ['enumerate', 'CIM_Foo', '-d'],
       'global': ['-o', 'grid']},
      {'stdout': ENUM_INST_TABLE_RESP,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand -o grid enumerate deepinheritance '
+     'CIM_Foo -d -o',
+     {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
+      'global': ['-o', 'grid']},
+     {'stdout': ENUM_INSTNAME_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -720,7 +747,7 @@ TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid get CIM_Foo -d',
+    ['Verify instance subcommand -o grid get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'global': ['-o', 'simple']},
      {'stdout': ENUM_INST_GET_TABLE_RESP,

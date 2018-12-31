@@ -15,7 +15,8 @@
 # limitations under the License.
 
 """
-Tests for _common functions.
+Tests for _common functions. This is a mix of pytest and unittests.
+TODO: Future, move all tests to pytest.
 """
 
 from __future__ import absolute_import, print_function
@@ -24,13 +25,20 @@ from datetime import datetime
 import unittest
 import pytest
 import click
+from mock import patch
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
-    CIMInstanceName, Uint32, Uint64, Sint32, CIMDateTime
+    CIMQualifierDeclaration, CIMInstanceName, Uint32, Uint64, Sint32, \
+    CIMDateTime
 from pywbemcli._common import parse_wbemuri_str, \
-    filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
+    filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
-    _format_instances_as_rows, _print_instances_as_table
+    _format_instances_as_rows, _print_instances_as_table, is_classname, \
+    pick_one_from_list, pick_multiple_from_list
+# pylint: disable=unused-import
+from pywbemcli._common import pywbemcli_prompt  # noqa: F401
+from pywbemcli._context_obj import ContextObj
+
 
 from tests.unit.pytest_extensions import simplified_test_function
 # from tests.unit.utils import assert_lines
@@ -38,6 +46,165 @@ from tests.unit.pytest_extensions import simplified_test_function
 DATETIME1_DT = datetime(2014, 9, 22, 10, 49, 20, 524789)
 DATETIME1_OBJ = CIMDateTime(DATETIME1_DT)
 DATETIME1_STR = '"20140922104920.524789+000"'
+
+OK = True  # mark tests OK when they execute correctly
+RUN = True  # Mark OK = False and current test case being created RUN
+FAIL = False  # Any test currently FAILING or not tested yet
+SKIP = False  # mark tests that are to be skipped.
+
+TESTCASES_ISCLASSNAME = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * name: string containing classname or instancename
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('verify is a classname',
+     dict(name=u"CIM_Blah", exp_rtn=True),
+     None, None, True),
+
+    ('verify is instance name',
+     dict(name=u"CIM_Blah.px=3", exp_rtn=True),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_ISCLASSNAME)
+@simplified_test_function
+def test_is_classname(testcase, name, exp_rtn):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    act_rtn = is_classname(name)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_PICK_ONE_FROM_LIST = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * options: tuple of strings defining properties
+    #   * choices: list of choices to return from mock
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify returns correct choice, in this case, ZERO',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after one error',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
+          exp_rtn=u'ONE'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after multipleerror',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
+          exp_rtn=u'TWO'),
+     None, None, OK),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_PICK_ONE_FROM_LIST)
+@simplified_test_function
+def test_pick_one_from_list(testcase, options, choices, exp_rtn):
+    """
+    Test for pick_one_from_list function. Uses mock patch to define return
+    values from the mock.
+    """
+    # setup mock for this test
+    with patch('pywbemcli._common.pywbemcli_prompt', side_effect=choices) \
+            as mock_prompt:
+        # The code to be tested
+        title = "Test pick_one_from_list"
+        context = ContextObj(None, None, None, None, None, None, None)
+        act_rtn = pick_one_from_list(context, options, title)
+        context.spinner.stop()
+        assert mock_prompt.call_count == len(choices)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_PICK_MULTIPLE_FROM_LIST = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * options: tuple of strings defining properties
+    #   * choices: item index from options that is to be chosen
+    #   * exp_rtn: expected function return, a list of selected items.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    # NOTE: choises must end with '' element to close the
+    #       pick_multiple_from_list function.
+
+    ('verify good choice ZERO made',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0', ''],
+          exp_rtn=[u'ZERO']),
+     None, None, OK),
+
+    ('verify good choice ONE made',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1', ''],
+          exp_rtn=[u'ONE']),
+     None, None, OK),
+
+    ('verify good choice TWO after bad choices',
+     dict(options=[u'ZERO', u'ONE', u'TWO'],
+          choices=['-1', '9', '3', 'a', '2', ''],
+          exp_rtn=[u'TWO']),
+     None, None, OK),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_PICK_MULTIPLE_FROM_LIST)
+@simplified_test_function
+def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
+    """Test for pick_one_from_list function"""
+    # setup mock for this test
+    with patch('pywbemcli._common.pywbemcli_prompt', side_effect=choices) as \
+            mock_prompt:
+        # The code to be tested
+        title = "test_pick_multiple_from_list"
+        # context = ContextObj(None, None, None, None, None, None, None)
+        act_rtn = pick_multiple_from_list(None, options, title)
+        # context.spinner.stop()
+        assert mock_prompt.call_count == len(choices)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
 
 
 TESTCASES_RESOLVE_PROPERTYLIST = [
@@ -101,8 +268,126 @@ def test_propertylist(testcase, pl_str, exp_pl):
     assert plist == exp_pl
 
 
-class TestParseWbemUri(object):
-    # pylint: disable=too-few-public-methods
+TESTCASES_COMPARE_INSTANCES = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * inst1: first instance for compare
+    #   * inst2: second instance for compare
+    #   * result: TODO
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('verify instances match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=True),
+     None, None, True),
+
+    ('verify classnames do not match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo1',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+    ('verify property values do not match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo1', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+    ('verify property names do not match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo',
+                            properties={'Name1': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+    ('verify classnames qualifiers do not match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo1',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+    ('verify instances do not match diff  in number of properties',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+    ('verify instances values do not match',
+     dict(inst1=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          inst2=CIMInstance('CIM_Foo',
+                            properties={'Name': 'Foo', 'Chicken': 'Ham1'},
+                            qualifiers={'Key': CIMQualifier('Key', True)},
+                            path=CIMInstanceName('CIM_Foo', {'Name': 'Foo'})),
+          result=False),
+     None, None, True),
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_COMPARE_INSTANCES)
+@simplified_test_function
+def test_compareinstances(testcase, inst1, inst2, result):
+    """Test for _common compare_instances function"""
+    # The code to be tested
+
+    rtn = compare_instances(inst1, inst2)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert rtn == result
+
+
+# TODO: move this to pytest
+class TestParseWbemUri(object):  # TODO: move this to pytest
+    # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
     Test CIMClassName.from_wbem_uri().
     """
@@ -222,7 +507,7 @@ class TestParseWbemUri(object):
 
 
 # TODO pytestify this test and the others in this file
-class FilterNamelistTest(object):
+class FilterNamelistTest(object):  # pytlint: disable=useless-object-inheritance
     """Test the common filter_namelist function."""
 
     name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
@@ -287,7 +572,9 @@ class FilterNamelistTest(object):
         assert filter_namelist(r'.*def', name_list) == ['CIM_def']
 
 
-class NameValuePairTest(object):  # pylint: disable=too-few-public-methods
+# TODO: move this to pytest
+class NameValuePairTest(object):
+    # pylint: disable=too-few-public-methods, , useless-object-inheritance
     """Test simple name value pair parser"""
 
     def test_simple_pairs(self):
@@ -346,18 +633,18 @@ class SorterTest(unittest.TestCase):
             'CID_Boo', properties={'InstanceID':
                                    CIMProperty('InstanceID', None,
                                                type='string')}))
-        sorted_rslt = objects_sort(classes)
+        sorted_rslt = sort_cimobjects(classes)
         self.assertEqual(len(classes), len(sorted_rslt))
         self.assertEqual(sorted_rslt[0].classname, 'CID_Boo')
         self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
         self.assertEqual(sorted_rslt[2].classname, 'CIM_Foo')
 
         classes = []
-        sorted_rslt = objects_sort(classes)
+        sorted_rslt = sort_cimobjects(classes)
         self.assertEqual(len(classes), len(sorted_rslt))
 
         classes = []
-        sorted_rslt = objects_sort(classes)
+        sorted_rslt = sort_cimobjects(classes)
         classes.append(CIMClass(
             'CIM_Foo', properties={'InstanceID':
                                    CIMProperty('InstanceID', None,
@@ -382,7 +669,7 @@ class SorterTest(unittest.TestCase):
         obj = CIMInstanceName('CID_Foo', kb)
         inst_names.append(obj)
 
-        sorted_rslt = objects_sort(inst_names)
+        sorted_rslt = sort_cimobjects(inst_names)
         self.assertEqual(len(inst_names), len(sorted_rslt))
         self.assertEqual(sorted_rslt[0].classname, 'CID_Foo')
         self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
@@ -413,13 +700,34 @@ class SorterTest(unittest.TestCase):
                           qualifiers=quals,
                           path=path)
         instances.append(obj)
-        instances_sorted = objects_sort(instances)
+        instances_sorted = sort_cimobjects(instances)
         self.assertEqual(len(instances), len(instances_sorted))
         self.assertEqual(instances_sorted[0].classname, 'CIM_Boo')
         # TODO create multiple and test result
 
+    def test_sort_qualifierdecls(self):
+        """Test ability to sort list of instance names"""
 
-class SplitTestNone(object):
+        qual_decls = []
+
+        obj = CIMQualifierDeclaration('FooQualDecl3', 'uint32')
+        qual_decls.append(obj)
+
+        obj = CIMQualifierDeclaration('FooQualDecl2', 'uint32')
+        qual_decls.append(obj)
+
+        obj = CIMQualifierDeclaration('FooQualDecl1', 'uint32')
+        qual_decls.append(obj)
+
+        sorted_rslt = sort_cimobjects(qual_decls)
+        self.assertEqual(len(qual_decls), len(sorted_rslt))
+        self.assertEqual(sorted_rslt[0].name, 'FooQualDecl1')
+        self.assertEqual(sorted_rslt[1].name, 'FooQualDecl2')
+        self.assertEqual(sorted_rslt[2].name, 'FooQualDecl3')
+
+
+# TODO: move this to pytest
+class SplitTestNone(object):  # pylint: disable=useless-object-inheritance
     """Test splitting input parameters"""
 
     def split_test(self, input_str, exp_result):
@@ -448,7 +756,8 @@ class SplitTestNone(object):
         # self.split_test('abc,de f', ['abc','de f'])
 
 
-class KVPairParsingTest(object):
+# TODO: move this to pytest
+class KVPairParsingTest(object):  # pylint: disable=useless-object-inheritance
     "Test parsing key/value pairs on input"
 
     def execute_test(self, test_string, exp_name, exp_value):
@@ -807,7 +1116,7 @@ def string_instance(tst_str):
     # * exp_rtn: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-TESTCASES_FMT_INSTANCE_AS_TABLE = [
+TESTCASES_FMT_INSTANCE_AS_ROWS = [
     (
         "Verify simple instance to table",
         dict(
@@ -912,12 +1221,14 @@ TESTCASES_FMT_INSTANCE_AS_TABLE = [
 
 ]
 
+# TODO: See line 973. We have some test duplication.
+
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_FMT_INSTANCE_AS_TABLE)
+    TESTCASES_FMT_INSTANCE_AS_ROWS)
 @simplified_test_function
-def test_format_insts_as_table(testcase, args, kwargs, exp_rtn):
+def test_format_insts_as_rows(testcase, args, kwargs, exp_rtn):
     """
     Test the output of the common:format_insts_as_table function
     """
@@ -1001,6 +1312,8 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
     """
     # TODO fix simplified_test_function so we can use so we capture output.
     # capsys in a builtin fixture that must be passed to this function.
+    # Currently the simplified_test_function does not allow any other
+    # parameters so we cannot use pytest capsys
 
     # The code to be tested
     _print_instances_as_table(*args, **kwargs)

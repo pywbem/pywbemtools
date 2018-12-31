@@ -28,7 +28,7 @@ from pywbem import Error, DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
     DEFAULT_LOG_DETAIL_LEVEL
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, pick_from_list, format_table, \
+from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
     verify_operation
 from ._common_options import add_options, verify_option
 from ._pywbem_server import PywbemServer
@@ -385,8 +385,8 @@ def cmd_connection_select(context, name):
         conn_names = list(six.viewkeys(pywbemcli_servers))
         conn_names = sorted(conn_names)
         if conn_names:
-            name = pick_from_list(context, conn_names,
-                                  "Select a connection or Ctrl_C to abort.")
+            name = pick_one_from_list(context, conn_names,
+                                      "Select a connection or Ctrl_C to abort.")
         else:
             raise click.ClickException(
                 'Connection repository empty' % name)
@@ -432,8 +432,8 @@ def cmd_connection_delete(context, name, options):
                 'No names defined in connection file' % name)
 
         context.spinner.stop()
-        name = pick_from_list(context, conn_names,
-                              "Select a connection or CTRL_C to abort.")
+        name = pick_one_from_list(context, conn_names,
+                                  "Select a connection or CTRL_C to abort.")
 
     # name defined. Test if in servers.
     if name in pywbemcli_servers:
