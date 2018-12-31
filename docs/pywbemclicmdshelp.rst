@@ -48,7 +48,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       attempts to retrieve the connection
                                       information from persistent storage. If the
                                       server option exists that is used as the
-                                      connection
+                                      connection name
       -d, --default_namespace TEXT    Default Namespace to use in the target
                                       WBEMServer if no namespace is defined in the
                                       subcommand(EnvVar:
@@ -320,8 +320,8 @@ The following defines the help output for the `pywbemcli class find --help` subc
       Find all classes that match CLASSNAME-REGEX.
 
       Find all classes in the namespace(s) of the target WBEMServer that match
-      the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
-      argument is required.
+      the CLASSNAME-REGEX regular expression argument and return the classnames.
+      The CLASSNAME-REGEX argument is required.
 
       The CLASSNAME-REGEX argument may be either a complete classname or a
       regular expression that can be matched to one or more classnames. To limit
@@ -329,7 +329,8 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
       The regular expression is anchored to the beginning of the classname and
       is case insensitive. Thus, `pywbem_` returns all classes that begin with
-      `PyWBEM_`, `pywbem_`, etc.
+      `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include the
+      case insensitive string `system`.
 
       The namespace option limits the search to the defined namespace. Otherwise
       all namespaces in the target server are searched.
@@ -749,13 +750,15 @@ The following defines the help output for the `pywbemcli connection select --hel
       Select a connection from defined connections.
 
       Selects a connection from the persistently stored set of named connections
-      if NAME exists in the store.
+      if NAME exists in the store. The name argument is optional.  If not
+      supplied, a list of connections from the connections definition file is
+      presented with a prompt for the user to select a name
 
       Examples:
 
          connection select <name>    # select the defined <name>
 
-         connection select       # presents select list to pick connection
+         connection select           # presents select list to pick connection
 
     Options:
       -h, --help  Show this message and exit.
