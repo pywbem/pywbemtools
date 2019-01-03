@@ -488,7 +488,7 @@ def cmd_class_find(context, classname, options):
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
             for row in rows:
-                print('  %s:%s' % (row[0], row[1]))
+                click.echo('  %s:%s' % (row[0], row[1]))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

@@ -517,9 +517,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate names CIM_Foo -o',
      ['enumerate', 'CIM_Foo', '-o'],
-     {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
-                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
+     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -979,9 +979,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '', '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
                  '="/root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member'
                  '="/root/cimv2:TST_Person.name=\\"Mike\\""'],
       'rc': 0,
@@ -992,7 +992,8 @@ TEST_CASES = [
      'valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1002,7 +1003,8 @@ TEST_CASES = [
      'valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '-o', '-s',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1012,7 +1014,8 @@ TEST_CASES = [
      'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1081,8 +1084,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person.name="Sofi"',
-                 '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Person.name="Sofi"',
+                 '', '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'],
       'rc': 0,
       'test': 'lines'},
