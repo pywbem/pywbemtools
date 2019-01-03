@@ -714,6 +714,7 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
                 raise click.ClickException("Cannot print %s as table" %
                                            type(objects[0]))
         else:
+            # recursively call to display each object
             for obj in objects:
                 display_cim_objects(context, obj, output_format=output_format)
         return
@@ -732,8 +733,11 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
         try:
             click.echo(object_.tomof())
         except AttributeError:
-            if isinstance(object_, (CIMInstanceName, CIMClassName,
-                                    six.string_types)):
+            # insert space between instance names for readability
+            if isinstance(object_, CIMInstanceName):
+                click.echo("")
+                click.echo(object_)
+            elif isinstance(object_, (CIMClassName, six.string_types)):
                 click.echo(object_)
             else:
                 raise click.ClickException('output_format %s invalid for %s '

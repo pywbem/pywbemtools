@@ -227,14 +227,14 @@ TEST_CASES = [
 
     ['Verify class subcommand enumerate CIM_Foo -o names only',
      ['enumerate', 'CIM_Foo', '-o'],
-     {'stdout': 'CIM_Foo',
-      'test': 'startswith'},
+     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo --names_only',
      ['enumerate', 'CIM_Foo', '--names_only'],
-     {'stdout': 'CIM_Foo',
-      'test': 'startswith'},
+     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo summary',
@@ -252,7 +252,7 @@ TEST_CASES = [
     ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
      ['enumerate', 'CIM_Foo', '-do'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
-      'test': 'patterns'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo include qualifiers',

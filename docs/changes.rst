@@ -44,12 +44,12 @@ Bug fixes
   connections so the user can maintain a list of WBEM servers that can be easily
   referenced rather than having to type them in.(issue # 6))
 
+* Fix issue where cmd line log option was not passed to named connections or
+  when connection select used.
+
 
 Build, test, quality
 ^^^^^^^^^^^^^^^^^^^^
 
 Documentation
 ^^^^^^^^^^^^^
-
-
-
