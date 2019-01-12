@@ -89,7 +89,8 @@ def class_get(context, classname, **options):
     The --includeclassorigin, --includeclassqualifiers, and --propertylist
     options determine what parts of the class definition are tetrieved.
 
-    The --output option determines the output format for the display.
+    Results are formatted as defined by the output format global option.
+
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 
@@ -178,6 +179,8 @@ def class_enumerate(context, classname, **options):
 
     The deepinheritance option defines whether the complete hiearchy is
     retrieved or just the next level in the hiearchy.
+
+    Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
                                                     options))
@@ -187,10 +190,15 @@ def class_enumerate(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-R', '--resultclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the classname provided.')
+              help='Filter by the result classname provided. Each returned '
+                   'class (or classname) should be this class or its '
+                   'subclasses. Optional.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
-              help='Filter by the role name provided.')
+              help='Filter by the role name provided. Each returned class '
+                   '(or classname) should refer to the target instance through '
+                   'a property with a name that matches the value of this '
+                   'parameter. Optional.')
 @add_options(includeclassqualifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -203,9 +211,11 @@ def class_references(context, classname, **options):
     """
     Get the reference classes for CLASSNAME.
 
-    Get the reference classes (or their classnames) for the CLASSNAME argument
-    filtered by the role and result class options and modified  by the
+    Get the reference classes (or class names) for the CLASSNAME argument
+    filtered by the role and result class options and modified by the
     other options.
+
+    Results are displayed as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_class_references(context, classname,
                                                      options))
@@ -215,16 +225,28 @@ def class_references(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-a', '--assocclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the associated class name provided.')
+              help='Filter by the association class name provided. Each '
+                   'returned class (or class name) should be associated to the '
+                   'source class through this class or its subclasses. '
+                   'Optional.')
 @click.option('-c', '--resultclass', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the result class name provided.')
+              help='Filter by the association result class name provided. Each '
+                   'returned class (or class name) should be this class or one '
+                   'of its subclasses. Optional')
 @click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
-              help='Filter by the role name provided.')
+              help='Filter by the role name provided. Each returned class '
+              '(or class name)should be associated with the source class '
+              '(CLASSNAME) through an association with this role (property '
+              'name in the association that matches this parameter). Optional.')
 @click.option('-R', '--resultrole', type=str, required=False,
               metavar='<role name>',
-              help='Filter by the role name provided.')
+              help='Filter by the result role name provided. Each returned '
+              'class (or class name)should be associated with the source class '
+              '(CLASSNAME) through an association with returned object having '
+              'this role (property name in the association that matches this '
+              'parameter). Optional.')
 @add_options(includeclassqualifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -237,11 +259,11 @@ def class_associators(context, classname, **options):
     """
     Get the associated classes for CLASSNAME.
 
-    Get the classes(or classnames) that are associated with the CLASSNAME
+    Get the classes(or class names) that are associated with the CLASSNAME
     argument filtered by the --assocclass, --resultclass, --role and
-    --resultrole options.
+    --resultrole options and modified by the other options.
 
-    Results are displayed as defined by the output format global option.
+    Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_class_associators(context, classname,
                                                       options))
@@ -302,7 +324,7 @@ def class_tree(context, classname, **options):
     if the --superclasses options is specified and a CLASSNAME is defined
     the class hiearchy of superclasses leading to CLASSNAME is displayed.
 
-    This is a separate subcommand because t is tied specifically to displaying
+    This is a separate subcommand because it is tied specifically to displaying
     in a tree format.so that the --output-format global option is ignored.
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
@@ -486,7 +508,7 @@ def cmd_class_find(context, classname, options):
             # their namespaces in the form <namespace>:<classname>
             context.spinner.stop()
             for row in rows:
-                print('  %s:%s' % (row[0], row[1]))
+                click.echo('  %s:%s' % (row[0], row[1]))
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

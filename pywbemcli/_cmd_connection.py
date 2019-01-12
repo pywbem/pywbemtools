@@ -375,7 +375,6 @@ def cmd_connection_select(context, name):
     Select an existing connection to use as the current WBEM Server. This
     command accepts the click_context since it updates that context.
     """
-    print('SEL CONTEXT %s' % context)
     pywbemcli_servers = get_pywbemcli_servers()
     if not name:
         # get all names from dictionary
@@ -389,15 +388,6 @@ def cmd_connection_select(context, name):
             raise click.ClickException(
                 'Connection repository empty' % name)
 
-    # set this name as the defined connection name for any other
-    # repl cmds.
-    # if name in pywbemcli_servers:
-        # INTER_CMD_VARIABLES['name'] = name
-        # print('INTER_CMD2 %s' % INTER_CMD_VARIABLES)
-
-    # else:
-        # raise click.ClickException(
-            # '%s not a defined connection name' % name)
     if name in pywbemcli_servers:
         pywbem_server = pywbemcli_servers[name]
         new_ctx = ContextObj(pywbem_server,
@@ -405,6 +395,7 @@ def cmd_connection_select(context, name):
                              pywbem_server.use_pull_ops,
                              pywbem_server.pull_max_cnt,
                              context.timestats,
+                             context.log,
                              context.verbose)
         ctx = click.get_current_context()
         ctx.obj = new_ctx

@@ -140,10 +140,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @ click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
                envvar=PywbemServer.log_envvar,
                help='Enable logging of CIM Operations and set a component to '
-                    'a log level, destination, and detail level\n'
-                    '(COMP: [{c}], Default: {cd}) '
-                    'DEST: [{d}], Default: {dd}) '
-                    'DETAIL:[{dl}], Default: {dll})'
+                    'a log level, destination, and detail level.\n'
+                    'COMP: [{c}], Default: {cd}\n'
+                    'DEST: [{d}], Default: {dd}\n'
+                    'DETAIL:[{dl}], Default: {dll}'
                     .format(c='|'.join(LOGGER_SIMPLE_NAMES),
                             cd='all',
                             d='|'.join(LOG_DESTINATIONS),
@@ -252,6 +252,9 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             if name:
                 if name in pywbemcli_servers:
                     pywbem_server = pywbemcli_servers[name]
+                    # NOTE: The log definition is only for this session.
+                    if log:
+                        pywbem_server._log = log
                 else:
                     raise click.ClickException('%s named connection does not '
                                                'exist' % name)
@@ -272,13 +275,15 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             verbose = ctx.obj.verbose
         if timestats is None:
             timestats = ctx.obj.timestats
+        if log is None:
+            log = ctx.obj.log
 
     # Create a command context for each command: An interactive command has
     # its own command context different from the command context for the
     # command line.
 
     ctx.obj = ContextObj(pywbem_server, output_format, use_pull_ops,
-                         pull_max_cnt, timestats, verbose)
+                         pull_max_cnt, timestats, log, verbose)
 
     # Invoke default command
     if ctx.invoked_subcommand is None:

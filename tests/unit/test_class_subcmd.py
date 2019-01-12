@@ -66,6 +66,8 @@ CLS_ENUM_HELP = """Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
   The deepinheritance option defines whether the complete hiearchy is
   retrieved or just the next level in the hiearchy.
 
+  Results are formatted as defined by the output format global option.
+
 Options:
   -d, --deepinheritance     Return complete subclass hierarchy for this class
                             if set. Otherwise retrieve only the next hierarchy
@@ -132,8 +134,9 @@ CLASS_TREE_HELP = """Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
   if the --superclasses options is specified and a CLASSNAME is defined the
   class hiearchy of superclasses leading to CLASSNAME is displayed.
 
-  This is a separate subcommand because t is tied specifically to displaying
-  in a tree format.so that the --output-format global option is ignored.
+  This is a separate subcommand because it is tied specifically to
+  displaying in a tree format.so that the --output-format global option is
+  ignored.
 
 Options:
   -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
@@ -228,14 +231,14 @@ TEST_CASES = [
 
     ['Verify class subcommand enumerate CIM_Foo -o names only',
      ['enumerate', 'CIM_Foo', '-o'],
-     {'stdout': 'CIM_Foo',
-      'test': 'startswith'},
+     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo --names_only',
      ['enumerate', 'CIM_Foo', '--names_only'],
-     {'stdout': 'CIM_Foo',
-      'test': 'startswith'},
+     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo summary',
@@ -253,7 +256,7 @@ TEST_CASES = [
     ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
      ['enumerate', 'CIM_Foo', '-do'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
-      'test': 'patterns'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo include qualifiers',
@@ -535,14 +538,14 @@ TEST_CASES = [
      {'stdout': ['Usage: pywbemcli class associators [COMMAND-OPTIONS] '
                  'CLASSNAME',
                  'Get the associated classes for CLASSNAME.',
-                 '-a, --assocclass <class name>   Filter by the associated '
+                 '-a, --assocclass <class name>   Filter by the association '
                  'class name',
-                 '-c, --resultclass <class name>  Filter by the result class '
-                 'name provided.',
+                 '-c, --resultclass <class name>  Filter by the association '
+                 'result class name',
                  '-r, --role <role name>          Filter by the role name '
                  'provided.',
-                 '-R, --resultrole <role name>    Filter by the role name '
-                 'provided.',
+                 '-R, --resultrole <role name>    Filter by the result role '
+                 'name provided.',
                  '--no-qualifiers',
                  '-c, --includeclassorigin', ],
       'test': 'in'},
@@ -558,8 +561,8 @@ TEST_CASES = [
      {'stdout': ['Usage: pywbemcli class references [COMMAND-OPTIONS] '
                  'CLASSNAME',
                  'Get the reference classes for CLASSNAME.',
-                 '-R, --resultclass <class name>  Filter by the classname '
-                 'provided.',
+                 '-R, --resultclass <class name>  Filter by the result '
+                 'classname provided.',
                  '-r, --role <role name>          Filter by the role name '
                  'provided.',
                  '--no-qualifiers',

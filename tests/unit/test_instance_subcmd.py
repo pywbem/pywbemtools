@@ -68,6 +68,8 @@ INST_ENUM_HELP = """Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSN
   Displays the returned instances in mof, xml, or table formats or the
   instance names as a string or XML formats (--names-only option).
 
+  Results are formatted as defined by the output format global option.
+
 Options:
   -l, --localonly                 Show only local properties of the class.
   -d, --deepinheritance           If set, requests server to return properties
@@ -100,8 +102,8 @@ INST_GET_HELP = """Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
 
-  Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
-  to the instance name of the desired instance. This may be supplied
+  Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
+  resolve to the instance name of the desired instance. This may be supplied
   directly as an untyped wbem_uri formatted string or through the
   --interactive option. The wbemuri may contain the namespace or the
   namespace can be supplied with the --namespace option. If no namespace is
@@ -110,6 +112,8 @@ INST_GET_HELP = """Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   This method may be executed interactively by providing only a classname
   and the interactive option (-i).
+
+  Results are formatted as defined by the output format global option.
 
 Options:
   -l, --localonly                 Show only local properties of the returned
@@ -131,7 +135,7 @@ Options:
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
-  -i, --interactive               If set, INSTANCENAME argument must be a
+  -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
                                   class from which the instance to process is
@@ -179,10 +183,10 @@ INST_DELETE_HELP = """Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANC
   interactive option.
 
 Options:
-  -i, --interactive       If set, INSTANCENAME argument must be a class rather
-                          than an instance and user is presented with a list
-                          of instances of the class from which the instance to
-                          process is selected.
+  -i, --interactive       If set, `INSTANCENAME` argument must be a class
+                          rather than an instance and user is presented with a
+                          list of instances of the class from which the
+                          instance to process is selected.
   -n, --namespace <name>  Namespace to use for this operation. If defined that
                           namespace overrides the general options namespace
   -h, --help              Show this message and exit.
@@ -221,20 +225,29 @@ Options:
 
 INST_REFERENCES_HELP = """Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
-   Get the reference instances or names.
+  Get the reference instances or names.
 
-   Gets the reference instances or instance names(--names-only option) for a
-   target `INSTANCENAME` in the target WBEM server filtered by the  `role`
-   and `resultclass` options.
+  Gets the reference instances or instance names(--names-only option) for a
+  target `INSTANCENAME` in the target WBEM server filtered by the `role` and
+  `resultclass` options.
 
   This may be executed interactively by providing only a class name for
   `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
-  of instances names in the class from which one can be chosen as the
+  of instances names in the class from which you can be chosen as the
   target.
+
+  Results are formatted as defined by the output format global option.
 
 Options:
   -R, --resultclass <class name>  Filter by the result class name provided.
-  -r, --role <role name>          Filter by the role name provided.
+                                  Each returned instance (or instance name)
+                                  should be a member of this class or its
+                                  subclasses. Optional
+  -r, --role <role name>          Filter by the role name provided. Each
+                                  returned instance (or instance name) should
+                                  refer to the target instance through a
+                                  property with aname that matches the value
+                                  of this parameter. Optional.
   -q, --includequalifiers         If set, requests server to include
                                   qualifiers in the returned instance(s).
   -c, --includeclassorigin        Include classorigin in the result.
@@ -253,7 +266,7 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   -s, --sort                      Sort into alphabetical order by classname.
-  -i, --interactive               If set, INSTANCENAME argument must be a
+  -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
                                   class from which the instance to process is
@@ -297,7 +310,7 @@ Options:
                                   server uses the propertylist to limit
                                   changes made to the instance to properties
                                   in the propertylist.
-  -i, --interactive               If set, INSTANCENAME argument must be a
+  -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
                                   class from which the instance to process is
@@ -316,19 +329,38 @@ INST_ASSOCIATORS_HELP = """Usage: pywbemcli instance associators [COMMAND-OPTION
   Get associated instances or names.
 
   Returns the associated instances or names (--names-only option) for the
-  INSTANCENAME argument filtered by the --assocclass, --resultclass, --role
-  and --resultrole options.
+  `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
+  --role and --resultrole options.
 
   This may be executed interactively by providing only a classname and the
   interactive option. Pywbemcli presents a list of instances in the class
   from which one can be chosen as the target.
 
+  Results are formatted as defined by the output format global option.
+
 Options:
-  -a, --assocclass <class name>   Filter by the associated instancename
-                                  provided.
+  -a, --assocclass <class name>   Filter by the association class name
+                                  provided.Each returned instance (or instance
+                                  name) should be associated to the source
+                                  instance through this class or its
+                                  subclasses. Optional.
   -c, --resultclass <class name>  Filter by the result class name provided.
-  -R, --role <role name>          Filter by the role name provided.
-  -R, --resultrole <class name>   Filter by the result role name provided.
+                                  Each returned instance (or instance name)
+                                  should be a member of this class or one of
+                                  its subclasses. Optional
+  -r, --role <role name>          Filter by the role name provided. Each
+                                  returned instance (or instance name)should
+                                  be associated with the source instance
+                                  (INSTANCENAME) through an association with
+                                  this role (property name in the association
+                                  that matches this parameter). Optional.
+  -R, --resultrole <role name>    Filter by the result role name provided.
+                                  Each returned instance (or instance
+                                  name)should be associated with the source
+                                  instance name (`INSTANCENAME`) through an
+                                  association with returned object having this
+                                  role (property name in the association that
+                                  matches this parameter). Optional.
   -q, --includequalifiers         If set, requests server to include
                                   qualifiers in the returned instance(s).
   -c, --includeclassorigin        Include classorigin in the result.
@@ -347,7 +379,7 @@ Options:
                                   defined that namespace overrides the general
                                   options namespace
   -s, --sort                      Sort into alphabetical order by classname.
-  -i, --interactive               If set, INSTANCENAME argument must be a
+  -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
                                   class from which the instance to process is
@@ -386,7 +418,7 @@ Options:
                               parameter to be included in the new instance.
                               Array parameter values defined by comma-
                               separated-values. EmbeddedInstance not allowed.
-  -i, --interactive           If set, INSTANCENAME argument must be a class
+  -i, --interactive           If set, `INSTANCENAME` argument must be a class
                               rather than an instance and user is presented
                               with a list of instances of the class from which
                               the instance to process is selected.
@@ -517,9 +549,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate names CIM_Foo -o',
      ['enumerate', 'CIM_Foo', '-o'],
-     {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
-                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
+     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -979,9 +1011,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '', '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
                  '="/root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member'
                  '="/root/cimv2:TST_Person.name=\\"Mike\\""'],
       'rc': 0,
@@ -992,7 +1024,8 @@ TEST_CASES = [
      'valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1002,7 +1035,8 @@ TEST_CASES = [
      'valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '-o', '-s',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1012,7 +1046,8 @@ TEST_CASES = [
      'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
       'test': 'lines'},
@@ -1081,8 +1116,9 @@ TEST_CASES = [
 
     ['Verify instance subcommand associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person.name="Sofi"',
-                 '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
+     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Person.name="Sofi"',
+                 '', '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
+                 '',
                  '//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'],
       'rc': 0,
       'test': 'lines'},

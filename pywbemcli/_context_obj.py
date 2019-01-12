@@ -46,7 +46,7 @@ class ContextObj(object):
     """
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
-                 pull_max_cnt, timestats, verbose):
+                 pull_max_cnt, timestats, log, verbose):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -55,6 +55,7 @@ class ContextObj(object):
         self._verbose = verbose
         self._timestats = timestats
         self._spinner = click_spinner.Spinner()
+        self._log = log
 
     def __repr__(self):
         return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
@@ -101,6 +102,13 @@ class ContextObj(object):
         """
         # This is created in wbemserver and retained there.
         return self._pywbem_server.conn
+
+    @property
+    def log(self):
+        """
+        :term:`string`: log definition from cmd line
+        """
+        return self._log
 
     @property
     def wbem_server(self):

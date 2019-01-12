@@ -184,18 +184,35 @@ The following defines the help output for the `pywbemcli class associators --hel
 
       Get the associated classes for CLASSNAME.
 
-      Get the classes(or classnames) that are associated with the CLASSNAME
+      Get the classes(or class names) that are associated with the CLASSNAME
       argument filtered by the --assocclass, --resultclass, --role and
-      --resultrole options.
+      --resultrole options and modified by the other options.
 
-      Results are displayed as defined by the output format global option.
+      Results are formatted as defined by the output format global option.
 
     Options:
-      -a, --assocclass <class name>   Filter by the associated class name
-                                      provided.
-      -c, --resultclass <class name>  Filter by the result class name provided.
-      -r, --role <role name>          Filter by the role name provided.
-      -R, --resultrole <role name>    Filter by the role name provided.
+      -a, --assocclass <class name>   Filter by the association class name
+                                      provided. Each returned class (or class
+                                      name) should be associated to the source
+                                      class through this class or its subclasses.
+                                      Optional.
+      -c, --resultclass <class name>  Filter by the association result class name
+                                      provided. Each returned class (or class
+                                      name) should be this class or one of its
+                                      subclasses. Optional
+      -r, --role <role name>          Filter by the role name provided. Each
+                                      returned class (or class name)should be
+                                      associated with the source class (CLASSNAME)
+                                      through an association with this role
+                                      (property name in the association that
+                                      matches this parameter). Optional.
+      -R, --resultrole <role name>    Filter by the result role name provided.
+                                      Each returned class (or class name)should be
+                                      associated with the source class (CLASSNAME)
+                                      through an association with returned object
+                                      having this role (property name in the
+                                      association that matches this parameter).
+                                      Optional.
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
                                       default behavior is to request include
@@ -284,6 +301,8 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       The deepinheritance option defines whether the complete hiearchy is
       retrieved or just the next level in the hiearchy.
 
+      Results are formatted as defined by the output format global option.
+
     Options:
       -d, --deepinheritance     Return complete subclass hierarchy for this class
                                 if set. Otherwise retrieve only the next hierarchy
@@ -371,7 +390,7 @@ The following defines the help output for the `pywbemcli class get --help` subco
       The --includeclassorigin, --includeclassqualifiers, and --propertylist
       options determine what parts of the class definition are tetrieved.
 
-      The --output option determines the output format for the display.
+      Results are formatted as defined by the output format global option.
 
     Options:
       -l, --localonly                 Show only local properties of the class.
@@ -447,13 +466,21 @@ The following defines the help output for the `pywbemcli class references --help
 
       Get the reference classes for CLASSNAME.
 
-      Get the reference classes (or their classnames) for the CLASSNAME argument
-      filtered by the role and result class options and modified  by the other
+      Get the reference classes (or class names) for the CLASSNAME argument
+      filtered by the role and result class options and modified by the other
       options.
 
+      Results are displayed as defined by the output format global option.
+
     Options:
-      -R, --resultclass <class name>  Filter by the classname provided.
-      -r, --role <role name>          Filter by the role name provided.
+      -R, --resultclass <class name>  Filter by the result classname provided.
+                                      Each returned class (or classname) should be
+                                      this class or its subclasses. Optional.
+      -r, --role <role name>          Filter by the role name provided. Each
+                                      returned class (or classname) should refer
+                                      to the target instance through a property
+                                      with a name that matches the value of this
+                                      parameter. Optional.
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
                                       default behavior is to request include
@@ -506,8 +533,9 @@ The following defines the help output for the `pywbemcli class tree --help` subc
       if the --superclasses options is specified and a CLASSNAME is defined the
       class hiearchy of superclasses leading to CLASSNAME is displayed.
 
-      This is a separate subcommand because t is tied specifically to displaying
-      in a tree format.so that the --output-format global option is ignored.
+      This is a separate subcommand because it is tied specifically to
+      displaying in a tree format.so that the --output-format global option is
+      ignored.
 
     Options:
       -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
@@ -893,19 +921,38 @@ The following defines the help output for the `pywbemcli instance associators --
       Get associated instances or names.
 
       Returns the associated instances or names (--names-only option) for the
-      INSTANCENAME argument filtered by the --assocclass, --resultclass, --role
-      and --resultrole options.
+      `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
+      --role and --resultrole options.
 
       This may be executed interactively by providing only a classname and the
       interactive option. Pywbemcli presents a list of instances in the class
       from which one can be chosen as the target.
 
+      Results are formatted as defined by the output format global option.
+
     Options:
-      -a, --assocclass <class name>   Filter by the associated instancename
-                                      provided.
+      -a, --assocclass <class name>   Filter by the association class name
+                                      provided.Each returned instance (or instance
+                                      name) should be associated to the source
+                                      instance through this class or its
+                                      subclasses. Optional.
       -c, --resultclass <class name>  Filter by the result class name provided.
-      -R, --role <role name>          Filter by the role name provided.
-      -R, --resultrole <class name>   Filter by the result role name provided.
+                                      Each returned instance (or instance name)
+                                      should be a member of this class or one of
+                                      its subclasses. Optional
+      -r, --role <role name>          Filter by the role name provided. Each
+                                      returned instance (or instance name)should
+                                      be associated with the source instance
+                                      (INSTANCENAME) through an association with
+                                      this role (property name in the association
+                                      that matches this parameter). Optional.
+      -R, --resultrole <role name>    Filter by the result role name provided.
+                                      Each returned instance (or instance
+                                      name)should be associated with the source
+                                      instance name (`INSTANCENAME`) through an
+                                      association with returned object having this
+                                      role (property name in the association that
+                                      matches this parameter). Optional.
       -q, --includequalifiers         If set, requests server to include
                                       qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include classorigin in the result.
@@ -924,7 +971,7 @@ The following defines the help output for the `pywbemcli instance associators --
                                       defined that namespace overrides the general
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
-      -i, --interactive               If set, INSTANCENAME argument must be a
+      -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
                                       class from which the instance to process is
@@ -1040,10 +1087,10 @@ The following defines the help output for the `pywbemcli instance delete --help`
       interactive option.
 
     Options:
-      -i, --interactive       If set, INSTANCENAME argument must be a class rather
-                              than an instance and user is presented with a list
-                              of instances of the class from which the instance to
-                              process is selected.
+      -i, --interactive       If set, `INSTANCENAME` argument must be a class
+                              rather than an instance and user is presented with a
+                              list of instances of the class from which the
+                              instance to process is selected.
       -n, --namespace <name>  Namespace to use for this operation. If defined that
                               namespace overrides the general options namespace
       -h, --help              Show this message and exit.
@@ -1071,6 +1118,8 @@ The following defines the help output for the `pywbemcli instance enumerate --he
 
       Displays the returned instances in mof, xml, or table formats or the
       instance names as a string or XML formats (--names-only option).
+
+      Results are formatted as defined by the output format global option.
 
     Options:
       -l, --localonly                 Show only local properties of the class.
@@ -1116,8 +1165,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
 
       Get a single CIMInstance.
 
-      Gets the instance defined by INSTANCENAME where INSTANCENAME  must resolve
-      to the instance name of the desired instance. This may be supplied
+      Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
+      resolve to the instance name of the desired instance. This may be supplied
       directly as an untyped wbem_uri formatted string or through the
       --interactive option. The wbemuri may contain the namespace or the
       namespace can be supplied with the --namespace option. If no namespace is
@@ -1126,6 +1175,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
 
       This method may be executed interactively by providing only a classname
       and the interactive option (-i).
+
+      Results are formatted as defined by the output format global option.
 
     Options:
       -l, --localonly                 Show only local properties of the returned
@@ -1147,7 +1198,7 @@ The following defines the help output for the `pywbemcli instance get --help` su
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      -i, --interactive               If set, INSTANCENAME argument must be a
+      -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
                                       class from which the instance to process is
@@ -1197,7 +1248,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
                                   parameter to be included in the new instance.
                                   Array parameter values defined by comma-
                                   separated-values. EmbeddedInstance not allowed.
-      -i, --interactive           If set, INSTANCENAME argument must be a class
+      -i, --interactive           If set, `INSTANCENAME` argument must be a class
                                   rather than an instance and user is presented
                                   with a list of instances of the class from which
                                   the instance to process is selected.
@@ -1254,7 +1305,7 @@ The following defines the help output for the `pywbemcli instance modify --help`
                                       server uses the propertylist to limit
                                       changes made to the instance to properties
                                       in the propertylist.
-      -i, --interactive               If set, INSTANCENAME argument must be a
+      -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
                                       class from which the instance to process is
@@ -1289,6 +1340,8 @@ The following defines the help output for the `pywbemcli instance query --help` 
 
       The results of the query are displayed as mof or xml.
 
+      Results are formatted as defined by the output format global option.
+
     Options:
       -l, --querylanguage QUERY LANGUAGE
                                       Use the query language defined. (Default:
@@ -1315,20 +1368,29 @@ The following defines the help output for the `pywbemcli instance references --h
 
     Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
-       Get the reference instances or names.
+      Get the reference instances or names.
 
-       Gets the reference instances or instance names(--names-only option) for a
-       target `INSTANCENAME` in the target WBEM server filtered by the  `role`
-       and `resultclass` options.
+      Gets the reference instances or instance names(--names-only option) for a
+      target `INSTANCENAME` in the target WBEM server filtered by the `role` and
+      `resultclass` options.
 
       This may be executed interactively by providing only a class name for
       `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
-      of instances names in the class from which one can be chosen as the
+      of instances names in the class from which you can be chosen as the
       target.
+
+      Results are formatted as defined by the output format global option.
 
     Options:
       -R, --resultclass <class name>  Filter by the result class name provided.
-      -r, --role <role name>          Filter by the role name provided.
+                                      Each returned instance (or instance name)
+                                      should be a member of this class or its
+                                      subclasses. Optional
+      -r, --role <role name>          Filter by the role name provided. Each
+                                      returned instance (or instance name) should
+                                      refer to the target instance through a
+                                      property with aname that matches the value
+                                      of this parameter. Optional.
       -q, --includequalifiers         If set, requests server to include
                                       qualifiers in the returned instance(s).
       -c, --includeclassorigin        Include classorigin in the result.
@@ -1347,7 +1409,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       defined that namespace overrides the general
                                       options namespace
       -s, --sort                      Sort into alphabetical order by classname.
-      -i, --interactive               If set, INSTANCENAME argument must be a
+      -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
                                       class from which the instance to process is

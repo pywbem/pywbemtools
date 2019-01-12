@@ -383,7 +383,7 @@ flake8.log: Makefile $(flake8_rc_file) $(check_py_files)
 
 $(test_log_file): Makefile $(cli_package_name)/*.py tests/unit/*.py coveragerc
 	rm -fv $@
-	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --cov $(cli_package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit -s 2>&1 |tee $@.tmp'
+	bash -c 'set -o pipefail; PYTHONWARNINGS=default py.test --color=yes --cov $(cli_package_name) $(coverage_report) --cov-config coveragerc $(pytest_opts) --ignore=tools --ignore=tests/live_unit --ignore=attic -s 2>&1 |tee $@.tmp'
 	mv -f $@.tmp $@
 	@echo 'Done: Created test log file: $@'
 

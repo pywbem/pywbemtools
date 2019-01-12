@@ -35,7 +35,7 @@ def print_profile_info(org_vm, inst):
     org = org_vm.tovalues(inst['RegisteredOrganization'])
     name = inst['RegisteredName']
     vers = inst['RegisteredVersion']
-    print("  %s %s %s" % (org, name, vers))
+    click.echo("  %s %s %s" % (org, name, vers))
 
 
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
