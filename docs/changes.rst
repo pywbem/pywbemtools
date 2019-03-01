@@ -20,6 +20,8 @@ pywbemcli v0.5.0.dev0
 
 Released: Not yet
 
+This is the initial release of pywbemcli command line tool.
+
 Incompatible changes
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -28,8 +30,6 @@ Enhancements
 
 * Add input argument to _common.format_table to define sort of the
   rows of the table as a function of the formatting.
-
-This is the initial release of pywbemcli command line tool.
 
 Bug fixes
 ^^^^^^^^^
