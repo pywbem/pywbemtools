@@ -183,26 +183,36 @@ def filter_namelist(regex, name_list, ignore_case=True):
     """
     Filter out names in name_list that do not match compiled_regex.
 
+    The regex is defines as IGNORECASE and anchored.
+
     Note that the regex may define a subset of the name string.  Thus,  regex:
         - CIM matches any name that starts with CIM
         - CIM_abc matches any name that starts with CIM_abc
         - CIM_ABC$ matches only the name CIM_ABC.
+        - .*ABC matches any name that includes ABC
 
     Parameters:
-      regex (:term: `String`) Python regular expression to match
+      regex (:term: `String`) Python regular expression to match.
 
       name_list: List of strings to be matched.
 
       ignore_case: bool. If True, do case-insensitive match. Default = True
 
-    Returns the list of names that match.
+    Returns:
+     List of names that match.
 
+    Raises:
+        click.ClickException for regex compile error
     """
+
     flags = re.IGNORECASE if ignore_case else None
+    try:
+        cmpiled_regex = re.compile(regex, flags) if flags else re.compile(regex)
+    except re.error as er:
+        raise click.ClickException("Regex Compile Error: %s: %s" %
+                                   (er.__class__.__name__, er))
 
-    compiled_regex = re.compile(regex, flags) if flags else re.compile(regex)
-
-    new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
+    new_list = [n for n in name_list for m in[cmpiled_regex.match(n)] if m]
 
     return new_list
 

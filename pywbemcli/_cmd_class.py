@@ -279,8 +279,8 @@ def class_find(context, classname, **options):
     Find all classes that match CLASSNAME-REGEX.
 
     Find all classes in the namespace(s) of the target WBEMServer that
-    match the CLASSNAME-REGEX regular expression argument. The CLASSNAME-REGEX
-    argument is required.
+    match the CLASSNAME-REGEX regular expression argument and return the
+    classnames. The CLASSNAME-REGEX argument is required.
 
     The CLASSNAME-REGEX argument may be either a complete classname or a regular
     expression that can be matched to one or more classnames. To limit the
@@ -288,7 +288,8 @@ def class_find(context, classname, **options):
 
     The regular expression is anchored to the beginning of the classname and
     is case insensitive. Thus, `pywbem_` returns all classes that begin with
-    `PyWBEM_`, `pywbem_`, etc.
+    `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include
+    the case insensitive string `system`.
 
     The namespace option limits the search to the defined namespace. Otherwise
     all namespaces in the target server are searched.
@@ -476,7 +477,7 @@ def cmd_class_find(context, classname, options):
     a list of classes/namespaces
     """
     if options['namespace']:
-        ns_names = options['namespace']
+        ns_names = [options['namespace']]
     else:
         ns_names = context.wbem_server.namespaces
         if options['sort']:
@@ -488,11 +489,7 @@ def cmd_class_find(context, classname, options):
             classnames = context.conn.EnumerateClassNames(
                 namespace=ns, DeepInheritance=True)
             filtered_classnames = filter_namelist(classname, classnames)
-            if options['sort']:
-                filtered_classnames.sort()
             names_dict[ns] = filtered_classnames
-
-        # TODO we sort twice (above and below)
 
         rows = []
         for ns_name in names_dict:
@@ -509,6 +506,7 @@ def cmd_class_find(context, classname, options):
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
+            context.spinner.stop()
             for row in rows:
                 click.echo('  %s:%s' % (row[0], row[1]))
 
