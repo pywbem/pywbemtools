@@ -84,7 +84,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       Output format (Default: simple). pywbemcli
                                       may override the format choice depending on
                                       the operation since not all formats apply to
-                                      all output data types. For CIMstructured
+                                      all output data types. For CIM structured
                                       objects (ex. CIMInstance), the default
                                       output format is mof
       --use-pull_ops [yes|no|either]  Determines whether the pull operations are
@@ -107,10 +107,11 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       operations after  each command execution.
       -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
                                       component to a log level, destination, and
-                                      detail level
-                                      (COMP: [api|http|all], Default:
-                                      all) DEST: [file|stderr], Default: file)
-                                      DETAIL:[all|paths|summary], Default: all)
+                                      detail level.
+                                      COMP: [api|http|all], Default:
+                                      all
+                                      DEST: [file|stderr], Default: file
+                                      DETAIL:[all|paths|summary], Default: all
       -v, --verbose                   Display extra information about the
                                       processing.
       -m, --mock-server FILENAME      If this option is defined, a mock WBEM

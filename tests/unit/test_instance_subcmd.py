@@ -566,10 +566,9 @@ TEST_CASES = [
     #
     ['Verify instance subcommand enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
-     {'stderr': 'Error: CIMError: 6: Class CIM_Foox not found in namespace'
-                ' root/cimv2.',
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate error, no classname fails',
@@ -702,13 +701,12 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get error. no classname',
+    ['Verify instance subcommand get error. bad classname',
      ['get', 'CIM_Foo.InstanceID="CIM_blah"'],
      {'stderr':
-      ['Error: CIMError: 6: Instance not found in repository namespace '
-       'root/cimv2. Path=root/cimv2:CIM_Foo.InstanceID="CIM_blah"'],
+      ["Error: CIMError: 6"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -786,11 +784,8 @@ TEST_CASES = [
     ['Verify instance subcommand create, new instance already exists',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance'],
      {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
-                 'namespace "root/cimv2" in WEB ',
-                 "server: PYWBEMCLIFakedConnection\\(url=",
-                 'http://FakedUrl',
-                 "creds=None, default_namespace=",
-                 "'root/cimv2'\\)"],
+                 'namespace "root/cimv2" in WEB server: FakedWBEMConnection'
+                 ],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -798,19 +793,15 @@ TEST_CASES = [
     ['Verify instance subcommand create, new instance invalid ns',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
       'blah'],
-     {'stderr': ['Exception 3: Namespace blah not found for classes', ],
+     {'stderr': ["Error: Exception 3"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+
     ['Verify instance subcommand create, new instance invalid class',
      ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
-     {'stderr': ['Error: CIMClass: "CIM_blah" does not exist in ',
-                 'namespace "root/cimv2" in WEB server',
-                 'PYWBEMCLIFakedConnection(url=',
-                 "'http://FakedUrl', creds=None, default_namespace=",
-                 "'root/cimv2\')"
-                 ],
+     {'stderr': ["Error:", "CIMClass"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1011,50 +1002,47 @@ TEST_CASES = [
 
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '', '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'
-                 '="/root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member'
-                 '="/root/cimv2:TST_Person.name=\\"Mike\\""'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family',
+                 '"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
+                 '=\"root/cimv2:TST_Person.name=\\"Mike\\""'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '',
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '-o', '-s',
       '--resultclass', 'TST_Lineage'],
-     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '',
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
-     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '',
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short formvalid returns paths',
+     'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o', '--summary',
       '-R', 'TST_Lineage'],
      {'stdout': ['2 CIMInstanceName(s) returned'],
@@ -1062,8 +1050,8 @@ TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short formvalid returns paths',
+    ['Verify instance subcommand references -S, returns paths with resultclass '
+     'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-S',
       '-R', 'TST_Lineage'],
      {'stdout': ['2 CIMInstance(s) returned'],
@@ -1198,19 +1186,17 @@ TEST_CASES = [
     ['Verify instance subcommand invokemethod fails Invalid Class',
      ['invokemethod', ':CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter="blah"'],
-     {'stderr': ["Error: CIMError: 6: Class CIM_Foox not found in namespace "
-                 "root/cimv2."],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'regex'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify instance subcommand invokemethod fails Method not registered',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter=blah'],
-     {'stderr': ["Error: CIMError: 17: Method Fuzzy in namespace root/cimv2 "
-                 "not registered in repository"],
+     {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'regex'},
      [SIMPLE_MOCK_FILE], OK],
 
     # TODO expand the number of invokemethod tests to include all options

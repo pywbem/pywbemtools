@@ -109,7 +109,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               type=click.Choice(OUTPUT_FORMATS),
               help='Output format (Default: {of}). pywbemcli may override '
                    'the format choice depending on the operation since not '
-                   'all formats apply to all output data types. For CIM'
+                   'all formats apply to all output data types. For CIM '
                    'structured objects (ex. CIMInstance), the default output '
                    'format is mof'
               .format(of=DEFAULT_OUTPUT_FORMAT))

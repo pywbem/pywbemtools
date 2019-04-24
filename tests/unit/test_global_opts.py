@@ -63,11 +63,11 @@ class TestGlobalOptions(object):
                 None,
             ],
             [
-                ["Python file as mock setup script"],
+                ["Python file as mock setup script. Fails, no qual decls"],
                 ['simple_python_mock_script.py'],
                 None,
                 None,
-                0,
+                1,
                 None,
             ],
             [
@@ -93,8 +93,7 @@ class TestGlobalOptions(object):
             cmd_line.append(os.path.join(TEST_DIR, tst_file))
         # Because there is no quit subcommand, some command must be issued
         # to avoid going into repl mode.
-        # TODO add a subcommand quit.
-        cmd_line.extend(['class', 'enumerate'])
+        cmd_line.extend(['qualifier', 'enumerate'])
 
         rc, stdout, stderr = execute_pywbemcli(cmd_line)
 

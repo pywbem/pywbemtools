@@ -38,7 +38,6 @@ However, they should be used from the ``pywbemcli`` namespace.
 
 # This module is meant to be safe for 'import *'.
 
-from pywbem import DEFAULT_ITER_MAXOBJECTCOUNT
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
@@ -82,7 +81,7 @@ DEFAULT_URL_SCHEME = 'https'
 #: number of objects per request that will be returned if the server
 #: uses the pull operations for EnumerateInstances, AssociatorInstances,
 #: etc. Set to the same default as used by pywbem.
-DEFAULT_MAXPULLCNT = DEFAULT_ITER_MAXOBJECTCOUNT
+DEFAULT_MAXPULLCNT = 1000
 
 #: Maximum allowed connection timeout in seconds.  The environment will not
 #: allow a connection timeout value larger than this on the command line or
