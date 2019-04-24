@@ -591,7 +591,7 @@ TEST_CASES = [
     #
     ['Verify instance subcommand enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
-     {'stderr': ["Error: CIMError: 6", "CIM_ERR_NOT_FOUND"],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -826,7 +826,11 @@ TEST_CASES = [
     ['Verify instance subcommand create, new instance invalid ns',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
       'blah'],
+<<<<<<< HEAD
      {'stderr': ["Error: Exception 3", "CIM_ERR_INVALID_NAMESPACE"],
+=======
+     {'stderr': ["Error: Exception 3"],
+>>>>>>> 76f5fb3... Fix a number of test issues resulting primarily from changes to
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -834,7 +838,11 @@ TEST_CASES = [
 
     ['Verify instance subcommand create, new instance invalid class',
      ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
+<<<<<<< HEAD
      {'stderr': ["Error:", "CIMClass", "does not exist"],
+=======
+     {'stderr': ["Error:", "CIMClass"],
+>>>>>>> 76f5fb3... Fix a number of test issues resulting primarily from changes to
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1237,7 +1245,11 @@ TEST_CASES = [
       'TestInOutParameter=blah'],
      {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
+<<<<<<< HEAD
       'test': 'in'},
+=======
+      'test': 'regex'},
+>>>>>>> 76f5fb3... Fix a number of test issues resulting primarily from changes to
      [SIMPLE_MOCK_FILE], OK],
 
     # TODO expand the number of invokemethod tests to include all options

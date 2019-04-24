@@ -235,7 +235,7 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand get invalid qual decl name .',
      ['get', 'NoSuchQualDecl'],
-     {'stderr': ["Error: CIMError: 6", "not found"],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -266,7 +266,11 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand enumerate invalid namespace Fails',
      ['enumerate', '--namespace', 'root/blah'],
+<<<<<<< HEAD
      {'stderr': ["Error: CIMError: 3", "CIM_ERR_INVALID_NAMESPACE"],
+=======
+     {'stderr': ["Error: CIMError: 3"],
+>>>>>>> 76f5fb3... Fix a number of test issues resulting primarily from changes to
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
