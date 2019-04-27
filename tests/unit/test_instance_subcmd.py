@@ -476,6 +476,24 @@ GET_INST_ALL_TYPES = """instance of PyWBEM_AllTypes {
 
 """
 
+ENUM_INST_TABLE_RESP = """CIM_Foo
++--------------+---------------+
+| InstanceID   | IntegerProp   |
++==============+===============+
+| "CIM_Foo1"   | 1             |
++--------------+---------------+
+| "CIM_Foo2"   | 2             |
++--------------+---------------+
+| "CIM_Foo3"   |               |
++--------------+---------------+
+"""
+
+ENUM_INST_GET_TABLE_RESP = """CIM_Foo
+InstanceID      IntegerProp
+------------  -------------
+"CIM_Foo1"                1
+"""
+
 REF_INSTS = """instance of TST_Lineage {
    InstanceID = "MikeSofi";
    parent = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
@@ -558,6 +576,13 @@ TEST_CASES = [
     ['Verify instance subcommand enumerate deepinheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout': ENUM_INST_RESP,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand -o grid enumerate deepinheritance CIM_Foo -d',
+     {'args': ['enumerate', 'CIM_Foo', '-d'],
+      'global': ['-o', 'grid']},
+     {'stdout': ENUM_INST_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -689,6 +714,14 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
+
+
+    ['Verify instance subcommand -o grid get CIM_Foo -d',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
+      'global': ['-o', 'simple']},
+     {'stdout': ENUM_INST_GET_TABLE_RESP,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
 
     #
     #  get subcommand errors

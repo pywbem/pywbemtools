@@ -160,6 +160,16 @@ QD_TBL_OUT = """Qualifier Declarations
 +-------------+---------+---------+---------+-------------+-----------------+
 """
 
+QD_TBL_GET_OUT = """Qualifier Declarations
++----------+---------+---------+---------+-------------+----------------+
+| Name     | Type    | Value   | Array   | Scopes      | Flavors        |
++==========+=========+=========+=========+=============+================+
+| Abstract | boolean | False   | False   | CLASS       | EnableOverride |
+|          |         |         |         | ASSOCIATION | Restricted     |
+|          |         |         |         | INDICATION  |                |
++----------+---------+---------+---------+-------------+----------------+
+"""
+
 # The following variables are used to control tests executed during
 # development of tests
 OK = True      # set to OK for tests passed. Set OK = False to execute one test
@@ -241,6 +251,15 @@ TEST_CASES = [
      {'args': ['enumerate'],
       'global': ['-o', 'grid']},
      {'stdout': QD_TBL_OUT,
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify qualifier subcommand -o grid get Abstract table out',
+     {'args': ['get', 'abstract'],
+      'global': ['-o', 'grid']},
+     {'stdout': QD_TBL_GET_OUT,
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],

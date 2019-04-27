@@ -20,17 +20,24 @@ Tests for _common functions.
 
 from __future__ import absolute_import, print_function
 
+from datetime import datetime
 import unittest
 import pytest
 import click
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
-    CIMInstanceName, Uint32
+    CIMInstanceName, Uint32, Uint64, Sint32, CIMDateTime
 from pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, objects_sort, \
-    create_ciminstance, compare_instances, resolve_propertylist
+    create_ciminstance, compare_instances, resolve_propertylist, \
+    _format_instances_as_rows, _print_instances_as_table
 
 from tests.unit.pytest_extensions import simplified_test_function
+# from tests.unit.utils import assert_lines
+
+DATETIME1_DT = datetime(2014, 9, 22, 10, 49, 20, 524789)
+DATETIME1_OBJ = CIMDateTime(DATETIME1_DT)
+DATETIME1_STR = '"20140922104920.524789+000"'
 
 
 TESTCASES_RESOLVE_PROPERTYLIST = [
@@ -464,7 +471,7 @@ class KVPairParsingTest(object):
         self.execute_test('prop_name=91999', 'prop_name', str(91999))
 
 
-# TODO cvt to pytest
+# TODO; Convert this test to pytest
 class CreateCIMInstanceTest(unittest.TestCase):
     """Test the function that creates a CIMInstance from cli args"""
 
@@ -737,6 +744,273 @@ class CreateCIMInstanceTest(unittest.TestCase):
             self.fail('Expected exception to create_instance property type err')
         except click.ClickException:
             pass
+
+
+# TODO this is a pytest. param
+def simple_instance(pvalue=None):
+    """
+    Build a simple instance to test and return that instance. If the param
+    pvalue is provided it is a scalar value and the instance with just
+    this property is returned.
+    """
+    if pvalue:
+        properties = [CIMProperty("P", pvalue)]
+    else:
+        properties = [CIMProperty("Pbt", value=True),
+                      CIMProperty("Pbf", value=False),
+                      CIMProperty("Pint32", Uint32(99)),
+                      CIMProperty("Pint64", Uint64(9999)),
+                      CIMProperty("Pdt", DATETIME1_OBJ),
+                      CIMProperty("Pstr1", u"Test String")]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
+def simple_instance2(pvalue=None):
+    """
+    Build a simple instance to test and return that instance. If the param
+    pvalue is provided it is a scalar value and the instance with just
+    this property is returned.
+    """
+    if pvalue:
+        properties = [CIMProperty("P", pvalue)]
+    else:
+        properties = [CIMProperty("Pbt", value=True),
+                      CIMProperty("Pbf", value=False),
+                      CIMProperty("Puint32", Uint32(4294967295)),
+                      CIMProperty("Psint32", Sint32(-2147483648)),
+                      CIMProperty("Pint64", Uint64(9999)),
+                      CIMProperty("Pdt", DATETIME1_OBJ),
+                      CIMProperty("Pstr1", u"Test String")]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
+def string_instance(tst_str):
+    """
+    Build a CIM instance with a single property.
+    """
+    properties = [CIMProperty("Pstr1", tst_str)]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
+# Testcases for format_inst_to_table()
+
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * args: CIMInstance(s) object to be tested and col_width field
+    #   * kwargs: Dict of input args for tocimxml().
+    #   * exp_xml_str: Expected CIM-XML string, as a tuple/list of parts.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_rtn: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+TESTCASES_FMT_INSTANCE_AS_TABLE = [
+    (
+        "Verify simple instance to table",
+        dict(
+            args=([simple_instance()], None),
+            kwargs=dict(),
+            exp_rtn=[
+                ["true", "false", "99", "9999", DATETIME1_STR,
+                 u'"Test String"', ]],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance to table with col limit",
+        dict(
+            args=([simple_instance()], 30),
+            kwargs=dict(),
+            exp_rtn=[
+                ["true", "false", "99", "9999", DATETIME1_STR,
+                 u'"Test String"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance with one string all components overflow line",
+        dict(
+            args=([simple_instance(pvalue="A B C D")], 4),
+            kwargs=dict(),
+            exp_rtn=[
+                ['"A "\n"B "\n"C "\n"D"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance with one string all components overflow line",
+        dict(
+            args=([simple_instance(pvalue="ABCD")], 4),
+            kwargs=dict(),
+            exp_rtn=[
+                ['\n"AB"\n"CD"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance with one string overflows line",
+        dict(
+            args=([simple_instance(pvalue="A B C D")], 8),
+            kwargs=dict(),
+            exp_rtn=[
+                ['"A B C "\n"D"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance withone unit32 max val",
+        dict(
+            args=([simple_instance(pvalue=Uint32(4294967295))], 8),
+            kwargs=dict(),
+            exp_rtn=[
+                ['4294967295']],
+        ),
+        None, None, True, ),
+
+
+    (
+        "Verify simple instance with one string fits on line",
+        dict(
+            args=([simple_instance(pvalue="A B C D")], 12),
+            kwargs=dict(),
+            exp_rtn=[
+                ['"A B C D"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify datetime property",
+        dict(
+            args=([simple_instance(pvalue=DATETIME1_OBJ)], 20),
+            kwargs=dict(),
+            exp_rtn=[
+                ['\n"20140922104920.524"\n"789+000"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify datetime property",
+        dict(
+            args=([simple_instance(pvalue=DATETIME1_OBJ)], 30),
+            kwargs=dict(),
+            exp_rtn=[
+                ['"20140922104920.524789+000"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify integer property where len too small",
+        dict(
+            args=([simple_instance(pvalue=Uint32(999999))], 4),
+            kwargs=dict(),
+            exp_rtn=[['999999']],
+        ),
+        None, None, True, ),
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_FMT_INSTANCE_AS_TABLE)
+@simplified_test_function
+def test_format_insts_as_table(testcase, args, kwargs, exp_rtn):
+    """
+    Test the output of the common:format_insts_as_table function
+    """
+
+    # The code to be tested
+    act_rtn = _format_instances_as_rows(*args, **kwargs)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+    # result is list of lists.  we want to test each item in inner list
+
+    assert len(act_rtn) == len(exp_rtn), \
+        "Unexpected number of lines in test desc: {}:\n" \
+        "Expected line cnt={}:\n" \
+        "{}\n\n" \
+        "Actual line cnt={}:\n" \
+        "{}\n". \
+        format(testcase.desc, len(act_rtn), '\n'.join(act_rtn),
+               len(exp_rtn), '\n'.join(exp_rtn))
+
+    assert exp_rtn == act_rtn, \
+        "Unequal values for test desc: {}:\n" \
+        "Expected = {}:\n" \
+        "Actual   = {}:\n". \
+        format(testcase.desc, exp_rtn, act_rtn)
+
+
+# Testcases for format_inst_to_table()
+
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * args: CIMInstance(s) object to be tested, col_width field, ouput_fmt
+    #   * kwargs: Dict of input args for tocimxml().
+    #   * exp_tbl: Expected Table to be output.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+TESTCASES_FMT_INSTANCE_AS_TABLE = [
+    (
+        "Verify print of simple instance to table",
+        dict(
+            args=([simple_instance()], None, 'simple'),
+            kwargs=dict(),
+            exp_tbl=[
+                'Pbt    Pbf      Pint32    Pint64  Pdt                    '
+                'Pstr1\n'
+                '-----  -----  --------  --------  ---------------------  '
+                '-------------\n'
+                'true   false        99      9999  "20140922104920.5247"'
+                '  "Test String"\n'
+                '                                  "89+000"\n'
+            ],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify print of simple instance to table with col limit",
+        dict(
+            args=([simple_instance2()], 80, 'simple'),
+            kwargs=dict(),
+            exp_tbl=[
+                ["true", "false", "99", '"Test String"']],
+        ),
+        None, None, True, ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_FMT_INSTANCE_AS_TABLE)
+@simplified_test_function
+def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
+    """
+    Test the output of the print_insts_as_table function. This primarily
+    tests for overall format and the ability of the function to output to
+    stdout. The previous test tests the row formatting and handling of
+    multiple instances.
+    """
+    # TODO fix simplified_test_function so we can use so we capture output.
+    # capsys in a builtin fixture that must be passed to this function.
+
+    # The code to be tested
+    _print_instances_as_table(*args, **kwargs)
+    # stdout, stderr = capsys.readouterr()
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    # assert_lines(exp_tbl, stdout, testcase.desc)
+
 
 # TODO Test compare and failure in compare_obj
 

@@ -501,8 +501,8 @@ def cmd_class_find(context, classname, options):
         if context.output_format in TABLE_FORMATS:
             headers = ['Namespace', 'Classname']
             click.echo(format_table(rows, headers,
-                                    table_format=context.output_format,
-                                    title='Find class %s' % classname))
+                                    title='Find class %s' % classname,
+                                    table_format=context.output_format))
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>

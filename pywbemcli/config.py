@@ -41,7 +41,8 @@ However, they should be used from the ``pywbemcli`` namespace.
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
-           'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT', 'DEFAULT_URL_SCHEME']
+           'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT', 'DEFAULT_URL_SCHEME',
+           'USE_TERMINAL_WIDTH', 'DEFAULT_TABLE_WIDTH']
 
 #: Default value in seconds for a WBEMConnection to timeout if the value
 #: is not set by an input parameter.
@@ -87,3 +88,14 @@ DEFAULT_MAXPULLCNT = 1000
 #: allow a connection timeout value larger than this on the command line or
 #: internal option for timeout.
 MAX_TIMEOUT = 300
+
+#: If True, the table formatter uses the terminal width as the maximum width
+#: of a table. If False it uses the DEFAULT_TABLE_WIDTH config variable. This
+#: sets the maximum width of table output. The table formatter tries to
+#: build any table output within this character width.
+USE_TERMINAL_WIDTH = True
+
+#: Default maximum character width of tables if USE_TERMINAL_WIDTH is NOT set.
+#: If this variable is an integer, that is the maximum width. If None, tables
+#: are output with no limit on width.
+DEFAULT_TABLE_WIDTH = 150
