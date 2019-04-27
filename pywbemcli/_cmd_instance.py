@@ -804,8 +804,8 @@ def cmd_instance_count(context, classname, options):
             rows.append([item[0], item[1]])
     context.spinner.stop()
     click.echo(format_table(rows, headers,
-                            table_format=context.output_format,
-                            title='Count of instances per class'))
+                            title='Count of instances per class',
+                            table_format=context.output_format))
 
 
 def cmd_instance_query(context, query, options):
