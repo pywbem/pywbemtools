@@ -633,7 +633,6 @@ def cmd_instance_enumerate(context, classname, options):
     Enumerate CIM instances or CIM instance names
 
     """
-    print("OPTIONS %s" % options)
     try:
         if options['names_only']:
             results = context.conn.EnumerateInstanceNames(
