@@ -26,7 +26,7 @@ from subprocess import Popen, PIPE
 import six
 
 
-def execute_pywbemcli(args, env=None, stdin=None):
+def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     """
     Invoke the 'pywbemcli' command as a child process.
 
@@ -49,6 +49,9 @@ def execute_pywbemcli(args, env=None, stdin=None):
 
       stdin: (:term:`string` or None):
         Passed to the executable as stdin.
+
+      verbose: (bool)
+        If True, display args before calling cli
 
     Returns:
 
@@ -95,6 +98,9 @@ def execute_pywbemcli(args, env=None, stdin=None):
             arg = arg.decode('utf-8')
         cmd_args.append(arg)
 
+    if verbose:
+        print("execute_pywbemcli CMD_ARGS %s" % cmd_args)
+
     # Note that the click package on Windows writes '\n' at the Python level
     # as '\r\n' at the level of the shell. Some other layer (presumably the
     # Windows shell) contriubutes another such translation, so we end up with
@@ -103,6 +109,9 @@ def execute_pywbemcli(args, env=None, stdin=None):
                  universal_newlines=True)
     stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
+
+    if verbose:
+        print("execute_pywbemcli rc = %s" % rc)
 
     if isinstance(stdout_str, six.binary_type):
         stdout_str = stdout_str.decode('utf-8')

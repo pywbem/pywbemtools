@@ -213,8 +213,8 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand enumerate summary returns qual decls.',
      ['enumerate', '--summary'],
-     {'stdout': '9 CIMQualifierDeclaration(s) returned',
-      'test': 'lines'},
+     {'stdout': ['9', 'CIMQualifierDeclaration'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier subcommand get  Description',
@@ -225,10 +225,9 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand get invalid qual decl name .',
      ['get', 'NoSuchQualDecl'],
-     {'stderr': "Error: CIMError: 6: Qualifier declaration NoSuchQualDecl not "
-                "found in namespace root/cimv2.",
+     {'stderr': ["Error: CIMError: 6", "not found"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier subcommand get  Description outputformat xml',
@@ -248,10 +247,9 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand enumerate invalid namespace Fails',
      ['enumerate', '--namespace', 'root/blah'],
-     {'stderr': "Error: CIMError: 3: Namespace root/blah not found for "
-                "qualifiers",
+     {'stderr': ["Error: CIMError: 3", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier subcommand --timestats gets stats output. Cannot test'

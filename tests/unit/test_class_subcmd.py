@@ -243,14 +243,14 @@ TEST_CASES = [
 
     ['Verify class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '-S'],
-     {'stdout': '2 CIMClass(s) returned',
-      'test': 'startswith'},
+     {'stdout': ['2 CIMClass(s) returned'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '--summary'],
-     {'stdout': '2 CIMClass(s) returned',
-      'test': 'startswith'},
+     {'stdout': ['2 CIMClass(s) returned'],
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
@@ -524,8 +524,7 @@ TEST_CASES = [
 
     ['Verify class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
-     {'stderr': ['CIMError:', 'Class CIM_Foo_subx not found in namespace',
-                 'root/cimv2.'],
+     {'stderr': ['CIMError:', 'not found'],
       'rc': 1,
       'test': 'regex'},
 
@@ -556,7 +555,7 @@ TEST_CASES = [
     #
     # references subcommand tests
     #
-    ['Verify class subcommand reference --help, . ',
+    ['Verify class subcommand references --help, . ',
      ['references', '--help'],
      {'stdout': ['Usage: pywbemcli class references [COMMAND-OPTIONS] '
                  'CLASSNAME',
@@ -603,27 +602,24 @@ TEST_CASES = [
 
     ['Verify class subcommand invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
-     {'stderr': ["Error: CIMError: 6: Class CIM_Foox not found in namespace "
-                 "root/cimv2."],
+     {'stderr': ["Error: CIMError: 6", "CIM_ERR_NOT_FOUND"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class subcommand invokemethod fails Invalid Method',
      ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
-     {'stderr': ["Error: CIMError: 17: Method Fuzzyx not in class CIM_Foo in "
-                 "server"],
+     {'stderr': ["Error: CIMError: 17", "CIM_ERR_METHOD_NOT_FOUND"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
 
     ['Verify class subcommand invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stderr': ["Error: CIMError: 17: Method Fuzzy in namespace root/cimv2 "
-                 "not registered in repository"],
+     {'stderr': ["Error: CIMError: 17", "CIM_ERR_METHOD_NOT_FOUND"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'in'},
      [SIMPLE_MOCK_FILE], OK],
 
     ['Verify  --timestats gets stats output. Cannot test '

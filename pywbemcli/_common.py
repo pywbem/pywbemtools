@@ -640,9 +640,10 @@ def display_cim_objects_summary(context, objects):
     count.
     """
     context.spinner.stop()
-
-    output_format = 'table' if context.output_format is 'None' else \
-        context.output_format
+    if context.output_format:
+        output_format = context.output_format
+    else:
+        output_format = 'mof'
 
     if objects:
         cim_type = get_cimtype(objects)
@@ -651,7 +652,7 @@ def display_cim_objects_summary(context, objects):
             rows = [[len(objects), cim_type]]
             click.echo(format_table(rows, ['Count', 'CIM Type'],
                                     table_format=context.output_format,
-                                    title='Summary of %s returned'))
+                                    title='Summary of %s returned' % cim_type))
             return
         click.echo('%s %s(s) returned' % (len(objects), cim_type))
     else:
