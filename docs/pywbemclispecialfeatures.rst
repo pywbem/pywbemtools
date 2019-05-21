@@ -1,4 +1,4 @@
-.. Copyright  2017 IBM Corp. and Inova Development Inc.
+g.. Copyright  2017 IBM Corp. and Inova Development Inc.
 ..
 .. Licensed under the Apache License, Version 2.0 (the "License");
 .. you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 ..
 
 
-.. _`Pywbemcli Specific Features`:
+.. _`Pywbemcli special command line features`:
 
-Pywbemcli Specific Features
-===========================
+Pywbemcli special command line features
+=======================================
 
 Pywbemcli includes several features in the syntax that are worth presenting
 in detail to help the user understand the background purpose and syntatic
@@ -27,7 +27,9 @@ implementation of the features. This includes:
   same command group.
 
 * The ability to receive either CIM instances or CIM instance names with only
-  a change of an option on the commands that request CIM instances.
+  a change of an option on the commands that request CIM instances. The option
+  ``-o`` or ``--name-only`` defines whether only the instance name or the complete
+  object will be displayed.
 
 * The ability to interactively select the data for certain objects as opposed
   to having to enter the full name.
@@ -60,7 +62,7 @@ parameter `max_object_cnt` sets the `MaxObjectCount` variable on the operation
 request if the pull operations are to be set which tells the wbem server to
 limit the size of the response.  As an example::
 
-    pywbemcli -s http/localhost use-pull-ops=yes max_object_cnt=10
+    pywbemcli --server http/localhost use-pull-ops=yes max_object_cnt=10
 
 would force the use of the pull operations and return an error if the target
 server did not implement them and would set the MaxObjCount parameter on the
@@ -83,15 +85,16 @@ Displaying CIM instances or CIM instance names
 ----------------------------------------------
 
 The pywbem API includes different WBEM operations (ex. EnumerateInstances and
-EnumerateInstanceNames). To simplify the overall CLI syntax pywbemcli combines
-these into a single subcommand (i.e. enumerate, references, associators)
-and includes an option (``-o,`` or ``--names-only``) that determines whether the
-instance names or instances are retrieved from the WBEM Server.
+EnumerateInstanceNames) to request CIM objects or just their names. To
+simplify the overall CLI syntax pywbemcli combines these into a single
+subcommand (i.e. enumerate, references, associators) and includes an option
+(``-o,`` or ``--names-only``) that determines whether the instance names or
+instances are retrieved from the WBEM Server.
 
 Thus, for example an `instance enumerate` with and without the ``-o`` option::
 
 
-    $ pywbemcli -m tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
     instance of CIM_Foo {
        InstanceID = "CIM_Foo1";
        IntegerProp = 1;
@@ -106,7 +109,7 @@ Thus, for example an `instance enumerate` with and without the ``-o`` option::
        InstanceID = "CIM_Foo3";
     };
 
-    $ pywbemcli -m tests/unit/simple_mock_model.mof instance enumerate CIM_Foo -o
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo -o
 
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
 
@@ -120,14 +123,14 @@ Interactively selecting INSTANCENAME
 ------------------------------------
 
 Arguments like the INSTANCENAME on some of the instance group subcommands (
-get, references, associators, etc) can be very difficult to correctly enter since it can
-involve multiple keybindings, use of quotation marks, etc.  To simplify this
-pywbemcli includes a option ``--interactive`` on these commands that allows
-the user to specify only the class name, retrieves all the instance names
-from the server and presents the user with a select list from which an instance
-name can be chosen. The following is an example::
+get, references, associators, etc) can be very difficult to correctly enter
+since it can involve multiple keybindings, use of quotation marks, etc.  To
+simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
+these commands that allows the user to specify only the class name, retrieves
+all the instance names from the server and presents the user with a select list
+from which an instance name can be chosen. The following is an example::
 
-    $ pywbemcli -m tests/unit/simple_mock_model.mof instance get CIM_Foo -i
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo --interactive
     Pick Instance name to process
     0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
     1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"

@@ -17,45 +17,85 @@ This documentation uses a few special terms to refer to Python types:
 
 .. glossary::
 
-   string
-      a :term:`unicode string` or a :term:`byte string`
+   CIM-XML
+     the name of the protocol used in the DMTF specification :term:`DSP0200`
+     the protocol pywbemcli uses to communicate with WBEM servers.
 
-   unicode string
-      a Unicode string type (:func:`unicode <py2:unicode>` in
-      Python 2, and :class:`py3:str` in Python 3)
+   INSTANCENAME
+      an argument of several of the command-group ``instance`` subcommands that
+      allows two possible inputs based on another subcommand option(``--interactive``).
 
-   byte string
-      a byte string type (:class:`py2:str` in Python 2, and
-      :class:`py3:bytes` in Python 3). Unless otherwise
-      indicated, byte strings in pywbem are always UTF-8 encoded.
+      When ``interactive`` is set the INSTANCENAME is  a string representation of
+      a CIMInstanceName formatted as defined by  :term:`WBEM-URI`
+
+      Otherwise the INSTANCENAME should be a classname in which case pywbemcli
+        will get the instance names from the WBEM server and present a
+        selection list for the user to select an instance
+        name :ref:`Displaying CIM instances or CIM instance names`
 
    connection id
-      a string (:term:`string`) that uniquely identifies each
-      :class:`pywbem.WBEMConnection` object created. The connection id is
-      immutable and is accessible from
+      a string that uniquely identifies each :class:`pywbem.WBEMConnection`
+      object created. The connection id is immutable and is accessible from
       :attr:`pywbem.WBEMConnection.conn_id`. It is included in of each log
       record created for pywbem log output and may be used to correlate pywbem
       log records for a single connection.
-
-   number
-      one of the number types :class:`py:int`, :class:`py2:long` (Python 2
-      only), or :class:`py:float`.
-
-   integer
-      one of the integer types :class:`py:int` or :class:`py2:long` (Python 2
-      only).
 
    DeprecationWarning
       a standard Python warning that indicates a deprecated functionality.
       See section :ref:`Deprecation and compatibility policy` and the standard
       Python module :mod:`py:warnings` for details.
 
-    MOF
-        MOF(Managed Object Format) is the language used byt the DMTF to
-        describe in textual form CIM objects including CIM classes,
-        CIM Instance, etc.  It is one of the output formats provided for
-        the display of CIM objects in pywbemcli. See DMTF `DSP0004` for more
-        information on the MOF format.
+   connections file
+      A file maintained by pywbemcli and managed by the pywbemcli
+      ``connections`` command group.  The file name is ``pywbemcli_connections.json``
+      and the file must be in the directory in which pywbemcli is executed.
+      Multiple connection files may exist in different directories.
+      The connection file contains a JSON definition of the parameters for
+      each connection with a name for the connection so that connections may
+      be predefined and pywbemcli commands executed against them using only
+      the connection name.
+
+   MOF
+      MOF(Managed Object Format) is the language used by the DMTF to
+      describe in textual form CIM objects including CIM classes,
+      CIM Instance, etc.  It is one of the output formats provided for
+      the display of CIM objects in pywbemcli. See DMTF term:`DSP0004` for more
+      information on the MOF format.
+
+   WBEM-URI
+      The wbem uri is a standardized text form for CIM instance names. It is
+      documented in DMTF DSP0207. Pywbemcli uses the untyped WBEM URI::
+
+            WBEM-URI = WBEM-URI-UntypedNamespacePath /
+                       WBEM-URI-UntypedClassPath /
+                       WBEM-URI-UntypedInstancePath
+
+            WBEM-URI-UntypedNamespacePath = namespacePath
+            WBEM-URI-UntypedClassPath     = namespacePath ":" className
+            WBEM-URI-UntypedInstancePath  = WBEM-URI-UntypedInstancePath
+                                            className "." key_value_pairs
+
+            namespacePath = [namespaceType ":"] namespaceHandle
+            namespaceType = ("http" ["s"]) / ("cimxml.wbem" ["s"])
+            namespaceHandle = ["//" authority] "/" [namespaceName]
+            namespaName     = IDENTIFIER *("/"IDENTIFIER))
+
+            // Untyped key value pairs
+            key_value_pairs  = key_value_pair *("," key_value_pair)
+            key_value_pair   = key_name "=" key_value
+            key_value        = stringValue / charValue / booleanValue /
+                               integerValue / realValue /
+                               "\"" datetimeValue "\"" /
+                               "\"" referenceValue "\""
+
+      In pywbemcli the WBEM-URI is used as the format for instance names on
+      commands such as ``instance get <instance-name>``
+
+      In these cases, the normal use is to specify only the classname and
+      keybindings so that examples of valid WBEM-URIs would be::
+
+        CIM_RegisteredProfile.InstanceID="acme:1"
+        CIM_RegisteredProfile.InstanceID=100
 
 .. _`Profile advertisement methodologies`:
 
@@ -174,17 +214,6 @@ Glossary
 
 .. glossary::
 
-   dynamic indication filter
-   dynamic filter
-      An indication filter in a WBEM server whose life cycle is managed by a
-      client.
-      See :term:`DSP1054` for an authoritative definition and for details.
-
-   static indication filter
-   static filter
-      An indication filter in a WBEM server that pre-exists and whose life
-      cycle cannot be managed by a client.
-      See :term:`DSP1054` for an authoritative definition and for details.
 
 .. _`References`:
 
@@ -214,21 +243,6 @@ References
    DSP1033
       `DMTF DSP1033, Profile Registration Profile, Version 1.1 <https://www.dmtf.org/standards/published_documents/DSP1033_1.1.pdf>`_
 
-   DSP1054
-      `DMTF DSP1054, Indications Profile, Version 1.2 <https://www.dmtf.org/standards/published_documents/DSP1054_1.2.pdf>`_
-
-   DSP1092
-      `DMTF DSP1092, WBEM Server Profile, Version 1.0 <https://www.dmtf.org/standards/published_documents/DSP1092_1.0.pdf>`_
-
-   X.509
-      `ITU-T X.509, Information technology - Open Systems Interconnection - The Directory: Public-key and attribute certificate frameworks <https://www.itu.int/rec/T-REC-X.509/en>`_
-
-   RFC2616
-      `IETF RFC2616, Hypertext Transfer Protocol -- HTTP/1.1, June 1999 <https://tools.ietf.org/html/rfc2616>`_
-
-   RFC2617
-      `IETF RFC2617, HTTP Authentication: Basic and Digest Access Authentication, June 1999 <https://tools.ietf.org/html/rfc2617>`_
-
    RFC3986
       `IETF RFC3986, Uniform Resource Identifier (URI): Generic Syntax, January 2005 <https://tools.ietf.org/html/rfc3986>`_
 
@@ -237,6 +251,9 @@ References
 
    WBEM Standards
       `DMTF WBEM Standards <https://www.dmtf.org/standards/wbem>`_
+
+   SMI-S
+      `SNIA Storage Management Initiative Specification`_
 
    Python Glossary
       * `Python 2.7 Glossary <https://docs.python.org/2.7/glossary.html>`_

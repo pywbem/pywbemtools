@@ -15,7 +15,7 @@ The pywbemtools github page is: ``https://github.com/pywbem/pywbemtools <https:/
    pywbemclicmdlineinterface.rst
    pywbemclisubcommands.rst
    pywbemclicmdshelp.rst
-   pywbemclispecificfeatures.rst
+   pywbemclispecialfeatures.rst
    mock_support.rst
    appendix.rst
    changes.rst
