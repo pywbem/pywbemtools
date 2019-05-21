@@ -96,7 +96,7 @@ class PywbemServer(object):
     certfile_envvar = 'PYWBEMCLI_CERTFILE'
     noverify_envvar = 'PYWBEMCLI_NOVERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
-    use_pull_envvar = 'PYWBEMCLI_USE_PULL'
+    use_pull_ops_envvar = 'PYWBEMCLI_USE_PULL_OPS'
     stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'

@@ -141,7 +141,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                            ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)) +
                    '[Default: "{}"]'.format(DEFAULT_OUTPUT_FORMAT))
 @click.option('--use-pull-ops',
-              envvar=PywbemServer.use_pull_envvar,
+              envvar=PywbemServer.use_pull_ops_envvar,
               type=click.Choice(['yes', 'no', 'either']),
               help='Determines whether pull operations are used for '
                    'EnumerateInstances, AssociatorInstances, '
@@ -152,7 +152,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'traditional non-pull operations.\n'
                    '* "either": pywbemcli trys first pull and then '
                    ' traditional operations.\n' +
-                   '(EnvVar: {}) '.format(PywbemServer.use_pull_envvar) +
+                   '(EnvVar: {}) '.format(PywbemServer.use_pull_ops_envvar) +
                    '[Default: {}]'.format(DEFAULT_PULL_CHOICE))
 @click.option('--pull-max-cnt', type=int,
               help='Maximium object count of objects to be returned for '

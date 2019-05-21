@@ -145,7 +145,7 @@ Options:
                                   pull operations.
                                   * "either": pywbemcli trys
                                   first pull and then  traditional operations.
-                                  (EnvVar: PYWBEMCLI_USE_PULL) [Default:
+                                  (EnvVar: PYWBEMCLI_USE_PULL_OPS) [Default:
                                   either]
   --pull-max-cnt INTEGER          Maximium object count of objects to be
                                   returned for each request if pull operations
@@ -186,6 +186,7 @@ Commands:
   repl        Enter interactive (REPL) mode (default).
   server      Command Group for WBEM server operations.
 """
+
 
 OK = True
 RUN = True
