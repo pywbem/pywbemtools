@@ -24,48 +24,59 @@ Introduction
 Pywbemtools features
 --------------------
 
-The pywbemtools package is a pure Python package that contains tools and
-applications that interact with WBEM servers:
+Pywbemtools is a collection of command line tools that communicate with WBEM
+Servers. The tools are written in pure Python and support Python 2 and Python
+3.
 
-* pywbemcli: A command line interface WBEM client module in pywbemtools that
-  interacts with WBEM servers
+Pywbemtools provides a command line tool (pywbemcli) that uses the pywbem
+Python WBEM client infrastructure to issue operations to a WBEM server using
+the WBEM standards defined by the DMTF to perform system management tasks.
 
-These tools use ``pywbem`` as the client WBEM infrastructure to communication
-with the WBEM servers.
+WBEM standards are used for a wide variety of systems management tasks
+in the industry including DMTF management standards and the SNIA Storage
+Management Initiative Specification(SMI-S).
 
-Pywbemtools and pywbem WBEM Client are packages in the github pywbem repository.
+Pywbemtools and pywbem WBEM Client are packages in the github pywbem repository
+and are released to PyPi. Pywbemcli is a module in pywbemtools.
 
-.. _`
-Pywbemcli command line WBEM client`:
+
+.. _`Pywbemcli command line interface WBEM client`:
 
 Pywbemcli command line interface WBEM client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pywbemcli provides access to WBEM servers directly from the command line.
-It provides commands to:
+Pywbemcli provides access to WBEM servers from the command line on multiple OS
+platforms. It provides functionality to:
 
-1. Inspect and manage the CIM Objects CIMClasses, CIMInstances,
-and CIM QualifierDeclaractions defined by the server using the
-requests APIs of the pywbem package.
+* Explore the CIM data of WBEM Servers. It can manage/inspect the CIM model
+  components including CIM classes, CIM instances, and CIM qualifiers and execute
+  CIM methods and queries on the WBEM server. It implements subcommands to
+  execute the :term:`CIM-XML` operations defined in the DMTF specification CIM Operations
+  Over HTTP(:term:`DSP0200`).
 
-2. Inspect and manage higher level components of the WBEM server including:
+* Inspect/manage WBEM server functionality including:
 
-   * CIM Namespaces
-   * WBEM Server brand information
-   * WBEM management profiles
+  * CIM namespaces,
+  * WBEM registered management profiles,
+  * WBEM server brand information
 
-3. Display information on the interactions with the server including logs and
-   time statistics.
+* Capture detailed information on interactions with the WBEM server including
+  time statistics.
 
-4. Maintain a persistent repository of WBEM server defintions so that server
-   definitions can be accesed by name.
+* Maintain a file of WBEM server definitions so that pywbemcli can access
+  multiple servers by name.
+
+* Provide both a command line interface and an interactive mode where multiple
+  pywbemcli commands can be executed within the context of a WBEM server.
+
 
 .. _`Supported environments`:
 
 Supported environments
 ----------------------
 
-The pywbemcli package is supported in these environments:
+The pywbemcli module of the pywbemtools package is supported in these
+environments:
 
 * Operating systems: Linux, Windows, MacOS
 * Python versions: 2.7, 3.4, and greater
@@ -114,14 +125,6 @@ branch of the Git repository of the package:
 .. code-block:: text
 
     $ pip install git+https://github.com/pywbem/pywbemtools.git@master
-
-You can verify that the pywbemtools package and its dependent packages are
-installed correctly by importing the package into Python:
-
-.. code-block:: text
-
-    $ python -c "import pywbemcli; print('ok')"
-    ok
 
 Verification of the installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -195,7 +198,7 @@ presence of a ".devD" suffix in the version string. Development versions are
 pre-versions of the next assumed version that is not yet released. For example,
 version 0.5.1.dev2 is development pre-version #2 of the next version to be
 released after 0.5.0. Version 1.5.1 is an `assumed` next version, because the
-`actually released` next version might be 0.2.0 or even 1.0.0.
+`actually released` next version might be 0.7.0 or even 1.0.0.
 
 
 .. _`Compatibility`:
@@ -209,13 +212,13 @@ that the user can safely upgrade to that new version without encountering
 compatibility issues.
 
 This package uses the rules of `Semantic Versioning 2.0.0`_ for compatibility
-between package versions, and for :ref:`deprecations <Deprecations>`.
+between package versions, and for deprecations.
 
-The public interfaces of this package that are subject to the semantic versioning
-rules (and specificically to its compatibility rules) is the CLI syntax described in
-this documentation.
+The public command line interface of this package that is subject to the
+semantic versioning rules (and specificically to its compatibility rules) is
+the CLI syntax described in this documentation.
 
-The output formats are currently the subject of compatiblity assurances.
+The output formats are currently not the subject of compatiblity assurances.
 
 Violations of these compatibility rules are described in section
 :ref:`Change log`.
@@ -239,7 +242,7 @@ suppressed by default. They can be shown for example in any of these ways:
 
   ``PYTHONWARNINGS=default``
 
-It is recommended that users of this package run their test code with
+It is recommended that users of this package run their tests with
 :exc:`~py:exceptions.DeprecationWarning` warnings being shown, so they become
 aware of any use of deprecated functionality.
 
