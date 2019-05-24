@@ -16,113 +16,129 @@ The following defines the help output for the `pywbemcli  --help` subcommand
 
     Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
-      Command line browser for WBEM Servers. This cli tool implements the
-      CIM/XML client APIs as defined in pywbem to make requests to a WBEM
-      server. This browser uses subcommands to:
+      WBEM Server command line browser. This cli tool implements the CIM/XML
+      client APIs as defined in pywbem to make requests to a WBEM server. This
+      browser uses subcommands to:
 
           * Explore the characteristics of WBEM Servers based on using the
             pywbem client APIs.  It can manage/inspect CIM_Classes and
-            CIM_instanceson the server.
+            CIM_instances on the server.
 
-          * In addition it can inspect namespaces and other server information
-            and inspect and manage WBEM indication subscriptions.
+          * In addition it can inspect namespaces, profiles, subscriptions,
+            and other server information and inspect and manage WBEM
+            indication subscriptions.
 
-      The options shown above that can also be specified on any of the
+      The global options shown above that can also be specified on any of the
       (sub-)commands as well as the command line.
 
     Options:
-      -s, --server TEXT               Hostname or IP address with scheme of the
-                                      WBEMServer in  format
-                                      [{scheme}://]{host}[:{port}]. Scheme must be
-                                      "https" or "http" (Default: "https"). Host
-                                      defines a  short or fully qualified DNS
-                                      hostname, a literal  IPV4 address (dotted)
-                                      or a literal IPV6 address Port (optional)
-                                      defines a  WBEM server protocol to be used
-                                      (Defaults 5988(HTTP) and  5989 (HTTPS).
+      -s, --server URI                Hostname or IP address with scheme of the
+                                      WBEMServer in format
+                                      [{scheme}://]{host}[:{port}] (optional, see
+                                      --name).
+                                      - Scheme: must be "https" or "http"
+                                      [Default: "https"].
+                                      - Host: defines short or
+                                      fully qualified DNS hostname, a literal IPV4
+                                      address (dotted) or a literal IPV6 address.
+                                      - Port: (optional) defines WBEM server port
+                                      to be used [Defaults:5988(HTTP) and 5989
+                                      (HTTPS)].
                                       (EnvVar: PYWBEMCLI_SERVER).
-      -N, --name TEXT                 Optional name for the connection.  If the
-                                      name option is not set, the name "default"
-                                      is used. If the name option exists and the
+      -N, --name NAME                 Name for the connection(optional, see
+                                      --server).  If this option exists and the
                                       server option does not exist pywbemcli
                                       attempts to retrieve the connection
-                                      information from persistent storage. If the
-                                      server option exists that is used as the
-                                      connection name
-      -d, --default_namespace TEXT    Default Namespace to use in the target
+                                      information from the connections file. If
+                                      the server option exists that is used as the
+                                      connection definition with the name
+                                      "default". This option and --server are
+                                      mutually exclusive.(EnvVar: PYWBEMCLI_NAME).
+      -d, --default_namespace NAMESPACE
+                                      Default Namespace to use in the target
                                       WBEMServer if no namespace is defined in the
-                                      subcommand(EnvVar:
-                                      PYWBEMCLI_DEFAULT_NAMESPACE). (Default:
-                                      root/cimv2).
-      -u, --user TEXT                 User name for the WBEM Server connection.
-                                      (EnvVar: PYWBEMCLI_USER).
-      -p, --password TEXT             Password for the WBEM Server. Will be
+                                      subcommand(EnvVar: PYWBEMCLI_NAME)
+                                      []Default: root/cimv2].
+      -u, --user USER                 User name for the WBEM Server connection.
+                                      (EnvVar: PYWBEMCLI_NAME)
+      -p, --password PASSWORD         Password for the WBEM Server. Will be
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
-                                      option.(EnvVar: PYWBEMCLI_PASSWORD ).
-      -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
-                                      seconds. (EnvVar: PYWBEMCLI_TIMEOUT).
-                                      Default: 30
+                                      option.(EnvVar: PYWBEMCLI_PASSWORD).
+      -t, --timeout INTEGER           Operation timeout for the WBEM Server in
+                                      seconds.
+                                      (EnvVar:
+                                      PYWBEMCLI_PYWBEMCLI_TIMEOUT)
       -n, --noverify                  If set, client does not verify server
-                                      certificate.
+                                      certificate.(EnvVar: PYWBEMCLI_NOVERIFY).
       -c, --certfile TEXT             Server certfile. Ignored if noverify flag
                                       set. (EnvVar: PYWBEMCLI_CERTFILE).
-      -k, --keyfile TEXT              Client private key file. (EnvVar:
+      -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                       PYWBEMCLI_KEYFILE).
       --ca_certs TEXT                 File or directory containing certificates
-                                      that will be matched against a certificate
-                                      received from the WBEM server. Set the --no-
-                                      verify-cert option to bypass client
-                                      verification of the WBEM server certificate.
-                                      (EnvVar: PYWBEMCLI_CA_CERTS).Default:
-                                      Searches for matching certificates in the
-                                      following system directories: /etc/pki/ca-
-                                      trust/extracted/openssl/ca-bundle.trust.crt
-                                      /etc/ssl/certs
-                                      /etc/ssl/certificates
-      -o, --output-format [table|plain|simple|grid|rst|mof|xml|txt|repr|tree]
-                                      Output format (Default: simple). pywbemcli
-                                      may override the format choice depending on
-                                      the operation since not all formats apply to
-                                      all output data types. For CIM structured
-                                      objects (ex. CIMInstance), the default
-                                      output format is mof.
+                                      that will be matched against certificate
+                                      received from WBEM server. Set --no-verify-
+                                      cert option to bypass client verification of
+                                      the WBEM server certificate.  (EnvVar:
+                                      PYWBEMCLI_CA_CERTS).
+                                      [Default: Searches for
+                                      matching certificates in the following
+                                      system directories: /etc/pki/ca-
+                                      trust/extracted/openssl/ca-bundle.trust.crt]
+                                      /etc/ssl/certs]
+                                      /etc/ssl/certificates]
+      -o, --output-format <choice>    Output format. Multiple table and CIMObjects
+                                      formats. pywbemcli may override the format
+                                      choice depending on the operation since not
+                                      all formats apply to all output data types.
+                                      Choices further defined in documentation.
+                                      Choices: ['table', 'plain', 'simple',
+                                      'grid', 'rst', 'mof', 'xml', 'txt', 'repr',
+                                      'tree']
+                                      [Default: "simple"]
       --use-pull_ops [yes|no|either]  Determines whether the pull operations are
-                                      used forthe EnumerateInstances,
-                                      associatorinstances,referenceinstances, and
-                                      ExecQuery operations. yes means that pull
-                                      will be used and if the server does not
-                                      support pull, the operation will fail. No
-                                      choice forces pywbemcli to try only the
-                                      traditional non-pull operations. either
-                                      allows pywbem to try both pull and then
-                                      traditional operations. This choice is
-                                      acomplished by using the Iter... operations
-                                      as the underlying pywbem api call.  The
-                                      default is either.
-      --pull-max-cnt INTEGER          MaxObjectCount of objects to be returned if
-                                      pull operations are used. This must be  a
-                                      positive non-zero integer. Default is 1000.
+                                      used for EnumerateInstances,
+                                      associatorinstances, referenceinstances, and
+                                      ExecQuery operations.
+                                      - "yes": pull
+                                      operations used; if server does not support
+                                      pull, the operation will fail.
+                                      - "no":
+                                      forces pywbemcli to try only the traditional
+                                      non-pull operations.
+                                      - "either": pywbemcli
+                                      trys first pull and then  traditional
+                                      operations.
+                                      (EnvVar: PYWBEMCLI_USE_PULL)
+                                      [Default: either]
+      --pull-max-cnt INTEGER          MaxObjectCount of objects to be returned for
+                                      each request if pull operations are used.
+                                      Must be  a positive non-zero
+                                      integer.(EnvVar: PYWBEMCLI_PULL_MAX_CNT)
+                                      [Default: 1000]
       -T, --timestats                 Show time statistics of WBEM server
-                                      operations after  each command execution.
+                                      operations after each command execution.
       -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
                                       component to a log level, destination, and
                                       detail level.
-                                      COMP: [api|http|all], Default:
+                                      - COMP: [api|http|all],
+                                      Default: all
+                                      - DEST: [file|stderr], Default:
+                                      file
+                                      - DETAIL:[all|paths|summary], Default:
                                       all
-                                      DEST: [file|stderr], Default: file
-                                      DETAIL:[all|paths|summary], Default: all
       -v, --verbose                   Display extra information about the
                                       processing.
-      -m, --mock-server FILENAME      If this option is defined, a mock WBEM
-                                      server is constructed as the target WBEM
-                                      server and the option value defines a MOF or
-                                      Python file to be used to populate the mock
-                                      repository. This option may be used multiple
-                                      times where each use defines a single file
-                                      or file_path.See the pywbemcli documentation
-                                      for more information.
-      --version                       Show the version of this command and exit.
+      -m, --mock-server FILENAME      Define, a mock WBEM server is as the target
+                                      WBEM server. The option value defines a MOF
+                                      or Python file path used to populate the
+                                      mock repository. This option may be used
+                                      multiple times where each use defines a
+                                      single file_path.See the pywbemtools
+                                      documentation for more information.(EnvVar:
+                                      PYWBEMCLI_MOCK_SERVER).
+      --version                       Show the version of this command and the
+                                      package and exit
       -h, --help                      Show this message and exit.
 
     Commands:

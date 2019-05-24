@@ -45,13 +45,13 @@ class ContextObj(object):
         the information that is common to the multiple click subcommands
     """
     # pylint: disable=unused-argument
-    def __init__(self, pywbem_server, output_format, use_pull,
+    def __init__(self, pywbem_server, output_format, use_pull_ops,
                  pull_max_cnt, timestats, log, verbose):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
+        self._use_pull_ops = use_pull_ops
         self._pull_max_cnt = pull_max_cnt
-        self._use_pull = use_pull
         self._verbose = verbose
         self._timestats = timestats
         self._spinner = click_spinner.Spinner()
@@ -59,9 +59,10 @@ class ContextObj(object):
 
     def __repr__(self):
         return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
-               'pull_max_cnt=%s, use_pull=%s, timestats=%s, verbose=%s' % \
+               'use_pull_ops=%s, pull_max_cnt=%s, timestats=%s, verbose=%s' % \
                (id(self), self.pywbem_server, self.output_format,
-                self.pull_max_cnt, self.use_pull, self.timestats, self.verbose)
+                self.use_pull_ops, self.pull_max_cnt, self.timestats,
+                self.verbose)
 
     @property
     def output_format(self):
@@ -80,13 +81,13 @@ class ContextObj(object):
         return self._timestats
 
     @property
-    def use_pull(self):
+    def use_pull_ops(self):
         """
         :term:`string`: Choice of whether pull, traditional or either type
         of operation is to be used for the instance enumerates, references,
         or associator commands.
         """
-        return self._use_pull
+        return self._use_pull_ops
 
     @property
     def pull_max_cnt(self):

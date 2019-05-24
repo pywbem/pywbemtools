@@ -86,6 +86,7 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
     # where server connection information are be saved and used as alternate
     # input sources for pywbemcli arguments and options.
     server_envvar = 'PYWBEMCLI_SERVER'
+    name_envvar = 'PYWBEMCLI_NAME'
     user_envvar = 'PYWBEMCLI_USER'
     password_envvar = 'PYWBEMCLI_PASSWORD'
     defaultnamespace_envvar = 'PYWBEMCLI_DEFAULT_NAMESPACE'
