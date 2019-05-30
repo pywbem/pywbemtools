@@ -524,7 +524,7 @@ TEST_CASES = [
 
     ['Verify class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
-     {'stderr': ['CIMError:', 'not found'],
+     {'stderr': ['CIMError:'],
       'rc': 1,
       'test': 'regex'},
 
@@ -602,14 +602,14 @@ TEST_CASES = [
 
     ['Verify class subcommand invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
-     {'stderr': ["Error: CIMError: 6", "CIM_ERR_NOT_FOUND"],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class subcommand invokemethod fails Invalid Method',
      ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
-     {'stderr': ["Error: CIMError: 17", "CIM_ERR_METHOD_NOT_FOUND"],
+     {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
       'test': 'in'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
@@ -617,7 +617,7 @@ TEST_CASES = [
 
     ['Verify class subcommand invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stderr': ["Error: CIMError: 17", "CIM_ERR_METHOD_NOT_FOUND"],
+     {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
       'test': 'in'},
      [SIMPLE_MOCK_FILE], OK],

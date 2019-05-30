@@ -498,6 +498,7 @@ def cmd_class_find(context, classname, options):
             ns_rows.sort(key=lambda x: x[1])
             rows.extend(ns_rows)
 
+        context.spinner.stop()
         if context.output_format in TABLE_FORMATS:
             headers = ['Namespace', 'Classname']
             click.echo(format_table(rows, headers,

@@ -591,7 +591,7 @@ TEST_CASES = [
     #
     ['Verify instance subcommand enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
-     {'stderr': ["Error: CIMError: 6", "CIM_ERR_NOT_FOUND"],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -834,7 +834,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand create, new instance invalid class',
      ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
-     {'stderr': ["Error:", "CIMClass", "does not exist"],
+     {'stderr': ["Error:", "CIMClass"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],

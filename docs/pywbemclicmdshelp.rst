@@ -80,13 +80,13 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       trust/extracted/openssl/ca-bundle.trust.crt
                                       /etc/ssl/certs
                                       /etc/ssl/certificates
-      -o, --output-format [table|plain|simple|grid|rst|mof|xml|txt|tree]
+      -o, --output-format [table|plain|simple|grid|rst|mof|xml|txt|repr|tree]
                                       Output format (Default: simple). pywbemcli
                                       may override the format choice depending on
                                       the operation since not all formats apply to
                                       all output data types. For CIM structured
                                       objects (ex. CIMInstance), the default
-                                      output format is mof
+                                      output format is mof.
       --use-pull_ops [yes|no|either]  Determines whether the pull operations are
                                       used forthe EnumerateInstances,
                                       associatorinstances,referenceinstances, and

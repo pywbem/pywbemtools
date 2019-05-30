@@ -111,7 +111,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'the format choice depending on the operation since not '
                    'all formats apply to all output data types. For CIM '
                    'structured objects (ex. CIMInstance), the default output '
-                   'format is mof'
+                   'format is mof.'
               .format(of=DEFAULT_OUTPUT_FORMAT))
 @click.option('--use-pull_ops', envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),

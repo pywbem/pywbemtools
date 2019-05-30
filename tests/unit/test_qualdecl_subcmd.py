@@ -235,7 +235,7 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand get invalid qual decl name .',
      ['get', 'NoSuchQualDecl'],
-     {'stderr': ["Error: CIMError: 6", "not found"],
+     {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -282,6 +282,20 @@ TEST_CASES = [
                  '0           0  GetQualifier'],
       'rc': 0,
       'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify qualifier subcommand -o repr get Description produces repr out',
+     {'args': ['get', 'Description'],
+      'global': ['-o', 'repr']},
+     {'stdout': "CIMQualifierDeclaration(name='Description', value=None, "
+                "type='string', is_array=False, array_size=None, "
+                "scopes=NocaseDict({'CLASS': False, 'ASSOCIATION': False, "
+                "'INDICATION': False, 'PROPERTY': False, 'REFERENCE': False, "
+                "'METHOD': False, 'PARAMETER': False, 'ANY': True}), "
+                "tosubclass=True, overridable=True, translatable=True, "
+                "toinstance=None)",
+      'rc': 0,
+      'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 ]
 
