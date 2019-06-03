@@ -368,7 +368,7 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 # Scripts are required to install the os components of pywbem.
 # Makefile gets the required scripts from github.pywbem (see pywbem doc)
 pywbem_os_setup.sh:
-# TODO tempoarily not download the shell script if platform is cygwin
+# TODO(ks) tempoarily not download the shell script if platform is cygwin
 ifeq  ($(PLATFORM),Windows_UNIX)
 	-$(call CP_FUNC,pywbem_os_setup_cygwin.sh,pywbem_os_setup.sh)
 else
@@ -554,8 +554,6 @@ doccoverage: develop_$(pymn).done
 	@echo "makefile: Target $@ done."
 
 testmv:
-
-
 # Note: distutils depends on the right files specified in MANIFEST.in, even when
 # they are already specified e.g. in 'package_data' in setup.py.
 # We generate the MANIFEST.in file automatically, to have a single point of
