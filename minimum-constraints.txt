@@ -44,7 +44,7 @@ wheel==0.29.0
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
-pywbem==0.14.3
+pywbem==0.14.4
 
 pbr==1.10.0
 six==1.10.0
@@ -53,15 +53,11 @@ click-spinner==0.1.8
 click-repl==0.1.6
 asciitree==0.3.3
 tabulate==0.8.2
-prompt-toolkit==1.0.15
-
+prompt-toolkit==2.0.1
 
 # Indirect dependencies for install (not in requirements.txt)
 
-# Direct dependencies from pywbem
-ply==3.10
-PyYAML==3.13
-M2Crypto==0.30.1
+# Indirect dependencies from pywbem
 M2Crypto==0.31.0
 mock==2.0.0
 ordereddict==1.1
@@ -120,7 +116,6 @@ twine==1.8.1
 # Jupyter Notebook (no imports, invoked via jupyter script):
 #jupyter==1.0.0
 
-
 # Indirect dependencies for develop (not in dev-requirements.txt)
 
 alabaster==0.7.9
@@ -149,7 +144,6 @@ jupyter_client==4.4.0
 jupyter_console==5.0.0
 jupyter_core==4.2.1
 linecache2==1.0.0
-lxml==4.2.4
 MarkupSafe==0.23
 mistune==0.8.1
 nbconvert==5.0.0
@@ -171,15 +165,13 @@ simplegeneric==0.8.1
 smmap2==2.0.1
 snowballstemmer==1.2.1
 terminado==0.6
-testfixtures==4.3.3
 testpath==0.3
 toml==0.10.0
 tornado==4.4.2
 traceback2==1.4.0
 traitlets==4.3.1
-unittest2==1.1.0
-urllib3==1.22
+urllib3==1.23
 virtualenv==14.0.0
 wcwidth==0.1.7
 widgetsnbextension==1.2.6
-yamlordereddictloader==0.4.0
+
