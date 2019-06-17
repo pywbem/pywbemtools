@@ -72,4 +72,4 @@ License
 
 The pywbemtools package is licensed under the `Apache 2.0 License`_.
 
-.. _Apache 2.0 License: https://github.com/zhmcclient/python-zhmcclient/tree/master/LICENSE
+.. _Apache 2.0 License: https://github.com/pywbem/pywbemtools/tree/master/LICENSE.txt
