@@ -310,7 +310,7 @@ class InstanceTests(TestsContainer):
             'Name=Bob -o')
 
         self.assertEqual(exitcode, 0)
-        self.assert_found(':PyWBEM_PersonCollection.InstanceID', out)  
+        self.assert_found(':PyWBEM_PersonCollection.InstanceID', out)
 
 
 if __name__ == '__main__':
