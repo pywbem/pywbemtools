@@ -206,7 +206,7 @@ doc_dependent_files := \
     $(wildcard $(cli_module_name)/*.py) \
 
 # PyLint config file
-pylint_rc_file := pylintrc
+pylint_rc_file := .pylintrc
 
 # Flake8 config file
 flake8_rc_file := .flake8
