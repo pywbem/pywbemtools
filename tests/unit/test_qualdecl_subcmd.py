@@ -181,32 +181,34 @@ TEST_CASES = [
     # inputs - String, or list of args or dict of 'env', 'args', 'globals',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation
-    # exp_response - Dictionary of expected responses,
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
     ['Verify qualifier subcommand help response',
      '--help',
      {'stdout': QD_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate  --help response',
      ['enumerate', '--help'],
      {'stdout': QD_ENUM_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate  -h response.',
      ['enumerate', '-h'],
      {'stdout': QD_ENUM_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify qualifier subcommand get  -h response.',
      ['get', '-h'],
      {'stdout': QD_GET_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate returns qual decls.',

@@ -18,14 +18,23 @@
 
 """
     Execute and test the validity of the help output from pywbemcli
+    TODO: Drop this test completely. It is redundant. Detailed help
+    is in each test_xxx_cmd file and the doc executes all cmd helps to
+    build the .rst file.
 """
 
 from __future__ import print_function, absolute_import
 
+import sys
 import unittest
 from re import findall
 from subprocess import Popen, PIPE
 import six
+
+if sys.platform == 'win32':
+    DISABLE_WARNINGS = 'set PYTHONWARNINGS=ignore'
+else:
+    DISABLE_WARNINGS = 'export PYTHONWARNINGS=""'
 
 
 # Map of all tests to be defined.
@@ -34,8 +43,8 @@ import six
 #   list of:
 #       list of components of pywbemcli help function to execute
 #       list of text pieces that must be in result
-# TODO ks Mar 17 Some day we should match the entire test result but lets keep
-#    it simple until code stabilizes.
+# TODO:Future Mar 17 Some day we should match the entire test result but lets
+#    keep it simple until code stabilizes.
 TESTS_MAP = {  # pylint: disable=invalid-name
     'top': ["", ['--server', '--default_namespace']],
 
@@ -95,13 +104,13 @@ class ContainerMeta(type):
             Defines the test method that we generate for each test
             and returns the method.
 
-            Each test builds the pywbemcli command executes it and tests the
-            results
+            Each test builds the pywbemcli command  defined by the cmd_str
+            executes it and tests the results against the expected_stdout.
             """
             def test(self):  # pylint: disable=missing-docstring
-                command = 'pywbemcli -s http://blah %s --help' % (cmd_str)
+                command = 'pywbemcli %s --help' % (cmd_str)
                 # Disable python warnings for pywbemcli call.See issue #42
-                command = 'export PYTHONWARNINGS="" && %s' % command
+                command = '%s && %s' % (DISABLE_WARNINGS, command)
                 proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
                 std_out, std_err = proc.communicate()
                 exitcode = proc.returncode

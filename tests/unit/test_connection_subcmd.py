@@ -279,10 +279,9 @@ TEST_CASES = [
     # inputs - String, or list of args or dict of 'env', 'args', 'globals',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation
-    # exp_response - Dictionary of expected responses,
-    #                This test adds a new dict entry to exp_response: "file"
-    #                that allows the test to determine if the json output file
-    #                exists and to remove it.
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
@@ -290,55 +289,55 @@ TEST_CASES = [
     ['Verify connection subcommand help response',
      '--help',
      {'stdout': CONN_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand show  --help response',
      ['show', '--help'],
      {'stdout': CONN_SHOW_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand delete  --help response',
      ['delete', '--help'],
      {'stdout': CONN_DEL_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand save  --help response',
      ['save', '--help'],
      {'stdout': CONN_SAVE_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand add  --help response',
      ['add', '--help'],
      {'stdout': CONN_ADD_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand list  --help response',
      ['list', '--help'],
      {'stdout': CONN_LIST_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand test  --help response',
      ['test', '--help'],
      {'stdout': CONN_TEST_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand export  --help response',
      ['export', '--help'],
      {'stdout': CONN_EXPORT_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand select  --help response',
      ['select', '--help'],
      {'stdout': CONN_SELECT_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     # ['Verify connection subcommand new. test with show and delete  ',
