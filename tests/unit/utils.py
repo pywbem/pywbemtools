@@ -20,6 +20,7 @@ a direct call.
 from __future__ import absolute_import, print_function
 
 import os
+import sys
 import re
 from copy import copy
 from subprocess import Popen, PIPE
@@ -60,12 +61,11 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         * rc(int): Exit code of the command.
         * stdout(:term:`unicode string`): Standard output of the command,
           as a unicode string with newlines represented as '\\n'.
-          An empty string, if there was no data.
+          Returns empty string, if there was no data.
         * stderr(:term:`unicode string`): Standard error of the command,
           as a unicode string with newlines represented as '\\n'.
-          An empty string, if there was no data.
+          Returns empty string, if there was no data.
     """
-
     cli_cmd = u'pywbemcli'
 
     if env is None:
@@ -99,24 +99,57 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         cmd_args.append(arg)
 
     if verbose:
-        print("execute_pywbemcli CMD_ARGS %s" % cmd_args)
+        print("\nexecute_pywbemcli CMD_ARGS %s" % cmd_args)
 
-    # Note that the click package on Windows writes '\n' at the Python level
-    # as '\r\n' at the level of the shell. Some other layer (presumably the
-    # Windows shell) contriubutes another such translation, so we end up with
-    # '\r\r\n' for each '\n'. Using universal_newlines=True undoes all of that.
-    proc = Popen(cmd_args, shell=False, stdout=PIPE, stderr=PIPE, stdin=PIPE,
-                 universal_newlines=True)
+    if stdin and six.PY3:
+        stdin = stdin.encode('utf-8')
+
+    if stdin:
+        print('stdin %r' % stdin)
+
+    # The click package on Windows writes NL at the Python level
+    # as '\r\r\n' at the level of the shell under some cases. This is
+    # documented in Click issue #1271 for Click 7.0 The Popen universal_newlines
+    # does not handle this variation. To fix for now, remove universal_newlines
+    # and replace \r\r\n with \n then \r\n and then \r also with \n in the code
+    # below.
+    #
+    # The original code was:
+    # proc = Popen(cmd_args, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE,
+    #             universal_newlines=True)
+    # stout_str, stderr_str = proc.communicate(input=stdin)
+    # Temp alternative is the following line and the second change
+    proc = Popen(cmd_args, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                 universal_newlines=False)
+
     stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
 
     if verbose:
-        print("execute_pywbemcli rc = %s" % rc)
+        print("executed_pywbemcli rc = %s" % rc)
+        print('output type %s\nstdout:%r\nstderr:%r' % (type(stdout_str),
+                                                        stdout_str,
+                                                        stderr_str))
 
     if isinstance(stdout_str, six.binary_type):
         stdout_str = stdout_str.decode('utf-8')
     if isinstance(stderr_str, six.binary_type):
         stderr_str = stderr_str.decode('utf-8')
+
+    # Replacement for Popen universal_newlines because of Click issue # 1271
+    # Second part of temp patch for CRCRNL. Does what popen does and
+    # CRCRNL replacement.
+    if sys.platform == 'win32':
+        # print('STDOUTBeforeReplace type %s\n%r' %
+        #      (type(stdout_str), stdout_str))
+        stdout_str = stdout_str.replace('\r\r\n', '\n')  \
+                               .replace('\r\n', '\n')  \
+                               .replace('\r', '')
+        stderr_str = stderr_str.replace('\r\r\n', '\n')  \
+                               .replace('\r\n', '\n')  \
+                               .replace('\r', '')
+        # print('STDOUTAfterReplace type %s\n%r' % (type(stdout_str),
+        #                                                 stdout_str))
 
     return rc, stdout_str, stderr_str
 

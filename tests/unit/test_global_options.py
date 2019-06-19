@@ -116,7 +116,9 @@ TEST_CASES = [
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation. This test processor includes an
     #          additional key, `subcmd`
-    # exp_response - Dictionary of expected responses,
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 

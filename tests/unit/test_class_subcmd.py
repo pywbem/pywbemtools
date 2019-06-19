@@ -157,14 +157,16 @@ TEST_CASES = [
     # inputs - String, or list of args or dict of 'env', 'args', 'globals',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation
-    # exp_response - Dictionary of expected responses,
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
     ['Verify class subcommand help response',
      '--help',
      {'stdout': CLS_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
     #
     # Enumerate subcommand and its options
@@ -172,13 +174,13 @@ TEST_CASES = [
     ['Verify class subcommand enumerate  --help response',
      ['enumerate', '--help'],
      {'stdout': CLS_ENUM_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify class subcommand enumerate  -h response.',
      ['enumerate', '-h'],
      {'stdout': CLS_ENUM_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify class subcommand enumerate CIM_Foo',
@@ -426,13 +428,13 @@ TEST_CASES = [
     ['class subcommand find -h, ',
      ['find', '-h'],
      {'stdout': CLASS_FIND_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['class subcommand find  --help',
      ['find', '--help'],
      {'stdout': CLASS_FIND_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['class subcommand find simple name in known namespace',
@@ -479,7 +481,7 @@ TEST_CASES = [
     ['class subcommand tree --help response',
      ['tree', '--help'],
      {'stdout': CLASS_TREE_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     # Order inconsistent on output. so we just test that some of the lines are
@@ -635,7 +637,14 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify  multiple subcommands with stdin work ',
+    ['Verify single subcommand with stdin works',
+     {'stdin': ['class get -h']},
+     {'stdout': ['Usage: pywbemcli  class get '],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
+
+    ['Verify multiple subcommands with stdin work',
      {'stdin': ['class get -h', 'class enumerate -h']},
      {'stdout': ['Usage: pywbemcli  class enumerate ',
                  'Usage: pywbemcli  class get '],

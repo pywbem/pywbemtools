@@ -540,16 +540,19 @@ TEST_CASES = [
     # inputs - String, or list of args or dict of 'env', 'args', 'globals',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation
-    # exp_response - Dictionary of expected responses,
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
+
     #
     #   instance --help
     #
     ['Verify instance subcommand help response',
      '--help',
      {'stdout': INST_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     #
@@ -558,13 +561,13 @@ TEST_CASES = [
     ['Verify instance subcommand enumerate  --help response',
      ['enumerate', '--help'],
      {'stdout': INST_ENUM_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
      {'stdout': ENUM_INST_RESP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate names CIM_Foo -o',
@@ -614,7 +617,7 @@ TEST_CASES = [
      ['get', '--help'],
      {'stdout': INST_GET_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand get with instancename returns data',
@@ -759,7 +762,7 @@ TEST_CASES = [
      ['create', '--help'],
      {'stdout': INST_CREATE_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand create, new instance of CIM_Foo  one property',
@@ -859,7 +862,7 @@ TEST_CASES = [
      ['modify', '--help'],
      {'stdout': INST_MODIFY_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand modify, single good change',
@@ -867,7 +870,7 @@ TEST_CASES = [
       '-P', 'scalBool=False'],
      {'stdout': "",
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand modify, single good change, explicit ns',
@@ -979,7 +982,7 @@ TEST_CASES = [
      ['delete', '--help'],
      {'stdout': INST_DELETE_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand delete, valid delete',
@@ -1053,7 +1056,7 @@ TEST_CASES = [
      ['references', '--help'],
      {'stdout': INST_REFERENCES_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand references, returns instances',
@@ -1183,11 +1186,11 @@ TEST_CASES = [
      ['associators', '--help'],
      {'stdout': INST_ASSOCIATORS_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
     # TODO  add valid associators tests
 
-    ['Verify instance subcommand associators, returns iinstances',
+    ['Verify instance subcommand associators, returns instances',
      ['associators', 'TST_Person.name="Mike"'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
@@ -1239,7 +1242,7 @@ TEST_CASES = [
      ['count', '--help'],
      {'stdout': INST_COUNT_HELP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand count, Return table of instances',
@@ -1271,7 +1274,7 @@ TEST_CASES = [
     ['class subcommand invokemethod --help, . ',
      ['invokemethod', '--help'],
      {'stdout': INST_INVOKE_METHOD_HELP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify instance subcommand invokemethod',

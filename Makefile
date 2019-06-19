@@ -211,7 +211,6 @@ pylint_rc_file := pylintrc
 # Flake8 config file
 flake8_rc_file := .flake8
 
-
 # Python source files to be checked by PyLint and Flake8
 py_src_files := \
     setup.py \

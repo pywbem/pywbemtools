@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests the class subcommand
+Tests the cglobal log option
 """
 import os
 import pytest
@@ -31,9 +31,10 @@ TEST_CASES = [
     # desc - Description of test
     # inputs - String, or list of args or dict of 'env', 'args', 'globals',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
-    #          detailed documentation. This test processor includes an
-    #          additional key, `subcmd`
-    # exp_response - Dictionary of expected responses,
+    #          detailed documentation
+    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
+    #                test definition (test: <testname>).
+    #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 

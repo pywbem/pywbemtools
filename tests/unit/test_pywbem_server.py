@@ -17,7 +17,7 @@
 # limitations under the License.
 
 """
-Tests for _common functions.
+Unit tests for PywbemServer class methods.
 """
 
 from __future__ import absolute_import, print_function
