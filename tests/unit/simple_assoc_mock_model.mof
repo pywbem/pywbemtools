@@ -1,3 +1,7 @@
+// This file defines a set of qualifiers declarations, classes and associations
+// that relate the member of family.
+// It is assumed that the entire model exists in a single namespace.
+
 Qualifier Association : boolean = false,
     Scope(association),
     Flavor(DisableOverride, ToSubclass);
@@ -51,11 +55,14 @@ class TST_FamilyCollection {
     string name;
 };
 
+// Define instances of TST_Person
+
 instance of TST_Person as $Mike { name = "Mike"; };
 instance of TST_Person as $Saara { name = "Saara"; };
 instance of TST_Person as $Sofi { name = "Sofi"; };
 instance of TST_Person as $Gabi{ name = "Gabi"; };
 
+// Define instances of the TST_PersonSub
 instance of TST_PersonSub as $Mikesub{ name = "Mikesub";
                             secondProperty = "one" ;
                             counter = 1; };
@@ -71,6 +78,8 @@ instance of TST_PersonSub as $Sofisub{ name = "Sofisub";
 instance of TST_PersonSub as $Gabisub{ name = "Gabisub";
                             secondProperty = "four" ;
                             counter = 4; };
+
+// Define instances of TST_Lineage
 
 instance of TST_Lineage as $MikeSofi
 {
@@ -92,6 +101,8 @@ instance of TST_Lineage  as $SaaraSofi
     parent = $Saara;
     child = $Sofi;
 };
+
+// Define instances of TST_FamilyCollection
 
 instance of TST_FamilyCollection as $Family1
 {

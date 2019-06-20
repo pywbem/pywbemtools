@@ -43,7 +43,8 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
     verify_operation, split_str_w_esc, format_keys, create_ciminstancename, \
-    NoCaseList
+    shorten_path_str, NoCaseList
+
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
@@ -197,11 +198,119 @@ TESTCASES_FORMAT_KEYBINDINGS = [
     TESTCASES_FORMAT_KEYBINDINGS)
 @simplified_test_function
 def test_format_keybindings(testcase, kb, width, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for format_keys function"""
     # The code to be tested
 
     kbs = CIMInstanceName('blah', kb)
     act_rtn = format_keys(kbs, width)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_SHORT_PATH = [
+    # TESTCASES for shorten_path_str
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * kb: keybinding
+    #   * rpl - definition of replacement parameter
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify simple keybinding replacement',
+     dict(kb=NocaseDict([('kEY1', u'Ham')]),
+          rpl={'kEY1': u'Ham'},
+          fp=False,
+          exp_rtn='/:cln.~'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, replace all',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': u'Ham', 'key2': 3},
+          fp=False,
+          exp_rtn='/:cln.~,~'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, one replacement',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': u'Ham', },
+          fp=False,
+          exp_rtn='/:cln.~,key2=3'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, no replacement because value different',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': u'Hamxxxx', },
+          fp=False,
+          exp_rtn='/:cln.kEY1="Ham",key2=3'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, replacement because value None',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': None, },
+          fp=False,
+          exp_rtn='/:cln.~,key2=3'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, replaced with tilde because values '
+     'match',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': None, 'key2': None},
+          fp=False,
+          exp_rtn='/:cln.~,~'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding, replaced with tilde because values '
+     'match',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          rpl={'kEY1': u'xxx', 'key2': 3},
+          fp=False,
+          exp_rtn='/:cln.kEY1="Ham",~'),
+     None, None, True),
+
+    ('Verify multiple keys binding with spaces in keys',
+     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+          rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
+          fp=False,
+          exp_rtn='/:cln.~,~'),
+     None, None, True),
+
+    ('Verify multiple keys binding with spaces in keys',
+     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+          rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
+          fp=True,
+          exp_rtn='/:cln.kEY1="Ham and eggs",key2="More eggs"'),
+     None, None, True),
+
+    ('Verify multiple keys binding multiple key types',
+     dict(kb=NocaseDict([('Name', 'Foo'),
+                         ('Number', Uint8(42)),
+                         ('Boolean', False),
+                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+          rpl={},
+          fp=False,
+          exp_rtn='/:cln.Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_SHORT_PATH)
+@simplified_test_function
+def test_short_path(testcase, kb, rpl, fp, exp_rtn):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    inst_name = CIMInstanceName('cln', kb)
+    act_rtn = shorten_path_str(inst_name, rpl, fp)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -2109,3 +2218,64 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
 # TODO Test compare with errors
 
 # NOTE: Format table is in test_tableformat.py
+
+
+TESTCASES_ASSOC_SHRUB = [
+    # TESTCASES for associatonshrub
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * pl_str: tuple of strings defining properties
+    #   * exp_pl: expected list return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('verify simple property list with 2 entries',
+     dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
+     None, None, True),
+
+    ('verify propertylist with single property entry',
+     dict(pl_str=("abc",), exp_pl=['abc']),
+     None, None, True),
+
+    ('verify multiple properties',
+     dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
+     None, None, True),
+
+    ('verify multiple properties and both multiple in on option and multiple '
+     'options.',
+     dict(pl_str=None, exp_pl=None),
+     None, None, True),
+
+    ('verify multiple properties and both multiple in on option and multiple '
+     'options.',
+     dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
+     None, None, True),
+
+
+    ('verify empty propertylist',
+     dict(pl_str=("",), exp_pl=[]),
+     None, None, False),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_ASSOC_SHRUB)
+@simplified_test_function
+def test_associatonshrub(testcase, pl_str, exp_pl):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    # wraps the test string in a tuple because that is the way the
+    # propertylist option returns the list since it is a multiple type
+    # option
+    plist = resolve_propertylist(pl_str)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert plist == exp_pl

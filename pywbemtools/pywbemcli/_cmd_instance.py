@@ -39,6 +39,9 @@ from ._common_options import add_options, propertylist_option, \
     summary_option, verify_option, multiple_namespaces_option, \
     association_filter_option, indication_filter_option, \
     experimental_filter_option
+
+from ._association_shrub import AssociationShrub
+
 from .config import DEFAULT_QUERY_LANGUAGE
 from ._click_extensions import PywbemcliGroup
 from ._cmd_class import get_namespaces, enumerate_classes_filtered
@@ -598,6 +601,72 @@ def instance_count(context, classname, **options):
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
 
+@instance_group.command('shrub', options_metavar=CMD_OPTS_TXT)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by association class name. '
+                   'Subclasses of the specified class also match.')
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False, metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
+@click.option('-r', '--role', type=str, required=False,
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@click.option('--rr', '--result-role', 'result_role', type=str, required=False,
+              metavar='PROPERTYNAME',
+              help='Filter the result set by far end role name.')
+@add_options(keybinding_key_option)
+@add_options(namespace_option)
+@add_options(summary_option)
+@click.option('-f', '--fullpath', default=False, is_flag=True,
+              help='Normally the instance paths in the tree views are '
+                   'by hiding some keys with ~ to make the tree simpler '
+                   'to read. This includes keys that have the same value '
+                   'for all instances and the "CreationClassName" key.  When'
+                   'this option is used the full instance paths are displayed.')
+@click.pass_obj
+def instance_shrub(context, instancename, **options):
+    """
+    Show the association shrub for INSTANCENAME.
+
+    The shrub is a view of all of the instance association relationships for
+    a defined INSTANCENAME showing the various components that are part of
+    the association including Role, AssocClasse,ResultRole, And ResultClas
+
+    The default view is a tree view from the INSTANCENAME to associated
+    instances.
+
+    Displays the shrub of association components for the association source
+    instance defined by INSTANCENAME.
+
+    The INSTANCENAME can be specified in two ways:
+
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
+
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
+
+    Normally the association information is displayed as a tree but it
+    may also be displayed as a table or as one of the object formats (ex. MOF)
+    of all instances that are part of the shrub if one of the cim object
+    formats is selected with the global output_format parameter.
+
+    Results are formatted as defined by the output format global option.
+    """
+    context.execute_cmd(lambda: cmd_instance_shrub(context, instancename,
+                                                   options))
+
+
 ####################################################################
 #
 #  Common functions for cmd_instance processing
@@ -706,7 +775,8 @@ def get_instancename(context, instancename, options):
 
         except CIMError as ce:
             if ce.status_code == CIM_ERR_NOT_FOUND:
-                raise click.ClickException('Class "{}" not found'.format(cln))
+                raise click.ClickException('Class "{}" not found'.
+                                           format(classname))
         except ValueError as ve:
             raise click.ClickException('{}: {}'.format(
                 ve.__class__.__name__, ve))
@@ -1138,5 +1208,33 @@ def cmd_instance_query(context, query, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=True)
 
+    except Error as er:
+        raise_pywbem_error_exception(er)
+
+
+def cmd_instance_shrub(context, instancename, options):
+    """
+    Display the association information defined by instancename as a tree
+    showing the various steps to get through the roles, references, etc. to
+    return the names of associated instances.
+    """
+
+    try:
+        instancepath = get_instancename(context, instancename, options)
+        if instancepath is None:
+            return
+
+        # Collect the data for the shrub
+        shrub = AssociationShrub(context, instancepath,
+                                 Role=options['role'],
+                                 AssocClass=options['assoc_class'],
+                                 ResultRole=options['result_role'],
+                                 ResultClass=options['result_class'],
+                                 verbose=context.verbose,
+                                 fullpath=options['fullpath'])
+
+        # display the shrub
+        context.spinner_stop()
+        shrub.display_shrub(context.output_format, options['summary'])
     except Error as er:
         raise_pywbem_error_exception(er)

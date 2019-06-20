@@ -1076,6 +1076,61 @@ class NoCaseList(object):
             self.str_list.append(strs)
 
 
+def shorten_path_str(path, replacements, fullpath):
+
+    """
+    Create a short-form path str from the input CIMInstanceName with selected
+    components shortened to just a single known character.  This allows
+    modifying the path string to replace selected key/value paris with a single
+    character. Thus where the original string is very long and contains
+    repeated key bindings (ex. CreationClassName) we can shorten the path
+    string by reducing selected key/value pairs to just ~
+
+    Parameters:
+
+      path (:class:`CIMInstanceName`):
+        CIMInstanceName object defining instance name to shorten
+
+      replacements:
+        Dictionary of the replacements containing a key names and key
+        values to be replaced. If the key value is None, they name alone
+        causes the replacement. Otherwise, both the name and value must
+        match.
+
+      fullpath((:class:`py:bool`):):
+        If True Return complete path using to_wbem_rul. Otherwise, shorten
+        the path by replacing keys defined by the replacements dictionary.
+        shorten the path, otherwise simply convert to string. Othewise
+
+    Returns:
+        String representation of the path.
+    """
+
+    if fullpath:
+        # Just build the full path string
+        name_str = path.to_wbem_uri()
+
+    else:
+        # Shorten path based on key definitons in replacements
+        kbs = path.keybindings
+        repl_list = []
+        magicvalue = 9999123999918
+        for k, v in kbs.items():
+            for key, value in replacements.items():
+                if k.lower() == key.lower():
+                    if value is None or v == value:
+                        repl_list.append((key, value))
+                        # Set the value to a known value for the replacement
+                        kbs[key] = magicvalue
+        path.keybindings = kbs
+        name_str = path.to_wbem_uri()
+        # replace each key binding in repl_list with ~ char
+        for key, value in repl_list:
+            name_str = name_str.replace("{}={}".format(key, magicvalue), "~", 1)
+
+    return name_str
+
+
 def _print_paths_as_table(objects, table_width, table_format):
     # pylint: disable=unused-argument
     """

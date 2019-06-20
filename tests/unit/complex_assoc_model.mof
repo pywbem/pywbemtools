@@ -1,0 +1,150 @@
+//
+//  MOF models defines a ternary association with subclasses to test
+//  the capability to process a ternary association and also toe
+//  process subclasses.
+//  This is based on the CIM InitiatorTargetLogicalPath classes in
+//  CIM with references for Initiator, Target, and LogicalDevice
+//  The names have been simplified to make creating tests easier.
+
+
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Override : string = null,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+    [Description("Top level class i.e ManagedElement")]
+class TST_ME {
+        [key]
+    Uint32 InstanceID;
+};
+
+    [Description("ManagedElement")]
+class TST_EP:TST_ME {
+    string EP_Prop;
+};
+
+    [Description("EndPoint")]
+class TST_EPSub:TST_EP {
+    string EP_SubProp;
+};
+
+    [Description("LogicalDevice")]
+class TST_LD:TST_ME  {
+    string LD_Prop;
+};
+
+    [Description("LogicalDevice Subclass")]
+class TST_LDSub:TST_LD  {
+    string LD_SubProp;
+};
+
+   [Association ( true ), Description ("Ternary way association." )]
+class TST_A3 {
+      [Key ( true ), Description ( "Initiator Endpoint." )]
+   TST_EP REF Initiator;
+
+      [Key ( true ),
+       Description ( "Target endpoint." )]
+   TST_EP REF Target;
+
+      [Key ( true ),
+       Description (
+          "Subclass of LogicalDevice representing a Logical Unit" )]
+   TST_LD REF LogicalUnit;};
+
+   [Association ( true ), Description ("Ternary way association subclass." )]
+class TST_A3Sub {
+      [Description ( "Initiator Endpointsub." ),
+      Override ( "Initiator" )]
+   TST_EP REF Initiator;
+
+      [Key ( true ),
+       Description ( "Target endpoint." )]
+   TST_EP REF Target;
+
+      [Description (
+          "Subclass of LogicalDevice representing a Logical Unit" ),
+       Override ( "Initiator" )]
+   TST_LD REF LogicalUnit;};
+
+// Instances for first association
+// Relate two TST_EP instances (initiator, target) to 1 TST_LD (this
+// class and subclass)
+// NOTE: InstanceID is monotonically increasing integer for all instances
+// in the model to make displays small and simplify tests
+instance of TST_EP as $EP1I {
+    InstanceID = 1;
+    EP_Prop = "Initiator1";};
+
+instance of TST_EP as $EP1T {
+    InstanceID = 2;
+    EP_Prop = "Target1";};
+
+instance of TST_LD as $LD1 {
+    InstanceID = 3;
+    LD_Prop = "LogDev1";};
+
+instance of TST_LDSub as $LD1Sub {
+    InstanceID = 4;
+    LD_Prop = "LogDev2";};
+
+instance of TST_A3 as $A311 {
+    Initiator = $EP1I;
+    Target = $EP1T;
+    LogicalUnit = $LD1;
+};
+
+// Instances for second association using same initiator
+// Relate two TST_EP instances (initiator, target) to 1 TST_LD (this
+// class and subclass)
+
+instance of TST_EP as $EP5T {
+    InstanceID = 5;
+    EP_Prop = "Target2";};
+
+instance of TST_LD as $LD6 {
+    InstanceID = 6;
+    LD_Prop = "LogDev3";};
+
+instance of TST_A3 as $A3151 {
+    Initiator = $EP1I;
+    Target = $EP5T;
+    LogicalUnit = $LD6;
+};
+
+// Instances for third association with same EP
+// Relate two TST_EP instances (initiator, target) to 1 TST_LD (this
+// class and subclass)
+
+instance of TST_EP as $EP7T {
+    InstanceID = 7;
+    EP_Prop = "Target7";};
+
+instance of TST_LD as $LD8 {
+    InstanceID = 8;
+    LD_Prop = "LogDev8";};
+
+instance of TST_LDSub as $LD9Sub {
+    InstanceID = 9;
+    LD_Prop = "LogDev4";};
+
+instance of TST_A3 as $A3122 {
+    Initiator = $EP1I;
+    Target = $EP7T;
+    LogicalUnit = $LD8;
+};
