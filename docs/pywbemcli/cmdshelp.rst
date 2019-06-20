@@ -1016,6 +1016,7 @@ Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
     Commands:
       count         Count the instances of each class with matching class name.
       associators   List the instances associated with an instance.
+      shrub         Show the association shrub for INSTANCENAME.
       get           Get an instance of a class.
       create        Create an instance of a class in a namespace.
       invokemethod  Invoke a method on an instance.
@@ -1695,6 +1696,83 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
+      -h, --help                      Show this message and exit.
+
+
+.. _`pywbemcli instance shrub --help`:
+
+pywbemcli instance shrub --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
+
+
+::
+
+    Usage: pywbemcli instance shrub [COMMAND-OPTIONS] INSTANCENAME
+
+      Show the association shrub for INSTANCENAME.
+
+      The shrub is a view of all of the instance association relationships for a
+      defined INSTANCENAME showing the various components that are part of the
+      association including Role, AssocClasse,ResultRole, And ResultClas
+
+      The default view is a tree view from the INSTANCENAME to associated
+      instances.
+
+      Displays the shrub of association components for the association source
+      instance defined by INSTANCENAME.
+
+      The INSTANCENAME can be specified in two ways:
+
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
+
+      2. By specifying a class name with wildcard for the keys in the
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
+      class are displayed and the user is prompted for an index number to select
+      an instance. The namespace in which the instances are looked up is the
+      namespace specified in the --namespace option, or otherwise the default
+      namespace of the connection.
+
+      Normally the association information is displayed as a tree but it may
+      also be displayed as a table or as one of the object formats (ex. MOF) of
+      all instances that are part of the shrub if one of the cim object formats
+      is selected with the global output_format parameter.
+
+      Results are formatted as defined by the output format global option.
+
+    Options:
+      --ac, --assoc-class CLASSNAME   Filter the result set by association class
+                                      name. Subclasses of the specified class also
+                                      match.
+      --rc, --result-class CLASSNAME  Filter the result set by result class name.
+                                      Subclasses of the specified class also
+                                      match.
+      -r, --role PROPERTYNAME         Filter the result set by source end role
+                                      name.
+      --rr, --result-role PROPERTYNAME
+                                      Filter the result set by far end role name.
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
+                                      times. Allows defining keys without the
+                                      issues of quotes. Default: No keybindings
+                                      provided.
+      -n, --namespace NAMESPACE       Namespace to use for this command, instead
+                                      of the default namespace of the connection.
+      -s, --summary                   Show only a summary (count) of the objects.
+      -f, --fullpath                  Normally the instance paths in the tree
+                                      views are by hiding some keys with ~ to make
+                                      the tree simpler to read. This includes keys
+                                      that have the same value for all instances
+                                      and the "CreationClassName" key.  Whenthis
+                                      option is used the full instance paths are
+                                      displayed.
       -h, --help                      Show this message and exit.
 
 
