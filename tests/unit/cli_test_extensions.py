@@ -20,14 +20,14 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
         Defines methods to execute tests on pywbemcli.
 
     """
-    def subcmd_test(self, desc, subcmd, inputs, exp_response, mock_file,
+    def subcmd_test(self, desc, subcmd, inputs, exp_response, mock_files,
                     condition, verbose=None):
         # pylint: disable=line-too-long, no-self-use
         """
         Test method to execute test on pywbemcli by calling the executable
         pywbemcli for the command defined by subcmd with arguments defined
         by args. This can execute pywbemcli either with a mock environment
-        by using the mock_file variable or without mock if the mock_file
+        by using the mock_files variable or without mock if the mock_files
         parameter is None. The method tests the results of the execution
         of pywbemcli using the exp_response parameter.
 
@@ -131,7 +131,7 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
                'rc' expected exit_code from pywbemcli.  If None, code 0
                is expected.
 
-          mock_file (:term:`string` or None):
+          mock_files (:term:`string` or list of string or None):
             If this is a string, this test will be executed using the
             --mock-server pywbemcl option with this file as the name of the
             objects to be compiled or executed. This should be just a file name
@@ -185,16 +185,16 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
         if global_args:
             cmd_line.extend(global_args)
 
-        if mock_file:
-            if isinstance(mock_file, (list, tuple)):
-                for item in mock_file:
+        if mock_files:
+            if isinstance(mock_files, (list, tuple)):
+                for item in mock_files:
                     cmd_line.extend(['--mock-server',
                                      os.path.join(TEST_DIR, item)])
-            elif isinstance(mock_file, six.string_types):
+            elif isinstance(mock_files, six.string_types):
                 cmd_line.extend(['--mock-server',
-                                 os.path.join(TEST_DIR, mock_file)])
+                                 os.path.join(TEST_DIR, mock_files)])
             else:
-                assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_file)
+                assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_files)
 
         if not stdin:
             cmd_line.append(subcmd)
