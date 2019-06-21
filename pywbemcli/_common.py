@@ -109,6 +109,63 @@ def resolve_propertylist(propertylist):
     return propertylist
 
 
+def pywbemcli_prompt(msg):
+    """
+    This function isolates the prompt call so that it can be mocked for
+    pywbemcli tests.
+    """
+    return prompt(msg)
+
+
+def pick_from_list(context, options, title):
+    """
+    Interactive component that displays a set of options (strings) and asks
+    the user to select one.  Returns the item and index of the selected string.
+
+    Parameters:
+      options:
+        List of strings from which one will is to be selected
+
+      title:
+        Title to display before selection
+
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl_C ends even the REPL.
+
+    Returns: Selected item from options_list
+
+    Exception: Returns ValueError if Ctrl-c input from console.
+
+    TODO: Possible Future This could be replaced by the python pick library
+    that would use curses for the selection process.
+    """
+    try:
+        context.spinner.stop()
+
+        click.echo(title)
+        index = -1
+        for str_ in options:
+            index += 1
+            click.echo('%s: %s' % (index, str_))
+        selection = None
+        msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' \
+            % index
+        while True:
+            try:
+                selection_txt = pywbemcli_prompt(msg)
+                selection = int(selection_txt)
+                if 0 <= selection <= index:
+                    context.spinner.start()
+                    return options[selection]
+            except ValueError:  # This causes the retry of the request
+                pass
+            except KeyboardInterrupt:
+                raise click.ClickException("Pick Aborted.")
+            click.echo('"%s" Invalid response %s' % (selection_txt, msg))
+    except Exception:
+        raise click.ClickException('Selection exception %s. Command Aborted')
+
+
 def pick_instance(context, objectname, namespace=None):
     """
     Display list of instances names from provided classname to console and user
@@ -136,85 +193,10 @@ def pick_instance(context, objectname, namespace=None):
         return None
 
     try:
-        index = pick_from_list(context, instance_names,
-                               'Pick Instance name to process')
-        return instance_names[index]
-    except Exception:
-        raise click.ClickException('Command Aborted')
-
-
-def _pick_from_list(context, options, title):
-    """
-    Interactive component that displays a set of options (strings) and asks
-    the user to select one.  Returns the item and index of the selected string.
-
-    Parameters:
-      options:
-        List of strings to select
-
-      title:
-        Title to display before selection
-
-    Retries until either integer within range of options list is input
-    or user enter no value. Ctrl_C ends even the REPL.
-
-    Returns: Index of selected item
-
-    Exception: Returns ValueError if Ctrl-c input from console.
-
-    TODO: This could be replaced by the python pick library that would use
-    curses for the selection process.
-    """
-    context.spinner.stop()
-
-    click.echo(title)
-    index = -1
-    for str_ in options:
-        index += 1
-        click.echo('%s: %s' % (index, str_))
-    selection = None
-    msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' % index
-    while True:
-        try:
-            selection = int(prompt(msg))
-            if selection >= 0 and selection <= index:
-                return selection
-        except ValueError:  # This causes the retry of the request
-            pass
-        except KeyboardInterrupt:
-            raise click.ClickException("Pick Aborted.")
-        click.echo('%s Invalid. %s' % (selection, msg))
-    context.spinner.start()
-
-
-def pick_from_list(context, options_list, title):
-    """
-    Interactive component that displays a set of options (strings) and asks
-    the user to select one.  Returns the item and index of the selected string.
-
-    Parameters:
-      options_list:
-        List of strings to select
-
-      title:
-        Title to display before selection
-
-    Retries until either integer within range of options list is input
-    or user enter no value. Ctrl_C ends even the REPL.
-
-    Returns: Index of selected item
-
-    Exception: Returns ValueError if Ctrl-c input from console.
-
-    TODO: This could be replaced by the python pick library that would use
-    curses for the selection process.
-    """
-    try:
-        index = _pick_from_list(context, options_list,
-                                'Pick Instance name to process')
-        return options_list[index]
-    except Exception:
-        raise click.ClickException('Command Aborted')
+        return pick_from_list(context, instance_names,
+                              'Pick Instance name to process')
+    except Exception as ex:
+        raise click.ClickException('Command Aborted. Exception %s' % ex)
 
 
 def is_classname(str_):
@@ -518,7 +500,8 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
                                        (name, cl_prop.type, cl_prop.is_array,
                                         value_str, ex))
 
-    new_inst = CIMInstance(cim_class.classname, properties=properties,
+    new_inst = CIMInstance(cim_class.classname,
+                           properties=properties,
                            property_list=property_list)
 
     return new_inst

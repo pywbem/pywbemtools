@@ -27,6 +27,8 @@ SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
+MOCK_PROMPT1_FILE = "mock_prompt_0.py"
+
 
 INST_HELP = """Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
 
@@ -715,13 +717,30 @@ TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-
     ['Verify instance subcommand -o grid get CIM_Foo -d',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'global': ['-o', 'simple']},
      {'stdout': ENUM_INST_GET_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand get with interactive option',
+     ['get', 'TST_Person', '-i'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Person {'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    ['Verify instance subcommand get with interactive option',
+     ['get', 'TST_Person', '--interactive'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Person {'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
 
     #
     #  get subcommand errors
@@ -733,15 +752,6 @@ TEST_CASES = [
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance subcommand get error. bad classname',
-     ['get', 'CIM_Foo.InstanceID="CIM_blah"'],
-     {'stderr':
-      ["Error: CIMError: 6"],
-      'rc': 1,
-      'test': 'in'},
-     SIMPLE_MOCK_FILE, OK],
-
     #
     #  instance create subcommand
     #
@@ -993,6 +1003,25 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand delete with interactive option',
+     ['delete', 'TST_Person', '-i'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    ['Verify instance subcommand delete with interactive option',
+     ['delete', 'TST_Person', '--interactive'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    #
+    # Delete subcommand error tests
+    #
     ['Verify instance subcommand delete, missing instance name',
      ['delete'],
      {'stderr':
@@ -1109,7 +1138,6 @@ TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO add more invalid references tests
     ['Verify instance subcommand references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
@@ -1124,6 +1152,29 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references with interactive option -i',
+     ['references', 'TST_Person', '-i'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Lineage {',
+       'instance of TST_MemberOfFamilyCollection {'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    ['Verify instance subcommand references with interactive option '
+     '--interactive',
+     ['references', 'TST_Person', '--interactive'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Lineage {',
+       'instance of TST_MemberOfFamilyCollection {'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    # TODO add more invalid references tests
 
     #
     #  instance associators subcommand
@@ -1168,6 +1219,19 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand associators with interactive option -i',
+     ['associators', 'TST_Person', '-i'],
+     {'stdout':
+      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Person {',
+       'instance of TST_FamilyCollection {'],
+      'rc': 0,
+      'test': 'in'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    # TODO add associators error tests
+
     #
     #  instance count subcommand
     #
@@ -1197,6 +1261,7 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
     # TODO add subclass instances to the count test.
 
     #
