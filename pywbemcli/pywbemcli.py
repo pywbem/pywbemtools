@@ -133,7 +133,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    .format(tb='|'.join(TABLE_FORMATS),
                            ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)) +
                    '[Default: "{}"]'.format(DEFAULT_OUTPUT_FORMAT))
-@click.option('--use-pull_ops',
+@click.option('--use-pull-ops',
               envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),
               help='Determines whether the pull operations are used for '
@@ -234,6 +234,21 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                     new_mock_server.append(fn)
             mock_server = new_mock_server
 
+            # abort for non-existent mock files or invalid type
+            # Otherwise these issued do not get found until connection
+            # exercised.
+            for fn in mock_server:
+                ext = os.path.splitext(fn)[1]
+                if ext not in ['.py', '.mof']:
+                    click.echo('Error: --mock-server: File: %s '
+                               'extension "%s" not valid. "py" or "mof" '
+                               'required' % (fn, ext), err=True)
+                    raise click.Abort()
+                if not os.path.isfile(fn):
+                    click.echo('Error: --mock-server: File: %s does '
+                               'not exist' % fn, err=True)
+                    raise click.Abort()
+
         if use_pull_ops:
             if use_pull_ops == 'either':
                 use_pull_ops = None
@@ -286,8 +301,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                         # pylint: disable=protected-access
                         pywbem_server._log = log
                 else:
-                    raise click.ClickException('%s named connection does not '
-                                               'exist' % name)
+                    raise click.ClickException('Named connection "{}" does '
+                                               'not exist'.format(name))
             else:
                 pywbemcli_servers = ConnectionRepository()
                 if 'default' in pywbemcli_servers:

@@ -19,14 +19,12 @@ test directory is the same as the current working directory where pywbemcli
 was called.
 """
 
-# TODO: clean up the connection repository file before and after the
-#       tests
-
 import os
 import pytest
+from pywbemcli._connection_repository import DEFAULT_CONNECTIONS_FILE
+
 from .cli_test_extensions import CLITestsBase
 
-from pywbemcli._connection_repository import DEFAULT_CONNECTIONS_FILE
 
 SCRIPT_DIR = os.path.dirname(__file__)
 TEST_DIR = os.getcwd()
@@ -346,7 +344,7 @@ TEST_CASES = [
     # # {'stdout': ["Name: test1", "  WBEMServer uri: http://blah",
     #  # "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
     #  # "  Timeout: None", "  Noverify: False", "  Certfile: None",
-    #  # "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+    #  # "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
     #  # "  log: None"],
     #  # 'test': 'in'},
     # # None, RUN],
@@ -386,7 +384,7 @@ TEST_CASES = [
          "Name: test1", "  WBEMServer uri: http://blah",
          "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
          "  Timeout: None", "  Noverify: False", "  Certfile: None",
-         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: None"],
       'test': 'in'},
      None, OK],
@@ -405,7 +403,7 @@ TEST_CASES = [
          "Name: test1", "  WBEMServer uri: http://blah",
          "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
          "  Timeout: None", "  Noverify: False", "  Certfile: None",
-         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: None"],
       'test': 'in'},
      None, OK],
@@ -416,7 +414,7 @@ TEST_CASES = [
          "Name: test2", "  WBEMServer uri: http://blahblah",
          "  Default_namespace: root/cimv2", "  User: fred", "  Password: argh",
          "  Timeout: 18", "  Noverify: True", "  Certfile: None",
-         "  Keyfile: None", "  use_pull_ops: None", "  mock: []",
+         "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: api=file,all"],
       'test': 'in'},
      None, OK],
@@ -495,16 +493,17 @@ TEST_CASES = [
     ['Verify connection subcommand show with all params',
      ['show', 'addallargs'],
      {'stdout': [
-         "Name: addallargs",
-         "  WBEMServer uri: http://blah",
-         "  Default_namespace: root/blah",
-         "  User: john",
-         "  Password: pw",
-         "  Certfile: mycertfile.pem",
-         "  Keyfile: mykeyfile.pem",
-         "  use_pull_ops: None",
-         "  mock: []",
-         "  log: None"],
+         'Name: addallargs',
+         '  WBEMServer uri: http://blah',
+         '  Default_namespace: root/blah',
+         '  User: john',
+         '  Password: pw',
+         '  Certfile: mycertfile.pem',
+         '  Keyfile: mykeyfile.pem',
+         '  use-pull-ops: None',
+         '  pull-max-cnt: 1000',
+         '  mock: ',
+         '  log: None'],
       'test': 'in'},
      None, OK],
 

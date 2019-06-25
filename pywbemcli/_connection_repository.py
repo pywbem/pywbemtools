@@ -65,7 +65,6 @@ class ConnectionRepository(object):
                                  "initalization original {} new {}".
                                  format(self._connections_file,
                                         connections_file))
-        # print("CONNREPO FILE %s" % self.connections_file)
 
     @property
     def connections_file(self):
@@ -100,10 +99,7 @@ class ConnectionRepository(object):
         return self._pywbemcli_servers[key]
 
     def __delitem__(self, key):
-        print("DELETE key %s dict %s" % (key, self._pywbemcli_servers))
         del self._pywbemcli_servers[key]
-        print("DELETE dict %s" % self._pywbemcli_servers)
-
         self.save()
 
     def __len__(self):
@@ -170,8 +166,8 @@ class ConnectionRepository(object):
     def add(self, name, svr_definition):
         """
         Add a new connection to the connections repository or replace an
-        existing connection.  User should check before add if they do not
-        want to replace an existing entry.
+        existing connection.  Users of this method should check before add if
+        they do not want to replace an existing entry.
         """
         ConnectionRepository._pywbemcli_servers[name] = svr_definition
         self._write_file()
@@ -186,7 +182,8 @@ class ConnectionRepository(object):
         Write the connections file if one has been loaded.
         If the dictionary is empty, it attempts to delete the file.
 
-        If there is an existing file it is moved to filename.bak
+        If there is an existing file it is moved to filename.bak and a new
+        current file written.
         """
         jsondata = {}
         if self._pywbemcli_servers:

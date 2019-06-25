@@ -892,7 +892,6 @@ def _print_paths_as_table(objects, table_width, table_format):
         if isinstance(objects[0], six.string_types):
             headers = ('path')
             rows = [obj for obj in objects]
-            print('HDR %s\nROWS %r' % (headers, rows))
         elif isinstance(objects[0], (CIMInstanceName, CIMClassName)):
             headers = ('host', 'namespace', 'keybindings')
             rows = [[obj.host, obj.namespace, obj.keybindings]
@@ -921,8 +920,6 @@ def _print_qual_decls_as_table(qual_decls, table_width, table_format):
         scopes = '\n'.join([key for key in q.scopes if q.scopes[key]])
         flavors = []
         flavors.append('EnableOverride' if q.overridable else 'DisableOverride')
-        # flavors = q.overridable and 'EnableOverride' or 'DisableOverride'
-        # flavors += ','
         flavors.append('ToSubclass' if q.tosubclass else 'Restricted')
         if q.translatable:
             flavors.append('Translatable')
