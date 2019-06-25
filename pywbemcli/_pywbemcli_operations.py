@@ -290,16 +290,19 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
     Each file path may be:
 
       a python file if the suffix is 'mof'. A mof file is compiled into the
-      repository with the method TODO
+      repository with the method
+
+    Returns a variety of errors for file not found, MOF syntax errors, and
+    python syntax errors.
     """
     def build_repository(self, conn, file_path_list, verbose):
         """
         Build the repository from the file_path list
         """
         for file_path in file_path_list:
-            ext = os.path.splitext(file_path)[1]
             if not os.path.exists(file_path):
-                raise ValueError('File name %s does not exist' % file_path)
+                raise IOError("No such file: %s", file_path)
+            ext = os.path.splitext(file_path)[1]
             if ext == '.mof':
                 conn.compile_mof_file(file_path)
             elif ext == '.py':
@@ -309,7 +312,10 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
                         globalparams = {'CONN': conn, 'VERBOSE': verbose}
                         # pylint: disable=exec-used
                         exec(fp.read(), globalparams, None)
+                except IOError:
+                    raise
 
+        # Other errors, display complete traceback
                 except Exception as ex:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     tb = repr(traceback.format_exception(exc_type, exc_value,
@@ -322,9 +328,9 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
                         (file_path, conn, ex, tb))
 
             else:
-                raise ValueError('Invalid suffix %s on "--mock-server" '
-                                 'global parameter %s. Must be "py" or "mof".'
-                                 % (ext, file_path))
+                raise IOError('Invalid suffix %s on "--mock-server" '
+                              'global parameter %s. Must be "py" or "mof".'
+                              % (ext, file_path))
 
         if verbose:
             self.display_repository()

@@ -292,19 +292,20 @@ def show_connection_information(context, svr, separate_line=True):
 
     click.echo('\nName: %s%sWBEMServer uri: %s%sDefault_namespace: %s'
                '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
-               'Certfile: %s%sKeyfile: %s%suse_pull_ops: %s%smock: %r%s'
-               'log: %s'
+               'Certfile: %s%sKeyfile: %s%suse-pull-ops: %s%spull-max-cnt: %s%s'
+               'mock: %s%slog: %s'
                % (svr.name, sep,
                   svr.server_url, sep,
                   svr.default_namespace, sep,
                   svr.user, sep,
                   svr.password, sep,
-                  svr.timeout,
-                  sep, svr.noverify,
-                  sep, svr.certfile, sep,
+                  svr.timeout, sep,
+                  svr.noverify, sep,
+                  svr.certfile, sep,
                   svr.keyfile, sep,
                   svr.use_pull_ops, sep,
-                  svr._mock_server, sep,
+                  svr.pull_max_cnt, sep,
+                  ", ".join(svr._mock_server), sep,
                   svr.log))
 
     if svr._mock_server and context.verbose:

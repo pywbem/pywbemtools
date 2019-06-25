@@ -100,7 +100,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       [table|plain|simple|grid|rst], Object:
                                       [mof|xml|txt|tree]
                                       [Default: "simple"]
-      --use-pull_ops [yes|no|either]  Determines whether the pull operations are
+      --use-pull-ops [yes|no|either]  Determines whether the pull operations are
                                       used for EnumerateInstances,
                                       associatorinstances, referenceinstances, and
                                       ExecQuery operations.

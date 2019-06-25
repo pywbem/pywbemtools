@@ -68,7 +68,8 @@ def _validate_server_url(server):
     return url
 
 
-class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
+class PywbemServer(object):
+    # pylint: disable=too-many-instance-attributes, useless-object-inheritance
     """
     Envelope for connections with WBEM Server incorporates both the
     pywbem WBEMConnection and pywbem WBEMServer classes.
@@ -354,8 +355,11 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(
                 default_namespace=self.default_namespace)
-
-            conn.build_repository(conn, self._mock_server, verbose)
+            try:
+                conn.build_repository(conn, self._mock_server, verbose)
+            except IOError as io:
+                click.echo('IOError exception %s' % io, err=True)
+                raise click.Abort()
         else:
             if not self.server_url:
                 raise click.ClickException('Server URL is empty. Cannot '
@@ -382,13 +386,14 @@ class PywbemServer(object):  # pylint: disable=too-many-instance-attributes
 
             # Create the WBEMConnection object and the _wbem_server object
 
-            # pylint: disable=redefined-variable-type
-            conn = PYWBEMCLIConnection(self.server_url, creds,
-                                       default_namespace=self.default_namespace,
-                                       no_verification=self.noverify,
-                                       x509=x509_dict, ca_certs=self.ca_certs,
-                                       timeout=self.timeout,
-                                       stats_enabled=self.stats_enabled)
+            conn = PYWBEMCLIConnection(
+                self.server_url, creds,
+                default_namespace=self.default_namespace,
+                no_verification=self.noverify,
+                x509=x509_dict, ca_certs=self.ca_certs,
+                timeout=self.timeout,
+                use_pull_operations=self.use_pull_ops,
+                stats_enabled=self.stats_enabled)
 
         if self.log:
             try:
