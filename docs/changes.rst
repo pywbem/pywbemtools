@@ -56,5 +56,9 @@ Bug fixes
 Build, test, quality
 ^^^^^^^^^^^^^^^^^^^^
 
+* Test: Removed pinning of distro version on Travis to Ubuntu xenial (16.04) 
+  for Python 3.7, because that is now the default distro version, in order to
+  pick up a future increase of the default distro version automatically.
+
 Documentation
 ^^^^^^^^^^^^^
