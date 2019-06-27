@@ -33,18 +33,22 @@ The following defines the help output for the `pywbemcli  --help` subcommand
 
     Options:
       -s, --server URI                Hostname or IP address with scheme of the
-                                      WBEMServer in format
-                                      [{scheme}://]{host}[:{port}] (optional, see
-                                      --name).
-                                      - Scheme: must be "https" or "http"
-                                      [Default: "https"].
-                                      - Host: defines short or
-                                      fully qualified DNS hostname, a literal IPV4
-                                      address (dotted) or a literal IPV6 address.
-                                      - Port: (optional) defines WBEM server port
-                                      to be used [Defaults:5988(HTTP) and 5989
-                                      (HTTPS)].
-                                      (EnvVar: PYWBEMCLI_SERVER).
+                                      WBEMServer in format:
+                                      [{scheme}://]{host}[:{port}]
+                                      The server
+                                      parameter is conditionally optional (see
+                                      --name)
+                                      * Scheme: must be "https" or "http"
+                                      [Default: "https"]
+                                      * Host: defines
+                                      short/fully qualified DNS hostname, literal
+                                      IPV4 address (dotted), or literal IPV6
+                                      address
+                                      * Port: (optional) defines WBEM
+                                      server port to be used [Defaults: 5988(HTTP)
+                                      and 5989(HTTPS)].
+                                      (EnvVar:
+                                      PYWBEMCLI_SERVER).
       -N, --name NAME                 Name for the connection(optional, see
                                       --server).  If this option exists and the
                                       server option does not exist pywbemcli
@@ -92,21 +96,21 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       choice depending on the operation since not
                                       all formats apply to all output data types.
                                       Choices further defined in documentation.
-                                      Choices: ['table', 'plain', 'simple',
-                                      'grid', 'rst', 'mof', 'xml', 'txt', 'repr',
-                                      'tree']
+                                      Choices: Table:
+                                      [table|plain|simple|grid|rst], Object:
+                                      [mof|xml|txt|tree]
                                       [Default: "simple"]
       --use-pull_ops [yes|no|either]  Determines whether the pull operations are
                                       used for EnumerateInstances,
                                       associatorinstances, referenceinstances, and
                                       ExecQuery operations.
-                                      - "yes": pull
+                                      * "yes": pull
                                       operations used; if server does not support
                                       pull, the operation will fail.
-                                      - "no":
+                                      * "no":
                                       forces pywbemcli to try only the traditional
                                       non-pull operations.
-                                      - "either": pywbemcli
+                                      * "either": pywbemcli
                                       trys first pull and then  traditional
                                       operations.
                                       (EnvVar: PYWBEMCLI_USE_PULL)
@@ -121,15 +125,15 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
                                       component to a log level, destination, and
                                       detail level.
-                                      - COMP: [api|http|all],
+                                      * COMP: [api|http|all],
                                       Default: all
-                                      - DEST: [file|stderr], Default:
+                                      * DEST: [file|stderr], Default:
                                       file
-                                      - DETAIL:[all|paths|summary], Default:
+                                      * DETAIL:[all|paths|summary], Default:
                                       all
       -v, --verbose                   Display extra information about the
                                       processing.
-      -m, --mock-server FILENAME      Define, a mock WBEM server is as the target
+      -m, --mock-server FILENAME      Defines, a mock WBEM server is as the target
                                       WBEM server. The option value defines a MOF
                                       or Python file path used to populate the
                                       mock repository. This option may be used
