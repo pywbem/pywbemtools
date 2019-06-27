@@ -245,9 +245,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 raise click.ClickException(
                     'Invalid choice for use_pull_ops %s' % use_pull_ops)
         else:
-            use_pull_ops = 'either'
+            use_pull_ops = DEFAULT_PULL_CHOICE
+
         if pull_max_cnt is None:
             pull_max_cnt = DEFAULT_MAXPULLCNT
+
         if timeout is None:
             timeout = DEFAULT_CONNECTION_TIMEOUT
 
@@ -303,9 +305,9 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         if output_format is None:
             output_format = ctx.obj.output_format
         if use_pull_ops is None:
-            output_format = ctx.obj.use_pull_ops
+            use_pull_ops = ctx.obj.use_pull_ops
         if pull_max_cnt is None:
-            output_format = ctx.obj.use_pull_ops
+            pull_max_cnt = ctx.obj.use_pull_ops
         if pywbem_server is None:
             timestats = ctx.obj.pull_max_cnt
         if log is None:
