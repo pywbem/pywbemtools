@@ -742,10 +742,9 @@ def display_cim_objects_summary(context, objects):
     count.
     """
     context.spinner.stop()
-    if context.output_format:
-        output_format = context.output_format
-    else:
-        output_format = 'mof'
+
+    # default when displaying cim objects is mof
+    output_format = context.output_format or 'mof'
 
     if objects:
         cim_type = get_cimtype(objects)
@@ -762,7 +761,6 @@ def display_cim_objects_summary(context, objects):
 
 
 def display_cim_objects(context, objects, output_format=None, summary=False):
-    # pylint: disable=line-too-long
     """
     Display CIM objects in form determined by input parameters.
 
@@ -802,13 +800,13 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
       summary(:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
-    """    # noqa: E501
-    # pylint: enable=line-too-long
+    """
     context.spinner.stop()
 
     if summary:
         display_cim_objects_summary(context, objects)
         return
+
     # default when displaying cim objects is mof
     output_format = context.output_format or 'mof'
 
