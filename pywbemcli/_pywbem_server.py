@@ -354,7 +354,9 @@ class PywbemServer(object):
         """
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(
-                default_namespace=self.default_namespace)
+                default_namespace=self.default_namespace,
+                use_pull_operations=self.use_pull_ops,
+                stats_enabled=self.stats_enabled)
             try:
                 conn.build_repository(conn, self._mock_server, verbose)
             except IOError as io:
