@@ -757,7 +757,7 @@ TEST_CASES = [
     ['Verify instance subcommand get with interactive option',
      ['get', 'TST_Person', '-i'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+      ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
@@ -766,7 +766,7 @@ TEST_CASES = [
     ['Verify instance subcommand get with interactive option',
      ['get', 'TST_Person', '--interactive'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+      ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
@@ -1036,7 +1036,7 @@ TEST_CASES = [
     ['Verify instance subcommand delete with interactive option',
      ['delete', 'TST_Person', '-i'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+      ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
@@ -1044,7 +1044,7 @@ TEST_CASES = [
     ['Verify instance subcommand delete with interactive option',
      ['delete', 'TST_Person', '--interactive'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+      ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
@@ -1186,7 +1186,7 @@ TEST_CASES = [
     ['Verify instance subcommand references with interactive option -i',
      ['references', 'TST_Person', '-i'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+      ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
@@ -1197,7 +1197,7 @@ TEST_CASES = [
      '--interactive',
      ['references', 'TST_Person', '--interactive'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+      ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
@@ -1253,7 +1253,7 @@ TEST_CASES = [
     ['Verify instance subcommand associators with interactive option -i',
      ['associators', 'TST_Person', '-i'],
      {'stdout':
-      ['//FakedUrl/root/cimv2:TST_Person.name="Mike"',
+      ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {',
        'instance of TST_FamilyCollection {'],
       'rc': 0,

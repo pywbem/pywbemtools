@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Test global options that can be tested without a subcommand
+Test global options.
+NOTE: The --log opetions are tested in a separate file.
 """
 from __future__ import absolute_import, print_function
 
@@ -171,7 +172,7 @@ Commands:
 
 OK = True
 RUN = True
-FrueAIL = False
+FAIL = False
 
 TEST_CASES = [
     # desc - Description of test
@@ -185,7 +186,7 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['verify -help.',
+    ['Verify -help.',
      {'global': ['--help'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
@@ -194,7 +195,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    ['verify invalid server definition.',
+    ['Verify invalid server definition.',
      {'global': ['-s', 'httpx://blah'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
@@ -204,17 +205,16 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify invalid server port definition.',
+    ['Verify invalid server port definition.',
      {'global': ['-s', 'http://blah:abcd'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
-     {'stderr': ['Error: ConnectionError: Socket error: [Errno -2] Name or '
-      'service not known'],
+     {'stderr': ['Error:', 'ConnectionError', 'Socket error'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
-    ['verify valid pull_ops parameter.',
+    ['Verify valid pull_ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'yes'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -223,7 +223,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify valid pull_ops parameter.',
+    ['Verify valid pull_ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'no'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -232,7 +232,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify valid pull_ops parameter.',
+    ['Verify valid pull_ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'either'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -241,17 +241,17 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify invalid pull-ops parameter.',
+    ['Verify invalid pull-ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': ['Error: Invalid value for "--use-pull-ops": invalid choice: '
-      'blah. (choose from yes, no, either)'],
+                 'blah. (choose from yes, no, either)'],
       'rc': 2,
       'test': 'in'},
      None, OK],
 
-    ['verify valid pull-max-cnt parameter.',
+    ['Verify valid pull-max-cnt parameter.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -260,17 +260,17 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify invalid pull-max-cnt parameter.',
+    ['Verify invalid pull-max-cnt parameter.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': ['Error: Invalid value for "--pull-max-cnt": blah is not a '
-      'valid integer'],
+                 'valid integer'],
       'rc': 2,
       'test': 'in'},
      None, OK],
 
-    ['verify --version global option.',
+    ['Verify --version global option.',
      {'global': ['-s', 'http://blah', '--version'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -279,59 +279,60 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['verify --mock option one file',
+    ['Verify --mock option one file',
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH],
       'subcmd': 'connection',
       'args': ['show']},
      {'stdout': ['Name: default',
                  'WBEMServer uri: None',
-                 'mock: /home/kschopmeyer/pywbem/pywbemtools/'
-                 'tests/unit/simple_mock_model.mof',
+                 'mock:',
+                 'simple_mock_model.mof',
                  'Default_namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
 
-    ['verify --mock option, multiple files',
+    ['Verify --mock option, multiple files',
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH,
                  '-m', PYTHON_MOCK_FILE_PATH],
       'subcmd': 'connection',
       'args': ['show']},
      {'stdout': ['Name: default',
                  'WBEMServer uri: None',
-                 'mock: /home/kschopmeyer/pywbem/pywbemtools/'
-                 'tests/unit/simple_mock_model.mof',
+                 'mock: ',
+                 r'simple_mock_model\.mof',
+                 r'simple_python_mock_script\.py',
                  'Default_namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
 
-    ['verify --mock option, file does not exist',
+    ['Verify --mock option, file does not exist',
      {'global': ['-m', 'invalidfilename.mof'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: --mock-server: File: '
-                 '/home/kschopmeyer/pywbem/pywbemtools/invalidfilename.mof '
+     {'stderr': ['Error: --mock-server: File: ',
+                 'pywbemtools', 'invalidfilename.mof ',
                  'does not exist',
                  'Aborted!'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
-    ['verify --mock option, file with bad extension',
+    ['Verify --mock option, file with bad extension',
      {'global': ['-m', 'invalidfilename.mofx'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: --mock-server: File: '
-                 '/home/kschopmeyer/pywbem/pywbemtools/invalidfilename.mofx '
+     {'stderr': ['Error: --mock-server: File: ',
+                 'pywbemtools', 'invalidfilename.mofx ',
                  'extension ".mofx" not valid. "py" or "mof" required',
                  'Aborted!'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
 
-    ['verify --name options with new name but not in repo failse',
+    ['Verify --name options with new name but not in repo failse',
      {'global': ['-N', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -342,7 +343,7 @@ TEST_CASES = [
 
 
 
-    ['verify --name options with new name but not in repo failse',
+    ['Verify --name options with new name but not in repo failse',
      {'global': ['--name', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -351,34 +352,34 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['verify --mock option one file and name OK',
+    ['Verify --mock option one file and name OK',
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stdout': ['Name: MyConnName',
                  'WBEMServer uri: None',
-                 'mock: /home/kschopmeyer/pywbem/pywbemtools/'
-                 'tests/unit/simple_mock_model.mof',
+                 'mock: ',
+                 'pywbemtools', 'tests', 'simple_mock_model.mof',
                  'Default_namespace: root/cimv2'],
       'rc': 0,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
-    ['verify --mock option one file and name OK',
+    ['Verify --mock option one file and name OK',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
                  'MyConnName'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stdout': ['Name: MyConnName',
                  'WBEMServer uri: None',
-                 'mock: /home/kschopmeyer/pywbem/pywbemtools/'
-                 'tests/unit/simple_mock_model.mof',
+                 'mock: ',
+                 'pywbemtools', 'tests', 'simple_mock_model.mof',
                  'Default_namespace: root/cimv2'],
       'rc': 0,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
-    ['verify --timestats',
+    ['Verify --timestats',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
                  'MyConnName', '--timestats'],
       'subcmd': 'class',
@@ -391,7 +392,7 @@ TEST_CASES = [
      None, OK],
 
 
-    ['verify --timestats -T',
+    ['Verify --timestats -T',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
                  'MyConnName', '-T'],
       'subcmd': 'class',
@@ -404,7 +405,7 @@ TEST_CASES = [
      None, OK],
 
 
-    ['verify uses pull Operation when us',
+    ['Verify uses pull Operation when us. Uses timestats for output test',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
       'subcmd': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
@@ -414,10 +415,50 @@ TEST_CASES = [
       'rc': 0,
       'test': 'regex'},
      None, OK],
+
+    ['Verify uses pull Operation  with option either',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                 '--timestats',
+                 '--use-pull-ops', 'either'],
+      'subcmd': 'instance',
+      'args': ['enumerate', 'CIM_Foo']},
+     {'stdout': ['instance of CIM_Foo {',
+                 '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
+                 ' OpenEnumerateInstances'],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
+
+
+    ['Verify uses pull Operation with option yes',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                 '--timestats',
+                 '--use-pull-ops', 'yes'],
+      'subcmd': 'instance',
+      'args': ['enumerate', 'CIM_Foo']},
+     {'stdout': ['instance of CIM_Foo {',
+                 '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
+                 ' OpenEnumerateInstances'],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
+
+
+    ['Verify uses pull Operation with option no',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                 '--timestats',
+                 '--use-pull-ops', 'no'],
+      'subcmd': 'instance',
+      'args': ['enumerate', 'CIM_Foo']},
+     {'stdout': ['instance of CIM_Foo {',
+                 '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
+                 ' EnumerateInstances'],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
 ]
 
-# TODO add test for pull operations with use-pull-ops and pull ops max size
-# TODO add tests for log option. NOTE Already in test_log_option.py
+# TODO add test for pull operations with pull ops max size variations
 
 
 class TestGlobalOptions(CLITestsBase):
