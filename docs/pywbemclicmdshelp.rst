@@ -180,7 +180,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
 
     Commands:
       associators   Get the associated classes for CLASSNAME.
-      delete        Delete a single class.
+      delete        Delete a single CIM class.
       enumerate     Enumerate classes from the WBEM Server.
       find          Find all classes that match CLASSNAME-REGEX.
       get           Get and display a single CIM class.
@@ -217,7 +217,7 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       name) should be associated to the source
                                       class through this class or its subclasses.
                                       Optional.
-      -c, --resultclass <class name>  Filter by the association result class name
+      -C, --resultclass <class name>  Filter by the association result class name
                                       provided. Each returned class (or class
                                       name) should be this class or one of its
                                       subclasses. Optional
@@ -272,12 +272,14 @@ The following defines the help output for the `pywbemcli class delete --help` su
 
     Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
 
-      Delete a single class.
+      Delete a single CIM class.
 
-      Deletes the class defined by CLASSNAME from the WBEM Server.
+      Deletes the CIM class defined by CLASSNAME from the WBEM Server.
 
       If the class has instances, the command is refused unless the --force
       option is used. If --force is used, instances are also deleted.
+
+      If the class has subclasses, the command is rejected.
 
       WARNING: Removing classes from a WBEM Server can cause damage to the
       server. Use this with caution.  It can impact instance providers and other
