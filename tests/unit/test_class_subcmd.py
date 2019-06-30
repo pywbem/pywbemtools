@@ -26,7 +26,9 @@ TEST_DIR = os.path.dirname(__file__)
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
+SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 
 CLS_HELP = """Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
@@ -41,7 +43,7 @@ Options:
 
 Commands:
   associators   Get the associated classes for CLASSNAME.
-  delete        Delete a single class.
+  delete        Delete a single CIM class.
   enumerate     Enumerate classes from the WBEM Server.
   find          Find all classes that match CLASSNAME-REGEX.
   get           Get and display a single CIM class.
@@ -146,6 +148,79 @@ Options:
                           namespace overrides the general options namespace
   -h, --help              Show this message and exit.
 """
+
+CLASS_DELETE_HELP = """Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
+
+  Delete a single CIM class.
+
+  Deletes the CIM class defined by CLASSNAME from the WBEM Server.
+
+  If the class has instances, the command is refused unless the --force
+  option is used. If --force is used, instances are also deleted.
+
+  If the class has subclasses, the command is rejected.
+
+  WARNING: Removing classes from a WBEM Server can cause damage to the
+  server. Use this with caution.  It can impact instance providers and other
+  components in the server.
+
+  Some servers may refuse the operation.
+
+Options:
+  -f, --force             Force the delete request to be issued even if there
+                          are instances in the server or subclasses to this
+                          class. The WBEM Server may still refuse the request.
+  -n, --namespace <name>  Namespace to use for this operation. If defined that
+                          namespace overrides the general options namespace
+  -h, --help              Show this message and exit.
+"""
+
+REFERENCES_CLASS_RTN = [
+    '//FakedUrl/root/cimv2:TST_Lineage',
+    '   [Association ( true ),',
+    '    Description (',
+    '       " Lineage defines the relationship between parents and '
+    'children." )]',
+    'class TST_Lineage {',
+    '',
+    '      [key ( true )]',
+    '   string InstanceID;',
+    '',
+    '   TST_Person REF parent;',
+    '',
+    '   TST_Person REF child;',
+    ''
+    '};'
+    '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
+    '   [Association ( true ),',
+    '    Description ( " Family gathers person to family." )]',
+    'class TST_MemberOfFamilyCollection {',
+    '',
+    '      [key ( true )]',
+    '   TST_Person REF family;',
+    '',
+    '      [key ( true )]',
+    '   TST_Person REF member;',
+    '',
+    '};',
+    '', ]
+
+REFERENCES_CLASS_RTN2 = [
+    '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
+    '   [Association ( true ),',
+    '    Description ( " Family gathers person to family." )]',
+    'class TST_MemberOfFamilyCollection {',
+    '',
+    '      [key ( true )]',
+    '   TST_Person REF family;',
+    '',
+    '      [key ( true )]',
+    '   TST_Person REF member;',
+    '',
+    '};',
+    '',
+    '']
+
 
 OK = True  # mark tests OK when they execute correctly
 RUN = True  # Mark OK = False and current test case being created RUN
@@ -362,7 +437,8 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand get with empty propertylist, . Tests whole response',
+    ['Verify class subcommand get with empty propertylist, . Tests whole '
+     'response',
      ['get', 'CIM_Foo_sub2', '-p', '""'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Description ( "Method with in and out parameters" )'
@@ -425,19 +501,28 @@ TEST_CASES = [
     #
     # find subcommand
     #
-    ['class subcommand find -h, ',
+    ['Verify class subcommand find -h, ',
      ['find', '-h'],
      {'stdout': CLASS_FIND_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['class subcommand find  --help',
+    ['Verify class subcommand find  --help',
      ['find', '--help'],
      {'stdout': CLASS_FIND_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['class subcommand find simple name in known namespace',
+    ['Verify class subcommand find simple name in all namespaces',
+     ['find', 'CIM_'],
+     {'stdout': ["  root/cimv2:CIM_Foo",
+                 "  root/cimv2:CIM_Foo_sub",
+                 "  root/cimv2:CIM_Foo_sub2",
+                 "  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand find simple name in known namespace',
      ['find', 'CIM_', '-n', 'root/cimv2'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
@@ -446,7 +531,7 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand find simple name in known namespace with sort',
+    ['Verify class subcommand find simple name in known namespace with -s',
      ['find', 'CIM_', '-n', 'root/cimv2', '-s'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
@@ -455,30 +540,102 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand verify nothing found for BLAH_ regex',
+    ['Verify class subcommand find simple name in known namespace with --sort',
+     ['find', 'CIM_', '-n', 'root/cimv2', '-s'],
+     {'stdout': ["  root/cimv2:CIM_Foo",
+                 "  root/cimv2:CIM_Foo_sub",
+                 "  root/cimv2:CIM_Foo_sub2",
+                 "  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand find name in known namespace with -s, 0 grid',
+     {'global': ['-o', 'grid'],
+      'args': ['find', 'CIM_', '-n', 'root/cimv2', '-s']},
+     {'stdout': ['Find class CIM_',
+                 '+-------------+-----------------+',
+                 '| Namespace   | Classname       |',
+                 '+=============+=================+',
+                 '| root/cimv2  | CIM_Foo         |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_Foo_sub     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_Foo_sub2    |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_Foo_sub_sub |',
+                 '+-------------+-----------------+', ],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand verify nothing found for BLAH_ regex',
      ['find', 'BLAH_', '-n', 'root/cimv2'],
      {'stdout': "",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand find simple name in known namespace with wildcard',
+    ['Verify class subcmd find simple name in known namespace with wildcard',
      ['find', '.*sub2', '-n', 'root/cimv2'],
      {'stdout': "  root/cimv2:CIM_Foo_sub2",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['class subcommand verify bad regex',
+    ['Verify class subcommand verify bad regex',
      ['find', '.**sub2', '-n', 'root/cimv2'],
      {'stderr': ["Error:", "Regex compile error", "multiple", "sub2"],
       'rc': 1,
       'test': 'regex'},  # regex because re message text changes with py version
      SIMPLE_MOCK_FILE, OK],
 
+    #
+    # subcommand "class delete"
+    #
+    ['Verify class subcommand delete --help response',
+     ['delete', '--help'],
+     {'stdout': CLASS_DELETE_HELP,
+      'test': 'linesnows'},
+     None, OK],
+
+    # Class delete successful
+    ['Verify class subcommand delete successful with no subclasses, --force',
+     ['delete', 'CIM_Foo_sub_sub', '--force'],
+     {'stdout': 'CIM_Foo_sub_sub delete successful',
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE_EXT], OK],
+
+    ['Verify class subcommand delete fail instances exist',
+     ['delete', 'CIM_Foo_sub_sub'],
+     {'stdout': 'CIM_Foo_sub_sub delete successful',
+      'rc': 0,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # Class delete errors
+    ['Verify class subcommand delete no classname',
+     ['delete'],
+     {'stderr': 'Error: Missing argument "CLASSNAME"',
+      'rc': 2,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand delete fail subclasses exist',
+     ['delete', 'CIM_Foo', '--force'],
+     {'stderr': 'Error: Delete rejected; subclasses exist',
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    #
+    ['Verify class subcommand delete faile, instances exist',
+     ['delete', 'CIM_Foo_sub_sub'],
+     {'stderr': 'Error: Delete rejected; instances exist',
+      'rc': 1,
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE_EXT], OK],
 
     #
     # subcommand "class tree"
     #
-    ['class subcommand tree --help response',
+    ['Verify class subcommand tree --help response',
      ['tree', '--help'],
      {'stdout': CLASS_TREE_HELP,
       'test': 'linesnows'},
@@ -507,7 +664,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    # TODO The following test fails right now completely.
     ['Verify class subcommand tree top down starting at defined class ',
      ['tree', 'CIM_Foo_sub'],
      {'stdout': ['CIM_Foo_sub',
@@ -524,13 +680,21 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    # class tree' error tests
     ['Verify class subcommand tree with invalid class',
      ['tree', '-s', 'CIM_Foo_subx'],
      {'stderr': ['CIMError:'],
       'rc': 1,
       'test': 'regex'},
-
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand tree with superclass option, no class',
+     ['tree', '-s'],
+     {'stderr': ['Error: Classname argument required for superclasses option'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
     #
     # associators subcommand tests
     #
@@ -541,7 +705,7 @@ TEST_CASES = [
                  'Get the associated classes for CLASSNAME.',
                  '-a, --assocclass <class name>   Filter by the association '
                  'class name',
-                 '-c, --resultclass <class name>  Filter by the association '
+                 '-C, --resultclass <class name>  Filter by the association '
                  'result class name',
                  '-r, --role <role name>          Filter by the role name '
                  'provided.',
@@ -552,8 +716,131 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    # TODO add detailed associators tests.  Need new mock file with
-    # associations to do this
+    ['Verify class subcommand associators simple request,',
+     ['associators', 'TST_Person', ],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+      'class TST_Person {',
+      '',
+      '      [Key ( true ),',
+      '       Description ( "This is key prop" )]',
+      '   string name;',
+      '',
+      '   string extraProperty = "defaultvalue";',
+      '',
+      '};',
+      ''],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators simple request, one parameter',
+     ['associators', 'TST_Person', '-a', 'TST_MemberOfFamilyCollection'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+      'class TST_Person {',
+      '',
+      '      [Key ( true ),',
+      '       Description ( "This is key prop" )]',
+      '   string name;',
+      '',
+      '   string extraProperty = "defaultvalue";',
+      '',
+      '};',
+      ''],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters long',
+     ['associators', 'TST_Person',
+      '--assocclass', 'TST_MemberOfFamilyCollection',
+      '--role', 'member',
+      '--resultrole', 'family',
+      '--resultclass', 'TST_Person'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+      'class TST_Person {',
+      '',
+      '      [Key ( true ),',
+      '       Description ( "This is key prop" )]',
+      '   string name;',
+      '',
+      '   string extraProperty = "defaultvalue";',
+      '',
+      '};',
+      ''],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters short',
+     ['associators', 'TST_Person',
+      '-a', 'TST_MemberOfFamilyCollection',
+      '-r', 'member',
+      '-R', 'family',
+      '-C', 'TST_Person'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+      'class TST_Person {',
+      '',
+      '      [Key ( true ),',
+      '       Description ( "This is key prop" )]',
+      '   string name;',
+      '',
+      '   string extraProperty = "defaultvalue";',
+      '',
+      '};',
+      ''],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters short,  -a '
+     'does not pass test',
+     ['associators', 'TST_Person',
+      '-a', 'TST_MemberOfFamilyCollectionx',
+      '-r', 'member',
+      '-R', 'family',
+      '-C', 'TST_Person'],
+     {'stdout': [],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters short,  -r '
+     'does not pass test',
+     ['associators', 'TST_Person',
+      '-a', 'TST_MemberOfFamilyCollection',
+      '-r', 'memberx',
+      '-R', 'family',
+      '-C', 'TST_Person'],
+     {'stdout': [],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters short,  -R '
+     'does not pass test',
+     ['associators', 'TST_Person',
+      '-a', 'TST_MemberOfFamilyCollection',
+      '-r', 'member',
+      '-R', 'familyx',
+      '-C', 'TST_Person'],
+     {'stdout': [],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters short,  -C '
+     'does not pass test',
+     ['associators', 'TST_Person',
+      '-a', 'TST_MemberOfFamilyCollection',
+      '-r', 'member',
+      '-R', 'family',
+      '-C', 'TST_Personx'],
+     {'stdout': [],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    # Associator errors
+
+    ['Verify class subcommand associators no CLASSNAM, . ',
+     ['associators'],
+     {'stderr': ['Error: Missing argument "CLASSNAME".', ],
+       'rc': 2,
+      'test': 'in'},
+     None, OK],
+
     #
     # references subcommand tests
     #
@@ -570,7 +857,37 @@ TEST_CASES = [
                  '-c, --includeclassorigin', ],
       'test': 'in'},
      None, OK],
-    # TODO add detailed reference tests
+
+    ['Verify class subcommand references simple request, -s',
+     ['references', 'TST_Person', '-s'],
+     {'stdout': REFERENCES_CLASS_RTN,
+      'test': 'linesnows'},
+     SIMPLE_ASSOC_MOCK_FILE, RUN],
+
+    ['Verify class subcommand references simple request -o -s',
+     ['references', 'TST_Person', '-o', '-s'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage',
+                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection'],
+      'test': 'linesnows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand references request, all filters long',
+     ['references', 'TST_Person',
+      '--role', 'member',
+      '--resultclass', 'TST_MemberOfFamilyCollection'],
+     {'stdout': REFERENCES_CLASS_RTN2,
+      'test': 'linesnows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+
+    # Reference errors
+
+    ['Verify class subcommand references no CLASSNAME',
+     ['references'],
+     {'stderr': ['Error: Missing argument "CLASSNAME".', ],
+       'rc': 2,
+      'test': 'in'},
+     None, OK],
 
     #
     # invokemethod subcommand tests

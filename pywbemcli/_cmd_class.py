@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import click
 
-from pywbem import Error, CIMClassName
+from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
@@ -105,13 +105,15 @@ def class_get(context, classname, **options):
 @click.pass_obj
 def class_delete(context, classname, **options):
     """
-    Delete a single class.
+    Delete a single CIM class.
 
-    Deletes the class defined by CLASSNAME from the WBEM Server.
+    Deletes the CIM class defined by CLASSNAME from the WBEM Server.
 
     If the class has instances, the command is refused unless the
     --force option is used. If --force is used, instances are also
     deleted.
+
+    If the class has subclasses, the command is rejected.
 
     WARNING: Removing classes from a WBEM Server can cause damage to the
     server. Use this with caution.  It can impact instance providers and
@@ -229,7 +231,7 @@ def class_references(context, classname, **options):
                    'returned class (or class name) should be associated to the '
                    'source class through this class or its subclasses. '
                    'Optional.')
-@click.option('-c', '--resultclass', type=str, required=False,
+@click.option('-C', '--resultclass', type=str, required=False,
               metavar='<class name>',
               help='Filter by the association result class name provided. Each '
                    'returned class (or class name) should be this class or one '
@@ -421,7 +423,7 @@ def cmd_class_references(context, classname, options):
                 classname,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
@@ -458,7 +460,7 @@ def cmd_class_associators(context, classname, options):
                 Role=options['role'],
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
@@ -479,7 +481,13 @@ def cmd_class_find(context, classname, options):
     if options['namespace']:
         ns_names = [options['namespace']]
     else:
-        ns_names = context.wbem_server.namespaces
+        try:
+            ns_names = context.wbem_server.namespaces
+        except CIMError as ce:
+            # allow processing to continue if no interop namespace
+            if ce.status_code == CIM_ERR_NOT_FOUND:
+                click.echo('WARNING: %s' % ce)
+                ns_names = [context.conn.default_namespace]
         if options['sort']:
             ns_names.sort()
 
@@ -558,15 +566,26 @@ def cmd_class_tree(context, classname, options):
 
 def cmd_class_delete(context, classname, options):
     """Delete a class from the wbemserver repository"""
-
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
 
+    instnames = context.conn.EnumerateInstanceNames(classname)
+    subclassnames = context.conn.EnumerateClassNames(ClassName=classname,
+                                                     DeepInheritance=True)
+
+    if subclassnames:
+        raise click.ClickException('Delete rejected; subclasses exist')
+
     if not options['force']:
-        insts = context.conn.PyWbemCLIEnumerateInstancePaths(classname)
-        if insts:
-            raise click.ClickException('Ignored; instances exist')
-        # TODO test for subclasses
+        if instnames:
+            raise click.ClickException('Delete rejected; instances exist')
+    else:
+        for instname in instnames:
+            context.conn.DeleteInstance(instname)
+
+    instnames = context.conn.EnumerateInstanceNames(classname)
+    if instnames:
+        raise click.ClickException('Delete rejected; instance delete failed')
 
     try:
         context.conn.DeleteClass(classname)
