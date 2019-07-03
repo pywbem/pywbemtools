@@ -1597,13 +1597,14 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       -h, --help  Show this message and exit.
 
     Commands:
-      brand       Display information on the server.
-      connection  Display connection info used by this server.
-      info        Display general information on the Server.
-      interop     Display the interop namespace name.
-      namespaces  Display the namespaces in the WBEM server
-      profiles    Display profiles in the WBEM Server.
-      test_pull   Test existence of pull opeations.
+      brand         Display information on the server.
+      centralinsts  Display Central Instances in the WBEM Server.
+      connection    Display connection info used by this server.
+      info          Display general information on the Server.
+      interop       Display the interop namespace name.
+      namespaces    Display the namespaces in the WBEM server
+      profiles      Display registered profiles from the WBEM Server.
+      test_pull     Test existence of pull opeations.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1629,6 +1630,58 @@ The following defines the help output for the `pywbemcli server brand --help` su
       -h, --help  Show this message and exit.
 
 
+.. _`pywbemcli server centralinsts --help`:
+
+pywbemcli server centralinsts --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server centralinsts --help` subcommand
+
+
+::
+
+    Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
+
+      Display Central Instances in the WBEM Server.
+
+      Displays central instances for management profiles registered in the
+      server. Displays management profiles that adher to to the central class
+      methodology with none of the extra parameters (ex. scoping_class)
+
+      However, profiles that only use the scoping methodology require extra
+      information that is dependent on the profile itself. These profiles will
+      only be accessed when the correct values of central_class, scoping_class,
+      and scoping path for the particular profile is provided.
+
+      This display may be filtered by the optional organization and profile name
+      options that define the organization for each profile (ex. SNIA) and the
+      name of the profile. This will display only the profiles that are
+      registered for the defined organization and/or name.
+
+      Profiles are display as a table showing the organization, name, and
+      version for each profile.
+
+    Options:
+      -o, --organization <org name>   Filter by the defined organization. (ex. -o
+                                      DMTF
+      -n, --profilename <profile name>
+                                      Filter by the profile name. (ex. -n Array
+      -c, --central_class <classname>
+                                      Optional. Required only if profiles supports
+                                      only scopig methodology
+      -s, --scoping_class <classname>
+                                      Optional. Required only if profiles supports
+                                      only scopig methodology
+      -p, --scoping_path <pathname>   Optional. Required only if profiles supports
+                                      only scopig methodology. Multiples allowed
+      -r, --reference_direction [snia|dmtf]
+                                      Navigation direction for association.
+                                      [default: dmtf]
+      -h, --help                      Show this message and exit.
+
+
 .. _`pywbemcli server connection --help`:
 
 pywbemcli server connection --help
@@ -1647,6 +1700,8 @@ The following defines the help output for the `pywbemcli server connection --hel
 
       Displays the connection information for the WBEM connection attached to
       this server.  This includes uri, default namespace, etc.
+
+      This is equivalent to the connection show subcommand.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1732,10 +1787,19 @@ The following defines the help output for the `pywbemcli server profiles --help`
 
     Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
-      Display profiles in the WBEM Server.
+      Display registered profiles from the WBEM Server.
+
+      Displays the management profiles that have been registered for this
+      server.  Within the DMTF and SNIA these are the definition of management
+      functionality supported by the server.
 
       This display may be filtered by the optional organization and profile name
-      options
+      options that define the organization for each profile (ex. SNIA) and the
+      name of the profile. This will display only the profiles that are
+      registered for the defined organization and/or name.
+
+      Profiles are display as a table showing the organization, name, and
+      version for each profile.
 
     Options:
       -o, --organization <org name>   Filter by the defined organization. (ex. -o

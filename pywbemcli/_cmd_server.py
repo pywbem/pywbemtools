@@ -109,12 +109,71 @@ def server_info(context):
 @click.pass_obj
 def server_profiles(context, **options):
     """
-    Display profiles in the WBEM Server.
+    Display registered profiles from the WBEM Server.
+
+    Displays the management profiles that have been registered for this
+    server.  Within the DMTF and SNIA these are the definition of management
+    functionality supported by the server.
 
     This display may be filtered by the optional organization and profile
-    name options
+    name options that define the organization for each profile (ex. SNIA)
+    and the name of the profile. This will display only the profiles that
+    are registered for the defined organization and/or name.
+
+    Profiles are display as a table showing the organization, name, and
+    version for each profile.
     """
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
+
+
+@server_group.command('centralinsts', options_metavar=CMD_OPTS_TXT)
+@click.option('-o', '--organization', type=str, required=False,
+              metavar='<org name>',
+              help='Filter by the defined organization. (ex. -o DMTF')
+@click.option('-n', '--profilename', type=str, required=False,
+              metavar='<profile name>',
+              help='Filter by the profile name. (ex. -n Array')
+@click.option('-c', '--central_class', type=str, required=False,
+              metavar='<classname>',
+              help='Optional. Required only if profiles supports only '
+              'scopig methodology')
+@click.option('-s', '--scoping_class', type=str, required=False,
+              metavar='<classname>',
+              help='Optional. Required only if profiles supports only '
+              'scopig methodology')
+@click.option('-p', '--scoping_path', type=str, required=False,
+              multiple=True,
+              metavar='<pathname>',
+              help='Optional. Required only if profiles supports only '
+              'scopig methodology. Multiples allowed')
+@click.option('-r', '--reference_direction',
+              type=click.Choice(['snia', 'dmtf']),
+              default='dmtf',
+              show_default=True,
+              help='Navigation direction for association.')
+@click.pass_obj
+def server_centralinsts(context, **options):
+    """
+    Display Central Instances in the WBEM Server.
+
+    Displays central instances for management profiles registered in the
+    server. Displays management profiles that adher to to the central
+    class methodology with none of the extra parameters (ex. scoping_class)
+
+    However, profiles that only use the scoping methodology require extra
+    information that is dependent on the profile itself. These profiles
+    will only be accessed when the correct values of central_class,
+    scoping_class, and scoping path for the particular profile is provided.
+
+    This display may be filtered by the optional organization and profile
+    name options that define the organization for each profile (ex. SNIA)
+    and the name of the profile. This will display only the profiles that
+    are registered for the defined organization and/or name.
+
+    Profiles are display as a table showing the organization, name, and
+    version for each profile.
+    """
+    context.execute_cmd(lambda: cmd_server_centralinsts(context, options))
 
 
 @server_group.command('connection', options_metavar=CMD_OPTS_TXT)
@@ -125,6 +184,8 @@ def server_connection(context):
 
     Displays the connection information for the WBEM connection
     attached to this server.  This includes uri, default namespace, etc.
+
+    This is equivalent to the connection show subcommand.
     """
     context.execute_cmd(lambda: cmd_server_connection(context))
 
@@ -154,7 +215,7 @@ def cmd_server_test_pull(context):
         Executes pull operations and reports whether pull is supported.
 
     """
-    raise ValueError('Not implemented')
+    raise click.ClickException('test_pull Not implemented')
 
 
 def cmd_server_namespaces(context, options):
@@ -290,5 +351,48 @@ def cmd_server_connection(context):
                    'timeout: %s sec.\nca_certs: %s' %
                    (conn.url, conn.creds, conn.x509, conn.default_namespace,
                     conn.timeout, conn.ca_certs))
+    except Error as er:
+        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+
+def cmd_server_centralinsts(context, options):
+    """
+    Display general overview of info from current WBEMServer
+    """
+    server = context.wbem_server
+    try:
+        found_server_profiles = server.get_selected_profiles(
+            registered_org=options['organization'],
+            registered_name=options['profilename'])
+
+        org_vm = ValueMapping.for_property(server,
+                                           server.interop_ns,
+                                           'CIM_RegisteredProfile',
+                                           'RegisteredOrganization')
+        rows = []
+        for inst in found_server_profiles:
+            pi = get_profile_info(org_vm, inst)
+            row = [":".join(pi)]
+            try:
+                ci = server.get_central_instances(
+                    inst.path,
+                    central_class=options['central_class'],
+                    scoping_class=options['scoping_class'],
+                    scoping_path=options['scoping_path'],
+                    reference_direction=options['reference_direction'])
+                row.append(":".join([str(p) for p in ci]))
+            except Exception as ex:
+                click.echo('Exception: %s %s' % (row, ex))
+                row.append("Failed")
+            rows.append(row)
+
+        # sort by org
+        rows.sort(key=lambda x: (x[0]))
+        headers = ['Profile', 'Central Instances']
+
+        click.echo(format_table(rows,
+                                headers,
+                                title='Advertised Central Instances:',
+                                table_format=context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

@@ -37,6 +37,7 @@ from .config import DEFAULT_MAXPULLCNT
 #  __all__ = ['PYWBEMCLIConnection', 'PYWBEMCLIFakedConnection']
 
 
+# pylint: disable=useless-object-inheritance
 class PYWBEMCLIConnectionMixin(object):
     """
     Mixin class to extend WBEMConnection with a set of methods that use the
@@ -280,7 +281,8 @@ class PYWBEMCLIConnectionMixin(object):
         return result
 
 
-class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
+class BuildRepositoryMixin(object):
+    # pylint: disable=too-few-public-methods
     """
     Builds the mock repository from the definitions in self._mock_server.
 
@@ -295,7 +297,7 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
     Returns a variety of errors for file not found, MOF syntax errors, and
     python syntax errors.
     """
-    def build_repository(self, conn, file_path_list, verbose):
+    def build_repository(self, conn, server, file_path_list, verbose):
         """
         Build the repository from the file_path list
         """
@@ -309,7 +311,9 @@ class BuildRepositoryMixin(object):  # pylint: disable=too-few-public-methods
                 try:
                     with open(file_path) as fp:
                         # the exec includes CONN and VERBOSE
-                        globalparams = {'CONN': conn, 'VERBOSE': verbose}
+                        globalparams = {'CONN': conn,
+                                        'SERVER': server,
+                                        'VERBOSE': verbose}
                         # pylint: disable=exec-used
                         exec(fp.read(), globalparams, None)
                 except IOError:

@@ -358,7 +358,11 @@ class PywbemServer(object):
                 use_pull_operations=self.use_pull_ops,
                 stats_enabled=self.stats_enabled)
             try:
-                conn.build_repository(conn, self._mock_server, verbose)
+                self._wbem_server = WBEMServer(conn)
+                conn.build_repository(conn,
+                                      self._wbem_server,
+                                      self._mock_server,
+                                      verbose)
             except IOError as io:
                 click.echo('IOError exception %s' % io, err=True)
                 raise click.Abort()
@@ -396,6 +400,8 @@ class PywbemServer(object):
                 timeout=self.timeout,
                 use_pull_operations=self.use_pull_ops,
                 stats_enabled=self.stats_enabled)
+            # Create a WBEMServer object
+            self._wbem_server = WBEMServer(conn)
 
         if self.log:
             try:
@@ -405,5 +411,3 @@ class PywbemServer(object):
             except ValueError as ve:
                 raise click.ClickException('Logger configuration error. input: '
                                            '%s. Exception: %s' % (self.log, ve))
-        # Save the connection object and create a WBEMServer object
-        self._wbem_server = WBEMServer(conn)
