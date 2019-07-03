@@ -263,10 +263,8 @@ class ContextObj(object):
         # if no server defined, do not try to connect. This allows
         # commands like help, connection new, select to execute without
         # a target server defined.
-        if self._pywbem_server:
+        if self._pywbem_server and self._pywbem_server.wbem_server is None:
             # get the password if it is required.  This may involve a
             # prompt.
             self._pywbem_server.get_password(self)
             self._pywbem_server.create_connection(self.verbose)
-        # else:
-        #    #raise click.ClickException('No server name definition')

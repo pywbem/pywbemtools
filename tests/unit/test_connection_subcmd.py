@@ -514,6 +514,26 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'None'}},
      None, OK],
 
+    # uses regex because windows generates set and linux export in statements
+    # No file verification required. Does not usefile
+    ['Verify connection subcommand export',
+     {'args': ['export'],
+      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh', '-n',
+                 '-c', 'certfile.txt', '-k', 'keyfile.txt', '-t', '12']},
+     {'stdout': ['PYWBEMCLI_SERVER=http://blah$',
+                 'PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2$',
+                 'PYWBEMCLI_USER=fred$',
+                 'PYWBEMCLI_PASSWORD=argh',
+                 'PYWBEMCLI_TIMEOUT=12$',
+                 'PYWBEMCLI_NOVERIFY=True$',
+                 'PYWBEMCLI_CERTFILE=certfile.txt$',
+                 'PYWBEMCLI_KEYFILE=keyfile.txt$',
+                 # account for windows and non_windows platforms
+                 '^(export|set) '],
+      'test': 'regex',
+      'file': {'before': 'None', 'after': 'None'}},
+     None, OK],
+
     #
     #  Test command line parameter errors
     #
@@ -551,7 +571,6 @@ TEST_CASES = [
       'test': 'in',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
-
 ]
 
 

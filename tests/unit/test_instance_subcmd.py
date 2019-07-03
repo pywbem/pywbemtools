@@ -30,7 +30,8 @@ INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT1_FILE = "mock_prompt_0.py"
 
 
-INST_HELP = """Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
+INST_HELP = """
+Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group to manage CIM instances.
 
@@ -59,7 +60,8 @@ Commands:
 """
 
 # pylint: disable=line-too-long
-INST_ENUM_HELP = """Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
+INST_ENUM_HELP = """
+Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate instances or names of CLASSNAME.
 
@@ -100,7 +102,8 @@ Options:
   -h, --help                      Show this message and exit.
 """
 
-INST_GET_HELP = """Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
+INST_GET_HELP = """
+Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
 
@@ -114,6 +117,9 @@ INST_GET_HELP = """Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   This method may be executed interactively by providing only a classname
   and the interactive option (-i).
+
+  Otherwise the INSTANCENAME must be a CIM instance name in the format
+  defined by DMTF `DSP0207`.
 
   Results are formatted as defined by the output format global option.
 
@@ -142,10 +148,10 @@ Options:
                                   presented with a list of instances of the
                                   class from which the instance to process is
                                   selected.
-  -h, --help                      Show this message and exit.
-"""
+  -h, --help                      Show this message and exit."""
 
-INST_CREATE_HELP = """Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
+INST_CREATE_HELP = """
+Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
 
   Create a CIM instance of CLASSNAME.
 
@@ -175,7 +181,8 @@ Options:
   -h, --help                 Show this message and exit.
 """
 
-INST_DELETE_HELP = """Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
+INST_DELETE_HELP = """
+Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
 
   Delete a single CIM instance.
 
@@ -183,6 +190,9 @@ INST_DELETE_HELP = """Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANC
 
   This may be executed interactively by providing only a class name and the
   interactive option.
+
+  Otherwise the INSTANCENAME must be a CIM instance name in the format
+  defined by DMTF `DSP0207`.
 
 Options:
   -i, --interactive       If set, `INSTANCENAME` argument must be a class
@@ -225,13 +235,17 @@ Options:
   -h, --help              Show this message and exit.
 """
 
-INST_REFERENCES_HELP = """Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
+INST_REFERENCES_HELP = """
+Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
   Get the reference instances or names.
 
   Gets the reference instances or instance names(--names-only option) for a
   target `INSTANCENAME` in the target WBEM server filtered by the `role` and
   `resultclass` options.
+
+  INSTANCENAME must be a CIM instance name in the format defined by DMTF
+  `DSP0207`.
 
   This may be executed interactively by providing only a class name for
   `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
@@ -274,10 +288,10 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit.
-"""
+  -h, --help                      Show this message and exit."""
 
-INST_MODIFY_HELP = """Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
+INST_MODIFY_HELP = """
+Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
 
   Modify an existing instance.
 
@@ -287,6 +301,9 @@ INST_MODIFY_HELP = """Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANC
   passed to the WBEM server as part of the ModifyInstance operation
   (normally the WBEM server limits modifications) to just those properties
   defined in the property list.
+
+  INSTANCENAME must be a CIM instance name in the format defined by DMTF
+  `DSP0207`.
 
   Pywbemcli builds only the properties defined with the --property option
   into an instance based on the CIMClass and forwards that to the WBEM
@@ -323,16 +340,19 @@ Options:
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
-  -h, --help                      Show this message and exit.
-"""
+  -h, --help                      Show this message and exit."""
 
-INST_ASSOCIATORS_HELP = """Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
+INST_ASSOCIATORS_HELP = """
+Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
 
   Get associated instances or names.
 
   Returns the associated instances or names (--names-only option) for the
   `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
   --role and --resultrole options.
+
+  INSTANCENAME must be a CIM instance name in the format defined by DMTF
+  `DSP0207`.
 
   This may be executed interactively by providing only a classname and the
   interactive option. Pywbemcli presents a list of instances in the class
@@ -387,10 +407,10 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit.
-"""
+  -h, --help                      Show this message and exit."""
 
-INST_INVOKE_METHOD_HELP = """Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
+INST_INVOKE_METHOD_HELP = """
+Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
                                        METHODNAME
 
   Invoke a CIM method on a CIMInstance.
@@ -400,6 +420,9 @@ INST_INVOKE_METHOD_HELP = """Usage: pywbemcli instance invokemethod [COMMAND-OPT
 
   This issues an instance level invokemethod request and displays the
   results.
+
+  INSTANCENAME must be a CIM instance name in the format defined by  DMTF
+  `DSP0207`.
 
   Pywbemcli creates the method call using the class in INSTANCENAME
   retrieved from the current WBEM server as a template for parameter
@@ -427,8 +450,7 @@ Options:
   -n, --namespace <name>      Namespace to use for this operation. If defined
                               that namespace overrides the general options
                               namespace
-  -h, --help                  Show this message and exit.
-"""
+  -h, --help                  Show this message and exit."""
 
 ENUM_INST_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
@@ -584,6 +606,22 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate names CIM_Foo -o',
      ['enumerate', 'CIM_Foo', '-o'],
+     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate names CIM_Foo -o -s',
+     ['enumerate', 'CIM_Foo', '-o', '-s'],
+     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate names CIM_Foo -o --sort',
+     ['enumerate', 'CIM_Foo', '-o', '--sort'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
@@ -807,23 +845,36 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    # TODO test datetime
+
+    ['Verify create, get, delete works with stdin',
+     {'stdin': ['instance create CIM_foo -P InstancID=blah',
+                'instance get CIM_Foo=/"blah/"',
+                'instance delete CIM_Foo/"blah/"']},
+     {'stdout': [''],
+      'rc': 0,
+      'test': 'regex'},
+     None, FAIL],
+
     ['Verify instance subcommand create, new instance of all_types '
      'with scalar types',
-     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
+     ['create', 'PyWBEM_AllTypes',
+      '-P', 'InstanceID=BunchOfValues',
       '-P', 'scalBool=true', '-P', 'scalUint8=1',
       '-P', 'scalUint16=9', '-P', 'scalSint16=-9',
       '-P', 'scalUint32=999', '-P', 'scalSint32=-999',
       '-P', 'scalSint64=-9999',
-      '-P', 'scalUint64=9999', '-P', 'scalString="test\"embedded\"quote"'],
-     {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="blah"',
+      '-P', 'scalUint64=9999',
+      '-P', 'scalString="test\"embedded\"quote"',
+      '-P', 'scalDateTime=19991224120000.000000+360'],
+     {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="BunchOfValues"',
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance of all_types '
      "with array values",
-     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
+     ['create', 'PyWBEM_AllTypes',
+      '-P', 'InstanceID=blah',
       '-P', 'arrayBool=true,false',
       '-P', 'arrayUint8=1,2,3',
       '-P', 'arraySint8=-1,-2,-3',
