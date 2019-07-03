@@ -28,16 +28,6 @@ from ._common import CMD_OPTS_TXT, format_table
 from ._common_options import add_options, sort_option
 
 
-def print_profile_info(org_vm, inst):
-    """Print the registered org, name, version for the profile defined by
-       inst.
-    """
-    org = org_vm.tovalues(inst['RegisteredOrganization'])
-    name = inst['RegisteredName']
-    vers = inst['RegisteredVersion']
-    click.echo("  %s %s %s" % (org, name, vers))
-
-
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
 def server_group():
     """
@@ -47,7 +37,7 @@ def server_group():
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 @server_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
@@ -381,7 +371,8 @@ def cmd_server_centralinsts(context, options):
                     scoping_path=options['scoping_path'],
                     reference_direction=options['reference_direction'])
                 row.append(":".join([str(p) for p in ci]))
-            except Exception as ex:
+            # mark current inst as failed and continue
+            except Exception as ex:  # pylint: disable=broad-except
                 click.echo('Exception: %s %s' % (row, ex))
                 row.append("Failed")
             rows.append(row)

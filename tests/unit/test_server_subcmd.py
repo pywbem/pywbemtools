@@ -239,9 +239,9 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    # TODO: Missing some of the subcomand help.
-
-
+    #
+    #   Verify the individual subcommands returning data
+    #
     ['Verify server subcommand interop',
      {'args': ['interop'],
       'global': ['-d', 'interop']},
@@ -255,6 +255,17 @@ TEST_CASES = [
 
     ['Verify server subcommand namespaces',
      {'args': ['namespaces'],
+      'global': ['-d', 'interop']},
+     {'stdout': ['Server Namespaces:',
+                 'Namespace Name',
+                 '----------------',
+                 'interop'],
+      'rc': 0,
+      'test': 'lines'},
+     MOCK_SERVER_MODEL, OK],
+
+    ['Verify server subcommand namespaces with sort option',
+     {'args': ['namespaces', '-s'],
       'global': ['-d', 'interop']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
@@ -363,6 +374,19 @@ TEST_CASES = [
       'test': 'regex'},
      MOCK_SERVER_MODEL, OK],
 
+
+    ['Verify server subcommand info with mock server',
+     {'args': ['info'],
+      'global': ['-d', 'interop']},
+     {'stdout':
+      ['Server General Information',
+       'Brand        Version    Interop Namespace    Namespaces',
+       '-----------  ---------  -------------------  ------------',
+       'OpenPegasus  2.15.0     interop              interop'],
+      'rc': 0,
+      'test': 'lines'},
+     MOCK_SERVER_MODEL, OK],
+
     #
     # Error tests
     #
@@ -373,7 +397,7 @@ TEST_CASES = [
 
 class TestSubcmdServer(CLITestsBase):
     """
-    Test all of the class subcommand variations.
+    Execute the testcases for server subcommand variations.
     """
     subcmd = 'server'
 

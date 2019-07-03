@@ -113,6 +113,9 @@ def instance_get(context, instancename, **options):
     This method may be executed interactively by providing only a classname and
     the interactive option (-i).
 
+    Otherwise the INSTANCENAME must be a CIM instance name in the format
+    defined by DMTF `DSP0207`.
+
     Results are formatted as defined by the output format global option.
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
@@ -132,6 +135,9 @@ def instance_delete(context, instancename, **options):
 
     This may be executed interactively by providing only a class name and the
     interactive option.
+
+    Otherwise the INSTANCENAME must be a CIM instance name in the format
+    defined by DMTF `DSP0207`.
     """
     context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
                                                     options))
@@ -190,6 +196,9 @@ def instance_modify(context, instancename, **options):
     the WBEM server limits modifications) to just those properties defined in
     the property list.
 
+    INSTANCENAME must be a CIM instance name in the format defined by DMTF
+    `DSP0207`.
+
     Pywbemcli builds only the properties defined with the --property option
     into an instance based on the CIMClass and forwards that to the WBEM
     server with the ModifyInstance method.
@@ -221,6 +230,9 @@ def instance_invokemethod(context, instancename, methodname, **options):
 
     This issues an instance level invokemethod request and displays the
     results.
+
+    INSTANCENAME must be a CIM instance name in the format defined by  DMTF
+    `DSP0207`.
 
     Pywbemcli creates the method call using the class in INSTANCENAME retrieved
     from the current WBEM server as a template for parameter characteristics.
@@ -303,6 +315,9 @@ def instance_references(context, instancename, **options):
     target `INSTANCENAME` in the target WBEM server filtered by the
     `role` and `resultclass` options.
 
+    INSTANCENAME must be a CIM instance name in the format defined by DMTF
+    `DSP0207`.
+
     This may be executed interactively by providing only a class name for
     `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
     of instances names in the class from which you can be chosen as the target.
@@ -355,6 +370,9 @@ def instance_associators(context, instancename, **options):
     Returns the associated instances or names (--names-only option) for the
     `INSTANCENAME` argument filtered by the --assocclass, --resultclass, --role
     and --resultrole options.
+
+    INSTANCENAME must be a CIM instance name in the format defined by DMTF
+    `DSP0207`.
 
     This may be executed interactively by providing only a classname and the
     interactive option. Pywbemcli presents a list of instances in the class
