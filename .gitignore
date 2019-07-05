@@ -12,8 +12,8 @@
 tmp.*
 *~
 .*~
-./pywbem_os_setup.sh
-./pywbem_os_setup.bat
+pywbem_os_setup.sh
+pywbem_os_setup.bat
 pywbem*.egg-info
 MANIFEST
 /AUTHORS
