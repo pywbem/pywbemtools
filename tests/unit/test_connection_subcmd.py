@@ -681,7 +681,7 @@ class TestSubcmdClass(CLITestsBase):
                 test_file(exp_response['file']['before'])
 
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition, verbose=True)
+                         mock, condition, verbose=False)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:

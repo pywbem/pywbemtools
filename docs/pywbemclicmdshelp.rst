@@ -143,7 +143,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       documentation for more information.(EnvVar:
                                       PYWBEMCLI_MOCK_SERVER).
       --version                       Show the version of this command and the
-                                      package and exit
+                                      pywbem package and exit.
       -h, --help                      Show this message and exit.
 
     Commands:

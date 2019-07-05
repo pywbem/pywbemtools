@@ -20,13 +20,11 @@ the pywbemcli click tool
 from __future__ import absolute_import
 
 import os
-import click_repl
 import click
+import click_repl
 from prompt_toolkit.history import FileHistory
 
-from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
-    LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
-    DEFAULT_LOG_DETAIL_LEVEL
+import pywbem
 
 from ._context_obj import ContextObj
 from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
@@ -38,12 +36,15 @@ from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
 
 from ._connection_repository import ConnectionRepository
 
-
 __all__ = ['cli']
+
+PYWBEM_VERSION = "pywbem, version {}".format(pywbem.__version__)
 
 # Defaults for some options
 DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
+USE_PULL_OPS_CHOICE = {'either': None, 'yes': True, 'no': False}
+
 # enable -h as additional help option
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -121,7 +122,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    ' (EnvVar: PYWBEMCLI_CA_CERTS).\n'
                    '[Default: Searches for matching certificates in the '
                    'following system directories:'
-                   ' ' + ("\n".join("%s]" % p for p in DEFAULT_CA_CERT_PATHS)))
+                   ' ' + ("\n".join("%s]" % p for p in
+                                    pywbem.DEFAULT_CA_CERT_PATHS)))
 @click.option('-o', '--output-format',
               metavar='<choice>',
               envvar=PywbemServer.timeout_envvar,
@@ -164,12 +166,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                     '* COMP: [{c}], Default: {cd}\n'
                     '* DEST: [{d}], Default: {dd}\n'
                     '* DETAIL:[{dl}], Default: {dll}'
-                    .format(c='|'.join(LOGGER_SIMPLE_NAMES),
+                    .format(c='|'.join(pywbem.LOGGER_SIMPLE_NAMES),
                             cd='all',
-                            d='|'.join(LOG_DESTINATIONS),
-                            dd=DEFAULT_LOG_DESTINATION,
-                            dl='|'.join(LOG_DETAIL_LEVELS),
-                            dll=DEFAULT_LOG_DETAIL_LEVEL))
+                            d='|'.join(pywbem.LOG_DESTINATIONS),
+                            dd=pywbem.DEFAULT_LOG_DESTINATION,
+                            dl='|'.join(pywbem.LOG_DETAIL_LEVELS),
+                            dll=pywbem.DEFAULT_LOG_DETAIL_LEVEL))
 @click.option('-v', '--verbose', is_flag=True,
               help='Display extra information about the processing.')
 @click.option('-m', '--mock-server', type=str, multiple=True,
@@ -181,8 +183,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'multiple times where each use defines a single file_path.'
                    'See the pywbemtools documentation for more information.' +
                    "(EnvVar: {}).".format(PywbemServer.mock_server_envvar))
-@click.version_option(help='Show the version of this command and the package '
-                      'and exit')
+@click.version_option(
+    message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
+    help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
@@ -250,15 +253,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                     raise click.Abort()
 
         if use_pull_ops:
-            if use_pull_ops == 'either':
-                use_pull_ops = None
-            elif use_pull_ops == 'yes':
-                use_pull_ops = True
-            elif use_pull_ops == 'no':
-                use_pull_ops = False
-            else:
+            try:
+                use_pull_ops = USE_PULL_OPS_CHOICE[use_pull_ops]
+            except KeyError:
                 raise click.ClickException(
-                    'Invalid choice for use_pull_ops %s' % use_pull_ops)
+                    'Invalid choice for --use_pull_ops %s' % use_pull_ops)
         else:
             use_pull_ops = DEFAULT_PULL_CHOICE
 
