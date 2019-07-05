@@ -33,18 +33,16 @@ It covers all variants of versions:
 * Releasing a fix stream branch of an already released version as a new fix
   version
 
-The description assumes that the `pywbem/pywbemtools` repo and the
-`pywbem/pywbemtools.github.io` repo are both cloned locally in sibling directories
-named `pywbemtools` and `pywbemtools.github.io`.
-Their upstream repos are assumed to have the remote name `origin`.
+The description assumes that the `pywbem/pywbemtools` repo is cloned locally.
+Its upstream repo is assumed to have the remote name `origin`.
 
 1.  Switch to your work directory of the `pywbem/pywbemtools` repo (this is where
-    the `makefile` is), and perform the following steps in that directory.
+    the `Makefile` is), and perform the following steps in that directory.
 
 2.  Set shell variables for the version and branch to be released:
 
-    - `MNU="0.9.0"` or `MNU="0.8.1"` - Full version number `M.N.U`
-    - `MN="0.9"` or `MN="0.8"` - Major and minor version number `M.N`
+    - `MNU="0.7.0"` or `MNU="0.8.1"` - Full version number `M.N.U`
+    - `MN="0.7"` or `MN="0.8"` - Major and minor version number `M.N`
     - `BRANCH="master"` or `BRANCH="stable_$MN"`
 
 3.  Check out the branch to be released, make sure it is up to date with
@@ -84,63 +82,30 @@ Their upstream repos are assumed to have the remote name `origin`.
       version. In the "Starting a new version" section, the link will be added
       again for the new version.
 
-5.  Edit the README file:
-
-    - `vi README.rst`
-
-    To make the following changes:
-
-    * Update the constants near the top of the file::
-
-      ```
-      .. |pywbemtools-version| replace:: {M.N.U}
-      .. |pywbemtools-next-version| replace:: {M.N.U+1}
-      .. |pywbemtools-next-issue| replace:: {issue-number}
-      ```
-
-      Where the items in curly braces are replaced with their actual values.
-
-5.  Edit the README_PYPI file:
-
-    - `vi README_PYPI.rst`
-
-    To make the following changes:
-
-    * Update the pywbemtools version in the two links near the bottom of the file:
-
-      ```
-      .. _README file: https://github.com/pywbem/pywbemtools/blob/stable_{M.N}/README.rst
-      .. _Documentation: https://pywbemtools.readthedocs.io/en/stable_{M.N}/
-      ```
-
-      Where the items in curly braces are replaced with their actual values.
-
-6.  Tag the version (temporary tagging, only locally):
-
-    Note: This is the basis on which `pbr` determines the package version for
-    the subsequent steps. Because we also have the file `PKG-INFO` in the repo,
-    tagging now needs to be done in two steps, this temporary step and a subsequent
-    final step.
-
-    Create a tag for the new version (just locally):
-
-    - `git tag $MNU`
-
-    Remove the build products so that the next build picks up the tagged
-    version:
+5.  Perform a complete build (in your favorite Python virtual environment):
 
     - `make clobber`
-
-7.  Perform a complete build (in your favorite Python virtual environment):
-
     - `make all`
 
     If this fails, fix and iterate over this step until it succeeds.
 
-8.  Commit the changes and push to upstream:
+6.  Optional: Perform a complete test using Tox:
 
-    Note: This also includes the file `PKG-INFO` in the commit, which now has
-    the version that was tagged.
+    - `tox`
+
+    This will create virtual Python environments for all supported versions
+    and will invoke `make test` (with its prerequisite make targets) in each
+    of them.
+
+    If this fails, fix and iterate over this step until it succeeds.
+
+7.  Optional: Perform a test against a real WBEM server:
+
+    If this fails, fix and iterate over this step until it succeeds.
+
+    Post the results to the release PR.
+
+8.  Commit the changes and push to upstream:
 
     - `git status` - to double check which files have been changed
     - `git commit -asm "Release $MNU"`
@@ -153,48 +118,29 @@ Their upstream repos are assumed to have the remote name `origin`.
     the `master` branch. If you are releasing a fix version, you need to
     change the target branch of the Pull Request to `stable_M.N`.
 
-10. Optional: Perform a complete test using Tox:
-
-    - `tox`
-
-    This will create virtual Python environments for all supported versions
-    and will invoke `make test` (with its prerequisite make targets) in each
-    of them.
-
-11. Optional: Perform a test in a local multi-platform test environment (Andy):
-
-    - Post the results to the release PR.
-
-12. Optional: Perform a test against a real WBEM server (Karl):
-
-    - Post the results to the release PR.
-
-13. If any of the tests mentioned above fails, fix the problem and iterate
-    back to step 6. until they all succeed.
-
-14. On GitHub, once the CI runs for the Pull Request succeed:
+10. On GitHub, once the CI runs for the Pull Request succeed:
 
     - Merge the Pull Request (no review is needed)
     - Delete the branch of the Pull Request (`release_M.N.U`)
 
-15. Checkout the branch you are releasing, update it from upstream, and
+11. Checkout the branch you are releasing, update it from upstream, and
     delete the local topic branch you created:
 
     - `git checkout $BRANCH`
     - `git pull`
     - `git branch -d release_$MNU`
 
-16. Tag the version (final tagging, both locally and remotely):
-
-    This step moves the local tag to the correct commit and pushes it upstream:
+12. Tag the version and push the tag to upstream:
 
     - `git status` - double check that the branch to be released
       (`$BRANCH`) is checked out
-    - `git tag -d $MNU`
     - `git tag $MNU`
     - `git push --tags`
 
-17. If you released the `master` branch (for a new minor or major version),
+    The pushing of the tag triggers another RTD docs build of its stable
+    version, this time with the correct version as defined in the tag.
+
+13. If you released the `master` branch (for a new minor or major version),
     it will be fixed separately, so it needs a new fix stream.
 
     * Create a branch for its fix stream and push it upstream:
@@ -204,18 +150,18 @@ Their upstream repos are assumed to have the remote name `origin`.
       - `git checkout -b stable_$MN`
       - `git push --set-upstream origin stable_$MN`
 
-    * Log on to [RTD](https://readthedocs.org/), go to the `pywbem` project,
+    * Log on to [RTD](https://readthedocs.org/), go to the `pywbemtools` project,
       and activate the new branch `stable_M.N` as a version to be built.
 
-18. On GitHub, edit the new tag, and create a release description on it. This
+14. On GitHub, edit the new tag, and create a release description on it. This
     will cause it to appear in the Release tab.
 
-19. On GitHub, close milestone `M.N.U`.
+15. On GitHub, close milestone `M.N.U`.
 
     Note: Issues with that milestone will be moved forward in the section
     "Starting a new version".
 
-20. Upload the package to PyPI:
+16. Upload the package to PyPI:
 
     **Attention!!** This only works once. You cannot re-release the same
     version to PyPI.
@@ -224,45 +170,14 @@ Their upstream repos are assumed to have the remote name `origin`.
 
     Verify that it arrived on PyPI: https://pypi.python.org/pypi/pywbemtools/
 
-21. Switch to the directory of the `pywbemtools.github.io` repo and perform the
-    following steps from that directory:
-
-    - `cd ../pywbemtools.github.io`
-
-22. Check out the `master` branch and update it from upstream:
-
-    - `git checkout master`
-    - `git pull`
-
-    In this repo, we don´t use a topic branch for these changes.
-
-23. Edit the installation page:
-
-    - `vi pywbemtools/installation.html`
-
-    To make the following changes in the installation table:
-
-    * If you are releasing a new minor or major version, insert a new row.
-    * If you are releasing a fix version, update the row for the release
-      it replaces.
-
-    Verify with a web browser on the locally changed file
-    `pywbemtools/installation.html` that the new release shows up correctly,
-    and that all of its links work.
-
-24. Commit the changes and push to the upstream repo:
-
-    - `git status` - to double check which files have been changed
-    - `git commit -asm "Release $MNU"`
-    - `git push`
-
-25. Announce the new version on the
+17. Announce the new version on the
     [pywbem-devel mailing list](https://sourceforge.net/p/pywbem/mailman/pywbem-devel/).
 
 Starting a new version
 ----------------------
 
-This section shows the steps for starting development of a new version of pywbemtools.
+This section shows the steps for starting development of a new version of
+pywbemtools.
 
 It covers all variants of new versions:
 
@@ -276,8 +191,8 @@ It covers all variants of new versions:
 2.  Set shell variables for the version to be started and for the branch it is
     based upon:
 
-    - `MNU="0.10.0"` or `MNU="0.9.1"` - Full version number `M.N.U`
-    - `MN="0.10"` or `MN="0.9"` - Major and minor version number `M.N`
+    - `MNU="0.7.0"` or `MNU="0.8.1"` - Full version number `M.N.U`
+    - `MN="0.7"` or `MN="0.8"` - Major and minor version number `M.N`
     - `BRANCH="master"` or `BRANCH="stable_$MN"`
 
 3.  Check out the branch the new version is based upon, make sure it is up to
@@ -294,8 +209,8 @@ It covers all variants of new versions:
     To insert the following section before the top-most section:
 
     ```
-    pywbemtools 0.07.0
-    -------------
+    pywbemtools 0.7.0
+    -----------------
 
     This version is currently in development and is shown as |version|.
 
