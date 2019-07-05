@@ -34,7 +34,8 @@ from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
 
-from ._connection_repository import ConnectionRepository
+from ._connection_repository import ConnectionRepository, \
+    DEFAULT_CONNECTIONS_FILE
 
 __all__ = ['cli']
 
@@ -69,19 +70,22 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-N', '--name', type=str,
               metavar='NAME',
               envvar=PywbemServer.name_envvar,
-              help='Name for the connection(optional, see --server).  If this '
+              help='Name for the connection.  If this '
                    'option exists and the server option does not exist '
-                   'pywbemcli attempts to retrieve the connection information '
-                   'from the connections file. If the server option exists '
-                   'that is used as the connection definition with the name '
-                   '"default". '
-                   'This option and --server are mutually exclusive.' +
+                   'pywbemcli retrieves the connection information from the '
+                   'connections file ' +
+                   '({cf}). '.format(cf=DEFAULT_CONNECTIONS_FILE) +
+                   'If the server option and this option does not exist '
+                   '--server is used as the connection definition with  '
+                   '"default" as the name.'
+                   'This option and --server are mutually exclusive except '
+                   'when defining a new server from the command line' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.name_envvar))
 @click.option('-d', '--default_namespace', type=str,
               metavar='NAMESPACE',
               envvar=PywbemServer.defaultnamespace_envvar,
-              help='Default Namespace to use in the target WBEMServer if no '
-                   'namespace is defined in the subcommand' +
+              help='Default Namespace to use in the target WBEM server if no '
+                   'namespace is defined in a subcommand' +
                    '(EnvVar: {ev}) ' .format(ev=PywbemServer.name_envvar) +
                    '[]Default: {of}].'.format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str, envvar=PywbemServer.user_envvar,
@@ -98,11 +102,11 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               metavar='INTEGER',
               envvar=PywbemServer.timeout_envvar,
-              help="Operation timeout for the WBEM Server in seconds.\n"
+              help="Timeout completion of WBEM server operation in seconds.\n"
                    '(EnvVar: PYWBEMCLI_{})'.format(PywbemServer.timeout_envvar))
 @click.option('-n', '--noverify', is_flag=True,
               envvar=PywbemServer.noverify_envvar,
-              help='If set, client does not verify server certificate.' +
+              help='If set, client does not verify WBEM server certificate.' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.noverify_envvar))
 @click.option('-c', '--certfile', type=str,
               envvar=PywbemServer.certfile_envvar,
@@ -127,10 +131,11 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-o', '--output-format',
               metavar='<choice>',
               envvar=PywbemServer.timeout_envvar,
-              help='Output format. Multiple table and CIMObjects formats. '
+              help='Choice for command output data format. '
                    'pywbemcli may override the format choice depending on the '
-                   'operation since not all formats apply to all output data '
-                   'types. Choices further defined in documentation.\n' +
+                   'command group and command since not all formats apply to '
+                   'all output data types. Choices further defined in '
+                   'pywbemcli documentation.\n' +
                    'Choices: Table: [{tb}], Object: [{ob}]\n'
                    .format(tb='|'.join(TABLE_FORMATS),
                            ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)) +
@@ -138,21 +143,21 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--use-pull-ops',
               envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),
-              help='Determines whether the pull operations are used for '
-                   'EnumerateInstances, associatorinstances, '
-                   'referenceinstances, and ExecQuery operations.\n'
-                   '* "yes": pull operations used; if server '
-                   'does not support pull, the operation will fail.\n'
-                   '* "no": forces pywbemcli to try only the '
+              help='Determines whether pull operations are used for '
+                   'EnumerateInstances, AssociatorInstances, '
+                   'ReferenceInstances, and ExecQuery operations.\n'
+                   '* "yes": pull operations required; if server '
+                   'does not support pull, the operation fails.\n'
+                   '* "no": forces pywbemcli to use only the '
                    'traditional non-pull operations.\n'
                    '* "either": pywbemcli trys first pull and then '
                    ' traditional operations.\n' +
                    '(EnvVar: {}) '.format(PywbemServer.use_pull_envvar) +
                    '[Default: {}]'.format(DEFAULT_PULL_CHOICE))
 @click.option('--pull-max-cnt', type=int,
-              help='MaxObjectCount of objects to be returned for each request '
-                   'if pull operations are used. Must be  a positive non-zero '
-                   'integer.' +
+              help='Maximium object count of objects to be returned for '
+                   'each request if pull operations are used. Must be  a '
+                   'positive non-zero integer.' +
                    '(EnvVar: {}) '.format(PywbemServer.pull_max_cnt_envvar) +
                    '[Default: {}]'.format(DEFAULT_MAXPULLCNT))
 @click.option('-T', '--timestats', is_flag=True,
@@ -161,8 +166,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @ click.option('-l', '--log', type=str,
                metavar='COMP=DEST:DETAIL,...',
                envvar=PywbemServer.log_envvar,
-               help='Enable logging of CIM Operations and set a component to '
-                    'a log level, destination, and detail level.\n'
+               help='Enable logging of CIM Operations and set a COMPONENT to '
+                    'a log level, DESTINATION, and DETAIL level.\n'
                     '* COMP: [{c}], Default: {cd}\n'
                     '* DEST: [{d}], Default: {dd}\n'
                     '* DETAIL:[{dl}], Default: {dll}'
@@ -177,7 +182,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-m', '--mock-server', type=str, multiple=True,
               envvar=PywbemServer.mock_server_envvar,
               metavar="FILENAME",
-              help='Defines, a mock WBEM server is as the target WBEM server. '
+              help='Defines, a mock WBEM server as the target WBEM server. '
                    'The option value defines a MOF or Python file path used to '
                    'populate the mock repository. This option may be used '
                    'multiple times where each use defines a single file_path.'
@@ -191,24 +196,38 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
         verbose, mock_server, pywbem_server=None, timestats=None, log=None):
     """
-    WBEM Server command line browser. This cli tool implements the
-    CIM/XML client APIs as defined in pywbem to make requests to a WBEM
-    server. This browser uses subcommands to:
+    Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML protocol
+    to communicate with WBEM servers. Pywbemcli can:
 
     \b
-        * Explore the characteristics of WBEM Servers based on using the
-          pywbem client APIs.  It can manage/inspect CIM_Classes and
-          CIM_instances on the server.
+        * Manage the information in WBEM Servers CIM objects using the
+          operations defined in the DMTF specification.  It can manage CIM
+          classes, CIM instances and CIM qualifier declarations in the WBEM
+          Server and execute CIM methods and queries on the server.
 
     \b
-        * In addition it can inspect namespaces, profiles, subscriptions,
-          and other server information and inspect and manage WBEM
-          indication subscriptions.
+        * Inspect WBEM Server characteristics including namespaces, registered
+          profiles, and other server information.
 
-    The global options shown above that can also be specified on any of the
-    (sub-)commands as well as the command line.
+    \b
+        * Capture detailed information on communication with the WBEM
+          server including time statistics and logs of the operations.
+
+    \b
+        * Maintain a persistent list of named WBEM servers and execute
+          operations on them by name.
+
+    Pywbemcli implements command groups and subcommands to execute the CIM/XML
+    operations defined by the DMTF CIM Operations Over HTTP
+    specification(DSP0201) specification.
+
+    The general options shown below can also be specified on any of the
+    (sub)commands as well as the command line.
+
+    For more detailed information, see:
+
+        https://pywbemtools.readthedocs.io/en/latest/
     """
-
     # In interactive mode, global options specified in cmd line are used as
     # defaults for interactive commands.
     # This requires being able to determine for each option whether it has been
