@@ -244,7 +244,7 @@ TEST_CASES = [
     #
     ['Verify server subcommand interop',
      {'args': ['interop'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Interop Namespace:',
                  'Namespace Name',
                  '----------------',
@@ -255,7 +255,7 @@ TEST_CASES = [
 
     ['Verify server subcommand namespaces',
      {'args': ['namespaces'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
                  '----------------',
@@ -266,7 +266,7 @@ TEST_CASES = [
 
     ['Verify server subcommand namespaces with sort option',
      {'args': ['namespaces', '-s'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
                  '----------------',
@@ -277,7 +277,7 @@ TEST_CASES = [
 
     ['Verify server subcommand brand',
      {'args': ['brand'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Brand:',
                  'WBEM Server Brand',
                  '-------------------',
@@ -288,7 +288,7 @@ TEST_CASES = [
 
     ['Verify server subcommand profiles',
      {'args': ['profiles'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -306,7 +306,7 @@ TEST_CASES = [
 
     ['Verify server subcommand profiles, filtered by org',
      {'args': ['profiles', '-o', 'DMTF'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -319,7 +319,7 @@ TEST_CASES = [
 
     ['Verify server subcommand profiles, filtered by org, long',
      {'args': ['profiles', '--organization', 'DMTF'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -332,7 +332,7 @@ TEST_CASES = [
 
     ['Verify server subcommand profiles, filtered by name',
      {'args': ['profiles', '-n', 'Profile Registration'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -343,7 +343,7 @@ TEST_CASES = [
 
     ['Verify server subcommand profiles, filtered by org, long',
      {'args': ['profiles', '--profilename', 'Profile Registration'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -364,7 +364,7 @@ TEST_CASES = [
     ['Verify server subcommand centralinsts, ',
      {'args': ['centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',
                  r'Profile +Central Instances',
                  'SNIA:Server:1.1.0',
@@ -377,7 +377,7 @@ TEST_CASES = [
 
     ['Verify server subcommand info with mock server',
      {'args': ['info'],
-      'global': ['-d', 'interop']},
+      'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout':
       ['Server General Information',
        'Brand        Version    Interop Namespace    Namespaces',

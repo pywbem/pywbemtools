@@ -106,6 +106,101 @@ class BaseTableTests(unittest.TestCase):
 
 class FormatTableTests(BaseTableTests):
     """Tests on the table_format function in _common.py"""
+
+    def test_table_table_hdr(self):
+        """Test a table output_format table with header"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_simple_table(table_format='table', title=True)
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test simple table\n'
+                    '+-----------+------------+-------------+\n'
+                    '| col1      | col2       | col3        |\n'
+                    '|-----------+------------+-------------|\n'
+                    '| row1col1  | row1col2   | row1col3    |\n'
+                    '| row2col1  | row2col2   | row2col3    |\n'
+                    '| row3 col1 | row3  col2 | row3   col3 |\n'
+                    '| 0         | 999        | 9999999     |\n'
+                    '| 1.1432    | 1.2        | 0           |\n'
+                    '+-----------+------------+-------------+\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
+    def test_tpsql_table_hdr(self):
+        """Test a table output_format table with header"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_simple_table(table_format='psql', title=True)
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = ('test simple table\n'
+                    '+-----------+------------+-------------+\n'
+                    '| col1      | col2       | col3        |\n'
+                    '|-----------+------------+-------------|\n'
+                    '| row1col1  | row1col2   | row1col3    |\n'
+                    '| row2col1  | row2col2   | row2col3    |\n'
+                    '| row3 col1 | row3  col2 | row3   col3 |\n'
+                    '| 0         | 999        | 9999999     |\n'
+                    '| 1.1432    | 1.2        | 0           |\n'
+                    '+-----------+------------+-------------+\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
+    def test_html_table_hdr(self):
+        """Test a table output_format table with header"""
+
+        captured_output = StringIO()          # Create StringIO object
+        sys.stdout = captured_output                   # and redirect stdout.
+        table = self.create_simple_table(table_format='html', title=True)
+        print(table)
+        sys.stdout = sys.__stdout__
+        actual = captured_output.getvalue()
+        if VERBOSE:
+            print(actual)
+
+        expected = (
+            '<p>test simple table</p>\n'
+            '<table>\n'
+            '<thead>\n'
+            '<tr><th>col1     </th><th>col2      </th><th>col3       '
+            '</th></tr>\n'
+            '</thead>\n'
+            '<tbody>\n'
+            '<tr><td>row1col1 </td><td>row1col2  </td><td>row1col3   '
+            '</td></tr>\n'
+            '<tr><td>row2col1 </td><td>row2col2  </td><td>row2col3   '
+            '</td></tr>\n'
+            '<tr><td>row3 col1</td><td>row3  col2</td><td>row3   '
+            'col3</td></tr>\n'
+            '<tr><td>0        </td><td>999       </td><td>9999999    '
+            '</td></tr>\n'
+            '<tr><td>1.1432   </td><td>1.2       </td><td>0          '
+            '</td></tr>\n'
+            '</tbody>\n'
+            '</table>\n')
+
+        self.compare_results(actual, expected)
+
+        self.assertEqual(actual, expected,
+                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+
     def test_table_simple_hdr(self):
         """Test a simple table with header"""
 
