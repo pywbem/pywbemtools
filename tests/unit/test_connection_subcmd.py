@@ -376,7 +376,8 @@ TEST_CASES = [
     # # None, RUN],
 
     ['Verify connection subcommand list empty repository.',
-     ['list'],
+     {'global': ['-o', 'simple'],
+      'args': ['list']},
      {'stdout': [
          "WBEMServer Connections:",
          "name    server uri    namespace    user    password    "
@@ -446,7 +447,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection subcommand list  with 2 servers defined',
-     ['list'],
+     {'global': ['--output-format', 'simple'],
+      'args': ['list']},
      {'stdout': ["test1   http://blah      root/cimv2                       "
                  "           False",
                  "test2   http://blahblah  root/cimv2   fred    argh        "
@@ -463,7 +465,8 @@ TEST_CASES = [
 
     ['Verify connection subcommand list  with 2 servers defined, not sel after '
      ' next pywbemcli call',
-     ['list'],
+     {'global': ['--output-format', 'simple'],
+      'args': ['list']},
      {'stdout': ["test1   http://blah      root/cimv2                       "
                  "           False",
                  "test2   http://blahblah  root/cimv2   fred    argh        "
@@ -486,7 +489,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection subcommand list empty repository.',
-     ['list'],
+     {'global': ['-o', 'simple'],
+      'args': ['list']},
      {'stdout': [
          "WBEMServer Connections:",
          "name    server uri    namespace    user    password    "
@@ -677,7 +681,7 @@ class TestSubcmdClass(CLITestsBase):
                 test_file(exp_response['file']['before'])
 
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition, verbose=False)
+                         mock, condition, verbose=True)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:

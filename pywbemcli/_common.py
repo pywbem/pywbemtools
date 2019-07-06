@@ -50,14 +50,13 @@ else:
     _Longint = int
 
 
-TABLE_FORMATS = ['table', 'plain', 'simple', 'grid', 'rst']
-CIM_OBJECT_OUTPUT_FORMATS = ['mof', 'xml', 'txt', 'tree']
-
+TABLE_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html')
+CIM_OBJECT_OUTPUT_FORMATS = ('mof', 'xml', 'txt', 'tree')
 
 # TODO: ks for some reason extending one list with another causes a problem
 # in click with the help. Review with future versions
-OUTPUT_FORMATS = ['table', 'plain', 'simple', 'grid', 'rst', 'mof', 'xml',
-                  'txt', 'repr', 'tree']
+OUTPUT_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html',
+                  'mof', 'xml', 'txt', 'tree')
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
@@ -1348,14 +1347,19 @@ def format_table(rows, headers, title=None, table_format='simple',
             assert False, "Sort_columns must be int or list/tuple of int"
 
     if table_format is None:
-        table_format = 'simple'
+        table_format = 'table'
+    if table_format == 'table':
+        table_format = 'psql'
     if table_format not in TABLE_FORMATS:
         raise click.ClickException('Invalid table format %s.' % table_format)
 
     result = tabulate.tabulate(rows, headers, tablefmt=table_format)
 
     if title:
-        result = '%s\n%s' % (title, result)
+        if table_format == 'html':
+            result = '<p>%s</p>\n%s' % (title, result)
+        else:
+            result = '%s\n%s' % (title, result)
     return result
 
 

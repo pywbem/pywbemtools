@@ -97,9 +97,10 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       all formats apply to all output data types.
                                       Choices further defined in documentation.
                                       Choices: Table:
-                                      [table|plain|simple|grid|rst], Object:
-                                      [mof|xml|txt|tree]
-                                      [Default: "simple"]
+                                      [table|plain|simple|grid|psql|rst|html],
+                                      Object: [mof|xml|txt|tree]
+                                      [Default:
+                                      "simple"]
       --use-pull-ops [yes|no|either]  Determines whether the pull operations are
                                       used for EnumerateInstances,
                                       associatorinstances, referenceinstances, and

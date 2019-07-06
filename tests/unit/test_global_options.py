@@ -29,7 +29,8 @@ TEST_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_mock_model.mof')
 PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
 
-GLOBAL_HELP_TST = '''Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
+GLOBAL_HELP = """
+Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
   WBEM Server command line browser. This cli tool implements the CIM/XML
   client APIs as defined in pywbem to make requests to a WBEM server. This
@@ -112,9 +113,10 @@ Options:
                                   all formats apply to all output data types.
                                   Choices further defined in documentation.
                                   Choices: Table:
-                                  [table|plain|simple|grid|rst], Object:
-                                  [mof|xml|txt|tree]
-                                  [Default: "simple"]
+                                  [table|plain|simple|grid|psql|rst|html],
+                                  Object: [mof|xml|txt|tree]
+                                  [Default:
+                                  "simple"]
   --use-pull-ops [yes|no|either]  Determines whether the pull operations are
                                   used for EnumerateInstances,
                                   associatorinstances, referenceinstances, and
@@ -168,7 +170,7 @@ Commands:
   qualifier   Command group to view QualifierDeclarations.
   repl        Enter interactive (REPL) mode (default).
   server      Command Group for WBEM server operations.
-'''
+"""
 
 OK = True
 RUN = True
@@ -190,7 +192,7 @@ TEST_CASES = [
      {'global': ['--help'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
-     {'stdout': GLOBAL_HELP_TST,
+     {'stdout': GLOBAL_HELP,
       'rc': 0,
       'test': 'linesnows'},
      None, OK],
