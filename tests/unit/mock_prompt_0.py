@@ -27,7 +27,7 @@
 """
 from mock import Mock
 
-import pywbemcli._common
+import pywbemtools.pywbemcli._common
 RETURN_VALUE = "0"
 
 
@@ -38,4 +38,4 @@ def mock_prompt(msg):
 
 
 # pylint: disable=protected-access
-pywbemcli._common.pywbemcli_prompt = Mock(side_effect=mock_prompt)
+pywbemtools.pywbemcli._common.pywbemcli_prompt = Mock(side_effect=mock_prompt)

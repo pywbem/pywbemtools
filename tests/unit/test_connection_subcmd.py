@@ -21,7 +21,8 @@ was called.
 
 import os
 import pytest
-from pywbemcli._connection_repository import DEFAULT_CONNECTIONS_FILE
+from pywbemtools.pywbemcli._connection_repository \
+    import DEFAULT_CONNECTIONS_FILE
 
 from .cli_test_extensions import CLITestsBase
 

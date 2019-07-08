@@ -133,10 +133,17 @@ endif
 # Name of this Python package on Pypi
 package_name := pywbemtools
 
+# Name of a specific module within the package_name.  This should be a
+# subdirectory of the package in git.
+# TODO: Future: expand so that multiple modules can reside in the package
+module_name := pywbemcli
+
 # Name of the Python package modules
 # TODO future: expand so multiple modules are allowed. Right now we have
 # one module and directly reference it in the Makefile
-cli_module_name := pywbemcli
+pywbemcli_module_path := $(package_name)/$(module_name)
+
+pywbemcli_module_import_name := $(package_name).$(module_name)
 
 # Determine if coverage details report generated
 # The variable can be passed in as either an environment variable or
@@ -203,7 +210,7 @@ doc_dependent_files := \
     $(doc_conf_dir)/pywbemclicmdshelp.rst \
     $(wildcard $(doc_conf_dir)/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
-    $(wildcard $(cli_module_name)/*.py) \
+    $(wildcard $(pywbemcli_module_path)/*.py) \
 
 # PyLint config file
 pylint_rc_file := pylintrc
@@ -214,7 +221,7 @@ flake8_rc_file := .flake8
 # Python source files to be checked by PyLint and Flake8
 py_src_files := \
     setup.py \
-    $(wildcard $(cli_module_name)/*.py) \
+    $(wildcard $(pywbemcli_module_path)/*.py) \
     $(wildcard tests/*.py) \
     $(wildcard tests/*/*.py) \
     $(wildcard tests/*/*/*.py) \
@@ -254,7 +261,7 @@ dist_manifest_in_files := \
     LICENSE.txt \
     README.rst \
     *.py \
-    $(cli_module_name)/*.py \
+    $(pywbemcli_module_path)/*.py \
 
 # Files that are dependents of the distribution archive.
 # Keep in sync with dist_manifest_in_files.
@@ -263,7 +270,7 @@ dist_dependent_files := \
     README.rst \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
-    $(wildcard $(cli_module_name)/*.py) \
+    $(wildcard $(pywbemcli_module_path)/*.py) \
 
 .PHONY: help
 help:
@@ -409,7 +416,7 @@ install: install_$(pymn).done
 
 install_$(pymn).done: Makefile install_os_$(pymn).done install_basic_$(pymn).done install_$(package_name)_$(pymn).done
 	-$(call RM_FUNC,$@)
-	$(PYTHON_CMD) -c "import $(cli_module_name)"
+	$(PYTHON_CMD) -c "import $(pywbemcli_module_import_name)"
 	echo "done" >$@
 
 .PHONY: develop_os
@@ -471,7 +478,7 @@ all: install develop build builddoc check pylint test
 .PHONY: clobber
 clobber: clean
 	@echo "makefile: Removing everything for a fresh start"
-	-$(call RM_FUNC,*.done epydoc.log $(dist_files) $(cli_module_name)/*cover)
+	-$(call RM_FUNC,*.done epydoc.log $(dist_files) $(pywbemcli_module_path)/*cover)
 	-$(call RMDIR_FUNC,$(doc_build_dir) .tox $(coverage_html_dir))
 	@echo "makefile: Done removing everything for a fresh start"
 	@echo "makefile: Target $@ done."
@@ -612,11 +619,11 @@ safety_$(pymn).done: develop_$(pymn).done Makefile minimum-constraints.txt
 .PHONY: test
 test: develop_$(pymn).done
 	@echo "makefile: Running unit and function tests"
-	py.test --color=yes --cov $(cli_module_name) $(coverage_report) --cov-config coveragerc $(pytest_warnings_opts) $(pytest_opts) tests/unit -s
+	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warnings_opts) $(pytest_opts) tests/unit -s
  	@echo "makefile: Done running tests"
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
-$(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(cli_module_name)/pywbemcli.py $(cli_module_name)/_cmd*.py
+$(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(pywbemcli_module_path)/_cmd*.py
 	@echo 'makefile: Creating $@ for documentation'
 	$(PYTHON_CMD) tools/click_help_capture.py >$@.tmp
 	-$(call RM_FUNC,$@)

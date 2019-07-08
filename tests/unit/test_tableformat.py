@@ -30,7 +30,7 @@ try:
 except ImportError:
     from io import StringIO
 
-from pywbemcli._common import format_table, fold_string
+from pywbemtools.pywbemcli._common import format_table, fold_string
 
 VERBOSE = False
 
