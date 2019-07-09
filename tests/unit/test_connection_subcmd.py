@@ -38,7 +38,8 @@ SAVE_FILE_PATH = os.path.join(SCRIPT_DIR, SAVE_FILE)
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 
-CONN_HELP = """Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
+CONN_HELP = """
+Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group to manage WBEM connections.
 
@@ -64,7 +65,8 @@ Commands:
   test    Execute a predefined wbem request.
 """
 
-CONN_SHOW_HELP = """Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
+CONN_SHOW_HELP = """
+Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
   Show current or NAME connection information.
 
@@ -80,7 +82,8 @@ Options:
   -h, --help  Show this message and exit.
 """
 
-CONN_DEL_HELP = """Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
+CONN_DEL_HELP = """
+Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
 
   Delete connection information.
 
@@ -98,7 +101,8 @@ Options:
   -h, --help    Show this message and exit.
 """
 
-CONN_SAVE_HELP = """Usage: pywbemcli connection save [COMMAND-OPTIONS]
+CONN_SAVE_HELP = """
+Usage: pywbemcli connection save [COMMAND-OPTIONS]
 
   Save current connection to repository.
 
@@ -114,12 +118,13 @@ Options:
   -h, --help    Show this message and exit.
 """
 
-CONN_ADD_HELP = """Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri
+CONN_ADD_HELP = """
+Usage: pywbemcli connection add [COMMAND-OPTIONS]
 
   Create a new named WBEM connection.
 
   This subcommand creates and saves a named connection from the input
-  arguments (NAME and URI) and options in the connections file.
+  options in the connections file.
 
   The new connection can be referenced by the name argument in the future.
   This connection object is capable of managing all of the properties
@@ -134,10 +139,27 @@ CONN_ADD_HELP = """Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri
   as the current connection.
 
   A new connection can also be defined by supplying the parameters on the
-  command line and using the `connection set` command to put it into the
+  command line and using the `connection save` command to put it into the
   connection repository.
 
 Options:
+  -s, --server SERVER             Required hostname or IP address with scheme
+                                  of the WBEMServer in format:
+                                  [{scheme}://]{host}[:{port}]
+                                  * Scheme: must
+                                  be "https" or "http" [Default: "https"]
+                                  *
+                                  Host: defines short/fully qualified DNS
+                                  hostname, literal IPV4 address (dotted), or
+                                  literal IPV6 address
+                                  * Port: (optional)
+                                  defines WBEM server port to be used
+                                  [Defaults: 5988(HTTP) and 5989(HTTPS)].
+                                  [required]
+  -N, --name NAME                 Required name for the connection(optional,
+                                  see --server).  This is the name for this
+                                  defined WBEM server in the connection file
+                                  [required]
   -d, --default_namespace TEXT    Default Namespace to use in the target
                                   WBEMServer if no namespace is defined in the
                                   subcommand (Default: root/cimv2).
@@ -183,7 +205,8 @@ Options:
   -h, --help                      Show this message and exit.
 """
 
-CONN_LIST_HELP = """Usage: pywbemcli connection list [COMMAND-OPTIONS]
+CONN_LIST_HELP = """
+Usage: pywbemcli connection list [COMMAND-OPTIONS]
 
   List the entries in the connection file.
 
@@ -196,7 +219,8 @@ Options:
   -h, --help  Show this message and exit.
 """
 
-CONN_TEST_HELP = """Usage: pywbemcli connection test [COMMAND-OPTIONS]
+CONN_TEST_HELP = """
+Usage: pywbemcli connection test [COMMAND-OPTIONS]
 
   Execute a predefined wbem request.
 
@@ -209,7 +233,8 @@ Options:
   -h, --help  Show this message and exit.
 """
 
-CONN_EXPORT_HELP = """Usage: pywbemcli connection export [COMMAND-OPTIONS]
+CONN_EXPORT_HELP = """
+Usage: pywbemcli connection export [COMMAND-OPTIONS]
 
   Export  the current connection information.
 
@@ -220,7 +245,8 @@ Options:
   -h, --help  Show this message and exit.
 """
 
-CONN_SELECT_HELP = """Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
+CONN_SELECT_HELP = """
+Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
 
   Select a connection from defined connections.
 
@@ -290,43 +316,43 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand show  --help response',
+    ['Verify connection subcommand show --help response',
      ['show', '--help'],
      {'stdout': CONN_SHOW_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand delete  --help response',
+    ['Verify connection subcommand delete --help response',
      ['delete', '--help'],
      {'stdout': CONN_DEL_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand save  --help response',
+    ['Verify connection subcommand save --help response',
      ['save', '--help'],
      {'stdout': CONN_SAVE_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand add  --help response',
+    ['Verify connection subcommand add --help response',
      ['add', '--help'],
      {'stdout': CONN_ADD_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand list  --help response',
+    ['Verify connection subcommand list --help response',
      ['list', '--help'],
      {'stdout': CONN_LIST_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand test  --help response',
+    ['Verify connection subcommand test --help response',
      ['test', '--help'],
      {'stdout': CONN_TEST_HELP,
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify connection subcommand export  --help response',
+    ['Verify connection subcommand export --help response',
      ['export', '--help'],
      {'stdout': CONN_EXPORT_HELP,
       'test': 'linesnows'},
@@ -372,7 +398,7 @@ TEST_CASES = [
     # and what was in the repository.
     #
     ['Verify connection subcommand add with simple arguments only.',
-     ['add', 'test1', 'http://blah'],
+     ['add', '-N', 'test1', '-s', 'http://blah'],
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
@@ -390,8 +416,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection subcommand add with complex options.',
-     ['add', 'test2', 'http://blahblah', '-u', 'fred', '-p', 'argh', '-t',
-      '18', '-n', '-l', 'api=file,all'],
+     ['add', '-N', 'test2', '-s', 'http://blahblah', '-u', 'fred', '-p',
+      'argh', '-t', '18', '-n', '-l', 'api=file,all'],
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -475,8 +501,9 @@ TEST_CASES = [
     #
     #   The following is a new sequence but depends on the repo being empty
     #
-    ['Verify connection subcommand add with add all arguments.',
-     ['add', 'addallargs', 'http://blah',
+    ['Verify connection subcommand add with all arguments.',
+     ['add', '--name', 'addallargs',
+      '--server', 'http://blah',
       '--default_namespace', 'root/blah',
       '--user', 'john',
       '--password', 'pw',
@@ -551,24 +578,58 @@ TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
-    ['Verify connection subcommand add no uri',
-     ['add', 'blah'],
-     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri',
-                 'Try "pywbemcli connection add -h" for help.',
-                 '',
-                 'Error: Missing argument "uri".'],
-      'rc': 2,
-      'test': 'lines'},
-     None, OK],
 
-    ['Verify connection subcommand add with bad arg.',
-     ['add', 'addallargs', 'http://blah',
+
+    ['Verify connection subcommand add with bad arg fails',
+     ['add', '-N', 'addallargs', '-s', 'http://blah',
       '--timeout', 'fred', ],
-     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri',
+     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
                  'Error: Invalid value for "-t" / "--timeout": '
                  'fred is not a valid integer'],
       'rc': 2,
       'test': 'in',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+    ['Verify connection subcommand add no server option fails',
+     ['add', '-N', 'blah'],
+     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
+                 'Try "pywbemcli connection add -h" for help.',
+                 '',
+                 'Error: Missing option "-s" / "--server".'],
+      'rc': 2,
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify connection subcommand fails, no --server.',
+     ['add',
+      '--name', 'strangename', ],
+     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
+                 'Try "pywbemcli connection add -h" for help.',
+                 '',
+                 'Error: Missing option "-s" / "--server".'],
+      'rc': 2,
+      'test': 'lines',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+
+    ['Verify connection subcommand fails, no --name.',
+     ['add',
+      '--server', 'http://strangename',
+      '--default_namespace', 'root/blah',
+      '--user', 'john',
+      '--password', 'pw',
+      '--timeout', '30',
+      '--noverify',
+      '--certfile', 'mycertfile.pem',
+      '--keyfile', 'mykeyfile.pem', ],
+     {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
+                 'Try "pywbemcli connection add -h" for help.',
+                 '',
+                 'Error: Missing option "-N" / "--name".'],
+      'rc': 2,
+      'test': 'lines',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 ]

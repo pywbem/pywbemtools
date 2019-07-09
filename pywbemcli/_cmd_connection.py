@@ -133,8 +133,18 @@ def connection_select(context, name):
 
 # pylint: disable=bad-continuation
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=True,)
-@click.argument('uri', type=str, metavar='uri', required=True)
+@click.option('-s', '--server', type=str, metavar='SERVER', required=True,
+              help='Required hostname or IP address with scheme of the '
+                   'WBEMServer in format:\n[{scheme}://]{host}[:{port}]\n'
+                   '* Scheme: must be "https" or "http" [Default: "https"]\n'
+                   '* Host: defines short/fully qualified DNS hostname, '
+                   'literal IPV4 address (dotted), or literal IPV6 address\n'
+                   '* Port: (optional) defines WBEM server port to be used '
+                   '[Defaults: 5988(HTTP) and 5989(HTTPS)].\n')
+@click.option('-N', '--name', type=str, metavar='NAME', required=True,
+              help='Required name for the connection(optional, see --server).  '
+                   'This is the name for this defined WBEM server in the'
+                   ' connection file')
 @click.option('-d', '--default_namespace', type=str,
               default=DEFAULT_NAMESPACE,
               help="Default Namespace to use in the target WBEMServer if no "
@@ -186,12 +196,12 @@ def connection_select(context, name):
                    ' ' + ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
 @add_options(verify_option)
 @click.pass_obj
-def connection_add(context, name, uri, **options):
+def connection_add(context, **options):
     """
     Create a new named WBEM connection.
 
     This subcommand creates and saves a named connection from the
-    input arguments (NAME and URI) and options in the connections file.
+    input options in the connections file.
 
     The new connection can be referenced by the name argument in
     the future.  This connection object is capable of managing all of the
@@ -206,11 +216,10 @@ def connection_add(context, name, uri, **options):
     as the current connection.
 
     A new connection can also be defined by supplying the parameters on the
-    command line and using the `connection set` command to put it into the
+    command line and using the `connection save` command to put it into the
     connection repository.
     """
-    context.execute_cmd(lambda: cmd_connection_add(context, name, uri,
-                                                   options))
+    context.execute_cmd(lambda: cmd_connection_add(context, options))
 
 
 @connection_group.command('test', options_metavar=CMD_OPTS_TXT)
@@ -454,16 +463,19 @@ def cmd_connection_delete(context, name, options):
 
 
 # pylint: disable=unused-argument
-def cmd_connection_add(context, name, uri, options):
+def cmd_connection_add(context, options):
     """
     Create a new connection object from the input arguments and options and
     put it into the PYWBEMCLI_SERVERS dictionary.
     """
+    name = options['name']
+    server = options['server']
     pywbemcli_servers = ConnectionRepository()
     if name in pywbemcli_servers:
         raise click.ClickException('%s is already defined as a server' % name)
 
-    new_server = PywbemServer(uri, options['default_namespace'], name,
+    new_server = PywbemServer(server, options['default_namespace'],
+                              name,
                               user=options['user'],
                               password=options['password'],
                               timeout=options['timeout'],

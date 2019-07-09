@@ -619,12 +619,12 @@ The following defines the help output for the `pywbemcli connection add --help` 
 
 ::
 
-    Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME uri
+    Usage: pywbemcli connection add [COMMAND-OPTIONS]
 
       Create a new named WBEM connection.
 
       This subcommand creates and saves a named connection from the input
-      arguments (NAME and URI) and options in the connections file.
+      options in the connections file.
 
       The new connection can be referenced by the name argument in the future.
       This connection object is capable of managing all of the properties
@@ -639,10 +639,27 @@ The following defines the help output for the `pywbemcli connection add --help` 
       as the current connection.
 
       A new connection can also be defined by supplying the parameters on the
-      command line and using the `connection set` command to put it into the
+      command line and using the `connection save` command to put it into the
       connection repository.
 
     Options:
+      -s, --server SERVER             Required hostname or IP address with scheme
+                                      of the WBEMServer in format:
+                                      [{scheme}://]{host}[:{port}]
+                                      * Scheme: must
+                                      be "https" or "http" [Default: "https"]
+                                      *
+                                      Host: defines short/fully qualified DNS
+                                      hostname, literal IPV4 address (dotted), or
+                                      literal IPV6 address
+                                      * Port: (optional)
+                                      defines WBEM server port to be used
+                                      [Defaults: 5988(HTTP) and 5989(HTTPS)].
+                                      [required]
+      -N, --name NAME                 Required name for the connection(optional,
+                                      see --server).  This is the name for this
+                                      defined WBEM server in the connection file
+                                      [required]
       -d, --default_namespace TEXT    Default Namespace to use in the target
                                       WBEMServer if no namespace is defined in the
                                       subcommand (Default: root/cimv2).
@@ -960,6 +977,9 @@ The following defines the help output for the `pywbemcli instance associators --
       `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
       --role and --resultrole options.
 
+      INSTANCENAME must be a CIM instance name in the format defined by DMTF
+      `DSP0207`.
+
       This may be executed interactively by providing only a classname and the
       interactive option. Pywbemcli presents a list of instances in the class
       from which one can be chosen as the target.
@@ -1122,6 +1142,9 @@ The following defines the help output for the `pywbemcli instance delete --help`
       This may be executed interactively by providing only a class name and the
       interactive option.
 
+      Otherwise the INSTANCENAME must be a CIM instance name in the format
+      defined by DMTF `DSP0207`.
+
     Options:
       -i, --interactive       If set, `INSTANCENAME` argument must be a class
                               rather than an instance and user is presented with a
@@ -1212,6 +1235,9 @@ The following defines the help output for the `pywbemcli instance get --help` su
       This method may be executed interactively by providing only a classname
       and the interactive option (-i).
 
+      Otherwise the INSTANCENAME must be a CIM instance name in the format
+      defined by DMTF `DSP0207`.
+
       Results are formatted as defined by the output format global option.
 
     Options:
@@ -1265,6 +1291,9 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       This issues an instance level invokemethod request and displays the
       results.
 
+      INSTANCENAME must be a CIM instance name in the format defined by  DMTF
+      `DSP0207`.
+
       Pywbemcli creates the method call using the class in INSTANCENAME
       retrieved from the current WBEM server as a template for parameter
       characteristics. Therefore pywbemcli will generate an exception if
@@ -1316,6 +1345,9 @@ The following defines the help output for the `pywbemcli instance modify --help`
       passed to the WBEM server as part of the ModifyInstance operation
       (normally the WBEM server limits modifications) to just those properties
       defined in the property list.
+
+      INSTANCENAME must be a CIM instance name in the format defined by DMTF
+      `DSP0207`.
 
       Pywbemcli builds only the properties defined with the --property option
       into an instance based on the CIMClass and forwards that to the WBEM
@@ -1409,6 +1441,9 @@ The following defines the help output for the `pywbemcli instance references --h
       Gets the reference instances or instance names(--names-only option) for a
       target `INSTANCENAME` in the target WBEM server filtered by the `role` and
       `resultclass` options.
+
+      INSTANCENAME must be a CIM instance name in the format defined by DMTF
+      `DSP0207`.
 
       This may be executed interactively by providing only a class name for
       `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
