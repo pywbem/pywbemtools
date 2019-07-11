@@ -227,6 +227,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             else:
                 row = [stats.count, stats.exception_count, time,
                        req_len, reply_len, stats.name]
+            rows.append(row)
 
         # only add table description if verbose on.
         if self.verbose:
@@ -235,7 +236,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         else:
             title = None
 
-        rows.append(row)
         click.echo(format_table(rows, hdr, title=title))
 
     def connect_wbem_server(self):

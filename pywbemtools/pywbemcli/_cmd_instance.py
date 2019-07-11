@@ -42,7 +42,18 @@ from .config import DEFAULT_QUERY_LANGUAGE
 includequalifiers_option = [              # pylint: disable=invalid-name
     click.option('-q', '--includequalifiers', is_flag=True, required=False,
                  help='If set, requests server to include qualifiers in the '
-                 'returned instance(s).')]
+                 'returned instances. Not all servers return qualifiers on '
+                 'instances')]
+
+includequalifiersenum_option = [              # pylint: disable=invalid-name
+    click.option('-q', '--includequalifiers', is_flag=True, required=False,
+                 help='If set, requests server to include qualifiers in the '
+                 'returned instances. This subcommand may use either pull '
+                 'or traditional operations depending on the server '
+                 'and the "--use--pull-ops" general option. If pull operations '
+                 'are used, qualifiers will not be included, even if this '
+                 'option is specified. If traditional operations are used, '
+                 'inclusion of qualifiers depends on the server.')]
 
 # specific to instance because deepinheritance differs between class and
 # instance operations.
@@ -86,6 +97,17 @@ filterquery_option = [              # pylint: disable=invalid-name
                  'used, the filter is not sent to the server. See the '
                  'documentation for more information. (Default: None)')]
 
+includeclassorigin_option = [              # pylint: disable=invalid-name
+    click.option('-c', '--includeclassorigin', is_flag=True, required=False,
+                 help='Include class origin attribute in returned '
+                      'instance(s).')]
+
+##########################################################################
+#
+#   Click command group and subcommand definitions
+#
+###########################################################################
+
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
 def instance_group():
@@ -106,10 +128,11 @@ def instance_group():
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Show only local properties of the returned instance.')
+              help='Request that server show only local properties of the '
+                   'returned instance. '
+                   'Some servers may not process this parameter.')
 @add_options(includequalifiers_option)
-@click.option('-c', '--includeclassorigin', is_flag=True, required=False,
-              help='Include class origin attribute in returned instance(s).')
+@add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
@@ -132,7 +155,7 @@ def instance_get(context, instancename, **options):
     Otherwise the INSTANCENAME must be a CIM instance name in the format
     defined by DMTF `DSP0207`.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the --output_format general option.
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
                                                  options))
@@ -272,11 +295,16 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Show only local properties of the class.')
+              help='Show only local properties of the instances. This '
+                   'subcommand may use either pull or traditional operations '
+                   'depending on the server and the "--use--pull-ops" general '
+                   'option. If pull operations are used, this parameters will '
+                   'not be included, even if specified. If '
+                   'traditional operations are used, some servers do not '
+                   'process the parameter.')
 @add_options(deepinheritance_option)
-@add_options(includequalifiers_option)
-@click.option('-c', '--includeclassorigin', is_flag=True, required=False,
-              help='Include ClassOrigin in the result.')
+@add_options(includequalifiersenum_option)
+@add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(names_only_option)
@@ -296,7 +324,7 @@ def instance_enumerate(context, classname, **options):
     Displays the returned instances in mof, xml, or table formats or the
     instance names as a string or XML formats (--names-only option).
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the --output_format general option.
 
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
@@ -316,7 +344,7 @@ def instance_enumerate(context, classname, **options):
                    '(or instance name) should refer to the target instance '
                    'through a property with aname that matches the value of '
                    'this parameter. Optional.')
-@add_options(includequalifiers_option)
+@add_options(includequalifiersenum_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
@@ -342,7 +370,7 @@ def instance_references(context, instancename, **options):
     `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
     of instances names in the class from which you can be chosen as the target.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the --output_format general option.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -374,7 +402,7 @@ def instance_references(context, instancename, **options):
               ' instance name (`INSTANCENAME`) through an association with '
               'returned object having this role (property name in the '
               'association that matches this parameter). Optional.')
-@add_options(includequalifiers_option)
+@add_options(includequalifiersenum_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
@@ -400,7 +428,7 @@ def instance_associators(context, instancename, **options):
     interactive option. Pywbemcli presents a list of instances in the class
     from which one can be chosen as the target.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the --output_format general option.
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))
@@ -425,7 +453,7 @@ def instance_query(context, query, **options):
 
     The results of the query are displayed as mof or xml.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the --output_format general option.
 
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
@@ -468,7 +496,9 @@ def instance_count(context, classname, **options):
 
 
 ####################################################################
+#
 #  cmd_instance_<action> processors
+#
 ####################################################################
 
 def get_instancename(context, instancename, options):
@@ -697,8 +727,8 @@ def cmd_instance_enumerate(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
-                DeepInheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
+                DeepInheritance=options['deepinheritance'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
@@ -740,7 +770,7 @@ def cmd_instance_references(context, instancename, options):
                 instancepath,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options["includequalifiers"],
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
@@ -785,7 +815,7 @@ def cmd_instance_associators(context, instancename, options):
                 Role=options['role'],
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options["includequalifiers"],
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),

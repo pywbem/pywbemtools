@@ -15,7 +15,8 @@
 # limitations under the License.
 """
 Click Command definition for the class command group which includes
-cmds for get, enumerate, list of classes.
+cmds for get, enumerate, associators, references, find, etc. of the objects
+CIMClass on a WBEM server
 """
 from __future__ import absolute_import
 
@@ -39,19 +40,17 @@ from ._displaytree import display_class_tree
 #
 
 includeclassqualifiers_option = [              # pylint: disable=invalid-name
-    click.option('--no-qualifiers', is_flag=True,
+    click.option('--no-qualifiers', 'includequalifiers', is_flag=True,
                  required=False, default=True,
                  help='If set, request server to not include qualifiers in '
                       'the returned class(s). The default behavior is to '
-                      'request include qualifiers in the returned class(s).')]
+                      'request qualifiers in returned class(s).')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deepinheritance', is_flag=True, required=False,
                  help='If set, request server to return complete subclass '
                       'hiearchy for this class. The default is False which '
                       'requests only one level of subclasses.')]
-
-# TODO add a case sensitive option for those things that use regex
 
 
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
@@ -87,9 +86,9 @@ def class_get(context, classname, **options):
     exception.
 
     The --includeclassorigin, --includeclassqualifiers, and --propertylist
-    options determine what parts of the class definition are tetrieved.
+    options determine what parts of the class definition are retrieved.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the output format general option.
 
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
@@ -174,7 +173,7 @@ def class_enumerate(context, classname, **options):
     either at the top of the class hierarchy or from  the position in the
     class hierarchy defined by `CLASSNAME` argument if provided.
 
-    The output format is defined by the output-format global option.
+    The output format is defined by the output-format general option.
 
     The includeclassqualifiers, includeclassorigin options define optional
     information to be included in the output.
@@ -182,7 +181,7 @@ def class_enumerate(context, classname, **options):
     The deepinheritance option defines whether the complete hiearchy is
     retrieved or just the next level in the hiearchy.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the output format general option.
     """
     context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
                                                     options))
@@ -198,7 +197,7 @@ def class_enumerate(context, classname, **options):
 @click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided. Each returned class '
-                   '(or classname) should refer to the target instance through '
+                   '(or classname) should refer to the target class through '
                    'a property with a name that matches the value of this '
                    'parameter. Optional.')
 @add_options(includeclassqualifiers_option)
@@ -217,7 +216,7 @@ def class_references(context, classname, **options):
     filtered by the role and result class options and modified by the
     other options.
 
-    Results are displayed as defined by the output format global option.
+    Results are displayed as defined by the output format general option.
     """
     context.execute_cmd(lambda: cmd_class_references(context, classname,
                                                      options))
@@ -265,7 +264,7 @@ def class_associators(context, classname, **options):
     argument filtered by the --assocclass, --resultclass, --role and
     --resultrole options and modified by the other options.
 
-    Results are formatted as defined by the output format global option.
+    Results are formatted as defined by the output format general option.
     """
     context.execute_cmd(lambda: cmd_class_associators(context, classname,
                                                       options))
@@ -335,7 +334,7 @@ def class_tree(context, classname, **options):
     the class hiearchy of superclasses leading to CLASSNAME is displayed.
 
     This is a separate subcommand because it is tied specifically to displaying
-    in a tree format.so that the --output-format global option is ignored.
+    in a tree format.so that the --output-format general option is ignored.
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
@@ -360,7 +359,7 @@ def cmd_class_get(context, classname, options):
             classname,
             namespace=options['namespace'],
             LocalOnly=options['localonly'],
-            IncludeQualifiers=options['no_qualifiers'],
+            IncludeQualifiers=options['includequalifiers'],
             IncludeClassOrigin=options['includeclassorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
@@ -399,7 +398,7 @@ def cmd_class_enumerate(context, classname, options):
                 namespace=options['namespace'],
                 LocalOnly=options['localonly'],
                 DeepInheritance=options['deepinheritance'],
-                IncludeQualifiers=options['no_qualifiers'],
+                IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'])
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
@@ -431,7 +430,7 @@ def cmd_class_references(context, classname, options):
                 classname,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
-                IncludeQualifiers=options['no_qualifiers'],
+                IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
@@ -468,7 +467,7 @@ def cmd_class_associators(context, classname, options):
                 Role=options['role'],
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'],
-                IncludeQualifiers=options['no_qualifiers'],
+                IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
