@@ -159,7 +159,7 @@ Options:
                                   documentation for more information.(EnvVar:
                                   PYWBEMCLI_MOCK_SERVER).
   --version                       Show the version of this command and the
-                                  package and exit
+                                  pywbem package and exit.
   -h, --help                      Show this message and exit.
 
 Commands:
@@ -276,7 +276,8 @@ TEST_CASES = [
      {'global': ['-s', 'http://blah', '--version'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': [r'^pywbemcli, version [0-9]+\.[0-9]+\.[0-9]+'],
+     {'stdout': [r'^pywbemcli, version [0-9]+\.[0-9]+\.[0-9]+',
+                 r'^pywbem, version [0-9]+\.[0-9]+\.[0-9]+'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
