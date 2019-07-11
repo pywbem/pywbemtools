@@ -44,7 +44,7 @@ It provides commands to:
 
 1. Inspect and manage the primitive CIM Objects CIMClasses, CIMInstances,
 and CIM QualifierDeclaractions defined by the server using the
-requests APIs of the pywbem package.  
+requests APIs of the pywbem package.
 
 2. Inspect and manage higher level components of the WBEM Server including
 
@@ -156,9 +156,7 @@ version.
 The package version can be accessed by programs using the
 ``pywbemtools.__version__`` variable [#]_:
 
-.. autodata:: pywbemcli._version.__version__
-
-TODO: This should probably be in another directory that covers all of the tools
+.. autodata:: pywbemtools.pywbemcli.__version__
 
 This documentation may have been built from a development level of the
 package. You can recognize a development version of this package by the
@@ -169,8 +167,8 @@ released after 0.5.0. Version 1.5.1 is an `assumed` next version, because the
 `actually released` next version might be 0.2.0 or even 1.0.0.
 
 .. [#] For tooling reasons, that variable is shown as
-   ``pywbemtools._version.__version__`` in this documentation, but it should be
-   accessed as ``pywbemtools.__version__``.
+   ``pywbemtools.pywbemcli.__version__`` in this documentation, but it should be
+   accessed as ``pywbemtools.pywbemcli.__version__``.
 
 
 .. _`Compatibility`:

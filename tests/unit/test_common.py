@@ -30,14 +30,14 @@ from mock import patch
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint32, Uint64, Sint32, \
     CIMDateTime
-from pywbemcli._common import parse_wbemuri_str, \
+from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list
 # pylint: disable=unused-import
-from pywbemcli._common import pywbemcli_prompt  # noqa: F401
-from pywbemcli._context_obj import ContextObj
+from pywbemtools.pywbemcli._common import pywbemcli_prompt  # noqa: F401
+from pywbemtools.pywbemcli._context_obj import ContextObj
 
 
 from tests.unit.pytest_extensions import simplified_test_function
@@ -134,8 +134,8 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     values from the mock.
     """
     # setup mock for this test
-    with patch('pywbemcli._common.pywbemcli_prompt', side_effect=choices) \
-            as mock_prompt:
+    mock_function = 'pywbemtools.pywbemcli._common.pywbemcli_prompt'
+    with patch(mock_function, side_effect=choices) as mock_prompt:
         # The code to be tested
         title = "Test pick_one_from_list"
         context = ContextObj(None, None, None, None, None, None, None)
@@ -191,8 +191,8 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
 def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     """Test for pick_one_from_list function"""
     # setup mock for this test
-    with patch('pywbemcli._common.pywbemcli_prompt', side_effect=choices) as \
-            mock_prompt:
+    mock_function = 'pywbemtools.pywbemcli._common.pywbemcli_prompt'
+    with patch(mock_function, side_effect=choices) as mock_prompt:
         # The code to be tested
         title = "test_pick_multiple_from_list"
         # context = ContextObj(None, None, None, None, None, None, None)

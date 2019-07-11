@@ -24,8 +24,8 @@ from __future__ import absolute_import, print_function
 
 import unittest
 
-from pywbemcli._context_obj import ContextObj
-from pywbemcli._pywbem_server import PywbemServer
+from pywbemtools.pywbemcli._context_obj import ContextObj
+from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 
 class ContextObjTests(unittest.TestCase):

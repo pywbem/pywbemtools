@@ -24,7 +24,7 @@ from __future__ import absolute_import, print_function
 
 import unittest
 
-from pywbemcli._pywbem_server import PywbemServer
+from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 
 class PywbemServerTests(unittest.TestCase):

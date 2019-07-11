@@ -2,4 +2,4 @@
 include LICENSE.txt
 include README.rst
 include *.py
-include pywbemcli/*.py
+include pywbemtools/pywbemcli/*.py
