@@ -32,15 +32,15 @@ propertylist_option = [                      # pylint: disable=invalid-name
                  help='Define a propertylist for the request. If option '
                       'not specified a Null property list is created and the '
                       'server returns all properties. Multiple properties may '
-                      'be defined with either a comma separated list defining '
-                      'the option multiple times. '
+                      'be defined with either a comma separated list or by '
+                      'using the option multiple times. '
                       '(ex: -p pn1 -p pn22 or -p pn1,pn2). '
                       'If defined as empty string the server should return no '
                       'properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name
     click.option('-o', '--names_only', is_flag=True, required=False,
-                 help='Show only local properties of the class.')]
+                 help='Show only the returned object names.')]
 
 sort_option = [                            # pylint: disable=invalid-name
     click.option('-s', '--sort', is_flag=True, required=False,
@@ -49,7 +49,9 @@ sort_option = [                            # pylint: disable=invalid-name
 includeclassorigin_option = [            # pylint: disable=invalid-name
     click.option('-c', '--includeclassorigin', is_flag=True,
                  required=False,
-                 help='Include classorigin in the result.')]
+                 help='Request that server include classorigin in the result.'
+                      'On some WBEM operations, server may ignore this '
+                      'option.')]
 
 namespace_option = [                     # pylint: disable=invalid-name
     click.option('-n', '--namespace', type=str,

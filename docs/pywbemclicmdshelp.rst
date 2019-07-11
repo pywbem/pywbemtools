@@ -225,7 +225,7 @@ The following defines the help output for the `pywbemcli class associators --hel
       argument filtered by the --assocclass, --resultclass, --role and
       --resultrole options and modified by the other options.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the output format general option.
 
     Options:
       -a, --assocclass <class name>   Filter by the association class name
@@ -252,20 +252,22 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       Optional.
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
-                                      default behavior is to request include
-                                      qualifiers in the returned class(s).
-      -c, --includeclassorigin        Include classorigin in the result.
+                                      default behavior is to request qualifiers in
+                                      returned class(s).
+      -c, --includeclassorigin        Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only local properties of the class.
+      -o, --names_only                Show only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -332,7 +334,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       at the top of the class hierarchy or from  the position in the class
       hierarchy defined by `CLASSNAME` argument if provided.
 
-      The output format is defined by the output-format global option.
+      The output format is defined by the output-format general option.
 
       The includeclassqualifiers, includeclassorigin options define optional
       information to be included in the output.
@@ -340,7 +342,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       The deepinheritance option defines whether the complete hiearchy is
       retrieved or just the next level in the hiearchy.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the output format general option.
 
     Options:
       -d, --deepinheritance     Return complete subclass hierarchy for this class
@@ -349,10 +351,11 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       -l, --localonly           Show only local properties of the class.
       --no-qualifiers           If set, request server to not include qualifiers
                                 in the returned class(s). The default behavior is
-                                to request include qualifiers in the returned
-                                class(s).
-      -c, --includeclassorigin  Include classorigin in the result.
-      -o, --names_only          Show only local properties of the class.
+                                to request qualifiers in returned class(s).
+      -c, --includeclassorigin  Request that server include classorigin in the
+                                result.On some WBEM operations, server may ignore
+                                this option.
+      -o, --names_only          Show only the returned object names.
       -s, --sort                Sort into alphabetical order by classname.
       -n, --namespace <name>    Namespace to use for this operation. If defined
                                 that namespace overrides the general options
@@ -430,25 +433,27 @@ The following defines the help output for the `pywbemcli class get --help` subco
       exception.
 
       The --includeclassorigin, --includeclassqualifiers, and --propertylist
-      options determine what parts of the class definition are tetrieved.
+      options determine what parts of the class definition are retrieved.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the output format general option.
 
     Options:
       -l, --localonly                 Show only local properties of the class.
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
-                                      default behavior is to request include
-                                      qualifiers in the returned class(s).
-      -c, --includeclassorigin        Include classorigin in the result.
+                                      default behavior is to request qualifiers in
+                                      returned class(s).
+      -c, --includeclassorigin        Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -512,7 +517,7 @@ The following defines the help output for the `pywbemcli class references --help
       filtered by the role and result class options and modified by the other
       options.
 
-      Results are displayed as defined by the output format global option.
+      Results are displayed as defined by the output format general option.
 
     Options:
       -R, --resultclass <class name>  Filter by the result classname provided.
@@ -520,25 +525,27 @@ The following defines the help output for the `pywbemcli class references --help
                                       this class or its subclasses. Optional.
       -r, --role <role name>          Filter by the role name provided. Each
                                       returned class (or classname) should refer
-                                      to the target instance through a property
-                                      with a name that matches the value of this
+                                      to the target class through a property with
+                                      a name that matches the value of this
                                       parameter. Optional.
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
-                                      default behavior is to request include
-                                      qualifiers in the returned class(s).
-      -c, --includeclassorigin        Include classorigin in the result.
+                                      default behavior is to request qualifiers in
+                                      returned class(s).
+      -c, --includeclassorigin        Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only local properties of the class.
+      -o, --names_only                Show only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -576,7 +583,7 @@ The following defines the help output for the `pywbemcli class tree --help` subc
       class hiearchy of superclasses leading to CLASSNAME is displayed.
 
       This is a separate subcommand because it is tied specifically to
-      displaying in a tree format.so that the --output-format global option is
+      displaying in a tree format.so that the --output-format general option is
       ignored.
 
     Options:
@@ -1003,7 +1010,7 @@ The following defines the help output for the `pywbemcli instance associators --
       interactive option. Pywbemcli presents a list of instances in the class
       from which one can be chosen as the target.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the --output_format general option.
 
     Options:
       -a, --assocclass <class name>   Filter by the association class name
@@ -1029,19 +1036,28 @@ The following defines the help output for the `pywbemcli instance associators --
                                       role (property name in the association that
                                       matches this parameter). Optional.
       -q, --includequalifiers         If set, requests server to include
-                                      qualifiers in the returned instance(s).
-      -c, --includeclassorigin        Include classorigin in the result.
+                                      qualifiers in the returned instances. This
+                                      subcommand may use either pull or
+                                      traditional operations depending on the
+                                      server and the "--use--pull-ops" general
+                                      option. If pull operations are used,
+                                      qualifiers will not be included, even if
+                                      this option is specified. If traditional
+                                      operations are used, inclusion of qualifiers
+                                      depends on the server.
+      -c, --includeclassorigin        Include class origin attribute in returned
+                                      instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only local properties of the class.
+      -o, --names_only                Show only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1210,31 +1226,48 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       Displays the returned instances in mof, xml, or table formats or the
       instance names as a string or XML formats (--names-only option).
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the --output_format general option.
 
     Options:
-      -l, --localonly                 Show only local properties of the class.
+      -l, --localonly                 Show only local properties of the instances.
+                                      This subcommand may use either pull or
+                                      traditional operations depending on the
+                                      server and the "--use--pull-ops" general
+                                      option. If pull operations are used, this
+                                      parameters will not be included, even if
+                                      specified. If traditional operations are
+                                      used, some servers do not process the
+                                      parameter.
       -d, --deepinheritance           If set, requests server to return properties
                                       in subclasses of the target instances class.
                                       If option not specified only properties from
                                       target class are returned
       -q, --includequalifiers         If set, requests server to include
-                                      qualifiers in the returned instance(s).
-      -c, --includeclassorigin        Include ClassOrigin in the result.
+                                      qualifiers in the returned instances. This
+                                      subcommand may use either pull or
+                                      traditional operations depending on the
+                                      server and the "--use--pull-ops" general
+                                      option. If pull operations are used,
+                                      qualifiers will not be included, even if
+                                      this option is specified. If traditional
+                                      operations are used, inclusion of qualifiers
+                                      depends on the server.
+      -c, --includeclassorigin        Include class origin attribute in returned
+                                      instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      -o, --names_only                Show only local properties of the class.
+      -o, --names_only                Show only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
       -f, --filterquery TEXT          A filter query to be passed to the server if
@@ -1281,13 +1314,15 @@ The following defines the help output for the `pywbemcli instance get --help` su
       Otherwise the INSTANCENAME must be a CIM instance name in the format
       defined by DMTF `DSP0207`.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the --output_format general option.
 
     Options:
-      -l, --localonly                 Show only local properties of the returned
-                                      instance.
+      -l, --localonly                 Request that server show only local
+                                      properties of the returned instance. Some
+                                      servers may not process this parameter.
       -q, --includequalifiers         If set, requests server to include
-                                      qualifiers in the returned instance(s).
+                                      qualifiers in the returned instances. Not
+                                      all servers return qualifiers on instances
       -c, --includeclassorigin        Include class origin attribute in returned
                                       instance(s).
       -p, --propertylist <property name>
@@ -1296,8 +1331,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
       -n, --namespace <name>          Namespace to use for this operation. If
@@ -1451,7 +1486,7 @@ The following defines the help output for the `pywbemcli instance query --help` 
 
       The results of the query are displayed as mof or xml.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the --output_format general option.
 
     Options:
       -l, --querylanguage QUERY LANGUAGE
@@ -1493,7 +1528,7 @@ The following defines the help output for the `pywbemcli instance references --h
       of instances names in the class from which you can be chosen as the
       target.
 
-      Results are formatted as defined by the output format global option.
+      Results are formatted as defined by the --output_format general option.
 
     Options:
       -R, --resultclass <class name>  Filter by the result class name provided.
@@ -1506,19 +1541,28 @@ The following defines the help output for the `pywbemcli instance references --h
                                       property with aname that matches the value
                                       of this parameter. Optional.
       -q, --includequalifiers         If set, requests server to include
-                                      qualifiers in the returned instance(s).
-      -c, --includeclassorigin        Include classorigin in the result.
+                                      qualifiers in the returned instances. This
+                                      subcommand may use either pull or
+                                      traditional operations depending on the
+                                      server and the "--use--pull-ops" general
+                                      option. If pull operations are used,
+                                      qualifiers will not be included, even if
+                                      this option is specified. If traditional
+                                      operations are used, inclusion of qualifiers
+                                      depends on the server.
+      -c, --includeclassorigin        Include class origin attribute in returned
+                                      instance(s).
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
                                       created and the server returns all
                                       properties. Multiple properties may be
                                       defined with either a comma separated list
-                                      defining the option multiple times. (ex: -p
-                                      pn1 -p pn22 or -p pn1,pn2). If defined as
+                                      or by using the option multiple times. (ex:
+                                      -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only local properties of the class.
+      -o, --names_only                Show only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace

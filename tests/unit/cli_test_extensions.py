@@ -106,7 +106,7 @@ class CLITestsBase(object):  # pylint: disable=too-few-public-methods
                  Compares for exact match between the expected response and the
                  returned data line by line. The number of lines and the data
                  in each line must match.  If the expected response is a single
-                 string is is split into lines separated at each new line
+                 string it is split into lines separated at each new line
                  before the match
 
                  'linesnows' - Expected response may be either list of strings

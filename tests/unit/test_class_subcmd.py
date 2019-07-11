@@ -53,6 +53,49 @@ Commands:
   tree          Display CIM class inheritance hierarchy tree.
 """
 
+CLS_GET_HELP = """
+Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
+
+  Get and display a single CIM class.
+
+  Get a single CIM class defined by the CLASSNAME argument from the WBEM
+  server and display it. Normally it is retrieved from the default namespace
+  in the server.
+
+  If the class is not found in the WBEM Server, the server returns an
+  exception.
+
+  The --includeclassorigin, --includeclassqualifiers, and --propertylist
+  options determine what parts of the class definition are retrieved.
+
+  Results are formatted as defined by the output format general option.
+
+Options:
+  -l, --localonly                 Show only local properties of the class.
+  --no-qualifiers                 If set, request server to not include
+                                  qualifiers in the returned class(s). The
+                                  default behavior is to request qualifiers in
+                                  returned class(s).
+  -c, --includeclassorigin        Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  option not specified a Null property list is
+                                  created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -h, --help                      Show this message and exit.
+"""
+
+
 CLS_ENUM_HELP = """
 Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
@@ -62,7 +105,7 @@ Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
   at the top of the class hierarchy or from  the position in the class
   hierarchy defined by `CLASSNAME` argument if provided.
 
-  The output format is defined by the output-format global option.
+  The output format is defined by the output-format general option.
 
   The includeclassqualifiers, includeclassorigin options define optional
   information to be included in the output.
@@ -70,7 +113,7 @@ Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
   The deepinheritance option defines whether the complete hiearchy is
   retrieved or just the next level in the hiearchy.
 
-  Results are formatted as defined by the output format global option.
+  Results are formatted as defined by the output format general option.
 
 Options:
   -d, --deepinheritance     Return complete subclass hierarchy for this class
@@ -79,10 +122,11 @@ Options:
   -l, --localonly           Show only local properties of the class.
   --no-qualifiers           If set, request server to not include qualifiers
                             in the returned class(s). The default behavior is
-                            to request include qualifiers in the returned
-                            class(s).
-  -c, --includeclassorigin  Include classorigin in the result.
-  -o, --names_only          Show only local properties of the class.
+                            to request qualifiers in returned class(s).
+  -c, --includeclassorigin  Request that server include classorigin in the
+                            result.On some WBEM operations, server may ignore
+                            this option.
+  -o, --names_only          Show only the returned object names.
   -s, --sort                Sort into alphabetical order by classname.
   -n, --namespace <name>    Namespace to use for this operation. If defined
                             that namespace overrides the general options
@@ -142,7 +186,7 @@ Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
   class hiearchy of superclasses leading to CLASSNAME is displayed.
 
   This is a separate subcommand because it is tied specifically to
-  displaying in a tree format.so that the --output-format global option is
+  displaying in a tree format.so that the --output-format general option is
   ignored.
 
 Options:
@@ -181,31 +225,140 @@ Options:
   -h, --help              Show this message and exit.
 """
 
+CLS_REFERENCES_HELP = """
+Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
+
+  Get the reference classes for CLASSNAME.
+
+  Get the reference classes (or class names) for the CLASSNAME argument
+  filtered by the role and result class options and modified by the other
+  options.
+
+  Results are displayed as defined by the output format general option.
+
+Options:
+  -R, --resultclass <class name>  Filter by the result classname provided.
+                                  Each returned class (or classname) should be
+                                  this class or its subclasses. Optional.
+  -r, --role <role name>          Filter by the role name provided. Each
+                                  returned class (or classname) should refer
+                                  to the target class through a property with
+                                  a name that matches the value of this
+                                  parameter. Optional.
+  --no-qualifiers                 If set, request server to not include
+                                  qualifiers in the returned class(s). The
+                                  default behavior is to request qualifiers in
+                                  returned class(s).
+  -c, --includeclassorigin        Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
+  -p, --propertylist <property name>
+                                  Define a propertylist for the request. If
+                                  option not specified a Null property list is
+                                  created and the server returns all
+                                  properties. Multiple properties may be
+                                  defined with either a comma separated list
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  empty string the server should return no
+                                  properties.
+  -o, --names_only                Show only the returned object names.
+  -s, --sort                      Sort into alphabetical order by classname.
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -S, --summary                   Return only summary of objects (count).
+  -h, --help                      Show this message and exit.
+"""
+
+CIMFOO_SUB_SUB = """
+   [Description ( "Subclass of CIM_Foo_sub" )]
+class CIM_Foo_sub_sub : CIM_Foo_sub {
+
+   string cimfoo_sub_sub;
+
+   string cimfoo_sub;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Sample method with input and output parameters" )]
+   uint32 Method1(
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Response param 2" )]
+      string OutputParam2);
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Method with no Parameters" )]
+   uint32 DeleteNothing();
+
+};
+
+"""
+
+CIMFOO_SUB_SUB_NO_QUALS = """
+class CIM_Foo_sub_sub : CIM_Foo_sub {
+
+   string cimfoo_sub_sub;
+
+   string cimfoo_sub;
+
+   string InstanceID;
+
+   uint32 IntegerProp;
+
+   uint32 Method1(
+      string OutputParam2);
+
+   uint32 Fuzzy(
+      string TestInOutParameter,
+      CIM_Foo REF TestRef,
+      string OutputParam,
+      uint32 OutputRtnValue);
+
+   uint32 DeleteNothing();
+
+};
+"""
 REFERENCES_CLASS_RTN = [
     '//FakedUrl/root/cimv2:TST_Lineage',
-    '   [Association ( true ),',
-    '    Description (',
-    '       " Lineage defines the relationship between parents and '
-    'children." )]',
     'class TST_Lineage {',
     '',
-    '      [key ( true )]',
     '   string InstanceID;',
     '',
     '   TST_Person REF parent;',
     '',
     '   TST_Person REF child;',
-    ''
-    '};'
+    '',
+    '};',
+    '',
     '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
-    '   [Association ( true ),',
-    '    Description ( " Family gathers person to family." )]',
     'class TST_MemberOfFamilyCollection {',
     '',
-    '      [key ( true )]',
     '   TST_Person REF family;',
     '',
-    '      [key ( true )]',
     '   TST_Person REF member;',
     '',
     '};',
@@ -213,19 +366,60 @@ REFERENCES_CLASS_RTN = [
 
 REFERENCES_CLASS_RTN2 = [
     '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
-    '   [Association ( true ),',
-    '    Description ( " Family gathers person to family." )]',
     'class TST_MemberOfFamilyCollection {',
     '',
-    '      [key ( true )]',
     '   TST_Person REF family;',
     '',
-    '      [key ( true )]',
     '   TST_Person REF member;',
     '',
     '};',
     '',
     '']
+
+REFERENCES_CLASS_RTN_QUALS1 = """
+//FakedUrl/root/cimv2:TST_Lineage
+   [Association ( true ),
+    Description (
+       " Lineage defines the relationship between parents and children." )]
+class TST_Lineage {
+
+      [key ( true )]
+   string InstanceID;
+
+   TST_Person REF parent;
+
+   TST_Person REF child;
+
+};
+
+//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
+   [Association ( true ),
+    Description ( " Family gathers person to family." )]
+class TST_MemberOfFamilyCollection {
+
+      [key ( true )]
+   TST_Person REF family;
+
+      [key ( true )]
+   TST_Person REF member;
+
+};
+"""
+
+REFERENCES_CLASS_RTN_QUALS2 = """
+//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
+   [Association ( true ),
+    Description ( " Family gathers person to family." )]
+class TST_MemberOfFamilyCollection {
+
+      [key ( true )]
+   TST_Person REF family;
+
+      [key ( true )]
+   TST_Person REF member;
+
+};
+"""
 
 
 OK = True  # mark tests OK when they execute correctly
@@ -277,11 +471,24 @@ TEST_CASES = [
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify class subcommand enumerate CIM_Foo_sub',
+     ['enumerate', 'CIM_Foo_sub'],
+     {'stdout': CIMFOO_SUB_SUB,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+
     ['Verify class subcommand enumerate CIM_Foo localonly',
      ['enumerate', 'CIM_Foo', '--localonly'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate CIM_Foo -no-qualifiers',
+     ['enumerate', 'CIM_Foo_sub', '--no-qualifiers'],
+     {'stdout': CIMFOO_SUB_SUB_NO_QUALS,
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo -d',
@@ -351,10 +558,10 @@ TEST_CASES = [
     #
     # Test class get
     #
-    ['Verify class subcommand get  --help response',
+    ['Verify class subcommand get --help response',
      ['get', '--help'],
-     {'stdout': 'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
-      'test': 'startswith'},
+     {'stdout': CLS_GET_HELP,
+      'test': 'linesnows'},
      None, OK],
 
     # subcommand get localonly option
@@ -365,7 +572,7 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly. Tests whole response',
+    ['Verify class subcommand get localonly. Tests whole response with -l',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -375,7 +582,7 @@ TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly. Tests whole response',
+    ['Verify class subcommand get localonly. Tests whole response --localonly',
      ['get', 'CIM_Foo_sub2', '--localonly'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -732,7 +939,6 @@ TEST_CASES = [
                  'provided.',
                  '-R, --resultrole <role name>    Filter by the result role '
                  'name provided.',
-                 '--no-qualifiers',
                  '-c, --includeclassorigin', ],
       'test': 'in'},
      None, OK],
@@ -867,23 +1073,15 @@ TEST_CASES = [
     #
     ['Verify class subcommand references --help, . ',
      ['references', '--help'],
-     {'stdout': ['Usage: pywbemcli class references [COMMAND-OPTIONS] '
-                 'CLASSNAME',
-                 'Get the reference classes for CLASSNAME.',
-                 '-R, --resultclass <class name>  Filter by the result '
-                 'classname provided.',
-                 '-r, --role <role name>          Filter by the role name '
-                 'provided.',
-                 '--no-qualifiers',
-                 '-c, --includeclassorigin', ],
-      'test': 'in'},
+     {'stdout': CLS_REFERENCES_HELP,
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify class subcommand references simple request, -s',
      ['references', 'TST_Person', '-s'],
-     {'stdout': REFERENCES_CLASS_RTN,
+     {'stdout': REFERENCES_CLASS_RTN_QUALS1,
       'test': 'linesnows'},
-     SIMPLE_ASSOC_MOCK_FILE, RUN],
+     SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class subcommand references simple request -o -s',
      ['references', 'TST_Person', '-o', '-s'],
@@ -896,7 +1094,7 @@ TEST_CASES = [
      ['references', 'TST_Person',
       '--role', 'member',
       '--resultclass', 'TST_MemberOfFamilyCollection'],
-     {'stdout': REFERENCES_CLASS_RTN2,
+     {'stdout': REFERENCES_CLASS_RTN_QUALS2,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
@@ -1017,7 +1215,7 @@ class TestSubcmdClass(CLITestsBase):
             pywbemcli command.
         """
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+                         mock, condition, verbose=False)
 
 
 class TestClassGeneral(object):

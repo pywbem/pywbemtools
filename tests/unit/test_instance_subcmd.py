@@ -72,31 +72,48 @@ Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
   Displays the returned instances in mof, xml, or table formats or the
   instance names as a string or XML formats (--names-only option).
 
-  Results are formatted as defined by the output format global option.
+  Results are formatted as defined by the --output_format general option.
 
 Options:
-  -l, --localonly                 Show only local properties of the class.
+  -l, --localonly                 Show only local properties of the instances.
+                                  This subcommand may use either pull or
+                                  traditional operations depending on the
+                                  server and the "--use--pull-ops" general
+                                  option. If pull operations are used, this
+                                  parameters will not be included, even if
+                                  specified. If traditional operations are
+                                  used, some servers do not process the
+                                  parameter.
   -d, --deepinheritance           If set, requests server to return properties
                                   in subclasses of the target instances class.
                                   If option not specified only properties from
                                   target class are returned
   -q, --includequalifiers         If set, requests server to include
-                                  qualifiers in the returned instance(s).
-  -c, --includeclassorigin        Include ClassOrigin in the result.
+                                  qualifiers in the returned instances. This
+                                  subcommand may use either pull or
+                                  traditional operations depending on the
+                                  server and the "--use--pull-ops" general
+                                  option. If pull operations are used,
+                                  qualifiers will not be included, even if
+                                  this option is specified. If traditional
+                                  operations are used, inclusion of qualifiers
+                                  depends on the server.
+  -c, --includeclassorigin        Include class origin attribute in returned
+                                  instance(s).
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defining the option multiple times. (ex: -p
-                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
-  -o, --names_only                Show only local properties of the class.
+  -o, --names_only                Show only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
   -h, --help                      Show this message and exit.
@@ -121,13 +138,15 @@ Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
   Otherwise the INSTANCENAME must be a CIM instance name in the format
   defined by DMTF `DSP0207`.
 
-  Results are formatted as defined by the output format global option.
+  Results are formatted as defined by the --output_format general option.
 
 Options:
-  -l, --localonly                 Show only local properties of the returned
-                                  instance.
+  -l, --localonly                 Request that server show only local
+                                  properties of the returned instance. Some
+                                  servers may not process this parameter.
   -q, --includequalifiers         If set, requests server to include
-                                  qualifiers in the returned instance(s).
+                                  qualifiers in the returned instances. Not
+                                  all servers return qualifiers on instances
   -c, --includeclassorigin        Include class origin attribute in returned
                                   instance(s).
   -p, --propertylist <property name>
@@ -136,8 +155,8 @@ Options:
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defining the option multiple times. (ex: -p
-                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
   -n, --namespace <name>          Namespace to use for this operation. If
@@ -148,7 +167,8 @@ Options:
                                   presented with a list of instances of the
                                   class from which the instance to process is
                                   selected.
-  -h, --help                      Show this message and exit."""
+  -h, --help                      Show this message and exit.
+"""
 
 INST_CREATE_HELP = """
 Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
@@ -255,7 +275,7 @@ Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
   of instances names in the class from which you can be chosen as the
   target.
 
-  Results are formatted as defined by the output format global option.
+  Results are formatted as defined by the --output_format general option.
 
 Options:
   -R, --resultclass <class name>  Filter by the result class name provided.
@@ -268,19 +288,28 @@ Options:
                                   property with aname that matches the value
                                   of this parameter. Optional.
   -q, --includequalifiers         If set, requests server to include
-                                  qualifiers in the returned instance(s).
-  -c, --includeclassorigin        Include classorigin in the result.
+                                  qualifiers in the returned instances. This
+                                  subcommand may use either pull or
+                                  traditional operations depending on the
+                                  server and the "--use--pull-ops" general
+                                  option. If pull operations are used,
+                                  qualifiers will not be included, even if
+                                  this option is specified. If traditional
+                                  operations are used, inclusion of qualifiers
+                                  depends on the server.
+  -c, --includeclassorigin        Include class origin attribute in returned
+                                  instance(s).
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defining the option multiple times. (ex: -p
-                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -o, --names_only                Show only local properties of the class.
+  -o, --names_only                Show only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -291,7 +320,8 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit."""
+  -h, --help                      Show this message and exit.
+"""
 
 INST_MODIFY_HELP = """
 Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
@@ -343,7 +373,8 @@ Options:
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
-  -h, --help                      Show this message and exit."""
+  -h, --help                      Show this message and exit.
+"""
 
 INST_ASSOCIATORS_HELP = """
 Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
@@ -361,7 +392,7 @@ Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
   interactive option. Pywbemcli presents a list of instances in the class
   from which one can be chosen as the target.
 
-  Results are formatted as defined by the output format global option.
+  Results are formatted as defined by the --output_format general option.
 
 Options:
   -a, --assocclass <class name>   Filter by the association class name
@@ -387,19 +418,28 @@ Options:
                                   role (property name in the association that
                                   matches this parameter). Optional.
   -q, --includequalifiers         If set, requests server to include
-                                  qualifiers in the returned instance(s).
-  -c, --includeclassorigin        Include classorigin in the result.
+                                  qualifiers in the returned instances. This
+                                  subcommand may use either pull or
+                                  traditional operations depending on the
+                                  server and the "--use--pull-ops" general
+                                  option. If pull operations are used,
+                                  qualifiers will not be included, even if
+                                  this option is specified. If traditional
+                                  operations are used, inclusion of qualifiers
+                                  depends on the server.
+  -c, --includeclassorigin        Include class origin attribute in returned
+                                  instance(s).
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
                                   created and the server returns all
                                   properties. Multiple properties may be
                                   defined with either a comma separated list
-                                  defining the option multiple times. (ex: -p
-                                  pn1 -p pn22 or -p pn1,pn2). If defined as
+                                  or by using the option multiple times. (ex:
+                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -o, --names_only                Show only local properties of the class.
+  -o, --names_only                Show only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -410,7 +450,8 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit."""
+  -h, --help                      Show this message and exit.
+"""
 
 INST_INVOKE_METHOD_HELP = """
 Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
@@ -453,7 +494,8 @@ Options:
   -n, --namespace <name>      Namespace to use for this operation. If defined
                               that namespace overrides the general options
                               namespace
-  -h, --help                  Show this message and exit."""
+  -h, --help                  Show this message and exit.
+"""
 
 ENUM_INST_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
@@ -631,6 +673,21 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand enumerate CIM_Foo --includequalifiers',
+     ['enumerate', 'CIM_Foo', '--includequalifiers'],
+     {'stdout': ENUM_INST_RESP,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate CIM_Foo includequalifiers and '
+     ' --use-pull-ops no',
+     {'args': ['enumerate', 'CIM_Foo', '--includequalifiers'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stdout': ENUM_INST_RESP,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+
     ['Verify instance subcommand enumerate deepinheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout': ENUM_INST_RESP,
@@ -737,6 +794,31 @@ TEST_CASES = [
     ['Verify instance subcommand get with instancename --localonly returns '
      ' data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--localonly'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand get with instancename --includequalifiers '
+     'returns data',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--includequalifiers'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand get with instancename --includequalifiers and '
+     'general --use-pull-ops returns data',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--includequalifiers'],
+      'global': ['--use-pull-ops', 'no']},
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -1236,6 +1318,21 @@ TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance subcommand references --includequalifiers',
+     ['references', 'TST_Person.name="Mike"', '--includequalifiers'],
+     {'stdout': REF_INSTS,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, RUN],
+
+    ['Verify instance subcommand references includequalifiers and '
+     ' --use-pull-ops no',
+     {'args': ['references', 'TST_Person.name="Mike"', '--includequalifiers'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stdout': REF_INSTS,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, RUN],
+
+
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'not a real ref returns no paths',
      ['references', 'TST_Person.name="Mike"', '-o',
@@ -1299,7 +1396,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'linesnows'},
      None, OK],
-    # TODO  add valid associators tests
 
     ['Verify instance subcommand associators, returns instances',
      ['associators', 'TST_Person.name="Mike"'],
@@ -1307,6 +1403,21 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand associators, --includequalifiers',
+     ['associators', 'TST_Person.name="Mike"', '--includequalifiers'],
+     {'stdout': ASSOC_INSTS,
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, RUN],
+
+    ['Verify instance subcommand associators, --includequalifiers wo pull',
+     {'global': ['--use-pull-ops', 'no'],
+      'args': ['associators', 'TST_Person.name="Mike"', '--includequalifiers']},
+     {'stdout': ASSOC_INSTS,
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, RUN],
 
     ['Verify instance subcommand associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '-o'],
@@ -1318,7 +1429,9 @@ TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO add invalid associators tests
+
+    # Invalid associators tests
+
     ['Verify instance subcommand associators, no instance name',
      ['associators'],
      {'stderr': ['Usage: pywbemcli instance associators [COMMAND-OPTIONS] '
@@ -1351,7 +1464,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, RUN],
 
-    # TODO add associators error tests
+    # TODO add more associators error tests
 
     #
     #  instance count subcommand
