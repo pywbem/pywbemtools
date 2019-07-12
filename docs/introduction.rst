@@ -19,84 +19,120 @@
 Introduction
 ============
 
-.. _`pywbemtools Features`:
+.. _`Pywbemtools Features`:
 
-pywbemtools Features
+Pywbemtools features
 --------------------
 
-The pywbemtools package (part of the pywbem github project) is a pure python package
-that is a container for multiple client tools and applications that use the
-pywbem APIs defined by the pywbem package in the github pywbem project to
-interact with WBEM Servers.
+The pywbemtools package is a pure Python package that contains tools and
+applications that interact with WBEM servers:
 
-The goal of this package is to provide a simple, complete and extensible
-tools to allow inspection and management of the data in WBEM
-servers that are compatible with the DMTF specifications.
+* pywbemcli: A command line interface WBEM client module in pywbemtools that
+  interacts with WBEM servers
 
-Today the only tool in this package is pywbemcli:
+These tools use ``pywbem`` as the client WBEM infrastructure to communication
+with the WBEM servers.
 
-Pywbemcli Command Line Browser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pywbemtools and pywbem WBEM Client are packages in the github pywbem repository.
 
-pywbemcli, an extensible command line browser for WBEM Servers.  This tool
-provides access to a WBEM server directly from the command line.
+.. _`
+Pywbemcli command line WBEM client`:
+
+Pywbemcli command line interface WBEM client
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pywbemcli provides access to WBEM servers directly from the command line.
 It provides commands to:
 
-1. Inspect and manage the primitive CIM Objects CIMClasses, CIMInstances,
+1. Inspect and manage the CIM Objects CIMClasses, CIMInstances,
 and CIM QualifierDeclaractions defined by the server using the
 requests APIs of the pywbem package.
 
-2. Inspect and manage higher level components of the WBEM Server including
+2. Inspect and manage higher level components of the WBEM server including:
 
-    - Namespaces
-    - Profiles
-    - Indication Subscriptions
+   * CIM Namespaces
+   * WBEM Server brand information
+   * WBEM management profiles
 
+3. Display information on the interactions with the server including logs and
+   time statistics.
+
+4. Maintain a persistent repository of WBEM server defintions so that server
+   definitions can be accesed by name.
+
+.. _`Supported environments`:
+
+Supported environments
+----------------------
+
+The pywbemcli package is supported in these environments:
+
+* Operating systems: Linux, Windows, MacOS
+* Python versions: 2.7, 3.4, and greater
+* pywbem 0.13.0 or greater
 
 .. _`Installation`:
 
 Installation
 ------------
 
-The easiest way to install the pywbemtools package is by using Pip:
+.. _virtual Python environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+.. _Pypi: http://pypi.python.org/
 
-::
+The easiest way to install the pywbemcli package is using Pip. Pip ensures
+that any dependent Python packages also get installed.
+
+Pip will install the packages into your currently active Python environment
+(your system Python or your predefined virtual Python environment).
+
+It is beneficial to set up a `virtual Python environment`_ for your project,
+because that leaves your system Python installation unchanged, it does not
+require ``sudo`` rights, and last but not least it gives you better control
+about the installed packages and their versions.
+
+Installation of latest released version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following command installs the latest released version of the pywbemctools
+package from `Pypi`_ into the currently active Python environment:
+
+.. code-block:: text
 
     $ pip install pywbemtools
 
-This will download and install the latest released version of pywbemcli and
+This will download and install the latest released version of pywbemtools and
 its dependent packages into your current Python environment (e.g. into your
 system Python or into a virtual Python environment).
 
-It is often beneficial to set up a `virtual Python environment`_, because that
-leaves your system Python installation unchanged.
-
-.. _virtual Python environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+Installation of latest development version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As an alternative, if you want to install the latest development level of the
-pywbemcli package for some reason, install directly from the ``master`` branch
-of the Git repository of the package:
+pywbemctools package for some reason, install directly from the ``master``
+branch of the Git repository of the package:
 
-::
+.. code-block:: text
 
     $ pip install git+https://github.com/pywbem/pywbemtools.git@master
 
 You can verify that the pywbemtools package and its dependent packages are
 installed correctly by importing the package into Python:
 
-::
+.. code-block:: text
 
-    $ python -c "import pywbemtools; print('ok')"
+    $ python -c "import pywbemcli; print('ok')"
     ok
 
-.. _`Setting up pywbemtools`:
+Verification of the installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Setting up pywbemtools
-----------------------
+You can verify that the pywbemcli package and its dependent packages are
+installed correctly by invoking:
 
-Currently there is no setup ones the package is installed.
+.. code-block:: bash
 
-Simply calling pywbemcli starts the cli tool
+    $ pywbemcli --version
+    0.5.0
 
 .. _`Deprecation policy`:
 
@@ -108,28 +144,27 @@ Pywbemtools attempts to be as backwards compatible as possible.
 Occasionally functionality needs to be retired, because it is flawed and
 a better but incompatible replacement has emerged.
 
-In pywbemtools, such changes are done by deprecating existing functionality, without
-removing it. The deprecated functionality is still supported throughout new
-minor releases. Eventually, a new major release will break compatibility and
-will remove the deprecated functionality.
+In pywbemtools, such changes are done by deprecating existing functionality,
+without removing it. The deprecated functionality is still supported throughout
+new minor releases. Eventually, a new major release will break compatibility
+and will remove the deprecated functionality.
 
-In order to prepare users of pywbemtools for that, deprecation of functionality is
-stated in the API documentation, and is made visible at runtime by issuing
+In order to prepare users of pywbemtools for that, deprecation of functionality
+is stated in the CLI documentation, and is made visible at runtime by issuing
 Python warnings of type ``DeprecationWarning`` (see the Python
 :mod:`py:warnings` module).
 
 Since Python 2.7, ``DeprecationWarning`` messages are suppressed by default.
 They can be shown for example in any of these ways:
 
-* By specifying the Python command line option: ``-W default``
 * By invoking Python with the environment variable: ``PYTHONWARNINGS=default``
 
 It is recommended that users of the pywbemtools package run their test code with
 ``DeprecationWarning`` messages being shown, so they become aware of any use of
 deprecated functionality.
 
-Here is a summary of the deprecation and compatibility policy used by pywbem,
-by release type:
+Here is a summary of the deprecation and compatibility policy used by
+pywbemtools, by release type:
 
 * New update release (M.N.U -> M.N.U+1): No new deprecations; fully backwards
   compatible.
@@ -138,9 +173,9 @@ by release type:
 * New major release (M.N.U -> M+1.0.0): Deprecated functionality may get
   removed; backwards compatibility may be broken.
 
-Compatibility is always seen from the perspective of the user of pywbemtools, so a
-backwards compatible new pywbem release means that the user can safely upgrade
-to that new release without encountering compatibility issues.
+Compatibility is always seen from the perspective of the user of pywbemtools,
+so a backwards compatible new pywbemtools release means that the user can
+safely upgrade to that new release without encountering compatibility issues.
 
 Versioning
 ----------
@@ -153,10 +188,6 @@ version.
 
 .. _Semantic Versioning 2.0.0: http://semver.org/spec/v2.0.0.html
 
-The package version can be accessed by programs using the
-``pywbemtools.__version__`` variable [#]_:
-
-.. autodata:: pywbemtools.pywbemcli.__version__
 
 This documentation may have been built from a development level of the
 package. You can recognize a development version of this package by the
@@ -165,10 +196,6 @@ pre-versions of the next assumed version that is not yet released. For example,
 version 0.5.1.dev2 is development pre-version #2 of the next version to be
 released after 0.5.0. Version 1.5.1 is an `assumed` next version, because the
 `actually released` next version might be 0.2.0 or even 1.0.0.
-
-.. [#] For tooling reasons, that variable is shown as
-   ``pywbemtools.pywbemcli.__version__`` in this documentation, but it should be
-   accessed as ``pywbemtools.pywbemcli.__version__``.
 
 
 .. _`Compatibility`:
@@ -184,18 +211,20 @@ compatibility issues.
 This package uses the rules of `Semantic Versioning 2.0.0`_ for compatibility
 between package versions, and for :ref:`deprecations <Deprecations>`.
 
-The public API of this package that is subject to the semantic versioning
-rules (and specificically to its compatibility rules) is the API described in
+The public interfaces of this package that are subject to the semantic versioning
+rules (and specificically to its compatibility rules) is the CLI syntax described in
 this documentation.
+
+The output formats are currently the subject of compatiblity assurances.
 
 Violations of these compatibility rules are described in section
 :ref:`Change log`.
 
 
-.. _`Deprecations`:
+.. _`Deprecation and compatibility policy`:
 
-Deprecations
-------------
+Deprecation and compatibility policy
+------------------------------------
 
 Deprecated functionality is marked accordingly in this documentation and in the
 :ref:`Change log`, and is made visible at runtime by issuing Python warnings of
@@ -205,26 +234,16 @@ details).
 Since Python 2.7, :exc:`~py:exceptions.DeprecationWarning` warnings are
 suppressed by default. They can be shown for example in any of these ways:
 
-* by specifying the Python command line option:
 
-  ``-W default``
-
-* by invoking Python with the environment variable:
+* by invoking pywbemcl with the environment variable:
 
   ``PYTHONWARNINGS=default``
-
-* by issuing in your program:
-
-  ::
-
-      warnings.filterwarnings(action='default', category=DeprecationWarning)
 
 It is recommended that users of this package run their test code with
 :exc:`~py:exceptions.DeprecationWarning` warnings being shown, so they become
 aware of any use of deprecated functionality.
 
-It is even possible to raise an exception instead of issuing a warning message
-upon the use of deprecated functionality, by setting the action to ``'error'``
+It is even possible to cause pywbemcli to fail by setting the action to ``'error'``
 instead of ``'default'``.
 
 

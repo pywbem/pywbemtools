@@ -2,13 +2,10 @@
 Pywbemtools - A set of tools using pywbem
 *****************************************
 
-Pywbem  is a WBEM client, written in pure Python. It supports Python 2 and
-Python 3.
+This package contains tools that provide a command line interface to interact
+with WBEM servers
 
-This package contains tools that use pywbem to implement a command line
-browser (pywbemcli)
-
-The general pywbem web site is: http://pywbem.github.io/pywbemtools/index.html.
+The pywbemtools github page is: ``https://github.com/pywbem/pywbemtools <https://github.com/pywbem/pywbemtools>``.
 
 .. toctree::
    :maxdepth: 2
