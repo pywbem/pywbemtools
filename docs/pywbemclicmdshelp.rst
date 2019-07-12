@@ -198,7 +198,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
       associators   Get the associated classes for CLASSNAME.
       delete        Delete a single CIM class.
       enumerate     Enumerate classes from the WBEM Server.
-      find          Find all classes that match CLASSNAME-REGEX.
+      find          Find all classes that match CLASSNAME-GLOB.
       get           Get and display a single CIM class.
       invokemethod  Invoke the class method named methodname.
       references    Get the reference classes for CLASSNAME.
@@ -373,25 +373,26 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
 ::
 
-    Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
+    Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-      Find all classes that match CLASSNAME-REGEX.
+      Find all classes that match CLASSNAME-GLOB.
 
       Find all classes in the namespace(s) of the target WBEMServer that match
-      the CLASSNAME-REGEX regular expression argument and return the classnames.
-      The CLASSNAME-REGEX argument is required.
+      the CLASSNAME-GLOB regular expression argument and return the classnames.
+      The CLASSNAME-GLOB argument is required.
 
-      The CLASSNAME-REGEX argument may be either a complete classname or a
+      The CLASSNAME-GLOB argument may be either a complete classname or a
       regular expression that can be matched to one or more classnames. To limit
       the filter to a single classname, terminate the classname with $.
 
-      The regular expression is anchored to the beginning of the classname and
-      is case insensitive. Thus, `pywbem_` returns all classes that begin with
-      `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include the
-      case insensitive string `system`.
+      The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
+      is case insensitive and uses the standard GLOB special characters (*(match
+      everything), ?(match single character)). Thus, `pywbem_*` returns all
+      classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
+      classnames that include the case insensitive string `system`.
 
-      The namespace option limits the search to the defined namespace. Otherwise
-      all namespaces in the target server are searched.
+      The namespace option limits the search to the defined namespaces.
+      Otherwise all namespaces in the target server are searched.
 
       Output is in table format if table output specified. Otherwise it is in
       the form <namespace>:<classname>
@@ -1066,25 +1067,27 @@ The following defines the help output for the `pywbemcli instance count --help` 
 
 ::
 
-    Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-REGEX
+    Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
 
       Get instance count for classes.
 
       Displays the count of instances for the classes defined by the `CLASSNAME-
-      REGEX` argument in one or more namespaces.
+      GLOB` argument in one or more namespaces.
 
-      The size of the response may be limited by CLASSNAME-REGEX argument which
+      The size of the response may be limited by CLASSNAME-GLOB argument which
       defines a regular expression based on the desired class names so that only
-      classes that match the regex are counted. The CLASSNAME-regex argument is
+      classes that match the regex are counted. The CLASSNAME-GLOB argument is
       optional.
 
-      The CLASSNAME-regex argument may be either a complete classname or a
+      The CLASSNAME-GLOB argument may be either a complete classname or a
       regular expression that can be matched to one or more classnames. To limit
       the filter to a single classname, terminate the classname with $.
 
-      The CLASSNAME-REGEX regular expression is anchored to the beginning of the
-      classname and is case insensitive. Thus `pywbem_` returns all classes that
-      begin with `PyWBEM_`, `pywbem_`, etc.
+      The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
+      is case insensitive and uses the standard GLOB special characters (*(match
+      everything), ?(match single character)). Thus, `pywbem_*` returns all
+      classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
+      classnames that include the case insensitive string `system`.
 
       This operation can take a long time to execute since it enumerates all
       classes in the namespace.
