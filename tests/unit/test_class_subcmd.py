@@ -30,7 +30,8 @@ SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 
-CLS_HELP = """Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
+CLS_HELP = """
+Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command group to manage CIM classes.
 
@@ -52,7 +53,8 @@ Commands:
   tree          Display CIM class inheritance hierarchy tree.
 """
 
-CLS_ENUM_HELP = """Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
+CLS_ENUM_HELP = """
+Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate classes from the WBEM Server.
 
@@ -89,8 +91,8 @@ Options:
   -h, --help                Show this message and exit.
 """
 
-# pylint: disable=line-too-long
-CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
+CLASS_FIND_HELP = """
+Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
 
   Find all classes that match CLASSNAME-REGEX.
 
@@ -115,12 +117,14 @@ CLASS_FIND_HELP = """Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REG
 
 Options:
   -s, --sort              Sort into alphabetical order by classname.
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace(s) to use for this operation. If defined
+                          only those namespaces are searched rather than all
+                          available namespaces. ex: -n root/interop -n
+                          root/cimv2
   -h, --help              Show this message and exit.
-"""  # pylint: enable=line-too-long
-
-CLASS_TREE_HELP = """Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
+"""
+CLASS_TREE_HELP = """
+Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
 
   Display CIM class inheritance hierarchy tree.
 
@@ -149,7 +153,8 @@ Options:
   -h, --help              Show this message and exit.
 """
 
-CLASS_DELETE_HELP = """Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
+CLASS_DELETE_HELP = """
+Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
 
   Delete a single CIM class.
 
