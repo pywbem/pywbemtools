@@ -19,6 +19,7 @@ Common Functions applicable across multiple components of pywbemcli
 
 from __future__ import absolute_import, unicode_literals
 
+import fnmatch
 import re
 from textwrap import fill
 from operator import itemgetter
@@ -270,7 +271,7 @@ def is_classname(str_):
     return not re.match(r'[a-zA_Z0-9_].*\.', str_)
 
 
-def filter_namelist(regex, name_list, ignore_case=True):
+def filter_namelist(pattern, name_list, ignore_case=True):
     """
     Filter out names in name_list that do not match compiled_regex.
 
@@ -283,7 +284,7 @@ def filter_namelist(regex, name_list, ignore_case=True):
         - .*ABC matches any name that includes ABC
 
     Parameters:
-      regex (:term: `String`) Python regular expression to match.
+      pattern (:term: `String`) Python glob pattern to match.
 
       name_list: List of strings to be matched.
 
@@ -299,8 +300,8 @@ def filter_namelist(regex, name_list, ignore_case=True):
     flags = re.IGNORECASE if ignore_case else None
     # compile the regex since it used multiple times
     try:
-        compiled_regex = re.compile(regex, flags) if flags \
-            else re.compile(regex)
+        regex = fnmatch.translate(pattern)
+        compiled_regex = re.compile(regex, flags)
 
     except Exception as ex:
         raise click.ClickException('Regex compile error. '

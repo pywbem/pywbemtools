@@ -272,7 +272,8 @@ def class_associators(context, classname, **options):
 
 
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', type=str, metavar='CLASSNAME-REGEX', required=True)
+@click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
+                required=True)
 @add_options(sort_option)
 @click.option('-n', '--namespace', type=str, multiple=True,
               required=False, metavar='<name>',
@@ -280,30 +281,33 @@ def class_associators(context, classname, **options):
               'those namespaces are searched rather than all available '
               'namespaces. ex: -n root/interop -n root/cimv2')
 @click.pass_obj
-def class_find(context, classname, **options):
+def class_find(context, classname_glob, **options):
     """
-    Find all classes that match CLASSNAME-REGEX.
+    Find all classes that match CLASSNAME-GLOB.
 
     Find all classes in the namespace(s) of the target WBEMServer that
-    match the CLASSNAME-REGEX regular expression argument and return the
-    classnames. The CLASSNAME-REGEX argument is required.
+    match the CLASSNAME-GLOB regular expression argument and return the
+    classnames. The CLASSNAME-GLOB argument is required.
 
-    The CLASSNAME-REGEX argument may be either a complete classname or a regular
+    The CLASSNAME-GLOB argument may be either a complete classname or a regular
     expression that can be matched to one or more classnames. To limit the
     filter to a single classname, terminate the classname with $.
 
-    The regular expression is anchored to the beginning of the classname and
-    is case insensitive. Thus, `pywbem_` returns all classes that begin with
-    `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include
+    The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
+    is case insensitive and uses the standard GLOB special characters
+    (*(match everything), ?(match single character)).
+    Thus, `pywbem_*` returns all classes that begin with
+    `PyWBEM_`, `pywbem_`, etc. '.*system*' returns classnames that include
     the case insensitive string `system`.
 
-    The namespace option limits the search to the defined namespace. Otherwise
+    The namespace option limits the search to the defined namespaces. Otherwise
     all namespaces in the target server are searched.
 
     Output is in table format if table output specified. Otherwise it is in the
     form <namespace>:<classname>
     """
-    context.execute_cmd(lambda: cmd_class_find(context, classname, options))
+    context.execute_cmd(lambda: cmd_class_find(context, classname_glob,
+                                               options))
 
 
 @class_group.command('tree', options_metavar=CMD_OPTS_TXT)
@@ -477,7 +481,7 @@ def cmd_class_associators(context, classname, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_class_find(context, classname, options):
+def cmd_class_find(context, classname_glob, options):
     """
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
@@ -500,7 +504,7 @@ def cmd_class_find(context, classname, options):
         for ns in ns_names:
             classnames = context.conn.EnumerateClassNames(
                 namespace=ns, DeepInheritance=True)
-            filtered_classnames = filter_namelist(classname, classnames)
+            filtered_classnames = filter_namelist(classname_glob, classnames)
             names_dict[ns] = filtered_classnames
 
         rows = []
@@ -514,7 +518,7 @@ def cmd_class_find(context, classname, options):
         if context.output_format in TABLE_FORMATS:
             headers = ['Namespace', 'Classname']
             click.echo(format_table(rows, headers,
-                                    title='Find class %s' % classname,
+                                    title='Find class %s' % classname_glob,
                                     table_format=context.output_format))
         else:
             # Display function to display classnames returned with

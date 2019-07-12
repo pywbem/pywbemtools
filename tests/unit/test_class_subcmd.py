@@ -46,7 +46,7 @@ Commands:
   associators   Get the associated classes for CLASSNAME.
   delete        Delete a single CIM class.
   enumerate     Enumerate classes from the WBEM Server.
-  find          Find all classes that match CLASSNAME-REGEX.
+  find          Find all classes that match CLASSNAME-GLOB.
   get           Get and display a single CIM class.
   invokemethod  Invoke the class method named methodname.
   references    Get the reference classes for CLASSNAME.
@@ -92,25 +92,26 @@ Options:
 """
 
 CLASS_FIND_HELP = """
-Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-REGEX
+Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-  Find all classes that match CLASSNAME-REGEX.
+  Find all classes that match CLASSNAME-GLOB.
 
   Find all classes in the namespace(s) of the target WBEMServer that match
-  the CLASSNAME-REGEX regular expression argument and return the classnames.
-  The CLASSNAME-REGEX argument is required.
+  the CLASSNAME-GLOB regular expression argument and return the classnames.
+  The CLASSNAME-GLOB argument is required.
 
-  The CLASSNAME-REGEX argument may be either a complete classname or a
+  The CLASSNAME-GLOB argument may be either a complete classname or a
   regular expression that can be matched to one or more classnames. To limit
   the filter to a single classname, terminate the classname with $.
 
-  The regular expression is anchored to the beginning of the classname and
-  is case insensitive. Thus, `pywbem_` returns all classes that begin with
-  `PyWBEM_`, `pywbem_`, etc. '.*system' returns classnames that include the
-  case insensitive string `system`.
+  The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
+  is case insensitive and uses the standard GLOB special characters (*(match
+  everything), ?(match single character)). Thus, `pywbem_*` returns all
+  classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
+  classnames that include the case insensitive string `system`.
 
-  The namespace option limits the search to the defined namespace. Otherwise
-  all namespaces in the target server are searched.
+  The namespace option limits the search to the defined namespaces.
+  Otherwise all namespaces in the target server are searched.
 
   Output is in table format if table output specified. Otherwise it is in
   the form <namespace>:<classname>
@@ -519,7 +520,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify class subcommand find simple name in all namespaces',
-     ['find', 'CIM_'],
+     ['find', 'CIM_*'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
                  "  root/cimv2:CIM_Foo_sub2",
@@ -527,8 +528,30 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify class subcommand find simple name in all namespaces wo case',
+     ['find', 'cim_*'],
+     {'stdout': ["  root/cimv2:CIM_Foo",
+                 "  root/cimv2:CIM_Foo_sub",
+                 "  root/cimv2:CIM_Foo_sub2",
+                 "  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand find simple name in all namespaces lead wc',
+     ['find', '*sub_sub*'],
+     {'stdout': ["  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify class subcommand find simple name in all namespaces wo case',
+     ['find', '*sub_su?*'],
+     {'stdout': ["  root/cimv2:CIM_Foo_sub_sub"],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify class subcommand find simple name in known namespace',
-     ['find', 'CIM_', '-n', 'root/cimv2'],
+     ['find', 'CIM_*', '-n', 'root/cimv2'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
                  "  root/cimv2:CIM_Foo_sub2",
@@ -537,7 +560,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand find simple name in known namespace with -s',
-     ['find', 'CIM_', '-n', 'root/cimv2', '-s'],
+     ['find', 'CIM_*', '-n', 'root/cimv2', '-s'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
                  "  root/cimv2:CIM_Foo_sub2",
@@ -546,7 +569,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand find simple name in known namespace with --sort',
-     ['find', 'CIM_', '-n', 'root/cimv2', '-s'],
+     ['find', 'CIM_*', '-n', 'root/cimv2', '-s'],
      {'stdout': ["  root/cimv2:CIM_Foo",
                  "  root/cimv2:CIM_Foo_sub",
                  "  root/cimv2:CIM_Foo_sub2",
@@ -556,8 +579,8 @@ TEST_CASES = [
 
     ['Verify class subcommand find name in known namespace with -s, 0 grid',
      {'global': ['-o', 'grid'],
-      'args': ['find', 'CIM_', '-n', 'root/cimv2', '-s']},
-     {'stdout': ['Find class CIM_',
+      'args': ['find', 'CIM_*', '-n', 'root/cimv2', '-s']},
+     {'stdout': ['Find class CIM_*',
                  '+-------------+-----------------+',
                  '| Namespace   | Classname       |',
                  '+=============+=================+',
@@ -573,22 +596,15 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand verify nothing found for BLAH_ regex',
-     ['find', 'BLAH_', '-n', 'root/cimv2'],
+     ['find', 'BLAH_*', '-n', 'root/cimv2'],
      {'stdout': "",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcmd find simple name in known namespace with wildcard',
-     ['find', '.*sub2', '-n', 'root/cimv2'],
+     ['find', '*sub2', '-n', 'root/cimv2'],
      {'stdout': "  root/cimv2:CIM_Foo_sub2",
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class subcommand verify bad regex',
-     ['find', '.**sub2', '-n', 'root/cimv2'],
-     {'stderr': ["Error:", "Regex compile error", "multiple", "sub2"],
-      'rc': 1,
-      'test': 'regex'},  # regex because re message text changes with py version
      SIMPLE_MOCK_FILE, OK],
 
     #
