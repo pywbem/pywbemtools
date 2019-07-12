@@ -63,7 +63,7 @@ def class_group():
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 @class_group.command('get', options_metavar=CMD_OPTS_TXT)
@@ -274,7 +274,11 @@ def class_associators(context, classname, **options):
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME-REGEX', required=True)
 @add_options(sort_option)
-@add_options(namespace_option)
+@click.option('-n', '--namespace', type=str, multiple=True,
+              required=False, metavar='<name>',
+              help='Namespace(s) to use for this operation. If defined only '
+              'those namespaces are searched rather than all available '
+              'namespaces. ex: -n root/interop -n root/cimv2')
 @click.pass_obj
 def class_find(context, classname, **options):
     """
@@ -479,7 +483,7 @@ def cmd_class_find(context, classname, options):
     a list of classes/namespaces
     """
     if options['namespace']:
-        ns_names = [options['namespace']]
+        ns_names = options['namespace']
     else:
         try:
             ns_names = context.wbem_server.namespaces

@@ -42,7 +42,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
 
       For more detailed information, see:
 
-      https:\https://pywbemtools.readthedocs.io/en/latest/
+          https://pywbemtools.readthedocs.io/en/latest/
 
     Options:
       -s, --server URI                Hostname or IP address with scheme of the
@@ -129,7 +129,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       pull operations.
                                       * "either": pywbemcli trys
                                       first pull and then  traditional operations.
-                                      (EnvVar: PYWBEMCLI_USE_PULL) [Default:
+                                      (EnvVar: PYWBEMCLI_USE_PULL_OPS) [Default:
                                       either]
       --pull-max-cnt INTEGER          Maximium object count of objects to be
                                       returned for each request if pull operations
@@ -398,8 +398,10 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
     Options:
       -s, --sort              Sort into alphabetical order by classname.
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace(s) to use for this operation. If defined
+                              only those namespaces are searched rather than all
+                              available namespaces. ex: -n root/interop -n
+                              root/cimv2
       -h, --help              Show this message and exit.
 
 
