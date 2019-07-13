@@ -9,10 +9,6 @@ pywbemtools: Python tools for communicating with WBEM servers
     :target: https://pypi.python.org/pypi/pywbemtools/
     :alt: Version on Pypi
 
-.. # .. image:: https://img.shields.io/pypi/dm/pywbemtools.svg
-.. #     :target: https://pypi.python.org/pypi/pywbemtools/
-.. #     :alt: Pypi downloads
-
 .. image:: https://travis-ci.org/pywbem/pywbemtools.svg?branch=master
     :target: https://travis-ci.org/pywbem/pywbemtools
     :alt: Travis test status (master)
@@ -38,9 +34,9 @@ pywbemtools: Python tools for communicating with WBEM servers
 Overview
 --------
 
-Pywbemtools is a collection of tools using a command line interface for
-communicating with WBEM servers. The tools are written in pure Python and
-support Python 2 and Python 3.
+Pywbemtools is a collection of command line tools that communicate with WBEM
+Servers. The tools are written in pure Python and support Python 2 and Python
+3.
 
 Pywbemtools provides a command line tool (pywbemcli) that uses the pywbem
 Python WBEM client infrastructure to issue operations to a WBEM server using
@@ -48,23 +44,23 @@ the CIM/WBEM standards defined by the DMTF to perform system management tasks.
 
 CIM/WBEM infrastructure is used for a wide variety of systems management tasks
 in the industry including DMTF management standards and the SNIA Storage
-Management Initiative Specification SMI-S.
+Management Initiative Specification(SMI-S).
 
-Pywbemcli provides a multilevel command line syntax to communicate with a
-WBEM server to:
+Pywbemcli provides the functionality to :
 
-* Explore the CIM data of WBEM server. It can manage/inspect the CIM model
-  components including CIM_Classes, CIM_instances, and CIM qualifiers
-  declarations and execute CIM methods and queries on the WBEM server. It
-  implements subcommands to execute almost all of the defined DMTF CIM/XML
-  operations.
+* Explore the CIM data of WBEM Servers. It can manage/inspect the CIM model
+  components including CIM classes, CIM instances, and CIM qualifiers and execute
+  CIM methods and queries on the WBEM server. It implements subcommands to
+  execute the CIM-XML operations defined in the DMTF specification
+  CIM Operations Over HTTP(DSP0200_).
 
-* Inspect WBEM server components such as namespaces, registered profiles, and
-  other server information.
+* Inspect/manage WBEM server functionality such as CIM namespaces, WBEM
+  registered profiles, and other server information.
 
-* Capture detailed information on the interactions with the WBEM server including
+* Capture detailed information on interactions with the WBEM server including
   time statistics.
 
+.. _DSP0200: https://www.dmtf.org/sites/default/files/standards/documents/DSP0200_1.4.0.pdf
 
 Installation Requirements
 -------------------------
@@ -82,12 +78,10 @@ The quick way:
 
     $ pip install pywbemtools
 
-For more details, see the `Installation section(stable)`_ or the
-`Installation section(latest)`_ in the pywbemcools documentation.
+For more details, see the `Installation section`_ in the pywbemcools
+documentation.
 
-.. _Installation section(latest): https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
-
-.. _Installation section(stable): https://pywbemtools.readthedocs.io/en/latest/introduction.html#installation
+.. _Installation section: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
 
 Documentation
 -------------
@@ -98,7 +92,7 @@ The latest pywbemtools documentation is available on ReadTheDocs:
 
 .. _Documentation for latest released version: https://pywbemtools.readthedocs.io/en/stable/
 
-* `Documentation for latest unreleased(master branch) development version`_
+* `Documentation for latest unreleased development version`_
 
 .. _Documentation for latest unreleased development version: https://pywbemtools.readthedocs.io/en/latest/
 
@@ -120,15 +114,11 @@ All commands within pywbemcli include help as the --help or -h option::
 
     pywbemcli --help
 
-The WBEM operations may be executed individually or in the interactive mode.
-
-
-Executing the EnumerateClasses operation:
-
+Executing the EnumerateClasses CIM-XML operation:
 
 .. code-block:: text
 
-    pywbemcli -s http://localhost  class get CIM_ManagedElement
+    $ pywbemcli -s http://localhost class get CIM_ManagedElement
 
        [Abstract ( true ),
         Version ( "2.19.0" ),
@@ -146,8 +136,8 @@ Executing the EnumerateClasses operation:
 
     };
 
-Executing the EnumerateInstance operation with ``-o`` option that returns
-instance names:
+Executing the CIM-XML EnumerateInstance operation with ``-o`` option that
+returns instance names:
 
 .. code-block:: text
 
@@ -157,7 +147,8 @@ instance names:
     root/cimv2:PyWBEM_Person.Name="Bob",CreationClassName="PyWBEM_Person"
     root/cimv2:PyWBEM_Person.Name="Charlie",CreationClassName="PyWBEM_Person"
 
-Executing the CIM/XML GetInstance operation:
+Executing the CIM/XML GetInstance operation that requests a single instance
+from the WBEM server with the instance name shown in the example:
 
 .. code-block:: text
 
@@ -171,8 +162,8 @@ Executing the CIM/XML GetInstance operation:
        Name = "Alice";
     };
 
-or using the interactive option (``-i`` or ``--interactive``) where pywbemcli presents
-a list of instances on the wbem server from the class name:
+or using the pywbemcli interactive option (``-i`` or ``--interactive``) where
+pywbemcli presents a list of instances on the wbem server from the class name:
 
 .. code-block:: text
 
@@ -185,13 +176,13 @@ a list of instances on the wbem server from the class name:
        CreationClassName = "PyWBEM_Person";
        Name = "Alice";
     };
-    # pywbemcli responds with:
+                 <<< pywbemcli responds with:
     Pick Instance name to process
     0: //leonard/root/cimv2:PyWBEM_Person.Name="Alice",CreationClassName="PyWBEM_Person"
     1: //leonard/root/cimv2:PyWBEM_Person.Name="Bob",CreationClassName="PyWBEM_Person"
     2: //leonard/root/cimv2:PyWBEM_Person.Name="Charlie",CreationClassName="PyWBEM_Person"
     Input integer between 0 and 2 or Ctrl-C to exit selection:
-    # user responds with >> 0
+                 <<< user responds with >> 0
 
     instance of PyWBEM_Person {
        ...
@@ -202,9 +193,9 @@ a list of instances on the wbem server from the class name:
     };
 
 There are alternate output formats for those subcommands that output CIM objects. Thus,
-`instance enumerate <classname> can produce a table output where the columns are
-the properties. The following is an example (The instances of CIM_Foo only have two
-properties):
+``instance enumerate <classname>`` can produce a table output where the columns are
+the properties by setting the general option ``-o table``. The following is an
+example (The instances of CIM_Foo only have two properties):
 
 .. code-block:: text
 
@@ -218,8 +209,7 @@ properties):
     | "CIM_Foo3"   |               |
     +--------------+---------------+
 
-
-Instance associators can be accessed as follows:
+Instance associators the (CIM-XML Associators operation) can be accessed as follows:
 
 .. code-block:: text
 
@@ -230,7 +220,7 @@ Instance associators can be accessed as follows:
     2: root/cimv2:TST_Person.name="Sofi"
     3: root/cimv2:TST_Person.name="Gabi"
     ...
-    Input integer between 0 and 7 or Ctrl-C to exit selection: 0
+    Input integer between 0 and 7 or Ctrl-C to exit selection: 0   << user responds 0
 
     instance of TST_Person {
        name = "Sofi";
@@ -245,11 +235,11 @@ Instance associators can be accessed as follows:
     };
 
 Other operations against WBEM servers include getting information on namespaces,
-and WBEM server brand informaton:
+the interop namespace, and WBEM server brand informaton:
 
 .. code-block:: text
 
-    pywbemcli -s https://localhost server interop
+    $ pywbemcli -s https://localhost server interop
 
     Server Interop Namespace:
     Namespace Name
@@ -259,7 +249,6 @@ and WBEM server brand informaton:
 Or to view registered profiles:
 
 .. code-block:: text
-
 
     $ pywbemcli -s http://localhost -u kschopmeyer -p test8play server profiles --organization DMTF
       Advertised management profiles:
@@ -275,7 +264,11 @@ Or to view registered profiles:
     +----------------+----------------------+-----------+
 
 
-Pywbemcli can also be executed in an interactive (REPL) mode:
+Pywbemcli can also be executed in the interactive (REPL) mode by executing it
+without entering a command or by using the command ``repl``. In this mode
+the command line prompt is ``pywbemcli>``, the WBEM server connection is
+maintained between commands and the general options apply to all commands
+executed:
 
 .. code-block:: text
 
@@ -296,10 +289,11 @@ Pywbemcli can also be executed in an interactive (REPL) mode:
     pywbemcli> :q
     $
 
-There are a number of commands to help locating information on the WBEM
-server including `class find`, `instance count`, `class tree`. For example
-`class find` returns list of classes that start with `CIM_` across multiple
-namespaces.
+There are several commands in different command groups to help locating information on the WBEM
+server including `class find`, `instance count`, and `class tree`.
+
+For example `class find` finds classes that start with `CIM_` across
+multiple namespaces.
 
 .. code-block:: text
 
@@ -309,6 +303,18 @@ namespaces.
       root/cimv2:CIM_Foo_sub
       root/cimv2:CIM_Foo_sub2
       root/cimv2:CIM_Foo_sub_sub
+
+The command `class tree` produces an ASCII tree output of the hiearchy of
+classes:
+
+.. code-block:: text
+
+    $ pywbemcli -m tests/unit/simple_mock_model.mof class tree
+    root
+     +-- CIM_Foo
+         +-- CIM_Foo_sub2
+         +-- CIM_Foo_sub
+             +-- CIM_Foo_sub_sub
 
 Pywbemcli can maintain a persistent file of connections that can be accessed by
 name. The following example shows creation of a new named server definition. The
