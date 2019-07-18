@@ -36,6 +36,10 @@ target server and display it in the defined output-format.
 The pywbemcli command groups are described below and the help output from
 pywbemcli documented in :ref:`pywbemcli Help Command Details`
 
+**NOTE:** Many of the examples below use the pywbem_mock module and the
+corresponding pywbemcli general option ``--mock-server`` with mock files
+in the pywbemtools tests/unit subdirectory because it is easy.
+
 .. _`Class command group`:
 
 Class command group
@@ -46,7 +50,7 @@ The **class** group defines subcommands that act on CIM classes. see
 
 * **associators** to get the class level associators for a class defined
   as an input argument in the default namespace or the namespace defined with this
-  subcommand display in the defined format. This subcommand can display the
+  subcommand displayed in the defined format. It can display the
   class in several formats including MOF, XML, and REPR. It requires the class
   name as input.  This returns the class level associators but not the instance
   associators. The :ref:`Instance subcommand group` includes the corresponding
@@ -59,9 +63,10 @@ The **class** group defines subcommands that act on CIM classes. see
   See :ref:`pywbemcli class associators --help` for details.
 * **delete** to delete the class defined by the CLASSNAME argument. Note that
   many WBEM servers may not allow this operation or may severely limit the
-  conditions under which a class can be deleted from the server. For example::
+  conditions under which a class can be deleted from the server. For example
+  to delete the class ``CIM_Blah``::
 
-    $ pywbemcli class delete CIM_blah     << attempt to delete CIM_Blah
+    $ pywbemcli class delete CIM_blah
     $
 
   Pywbemcli will not delete a class that has subclasses.
@@ -69,7 +74,7 @@ The **class** group defines subcommands that act on CIM classes. see
 * **enumerate** to enumerate classes or their classnames in the default
   namespace or the namespace defined with this subcommand.  If the
   ``--DeepInheritance``/``-d`  option is set it shows all the classes in the
-  hiearchy, not just the next level f the hiearchy::
+  hierarchy, not just the next level f the hierarchy::
 
     $ pywbemcli --mock-server mockassoc class enumerate --name-only
     TST_Person
@@ -79,8 +84,8 @@ The **class** group defines subcommands that act on CIM classes. see
     $
 
   See :ref:`pywbemcli class enumerate --help` for details.
-* **find** to find classes in the target WBEM server across namespaces.  The
-  input argument is a regular expression which is used to search namespaces
+* **find** to find classes in the target WBEM server across multiple namespaces.
+  The input argument is a regular expression which is used to search namespaces
   for matching class names.  This subcommand uses a regex for the classname to
   attempt to list the names and namespaces of all of the classes in the WBEM
   Server (or the namespaces defined with the ``--namespaces``/``-n` option)::
@@ -106,8 +111,8 @@ The **class** group defines subcommands that act on CIM classes. see
 
   See :ref:`pywbemcli class find --help` for details.
 * **get** to get a single class in the default namespace or the namespace
-  defined with this subcommand and display in the defined format. This
-  subcommand can display the class in several formats including MOF, XML, and
+  defined with this subcommand displayed in the defined format. It
+  can display the class in several formats including MOF, XML, and
   REPR. It requires the class name as input::
 
       $ pywbemcli> --name mock1 class get CIM_Foo
@@ -151,14 +156,14 @@ The **class** group defines subcommands that act on CIM classes. see
   name.   See :ref:`pywbemcli class invokemethod --help` for details.
 * **references** to get the class level reference classes or classnames for a
   class defined as an input argument in the default namespace or the namespace
-  defined with this subcommand display in the defined format. This subcommand
+  defined with this subcommand displayed in the defined format. This subcommand
   can display the class in several formats including MOF, XML, and REPR.. This
   returns the class level references but not the instance references. The
   :ref:`Instance subcommand group` includes a corresponding instance references
   operation::
 
-
     $pywbemcli --mock-server mockassoc class references TST_Person --name-only
+
     //FakedUrl/root/cimv2:TST_Lineage
     //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
 
@@ -192,7 +197,7 @@ The **instance** group defines subcommands that act on CIM instances including:
 
 * **associators** to get the associator instances for the instance name defined
   as input argument in the default namespace or the namespace defined with this
-  subcommand display in the defined format. The inThis subcommand can display the
+  subcommand displayed in the defined format. The inThis subcommand can display the
   class in several formats including MOF, XML, and REPR.::
 
     $ pywbemcli --name mockassoc instance references TST_Person --name-only --interactive
@@ -282,7 +287,7 @@ The **instance** group defines subcommands that act on CIM instances including:
 
   See :ref:`pywbemcli instance enumerate --help` for details.
 * **get** to get a single CIM instance from the default namespace or the
-    namespace defined with the subcommand and display it in the defined format.
+    namespace defined with the subcommand displayed in the defined format.
     The instance to be deleted is the ``INSTANCENAME`` argument. The form is
     determined by the ``--interactive`` options and must be either:
 
@@ -308,7 +313,7 @@ The **instance** group defines subcommands that act on CIM instances including:
   See :ref:`pywbemcli instance delete --help` for details.
 * **references** to get the reference instances or paths for a
   instance defined as an input argument in the default namespace or the
-  namespace defined with this subcommand display in the defined format. This
+  namespace defined with this subcommand displayed in the defined format. This
   subcommand can display the class in several formats including MOF, XML, and
   REPR.::
 
@@ -537,7 +542,7 @@ viewing servers defined in the the file. This allows multiple connections to be
 defined and then used by name rather than through the detailed information
 about the connection.
 
-Connections in the :term:`connection` file can be created by:
+Connections in the :term:`connections file` can be created by:
 
 * Using the add subcommand. This allows defining the parameters of a connection
   as a subcommand
