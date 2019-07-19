@@ -78,6 +78,63 @@ Note that there is a special request `server test-pull` that will test if
 a server implements the pull operations and for which of the possible operations
 pull is implemented.
 
+The following table defines which pywbemcli commands are used for the corresponding pywbem
+request operations
+
+=================================  ==============================================
+WBEM CIM-XML Operation             pywbemtools command-group command
+=================================  ==============================================
+EnumerateInstances                 instance enumerate INSTANCENAME
+EnumerateInstanceNames             instance enumerate INSTANCENAME --name_only
+GetInstance                        instance get INSTANCENAME
+ModifyInstance                     instance modify
+CreateInstance                     instance create
+DeleteInstance                     instance delete INSTANCENAME
+Associators                        instance associators INSTANCENAME
+Associators                        class associators CLASSNAME
+AssociatorNames                    instance associators INSTANCENAME --name_only
+AssociatorNames                    class associators CLASSNAME --name_only
+References                         instance references INSTANCENAME
+References                         class references CLASSNAME
+ReferenceNames                     instance references INSTANCENAME --name_only
+ReferenceNames                     class references CLASSNAME --name_only
+InvokeMethod                       instance invokemethod INSTANCENAME --name_only
+ReferenceNames                     class invokemethod CLASSNAME --name_only
+ExecQuery                          instance query
+IterEnumerateInstances             instance enumerate INSTANCENAME
+IterEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
+IterAssociatorInstances            instance associators INSTANCENAME
+IterAssociatorInstancePaths        instance associators INSTANCENAME --name_only
+IterReferenceInstances             instance references INSTANCENAME
+IterReferenceInstancePaths         instance references INSTANCENAME --name_only
+IterQueryInstances                 instance query
+When --use-pull-ops either or yes  TODO
+OpenEnumerateInstances             instance enumerate INSTANCENAME
+OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
+OpenAssociatorInstances            instance associators INSTANCENAME
+OpenAssociatorInstancePaths        instance associators INSTANCENAME --name_only
+OpenReferenceInstances             instance references INSTANCENAME
+OpenReferenceInstancePaths         instance references INSTANCENAME --name_only
+OpenQueryInstances                 instance references INSTANCENAME --name_only
+PullInstancesWithPath              part of pull sequence
+PullInstancePaths                  part of pull sequence
+PullInstances                      part of pull sequence
+CloseEnumeration                   Not implemented
+EnumerateClasses                   class enumerate CLASSNAME
+EnumerateClassNames                class enumerate --name-only
+GetClass                           class get CLASSNAME
+ModifyClass                        Not implemented
+CreateClass                        Not implemented
+DeleteClass                        class delete CLASSNAME
+EnumerateQualifiers                qualifier enumerate
+GetQualifier                       qualifier get QUALIFIERNAME
+SetQualifier                       Not implemented
+DeleteQualifier                    Not Implemented
+=================================  ==============================================
+
+1. Iter operations are all used as the common code path by pywbemcli. It is
+these operations that determine whether the original operations (ex. EnumerateInstances)
+
 
 .. _`Displaying CIM instances or CIM instance names`:
 
