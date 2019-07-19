@@ -51,7 +51,7 @@ def connection_group():
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 @connection_group.command('export', options_metavar=CMD_OPTS_TXT)
@@ -129,7 +129,7 @@ def connection_select(context, name):
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
-# TODO Maybe most of these options can be generalized for here and cli
+# TODO: Future Maybe most of these options can be generalized for here and cli
 
 # pylint: disable=bad-continuation
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
@@ -314,10 +314,10 @@ def show_connection_information(context, svr, separate_line=True):
                   svr.keyfile, sep,
                   svr.use_pull_ops, sep,
                   svr.pull_max_cnt, sep,
-                  ", ".join(svr._mock_server), sep,
+                  ", ".join(svr.mock_server), sep,
                   svr.log))
 
-    if svr._mock_server and context.verbose:
+    if svr.mock_server and context.verbose:
         click.echo(context.conn.display_repository())
 
 ################################################################
@@ -447,7 +447,6 @@ def cmd_connection_delete(context, name, options):
 
     # name defined. Test if in servers.
     if name in pywbemcli_servers:
-        # TODO test for same as current connection. Error if it is
         if pywbemcli_servers[name] == context.pywbem_server:
             click.echo('Deleting current connection %s' % name)
         context.spinner.stop()

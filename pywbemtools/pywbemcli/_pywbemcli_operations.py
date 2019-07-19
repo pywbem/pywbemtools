@@ -29,7 +29,8 @@ import os
 import sys
 import traceback
 
-from pywbem import WBEMConnection, CIMError, CIM_ERR_FAILED
+from pywbem import WBEMConnection, CIMError, CIM_ERR_FAILED, \
+    Error
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
@@ -303,7 +304,8 @@ class BuildRepositoryMixin(object):
         """
         for file_path in file_path_list:
             if not os.path.exists(file_path):
-                raise IOError("No such file: %s", file_path)
+                raise IOError("No such file: %s" % file_path)
+
             ext = os.path.splitext(file_path)[1]
             if ext == '.mof':
                 conn.compile_mof_file(file_path)
@@ -316,7 +318,7 @@ class BuildRepositoryMixin(object):
                                         'VERBOSE': verbose}
                         # pylint: disable=exec-used
                         exec(fp.read(), globalparams, None)
-                except IOError:
+                except (IOError, Error):
                     raise
 
         # Other errors, display complete traceback

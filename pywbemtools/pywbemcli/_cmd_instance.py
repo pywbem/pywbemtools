@@ -84,7 +84,7 @@ def instance_group():
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
@@ -543,14 +543,13 @@ def cmd_instance_create(context, classname, options):
             classname, namespace=options['namespace'], LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            ns = options['namespace'] if options['namespace'] else \
-                context.conn.default_namespace
+            ns = options['namespace'] or context.conn.default_namespace
             raise click.ClickException('CIMClass: "%s" does not exist in '
                                        'namespace "%s" in WEB '
                                        'server: %s.'
                                        % (classname, ns, context.conn))
-        else:
-            raise click.ClickException('Exception %s' % ce)
+
+        raise click.ClickException('Exception %s' % ce)
     except Error as er:
         raise click.ClickException('Exception %s' % er)
 
@@ -565,7 +564,6 @@ def cmd_instance_create(context, classname, options):
         if not verify_operation("Execute CreateInstance operation"):
             return
     try:
-        # TODO: Future Possibly create log of instance created.
         name = context.conn.CreateInstance(new_inst,
                                            namespace=options['namespace'])
 
@@ -603,8 +601,8 @@ def cmd_instance_modify(context, instancename, options):
                                        'server: %s'
                                        % (instancepath.classname,
                                           context.conn.uri))
-        else:
-            raise click.ClickException('Exception %s' % ce)
+
+        raise click.ClickException('Exception %s' % ce)
     except Error as er:
         raise click.ClickException('Exception %s' % er)
 
@@ -622,7 +620,6 @@ def cmd_instance_modify(context, instancename, options):
             return
 
     try:
-        # TODO: Future Possibly create log of instance modified.
         context.conn.ModifyInstance(modified_inst,
                                     PropertyList=property_list)
     except Error as er:
