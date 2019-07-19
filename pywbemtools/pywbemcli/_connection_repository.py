@@ -34,6 +34,7 @@ DEFAULT_CONNECTIONS_PATH = os.path.join(os.getcwd(), DEFAULT_CONNECTIONS_FILE)
 
 
 class ConnectionRepository(object):
+    # pylint: disable=useless-object-inheritance
     """
     Manage the set of connections defined.  The data for the predefined
     connection exists on disk between pywbemcli sessions and within an
@@ -100,7 +101,7 @@ class ConnectionRepository(object):
 
     def __delitem__(self, key):
         del self._pywbemcli_servers[key]
-        self.save()
+        self._write_file()
 
     def __len__(self):
         return len(ConnectionRepository._pywbemcli_servers)

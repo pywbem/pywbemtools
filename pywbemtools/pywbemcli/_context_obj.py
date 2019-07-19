@@ -37,7 +37,7 @@ PYWBEM_SERVER_OBJ = None
 PYWBEM_SERVERS = {}
 
 
-class ContextObj(object):
+class ContextObj(object):  # pylint: disable=useless-object-inheritance
     """
         Manage the pywbemcli context that is carried within the Click
         context object in the obj parameter. This is the object that
@@ -197,7 +197,7 @@ class ContextObj(object):
         include_svr = False
         for name, stats in snapshot:  # pylint: disable=unused-variable
             # TODO: clean up pywbem stats so this is in pywbem, not here
-            if stats._server_time_stored:  # pylint: protected-access
+            if stats._server_time_stored:  # pylint: disable=protected-access
                 include_svr = True
 
         # build list of column names

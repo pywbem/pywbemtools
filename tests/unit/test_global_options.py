@@ -28,6 +28,7 @@ TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_mock_model.mof')
 PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
+BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
 
 GLOBAL_HELP = """
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
@@ -350,6 +351,17 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+
+    ['Verify --mock option, file with mof containing syntax error',
+     {'global': ['-m', BAD_MOF_FILE_PATH],
+      'subcmd': 'class',
+      'args': ['enumerate']},
+     {'stderr': ['badtypedef InstanceID;',
+                 'Repository build exception MOFParseError.: MOFParseError:',
+                 'Aborted!'],
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
 
     ['Verify --name options with new name but not in repo failse',
      {'global': ['-N', 'fred'],

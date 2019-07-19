@@ -151,7 +151,7 @@ class PywbemServer(object):
                (self.server_url, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.noverify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
-                self.pull_max_cnt, self.stats_enabled, self._mock_server,
+                self.pull_max_cnt, self.stats_enabled, self.mock_server,
                 self._log)
 
     @property
@@ -272,6 +272,13 @@ class PywbemServer(object):
         """
         return self._wbem_server
 
+    @property
+    def mock_server(self):
+        """
+        :term: `list of strings`: list of file paths for mock server setup.
+        """
+        return self._mock_server
+
     def _validate_timeout(self):
         """
         Validate that timeout parameter is in proper range.
@@ -325,7 +332,7 @@ class PywbemServer(object):
                  "ca_certs": self.ca_certs,
                  "use_pull_ops": self.use_pull_ops,
                  "pull_max_cnt": self.pull_max_cnt,
-                 "mock_server": self._mock_server,
+                 "mock_server": self.mock_server,
                  "log": self.log}
         return dict_
 
@@ -363,8 +370,9 @@ class PywbemServer(object):
                                       self._wbem_server,
                                       self._mock_server,
                                       verbose)
-            except IOError as io:
-                click.echo('IOError exception %s' % io, err=True)
+            except Exception as ex:
+                click.echo('Repository build exception %s.: %s' % (
+                    ex.__class__.__name__, ex), err=True)
                 raise click.Abort()
         else:
             if not self.server_url:

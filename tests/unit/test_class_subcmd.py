@@ -740,32 +740,32 @@ TEST_CASES = [
     ['Verify class subcommand associators simple request,',
      ['associators', 'TST_Person', ],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
-      'class TST_Person {',
-      '',
-      '      [Key ( true ),',
-      '       Description ( "This is key prop" )]',
-      '   string name;',
-      '',
-      '   string extraProperty = "defaultvalue";',
-      '',
-      '};',
-      ''],
+                 'class TST_Person {',
+                 '',
+                 '      [Key ( true ),',
+                 '       Description ( "This is key prop" )]',
+                 '   string name;',
+                 '',
+                 '   string extraProperty = "defaultvalue";',
+                 '',
+                 '};',
+                 ''],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class subcommand associators simple request, one parameter',
      ['associators', 'TST_Person', '-a', 'TST_MemberOfFamilyCollection'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
-      'class TST_Person {',
-      '',
-      '      [Key ( true ),',
-      '       Description ( "This is key prop" )]',
-      '   string name;',
-      '',
-      '   string extraProperty = "defaultvalue";',
-      '',
-      '};',
-      ''],
+                 'class TST_Person {',
+                 '',
+                 '      [Key ( true ),',
+                 '       Description ( "This is key prop" )]',
+                 '   string name;',
+                 '',
+                 '   string extraProperty = "defaultvalue";',
+                 '',
+                 '};',
+                 ''],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
@@ -776,16 +776,16 @@ TEST_CASES = [
       '--resultrole', 'family',
       '--resultclass', 'TST_Person'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
-      'class TST_Person {',
-      '',
-      '      [Key ( true ),',
-      '       Description ( "This is key prop" )]',
-      '   string name;',
-      '',
-      '   string extraProperty = "defaultvalue";',
-      '',
-      '};',
-      ''],
+                 'class TST_Person {',
+                 '',
+                 '      [Key ( true ),',
+                 '       Description ( "This is key prop" )]',
+                 '   string name;',
+                 '',
+                 '   string extraProperty = "defaultvalue";',
+                 '',
+                 '};',
+                 ''],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
@@ -796,16 +796,16 @@ TEST_CASES = [
       '-R', 'family',
       '-C', 'TST_Person'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
-      'class TST_Person {',
-      '',
-      '      [Key ( true ),',
-      '       Description ( "This is key prop" )]',
-      '   string name;',
-      '',
-      '   string extraProperty = "defaultvalue";',
-      '',
-      '};',
-      ''],
+                 'class TST_Person {',
+                 '',
+                 '      [Key ( true ),',
+                 '       Description ( "This is key prop" )]',
+                 '   string name;',
+                 '',
+                 '   string extraProperty = "defaultvalue";',
+                 '',
+                 '};',
+                 ''],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
@@ -858,7 +858,7 @@ TEST_CASES = [
     ['Verify class subcommand associators no CLASSNAM, . ',
      ['associators'],
      {'stderr': ['Error: Missing argument "CLASSNAME".', ],
-       'rc': 2,
+      'rc': 2,
       'test': 'in'},
      None, OK],
 
@@ -906,7 +906,7 @@ TEST_CASES = [
     ['Verify class subcommand references no CLASSNAME',
      ['references'],
      {'stderr': ['Error: Missing argument "CLASSNAME".', ],
-       'rc': 2,
+      'rc': 2,
       'test': 'in'},
      None, OK],
 
@@ -1020,7 +1020,8 @@ class TestSubcmdClass(CLITestsBase):
                          mock, condition)
 
 
-class TestClassGeneral(object):  # pylint: disable=too-few-public-methods
+class TestClassGeneral(object):
+    # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
     Test class using pytest for the subcommands of the class subcommand
     """
@@ -1044,7 +1045,8 @@ class TestClassGeneral(object):  # pylint: disable=too-few-public-methods
             "stderr={!r}".format(stderr)
 
 
-class TestClassEnumerate(object):  # pylint: disable=too-few-public-methods
+class TestClassEnumerate(object):
+    # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
     Test the options of the pywbemcli class enumerate' subcommand
     """
