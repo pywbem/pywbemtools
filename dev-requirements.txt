@@ -67,3 +67,8 @@ twine>=1.8.1
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
 # TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
+
+
+# TODO: docutils pinned to 0.14, see https://github.com/pywbem/pywbem/issues/1788. Remove pinning once fixed.
+docutils<=0.14
+
