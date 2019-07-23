@@ -666,6 +666,13 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand enumerate with query , traditional ops',
+     {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stdout': ENUM_INST_RESP,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
     #
     # instance enumerate error returns
     #
@@ -726,7 +733,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify instance subcommand get with instancename --localonly returns '
      ' data',
