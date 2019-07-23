@@ -74,17 +74,17 @@ filterquerylanguage_option = [              # pylint: disable=invalid-name
     click.option('--filterquerylanguage', type=str, required=False,
                  default=None,
                  help='A filterquery language to be used with a filter query '
-                 'defined by --filterquery.')]
+                 'defined by --filterquery. (Default: None)')]
 
 filterquery_option = [              # pylint: disable=invalid-name
     click.option('-f', '--filterquery', type=str, required=False,
                  default=None,
                  help='A filter query to be passed to the server if the pull '
                  'operations are used. If this option is defined and the '
-                 'filterquerylanguage is None, pywbemcli assumes DMTF:FQL '
-                 'If this option is defined and the not-pull operations are '
+                 '--filterquerylanguage is None, pywbemcli assumes DMTF:FQL. '
+                 'If this option is defined and the traditional operations are '
                  'used, the filter is not sent to the server. See the '
-                 'documentation for more information.')]
+                 'documentation for more information. (Default: None)')]
 
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
