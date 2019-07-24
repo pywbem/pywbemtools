@@ -29,7 +29,7 @@ from pywbem import Error, DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
-    verify_operation
+    verify_operation, hide_empty_columns
 from ._common_options import add_options, verify_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
@@ -260,7 +260,7 @@ def connection_list(context):
 
     This subcommand displays all entries in the connection file as
     a table using the command line output_format to define the
-    table format.
+    table format with default of simple format.
 
     An "*" after the name indicates the currently selected connection.
     """
@@ -521,16 +521,13 @@ def cmd_connection_list(context):
     of the value of the cmd line output_format general option.
     """
     pywbemcli_servers = ConnectionRepository()
-
-    # build the table structure
-    headers = ['name', 'server uri', 'namespace', 'user', 'password',
-               'timeout', 'noverify', 'certfile', 'keyfile', 'log']
-    rows = []
-
     if context.pywbem_server:
         current_server_name = context.pywbem_server.name
     else:
         current_server_name = None
+
+    # build the table structure
+    rows = []
     for name, svr in pywbemcli_servers.items():
         # if there is a current server, and it is this item in list
         # append * to name
@@ -538,9 +535,15 @@ def cmd_connection_list(context):
             if name == current_server_name:
                 name = name + "*"
         row = [name, svr.server_url, svr.default_namespace, svr.user,
-               svr.password, svr.timeout, svr.noverify, svr.certfile,
-               svr.keyfile, svr.log]
+               svr.timeout, svr.noverify, svr.certfile,
+               svr.keyfile, svr.log, "\n".join(svr.mock_server)]
         rows.append(row)
+
+    headers = ['name', 'server uri', 'namespace', 'user',
+               'timeout', 'noverify', 'certfile', 'keyfile', 'log',
+               'mock_server']
+
+    headers, rows = hide_empty_columns(headers, rows)
 
     context.spinner.stop()
     click.echo(format_table(sorted(rows), headers,

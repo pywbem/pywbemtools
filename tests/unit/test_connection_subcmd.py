@@ -212,7 +212,8 @@ Usage: pywbemcli connection list [COMMAND-OPTIONS]
   List the entries in the connection file.
 
   This subcommand displays all entries in the connection file as a table
-  using the command line output_format to define the table format.
+  using the command line output_format to define the table format with
+  default of simple format.
 
   An "*" after the name indicates the currently selected connection.
 
@@ -380,11 +381,7 @@ TEST_CASES = [
      {'global': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEMServer Connections:",
-         "name    server uri    namespace    user    password    "
-         "timeout    noverify    certfile    keyfile    log",
-         "------  ------------  -----------  ------  ----------  ---------  "
-         "----------  ----------  ---------  -----"],
+         "WBEMServer Connections:", ""],
       'test': 'lines'},
      None, OK],
 
@@ -450,11 +447,14 @@ TEST_CASES = [
     ['Verify connection subcommand list  with 2 servers defined',
      {'global': ['--output-format', 'simple'],
       'args': ['list']},
-     {'stdout': ["test1   http://blah      root/cimv2                       "
-                 "           False",
-                 "test2   http://blahblah  root/cimv2   fred    argh        "
-                 "       18  True                               api=file,all"],
-      'test': 'in'},
+     {'stdout': ['WBEMServerConnections:',
+                 'name    server uri namespace user timeout noverify    log',
+                 '---------------------------------------------------------'
+                 '------------',
+                 "test1   http://blah      root/cimv2   False",
+                 "test2   http://blahblah  root/cimv2   fred  18  True "
+                 "api=file,all"],
+      'test': 'linesnows'},
      None, OK],
 
 
@@ -468,11 +468,14 @@ TEST_CASES = [
      ' next pywbemcli call',
      {'global': ['--output-format', 'simple'],
       'args': ['list']},
-     {'stdout': ["test1   http://blah      root/cimv2                       "
-                 "           False",
-                 "test2   http://blahblah  root/cimv2   fred    argh        "
-                 "       18  True                               api=file,all"],
-      'test': 'in'},
+     {'stdout': ['WBEMServerConnections:',
+                 'name    server uri namespace user timeout noverify    log',
+                 '---------------------------------------------------------'
+                 '------------',
+                 'test1   http://blah      root/cimv2  False',
+                 'test2   http://blahblah  root/cimv2   fred 18  True '
+                 'api=file,all'],
+      'test': 'linesnows'},
      None, OK],
 
     ['Verify connection subcommand delete ',
@@ -493,12 +496,8 @@ TEST_CASES = [
      {'global': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEMServer Connections:",
-         "name    server uri    namespace    user    password    "
-         "timeout    noverify    certfile    keyfile    log",
-         "------  ------------  -----------  ------  ----------  ---------  "
-         "----------  ----------  ---------  -----"],
-      'test': 'lines',
+         "WBEMServer Connections:", ""],
+      'test': 'linesnows',
       'file': {'before': 'None', 'after': 'None'}},
 
      None, OK],

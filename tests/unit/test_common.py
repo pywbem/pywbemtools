@@ -34,7 +34,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
-    pick_one_from_list, pick_multiple_from_list
+    pick_one_from_list, pick_multiple_from_list, hide_empty_columns
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._common import pywbemcli_prompt  # noqa: F401
 from pywbemtools.pywbemcli._context_obj import ContextObj
@@ -89,6 +89,130 @@ def test_is_classname(testcase, name, exp_rtn):
     assert testcase.exp_exc_types is None
 
     assert act_rtn == exp_rtn
+
+
+TESTCASES_HIDE_EMPTY_COLUMNS = [
+    # TESTCASES for hide_empty_column
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * rows: Array of strings (columns, rows)
+    #   * headrs: list of strings
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify deletes nothing with integers in rows',
+     dict(rows=[[1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [[1, 2, 3],
+                            [4, 5, 6],
+                            [7, 8, 9]],
+                   'headers': ['h1', 'h2', 'h3']}),
+     None, None, True),
+
+    ('Verify deletes nothing with integers in rows',
+     dict(rows=[[1, 2, 0],
+                [4, 5, 0],
+                [7, 8, 0]],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [[1, 2, 0],
+                            [4, 5, 0],
+                            [7, 8, 0]],
+                   'headers': ['h1', 'h2', 'h3']}),
+     None, None, True),
+
+    ('Verify deletes nothing with strings in rows',
+     dict(rows=[['1', '2', '3'],
+                ['4', '5', '6'],
+                ['7', '8', '9']],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['1', '2', '3'],
+                            ['4', '5', '6'],
+                            ['7', '8', '9']],
+                   'headers': ['h1', 'h2', 'h3']}),
+     None, None, True),
+
+    ('Verify deletes nothing with strings in rows',
+     dict(rows=[['1', '2', ''],
+                ['4', '5', ''],
+                ['7', '8', '']],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['1', '2'],
+                            ['4', '5'],
+                            ['7', '8']],
+                   'headers': ['h1', 'h2']}),
+     None, None, True),
+
+    ('Verify deletes nothing with strings in rows',
+     dict(rows=[['1', '2', '3'],
+                ['4', '5', ''],
+                ['7', '8', '']],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['1', '2', '3'],
+                            ['4', '5', ''],
+                            ['7', '8', '']],
+                   'headers': ['h1', 'h2', 'h3']}),
+     None, None, True),
+
+    ('Verify deletes 3rd with strings in rows',
+     dict(rows=[['1', '2', None],
+                ['4', '5', None],
+                ['7', '8', None]],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['1', '2'],
+                            ['4', '5'],
+                            ['7', '8']],
+                   'headers': ['h1', 'h2']}),
+     None, None, True),
+
+    ('Verify deletes 2nd with strings in rows',
+     dict(rows=[['1', None, '3'],
+                ['4', None, '6'],
+                ['7', None, '9']],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['1', '3'],
+                            ['4', '6'],
+                            ['7', '9']],
+                   'headers': ['h1', 'h3']}),
+     None, None, True),
+
+    ('Verify deletes 1st 2nd with strings in rows',
+     dict(rows=[[None, None, '3'],
+                [None, None, '6'],
+                [None, None, '9']],
+          headers=['h1', 'h2', 'h3'],
+          exp_rtn={'rows': [['3'],
+                            ['6'],
+                            ['9']],
+                   'headers': ['h3']}),
+     None, None, True),
+
+
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_HIDE_EMPTY_COLUMNS)
+@simplified_test_function
+def test_hide_empty_columns(testcase, rows, headers, exp_rtn):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    act_rtn_headrs, act_rtn_rows = hide_empty_columns(headers, rows)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn_rows == exp_rtn['rows']
+    assert act_rtn_headrs == exp_rtn['headers']
 
 
 TESTCASES_PICK_ONE_FROM_LIST = [
