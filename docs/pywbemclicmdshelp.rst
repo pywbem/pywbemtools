@@ -1052,6 +1052,17 @@ The following defines the help output for the `pywbemcli instance associators --
                                       class from which the instance to process is
                                       selected.
       -S, --summary                   Return only summary of objects (count).
+      -f, --filterquery TEXT          A filter query to be passed to the server if
+                                      the pull operations are used. If this option
+                                      is defined and the --filterquerylanguage is
+                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      option is defined and the traditional
+                                      operations are used, the filter is not sent
+                                      to the server. See the documentation for
+                                      more information. (Default: None)
+      --filterquerylanguage TEXT      A filterquery language to be used with a
+                                      filter query defined by --filterquery.
+                                      (Default: None)
       -h, --help                      Show this message and exit.
 
 
@@ -1226,6 +1237,17 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -o, --names_only                Show only local properties of the class.
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
+      -f, --filterquery TEXT          A filter query to be passed to the server if
+                                      the pull operations are used. If this option
+                                      is defined and the --filterquerylanguage is
+                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      option is defined and the traditional
+                                      operations are used, the filter is not sent
+                                      to the server. See the documentation for
+                                      more information. (Default: None)
+      --filterquerylanguage TEXT      A filterquery language to be used with a
+                                      filter query defined by --filterquery.
+                                      (Default: None)
       -h, --help                      Show this message and exit.
 
 
@@ -1507,6 +1529,17 @@ The following defines the help output for the `pywbemcli instance references --h
                                       class from which the instance to process is
                                       selected.
       -S, --summary                   Return only summary of objects (count).
+      -f, --filterquery TEXT          A filter query to be passed to the server if
+                                      the pull operations are used. If this option
+                                      is defined and the --filterquerylanguage is
+                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      option is defined and the traditional
+                                      operations are used, the filter is not sent
+                                      to the server. See the documentation for
+                                      more information. (Default: None)
+      --filterquerylanguage TEXT      A filterquery language to be used with a
+                                      filter query defined by --filterquery.
+                                      (Default: None)
       -h, --help                      Show this message and exit.
 
 
