@@ -794,7 +794,8 @@ The following defines the help output for the `pywbemcli connection list --help`
       List the entries in the connection file.
 
       This subcommand displays all entries in the connection file as a table
-      using the command line output_format to define the table format.
+      using the command line output_format to define the table format with
+      default of simple format.
 
       An "*" after the name indicates the currently selected connection.
 

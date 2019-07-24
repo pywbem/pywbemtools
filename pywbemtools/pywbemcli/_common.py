@@ -1298,6 +1298,41 @@ def _value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
     return mof_str, line_pos
 
 
+def hide_empty_columns(headers, rows):
+    """
+    Removes columns from rows if the colmuns are considered empty.
+    The definiton of an empty row is"
+    1. All entries for the column in all rows are None or "" if type string.
+    2. All entries for the column in all rows are None if number.
+
+    Returns new rows and headers
+    """
+    def column_is_empty(rows, column):
+        """
+        Determine if entries for defined column in all rows are considered
+        empty.
+        Returns True if all are empty. Otherwise returns False
+        """
+        for row in rows:
+            if isinstance(row[column], six.integer_types) and \
+                    row[column] is not None:
+                return False
+            if row[column]:
+                return False
+        return True
+
+    # Remove empty rows
+    for row in rows:
+        assert len(row) == len(headers)
+    for column in range(len(headers) - 1, -1, -1):
+        if column_is_empty(rows, column):
+            del headers[column]
+            for row in rows:
+                del row[column]
+
+    return headers, rows
+
+
 def format_table(rows, headers, title=None, table_format='simple',
                  sort_columns=None):
     """
