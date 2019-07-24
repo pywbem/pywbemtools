@@ -44,7 +44,7 @@ def qualifier_group():
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 @qualifier_group.command('get', options_metavar=CMD_OPTS_TXT)

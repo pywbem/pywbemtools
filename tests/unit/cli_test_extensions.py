@@ -15,7 +15,8 @@ from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
 TEST_DIR = os.path.dirname(__file__)
 
 
-class CLITestsBase(object):  # pylint: disable=too-few-public-methods
+class CLITestsBase(object):
+    # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
         Defines methods to execute tests on pywbemcli.
 

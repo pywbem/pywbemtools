@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Pywbemcli is a command line WBEM client that uses pywbem as its communication
+interface with WBEM Servers. It is written in pure Python and supports Python 2
+and Python 3.
+"""
+
 from __future__ import absolute_import
 
 import sys
@@ -35,7 +41,7 @@ from ._version import __version__  # noqa: F401
 
 _python_m = sys.version_info[0]  # pylint: disable=invalid-name
 _python_n = sys.version_info[1]  # pylint: disable=invalid-name
-if _python_m == 2 and _python_n < 6:
-    raise RuntimeError('On Python 2, pywbem requires Python 2.6 or higher')
-elif _python_m == 3 and _python_n < 4:
+if _python_m == 2 and _python_n < 7:
+    raise RuntimeError('On Python 2, pywbem requires Python 2.7 or higher')
+if _python_m == 3 and _python_n < 4:
     raise RuntimeError('On Python 3, pywbem requires Python 3.4 or higher')
