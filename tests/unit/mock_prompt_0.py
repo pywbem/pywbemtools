@@ -27,7 +27,7 @@
 """
 from mock import Mock
 
-import pywbemtools.pywbemcli._common
+import pywbemtools
 RETURN_VALUE = "0"
 
 

@@ -108,6 +108,7 @@ DEFAULT_WBEM_SERVER_MOCK_DICT = {
 
 
 class WbemServerMock(object):
+    # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
     Class that mocks the classes and methods used by the pywbem
     WBEMServer class so that the WBEMServer class will produce valid data
@@ -154,10 +155,10 @@ class WbemServerMock(object):
         # Retrieved from globals setup by pywbemcli for
         #  WBEMConnection object
         #  WBEMServer object
-        global CONN
-        self.conn = CONN
-        global SERVER
-        self.wbem_server = SERVER
+        global CONN  # pylint: disable=global-variable-not-assigned
+        self.conn = CONN  # pylint: disable=undefined-variable
+        global SERVER  # pylint: disable=global-variable-not-assigned
+        self.wbem_server = SERVER  # pylint: disable=undefined-variable
         self.build_mock()
 
     def __str__(self):
@@ -204,9 +205,9 @@ class WbemServerMock(object):
             self.dmtf_schema_ver, self.schema_dir,
             class_names=self.server_mock_data['class_names'], verbose=False)
 
-        for fn in self.pg_schema_files:
-            pg_file = os.path.join(self.pg_schema_dir, fn)
-            self.conn.compile_mof_file(pg_file, namespace=default_namespace,
+        for filename in self.pg_schema_files:
+            filepath = os.path.join(self.pg_schema_dir, filename)
+            self.conn.compile_mof_file(filepath, namespace=default_namespace,
                                        search_paths=[self.pg_schema_dir],
                                        verbose=False)
 
@@ -220,6 +221,7 @@ class WbemServerMock(object):
                             property_values=None,
                             include_missing_properties=True,
                             include_path=True):
+        # pylint: disable=too-many-arguments
         """
         Build instance from classname using class_name property to get class
         from a repository.
@@ -272,10 +274,10 @@ class WbemServerMock(object):
         Build instances of CIM_Namespace defined by test_namespaces list. These
         instances are built into the interop namespace
         """
-        for ns in namespaces:
+        for namespace in namespaces:
             nsdict = {"SystemName": self.system_name,
                       "ObjectManagerName": self.object_manager_name,
-                      'Name': ns,
+                      'Name': namespace,
                       'CreationClassName': 'PG_Namespace',
                       'ObjectManagerCreationClassName': 'CIM_ObjectManager',
                       'SystemCreationClassName': 'CIM_ComputerSystem'}
@@ -313,11 +315,11 @@ class WbemServerMock(object):
         for value in range(0, 22):
             org_vm_dict[org_vm.tovalues(value)] = value
 
-        for p in profiles:
-            instance_id = '%s+%s+%s' % (p[0], p[1], p[2])
-            reg_prof_dict = {'RegisteredOrganization': org_vm_dict[p[0]],
-                             'RegisteredName': p[1],
-                             'RegisteredVersion': p[2],
+        for profile in profiles:
+            instance_id = '%s+%s+%s' % (profile[0], profile[1], profile[2])
+            reg_prof_dict = {'RegisteredOrganization': org_vm_dict[profile[0]],
+                             'RegisteredName': profile[1],
+                             'RegisteredVersion': profile[2],
                              'InstanceID': instance_id}
             rpinst = self.inst_from_classname("CIM_RegisteredProfile",
                                               namespace=self.interop_ns,

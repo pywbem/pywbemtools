@@ -92,9 +92,10 @@ class TestsContainer(ClientTest):
         if six.PY3:
             # pylint: disable=no-member
             return self.assertRegex(test_str, regex)
-        else:
-            return self.assertRegexpMatches(test_str,
-                                            regex)  # pylint: disable=no-member
+
+        # pylint: disable=no-member, deprecated-method
+        return self.assertRegexpMatches(test_str,
+                                        regex)  # pylint: disable=no-member
 
 
 class ClassTests(TestsContainer):
@@ -107,7 +108,7 @@ class ClassTests(TestsContainer):
         return exitcode, std_out_str, std_err_str
 
     def test_get_simple(self):
-        """ """
+        """Test a get of CIM_ManagedElement"""
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement')
 
         self.assertEqual(exitcode, 0)
@@ -115,10 +116,11 @@ class ClassTests(TestsContainer):
         self.assert_found('CIM_ManagedElement', out)
 
     def test__get_localonly(self):
-        """ """
+        """Test class get --localonly"""
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement -l')
 
         self.assertEqual(exitcode, 0)
+        self.assertEqual(err, "")
         self.assert_found('CIM_ManagedElement', out)
 
         exitcode, out, err = self.class_cmd(

@@ -1,22 +1,29 @@
 """
     Test script to be loaded with pywbemcli --mock-server global option to test
     capability to execute python code as part of startup.
-    This script loads a single class into the repository and displays
-    the resulting repository.
-    This script includes an assert to confirm that the class is loaded into
-    the repository.
+    This script loads a single class into the repository.
+    This script includes  asserts to confirm that the class is loaded into
+    the repositoryand to verify that the GLOBALS are passed to this code from
+    pywbemcli.
 """
 from pywbem import CIMQualifier, CIMClass, CIMProperty, CIMMethod
+
+# test that GLOBALS exist
+assert "CONN" in globals()
+assert 'SERVER' in globals()
+assert 'VERBOSE'in globals()
 
 
 def build_classes():
     """
-    Builds and returns a single class: CIM_Foo that to be used as a
-    test class for the mock class tests.
+    Function that builds and returns a single class: CIM_Foo that will to be
+     used as a test class for the mock class tests.
     """
+    # build the key properties
     qkey = {'Key': CIMQualifier('Key', True)}
     dkey = {'Description': CIMQualifier('Description', 'blah blah')}
 
+    # build the CIMClass with properties and methods.
     c = CIMClass(
         'CIM_FooDirLoad', qualifiers=dkey,
         properties={'InstanceID':
@@ -29,9 +36,9 @@ def build_classes():
                  'Fuzzy': CIMMethod('Fuzzy', 'string', qualifiers=dkey,
                                     class_origin='CIM_Foo',
                                     propagated=False)})
-    global CONN
-    CONN.add_cimobjects(c)
+    # add the objects to the mock repository
+    CONN.add_cimobjects(c)  # noqa: F821
 
 
 build_classes()
-assert(CONN.GetClass('CIM_FooDirLoad'))
+assert(CONN.GetClass('CIM_FooDirLoad'))  # noqa: F821

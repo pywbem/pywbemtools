@@ -630,8 +630,8 @@ class TestParseWbemUri(object):  # TODO: move this to pytest
             assert isinstance(obj.host, type(exp_host))
 
 
-# TODO pytestify this test and the others in this file
-class FilterNamelistTest(object):  # pytlint: disable=useless-object-inheritance
+# TODO: Future pytestify this test and the others in this file
+class FilterNamelistTest(object):  # pylint: disable=useless-object-inheritance
     """Test the common filter_namelist function."""
 
     name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']

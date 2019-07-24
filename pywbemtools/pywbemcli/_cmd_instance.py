@@ -719,7 +719,7 @@ def cmd_instance_enumerate(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 FilterQuery=options['filterquery'],
-                FilterQueryLanguage=get_filterquerylanguage(options)),
+                FilterQueryLanguage=get_filterquerylanguage(options))
             if options['sort']:
                 results = sort_cimobjects(results)
         else:
@@ -762,7 +762,7 @@ def cmd_instance_references(context, instancename, options):
                 ResultClass=options['resultclass'],
                 Role=options['role'],
                 FilterQuery=options['filterquery'],
-                FilterQueryLanguage=get_filterquerylanguage(options)),
+                FilterQueryLanguage=get_filterquerylanguage(options))
             if options['sort']:
                 results = sort_cimobjects(results)
         else:
@@ -805,7 +805,7 @@ def cmd_instance_associators(context, instancename, options):
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'],
                 FilterQuery=options['filterquery'],
-                FilterQueryLanguage=get_filterquerylanguage(options)),
+                FilterQueryLanguage=get_filterquerylanguage(options))
             if options['sort']:
                 results.sort()
         else:

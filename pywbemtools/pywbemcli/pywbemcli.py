@@ -228,10 +228,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         https://pywbemtools.readthedocs.io/en/latest/
     """
-    # In interactive mode, global options specified in cmd line are used as
+    # In interactive mode, general options specified in cmd line are used as
     # defaults for interactive commands.
     # This requires being able to determine for each option whether it has been
-    # specified and is why global options don't define defaults in the
+    # specified and is why general options don't define defaults in the
     # decorators that define them.
 
     if ctx.obj is None:

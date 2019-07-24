@@ -150,9 +150,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def execute_cmd(self, cmd):
         """
         Call the cmd executor defined by cmd with the spinner. If the
-        WBEMServer object has not been created it is created and the
-        result stored in global storage so that this wbem server can be
-        used for interactive commands.
+        WBEMServer object has not been created it is created so that this wbem
+        server can be used for interactive commands.
 
         This method is called by every subcommand execution to setup and
         execute the command. Thus, each subcommand has the line similar to:
@@ -242,25 +241,26 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         If the wbem server has not been connected yet, connect it. The
         wbemserver object is saved both in the context and as a GLOBAL
-        This global is used to determine that the server has been connected.
-        TODO: Rather than a global, we should be the wbemserver into the
+        This GLOBAL is used to determine that the server has been connected.
+        TODO: FUTURE Rather than a global, we should be the wbemserver into the
         parent probably.
 
         Both the WBEMConnection and WBEMServer objects are established
         at this point since the cost of doing the WBEMServer object is low.
-        The existence of the WBEMSerer object in the global is the flag that
+        The existence of the WBEMServer object in the GLOBALS is the flag that
         this server connection has been established already.
 
-        TODO: We should probably move this logic to the first place a
+        TODO: FUTURE - We should probably move this logic to the first place a
         connection is actually established so that if we have not-password
         commands in the environment they do not force the password request.
         Logical would be the first time the conn or wbem_server property is
         used in pywbem_server.
 
         """
-        # TODO investigate putting this into parent context instead of global
+        # TODO: FUTURE investigate putting this into parent context instead of
+        #       global
 
-        # if no server defined, do not try to connect. This allows
+        # If no server defined, do not try to connect. This allows
         # commands like help, connection new, select to execute without
         # a target server defined.
         if self._pywbem_server and self._pywbem_server.wbem_server is None:

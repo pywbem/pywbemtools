@@ -60,7 +60,7 @@ Commands:
 """
 
 # pylint: disable=line-too-long
-INST_ENUM_HELP = """
+INST_ENUMERATE_HELP = """
 Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate instances or names of CLASSNAME.
@@ -116,6 +116,17 @@ Options:
   -o, --names_only                Show only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
+  -f, --filterquery TEXT          A filter query to be passed to the server if
+                                  the pull operations are used. If this option
+                                  is defined and the --filterquerylanguage is
+                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  option is defined and the traditional
+                                  operations are used, the filter is not sent
+                                  to the server. See the documentation for
+                                  more information. (Default: None)
+  --filterquerylanguage TEXT      A filterquery language to be used with a
+                                  filter query defined by --filterquery.
+                                  (Default: None)
   -h, --help                      Show this message and exit.
 """
 
@@ -123,6 +134,8 @@ INST_GET_HELP = """
 Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
+
+
 
   Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
   resolve to the instance name of the desired instance. This may be supplied
@@ -320,6 +333,17 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
+  -f, --filterquery TEXT          A filter query to be passed to the server if
+                                  the pull operations are used. If this option
+                                  is defined and the --filterquerylanguage is
+                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  option is defined and the traditional
+                                  operations are used, the filter is not sent
+                                  to the server. See the documentation for
+                                  more information. (Default: None)
+  --filterquerylanguage TEXT      A filterquery language to be used with a
+                                  filter query defined by --filterquery.
+                                  (Default: None)
   -h, --help                      Show this message and exit.
 """
 
@@ -450,6 +474,17 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
+  -f, --filterquery TEXT          A filter query to be passed to the server if
+                                  the pull operations are used. If this option
+                                  is defined and the --filterquerylanguage is
+                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  option is defined and the traditional
+                                  operations are used, the filter is not sent
+                                  to the server. See the documentation for
+                                  more information. (Default: None)
+  --filterquerylanguage TEXT      A filterquery language to be used with a
+                                  filter query defined by --filterquery.
+                                  (Default: None)
   -h, --help                      Show this message and exit.
 """
 
@@ -639,7 +674,7 @@ TEST_CASES = [
     #
     ['Verify instance subcommand enumerate  --help response',
      ['enumerate', '--help'],
-     {'stdout': INST_ENUM_HELP,
+     {'stdout': INST_ENUMERATE_HELP,
       'test': 'linesnows'},
      None, OK],
 
@@ -726,9 +761,9 @@ TEST_CASES = [
     ['Verify instance subcommand enumerate with query , traditional ops',
      {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': "ValueError: EnumerateInstances does not support FilterQuery",
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_FILE, FAIL],
 
     #
     # instance enumerate error returns
@@ -755,7 +790,7 @@ TEST_CASES = [
       ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
       'rc': 2,
       'test': 'in'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
 
     #
@@ -1569,4 +1604,4 @@ class TestSubcmd(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+                         mock, condition, verbose=True)

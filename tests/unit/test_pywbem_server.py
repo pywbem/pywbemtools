@@ -26,6 +26,8 @@ import unittest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
+# TODO: Future - Move these tests to pytest
+
 
 class PywbemServerTests(unittest.TestCase):
     """ Test the PywbemServer class """
@@ -47,6 +49,7 @@ class PywbemServerTests(unittest.TestCase):
         print(svr)
 
     def test_all_parms(self):
+        """Test all the PywbemServer input parameters"""
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'
@@ -70,6 +73,7 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.keyfile, keyfile)
 
     def test_all_connect(self):
+        """Test all input parameters"""
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'

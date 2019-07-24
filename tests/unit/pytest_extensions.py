@@ -15,7 +15,7 @@ if six.PY3:
     # pylint: disable=no-name-in-module
     from inspect import Signature, Parameter
 else:
-    from funcsigs import Signature, Parameter
+    from funcsigs import Signature, Parameter  # pylint: disable=import-error
 
 __all__ = ['simplified_test_function']
 
