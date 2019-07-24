@@ -70,6 +70,22 @@ instance_property_option = [              # pylint: disable=invalid-name
                  'defined by comma-separated-values. EmbeddedInstance not '
                  'allowed.')]
 
+filterquerylanguage_option = [              # pylint: disable=invalid-name
+    click.option('--filterquerylanguage', type=str, required=False,
+                 default=None,
+                 help='A filterquery language to be used with a filter query '
+                 'defined by --filterquery. (Default: None)')]
+
+filterquery_option = [              # pylint: disable=invalid-name
+    click.option('-f', '--filterquery', type=str, required=False,
+                 default=None,
+                 help='A filter query to be passed to the server if the pull '
+                 'operations are used. If this option is defined and the '
+                 '--filterquerylanguage is None, pywbemcli assumes DMTF:FQL. '
+                 'If this option is defined and the traditional operations are '
+                 'used, the filter is not sent to the server. See the '
+                 'documentation for more information. (Default: None)')]
+
 
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
 def instance_group():
@@ -266,6 +282,8 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @add_options(names_only_option)
 @add_options(sort_option)
 @add_options(summary_objects_option)
+@add_options(filterquery_option)
+@add_options(filterquerylanguage_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
@@ -306,6 +324,8 @@ def instance_enumerate(context, classname, **options):
 @add_options(sort_option)
 @add_options(interactive_option)
 @add_options(summary_objects_option)
+@add_options(filterquery_option)
+@add_options(filterquerylanguage_option)
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
@@ -362,6 +382,8 @@ def instance_references(context, instancename, **options):
 @add_options(sort_option)
 @add_options(interactive_option)
 @add_options(summary_objects_option)
+@add_options(filterquery_option)
+@add_options(filterquerylanguage_option)
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
@@ -641,6 +663,21 @@ def cmd_instance_invokemethod(context, instancename, methodname,
         raise click.ClickException("%s: %s" % (ex.__class__.__name__, ex))
 
 
+def get_filterquerylanguage(options):
+    """
+    Get the filterquery language based on what is in the filterquery option
+    and the filterquerylanguage options.
+    If filterquery exists but filterquerylanguage does not, use DMTF as
+    the filter query language.
+    if filterquery does not exist but filterquerylanguage does, just return it
+    """
+    if options['filterquery']:
+        fql = options['filterquerylanguage'] or 'DMTF:FQL'
+    else:
+        fql = options['filterquerylanguage']
+    return fql
+
+
 def cmd_instance_enumerate(context, classname, options):
     """
     Enumerate CIM instances or CIM instance names
@@ -650,9 +687,11 @@ def cmd_instance_enumerate(context, classname, options):
         if options['names_only']:
             results = context.conn.EnumerateInstanceNames(
                 ClassName=classname,
-                namespace=options['namespace'])
+                namespace=options['namespace'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options)),
             if options['sort']:
-                results.sort()
+                results = sort_cimobjects(results)
         else:
             results = context.conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
@@ -661,8 +700,9 @@ def cmd_instance_enumerate(context, classname, options):
                 DeepInheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
-
             if options['sort']:
                 results = sort_cimobjects(results)
 
@@ -690,9 +730,11 @@ def cmd_instance_references(context, instancename, options):
             results = context.conn.PyWbemcliReferenceInstancePaths(
                 instancepath,
                 ResultClass=options['resultclass'],
-                Role=options['role'])
+                Role=options['role'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options)),
             if options['sort']:
-                results.sort()
+                results = sort_cimobjects(results)
         else:
             results = context.conn.PyWbemcliReferenceInstances(
                 instancepath,
@@ -700,6 +742,8 @@ def cmd_instance_references(context, instancename, options):
                 Role=options['role'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)
@@ -729,7 +773,9 @@ def cmd_instance_associators(context, instancename, options):
                 AssocClass=options['assocclass'],
                 Role=options['role'],
                 ResultClass=options['resultclass'],
-                ResultRole=options['resultrole'])
+                ResultRole=options['resultrole'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options)),
             if options['sort']:
                 results.sort()
         else:
@@ -741,6 +787,8 @@ def cmd_instance_associators(context, instancename, options):
                 ResultRole=options['resultrole'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
+                FilterQuery=options['filterquery'],
+                FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
             if options['sort']:
                 results.sort(key=lambda x: x.classname)

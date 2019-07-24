@@ -568,7 +568,7 @@ instance of TST_FamilyCollection {
 
 # pylint: enable=line-too-long
 
-OK = True  # mark tests OK when they execute correctly
+OK = False  # mark tests OK when they execute correctly
 RUN = True  # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -651,12 +651,26 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate deepinheritance '
-     'CIM_Foo -d -o',
+    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
      {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
       'global': ['-o', 'grid']},
      {'stdout': ENUM_INSTNAME_TABLE_RESP,
       'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO: modify this to output log and test for info in return and log
+
+    ['Verify instance subcommand enumerate with query.',
+     ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+     {'stdout': ENUM_INST_RESP,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate with query , traditional ops',
+     {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stdout': ENUM_INST_RESP,
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -676,6 +690,16 @@ TEST_CASES = [
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate fails invalid query language',
+     ['enumerate', '--filterquerylanguage', 'blah',
+      '--filterquery', 'InstanceID = 3'],
+     {'stderr':
+      ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
+      'rc': 2,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, RUN],
+
 
     #
     #  instance get subcommand
@@ -709,7 +733,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify instance subcommand get with instancename --localonly returns '
      ' data',
@@ -1258,6 +1281,13 @@ TEST_CASES = [
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
 
+    ['Verify instance subcommand references with query.',
+     ['references', 'TST_Person.name="Mike"', '--filterquery',
+      'InstanceID = 3'],
+     {'stdout': REF_INSTS,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, RUN],
+
     # TODO add more invalid references tests
 
     #
@@ -1313,6 +1343,13 @@ TEST_CASES = [
       'rc': 0,
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+
+    ['Verify instance subcommand references with query.',
+     ['associators', 'TST_Person.name="Mike"', '--filterquery',
+      'InstanceID = 3'],
+     {'stdout': ASSOC_INSTS,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, RUN],
 
     # TODO add associators error tests
 
