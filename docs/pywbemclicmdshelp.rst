@@ -62,7 +62,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       and 5989(HTTPS)].
                                       (EnvVar:
                                       PYWBEMCLI_SERVER).
-      -N, --name NAME                 Name for the connection.  If this option
+      -n, --name NAME                 Name for the connection.  If this option
                                       exists and the server option does not exist
                                       pywbemcli retrieves the connection
                                       information from the connections file
@@ -84,13 +84,13 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
                                       option.(EnvVar: PYWBEMCLI_PASSWORD).
-      -t, --timeout INTEGER           Timeout completion of WBEM server operation
-                                      in seconds.
+      -t, --timeout INTEGER           Client timeout completion of WBEM server
+                                      operation in seconds.
                                       (EnvVar:
                                       PYWBEMCLI_PYWBEMCLI_TIMEOUT)
-      -n, --noverify                  If set, client does not verify WBEM server
+      -N, --noverify                  If set, client does not verify WBEM server
                                       certificate.(EnvVar: PYWBEMCLI_NOVERIFY).
-      -c, --certfile TEXT             Server certfile. Ignored if noverify flag
+      -c, --certfile TEXT             Server certfile. Ignored if --noverify flag
                                       set. (EnvVar: PYWBEMCLI_CERTFILE).
       -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                       PYWBEMCLI_KEYFILE).
@@ -117,7 +117,8 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       Object: [mof|xml|txt|tree]
                                       [Default:
                                       "simple"]
-      --use-pull-ops [yes|no|either]  Determines whether pull operations are used
+      -U, --use-pull-ops [yes|no|either]
+                                      Determines whether pull operations are used
                                       for EnumerateInstances, AssociatorInstances,
                                       ReferenceInstances, and ExecQuery
                                       operations.
@@ -682,7 +683,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       defines WBEM server port to be used
                                       [Defaults: 5988(HTTP) and 5989(HTTPS)].
                                       [required]
-      -N, --name NAME                 Required name for the connection(optional,
+      -n, --name NAME                 Required name for the connection(optional,
                                       see --server).  This is the name for this
                                       defined WBEM server in the connection file
                                       [required]
@@ -696,7 +697,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       option.
       -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
                                       seconds. Default: 30
-      -n, --noverify                  If set, client does not verify server
+      -N, --noverify                  If set, client does not verify server
                                       certificate.
       -c, --certfile TEXT             Server certfile. Ignored if noverify flag
                                       set.
