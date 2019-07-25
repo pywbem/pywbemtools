@@ -645,8 +645,8 @@ instance of TST_FamilyCollection {
 
 # pylint: enable=line-too-long
 
-OK = False  # mark tests OK when they execute correctly
-RUN = True  # Mark OK = False and current test case being created RUN
+OK = True     # mark tests OK when they execute correctly
+RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
 TEST_CASES = [
@@ -758,12 +758,14 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate with query , traditional ops',
+    ['Verify instance subcommand enumerate with query, traditional ops fails',
      {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
-     {'stdout': "ValueError: EnumerateInstances does not support FilterQuery",
-      'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, FAIL],
+     {'stderr': ["ValueError",
+                 "EnumerateInstances does not support FilterQuery"],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
 
     #
     # instance enumerate error returns
@@ -791,7 +793,6 @@ TEST_CASES = [
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
-
 
     #
     #  instance get subcommand
@@ -989,6 +990,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
 
+    # This test skipped because click stdin broken
     ['Verify create, get, delete works with stdin',
      {'stdin': ['instance create CIM_foo -P InstancID=blah',
                 'instance get CIM_Foo=/"blah/"',
@@ -1357,7 +1359,7 @@ TEST_CASES = [
      ['references', 'TST_Person.name="Mike"', '--includequalifiers'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references includequalifiers and '
      ' --use-pull-ops no',
@@ -1365,7 +1367,7 @@ TEST_CASES = [
       'global': ['--use-pull-ops', 'no']},
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
@@ -1418,7 +1420,17 @@ TEST_CASES = [
       'InstanceID = 3'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand references with query, traditional ops fails',
+     {'args': ['references', 'TST_Person.name="Mike"', '--filterquery',
+               'InstanceID = 3'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stderr': ["ValueError:",
+                 "References does not support FilterQuery"],
+      'rc': 1,
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
 
     # TODO add more invalid references tests
 
@@ -1444,7 +1456,7 @@ TEST_CASES = [
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators, --includequalifiers wo pull',
      {'global': ['--use-pull-ops', 'no'],
@@ -1452,7 +1464,7 @@ TEST_CASES = [
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '-o'],
@@ -1497,7 +1509,18 @@ TEST_CASES = [
       'InstanceID = 3'],
      {'stdout': ASSOC_INSTS,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
+
+
+    ['Verify instance subcommand associators with query, traditional ops',
+     {'args': ['associators', 'TST_Person.name="Mike"', '--filterquery',
+               'InstanceID = 3'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stderr': ["ValueError:",
+                 "Associators does not support FilterQuery"],
+      'rc': 1,
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
 
     # TODO add more associators error tests
 
@@ -1604,4 +1627,4 @@ class TestSubcmd(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition, verbose=True)
+                         mock, condition)
