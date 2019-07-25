@@ -233,7 +233,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # This requires being able to determine for each option whether it has been
     # specified and is why general options don't define defaults in the
     # decorators that define them.
-
     if ctx.obj is None:
         # In command mode or processing the command line options in
         # interactive mode. Apply the documented option defaults.
@@ -262,12 +261,12 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             for fn in mock_server:
                 ext = os.path.splitext(fn)[1]
                 if ext not in ['.py', '.mof']:
-                    click.echo('Error: --mock-server: File: %s '
-                               'extension "%s" not valid. "py" or "mof" '
+                    click.echo('Error: --mock-server: File: "%s" '
+                               'extension: "%s" not valid. "py" or "mof" '
                                'required' % (fn, ext), err=True)
                     raise click.Abort()
                 if not os.path.isfile(fn):
-                    click.echo('Error: --mock-server: File: %s does '
+                    click.echo('Error: --mock-server: File: "%s" does '
                                'not exist' % fn, err=True)
                     raise click.Abort()
 
@@ -279,7 +278,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                     'Invalid choice for --use_pull_ops %s' % use_pull_ops)
         else:
             use_pull_ops = DEFAULT_PULL_CHOICE
-
         if pull_max_cnt is None:
             pull_max_cnt = DEFAULT_MAXPULLCNT
 

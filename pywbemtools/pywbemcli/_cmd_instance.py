@@ -739,7 +739,7 @@ def cmd_instance_enumerate(context, classname, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'])
 
-    except Error as er:
+    except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
@@ -783,7 +783,7 @@ def cmd_instance_references(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'])
 
-    except Error as er:
+    except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
@@ -826,7 +826,7 @@ def cmd_instance_associators(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'])
 
-    except Error as er:
+    except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
