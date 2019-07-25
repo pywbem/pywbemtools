@@ -79,7 +79,7 @@ Options:
                                   and 5989(HTTPS)].
                                   (EnvVar:
                                   PYWBEMCLI_SERVER).
-  -N, --name NAME                 Name for the connection.  If this option
+  -n, --name NAME                 Name for the connection.  If this option
                                   exists and the server option does not exist
                                   pywbemcli retrieves the connection
                                   information from the connections file
@@ -101,13 +101,13 @@ Options:
                                   requested as part  of initialization if user
                                   name exists and it is not  provided by this
                                   option.(EnvVar: PYWBEMCLI_PASSWORD).
-  -t, --timeout INTEGER           Timeout completion of WBEM server operation
-                                  in seconds.
+  -t, --timeout INTEGER           Client timeout completion of WBEM server
+                                  operation in seconds.
                                   (EnvVar:
                                   PYWBEMCLI_PYWBEMCLI_TIMEOUT)
-  -n, --noverify                  If set, client does not verify WBEM server
+  -N, --noverify                  If set, client does not verify WBEM server
                                   certificate.(EnvVar: PYWBEMCLI_NOVERIFY).
-  -c, --certfile TEXT             Server certfile. Ignored if noverify flag
+  -c, --certfile TEXT             Server certfile. Ignored if --noverify flag
                                   set. (EnvVar: PYWBEMCLI_CERTFILE).
   -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                   PYWBEMCLI_KEYFILE).
@@ -134,7 +134,8 @@ Options:
                                   Object: [mof|xml|txt|tree]
                                   [Default:
                                   "simple"]
-  --use-pull-ops [yes|no|either]  Determines whether pull operations are used
+  -U, --use-pull-ops [yes|no|either]
+                                  Determines whether pull operations are used
                                   for EnumerateInstances, AssociatorInstances,
                                   ReferenceInstances, and ExecQuery
                                   operations.
@@ -251,7 +252,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify valid pull_ops parameter.',
+    ['Verify valid --use-pull_ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'either'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -260,11 +261,11 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid pull-ops parameter.',
+    ['Verify invalid --use-pull-ops parameter.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Invalid value for "--use-pull-ops": invalid choice: '
+     {'stderr': ['Invalid value for "-U" / "--use-pull-ops": invalid choice: '
                  'blah. (choose from yes, no, either)'],
       'rc': 2,
       'test': 'in'},
@@ -367,7 +368,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --name options with new name but not in repo failse',
-     {'global': ['-N', 'fred'],
+     {'global': ['-n', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': 'Error: Named connection "fred" does not exist',

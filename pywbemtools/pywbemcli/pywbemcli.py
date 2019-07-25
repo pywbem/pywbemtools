@@ -67,7 +67,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'used '
                    '[Defaults: 5988(HTTP) and 5989(HTTPS)].\n' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.server_envvar))
-@click.option('-N', '--name', type=str,
+@click.option('-n', '--name', type=str,
               metavar='NAME',
               envvar=PywbemServer.name_envvar,
               help='Name for the connection.  If this '
@@ -102,15 +102,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               metavar='INTEGER',
               envvar=PywbemServer.timeout_envvar,
-              help="Timeout completion of WBEM server operation in seconds.\n"
+              help='Client timeout completion of WBEM server operation in '
+                   'seconds.\n' +
                    '(EnvVar: PYWBEMCLI_{})'.format(PywbemServer.timeout_envvar))
-@click.option('-n', '--noverify', is_flag=True,
+@click.option('-N', '--noverify', is_flag=True,
               envvar=PywbemServer.noverify_envvar,
               help='If set, client does not verify WBEM server certificate.' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.noverify_envvar))
 @click.option('-c', '--certfile', type=str,
               envvar=PywbemServer.certfile_envvar,
-              help="Server certfile. Ignored if noverify flag set. " +
+              help="Server certfile. Ignored if --noverify flag set. " +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.certfile_envvar))
 @click.option('-k', '--keyfile', type=str,
               metavar='FILE PATH',
@@ -140,7 +141,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    .format(tb='|'.join(TABLE_FORMATS),
                            ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)) +
                    '[Default: "{}"]'.format(DEFAULT_OUTPUT_FORMAT))
-@click.option('--use-pull-ops',
+@click.option('-U', '--use-pull-ops',
               envvar=PywbemServer.use_pull_ops_envvar,
               type=click.Choice(['yes', 'no', 'either']),
               help='Determines whether pull operations are used for '

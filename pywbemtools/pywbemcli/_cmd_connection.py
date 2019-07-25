@@ -141,7 +141,7 @@ def connection_select(context, name):
                    'literal IPV4 address (dotted), or literal IPV6 address\n'
                    '* Port: (optional) defines WBEM server port to be used '
                    '[Defaults: 5988(HTTP) and 5989(HTTPS)].\n')
-@click.option('-N', '--name', type=str, metavar='NAME', required=True,
+@click.option('-n', '--name', type=str, metavar='NAME', required=True,
               help='Required name for the connection(optional, see --server).  '
                    'This is the name for this defined WBEM server in the'
                    ' connection file')
@@ -160,7 +160,7 @@ def connection_select(context, name):
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               help="Operation timeout for the WBEM Server in seconds. "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
-@click.option('-n', '--noverify', is_flag=True,
+@click.option('-N', '--noverify', is_flag=True,
               help='If set, client does not verify server certificate.')
 @click.option('-c', '--certfile', type=str,
               help="Server certfile. Ignored if noverify flag set. ")

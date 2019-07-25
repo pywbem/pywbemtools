@@ -157,7 +157,7 @@ Options:
                                   defines WBEM server port to be used
                                   [Defaults: 5988(HTTP) and 5989(HTTPS)].
                                   [required]
-  -N, --name NAME                 Required name for the connection(optional,
+  -n, --name NAME                 Required name for the connection(optional,
                                   see --server).  This is the name for this
                                   defined WBEM server in the connection file
                                   [required]
@@ -171,7 +171,7 @@ Options:
                                   option.
   -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
                                   seconds. Default: 30
-  -n, --noverify                  If set, client does not verify server
+  -N, --noverify                  If set, client does not verify server
                                   certificate.
   -c, --certfile TEXT             Server certfile. Ignored if noverify flag
                                   set.
@@ -397,7 +397,7 @@ TEST_CASES = [
     # and what was in the repository.
     #
     ['Verify connection subcommand add with simple arguments only.',
-     ['add', '-N', 'test1', '-s', 'http://blah'],
+     ['add', '--name', 'test1', '-s', 'http://blah'],
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
@@ -415,8 +415,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection subcommand add with complex options.',
-     ['add', '-N', 'test2', '-s', 'http://blahblah', '-u', 'fred', '-p',
-      'argh', '-t', '18', '-n', '-l', 'api=file,all'],
+     ['add', '--name', 'test2', '-s', 'http://blahblah', '-u', 'fred', '-p',
+      'argh', '-t', '18', '-N', '-l', 'api=file,all'],
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -546,10 +546,10 @@ TEST_CASES = [
      None, OK],
 
     # uses regex because windows generates set and linux export in statements
-    # No file verification required. Does not usefile
+    # No file verification required. Does not use file
     ['Verify connection subcommand export',
      {'args': ['export'],
-      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh', '-n',
+      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh', '-N',
                  '-c', 'certfile.txt', '-k', 'keyfile.txt', '-t', '12']},
      {'stdout': ['PYWBEMCLI_SERVER=http://blah$',
                  'PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2$',
@@ -585,7 +585,7 @@ TEST_CASES = [
 
 
     ['Verify connection subcommand add with bad arg fails',
-     ['add', '-N', 'addallargs', '-s', 'http://blah',
+     ['add', '--name', 'addallargs', '-s', 'http://blah',
       '--timeout', 'fred', ],
      {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
                  'Error: Invalid value for "-t" / "--timeout": '
@@ -596,7 +596,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection subcommand add no server option fails',
-     ['add', '-N', 'blah'],
+     ['add', '--name', 'blah'],
      {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
                  'Try "pywbemcli connection add -h" for help.',
                  '',
@@ -631,7 +631,7 @@ TEST_CASES = [
      {'stderr': ['Usage: pywbemcli connection add [COMMAND-OPTIONS]',
                  'Try "pywbemcli connection add -h" for help.',
                  '',
-                 'Error: Missing option "-N" / "--name".'],
+                 'Error: Missing option "-n" / "--name".'],
       'rc': 2,
       'test': 'lines',
       'file': {'before': 'none', 'after': 'none'}},
