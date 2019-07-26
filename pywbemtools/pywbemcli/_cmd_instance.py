@@ -741,6 +741,13 @@ def cmd_instance_enumerate(context, classname, options):
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except ValueError as ve:
+        raise click.ClickException('instance enumerate failed because '
+                                   'FilterQuery not allowed with traditional '
+                                   'EnumerateInstance. use_pull_ops: '
+                                   '%s. Exception: %s: %s' %
+                                   (context.use_pull_ops,
+                                    ve.__class__.__name__, ve))
 
 
 def cmd_instance_references(context, instancename, options):
@@ -785,6 +792,13 @@ def cmd_instance_references(context, instancename, options):
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except ValueError as ve:
+        raise click.ClickException('instance references failed because '
+                                   'FilterQuery not allowed with traditional '
+                                   'References. use_pull_ops: '
+                                   '%s. Exception: %s: %s' %
+                                   (context.use_pull_ops,
+                                    ve.__class__.__name__, ve))
 
 
 def cmd_instance_associators(context, instancename, options):
@@ -828,6 +842,13 @@ def cmd_instance_associators(context, instancename, options):
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except ValueError as ve:
+        raise click.ClickException('instance associators failed because '
+                                   'FilterQuery not allowed with traditional '
+                                   'Associators. use_pull_ops: '
+                                   '%s. Exception: %s: %s' %
+                                   (context.use_pull_ops,
+                                    ve.__class__.__name__, ve))
 
 
 def cmd_instance_count(context, classname, options):
