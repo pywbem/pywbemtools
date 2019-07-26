@@ -23,7 +23,7 @@ import click
 from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
-    pick_instance, sort_cimobjects, resolve_propertylist, create_ciminstance, \
+    pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
     process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
@@ -720,8 +720,6 @@ def cmd_instance_enumerate(context, classname, options):
                 namespace=options['namespace'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options))
-            if options['sort']:
-                results = sort_cimobjects(results)
         else:
             results = context.conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
@@ -733,11 +731,9 @@ def cmd_instance_enumerate(context, classname, options):
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
-            if options['sort']:
-                results = sort_cimobjects(results)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -770,8 +766,6 @@ def cmd_instance_references(context, instancename, options):
                 Role=options['role'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options))
-            if options['sort']:
-                results = sort_cimobjects(results)
         else:
             results = context.conn.PyWbemcliReferenceInstances(
                 instancepath,
@@ -782,13 +776,9 @@ def cmd_instance_references(context, instancename, options):
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
-            if options['sort']:
-                results.sort(key=lambda x: x.classname)
-        if options['sort']:
-            results = sort_cimobjects(results)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -820,8 +810,6 @@ def cmd_instance_associators(context, instancename, options):
                 ResultRole=options['resultrole'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options))
-            if options['sort']:
-                results.sort()
         else:
             results = context.conn.PyWbemcliAssociatorInstances(
                 instancepath,
@@ -834,11 +822,9 @@ def cmd_instance_associators(context, instancename, options):
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 PropertyList=resolve_propertylist(options['propertylist']))
-            if options['sort']:
-                results.sort(key=lambda x: x.classname)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except (Error, ValueError) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -928,11 +914,8 @@ def cmd_instance_query(context, query, options):
                                                        query,
                                                        options['namespace'])
 
-        if options['sort']:
-            results.sort(key=lambda x: x.classname)
-
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

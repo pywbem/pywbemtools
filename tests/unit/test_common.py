@@ -29,7 +29,7 @@ from mock import patch
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint32, Uint64, Sint32, \
-    CIMDateTime
+    CIMDateTime, CIMClassName
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
@@ -776,6 +776,55 @@ class SorterTest(unittest.TestCase):
         self.assertEqual(len(classes), len(sorted_rslt))
         self.assertEqual(sorted_rslt[0].classname, 'CIM_Foo')
 
+    def test_sort_classnames(self):
+        """Test sorting list of list of CIMClassName"""
+
+        cln1 = CIMClassName("whoops", host="fred", namespace="root/cimv2")
+        cln2 = CIMClassName("blah", host="fred", namespace="root/cimv2")
+        cln3 = CIMClassName("blah", host="john", namespace="root/cimv2")
+        cln4 = CIMClassName("blah", host="fred", namespace="root/cimv3")
+
+        clns_in = [cln1, cln2, cln3, cln4]
+        clns_exp = [cln2, cln1, cln4, cln3]
+
+        sorted_rslt = sort_cimobjects(clns_in)
+
+        self.assertEqual(len(clns_in), len(sorted_rslt))
+        self.assertEqual(sorted_rslt, clns_exp)
+        for obj in sorted_rslt:
+            self.assertEqual(type(obj), CIMClassName)
+
+    def test_sort_class_ref_rtn(self):
+        """
+        Test the return from the class references and class associators
+        subcommands which is a tuple of CIMCLassName and CIMClass
+        """
+
+        cl1 = (CIMClass(
+            'CIM_Foo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        cl2 = (CIMClass(
+            'CIM_Boo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+        cl3 = (CIMClass(
+            'CID_Boo', properties={'InstanceID':
+                                   CIMProperty('InstanceID', None,
+                                               type='string')}))
+
+        cln1 = CIMClassName("CIM_Foo", host="fred", namespace="root/cimv2")
+        cln2 = CIMClassName("CIM_Boo", host="fred", namespace="root/cimv1")
+        cln3 = CIMClassName("CIM_Boo", host="john", namespace="root/cimv2")
+
+        input_tup = [(cln1, cl1), (cln2, cl2), (cln3, cl3)]
+        sorted_rslt = sort_cimobjects(input_tup)
+        print('SORTREF %r' % (sorted_rslt))
+        self.assertEqual(len(input_tup), len(sorted_rslt))
+        self.assertEqual(sorted_rslt[0][0], cln2)
+        self.assertEqual(sorted_rslt[1][0], cln1)
+        self.assertEqual(sorted_rslt[2][0], cln3)
+
     def test_sort_instancenames(self):
         """Test ability to sort list of instance names"""
 
@@ -801,7 +850,6 @@ class SorterTest(unittest.TestCase):
 
     def test_sort_instances(self):
         """Test sort of instances"""
-
         instances = []
 
         props = {'Chicken': CIMProperty('Chicken', 'Ham'),
@@ -830,7 +878,7 @@ class SorterTest(unittest.TestCase):
         # TODO create multiple and test result
 
     def test_sort_qualifierdecls(self):
-        """Test ability to sort list of instance names"""
+        """Test ability to sort list of qualifier declaractions"""
 
         qual_decls = []
 

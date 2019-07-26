@@ -338,38 +338,6 @@ def verify_operation(txt, msg=None):
     return False
 
 
-def sort_cimobjects(objects):
-    """
-    Sort CIMClasses, CIMQualifierDecls, CIMInstances or instance names.
-    Returns new list with the sorted objects.
-    """
-    if len(objects) < 2:
-        return objects
-    if isinstance(objects[0], CIMClass):
-        return sorted(objects, key=lambda class_: class_.classname)
-
-    sort_dict = {}
-    rtn_objs = []
-    if isinstance(objects[0], CIMInstanceName):
-        for instname in objects:
-            key = "%s" % instname
-            sort_dict[key] = instname
-    elif isinstance(objects[0], CIMInstance):
-        for inst in objects:
-            key = "%s" % inst.path
-            sort_dict[key] = inst
-    elif isinstance(objects[0], CIMQualifierDeclaration):
-        for qd in objects:
-            key = "%s" % qd.name
-            sort_dict[key] = qd
-    else:
-        raise TypeError('%s cannot be sorted' % type(objects[0]))
-
-    for key in sorted(sort_dict):
-        rtn_objs.append(sort_dict[key])
-    return rtn_objs
-
-
 def parse_wbemuri_str(wbemuri_str, namespace=None):
     """
     Parse a string that is a wbemuri into a CIMInstanceName object.  This method
@@ -736,6 +704,46 @@ def process_invokemethod(context, objectname, methodname, options):
             click.echo("%s=%s" % (param, params[param]))
 
 
+def sort_cimobjects(cim_objects):
+    """
+    Sort lists of CIMClass, CIMCLassName, CIMQualifierDecl, CIMInstance or
+    CIMInstanceName. Sorts based on name or CIMInstancename. Sorting is based
+    on the name value (name, classname, wbemuri(canonical form)
+    Returns new list with the sorted objects.  This was defined as a common
+    sort mechanism for all of the CIM object responses from WBEM servers.
+    """
+    if len(cim_objects) < 2:
+        return cim_objects
+
+    tst_obj = cim_objects[0]
+    # this covers lists of classnames from class enum -o
+    if isinstance(tst_obj, six.string_types):
+        return sorted(cim_objects)
+
+    if isinstance(tst_obj, CIMClass):
+        return sorted(cim_objects, key=lambda class_: class_.classname)
+
+    if isinstance(tst_obj, (CIMClassName, CIMInstanceName)):
+        sort_dict = {obj.to_wbem_uri(format="canonical"): obj
+                     for obj in cim_objects}
+    elif isinstance(tst_obj, CIMInstance):
+        sort_dict = {obj.path.to_wbem_uri(format="canonical"): obj
+                     for obj in cim_objects}
+    elif isinstance(tst_obj, CIMQualifierDeclaration):
+        sort_dict = {obj.name: obj for obj in cim_objects}
+    # Oddball case. In this case it is a tuple of CIMClassname,
+    # CIMClass from class references/associators
+    elif isinstance(tst_obj, tuple):
+        assert isinstance(tst_obj[0], CIMClassName)
+        assert isinstance(tst_obj[1], CIMClass)
+        sort_dict = {tup[0].to_wbem_uri(format="canonical"): tup for tup in
+                     cim_objects}
+    else:
+        raise TypeError('%s cannot be sorted' % type(cim_objects[0]))
+
+    return [sort_dict[key] for key in sorted(sort_dict.keys())]
+
+
 def display_cim_objects_summary(context, objects):
     """
     Display a summary of the objects received. This only displays the
@@ -760,7 +768,8 @@ def display_cim_objects_summary(context, objects):
         click.echo('0 objects returned')
 
 
-def display_cim_objects(context, objects, output_format=None, summary=False):
+def display_cim_objects(context, cim_objects, output_format=None, summary=False,
+                        sort=False):
     """
     Display CIM objects in form determined by input parameters.
 
@@ -804,25 +813,28 @@ def display_cim_objects(context, objects, output_format=None, summary=False):
     context.spinner.stop()
 
     if summary:
-        display_cim_objects_summary(context, objects)
+        display_cim_objects_summary(context, cim_objects)
         return
+
+    if sort:
+        cim_objects = sort_cimobjects(cim_objects)
 
     # default when displaying cim objects is mof
     output_format = context.output_format or 'mof'
 
-    if isinstance(objects, (list, tuple)):
+    if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
         if output_format in TABLE_FORMATS:
-            _print_objects_as_table(context, objects)
+            _print_objects_as_table(context, cim_objects)
         else:
             # Recursively call to display each object
-            for obj in objects:
+            for obj in cim_objects:
                 display_cim_objects(context, obj,
                                     output_format=context.output_format)
         return
 
     # Display a single item.
-    object_ = objects
+    object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format in TABLE_FORMATS:
         _print_objects_as_table(context, [object_])

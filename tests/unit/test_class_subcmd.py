@@ -422,8 +422,8 @@ class TST_MemberOfFamilyCollection {
 """
 
 
-OK = True  # mark tests OK when they execute correctly
-RUN = True  # Mark OK = False and current test case being created RUN
+OK = True     # mark tests OK when they execute correctly
+RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
 # pylint: enable=line-too-long
