@@ -795,7 +795,7 @@ def cmd_instance_references(context, instancename, options):
     except ValueError as ve:
         raise click.ClickException('instance references failed because '
                                    'FilterQuery not allowed with traditional '
-                                   'EnumerateInstance. use_pull_ops: '
+                                   'References. use_pull_ops: '
                                    '%s. Exception: %s: %s' %
                                    (context.use_pull_ops,
                                     ve.__class__.__name__, ve))
@@ -845,7 +845,7 @@ def cmd_instance_associators(context, instancename, options):
     except ValueError as ve:
         raise click.ClickException('instance associators failed because '
                                    'FilterQuery not allowed with traditional '
-                                   'EnumerateInstance. use_pull_ops: '
+                                   'Associators. use_pull_ops: '
                                    '%s. Exception: %s: %s' %
                                    (context.use_pull_ops,
                                     ve.__class__.__name__, ve))
