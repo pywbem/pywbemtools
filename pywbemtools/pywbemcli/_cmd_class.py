@@ -390,8 +390,6 @@ def cmd_class_enumerate(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 DeepInheritance=options['deepinheritance'])
-            if options['sort']:
-                results.sort()
         else:
             results = context.conn.EnumerateClasses(
                 ClassName=classname,
@@ -400,11 +398,9 @@ def cmd_class_enumerate(context, classname, options):
                 DeepInheritance=options['deepinheritance'],
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'])
-            if options['sort']:
-                results.sort(key=lambda x: x.classname)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -423,8 +419,6 @@ def cmd_class_references(context, classname, options):
                 classname,
                 ResultClass=options['resultclass'],
                 Role=options['role'])
-            if options['sort']:
-                results.sort()
         else:
             results = context.conn.References(
                 classname,
@@ -433,11 +427,9 @@ def cmd_class_references(context, classname, options):
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
-            if options['sort']:
-                results.sort(key=lambda x: x[1].classname)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -458,8 +450,6 @@ def cmd_class_associators(context, classname, options):
                 Role=options['role'],
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'])
-            if options['sort']:
-                results.sort()
         else:
             results = context.conn.Associators(
                 classname,
@@ -470,11 +460,9 @@ def cmd_class_associators(context, classname, options):
                 IncludeQualifiers=options['includequalifiers'],
                 IncludeClassOrigin=options['includeclassorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
-            if options['sort']:
-                results.sort(key=lambda x: x[1].classname)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'])
+                            summary=options['summary'], sort=options['sort'])
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

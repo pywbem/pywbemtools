@@ -24,7 +24,7 @@ import click
 from pywbem import Error
 from .pywbemcli import cli
 from ._common import display_cim_objects, CMD_OPTS_TXT, \
-    output_format_is_table
+    output_format_is_table, sort_cimobjects
 from ._common_options import namespace_option, add_options, \
     summary_objects_option
 
@@ -108,10 +108,8 @@ def cmd_qualifier_enumerate(context, options):
     Execute the command for enumerate qualifiers and desplay the result.
     """
     try:
-        qual_decls = context.conn.EnumerateQualifiers(
-            namespace=options['namespace'])
-
-        qual_decls.sort(key=lambda x: x.name)
+        qual_decls = sort_cimobjects(context.conn.EnumerateQualifiers(
+            namespace=options['namespace']))
 
         display_cim_objects(context, qual_decls, context.output_format,
                             summary=options['summary'])
