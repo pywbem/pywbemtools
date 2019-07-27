@@ -1157,7 +1157,7 @@ The following defines the help output for the `pywbemcli instance create --help`
 
     Options:
       -P, --property name=value  Optional property definitions of the form
-                                 name=value.Multiple definitions allowed, one for
+                                 name=value. Multiple definitions allowed, one for
                                  each property to be included in the
                                  createdinstance. Array property values defined by
                                  comma-separated-values. EmbeddedInstance not
@@ -1436,8 +1436,8 @@ The following defines the help output for the `pywbemcli instance modify --help`
 
     Options:
       -P, --property name=value       Optional property definitions of the form
-                                      name=value.Multiple definitions allowed, one
-                                      for each property to be included in the
+                                      name=value. Multiple definitions allowed,
+                                      one for each property to be included in the
                                       createdinstance. Array property values
                                       defined by comma-separated-values.
                                       EmbeddedInstance not allowed.

@@ -419,13 +419,13 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify connection subcommand add with complex options.',
+    ['Verify connection subcommand add with complex options and verify',
      ['add', '--name', 'test2', '-s', 'http://blahblah', '-u', 'fred', '-p',
-      'argh', '-t', '18', '-N', '-l', 'api=file,all'],
-     {'stdout': "",
-      'test': 'lines',
+      'argh', '-t', '18', '-N', '-l', 'api=file,all', '--verify'],
+     {'stdout': "Execute add connection",
+      'test': ['test2', 'Execute add connection'],
       'file': {'before': 'exists', 'after': 'exists'}},
-     None, OK],
+     MOCK_CONFIRMY_FILE, OK],
 
     ['Verify connection subcommand show  ',
      ['show', 'test1'],
@@ -462,11 +462,17 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-
     ['Verify connection subcommand select test2',
      ['select', 'test2'],
-     {'stdout': [""],
-      'test': 'in'},
+     {'stdout': "",
+      'test': 'regex'},
+     None, OK],
+
+    ['Verify connection subcommand select test2',
+     ['select', 'test9'],
+     {'stderr': ['Connection name "test9" does not exist'],
+      'rc': 1,
+      'test': 'regex'},
      None, OK],
 
     ['Verify connection subcommand list  with 2 servers defined, not sel after '
@@ -530,6 +536,22 @@ TEST_CASES = [
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
+     None, OK],
+
+    ['Verify connection subcommand with duplicate name fails.',
+     ['add', '--name', 'addallargs',
+      '--server', 'http://blah',
+      '--default_namespace', 'root/blah',
+      '--user', 'john',
+      '--password', 'pw',
+      '--timeout', '30',
+      '--noverify',
+      '--certfile', 'mycertfile.pem',
+      '--keyfile', 'mykeyfile.pem', ],
+     {'stderr': 'Connection name "addallargs" already defined',
+      'rc': 1,
+      'test': 'in',
+      'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
     ['Verify connection subcommand show with all params',
@@ -717,8 +739,9 @@ TEST_CASES = [
     #
     #  Verify Create from mock with cmd line params, save, show, delete works
     #
-    ['Verify save mock server with cmd line params to empty connections file.',
-     {'args': ['save'],
+    ['Verify save server with cmd line params to empty connections file. Use '
+     '--verify',
+     {'args': ['save', '--verify'],
       'global': ['--name', 'svrtest2',
                  '--server', 'http://blah',
                  '--timeout', '45',
@@ -730,9 +753,9 @@ TEST_CASES = [
                  '--certfile', 'mycertfile.pem',
                  '--keyfile', 'mykeyfile.pem']},
      {'stdout': "",
-      'test': 'lines',
+      'test': 'in',
       'file': {'before': 'none', 'after': 'exists'}},
-     None, OK],
+     MOCK_CONFIRMY_FILE, OK],
 
     ['Verify save mock server with cmd line params to empty connections file.',
      {'args': ['save'],
@@ -751,7 +774,6 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-
     ['Verify connection subcommand shows mock file ',
      ['show', 'mocktest2'],
      {'stdout': [
@@ -764,7 +786,6 @@ TEST_CASES = [
       'test': 'regex',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
-
 
     ['Verify connection subcommand shows svrtest2 ',
      ['show', 'svrtest2'],
@@ -788,8 +809,7 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand delete works'
-     'verify',
+    ['Verify connection subcommand delete works',
      ['delete', 'svrtest2'],
      {'stdout': "",
       'test': 'regex',

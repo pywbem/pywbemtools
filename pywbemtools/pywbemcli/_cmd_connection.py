@@ -421,7 +421,7 @@ def cmd_connection_select(context, name):
             parent_ctx = parent_ctx.parent
     else:
         raise click.ClickException(
-            '%s not a defined connection name' % name)
+            'Connection name "%s" does not exist' % name)
 
 
 def cmd_connection_delete(context, name, options):
@@ -472,7 +472,8 @@ def cmd_connection_add(context, options):
     server = options['server']
     connections = ConnectionRepository()
     if name in connections:
-        raise click.ClickException('%s is already defined as a server' % name)
+        raise click.ClickException('Connection name "%s" already defined'
+                                   % name)
 
     try:
         new_server = PywbemServer(server, options['default_namespace'],
@@ -494,7 +495,7 @@ def cmd_connection_add(context, options):
     if options['verify']:
         click.echo(show_connection_information(context, new_server,
                                                separate_line=False))
-        if not verify_operation("Execute add operation", msg=True):
+        if not verify_operation("Execute add connection", msg=True):
             return
 
     connections.add(name, new_server)

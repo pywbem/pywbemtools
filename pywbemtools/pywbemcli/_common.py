@@ -273,15 +273,16 @@ def is_classname(str_):
 
 def filter_namelist(pattern, name_list, ignore_case=True):
     """
-    Filter out names in name_list that do not match compiled_regex.
+    Filter out names in name_list that do not match glob pattern compiled
+    as regex.
 
     The regex is defines as IGNORECASE and anchored.
 
     Note that the regex may define a subset of the name string.  Thus,  regex:
-        - CIM matches any name that starts with CIM
-        - CIM_abc matches any name that starts with CIM_abc
-        - CIM_ABC$ matches only the name CIM_ABC.
-        - .*ABC matches any name that includes ABC
+        - CIM* matches any name that starts with CIM
+        - CIM_abc* matches any name that starts with CIM_abc
+        - CIM_ABC matches only the name CIM_ABC.
+        - *ABC matches any name that includes ABC
 
     Parameters:
       pattern (:term: `String`) Python glob pattern to match.
@@ -300,6 +301,7 @@ def filter_namelist(pattern, name_list, ignore_case=True):
     flags = re.IGNORECASE if ignore_case else None
     # compile the regex since it used multiple times
     try:
+        # Convert the glob input to regex.
         regex = fnmatch.translate(pattern)
         compiled_regex = re.compile(regex, flags)
 
@@ -603,34 +605,41 @@ def parse_kv_pair(pair):
 def split_array_value(string, delimiter):
     """Simple split of a string based on a delimiter"""
 
-    rslt = [item for item in split_value_str(string, delimiter)]
+    rslt = [item for item in split_str_w_esc(string, delimiter)]
     return rslt
 
 
-def split_value_str(string, delimiter):
+def split_str_w_esc(str, delimiter, escape='\\'):
     """
-    Split a string based on a delimiter character bypassing escaped
-    instances of the delimiter.  This is a generator function in that
-    it yields each time it separates a value.
-
-    Delimiter must be single character.
+    Split string based on delimiter defined in call and the escape character \\
+    To escape use of the delimiter in the strings. Delimiter may be multi
+    character.
+    Returns list of elements split from the input str
     """
-    if len(delimiter) != 1:
-        raise ValueError('Invalid delimiter: ' + delimiter)
-    ln = len(string)
-    i = 0
-    j = 0
-    while j < ln:
-        if string[j] == '\\':
-            if j + 1 >= ln:
-                yield string[i:j]
-                return
-            j += 1
-        elif string[j] == delimiter:
-            yield string[i:j]
-            i = j + 1
-        j += 1
-    yield string[i:j]
+    ret = []
+    current_element = []
+    iterator = iter(str)
+    for ch in iterator:
+        if ch == escape:
+            try:
+                next_character = next(iterator)
+                # Do not copy escape character if intended to escape either the
+                # delimiter or the escape character itself. Copy the escape
+                # character if it is not in use to escape one of these
+                # characters.
+                if next_character != delimiter and next_character != escape:
+                    current_element.append(escape)
+                current_element.append(next_character)
+            except StopIteration:
+                current_element.append(escape)
+        elif ch == delimiter:
+            # split! (add current to the list and reset it)
+            ret.append(''.join(current_element))
+            current_element = []
+        else:
+            current_element.append(ch)
+    ret.append(''.join(current_element))
+    return ret
 
 
 def get_cimtype(objects):
@@ -650,7 +659,7 @@ def get_cimtype(objects):
 
     if isinstance(test_object, tuple):
         # associator or reference class level return is tuple
-        cim_type = test_object[1].__class__.__name__
+        cim_type = test_object[0].__class__.__name__
     else:
         cim_type = test_object.__class__.__name__
 
@@ -982,7 +991,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
     for inst in insts:
         if not isinstance(inst, CIMInstance):
-            raise ValueError('Only  Accepts CIMInstance. not type %s' %
+            raise ValueError('Only accepts CIMInstance; not type %s' %
                              type(inst))
 
         # Insert classname as first col if flag set
@@ -1197,9 +1206,6 @@ def _scalar_value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
         * new line_pos
     """  # noqa: E501
 
-    if value is None:
-        return mofval(u'NULL', indent, maxline, line_pos, end_space)
-
     if type == 'string':  # pylint: disable=no-else-raise
         if isinstance(value, six.string_types):
             return mofstr(value, indent, maxline, line_pos, end_space,
@@ -1282,7 +1288,7 @@ def _value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
         for i, v in enumerate(value):
 
             if i > 0:
-                # Assume we would add comma and space as separator
+                # Assume comma and space as separator
                 line_pos += 2
 
             val_str, line_pos = _scalar_value_tomof(
@@ -1311,7 +1317,7 @@ def _value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
 def hide_empty_columns(headers, rows):
     """
     Removes columns from rows if the colmuns are considered empty.
-    The definiton of an empty row is"
+    The definiton of an empty row is:
     1. All entries for the column in all rows are None or "" if type string.
     2. All entries for the column in all rows are None if number.
 
