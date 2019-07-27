@@ -27,6 +27,11 @@ import pytest
 import click
 from mock import patch
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  # pylint: disable=import-error
+
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint32, Uint64, Sint32, \
     CIMDateTime, CIMClassName
@@ -34,7 +39,8 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
-    pick_one_from_list, pick_multiple_from_list, hide_empty_columns
+    pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
+    verify_operation, split_str_w_esc
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._common import pywbemcli_prompt  # noqa: F401
 from pywbemtools.pywbemcli._context_obj import ContextObj
@@ -47,10 +53,11 @@ DATETIME1_DT = datetime(2014, 9, 22, 10, 49, 20, 524789)
 DATETIME1_OBJ = CIMDateTime(DATETIME1_DT)
 DATETIME1_STR = '"20140922104920.524789+000"'
 
-OK = True  # mark tests OK when they execute correctly
-RUN = True  # Mark OK = False and current test case being created RUN
+OK = True     # mark tests OK when they execute correctly
+RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
+
 
 TESTCASES_ISCLASSNAME = [
     # TESTCASES for resolve_propertylist
@@ -191,9 +198,6 @@ TESTCASES_HIDE_EMPTY_COLUMNS = [
                             ['9']],
                    'headers': ['h3']}),
      None, None, True),
-
-
-
 ]
 
 
@@ -213,6 +217,92 @@ def test_hide_empty_columns(testcase, rows, headers, exp_rtn):
 
     assert act_rtn_rows == exp_rtn['rows']
     assert act_rtn_headrs == exp_rtn['headers']
+
+
+TESTCASES_SPLIT_STR = [
+    # TESTCASES for split_value_str
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * input_str: string to split
+    #   * delimiter: split delimiter
+    #   * exp_rtn: expected list of strings returned
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify simple split',
+     dict(input_str="abc,def,ijk",
+          delimiter=',',
+          exp_rtn=['abc', 'def', 'ijk']),
+     None, None, True),
+
+    ('Verify simple split empty entry',
+     dict(input_str="abc,,ijk",
+          delimiter=',',
+          exp_rtn=['abc', '', 'ijk']),
+     None, None, True),
+
+    ('Verify string with escape',
+     dict(input_str="abc,de\\,f,ijk",
+          delimiter=',',
+          exp_rtn=['abc', 'de,f', 'ijk']),
+     None, None, True),
+
+    ('Verify string with double escape',
+     dict(input_str="abc,de\\,f,ijk",
+          delimiter=',',
+          exp_rtn=['abc', 'de,f', 'ijk']),
+     None, None, True),
+
+    ('Verify string with escape that should be ignored',
+     dict(input_str="abc,de\\xf,ijk",
+          delimiter=',',
+          exp_rtn=['abc', 'de\\xf', 'ijk']),
+     None, None, True),
+
+    ('Verify string with trailingescape that should be ignored',
+     dict(input_str="abc,def,ijk\\",
+          delimiter=',',
+          exp_rtn=['abc', 'def', 'ijk\\']),
+     None, None, True),
+
+    ('Verify string with leading escape that should be ignored',
+     dict(input_str="\\abc,def,ijk",
+          delimiter=',',
+          exp_rtn=['\\abc', 'def', 'ijk']),
+     None, None, True),
+
+    ('Verify string with leading escape',
+     dict(input_str="\\,abc,def,ijk",
+          delimiter=',',
+          exp_rtn=[',abc', 'def', 'ijk']),
+     None, None, True),
+
+    ('Verify string with multiple escape',
+     dict(input_str="\\,abc\\,,def,\\,ijk",
+          delimiter=',',
+          exp_rtn=[',abc,', 'def', ',ijk']),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_SPLIT_STR)
+@simplified_test_function
+def test_split_str(testcase, input_str, delimiter, exp_rtn):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    act_result = [item for item in split_str_w_esc(input_str, delimiter)]
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_result == exp_rtn
 
 
 TESTCASES_PICK_ONE_FROM_LIST = [
@@ -496,11 +586,63 @@ TESTCASES_COMPARE_INSTANCES = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_COMPARE_INSTANCES)
 @simplified_test_function
-def test_compareinstances(testcase, inst1, inst2, result):
+def test_compare_instances(testcase, inst1, inst2, result):
     """Test for _common compare_instances function"""
     # The code to be tested
 
     rtn = compare_instances(inst1, inst2)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert rtn == result
+
+
+# TODO: The mock for the following test is broken. Not sure yet how to
+# fix it
+TESTCASES_VERIFY_OPERATION = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * txt: Text that would be fdisplayed
+    #   * abort_msg: message that outputs with abort if response is n
+    #   * result: True or False
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify response y',
+     dict(txt="blah",
+          abort_msg=None,
+          result=True),
+     None, None, True),
+
+    ('Verify response n',
+     dict(txt="blahno",
+          abort_msg=None,
+          result=False),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_VERIFY_OPERATION)
+@simplified_test_function
+def test_verify_operation(testcase, txt, abort_msg, result):
+    """
+    This method mocks the click.click_confirm function to generate a response
+    to the verify operation function
+    """
+    @patch('pywbemtools.pywbemcli.click.confirm', return_value=result)
+    def test_verify_operation(txt, test_patch):
+        return verify_operation(txt)
+
+    # The code to be tested
+    rtn = test_verify_operation(txt)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -819,7 +961,6 @@ class SorterTest(unittest.TestCase):
 
         input_tup = [(cln1, cl1), (cln2, cl2), (cln3, cl3)]
         sorted_rslt = sort_cimobjects(input_tup)
-        print('SORTREF %r' % (sorted_rslt))
         self.assertEqual(len(input_tup), len(sorted_rslt))
         self.assertEqual(sorted_rslt[0][0], cln2)
         self.assertEqual(sorted_rslt[1][0], cln1)
@@ -896,6 +1037,12 @@ class SorterTest(unittest.TestCase):
         self.assertEqual(sorted_rslt[0].name, 'FooQualDecl1')
         self.assertEqual(sorted_rslt[1].name, 'FooQualDecl2')
         self.assertEqual(sorted_rslt[2].name, 'FooQualDecl3')
+
+    def test_sort_stringss(self):
+        """Test ability to sort list of qualifier declaractions"""
+        inputs = ['xyz', 'abc']
+        sorted_rslt = sort_cimobjects(inputs)
+        self.assertEqual(sorted_rslt, ['abc', 'xyz'])
 
 
 # TODO: move this to pytest
@@ -1391,6 +1538,49 @@ TESTCASES_FMT_INSTANCE_AS_ROWS = [
         ),
         None, None, True, ),
 
+    (
+        "Verify char16 property",
+        dict(
+            args=([CIMInstance('P', [CIMProperty('P',
+                                                 type='char16',
+                                                 value='f')])], 4),
+            kwargs=dict(),
+            exp_rtn=[[u"'f'"]],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify properties with no value",
+        dict(
+            args=([CIMInstance('P', [CIMProperty('P', value=None,
+                                                 type='char16'),
+                                     CIMProperty('Q', value=None,
+                                                 type='uint32'),
+                                     CIMProperty('R', value=None,
+                                                 type='string'), ])], 4),
+            kwargs=dict(),
+            exp_rtn=[[u'', u'', u'']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify format of instance with reference property as row entry",
+        dict(
+            args=([CIMInstance("TST_REFPROP",
+                               [CIMProperty(
+                                   'P',
+                                   type='reference',
+                                   reference_class="blah",
+                                   value=CIMInstanceName(
+                                       "REF_CLN",
+                                       keybindings=OrderedDict(k1='v1')))])],
+                  30),
+            kwargs=dict(),
+            exp_rtn=[
+                [u'"/:REF_CLN.k1=\\"v1\\""']],
+        ),
+        None, None, True, ),
+
 ]
 
 # TODO: See line 973. We have some test duplication.
@@ -1441,7 +1631,7 @@ def test_format_insts_as_rows(testcase, args, kwargs, exp_rtn):
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-TESTCASES_FMT_INSTANCE_AS_TABLE = [
+TESTCASES_PRINT_INSTANCE_AS_TABLE = [
     (
         "Verify print of simple instance to table",
         dict(
@@ -1468,12 +1658,30 @@ TESTCASES_FMT_INSTANCE_AS_TABLE = [
                 ["true", "false", "99", '"Test String"']],
         ),
         None, None, True, ),
+    (
+        "Verify print of instance with reference property",
+        dict(
+            args=([CIMInstance("CIM_Foo",
+                               [CIMProperty(
+                                   'P',
+                                   type='reference',
+                                   reference_class="blah",
+                                   value=CIMInstanceName(
+                                       "REF_CLN",
+                                       keybindings=OrderedDict(k1='v1',
+                                                               k2=32)))])],
+                  80, 'simple'),
+            kwargs=dict(),
+            exp_tbl=[
+                ["/:REF_CLN.k2=32,k1=\"v1\""]],
+        ),
+        None, None, True, ),
 ]
 
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_FMT_INSTANCE_AS_TABLE)
+    TESTCASES_PRINT_INSTANCE_AS_TABLE)
 @simplified_test_function
 def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
     """
@@ -1494,7 +1702,7 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
     # are not mistaken as expected exceptions
     assert testcase.exp_exc_types is None
 
-    # assert_lines(exp_tbl, stdout, testcase.desc)
+    # assertexp_tbl, stdout, testcase.desc)
 
 
 # TODO Test compare and failure in compare_obj

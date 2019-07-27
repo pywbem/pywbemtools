@@ -75,7 +75,7 @@ instance_property_option = [              # pylint: disable=invalid-name
     click.option('-P', '--property', type=str, metavar='name=value',
                  required=False,
                  multiple=True,
-                 help='Optional property definitions of the form name=value.'
+                 help='Optional property definitions of the form name=value. '
                  'Multiple definitions allowed, one for each property to be '
                  'included in the createdinstance. Array property values '
                  'defined by comma-separated-values. EmbeddedInstance not '
@@ -511,17 +511,13 @@ def get_instancename(context, instancename, options):
     """
     try:
         if options['interactive']:
-            if 'namespace' in options:
-                ns = options['namespace']
-            else:
-                ns = None
+            ns = options.get('namespace', context.conn.default_namespace)
 
-            if ns is None:
-                ns = context.conn.default_namespace
             try:
                 instancepath = pick_instance(context, instancename,
                                              namespace=ns)
                 return instancepath
+
             except ValueError:
                 click.echo('Function aborted')
                 return None
@@ -613,7 +609,7 @@ def cmd_instance_create(context, classname, options):
     if options['verify']:
         context.spinner.stop()
         click.echo(new_inst.tomof())
-        if not verify_operation("Execute CreateInstance operation"):
+        if not verify_operation("Execute CreateInstance", msg=True):
             return
     try:
         name = context.conn.CreateInstance(new_inst,
@@ -652,7 +648,7 @@ def cmd_instance_modify(context, instancename, options):
             raise click.ClickException('CIMClass: %r does not exist in WEB '
                                        'server: %s'
                                        % (instancepath.classname,
-                                          context.conn.uri))
+                                          context.conn.url))
 
         raise click.ClickException('Exception %s' % ce)
     except Error as er:
@@ -668,7 +664,7 @@ def cmd_instance_modify(context, instancename, options):
     if options['verify']:
         context.spinner.stop()
         click.echo(modified_inst.tomof())
-        if not verify_operation("Execute ModifyInstance operation", msg=True):
+        if not verify_operation("Execute ModifyInstance", msg=True):
             return
 
     try:
@@ -910,7 +906,7 @@ def cmd_instance_query(context, query, options):
     """Execute the query defined by the inputs"""
 
     try:
-        results = context.conn.pyWbemcliQueryInstances(options['querylanguage'],
+        results = context.conn.PyWbemcliQueryInstances(options['querylanguage'],
                                                        query,
                                                        options['namespace'])
 

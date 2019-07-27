@@ -27,8 +27,9 @@ SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
-MOCK_PROMPT1_FILE = "mock_prompt_0.py"
-
+MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
+MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
+MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
 INST_HELP = """
 Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
@@ -532,6 +533,30 @@ Options:
   -h, --help                  Show this message and exit.
 """
 
+INST_QUERY_HELP = """
+Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY_STRING
+
+  Execute an execquery request.
+
+  Executes a query request on the target WBEM Server with the QUERY_STRING
+  argument and query language options.
+
+  The results of the query are displayed as mof or xml.
+
+  Results are formatted as defined by the --output_format general option.
+
+Options:
+  -l, --querylanguage QUERY LANGUAGE
+                                  Use the query language defined. (Default:
+                                  DMTF:CQL.
+  -n, --namespace <name>          Namespace to use for this operation. If
+                                  defined that namespace overrides the general
+                                  options namespace
+  -s, --sort                      Sort into alphabetical order by classname.
+  -S, --summary                   Return only summary of objects (count).
+  -h, --help                      Show this message and exit.
+"""
+
 ENUM_INST_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
    IntegerProp = 1;
@@ -645,7 +670,7 @@ instance of TST_FamilyCollection {
 
 # pylint: enable=line-too-long
 
-OK = True     # mark tests OK when they execute correctly
+OK = True    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -693,7 +718,13 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate names CIM_Foo -o -s',
-     ['enumerate', 'CIM_Foo', '-o', '-s'],
+     ['enumerate', 'CIM_Foo', '-o', '--summary'],
+     {'stdout': ['3 CIMInstanceName(s) returned'],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate names CIM_Foo -o --namespace',
+     ['enumerate', 'CIM_Foo', '-o', '--namespace', 'root/cimv2'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
@@ -701,7 +732,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate names CIM_Foo -o --sort',
-     ['enumerate', 'CIM_Foo', '-o', '--sort'],
+     ['enumerate', 'CIM_Foo', '--names-only', '--sort'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
@@ -722,7 +753,6 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify instance subcommand enumerate deepinheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout': ENUM_INST_RESP,
@@ -738,17 +768,59 @@ TEST_CASES = [
 
     ['Verify instance subcommand -o grid enumerate deepinheritance CIM_Foo -d',
      {'args': ['enumerate', 'CIM_Foo', '-d'],
-      'global': ['-o', 'grid']},
+      'global': ['--output-format', 'grid']},
      {'stdout': ENUM_INST_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
      {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
-      'global': ['-o', 'grid']},
+      'global': ['--output-format', 'grid']},
      {'stdout': ENUM_INSTNAME_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
+     {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
+      'global': ['--output-format', 'txt']},
+     {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"'],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
+     {'args': ['enumerate', 'CIM_Foo'],
+      'global': ['--output-format', 'txt']},
+     {'stdout': ["CIMInstance(classname='CIM_Foo', "
+                 "path=CIMInstanceName(classname='CIM_Foo', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo1'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo', "
+                 "path=CIMInstanceName(classname='CIM_Foo', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo2'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo', "
+                 "path=CIMInstanceName(classname='CIM_Foo', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo3'}), "
+                 "namespace='root/cimv2', host=None), ...)"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand -o grid enumerate di alltypes, datetime',
+     {'args': ['enumerate', 'Pywbem_Alltypes', '-d',
+               '--propertylist', 'scalDateTime', '-p', 'scalTimeDelta'],
+      'global': ['--output-format', 'grid']},
+     {'stdout': ["""Instances: PyWBEM_AllTypes
++-----------------------------+
+| scalDateTime                |
++=============================+
+| "19991224120000.000000+360" |
++-----------------------------+
+"""],
+      'test': 'linesnows'},
+     ALLTYPES_MOCK_FILE, OK],
 
     # TODO: modify this to output log and test for info in return and log
 
@@ -766,6 +838,75 @@ TEST_CASES = [
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify subcommand enumerate with CIM_Foo summary table output',
+     {'args': ['enumerate', 'CIM_Foo', '--names-only'],
+      'global': ['--output-format', 'table']},
+     {'stdout': """InstanceNames: CIM_Foo
++--------+-------------+----------------------------------------+
+| host   | namespace   | keybindings                            |
+|--------+-------------+----------------------------------------|
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo1'}) |
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo2'}) |
+|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo3'}) |
++--------+-------------+----------------------------------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify subcommand enumerate with CIM_Foo summary table output',
+     {'args': ['enumerate', 'CIM_Foo', '--summary'],
+      'global': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstance returned
++---------+-------------+
+|   Count | CIM Type    |
+|---------+-------------|
+|       3 | CIMInstance |
++---------+-------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO the following uses deepinheritance because of issue in pywbem_mock
+    ['Verify subcommand enumerate with PyWBEM_AllTypes table with scalar '
+     'properties returns instance with all property types',
+     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deepinheritance',
+               '--propertylist',
+               'instanceid,scalbool,scaluint32,scalsint32'],
+      'global': ['--output-format', 'grid']},
+     {'stdout': """
+Instances: PyWBEM_AllTypes
++-----------------+------------+--------------+--------------+
+| InstanceId      | scalBool   |   scalUint32 |   scalSint32 |
++=================+============+==============+==============+
+| "test_instance" | true       |         9999 |        -9999 |
++-----------------+------------+--------------+--------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify subcommand enumerate with PyWBEM_AllTypes with array properties '
+     'returns instance with all property types',
+     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deepinheritance',
+               '--propertylist',
+               'instanceid,arraybool,arrayuint32,arraysint32'],
+      'global': ['--output-format', 'grid']},
+     {'stdout': """
+Instances: PyWBEM_AllTypes
++-----------------+-------------+---------------+---------------+
+| InstanceId      | arrayBool   | arrayUint32   | arraySint32   |
++=================+=============+===============+===============+
+| "test_instance" | true, false | 0, 9999       | 0, -9999      |
++-----------------+-------------+---------------+---------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ALLTYPES_MOCK_FILE, OK],
 
     #
     # instance enumerate error returns
@@ -785,13 +926,30 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate fails invalid query language',
-     ['enumerate', '--filterquerylanguage', 'blah',
-      '--filterquery', 'InstanceID = 3'],
+    ['Verify instance subcommand enumerate error, invalid namespace',
+     ['enumerate', 'CIM_Foo', '--namespace', 'root/blah'],
      {'stderr':
-      ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
-      'rc': 2,
+      ["CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not exist in "
+       "mock repository: 'root/blah'", ],
+      'rc': 1,
       'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate fails invalid query language',
+     ['enumerate', 'CIM_Foo', '--filterquerylanguage', 'blah',
+      '--filterquery', 'InstanceID = 3'],
+     {'stderr': ['CIMError', '14', 'CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate fails using traditional op',
+     {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+      'global': ['--use-pull-ops', 'no']},
+     {'stderr':
+      ['ValueError', 'EnumerateInstances does not support FilterQuery'],
+      'rc': 1,
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -807,6 +965,17 @@ TEST_CASES = [
 
     ['Verify instance subcommand get with instancename returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand get with instancename, namespace returns data',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -922,7 +1091,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with instancename PyWBEM_AllTypes'
-     ' returns innstance with all property types',
+     ' returns instance with all property types',
      ['get', 'PyWBEM_AllTypes.InstanceID="test_instance"'],
      {'stdout': GET_INST_ALL_TYPES,
       'rc': 0,
@@ -943,7 +1112,7 @@ TEST_CASES = [
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand get with interactive option',
      ['get', 'TST_Person', '--interactive'],
@@ -952,7 +1121,7 @@ TEST_CASES = [
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     #
     #  get subcommand errors
@@ -964,6 +1133,27 @@ TEST_CASES = [
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['instance subcommand get error. invalid namespace',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
+      '--namespace', 'root/invalidnamespace'],
+     {'stderr':
+      ['CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not exist'
+       " in mock repository: 'root/invalidnamespace'", ],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand get with none existentinstancename',
+     ['get', 'CIM_Foo.InstanceID="CIM_NOTEXIST"'],
+     {'stderr': ["Error: CIMError: 6 (CIM_ERR_NOT_FOUND): Instance not found "
+                 "in repository namespace 'root/cimv2'. Path=CIMInstanceName("
+                 "classname='CIM_Foo', keybindings=NocaseDict({'InstanceID': "
+                 "'CIM_NOTEXIST'}), namespace='root/cimv2', host=None)"],
+      'rc': 1,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     #
     #  instance create subcommand
     #
@@ -974,21 +1164,43 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo  one property',
+    ['Verify instance subcommand create, new instance of CIM_Foo one property',
      ['create', 'CIM_Foo', '-P', 'InstanceID=blah'],
      {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand create, new instance of CIM_Foo one '
+     'property and verify yes',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     {'stdout': ['instance of CIM_Foo {',
+                 'InstanceID = "blah";',
+                 'root/cimv2:CIM_Foo.InstanceID="blah"',
+                 'Execute CreateInstance'],
+      'rc': 0,
+      'test': 'in '},
+     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
+
+    ['Verify instance subcommand create, new instance of CIM_Foo one '
+     'property and verify no',
+     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     {'stdout': ['instance of CIM_Foo {',
+                 'InstanceID = "blah";',
+                 'root/cimv2:CIM_Foo.InstanceID="blah"',
+                 'Execute CreateInstance'
+                 'Request aborted'],
+      'rc': 0,
+      'test': 'in '},
+     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
+
     ['Verify instance subcommand create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
      ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '-n', 'root/cimv2'],
-     {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
+     {'stdout': "",
       'rc': 0,
-      'test': 'lines'},
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
-
 
     # This test skipped because click stdin broken
     ['Verify create, get, delete works with stdin',
@@ -1031,7 +1243,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
-    # TODO create more valid create instance tests, i.e. datetime
 
     ['Verify instance subcommand create, new instance Error in Property Type'
      " with array values",
@@ -1053,8 +1264,7 @@ TEST_CASES = [
     ['Verify instance subcommand create, new instance already exists',
      ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance'],
      {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
-                 'namespace "root/cimv2" in WEB server: FakedWBEMConnection'
-                 ],
+                 'namespace "root/cimv2" in WEB server: FakedWBEMConnection'],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -1096,6 +1306,29 @@ TEST_CASES = [
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
+    ['Verify instance subcommand modify, single good change with verify yes',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=False', '--verify'],
+     {'stdout': ['instance of PyWBEM_AllTypes {',
+                 'scalBool = false;',
+                 '};',
+                 'Execute ModifyInstance'],
+      'rc': 0,
+      'test': 'linesnows'},
+     [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
+
+    ['Verify instance subcommand modify, single good change with verify no',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'scalBool=False', '--verify'],
+     {'stdout': ['instance of PyWBEM_AllTypes {',
+                 'scalBool = false;',
+                 'Execute ModifyInstance',
+                 'Request aborted'],
+      'rc': 0,
+      'test': 'regex'},
+     [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
+
+
     ['Verify instance subcommand modify, single good change, explicit ns',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
       'root/cimv2', '-P', 'scalBool=False'],
@@ -1124,12 +1357,35 @@ TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
+    #
+    # Instance modify errors
+    #
+    ['Verify instance subcommand modify, invalid class',
+     ['modify', 'PyWBEM_AllTypesxxx.InstanceID="test_instance"',
+      '-P', 'scalBool=9'],
+     {'stderr': ["CIMClass:", "PyWBEM_AllTypesxxx",
+                 "does not exist in WEB server",
+                 "FakedUrl"],
+      'rc': 1,
+      'test': 'regex'},
+     ALLTYPES_MOCK_FILE, OK],
+
     ['Verify instance subcommand modify, single property, Type Error bool',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-P', 'scalBool=9'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
                 "type='boolean', array=False and input value='9'. "
                 'Exception: Invalid boolean value: "9"',
+      'rc': 1,
+      'test': 'lines'},
+     ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance subcommand modify, single property, Fail modifies key',
+     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-P', 'InstanceID=9'],
+     {'stderr': 'Error: Server Error modifying instance. Exception: CIMError:'
+                " 4 (CIM_ERR_INVALID_PARAMETER): Property 'InstanceID' in "
+                "ModifiedInstance not in class 'PyWBEM_AllTypes'",
       'rc': 1,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
@@ -1195,8 +1451,7 @@ TEST_CASES = [
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    # TODO additional error tests required
-
+    # TODO additional modify error tests required
 
     #
     #  instance delete subcommand
@@ -1235,7 +1490,7 @@ TEST_CASES = [
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand delete with interactive option',
      ['delete', 'TST_Person', '--interactive'],
@@ -1243,7 +1498,7 @@ TEST_CASES = [
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     #
     # Delete subcommand error tests
@@ -1267,7 +1522,15 @@ TEST_CASES = [
     ['Verify instance subcommand delete, instance name not in repo',
      ['delete', 'CIM_Foo.InstanceID="xxxxx"', '--namespace', 'root/cimv2'],
      {'stderr':
-      ["CIMError: 6", "CIM_ERR_NOT_FOUND"],
+      ["CIMError", "6", "CIM_ERR_NOT_FOUND"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand delete, namespace not in repo',
+     ['delete', 'CIM_Foo.InstanceID=1', '--namespace', 'Argh'],
+     {'stderr':
+      ["CIMError", "3", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1346,6 +1609,23 @@ TEST_CASES = [
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
+
+    ['Verify instance subcommand references -o, returns paths with resultclass '
+     'short form valid returns paths',
+     {'args': ['references', 'TST_Person.name="Mike"', '-o', '--summary',
+               '-R', 'TST_Lineage'],
+      'global': ['--output-format', 'table']},
+     {'stdout': ["""Summary of CIMInstanceName returned
++---------+-----------------+
+|   Count | CIM Type        |
+|---------+-----------------|
+|       2 | CIMInstanceName |
++---------+-----------------+
+"""],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance subcommand references -S, returns paths with resultclass '
      'short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-S',
@@ -1402,7 +1682,7 @@ TEST_CASES = [
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand references with interactive option '
      '--interactive',
@@ -1413,7 +1693,7 @@ TEST_CASES = [
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand references with query.',
      ['references', 'TST_Person.name="Mike"', '--filterquery',
@@ -1502,7 +1782,7 @@ TEST_CASES = [
        'instance of TST_FamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT1_FILE], OK],
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand references with query.',
      ['associators', 'TST_Person.name="Mike"', '--filterquery',
@@ -1536,6 +1816,19 @@ TEST_CASES = [
 
     ['Verify instance subcommand count, Return table of instances',
      ['count', 'CIM_*'],
+     {'stdout': ['Count of instances per class',
+                 '+---------+---------+',
+                 '| Class   |   count |',
+                 '|---------+---------|',
+                 '| CIM_Foo |       3 |',
+                 '+---------+---------+', ],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify instance subcommand count, Return table of instances',
+     ['count', 'CIM_*', '--sort'],
      {'stdout': ['Count of instances per class',
                  '+---------+---------+',
                  '| Class   |   count |',
@@ -1608,7 +1901,22 @@ TEST_CASES = [
 
     #
     #  instance query subcommand. We have not implemented this command
+    #
+    ['Verify instance subcommand query, --help response',
+     ['query', '--help'],
+     {'stdout': INST_QUERY_HELP,
+      'rc': 0,
+      'test': 'linesnows'},
+     None, OK],
 
+    ['Verify instance subcommand query execution. Returns error becasue '
+     'mock does not support query',
+     ['query', 'Select blah from blah'],
+     {'stderr': ['Error: CIMError: 14 (CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): '
+                 "FilterQueryLanguage 'DMTF:CQL' not supported"],
+      'rc': 1,
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
 ]
 
 
