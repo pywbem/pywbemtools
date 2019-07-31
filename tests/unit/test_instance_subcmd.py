@@ -113,7 +113,7 @@ Options:
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
-  -o, --names_only                Show only the returned object names.
+  -o, --names-only                Retrieve only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
   -f, --filterquery TEXT          A filter query to be passed to the server if
@@ -322,7 +322,7 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -o, --names_only                Show only the returned object names.
+  -o, --names-only                Retrieve only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace
@@ -463,7 +463,7 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -o, --names_only                Show only the returned object names.
+  -o, --names-only                Retrieve only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
                                   options namespace

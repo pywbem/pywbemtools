@@ -39,8 +39,8 @@ propertylist_option = [                      # pylint: disable=invalid-name
                       'properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name
-    click.option('-o', '--names_only', is_flag=True, required=False,
-                 help='Show only the returned object names.')]
+    click.option('-o', '--names-only', is_flag=True, required=False,
+                 help='Retrieve only the returned object names.')]
 
 sort_option = [                            # pylint: disable=invalid-name
     click.option('-s', '--sort', is_flag=True, required=False,
