@@ -126,7 +126,7 @@ Options:
   -c, --includeclassorigin  Request that server include classorigin in the
                             result.On some WBEM operations, server may ignore
                             this option.
-  -o, --names_only          Show only the returned object names.
+  -o, --names-only          Retrieve only the returned object names.
   -s, --sort                Sort into alphabetical order by classname.
   -n, --namespace <name>    Namespace to use for this operation. If defined
                             that namespace overrides the general options
@@ -262,7 +262,7 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -o, --names_only                Show only the returned object names.
+  -o, --names-only                Retrieve only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -n, --namespace <name>          Namespace to use for this operation. If
                                   defined that namespace overrides the general
@@ -477,7 +477,6 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class subcommand enumerate CIM_Foo localonly',
      ['enumerate', 'CIM_Foo', '--localonly'],
      {'stdout':
@@ -525,8 +524,8 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo --names_only',
-     ['enumerate', 'CIM_Foo', '--names_only'],
+    ['Verify class subcommand enumerate CIM_Foo --names-only',
+     ['enumerate', 'CIM_Foo', '--names-only'],
      {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],

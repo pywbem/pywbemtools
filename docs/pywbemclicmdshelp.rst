@@ -268,7 +268,7 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only the returned object names.
+      -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -356,7 +356,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
       -c, --includeclassorigin  Request that server include classorigin in the
                                 result.On some WBEM operations, server may ignore
                                 this option.
-      -o, --names_only          Show only the returned object names.
+      -o, --names-only          Retrieve only the returned object names.
       -s, --sort                Sort into alphabetical order by classname.
       -n, --namespace <name>    Namespace to use for this operation. If defined
                                 that namespace overrides the general options
@@ -546,7 +546,7 @@ The following defines the help output for the `pywbemcli class references --help
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only the returned object names.
+      -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
@@ -1059,7 +1059,7 @@ The following defines the help output for the `pywbemcli instance associators --
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only the returned object names.
+      -o, --names-only                Retrieve only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
@@ -1269,7 +1269,7 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
-      -o, --names_only                Show only the returned object names.
+      -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
       -f, --filterquery TEXT          A filter query to be passed to the server if
@@ -1564,7 +1564,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -o, --names_only                Show only the returned object names.
+      -o, --names-only                Retrieve only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation. If
                                       defined that namespace overrides the general
                                       options namespace
