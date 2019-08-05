@@ -711,11 +711,12 @@ def cmd_instance_enumerate(context, classname, options):
     """
     try:
         if options['names_only']:
-            results = context.conn.EnumerateInstanceNames(
+            results = context.conn.PyWbemcliEnumerateInstancePaths(
                 ClassName=classname,
                 namespace=options['namespace'],
                 FilterQuery=options['filterquery'],
-                FilterQueryLanguage=get_filterquerylanguage(options))
+                FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt)
         else:
             results = context.conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
@@ -726,6 +727,7 @@ def cmd_instance_enumerate(context, classname, options):
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
@@ -761,7 +763,8 @@ def cmd_instance_references(context, instancename, options):
                 ResultClass=options['resultclass'],
                 Role=options['role'],
                 FilterQuery=options['filterquery'],
-                FilterQueryLanguage=get_filterquerylanguage(options))
+                FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt)
         else:
             results = context.conn.PyWbemcliReferenceInstances(
                 instancepath,
@@ -771,6 +774,7 @@ def cmd_instance_references(context, instancename, options):
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
@@ -805,6 +809,7 @@ def cmd_instance_associators(context, instancename, options):
                 ResultClass=options['resultclass'],
                 ResultRole=options['resultrole'],
                 FilterQuery=options['filterquery'],
+                MaxObjectCount=context.pull_max_cnt,
                 FilterQueryLanguage=get_filterquerylanguage(options))
         else:
             results = context.conn.PyWbemcliAssociatorInstances(
@@ -817,6 +822,7 @@ def cmd_instance_associators(context, instancename, options):
                 IncludeClassOrigin=options['includeclassorigin'],
                 FilterQuery=options['filterquery'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
@@ -906,9 +912,11 @@ def cmd_instance_query(context, query, options):
     """Execute the query defined by the inputs"""
 
     try:
-        results = context.conn.PyWbemcliQueryInstances(options['querylanguage'],
-                                                       query,
-                                                       options['namespace'])
+        results = context.conn.PyWbemcliQueryInstances(
+            options['querylanguage'],
+            query,
+            namespace=options['namespace'],
+            MaxObjectCount=context.pull_max_cnt)
 
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=options['sort'])

@@ -311,7 +311,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          log=log)
         else:  # Server and mock_server are None
             # if name cmd line option, get connection repo and
-            # search for name
+            # get name from the repo.
             pywbemcli_servers = ConnectionRepository()
             s_name = None
             if name:
@@ -326,7 +326,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 if 'default' in pywbemcli_servers:
                     s_name = name
 
-            # get the named server
+            # Get the named connection from the repo
             if s_name:
                 pywbem_server = pywbemcli_servers[name]
                 # Test for invalid other options with the --name option
@@ -366,11 +366,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         if output_format is None:
             output_format = ctx.obj.output_format
         if use_pull_ops is None:
-            use_pull_ops = ctx.obj.use_pull_ops
+            resolved_use_pull_ops = ctx.obj.use_pull_ops
         if pull_max_cnt is None:
-            pull_max_cnt = ctx.obj.use_pull_ops
+            resolved_pull_max_cnt = ctx.obj.use_pull_ops
         if pywbem_server is None:
-            timestats = ctx.obj.pull_max_cnt
+            resolved_timestats = ctx.obj.pull_max_cnt
         if log is None:
             log = ctx.obj.log
         if verbose is None:
@@ -379,8 +379,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # its own command context different from the command context for the
     # command line.
 
-    ctx.obj = ContextObj(pywbem_server, output_format, use_pull_ops,
-                         pull_max_cnt, timestats, log, verbose)
+    ctx.obj = ContextObj(pywbem_server, output_format,
+                         resolved_use_pull_ops,
+                         resolved_pull_max_cnt,
+                         resolved_timestats,
+                         log, verbose)
 
     # Invoke default command
     if ctx.invoked_subcommand is None:
