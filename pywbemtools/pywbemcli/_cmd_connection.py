@@ -133,7 +133,7 @@ def connection_select(context, name):
 
 # pylint: disable=bad-continuation
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
-@click.option('-s', '--server', type=str, metavar='SERVER', required=True,
+@click.option('-s', '--server', type=str, metavar='SERVER', required=False,
               help='Required hostname or IP address with scheme of the '
                    'WBEMServer in format:\n[{scheme}://]{host}[:{port}]\n'
                    '* Scheme: must be "https" or "http" [Default: "https"]\n'
@@ -226,12 +226,12 @@ def connection_add(context, **options):
 @click.pass_obj
 def connection_test(context):
     """
-    Execute a predefined wbem request.
+    Execute a predefined WBEM request.
 
-    This executes a predefined request against the currente WBEM server to
+    This executes a predefined request against the current WBEM server to
     confirm that the connection exists and is working.
 
-    It executes getclass on CIM_ManagedElement as the test.
+    It executes EnumerateClassNames on the default namespace as the test.
     """
     context.execute_cmd(lambda: cmd_connection_test(context))
 
@@ -335,7 +335,7 @@ def cmd_connection_export(context):
     context.spinner.stop()
     svr = context.pywbem_server
     if not svr:
-        click.ClickException("No server currently defined as current")
+        raise click.ClickException("No server currently defined as current")
 
     export_statement(PywbemServer.server_envvar, svr.server_url)
 
@@ -354,11 +354,11 @@ def cmd_connection_show(context, name):
     """
     Show the parameters that make up the current connection information
     """
-    pywbemcli_servers = ConnectionRepository()
+    connections = ConnectionRepository()
 
     if name:
-        if name in pywbemcli_servers:
-            svr = pywbemcli_servers[name]
+        if name in connections:
+            svr = connections[name]
         else:
             raise click.ClickException("Name %s not in servers repository" %
                                        name)
@@ -373,7 +373,9 @@ def cmd_connection_show(context, name):
 
 def cmd_connection_test(context):
     """
-    Test the current connection with a single command on the default_namespace
+    Test the current connection with a single command on the default_namespace.
+    Uses enumerateClassNames against current workspace as most general
+    possible operation.
     """
     try:
         context.conn.EnumerateClassNames()
@@ -388,21 +390,21 @@ def cmd_connection_select(context, name):
     Select an existing connection to use as the current WBEM Server. This
     command accepts the click_context since it updates that context.
     """
-    pywbemcli_servers = ConnectionRepository()
+    connections = ConnectionRepository()
 
     if not name:
         # get all names from dictionary
-        conn_names = list(six.viewkeys(pywbemcli_servers))
+        conn_names = list(six.iterkeys(connections))
         conn_names = sorted(conn_names)
         if conn_names:
             name = pick_one_from_list(context, conn_names,
                                       "Select a connection or Ctrl_C to abort.")
         else:
             raise click.ClickException(
-                'Connection repository empty' % name)
+                'Connection repository %s empty' % connections.connections_file)
 
-    if name in pywbemcli_servers:
-        pywbem_server = pywbemcli_servers[name]
+    if name in connections:
+        pywbem_server = connections[name]
         new_ctx = ContextObj(pywbem_server,
                              context.output_format,
                              pywbem_server.use_pull_ops,
@@ -429,34 +431,33 @@ def cmd_connection_delete(context, name, options):
     This may be either defined by the optional name parameter or if there
     is no name provided, a select list will be presented for the user
     to select the connection to be deleted.
-    # TODO make select if name not provided
     """
-    pywbemcli_servers = ConnectionRepository()
+    connections = ConnectionRepository()
 
     if not name:
         # get all names from dictionary
-        conn_names = list(six.viewkeys(pywbemcli_servers))
+        conn_names = list(six.iterkeys(connections))
         conn_names = sorted(conn_names)
         if not conn_names:
             raise click.ClickException(
-                'No names defined in connection file' % name)
+                'Connection repository %s empty' % connections.connections_file)
 
         context.spinner.stop()
         name = pick_one_from_list(context, conn_names,
                                   "Select a connection or CTRL_C to abort.")
 
     # name defined. Test if in servers.
-    if name in pywbemcli_servers:
-        if pywbemcli_servers[name] == context.pywbem_server:
+    if name in connections:
+        if connections[name] == context.pywbem_server:
             click.echo('Deleting current connection %s' % name)
         context.spinner.stop()
         if options['verify']:
             click.echo(show_connection_information(context,
-                                                   pywbemcli_servers[name],
+                                                   connections[name],
                                                    separate_line=False))
-            if not verify_operation("Execute dete operation", msg=True):
+            if not verify_operation('Execute delete', msg=True):
                 return
-        pywbemcli_servers.delete(name)
+        connections.delete(name)
     else:
         raise click.ClickException('%s not a defined connection name' % name)
 
@@ -469,21 +470,25 @@ def cmd_connection_add(context, options):
     """
     name = options['name']
     server = options['server']
-    pywbemcli_servers = ConnectionRepository()
-    if name in pywbemcli_servers:
+    connections = ConnectionRepository()
+    if name in connections:
         raise click.ClickException('%s is already defined as a server' % name)
 
-    new_server = PywbemServer(server, options['default_namespace'],
-                              name,
-                              user=options['user'],
-                              password=options['password'],
-                              timeout=options['timeout'],
-                              noverify=options['noverify'],
-                              certfile=options['certfile'],
-                              keyfile=options['keyfile'],
-                              ca_certs=options['ca_certs'],
-                              mock_server=options['mock_server'],
-                              log=options['log'])
+    try:
+        new_server = PywbemServer(server, options['default_namespace'],
+                                  name,
+                                  user=options['user'],
+                                  password=options['password'],
+                                  timeout=options['timeout'],
+                                  noverify=options['noverify'],
+                                  certfile=options['certfile'],
+                                  keyfile=options['keyfile'],
+                                  ca_certs=options['ca_certs'],
+                                  mock_server=options['mock_server'],
+                                  log=options['log'])
+
+    except ValueError as ve:
+        raise click.ClickException('Add failed. %s' % ve)
 
     context.spinner.stop()
     if options['verify']:
@@ -492,7 +497,7 @@ def cmd_connection_add(context, options):
         if not verify_operation("Execute add operation", msg=True):
             return
 
-    pywbemcli_servers.add(name, new_server)
+    connections.add(name, new_server)
 
 
 def cmd_connection_save(context, options):
@@ -500,18 +505,18 @@ def cmd_connection_save(context, options):
     Sets the current connection into the persistent connection repository
     """
     current_svr = context.pywbem_server
-    pywbemcli_servers = ConnectionRepository()
-    if current_svr.name in pywbemcli_servers:
+    connections = ConnectionRepository()
+    if current_svr.name in connections:
         raise click.ClickException('%s is already defined as a server' %
                                    current_svr.name)
     context.spinner.stop()
     if options['verify']:
         click.echo(show_connection_information(context, current_svr,
                                                separate_line=False))
-        if not verify_operation("Execute add operation", msg=True):
+        if not verify_operation('Execute save', msg=True):
             return
 
-    pywbemcli_servers.add(current_svr.name, current_svr)
+    connections.add(current_svr.name, current_svr)
 
 
 def cmd_connection_list(context):
@@ -520,7 +525,7 @@ def cmd_connection_list(context):
     by line.  This method displays the information as a table independent
     of the value of the cmd line output_format general option.
     """
-    pywbemcli_servers = ConnectionRepository()
+    connections = ConnectionRepository()
     if context.pywbem_server:
         current_server_name = context.pywbem_server.name
     else:
@@ -528,7 +533,7 @@ def cmd_connection_list(context):
 
     # build the table structure
     rows = []
-    for name, svr in pywbemcli_servers.items():
+    for name, svr in connections.items():
         # if there is a current server, and it is this item in list
         # append * to name
         if context.pywbem_server:

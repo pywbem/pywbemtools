@@ -315,12 +315,12 @@ def filter_namelist(pattern, name_list, ignore_case=True):
 
 def verify_operation(txt, msg=None):
     """
-    Issue prompt to verify the execution of the request and test the response
-    for y or n.  Repeat until one of them is received.
+    Issue click confirm request and return result.  If msg is none and
+    confirm response is n, output msg.
 
       Parameters
         txt(:term:`string`):
-        String that it prefixed to the prompt text.
+        String that is prefixed to the prompt text.
 
       msg (:class:`py:bool`)
         Optional parameter that if True causes an abort msg on the console.
@@ -328,13 +328,11 @@ def verify_operation(txt, msg=None):
       Returns:
         (:class:`py:bool`) where true corresponds to 'y' prompt response
     """
-    value = 'x'
-    while value not in ('y', 'n'):
-        value = click.prompt('%s Verify y/n ' % txt, default='n').lower()
-    if value == 'y':
-        if msg:
-            click.echo('Request aborted')
+
+    if click.confirm(txt):
         return True
+    if msg:
+        click.echo('Request aborted')
     return False
 
 

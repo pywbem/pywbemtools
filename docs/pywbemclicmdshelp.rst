@@ -631,7 +631,7 @@ The following defines the help output for the `pywbemcli connection --help` subc
       save    Save current connection to repository.
       select  Select a connection from defined connections.
       show    Show current or NAME connection information.
-      test    Execute a predefined wbem request.
+      test    Execute a predefined WBEM request.
 
 
 .. _`pywbemcli connection add --help`:
@@ -682,7 +682,6 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       * Port: (optional)
                                       defines WBEM server port to be used
                                       [Defaults: 5988(HTTP) and 5989(HTTPS)].
-                                      [required]
       -n, --name NAME                 Required name for the connection(optional,
                                       see --server).  This is the name for this
                                       defined WBEM server in the connection file
@@ -914,12 +913,12 @@ The following defines the help output for the `pywbemcli connection test --help`
 
     Usage: pywbemcli connection test [COMMAND-OPTIONS]
 
-      Execute a predefined wbem request.
+      Execute a predefined WBEM request.
 
-      This executes a predefined request against the currente WBEM server to
+      This executes a predefined request against the current WBEM server to
       confirm that the connection exists and is working.
 
-      It executes getclass on CIM_ManagedElement as the test.
+      It executes EnumerateClassNames on the default namespace as the test.
 
     Options:
       -h, --help  Show this message and exit.
