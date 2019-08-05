@@ -73,7 +73,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       option and --server are mutually exclusive
                                       except when defining a new server from the
                                       command line(EnvVar: PYWBEMCLI_NAME).
-      -d, --default_namespace NAMESPACE
+      -d, --default-namespace NAMESPACE
                                       Default Namespace to use in the target WBEM
                                       server if no namespace is defined in a
                                       subcommand(EnvVar: PYWBEMCLI_NAME)
@@ -686,7 +686,8 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       see --server).  This is the name for this
                                       defined WBEM server in the connection file
                                       [required]
-      -d, --default_namespace TEXT    Default Namespace to use in the target
+      -d, --default-namespace NAMESPACE
+                                      Default namespace to use in the target
                                       WBEMServer if no namespace is defined in the
                                       subcommand (Default: root/cimv2).
       -u, --user TEXT                 User name for the WBEM Server connection.

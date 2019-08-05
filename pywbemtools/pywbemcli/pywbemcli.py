@@ -81,7 +81,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'This option and --server are mutually exclusive except '
                    'when defining a new server from the command line' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.name_envvar))
-@click.option('-d', '--default_namespace', type=str,
+@click.option('-d', '--default-namespace', type=str,
               metavar='NAMESPACE',
               envvar=PywbemServer.defaultnamespace_envvar,
               help='Default Namespace to use in the target WBEM server if no '

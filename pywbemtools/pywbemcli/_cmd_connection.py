@@ -145,9 +145,10 @@ def connection_select(context, name):
               help='Required name for the connection(optional, see --server).  '
                    'This is the name for this defined WBEM server in the'
                    ' connection file')
-@click.option('-d', '--default_namespace', type=str,
+@click.option('-d', '--default-namespace', type=str,
+              metavar='NAMESPACE',
               default=DEFAULT_NAMESPACE,
-              help="Default Namespace to use in the target WBEMServer if no "
+              help="Default namespace to use in the target WBEMServer if no "
                    "namespace is defined in the subcommand"
                    " (Default: {of}).".format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str,
@@ -299,7 +300,7 @@ def show_connection_information(context, svr, separate_line=True):
     sep = '\n  ' if separate_line else ', '
     context.spinner.stop()
 
-    click.echo('\nName: %s%sWBEMServer uri: %s%sDefault_namespace: %s'
+    click.echo('\nName: %s%sWBEMServer uri: %s%sDefault-namespace: %s'
                '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
                'Certfile: %s%sKeyfile: %s%suse-pull-ops: %s%spull-max-cnt: %s%s'
                'mock: %s%slog: %s'
