@@ -29,6 +29,7 @@ TEST_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_mock_model.mof')
 PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
 BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
+BAD_PY_FILE_PATH = os.path.join(TEST_DIR, 'py_with_error.py')
 
 GLOBAL_HELP = """
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
@@ -225,7 +226,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid server port definition.',
+    ['Verify invalid server port definition fails.',
      {'global': ['-s', 'http://blah:abcd'],
       'subcmd': 'class',
       'args': ['get', 'blah']},
@@ -234,7 +235,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify valid pull_ops parameter.',
+    ['Verify valid pull_ops parameter yes.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'yes'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -243,7 +244,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify valid pull_ops parameter.',
+    ['Verify valid pull_ops parameter no.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'no'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -261,7 +262,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid --use-pull-ops parameter.',
+    ['Verify invalid --use-pull-ops parameter fails.',
      {'global': ['-s', 'http://blah', '--use-pull-ops', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -280,7 +281,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid pull-max-cnt parameter.',
+    ['Verify invalid pull-max-cnt parameter fails.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -355,14 +356,26 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
     ['Verify --mock option, file with mof containing syntax error',
      {'global': ['-m', BAD_MOF_FILE_PATH],
       'subcmd': 'class',
       'args': ['enumerate']},
      {'stderr': ['badtypedef InstanceID;',
-                 'Repository build exception MOFParseError.: MOFParseError:',
+                 'Repository build exception MOFParseError',
                  'Aborted!'],
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
+    ['Verify --mock option, file with python containing syntax error',
+     {'global': ['-m', BAD_PY_FILE_PATH],
+      'subcmd': 'class',
+      'args': ['enumerate']},
+     {'stderr': [r'Traceback \(most recent call last\)',
+                 r'pywbemtools', r'_pywbemcli_operations\.py',
+                 r'line ', 'in build_repository',
+                 r"NameError: name 'globalsx' is not defined",
+                 'Aborted'],
       'rc': 1,
       'test': 'regex'},
      None, OK],
@@ -375,8 +388,6 @@ TEST_CASES = [
       'rc': 1,
       'test': 'in'},
      None, OK],
-
-
 
     ['Verify --name options with new name but not in repo failse',
      {'global': ['--name', 'fred'],
@@ -463,7 +474,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'regex'},
      None, OK],
-
 
     ['Verify uses pull Operation with option yes',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,

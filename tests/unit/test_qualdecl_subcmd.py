@@ -229,6 +229,20 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+
+    ['Verify qualifier subcommand enumerate summary returns qual decls table',
+     {'args': ['enumerate', '--summary'],
+      'global': ['--output-format', 'table']},
+     {'stdout': ["""Summary of CIMQualifierDeclaration returned
++---------+-------------------------+
+|   Count | CIM Type                |
+|---------+-------------------------|
+|       9 | CIMQualifierDeclaration |
++---------+-------------------------+
+"""],
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify qualifier subcommand get  Description',
      ['get', 'Description'],
      {'stdout': QD_GET_MOCK,

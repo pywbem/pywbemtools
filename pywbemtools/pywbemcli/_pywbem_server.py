@@ -115,8 +115,8 @@ class PywbemServer(object):
             and execute cim_operations on the server.
         """
         if not server_url and not mock_server:
-            raise ValueError('Server_url parameter required unless '
-                             '--mock-server set')
+            raise ValueError('Missing server definition "--server" or '
+                             '"--mock-server" required')
         self._server_url = server_url
         self._mock_server = mock_server
 
