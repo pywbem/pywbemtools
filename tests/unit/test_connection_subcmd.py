@@ -168,7 +168,8 @@ Options:
                                   see --server).  This is the name for this
                                   defined WBEM server in the connection file
                                   [required]
-  -d, --default_namespace TEXT    Default Namespace to use in the target
+  -d, --default-namespace NAMESPACE
+                                  Default namespace to use in the target
                                   WBEMServer if no namespace is defined in the
                                   subcommand (Default: root/cimv2).
   -u, --user TEXT                 User name for the WBEM Server connection.
@@ -412,7 +413,7 @@ TEST_CASES = [
      ['show', 'test1'],
      {'stdout': [
          "Name: test1", "  WBEMServer uri: http://blah",
-         "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+         "  Default-namespace: root/cimv2", "  User: None", "  Password: None",
          "  Timeout: None", "  Noverify: False", "  Certfile: None",
          "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: None"],
@@ -431,7 +432,7 @@ TEST_CASES = [
      ['show', 'test1'],
      {'stdout': [
          "Name: test1", "  WBEMServer uri: http://blah",
-         "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+         "  Default-namespace: root/cimv2", "  User: None", "  Password: None",
          "  Timeout: None", "  Noverify: False", "  Certfile: None",
          "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: None"],
@@ -442,7 +443,7 @@ TEST_CASES = [
      ['show', 'test2'],
      {'stdout': [
          "Name: test2", "  WBEMServer uri: http://blahblah",
-         "  Default_namespace: root/cimv2", "  User: fred", "  Password: argh",
+         "  Default-namespace: root/cimv2", "  User: fred", "  Password: argh",
          "  Timeout: 18", "  Noverify: True", "  Certfile: None",
          "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: api=file,all"],
@@ -520,7 +521,7 @@ TEST_CASES = [
     ['Verify connection subcommand add with all arguments.',
      ['add', '--name', 'addallargs',
       '--server', 'http://blah',
-      '--default_namespace', 'root/blah',
+      '--default-namespace', 'root/blah',
       '--user', 'john',
       '--password', 'pw',
       '--timeout', '30',
@@ -537,7 +538,7 @@ TEST_CASES = [
      {'stdout': [
          'Name: addallargs',
          '  WBEMServer uri: http://blah',
-         '  Default_namespace: root/blah',
+         '  Default-namespace: root/blah',
          '  User: john',
          '  Password: pw',
          '  Certfile: mycertfile.pem',
@@ -617,7 +618,7 @@ TEST_CASES = [
     ['Verify connection subcommand fails, no --name.',
      ['add',
       '--server', 'http://strangename',
-      '--default_namespace', 'root/blah',
+      '--default-namespace', 'root/blah',
       '--user', 'john',
       '--password', 'pw',
       '--timeout', '30',
@@ -666,7 +667,7 @@ TEST_CASES = [
      ['show', 'mocktest'],
      {'stdout': [
          "Name: mocktest",
-         "  Default_namespace: root/cimv2",
+         "  Default-namespace: root/cimv2",
          "  User: None", "  Password: None",
          "  Timeout: None",
          "  Noverify: False", "  Certfile: None",
@@ -723,7 +724,7 @@ TEST_CASES = [
                  '--server', 'http://blah',
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
-                 '--default_namespace', 'root/blah',
+                 '--default-namespace', 'root/blah',
                  '--user', 'john',
                  '--password', 'pw',
                  '--noverify',
@@ -740,7 +741,7 @@ TEST_CASES = [
                  '--mock-server', MOCK_FILE_PATH,
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
-                 '--default_namespace', 'root/blah',
+                 '--default-namespace', 'root/blah',
                  '--user', 'john',
                  '--password', 'pw',
                  '--noverify',
@@ -756,7 +757,7 @@ TEST_CASES = [
      ['show', 'mocktest2'],
      {'stdout': [
          "Name: mocktest2",
-         "  Default_namespace: root/blah", "  User: john", "  Password: pw",
+         "  Default-namespace: root/blah", "  User: john", "  Password: pw",
          "  Timeout: 45", "  Noverify: True", "  Certfile: mycertfile.pem",
          "  Keyfile: mykeyfile.pem", "  use-pull-ops: False",
          r"  mock: tests", "simple_mock_model.mof",
@@ -771,7 +772,7 @@ TEST_CASES = [
      {'stdout': [
          "Name: svrtest2",
          "  WBEMServer uri: http://blah",
-         "  Default_namespace: root/blah", "  User: john", "  Password: pw",
+         "  Default-namespace: root/blah", "  User: john", "  Password: pw",
          "  Timeout: 45", "  Noverify: True", "  Certfile: mycertfile.pem",
          "  Keyfile: mykeyfile.pem", "  use-pull-ops: False",
          "  mock:",

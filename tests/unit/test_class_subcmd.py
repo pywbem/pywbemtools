@@ -539,7 +539,20 @@ TEST_CASES = [
     ['Verify class subcommand enumerate CIM_Foo summary',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': ['2 CIMClass(s) returned'],
-      'test': 'in'},
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate CIM_Foo summary table output',
+     {'args': ['enumerate', 'CIM_Foo', '--summary'],
+      'global': ['--output-format', 'table']},
+     {'stdout': ["""Summary of CIMClass returned
++---------+------------+
+|   Count | CIM Type   |
+|---------+------------|
+|       2 | CIMClass   |
++---------+------------+
+"""],
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
@@ -552,6 +565,17 @@ TEST_CASES = [
      ['enumerate', 'CIM_Foo'],
      {'stdout': ['Key ( true )', '[Description (', 'class CIM_Foo'],
       'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    #
+    # Enumerate errors
+    #
+
+    ['Verify class subcommand enumerate nonexistent class name',
+     ['enumerate', 'CIM_FClassDoesNotExist'],
+     {'stderr': ['CIMError', 'CIM_ERR_INVALID_CLASS'],
+      'rc': 1,
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -571,7 +595,7 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly. Tests whole response with -l',
+    ['Verify class subcommand get localonly(-l)).',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -581,7 +605,7 @@ TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly. Tests whole response --localonly',
+    ['Verify class subcommand get localonly. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--localonly'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -592,7 +616,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # includequalifiers. Test the flag that excludes qualifiers
-    ['Verify class subcommand get without qualifiers, . Tests whole response',
+    ['Verify class subcommand get without qualifiers. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--no-qualifiers'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -616,7 +640,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # pylint: disable=line-too-long
-    ['Verify class subcommand get with propertylist, . Tests whole response',
+    ['Verify class subcommand get with propertylist. Tests whole response',
      ['get', 'CIM_Foo_sub2', '-p', 'InstanceID'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Key ( true ),',
@@ -649,7 +673,7 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get with empty propertylist, . Tests whole '
+    ['Verify class subcommand get with empty propertylist. Tests whole '
      'response',
      ['get', 'CIM_Foo_sub2', '-p', '""'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
@@ -709,6 +733,22 @@ TEST_CASES = [
                  '};', '', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, FAIL],
+
+    # get subcommand errors
+
+    ['Verify class subcommand get invalid classname',
+     ['get', 'CIM_Argh'],
+     {'stderr': ['CIMError', 'CIM_ERR_NOT_FOUND', '6'],
+      'rc': 1,
+      'test': 'regex'},
+
+     SIMPLE_MOCK_FILE, OK],
+    ['Verify class subcommand get invalid namespace',
+     ['get', 'CIM_Foo', '--namespace', 'Argh'],
+     {'stderr': ['CIMError', 'CIM_ERR_INVALID_NAMESPACE', '3'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
 
     #
     # find subcommand
@@ -844,6 +884,8 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+    # class delete error tests
+
     ['Verify class subcommand delete fail subclasses exist',
      ['delete', 'CIM_Foo', '--force'],
      {'stderr': 'Error: Delete rejected; subclasses exist',
@@ -851,8 +893,21 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    #
-    ['Verify class subcommand delete faile, instances exist',
+    ['Verify class subcommand delete no classname fails',
+     ['delete', ],
+     {'stderr': 'Missing argument "CLASSNAME"',
+      'rc': 2,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand delete nonexistent classname fails',
+     ['delete', 'Argh'],
+     {'stderr': ['CIMError', 'CIM_ERR_INVALID_CLASS', '5'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand delete fails, instances exist',
      ['delete', 'CIM_Foo_sub_sub'],
      {'stderr': 'Error: Delete rejected; instances exist',
       'rc': 1,
@@ -958,6 +1013,13 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+
+    ['Verify class subcommand associators simple request names only,',
+     ['associators', 'TST_Person', '--names-only'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_Person'],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
     ['Verify class subcommand associators simple request, one parameter',
      ['associators', 'TST_Person', '-a', 'TST_MemberOfFamilyCollection'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
@@ -1060,12 +1122,26 @@ TEST_CASES = [
 
     # Associator errors
 
-    ['Verify class subcommand associators no CLASSNAM, . ',
+    ['Verify class subcommand associators no CLASSNAME',
      ['associators'],
      {'stderr': ['Error: Missing argument "CLASSNAME".', ],
       'rc': 2,
       'test': 'in'},
      None, OK],
+
+    ['Verify class subcommand associators non-existent CLASSNAME rtns empty',
+     ['associators', 'CIM_Nonexistentclass'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'regex'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators non-existent namespace fails',
+     ['associators', 'TST_Person', '--namespace', 'blah'],
+     {'stderr': ['CIMError', 'CIM_ERR_INVALID_NAMESPACE'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
 
     #
     # references subcommand tests
@@ -1097,7 +1173,6 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-
     # Reference errors
 
     ['Verify class subcommand references no CLASSNAME',
@@ -1106,6 +1181,20 @@ TEST_CASES = [
       'rc': 2,
       'test': 'in'},
      None, OK],
+
+    ['Verify class subcommand references non-existent CLASSNAME rtns empty',
+     ['references', 'CIM_Nonexistentclass'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'regex'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand references non-existent namespace fails',
+     ['references', 'TST_Person', '--namespace', 'blah'],
+     {'stderr': ['CIMError', 'CIM_ERR_INVALID_NAMESPACE'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
 
     #
     # invokemethod subcommand tests

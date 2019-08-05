@@ -91,7 +91,7 @@ Options:
                                   option and --server are mutually exclusive
                                   except when defining a new server from the
                                   command line(EnvVar: PYWBEMCLI_NAME).
-  -d, --default_namespace NAMESPACE
+  -d, --default-namespace NAMESPACE
                                   Default Namespace to use in the target WBEM
                                   server if no namespace is defined in a
                                   subcommand(EnvVar: PYWBEMCLI_NAME)
@@ -309,7 +309,7 @@ TEST_CASES = [
                  'WBEMServer uri: None',
                  'mock:',
                  'simple_mock_model.mof',
-                 'Default_namespace: root/cimv2'],
+                 'Default-namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -324,7 +324,7 @@ TEST_CASES = [
                  'mock: ',
                  r'simple_mock_model\.mof',
                  r'simple_python_mock_script\.py',
-                 'Default_namespace: root/cimv2'],
+                 'Default-namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -406,7 +406,7 @@ TEST_CASES = [
                  'WBEMServer uri: None',
                  'mock: ',
                  'pywbemtools', 'tests', 'simple_mock_model.mof',
-                 'Default_namespace: root/cimv2'],
+                 'Default-namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -420,7 +420,7 @@ TEST_CASES = [
                  'WBEMServer uri: None',
                  'mock: ',
                  'pywbemtools', 'tests', 'simple_mock_model.mof',
-                 'Default_namespace: root/cimv2'],
+                 'Default-namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
