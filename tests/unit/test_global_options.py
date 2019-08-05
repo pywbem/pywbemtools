@@ -525,7 +525,7 @@ TEST_CASES = [
                  '--server', 'http://blah',
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
-                 '--default_namespace', 'root/blah',
+                 '--default-namespace', 'root/blah',
                  '--user', 'john',
                  '--password', 'pw',
                  '--noverify',

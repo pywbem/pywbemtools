@@ -39,6 +39,7 @@ TEST_DIR = os.path.dirname(__file__)
 # test was run from the pywbemtools directory
 TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
+CONFIRM_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_CONFIRMY_FILE)
 
 CONN_HELP = """
 Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
@@ -345,7 +346,7 @@ TEST_CASES = [
     # # {'stdin': ['connection new test1 http://blah', 'connection show test1',
     #            # 'connection delete test1']},
     # # {'stdout': ["Name: test1", "  WBEMServer uri: http://blah",
-    #  # "  Default_namespace: root/cimv2", "  User: None", "  Password: None",
+    #  # "  Default-namespace: root/cimv2", "  User: None", "  Password: None",
     #  # "  Timeout: None", "  Noverify: False", "  Certfile: None",
     #  # "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
     #  # "  log: None"],
@@ -520,7 +521,7 @@ TEST_CASES = [
     ['Verify connection subcommand with duplicate name fails.',
      ['add', '--name', 'addallargs',
       '--server', 'http://blah',
-      '--default_namespace', 'root/blah',
+      '--default-namespace', 'root/blah',
       '--user', 'john',
       '--password', 'pw',
       '--timeout', '30',
@@ -718,12 +719,13 @@ TEST_CASES = [
     #
     #  Verify Create from mock with cmd line params, save, show, delete works
     #  The following is a sequence of tests that must be run in order
+    #  The following test is artifical in that the first create actually
+    #  uses the mock but not to really create a server
     #
     ['Verify save server with cmd line params to empty connections file. Use '
      '--verify',
      {'args': ['save', '--verify'],
       'global': ['--name', 'svrtest2',
-                 '--server', 'http://blah',
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
                  '--default-namespace', 'root/blah',
@@ -771,11 +773,10 @@ TEST_CASES = [
      ['show', 'svrtest2'],
      {'stdout': [
          "Name: svrtest2",
-         "  WBEMServer uri: http://blah",
+         "  WBEMServer uri: None",
          "  Default-namespace: root/blah", "  User: john", "  Password: pw",
          "  Timeout: 45", "  Noverify: True", "  Certfile: mycertfile.pem",
          "  Keyfile: mykeyfile.pem", "  use-pull-ops: False",
-         "  mock:",
          "  log: None"],
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},

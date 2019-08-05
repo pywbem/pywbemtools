@@ -753,6 +753,30 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance subcommand enumerate CIM_Foo with --use-pull-ops yes and '
+     '--pull_max_cnt=2',
+     {'args': ['enumerate', 'CIM_Foo', '--includequalifiers'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '2', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancesWithPath\(pull_inst_result_tuple\(context='
+                 'None, eos=True,',
+                 r'PullInstancesWithPath\(MaxObjectCount=2',
+                 r'OpenEnumerateInstances\(ClassName='],
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance subcommand enumerate CIM_Foo with --use-pull-ops yes and '
+     '--pull_max_cnt=2 and --namesonly',
+     {'args': ['enumerate', 'CIM_Foo', '--names-only'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '2', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancePaths\(pull_path_result_tuple\(context='
+                 'None, eos=True,',
+                 r'PullInstancePaths\(MaxObjectCount=2',
+                 r'OpenEnumerateInstancePaths\(ClassName='],
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify instance subcommand enumerate deepinheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout': ENUM_INST_RESP,
@@ -1580,6 +1604,32 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance subcommand references CIM_Foo with --use-pull-ops yes '
+     'and --pull_max_cnt=1',
+     {'args': ['references', 'TST_Person.name="Mike"'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
+                 r'OpenReferenceInstances\(pull_inst_result_tuple\('
+                 'context=',
+                 r'TST_MemberOfFamilyCollection',
+                 r'TST_Lineage'],
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand reference paths CIM_Foo with --use-pull-ops '
+     'yes and --pull_max_cnt=1 and --names_only',
+     {'args': ['references', 'TST_Person.name="Mike"', '--names-only'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
+                 r'OpenReferenceInstancePaths\(pull_path_result_tuple\('
+                 'context=',
+                 r'TST_MemberOfFamilyCollection',
+                 r'TST_Lineage'],
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '-o', '-s',
@@ -1756,6 +1806,31 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance subcommand associators CIM_Foo with --use-pull-ops yes '
+     'and --pull_max_cnt=1',
+     {'args': ['associators', 'TST_Person.name="Mike"'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
+                 r'OpenAssociatorInstances\(pull_inst_result_tuple\('
+                 'context=',
+                 r'TST_Person'],
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance subcommand associator paths CIM_Foo with --use-pull-ops '
+     'yes and --pull_max_cnt=1 and --names_only',
+     {'args': ['associators', 'TST_Person.name="Mike"', '--names-only'],
+      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+                 'all=stderr']},
+     {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
+                 r'OpenAssociatorInstancePaths\(pull_path_result_tuple\('
+                 'context=',
+                 r'TST_Person'],
+      'test': 'regex'},
+     ASSOC_MOCK_FILE, OK],
+
+
 
     # Invalid associators tests
 
@@ -1784,7 +1859,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand references with query.',
+    ['Verify instance subcommand associators with query.',
      ['associators', 'TST_Person.name="Mike"', '--filterquery',
       'InstanceID = 3'],
      {'stdout': ASSOC_INSTS,
