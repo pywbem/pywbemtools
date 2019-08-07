@@ -109,6 +109,11 @@ def resolve_propertylist(propertylist):
     return propertylist
 
 
+def warning_msg(msg):
+    """Issue the msg param as warning"""
+    click.echo('WARNING: %s' % msg)
+
+
 def pywbemcli_prompt(msg):
     """
     This function isolates the prompt call so that it can be mocked for
