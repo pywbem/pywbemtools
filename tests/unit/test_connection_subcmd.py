@@ -21,17 +21,10 @@ was called.
 
 import os
 import pytest
-from pywbemtools.pywbemcli._connection_repository \
-    import DEFAULT_CONNECTIONS_FILE
 
 from .cli_test_extensions import CLITestsBase
 
 SCRIPT_DIR = os.path.dirname(__file__)
-TEST_DIR = os.getcwd()
-REPO_FILE_PATH = os.path.join(TEST_DIR, DEFAULT_CONNECTIONS_FILE)
-# if there is a config file, save to this name during tests
-SAVE_FILE = DEFAULT_CONNECTIONS_FILE + '.testsave'
-SAVE_FILE_PATH = os.path.join(SCRIPT_DIR, SAVE_FILE)
 
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
@@ -278,30 +271,6 @@ Options:
 """
 
 
-@pytest.fixture(scope='session', autouse=True)
-def set_connections_file(request):
-    """
-    Fixture to hide any existing repo at the beginning and restore it
-    at the end of the session.  This assumes that the connection repository
-    is in the root directory of pywbemcli which is logical since that file
-    is defined by the call to pywbemcli in tests.
-    """
-    if os.path.isfile(REPO_FILE_PATH):
-        os.rename(REPO_FILE_PATH, SAVE_FILE_PATH)
-
-    def teardown():
-        """
-        Remove any created repository file and restore saved file. This
-        should occur as session end.
-        """
-        if os.path.isfile(REPO_FILE_PATH):
-            os.remove(REPO_FILE_PATH)
-        if os.path.isfile(SAVE_FILE_PATH):
-            os.rename(SAVE_FILE_PATH, REPO_FILE_PATH)
-
-    request.addfinalizer(teardown)
-
-
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
@@ -398,9 +367,18 @@ TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
+    ['Verify --moc-server and --server together fail.',
+     ['add', '--mock-server', 'test1.mof', '--server', 'http://blah',
+      '--name', 'fred'],
+     {'stderr': 'Error: Add failed. Simultaneous "--server" and '
+      '"--mock-server" not allowed',
+      'rc': 1,
+      'test': 'lines'},
+     None, OK],
+
     #
     # The following tests are a sequence. Each depends on the previous
-    # and what was in the repository.
+    # and what was in the repository when each test is executed.
     #
     ['Verify connection subcommand add with simple arguments only.',
      ['add', '--name', 'test1', '-s', 'http://blah'],
@@ -739,6 +717,7 @@ TEST_CASES = [
 
     #
     #  Verify Create from mock with cmd line params, save, show, delete works
+    #  The following is a sequence of tests that must be run in order
     #
     ['Verify save server with cmd line params to empty connections file. Use '
      '--verify',
@@ -828,7 +807,8 @@ class TestSubcmdClass(CLITestsBase):
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition",
         TEST_CASES)
-    def test_connection(self, desc, inputs, exp_response, mock, condition):
+    def test_connection(self, desc, inputs, exp_response, mock, condition,
+                        repo_file_path):
         """
         Common test method for those subcommands and options in the
         class subcmd that can be tested.  Note the
@@ -837,7 +817,7 @@ class TestSubcmdClass(CLITestsBase):
         restore it after the test.
         """
         # Where is this file to be located for tests.
-        pywbemserversfile = REPO_FILE_PATH
+        pywbemserversfile = repo_file_path
 
         def test_file(file_test):
             """Local function to execute tests on servers file."""

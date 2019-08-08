@@ -24,12 +24,13 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 
-TEST_DIR = os.path.dirname(__file__)
+SCRIPT_DIR = os.path.dirname(__file__)
 
-SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_mock_model.mof')
-PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
-BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
-BAD_PY_FILE_PATH = os.path.join(TEST_DIR, 'py_with_error.py')
+SIMPLE_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_mock_model.mof')
+PYTHON_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_python_mock_script.py')
+BAD_MOF_FILE_PATH = os.path.join(SCRIPT_DIR, 'mof_with_error.mof')
+BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
+
 
 GLOBAL_HELP = """
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
@@ -334,7 +335,6 @@ TEST_CASES = [
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File:',
-                 r'pywbemtools',
                  r'invalidfilename\.mof',
                  r'does not exist',
                  r'Aborted!'],
@@ -347,7 +347,6 @@ TEST_CASES = [
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File: ',
-                 r'pywbemtools',
                  r'invalidfilename\.mofx',
                  r'extension.*not valid',
                  r'"py" or "mof" required',
@@ -380,7 +379,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify --name options with new name but not in repo failse',
+    ['Verify --name option with new name but not in repo fails',
      {'global': ['-n', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -389,13 +388,24 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify --name options with new name but not in repo failse',
+    ['Verify --name option with new name but not in repo fails',
      {'global': ['--name', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': 'Error: Named connection "fred" does not exist',
       'rc': 1,
       'test': 'in'},
+     None, OK],
+
+    ['Verify --mock_server and --server options together fail',
+     {'global': ['--mock-server', 'fred', '--server', 'http://localhost'],
+      'subcmd': 'connection',
+      'args': ['show']},
+     {'stderr': ['Conflicting server definition. Do not use --server '
+                 'and --mock-server simultaneously',
+                 'Aborted!'],
+      'rc': 1,
+      'test': 'regex'},
      None, OK],
 
     ['Verify --mock option one file and name OK',
@@ -501,6 +511,48 @@ TEST_CASES = [
       'rc': 0,
       'test': 'regex'},
      None, OK],
+
+    #
+    #   The following is a new sequence but depends on the repo being empty
+    #   It creates, shows and deletes a single server definition to demo
+    #   effect of other parameters than the --name parameter
+    #
+
+    ['Verify Create a connection for test.',
+     {'args': ['save'],
+      'subcmd': 'connection',
+      'global': ['--name', 'globaltest1',
+                 '--server', 'http://blah',
+                 '--timeout', '45',
+                 '--use-pull-ops', 'no',
+                 '--default_namespace', 'root/blah',
+                 '--user', 'john',
+                 '--password', 'pw',
+                 '--noverify',
+                 '--certfile', 'mycertfile.pem',
+                 '--keyfile', 'mykeyfile.pem']},
+     {'stdout': "",
+      'test': 'lines'},
+     None, OK],
+
+    ['Verify --name and other options generates warnings but works',
+     {'global': ['--name', 'globaltest1', '--timeout', '90'],
+      'subcmd': 'connection',
+      'args': ['delete', 'globaltest1']},
+     {'stdout': ['WARNING: "timeout 90" ignored when "-n/--name used',
+                 'globaltest1'],
+      'rc': 0,
+      'test': 'regex'},
+     None, OK],
+
+    ['Verify connection already deleted.',
+     {'subcmd': 'connection',
+      'args': ['delete', 'globaltest1']},
+     {'stderr': "Error: globaltest1 not a defined connection name",
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
 ]
 
 # TODO add test for pull operations with pull ops max size variations

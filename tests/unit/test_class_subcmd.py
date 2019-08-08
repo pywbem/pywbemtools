@@ -1283,6 +1283,10 @@ TEST_CASES = [
 # other tests.  Test localonly on top level
 
 
+# TODO the following two test classes should be removed as I believe they
+# are redundant.
+
+
 class TestSubcmdClass(CLITestsBase):
     """
     Test all of the class subcommand variations.
@@ -1364,8 +1368,7 @@ class TestClassEnumerate(object):
         mock_mof_path = os.path.join(TEST_DIR, 'simple_mock_model.mof')
 
         # build basic cmd line, server, mock-server def, basic enum command
-        cmd_line = ['-s', 'http:/blah', '--mock-server',
-                    mock_mof_path, 'class', 'enumerate']
+        cmd_line = ['--mock-server', mock_mof_path, 'class', 'enumerate']
 
         if tst_args:
             cmd_line.extend(tst_args)

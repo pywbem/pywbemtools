@@ -28,7 +28,7 @@ import pywbem
 
 from ._context_obj import ContextObj
 from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
-    CIM_OBJECT_OUTPUT_FORMATS
+    CIM_OBJECT_OUTPUT_FORMATS, warning_msg
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
@@ -239,22 +239,26 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         # interactive mode. Apply the documented option defaults.
         # Default for output_format is applied in processing since it depends
         # on request (ex. mof for get class vs table for many)
-        if default_namespace is None:
-            default_namespace = DEFAULT_NAMESPACE
 
-        if timestats is None:
-            timestats = DEFAULT_TIMESTATS
+        if server and mock_server:
+            click.echo('Error: Conflicting server definition. Do not use '
+                       '--server and --mock-server simultaneously', err=True)
+            raise click.Abort()
 
+        resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
+
+        resolved_timestats = timestats or DEFAULT_TIMESTATS
+
+        # process mock_server option
         if mock_server:
             assert isinstance(mock_server, tuple)
-            new_mock_server = []
+            resolved_mock_server = []
             # allow relative or absolute paths
             for fn in mock_server:
                 if fn == os.path.basename(fn):
-                    new_mock_server.append(os.path.join(os.getcwd(), fn))
+                    resolved_mock_server.append(os.path.join(os.getcwd(), fn))
                 else:
-                    new_mock_server.append(fn)
-            mock_server = new_mock_server
+                    resolved_mock_server.append(fn)
 
             # abort for non-existent mock files or invalid type
             # Otherwise these issued do not get found until connection
@@ -273,17 +277,16 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         if use_pull_ops:
             try:
-                use_pull_ops = USE_PULL_OPS_CHOICE[use_pull_ops]
+                resolved_use_pull_ops = USE_PULL_OPS_CHOICE[use_pull_ops]
             except KeyError:
                 raise click.ClickException(
                     'Invalid choice for --use_pull_ops %s' % use_pull_ops)
         else:
-            use_pull_ops = DEFAULT_PULL_CHOICE
-        if pull_max_cnt is None:
-            pull_max_cnt = DEFAULT_MAXPULLCNT
+            resolved_use_pull_ops = DEFAULT_PULL_CHOICE
 
-        if timeout is None:
-            timeout = DEFAULT_CONNECTION_TIMEOUT
+        resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
+
+        resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
@@ -291,44 +294,70 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             if not name:
                 name = 'default'
             pywbem_server = PywbemServer(server,
-                                         default_namespace,
+                                         resolved_default_namespace,
                                          name=name,
                                          user=user,
                                          password=password,
-                                         timeout=timeout,
+                                         timeout=resolved_timeout,
                                          noverify=noverify,
                                          certfile=certfile,
                                          keyfile=keyfile,
                                          ca_certs=ca_certs,
-                                         use_pull_ops=use_pull_ops,
-                                         pull_max_cnt=pull_max_cnt,
-                                         stats_enabled=timestats,
+                                         use_pull_ops=resolved_use_pull_ops,
+                                         pull_max_cnt=resolved_pull_max_cnt,
+                                         stats_enabled=resolved_timestats,
                                          verbose=verbose,
                                          mock_server=mock_server,
                                          log=log)
-        else:  # no server and mock_server are None
+        else:  # Server and mock_server are None
             # if name cmd line option, get connection repo and
             # search for name
+            pywbemcli_servers = ConnectionRepository()
+            s_name = None
             if name:
-                pywbemcli_servers = ConnectionRepository()
                 if name in pywbemcli_servers:
-                    pywbem_server = pywbemcli_servers[name]
-                    # NOTE: The log definition is only for this session.
-                    if log:
-                        # pylint: disable=protected-access
-                        pywbem_server._log = log
+                    s_name = name
+                # exception when defined name does not exist
                 else:
                     raise click.ClickException('Named connection "{}" does '
                                                'not exist'.format(name))
             else:
-                pywbemcli_servers = ConnectionRepository()
+                # try default but ignore if it does not exist
                 if 'default' in pywbemcli_servers:
-                    pywbem_server = pywbemcli_servers['default']
-                else:
-                    # If no server defined, set None. This allows subcmds that
-                    # donot require a server executed without the server
-                    # defined.
-                    pywbem_server = None
+                    s_name = name
+
+            # get the named server
+            if s_name:
+                pywbem_server = pywbemcli_servers[name]
+                # Test for invalid other options with the --name option
+                # The following options are part of each PywbemServer object
+                # TODO: should really put this into pywbemserver itself.
+                other_options = ((default_namespace, 'default_namespace'),
+                                 (use_pull_ops, 'use_pull_ops'),
+                                 (pull_max_cnt, ''),
+                                 (timeout, 'timeout'),
+                                 (noverify, 'noverify'),
+                                 (user, 'user'),
+                                 (certfile, 'certfile'),
+                                 (keyfile, 'keyfile'),
+                                 (ca_certs, 'ca_certs'),
+                                 (server, 'server'),
+                                 (mock_server, 'mock-server'))
+
+                for option in other_options:
+                    if option[0]:
+                        warning_msg('"%s %s" ignored when "-n/--name '
+                                    'used' % (option[1], option[0]))
+                # NOTE: The log definition is only for this session.
+                if log:
+                    # pylint: disable=protected-access
+                    pywbem_server._log = log
+
+            else:
+                # If no server defined, set None. This allows subcmds that
+                # donot require a server executed without the server
+                # defined.
+                pywbem_server = None
 
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options.
