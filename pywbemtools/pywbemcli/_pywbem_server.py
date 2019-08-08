@@ -117,6 +117,9 @@ class PywbemServer(object):
         if not server_url and not mock_server:
             raise ValueError('Missing server definition "--server" or '
                              '"--mock-server" required')
+        if server_url and mock_server:
+            raise ValueError('Simultaneous "--server" and '
+                             '"--mock-server" not allowed')
         self._server_url = server_url
         self._mock_server = mock_server
 

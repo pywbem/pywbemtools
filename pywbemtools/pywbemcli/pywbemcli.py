@@ -242,15 +242,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         if server and mock_server:
             click.echo('Error: Conflicting server definition. Do not use '
-                       '--server and --mock-server simultaneously')
+                       '--server and --mock-server simultaneously', err=True)
             raise click.Abort()
 
-        if default_namespace is None:
-            default_namespace = DEFAULT_NAMESPACE
         resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
-
-        if timestats is None:
-            timestats = DEFAULT_TIMESTATS
 
         resolved_timestats = timestats or DEFAULT_TIMESTATS
 
@@ -318,40 +313,51 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             # if name cmd line option, get connection repo and
             # search for name
             pywbemcli_servers = ConnectionRepository()
+            s_name = None
             if name:
                 if name in pywbemcli_servers:
-                    pywbem_server = pywbemcli_servers[name]
-
-                    # pylint: disable=too-many-boolean-expressions
-                    if default_namespace or timestats or use_pull_ops or \
-                            pull_max_cnt or timeout or noverify or name or \
-                            user or certfile or keyfile or ca_certs:
-                        warning_msg("Other options ignored when --name used")
-                    # NOTE: The log definition is only for this session.
-                    if log:
-                        # pylint: disable=protected-access
-                        pywbem_server._log = log
+                    s_name = name
+                # exception when defined name does not exist
                 else:
                     raise click.ClickException('Named connection "{}" does '
                                                'not exist'.format(name))
-            else:  # try the deafault name
+            else:
+                # try default but ignore if it does not exist
                 if 'default' in pywbemcli_servers:
-                    pywbem_server = pywbemcli_servers['default']
-                    # We ignore any other input options.
-                    # pylint: disable=too-many-boolean-expressions
-                    if default_namespace or timestats or use_pull_ops or \
-                            pull_max_cnt or timeout or noverify or name or \
-                            user or certfile or keyfile or ca_certs:
-                        warning_msg("Other options ignored when --name used")
-                    # NOTE: The log definition is only for this session.
-                    if log:
-                        # pylint: disable=protected-access
-                        pywbem_server._log = log
-                else:
-                    # If no server defined, set None. This allows subcmds that
-                    # donot require a server executed without the server
-                    # defined.
-                    pywbem_server = None
+                    s_name = name
+
+            # get the named server
+            if s_name:
+                pywbem_server = pywbemcli_servers[name]
+                # Test for invalid other options with the --name option
+                # The following options are part of each PywbemServer object
+                # TODO: should really put this into pywbemserver itself.
+                other_options = ((default_namespace, 'default_namespace'),
+                                 (use_pull_ops, 'use_pull_ops'),
+                                 (pull_max_cnt, ''),
+                                 (timeout, 'timeout'),
+                                 (noverify, 'noverify'),
+                                 (user, 'user'),
+                                 (certfile, 'certfile'),
+                                 (keyfile, 'keyfile'),
+                                 (ca_certs, 'ca_certs'),
+                                 (server, 'server'),
+                                 (mock_server, 'mock-server'))
+
+                for option in other_options:
+                    if option[0]:
+                        warning_msg('"%s %s" ignored when "-n/--name '
+                                    'used' % (option[1], option[0]))
+                # NOTE: The log definition is only for this session.
+                if log:
+                    # pylint: disable=protected-access
+                    pywbem_server._log = log
+
+            else:
+                # If no server defined, set None. This allows subcmds that
+                # donot require a server executed without the server
+                # defined.
+                pywbem_server = None
 
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options.

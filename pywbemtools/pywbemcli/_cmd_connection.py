@@ -129,8 +129,6 @@ def connection_select(context, name):
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
-# TODO: Future Maybe most of these options can be generalized for here and cli
-
 # pylint: disable=bad-continuation
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
 @click.option('-s', '--server', type=str, metavar='SERVER', required=False,
@@ -375,7 +373,9 @@ def cmd_connection_test(context):
     """
     Test the current connection with a single command on the default_namespace.
     Uses enumerateClassNames against current workspace as most general
-    possible operation.
+    possible operations that should work on all servers that support class
+    operation. Even if class operations are not supported, a return from the
+    server such as "unsupported" indicates the server exists.
     """
     try:
         context.conn.EnumerateClassNames()

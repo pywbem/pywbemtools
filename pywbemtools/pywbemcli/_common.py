@@ -110,7 +110,7 @@ def resolve_propertylist(propertylist):
 
 
 def warning_msg(msg):
-    """Issue the msg param as warning"""
+    """Issue the msg param as warning prefixed by WARNING:"""
     click.echo('WARNING: %s' % msg)
 
 
