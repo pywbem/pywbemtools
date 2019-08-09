@@ -325,7 +325,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pywbemcli', _short_description, [author], 1)
+    (master_doc, 'pywbemtools', _short_description, [author], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -338,8 +338,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pywbemcli', _short_description,
-     author, 'pywbemcli', _short_description,
+    (master_doc, 'pywbemtools', _short_description,
+     author, 'pywbemtools', _short_description,
      'Miscellaneous'),
 ]
 
@@ -467,4 +467,16 @@ intersphinx_cache_limit = 5
 extlinks = {
   'nbview': ('http://nbviewer.jupyter.org/github/pywbem/pywbemcli/blob/master/docs/notebooks/%s', ''),
   'nbdown': ('https://github.com/pywbem/pywbemcli/raw/master/docs/notebooks/%s', '')
+}
+
+
+# http://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html
+# Add the "intersphinx" extension
+extensions = [
+    'sphinx.ext.intersphinx',
+]
+# Addintersphinx mappings
+intersphinx_mapping = {
+    'pywbem': ('https://pywbem.readthedocs.io/en/stable', None),
+    'pywbem_mock': ('https://pywbem.readthedocs.io/en/stable', None),
 }

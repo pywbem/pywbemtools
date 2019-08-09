@@ -8,24 +8,30 @@ This section contains information that is referenced from other sections,
 and that does not really need to be read in sequence.
 
 
-.. _'Special type names`:
+.. _'Special terms`:
 
-Special type names
-------------------
+Special terms
+-------------
 
 This documentation uses a few special terms to refer to Python types:
 
 .. glossary::
 
    CIM-XML
-     the name of the protocol used in the DMTF specification :term:`DSP0200`
-     the protocol pywbemcli uses to communicate with WBEM servers.
+     The name of the protocol used in the DMTF specification :term:`DSP0200`
+     that pywbem/pywbemcli use to communicate with WBEM servers.
+
+   CIM model output formats
+      Several of the output formats defined and available in the ``-o``\``--output-format``
+      general option are specific for the presentation of CIM objects(CIMClass,
+      CIMInstance, CIMParameter, CIMMethod, CIMClassName and CIMInstanceName)
+      This includes the format choices ``MOF``, ``XML``, ``REPR``.
 
    INSTANCENAME
       an argument of several of the command-group ``instance`` subcommands that
       allows two possible inputs based on another subcommand option(``--interactive``).
 
-      When ``interactive`` is set the INSTANCENAME is  a string representation of
+      When ``interactive`` is set the INSTANCENAME is a string representation of
       a CIMInstanceName formatted as defined by  :term:`WBEM-URI`
 
       Otherwise the INSTANCENAME should be a classname in which case pywbemcli
@@ -45,6 +51,14 @@ This documentation uses a few special terms to refer to Python types:
       See section :ref:`Deprecation and compatibility policy` and the standard
       Python module :mod:`py:warnings` for details.
 
+   CIM namespace
+      A CIM namespace (defined in :term:`DSP0004`) provides a scope of
+      uniqueness  for cim objects; specifically, the names of class objects and
+      of qualifier type objects shall be unique in a namespace. The compound
+      key of non- embedded instance objects shall also be unique across all
+      non-embedded instances of the class (not including subclasses) within the
+      namespace.
+
    connections file
       A file maintained by pywbemcli and managed by the pywbemcli
       ``connections`` command group.  The file name is ``pywbemcli_connections.json``
@@ -62,9 +76,21 @@ This documentation uses a few special terms to refer to Python types:
       the display of CIM objects in pywbemcli. See DMTF term:`DSP0004` for more
       information on the MOF format.
 
+   WBEM management profile
+      The DMTF and SNIA define specific profiles of manageability that are
+      published as specifications in the DMTF and within the SMI-S specification
+      in SNIA. A management profile defines the managability characteristics
+      of a specic set of services in terms of the CIM model and WBEM operations.
+      These profiles are documented by name and version and are incorporated into
+      compliant WBEM servers so that they can be discovered by WBEM clients to
+      determine the management capabilities of the WBEM server.
+      See :ref:`Profile advertisement methodologies`
+
    WBEM-URI
-      The wbem uri is a standardized text form for CIM instance names. It is
-      documented in DMTF DSP0207. Pywbemcli uses the untyped WBEM URI::
+      The wbem-uri is a standardized text form for CIM instance names. It is
+      documented in DMTF :term:`DSP0207`. Pywbemcli uses the untyped WBEM URI
+      as the format for instance names in cli input parameters
+      (i.e. :term:`INSTANCENAME`)::
 
             WBEM-URI = WBEM-URI-UntypedNamespacePath /
                        WBEM-URI-UntypedClassPath /
@@ -97,6 +123,19 @@ This documentation uses a few special terms to refer to Python types:
         CIM_RegisteredProfile.InstanceID="acme:1"
         CIM_RegisteredProfile.InstanceID=100
 
+   REPL
+      Stands for "Read-Execute-Print-Loop" which is a term that denotes the
+      pywbemcli shell interactive mode where multiple command-groups and
+      subcommands may be executed within the context of a connection defined
+      by a set of general options.
+
+   GLOB
+      A pathname pattern pattern expansion used in Unix environments. It is
+      used by pywbemcli to expand classnames in the ``class find`` subcommand.
+      No tilde expansion is done, but ``*``, ``?``, and character ranges
+      expressed with ``[]`` will be correctly matched.
+
+
 .. _`Profile advertisement methodologies`:
 
 Profile advertisement methodologies
@@ -112,7 +151,7 @@ class of choice. The reason is that this approach enables clients to work
 seamlessly with different server implementations, even when they have
 implemented a different set of management profiles.
 
-DMTF defines three profile advertisement methodologies in :term:`DSP1033`:
+The DMTF defines three profile advertisement methodologies in :term:`DSP1033`:
 
 * GetCentralInstances methodology (new in :term:`DSP1033` 1.1)
 * Central class methodology
@@ -177,8 +216,8 @@ a single invocation of an easy-to use method
 Profile implementations in a WBEM server are not entirely free when making a
 choice of which methodology to implement:
 
-* Autonomous profiles in a WBEM server must implement the central class
-  methodology, and may in addition implement the new GetCentralInstances
+* Autonomous profiles in a WBEM server must implement the central-class
+  methodology, and may in addition implement the GetCentralInstances
   methodology.
 
   Note that the scoping class methodology falls together with the
@@ -186,7 +225,7 @@ choice of which methodology to implement:
   class is also their central class.
 
 * Component profiles in a WBEM server may implement the central class
-  methodology and the new GetCentralInstances methodology, and must support the
+  methodology and the GetCentralInstances methodology, and must support the
   scoping class methodology.
 
   Note that implementing the scoping class methodology in a WBEM server
@@ -206,7 +245,7 @@ Older DMTF component profiles and older SNIA subprofiles do not always specify
 scoping class and scoping path. In such cases, the scoping class and scoping
 path can often be determined from the class diagram in the specification for
 the profile.
-Many times, CIM_System or CIM_ComputerSystem is the scoping class.
+Many times, ``CIM_System`` or ``CIM_ComputerSystem`` is the scoping class.
 .. _'Glossary`:
 
 Glossary
@@ -253,7 +292,7 @@ References
       `DMTF WBEM Standards <https://www.dmtf.org/standards/wbem>`_
 
    SMI-S
-      `SNIA Storage Management Initiative Specification`_
+      `SNIA Storage Management Initiative Specification <https://www.snia.org/forums/smi/tech_programs/smis_home>`_
 
    Python Glossary
       * `Python 2.7 Glossary <https://docs.python.org/2.7/glossary.html>`_
