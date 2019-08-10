@@ -378,8 +378,9 @@ class PywbemServer(object):
                     ex.__class__.__name__, ex), err=True)
                 raise click.Abort()
         else:
+            print('TESTCREATE %r\n server %s' % (self, self.server_url))
             if not self.server_url:
-                raise click.ClickException('Server URL is empty. Cannot '
+                raise click.ClickException('No server found. Cannot '
                                            'connect.')
             self._server_url = _validate_server_url(self._server_url)
             if self.keyfile is not None and self.certfile is None:

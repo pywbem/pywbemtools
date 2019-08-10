@@ -553,6 +553,17 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+
+    ['Verify connection without server definition and subcommand that requires connection fails.',
+     {'subcmd': 'class',
+      'args': ['enumerate']},
+     {'stderr': 'No server defined for subcommand that requires server. '
+                'Define a server with "--server", "--mock-server", or '
+                '"--name" general options',
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
 ]
 
 # TODO add test for pull operations with pull ops max size variations

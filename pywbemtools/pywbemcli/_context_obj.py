@@ -101,8 +101,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
         """
-        # This is created in wbemserver and retained there.
-        return self._pywbem_server.conn
+        # The conn property is created in wbemserver and retained there.
+        return self.wbem_server.conn
 
     @property
     def log(self):
@@ -115,9 +115,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def wbem_server(self):
         """
         :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
-        requests This is maintained in the pywbem_server object.
+        requests This is maintained in the pywbem_server object as
+        _pywbem_server
         """
-        return self._pywbem_server.wbem_server
+        if self._pywbem_server:
+            return self._pywbem_server.wbem_server
+        else:
+            raise click.ClickException('No server defined for subcommand '
+                                       'that requires server. Define a server '
+                                       'with "--server", "--mock-server", or '
+                                       '"--name" general options')
 
     @property
     def pywbem_server(self):
@@ -261,7 +268,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         #       global
 
         # If no server defined, do not try to connect. This allows
-        # commands like help, connection new, select to execute without
+        # commands like help, connection new, list to execute without
         # a target server defined.
         if self._pywbem_server and self._pywbem_server.wbem_server is None:
             # get the password if it is required.  This may involve a
