@@ -42,7 +42,6 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
     verify_operation, split_str_w_esc
 # pylint: disable=unused-import
-from pywbemtools.pywbemcli._common import pywbemcli_prompt  # noqa: F401
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
 
@@ -348,7 +347,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     values from the mock.
     """
     # setup mock for this test
-    mock_function = 'pywbemtools.pywbemcli._common.pywbemcli_prompt'
+    mock_function = 'pywbemtools.pywbemcli.click.prompt'
     with patch(mock_function, side_effect=choices) as mock_prompt:
         # The code to be tested
         title = "Test pick_one_from_list"
@@ -405,7 +404,7 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
 def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     """Test for pick_one_from_list function"""
     # setup mock for this test
-    mock_function = 'pywbemtools.pywbemcli._common.pywbemcli_prompt'
+    mock_function = 'pywbemtools.pywbemcli.click.prompt'
     with patch(mock_function, side_effect=choices) as mock_prompt:
         # The code to be tested
         title = "test_pick_multiple_from_list"
@@ -634,7 +633,7 @@ TESTCASES_VERIFY_OPERATION = [
 @simplified_test_function
 def test_verify_operation(testcase, txt, abort_msg, result):
     """
-    This method mocks the click.click_confirm function to generate a response
+    This method mocks the click.confirm function to generate a response
     to the verify operation function
     """
     @patch('pywbemtools.pywbemcli.click.confirm', return_value=result)

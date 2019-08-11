@@ -27,9 +27,6 @@ SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
-MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
-MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
-MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
 INST_HELP = """
 Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
@@ -1130,22 +1127,24 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with interactive option',
-     ['get', 'TST_Person', '-i'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['get', 'TST_Person', '-i']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with interactive option',
-     ['get', 'TST_Person', '--interactive'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['get', 'TST_Person', '--interactive']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     #
     #  get subcommand errors
@@ -1197,18 +1196,20 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand create, new instance of CIM_Foo one '
      'property and verify yes',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     {'global': ['--mocker-for-tests', 'confirm:y'],
+      'args': ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify']},
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  'root/cimv2:CIM_Foo.InstanceID="blah"',
                  'Execute CreateInstance'],
       'rc': 0,
       'test': 'in '},
-     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance of CIM_Foo one '
      'property and verify no',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     {'global': ['--mocker-for-tests', 'confirm:n'],
+      'args':['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify']},
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  'root/cimv2:CIM_Foo.InstanceID="blah"',
@@ -1216,7 +1217,7 @@ Instances: PyWBEM_AllTypes
                  'Request aborted'],
       'rc': 0,
       'test': 'in '},
-     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
@@ -1331,26 +1332,28 @@ Instances: PyWBEM_AllTypes
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand modify, single good change with verify yes',
-     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False', '--verify'],
+     {'global': ['--mocker-for-tests', 'confirm:y'],
+      'args': ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+               '-P', 'scalBool=False', '--verify']},
      {'stdout': ['instance of PyWBEM_AllTypes {',
                  'scalBool = false;',
                  '};',
-                 'Execute ModifyInstance'],
+                 'MOCKcoclick.confirm(y):Execute ModifyInstance'],
       'rc': 0,
       'test': 'linesnows'},
-     [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
+     ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand modify, single good change with verify no',
-     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False', '--verify'],
+     {'global': ['--mocker-for-tests', 'confirm:n'],
+      'args': ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+               '-P', 'scalBool=False', '--verify']},
      {'stdout': ['instance of PyWBEM_AllTypes {',
                  'scalBool = false;',
                  'Execute ModifyInstance',
                  'Request aborted'],
       'rc': 0,
       'test': 'regex'},
-     [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
+     ALLTYPES_MOCK_FILE, OK],
 
 
     ['Verify instance subcommand modify, single good change, explicit ns',
@@ -1509,20 +1512,22 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand delete with interactive option',
-     ['delete', 'TST_Person', '-i'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['delete', 'TST_Person', '-i']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand delete with interactive option',
-     ['delete', 'TST_Person', '--interactive'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['delete', 'TST_Person', '--interactive']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     #
     # Delete subcommand error tests
@@ -1725,25 +1730,27 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references with interactive option -i',
-     ['references', 'TST_Person', '-i'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['references', 'TST_Person', '-i']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references with interactive option '
      '--interactive',
-     ['references', 'TST_Person', '--interactive'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['references', 'TST_Person', '--interactive']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references with query.',
      ['references', 'TST_Person.name="Mike"', '--filterquery',
@@ -1850,14 +1857,15 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators with interactive option -i',
-     ['associators', 'TST_Person', '-i'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['associators', 'TST_Person', '-i']},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {',
        'instance of TST_FamilyCollection {'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators with query.',
      ['associators', 'TST_Person.name="Mike"', '--filterquery',
@@ -1865,7 +1873,6 @@ Instances: PyWBEM_AllTypes
      {'stdout': ASSOC_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
-
 
     ['Verify instance subcommand associators with query, traditional ops',
      {'args': ['associators', 'TST_Person.name="Mike"', '--filterquery',

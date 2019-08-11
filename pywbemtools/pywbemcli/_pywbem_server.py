@@ -114,8 +114,9 @@ class PywbemServer(object):
             and operation information to create a connection to the server
             and execute cim_operations on the server.
         """
+
         if not server_url and not mock_server:
-            raise ValueError('Missing server definition "--server" or '
+            raise ValueError('Missing server definition. "--server" or '
                              '"--mock-server" required')
         if server_url and mock_server:
             raise ValueError('Simultaneous "--server" and '
@@ -378,17 +379,12 @@ class PywbemServer(object):
                     ex.__class__.__name__, ex), err=True)
                 raise click.Abort()
         else:
-            print('TESTCREATE %r\n server %s' % (self, self.server_url))
             if not self.server_url:
                 raise click.ClickException('No server found. Cannot '
                                            'connect.')
             self._server_url = _validate_server_url(self._server_url)
             if self.keyfile is not None and self.certfile is None:
                 ValueError('keyfile option requires certfile option')
-
-            # If supplied by connect request, save the password
-            # if password:
-            #   self._password = password
 
             creds = (self.user, self.password) if self.user or \
                 self.password else None

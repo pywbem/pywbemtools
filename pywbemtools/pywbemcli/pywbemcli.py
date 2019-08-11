@@ -33,6 +33,7 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
+from ._test_mock import setup_mock
 
 from ._connection_repository import ConnectionRepository, \
     DEFAULT_CONNECTIONS_FILE
@@ -189,13 +190,19 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'multiple times where each use defines a single file_path.'
                    'See the pywbemtools documentation for more information.' +
                    "(EnvVar: {}).".format(PywbemServer.mock_server_envvar))
+@click.option('--mocker-for-tests', type=str, multiple=True,
+              hidden=True,
+              required=False,
+              help='Hidden option to set mock values for tests.'
+                   'String with values confirm:<y/n>, prompt:<integer>')
 @click.version_option(
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
     help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, mock_server, pywbem_server=None, timestats=None, log=None):
+        verbose, mock_server, pywbem_server=None, timestats=None, log=None,
+        mocker_for_tests=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -288,6 +295,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
+        # set mock
+        if mocker_for_tests:
+            setup_mock(mocker_for_tests)
+
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
         if server or mock_server:
@@ -320,7 +331,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 # exception when defined name does not exist
                 else:
                     raise click.ClickException('Named connection "{}" does '
-                                               'not exist'.format(name))
+                                               'not exist and no --server or '
+                                               '--mock-server options to '
+                                               'define a '
+                                               'WBEMServer'.format(name))
             else:
                 # try default but ignore if it does not exist
                 if 'default' in pywbemcli_servers:

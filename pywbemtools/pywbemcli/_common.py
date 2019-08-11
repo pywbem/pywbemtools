@@ -23,7 +23,6 @@ import fnmatch
 import re
 from textwrap import fill
 from operator import itemgetter
-from prompt_toolkit import prompt
 import six
 import click
 import tabulate
@@ -114,14 +113,6 @@ def warning_msg(msg):
     click.echo('WARNING: %s' % msg)
 
 
-def pywbemcli_prompt(msg):
-    """
-    This function isolates the prompt call so that it can be mocked for
-    pywbemcli tests.
-    """
-    return prompt(msg)
-
-
 def pick_one_from_list(context, options, title):
     """
     Interactive component that displays a set of options (strings) and asks
@@ -158,7 +149,7 @@ def pick_one_from_list(context, options, title):
             % index
         while True:
             try:
-                selection_txt = pywbemcli_prompt(msg)
+                selection_txt = click.prompt(msg)
                 selection = int(selection_txt)
                 if 0 <= selection <= index:
                     if context:
@@ -245,7 +236,7 @@ def pick_multiple_from_list(context, options, title):
     msg = 'Select entry by index or hit enter to end selection>'
     while True:
         try:
-            selection_txt = pywbemcli_prompt(msg)
+            selection_txt = click.prompt(msg)
             if not selection_txt:
                 if context:
                     context.spinner.start()

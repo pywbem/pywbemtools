@@ -554,12 +554,14 @@ TEST_CASES = [
      None, OK],
 
 
-    ['Verify connection without server definition and subcommand that requires connection fails.',
+    ['Verify connection without server definition and subcommand that '
+     ' requires connection fails.',
      {'subcmd': 'class',
       'args': ['enumerate']},
      {'stderr': 'No server defined for subcommand that requires server. '
                 'Define a server with "--server", "--mock-server", or '
-                '"--name" general options',
+                '"--name" general options; or in interactive mode, use '
+                '"connection select" to enable a connection',
       'rc': 1,
       'test': 'regex'},
      None, OK],

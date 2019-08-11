@@ -30,8 +30,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
-MOCK_PROMPT0_FILE = "mock_prompt_0.py"
-MOCK_CONFIRMY_FILE = "mock_confirm_y.py"
+
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -39,7 +38,6 @@ TEST_DIR = os.path.dirname(__file__)
 # test was run from the pywbemtools directory
 TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
-CONFIRM_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_CONFIRMY_FILE)
 
 CONN_HELP = """
 Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
@@ -368,7 +366,7 @@ TEST_CASES = [
       'test': 'lines'},
      None, OK],
 
-    ['Verify --moc-server and --server together fail.',
+    ['Verify --mock-server and --server together fail.',
      ['add', '--mock-server', 'test1.mof', '--server', 'http://blah',
       '--name', 'fred'],
      {'stderr': 'Error: Add failed. Simultaneous "--server" and '
@@ -396,16 +394,17 @@ TEST_CASES = [
          "  Timeout: None", "  Noverify: False", "  Certfile: None",
          "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
          "  log: None"],
-      'test': 'in'},
+      'test': 'in',
+      'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand add with complex options and verify',
+    ['Verify connection subcommand add with complex options',
      ['add', '--name', 'test2', '-s', 'http://blahblah', '-u', 'fred', '-p',
-      'argh', '-t', '18', '-N', '-l', 'api=file,all', '--verify'],
-     {'stdout': "Execute add connection",
-      'test': ['test2', 'Execute add connection'],
+      'argh', '-t', '18', '-N', '-l', 'api=file,all'],
+     {'stdout': "",
+      'test': 'regex',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_CONFIRMY_FILE, OK],
+     None, OK],
 
     ['Verify connection subcommand show  ',
      ['show', 'test1'],
@@ -686,20 +685,21 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify connection subcommand select mocktest with prompt ',
-     ['select'],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['select']},
      {'stdout': "",
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_PROMPT0_FILE, OK],
+     None, OK],
 
     ['Verify connection subcommand delete with prompt that selects 0',
-     ['delete', ],
+     {'global': ['--mocker-for-tests', 'prompt:0'],
+      'args': ['delete', ]},
      {'stdout': ['Select a connection or CTRL_C to abort.',
-                 '0: mocktest',
                  'Input integer between 0 and 0 or Ctrl-C to exit selection:'],
-      'test': 'linesnows',
+      'test': 'regex',
       'file': {'before': 'exists', 'after': 'None'}},
-     MOCK_PROMPT0_FILE, OK],
+     None, OK],
 
     ['Verify Add mock server to empty connections file.',
      ['add', '--name', 'mocktest', '--mock-server', MOCK_FILE_PATH],
@@ -710,11 +710,31 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete with prompt that selects y for '
      'verify',
-     ['delete', 'mocktest', '--verify'],
+     {'global': ['--mocker-for-tests', 'confirm:y'],
+      'args': ['delete', 'mocktest', '--verify']},
      {'stdout': ['Name: mocktest', 'Execute delete'],
       'test': 'regex',
       'file': {'before': 'exists', 'after': 'None'}},
-     MOCK_CONFIRMY_FILE, OK],
+     None, OK],
+
+    ['Verify --name with no --server or --mock-server fails '
+     '--verify',
+     {'args': ['save', '--verify'],
+      'global': ['--name', 'NameWithNoServer',
+                 '--timeout', '45',
+                 '--use-pull-ops', 'no',
+                 '--default-namespace', 'root/blah',
+                 '--user', 'john',
+                 '--password', 'pw',
+                 '--noverify',
+                 '--certfile', 'mycertfile.pem',
+                 '--keyfile', 'mykeyfile.pem']},
+     {'stderr': 'Named connection "NameWithNoServer" does not exist and no '
+         '--server or --mock-server options to define a WBEMServer',
+      'rc': 1,
+      'test': 'in',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
 
     #
     #  Verify Create from mock with cmd line params, save, show, delete works
@@ -725,7 +745,9 @@ TEST_CASES = [
     ['Verify save server with cmd line params to empty connections file. Use '
      '--verify',
      {'args': ['save', '--verify'],
-      'global': ['--name', 'svrtest2',
+      'global': ['--mocker-for-tests', 'confirm:y',
+                 '--server', 'http://blah',
+                 '--name', 'svrtest2',
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
                  '--default-namespace', 'root/blah',
@@ -737,7 +759,7 @@ TEST_CASES = [
      {'stdout': "",
       'test': 'in',
       'file': {'before': 'none', 'after': 'exists'}},
-     MOCK_CONFIRMY_FILE, OK],
+     None, OK],
 
     ['Verify save mock server with cmd line params to empty connections file.',
      {'args': ['save'],
@@ -773,7 +795,7 @@ TEST_CASES = [
      ['show', 'svrtest2'],
      {'stdout': [
          "Name: svrtest2",
-         "  WBEMServer uri: None",
+         "  WBEMServer uri: http://blah",
          "  Default-namespace: root/blah", "  User: john", "  Password: pw",
          "  Timeout: 45", "  Noverify: True", "  Certfile: mycertfile.pem",
          "  Keyfile: mykeyfile.pem", "  use-pull-ops: False",
@@ -787,14 +809,22 @@ TEST_CASES = [
      ['delete', 'mocktest2'],
      {'stdout': "",
       'test': 'regex',
-      'file': {'before': 'exists', 'after': 'exists'}},
+      'file': {'before': 'exists', 'after': 'None'}},
      None, OK],
 
-    ['Verify connection subcommand delete works',
+    ['Verify connection subcommand delete Fails, No file',
      ['delete', 'svrtest2'],
      {'stdout': "",
       'test': 'regex',
       'file': {'before': 'exists', 'after': 'none'}},
+     None, OK],
+
+    ['Verify connection subcommand delete Fails, No file',
+     ['delete', 'svrtest2'],
+     {'stderr': "svrtest2 not a defined connection name",
+      'rc': 1,
+      'test': 'regex',
+      'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 ]
 
@@ -842,7 +872,7 @@ class TestSubcmdClass(CLITestsBase):
                 test_file(exp_response['file']['before'])
 
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+                         mock, condition, verbose=False)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:
