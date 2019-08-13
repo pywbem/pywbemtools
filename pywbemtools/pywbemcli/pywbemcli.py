@@ -20,6 +20,8 @@ the pywbemcli click tool
 from __future__ import absolute_import
 
 import os
+import sys
+import traceback
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
@@ -240,40 +242,71 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         # Default for output_format is applied in processing since it depends
         # on request (ex. mof for get class vs table for many)
 
-        if server and mock_server:
-            click.echo('Error: Conflicting server definition. Do not use '
-                       '--server and --mock-server simultaneously', err=True)
-            raise click.Abort()
-
         resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
 
         resolved_timestats = timestats or DEFAULT_TIMESTATS
 
         # process mock_server option
+        resolved_mock_server = []
         if mock_server:
             assert isinstance(mock_server, tuple)
             resolved_mock_server = []
-            # allow relative or absolute paths
+            # resolve relative and absolute paths
+            mock_server_path = []
             for fn in mock_server:
                 if fn == os.path.basename(fn):
-                    resolved_mock_server.append(os.path.join(os.getcwd(), fn))
+                    mock_server_path.append(os.path.join(os.getcwd(), fn))
                 else:
-                    resolved_mock_server.append(fn)
+                    mock_server_path.append(fn)
 
-            # abort for non-existent mock files or invalid type
+            # Abort for non-existent mock files or invalid type
             # Otherwise these issued do not get found until connection
             # exercised.
-            for fn in mock_server:
-                ext = os.path.splitext(fn)[1]
+            # TODO: Future: Create common method with code in build_respository
+            for file_path in mock_server_path:
+                ext = os.path.splitext(file_path)[1]
                 if ext not in ['.py', '.mof']:
                     click.echo('Error: --mock-server: File: "%s" '
                                'extension: "%s" not valid. "py" or "mof" '
-                               'required' % (fn, ext), err=True)
+                               'required' % (file_path, ext), err=True)
                     raise click.Abort()
-                if not os.path.isfile(fn):
+                if not os.path.isfile(file_path):
                     click.echo('Error: --mock-server: File: "%s" does '
-                               'not exist' % fn, err=True)
+                               'not exist' % file_path, err=True)
                     raise click.Abort()
+                if ext != '.py':
+                    resolved_mock_server.append(file_path)
+                    continue
+
+                with open(file_path) as fp:
+                    if '!PROCESS!AT!STARTUP!' in fp.readline():
+                        try:
+                            # Only verbose is allowed here
+                            globalparams = {'VERBOSE': verbose}
+                            # pylint: disable=exec-used
+                            exec(fp.read(), globalparams, None)
+                        except Exception as ex:
+                            exc_type, exc_value, exc_traceback = \
+                                sys.exc_info()
+                            tb = repr(traceback.format_exception(
+                                exc_type,
+                                exc_value,
+                                exc_traceback))
+                            raise click.ClickException('Exception failure of '
+                                                       '"--mock-server" python '
+                                                       'script %r. '
+                                                       'Exception: %r\n'
+                                                       'Traceback\n%s' %
+                                                       (file_path, ex, tb))
+                    else:  # not processed during startup
+                        resolved_mock_server.append(file_path)
+
+        if server and resolved_mock_server:
+            click.echo('Error: Conflicting server definitions. Do not use '
+                       '--server and --mock-server simultaneously. '
+                       '--server: %s, --mock-server: %s' %
+                       (server, resolved_mock_server), err=True)
+            raise click.Abort()
 
         if use_pull_ops:
             try:
@@ -307,7 +340,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          pull_max_cnt=resolved_pull_max_cnt,
                                          stats_enabled=resolved_timestats,
                                          verbose=verbose,
-                                         mock_server=mock_server,
+                                         mock_server=resolved_mock_server,
                                          log=log)
         else:  # Server and mock_server are None
             # if name cmd line option, get connection repo and
@@ -320,7 +353,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 # exception when defined name does not exist
                 else:
                     raise click.ClickException('Named connection "{}" does '
-                                               'not exist'.format(name))
+                                               'not exist and no --server or '
+                                               '--mock-server options to '
+                                               'define a '
+                                               'WBEMServer'.format(name))
             else:
                 # try default but ignore if it does not exist
                 if 'default' in pywbemcli_servers:
@@ -331,7 +367,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 pywbem_server = pywbemcli_servers[name]
                 # Test for invalid other options with the --name option
                 # The following options are part of each PywbemServer object
-                # TODO: should really put this into pywbemserver itself.
+                # TODO: FUTURE should really put this into pywbemserver itself.
                 other_options = ((default_namespace, 'default_namespace'),
                                  (use_pull_ops, 'use_pull_ops'),
                                  (pull_max_cnt, ''),
@@ -369,8 +405,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             resolved_use_pull_ops = ctx.obj.use_pull_ops
         if pull_max_cnt is None:
             resolved_pull_max_cnt = ctx.obj.use_pull_ops
-        if pywbem_server is None:
-            resolved_timestats = ctx.obj.pull_max_cnt
+        if not timestats:  # Defaults to False, not None
+            resolved_timestats = ctx.obj.timestats
         if log is None:
             log = ctx.obj.log
         if verbose is None:

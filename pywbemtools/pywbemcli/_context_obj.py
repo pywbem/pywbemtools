@@ -29,13 +29,6 @@ import click_spinner
 
 from ._common import format_table
 
-# The current pywbem server object for subcommands.
-PYWBEM_SERVER_OBJ = None
-
-# dictionary of defined servers. The key is the name for each
-# server. the value is a PywbemServer object
-PYWBEM_SERVERS = {}
-
 
 class ContextObj(object):  # pylint: disable=useless-object-inheritance
     """
@@ -56,6 +49,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._timestats = timestats
         self._spinner = click_spinner.Spinner()
         self._log = log
+        self._conn = None
 
     def __repr__(self):
         return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
@@ -100,9 +94,18 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def conn(self):
         """
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
+        This property uses the wbem_server property to activate the
+        conn and wbem_server. Thus, the connection is not activated unless
+        a command requiring the webem server is executed.  This allows other
+        commands like connection to execute without testing whether or not the
+        WBEM server exists.
         """
-        # This is created in wbemserver and retained there.
-        return self._pywbem_server.conn
+        # The conn property is created in wbem_server and retained here.
+        if self._conn:
+            return self._conn
+        else:
+            self._conn = self.wbem_server.conn
+            return self._conn
 
     @property
     def log(self):
@@ -115,9 +118,31 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def wbem_server(self):
         """
         :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
-        requests This is maintained in the pywbem_server object.
+        requests This is maintained in the pywbem_server object as
+        _pywbem_server. This and/or the conn property are executed before
+        any operation that is to contact the server.  This property enables any
+        server characteristics.
         """
-        return self._pywbem_server.wbem_server
+        # If no server defined, do not try to connect. This allows
+        # commands like help, connection new, list to execute without
+        # a target server defined.
+        if self._pywbem_server:
+            if self._pywbem_server.wbem_server is None:
+                # get the password if it is required.  This may involve a
+                # prompt.
+                self._pywbem_server.get_password(self)
+                self._pywbem_server.create_connection(self.verbose)
+                if self._conn and self.timestats:  # Enable stats gathering
+                    self.conn.statistics.enable()
+            return self._pywbem_server.wbem_server
+        else:
+            raise click.ClickException('No server defined for subcommand '
+                                       'that requires server. Define a server '
+                                       'with "--server", "--mock-server", or '
+                                       '"--name" general options; or in '
+                                       'interactive mode, use "connection '
+                                       'select" or "connection add" to define '
+                                       'a connection.')
 
     @property
     def pywbem_server(self):
@@ -130,7 +155,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     @property
     def spinner(self):
         """
-        :class:`~click_spinner.Spinner` object.
+        :class:`~click_spinner.Spinner` object. Controls start and stop of
+        the spinner object
         """
         return self._spinner
 
@@ -158,18 +184,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
-        self.connect_wbem_server()
-        if self.timestats:  # Enable statistics gathering if required
-            if self.conn:
-                self.conn.statistics.enable()
         self.spinner.start()
         try:
             cmd()
         finally:
             self.spinner.stop()
-            if self.timestats:
-                if self.conn:
-                    click.echo(self.format_statistics(self.conn.statistics))
+
+            # Issue statistics if required. Note that we use _conn in order
+            # not to create the connection if not created.
+            if self.timestats and self._conn:
+                click.echo(self.format_statistics(self.conn.statistics))
 
     def format_statistics(self, statistics):
         """

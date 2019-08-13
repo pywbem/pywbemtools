@@ -331,7 +331,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file does not exist',
-     {'global': ['-m', 'invalidfilename.mof'],
+     {'global': ['--mock-server', 'invalidfilename.mof'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File:',
@@ -343,7 +343,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file with bad extension',
-     {'global': ['-m', 'invalidfilename.mofx'],
+     {'global': ['--mock-server', 'invalidfilename.mofx'],
       'subcmd': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File: ',
@@ -397,12 +397,25 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify --mock_server and --server options together fail',
-     {'global': ['--mock-server', 'fred', '--server', 'http://localhost'],
+    ['Verify simultaneous --mock_server and --server options fail',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                 '--server', 'http://localhost'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stderr': ['Conflicting server definition. Do not use --server '
+     {'stderr': ['Conflicting server definitions. Do not use --server '
                  'and --mock-server simultaneously',
+                 'Aborted!'],
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
+    ['Verify --mock_server invalid name',
+     {'global': ['--mock-server', 'fred'],
+      'subcmd': 'connection',
+      'args': ['show']},
+     {'stderr': ['--mock-server: File:',
+                 'fred',
+                 'extension: "" not valid.',
                  'Aborted!'],
       'rc': 1,
       'test': 'regex'},
@@ -549,6 +562,19 @@ TEST_CASES = [
      {'subcmd': 'connection',
       'args': ['delete', 'globaltest1']},
      {'stderr': "Error: globaltest1 not a defined connection name",
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
+
+    ['Verify connection without server definition and subcommand that '
+     ' requires connection fails.',
+     {'subcmd': 'class',
+      'args': ['enumerate']},
+     {'stderr': 'No server defined for subcommand that requires server. '
+                'Define a server with "--server", "--mock-server", or '
+                '"--name" general options; or in interactive mode, use '
+                '"connection select" to enable a connection',
       'rc': 1,
       'test': 'regex'},
      None, OK],
