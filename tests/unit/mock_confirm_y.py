@@ -1,5 +1,10 @@
-# (C) Copyright 2017 IBM Corp.
-# (C) Copyright 2017 Inova Development Inc.
+# !PROCESS!AT!STARTUP!
+# The previous statement is used by pywbemcli to force this script to be
+# run at pywbemcli startup and not included in the list of --mock-server
+# files that are used to build the repository.  This is a development
+# test aid.
+# (C) Copyright 2019 IBM Corp.
+# (C) Copyright 2019 Inova Development Inc.
 # All Rights Reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +32,7 @@ RETURN_VALUE = True
 
 def mock_confirm(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print(msg)
+    print('MOCK_CLICK_CONFIRM(y): %s' % msg)
     return RETURN_VALUE
 
 

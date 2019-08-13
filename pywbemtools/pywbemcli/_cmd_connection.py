@@ -471,10 +471,16 @@ def cmd_connection_add(context, options):
     """
     name = options['name']
     server = options['server']
+    mock_server = options['mock_server']
     connections = ConnectionRepository()
     if name in connections:
         raise click.ClickException('Connection name "%s" already defined'
                                    % name)
+
+    if not mock_server and not server:
+        raise click.ClickException('Add failed; missing server definition. A '
+                                   'server using either "--server" or '
+                                   '"--mock-server" required.')
 
     try:
         new_server = PywbemServer(server, options['default_namespace'],

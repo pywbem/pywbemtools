@@ -1338,7 +1338,7 @@ Instances: PyWBEM_AllTypes
                  '};',
                  'Execute ModifyInstance'],
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'regex'},
      [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
 
     ['Verify instance subcommand modify, single good change with verify no',
@@ -1865,7 +1865,6 @@ Instances: PyWBEM_AllTypes
      {'stdout': ASSOC_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
-
 
     ['Verify instance subcommand associators with query, traditional ops',
      {'args': ['associators', 'TST_Person.name="Mike"', '--filterquery',
