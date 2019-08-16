@@ -365,15 +365,10 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 	echo "done" >$@
 	@echo "makefile: Done installing/upgrading basic Python packages"
 
-# Scripts are required to install the os components of pywbem.
+# Scripts may be required to install the os components of pywbem.
 # Makefile gets the required scripts from github.pywbem (see pywbem doc)
 pywbem_os_setup.sh:
-# TODO(ks) tempoarily not download the shell script if platform is cygwin
-ifeq  ($(PLATFORM),Windows_UNIX)
-	-$(call CP_FUNC,pywbem_os_setup_cygwin.sh,pywbem_os_setup.sh)
-else
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
-endif
 	chmod 755 pywbem_os_setup.sh
 
 pywbem_os_setup.bat:
