@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Test global options.
-NOTE: The --log opetions are tested in a separate file.
+Test the pywbemcli general options.  That is those options that are defined and
+used in pywbemcli.py and show up in the help output from pywbemcli --help.
+
+NOTE: The --log options are tested in a separate file.
 """
 from __future__ import absolute_import, print_function
 
