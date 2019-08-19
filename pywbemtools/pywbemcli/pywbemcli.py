@@ -60,14 +60,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               metavar='URI',
               help='Hostname or IP address with scheme of the WBEM server in '
                    'format:\n[{scheme}://]{host}[:{port}]\n'
-                   'The server parameter is conditionally optional '
-                   '(see --name)\n'
                    '* Scheme: must be "https" or "http" [Default: "https"]\n'
                    '* Host: defines short/fully qualified DNS hostname, '
                    'literal IPV4 address (dotted), or literal IPV6 address\n'
                    '* Port: (optional) defines WBEM server port to be '
-                   'used '
-                   '[Defaults: 5988(HTTP) and 5989(HTTPS)].\n' +
+                   'used [Defaults: 5988(HTTP) and 5989(HTTPS)].\n'
+                   'Thhis option the --name option and the --mock-server are '
+                   'mututally exclusive since each defines a WBEM server.\n' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.server_envvar))
 @click.option('-n', '--name', type=str,
               metavar='NAME',
@@ -77,16 +76,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'pywbemcli retrieves the connection information from the '
                    'connections file ' +
                    '({cf}). '.format(cf=DEFAULT_CONNECTIONS_FILE) +
-                   'If the server option and this option does not exist '
-                   '--server is used as the connection definition with  '
-                   '"default" as the name.'
-                   'This option and --server are mutually exclusive except '
-                   'when defining a new server from the command line' +
+                   'This option --server  and --mock-server are mutually '
+                   'exclusive since each defines a WBEM server ' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.name_envvar))
 @click.option('-d', '--default-namespace', type=str,
               metavar='NAMESPACE',
               envvar=PywbemServer.defaultnamespace_envvar,
-              help='Default Namespace to use in the target WBEM server if no '
+              help='Default namespace to use in the target WBEM server if no '
                    'namespace is defined in a subcommand' +
                    '(EnvVar: {ev}) ' .format(ev=PywbemServer.name_envvar) +
                    '[]Default: {of}].'.format(of=DEFAULT_NAMESPACE))
@@ -189,6 +185,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'The option value defines a MOF or Python file path used to '
                    'populate the mock repository. This option may be used '
                    'multiple times where each use defines a single file_path.'
+                   'This parameter the --server option and the --name option '
+                   'are mutually exclusive since each defines a WBEM server. '
                    'See the pywbemtools documentation for more information.' +
                    "(EnvVar: {}).".format(PywbemServer.mock_server_envvar))
 @click.version_option(
@@ -247,6 +245,12 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
 
         resolved_timestats = timestats or DEFAULT_TIMESTATS
 
+        if server and name:
+            click.echo('The --name argument "%s" and --server argument "%s" '
+                       'are mutually exclusive and may not be used '
+                       'simultaneously' % (name, server), err=True)
+            raise click.Abort()
+
         # process mock_server option
         resolved_mock_server = []
         if mock_server:
@@ -302,11 +306,19 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                     else:  # not processed during startup
                         resolved_mock_server.append(file_path)
 
+        # The mock-server that leaves something in resolved server
+        # and name simultaneously fail.
         if server and resolved_mock_server:
             click.echo('Error: Conflicting server definitions. Do not use '
                        '--server and --mock-server simultaneously. '
                        '--server: %s, --mock-server: %s' %
                        (server, resolved_mock_server), err=True)
+            raise click.Abort()
+
+        if resolved_mock_server and name:
+            click.echo('The --name argument "%s" and --,pcl+server argument '
+                       '"%s" are mutually exclusive and may not be used '
+                       'simultaneiously' % (name, mock_server), err=True)
             raise click.Abort()
 
         if use_pull_ops:
@@ -325,8 +337,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
         if server or mock_server:
-            if not name:
-                name = 'default'
+            if name:
+                click.echo("Name found with server or mock-server", err=True)
+                click.Abort()
+            name = 'default'
             pywbem_server = PywbemServer(server,
                                          resolved_default_namespace,
                                          name=name,

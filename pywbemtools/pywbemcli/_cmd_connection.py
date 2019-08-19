@@ -32,7 +32,8 @@ from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
     verify_operation, hide_empty_columns
 from ._common_options import add_options, verify_option
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT
+from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT, \
+    DEFAULT_MAXPULLCNT
 from ._connection_repository import ConnectionRepository
 from .config import MAX_TIMEOUT
 from ._context_obj import ContextObj
@@ -165,6 +166,24 @@ def connection_select(context, name):
               help="Server certfile. Ignored if noverify flag set. ")
 @click.option('-k', '--keyfile', type=str,
               help="Client private key file. ")
+@click.option('-U', '--use-pull-ops',
+              envvar=PywbemServer.use_pull_ops_envvar,
+              type=click.Choice(['yes', 'no', 'either']),
+              default='either',
+              help='Determines whether pull operations are used for '
+                   'EnumerateInstances, AssociatorInstances, '
+                   'ReferenceInstances, and ExecQuery operations.\n'
+                   '* "yes": pull operations required; if server '
+                   'does not support pull, the operation fails.\n'
+                   '* "no": forces pywbemcli to use only the '
+                   'traditional non-pull operations.\n'
+                   '* "either": pywbemcli trys first pull and then '
+                   ' traditional operations.')
+@click.option('--pull-max-cnt', type=int,
+              help='Maximium object count of objects to be returned for '
+                   'each request if pull operations are used. Must be  a '
+                   'positive non-zero integer.' +
+                   '[Default: {}]'.format(DEFAULT_MAXPULLCNT))
 @click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
               help='Enable logging of CIM Operations and set a component '
                    'to destination, and detail level\n'
@@ -236,6 +255,11 @@ def connection_test(context):
 
 
 @connection_group.command('save', options_metavar=CMD_OPTS_TXT)
+@click.option('-n', '--name', type=str,
+              metavar="Connection name",
+              help='If defined, this changes the name of the connection to '
+              'be saved. This allows renaming the current connection '
+              'as part of saving it.')
 @add_options(verify_option)
 @click.pass_obj
 def connection_save(context, **options):
@@ -514,6 +538,8 @@ def cmd_connection_save(context, options):
     """
     current_svr = context.pywbem_server
     connections = ConnectionRepository()
+    if options['name']:
+        current_svr._name = options['name']
     if current_svr.name in connections:
         raise click.ClickException('%s is already defined as a server' %
                                    current_svr.name)

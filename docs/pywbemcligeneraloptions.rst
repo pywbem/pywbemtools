@@ -21,15 +21,13 @@ information on each command-group arguments and options):
   * Port: (optional) defines WBEM server port to be used [Defaults: 5988(HTTP)
     and 5989(HTTPS)]. (EnvVar: PYWBEMCLI_SERVER).
 
-  The server parameter is conditionally optional (see ``--name`` options). If the
-  ``--name`` option exists and there is a server with the name defined by
-  ``--name`` defined in the :term:`connections file` the parameters of that
-  name are used for the connection.
+  The server parameter is mutually exclusive with the ``--name`` option and the
+  ``mock-server option since each define a connection to a WBEM server.
 
   In the interactive mode this connection is not actually executed until a
   command or subcommand requiring access to the WBEM server is entered.
-* **--name/-n** - The name of a WBEM server that is defined in the :term:``connection
-  file`` or, if the ``--server`` parameter exists, to define a name for a
+* **--name/-n** - The name of a WBEM server that is defined in the
+  :term:``connection file`` or, if the ``--server`` parameter exists, to define a name for a
   connection that will be entered in the connection file.  The server
   parameters for this connection will be set in pywbemcli.
   In the interactive mode a connection is not actually used until
@@ -38,25 +36,25 @@ information on each command-group arguments and options):
   A new server (``myserver``)may be defined and saved in the connection file with a
   name is defined as follows::
 
-    $ pywbemcli -s http://localhost --name myserver --user user --password password connection save
+    $ pywbemcli add -s http://localhost --name myserver --user user --password password
 
-  To use an existing server named ``myserver`` in the defined connections:
+  To use an existing server named ``myserver`` in the defined connections::
 
     $ pywbemcli --name myserver class get CIM_ManagedElement
 
   See :ref:`Connection command-group` for more information on managing
   connections.
 
-* **--default_namespace/-d** - Default :term:`CIM namespace` to use in the target
-   WBEM server if no namespace is defined in a command. If not defined the
-   pywbemcli default is ``root/cimv2``.  This is the namespace used on all
-   server operation requests unless a specific namespace is defined by:
+* **--default-namespace/-d** - Default :term:`CIM namespace` to use in the target
+  WBEM server if no namespace is defined in a command. If not defined the
+  pywbemcli default is ``root/cimv2``.  This is the namespace used on all
+  server operation requests unless a specific namespace is defined by:
 
-   * In the interactive mode prepending the command-group name with the
-     ``--namespace`` option.
-   * Using the ``--namespace`` or ``-n`` command option to define a namespace
-     on subcommands that specify this option.
-   * Executing a command that looks in multiple namespaces (ex. ``class find``).
+  * In the interactive mode prepending the command-group name with the
+    ``--namespace`` option.
+  * Using the ``--namespace`` or ``-n`` command option to define a namespace
+    on subcommands that specify this option.
+  * Executing a command that looks in multiple namespaces (ex. ``class find``).
 * **--user/-u** - Username for the WBEM server if a user name is required to
   authenticate the client.
 * **--password/-p** - Password for the WBEM server. This option is normally
@@ -72,7 +70,7 @@ information on each command-group arguments and options):
 * **--output-format/-o** - Output format choice (Default: mof).
   Note that the actual output format may differ from this value because some
   subcommands only allow selected formats. See :ref:`Output formats`.
-* **--use-pull_ops** [``yes``|``no``|``either``] - Determines whether the pull
+* **--use-pull-ops** [``yes``|``no``|``either``] - Determines whether the pull
   operations are used for ``EnumerateInstances``, ``AssociatorInstances``,
   ``ReferenceInstances``, and ``ExecQuery`` operations See :ref:`Pywbemcli and
   the DMTF pull operations` for more information on pull operations:
@@ -92,8 +90,7 @@ information on each command-group arguments and options):
   can be used to execute pywbemcli commands without access to a real server.
   See chapter :ref:`Mock WBEM server support` for information on defining
   mock servers.
-* **--log/-l** - See:ref:`Pywbemcli defined logging`. see
-  :ref:`Pywbemcli defined logging`
+* **--log/-l** - See:ref:`Pywbemcli defined logging`.
 * **--verbose/-v** -  Display extra information about the processing.
 * **--version** - Show the version of this command and of the pywbem package
       imported then exit.
@@ -117,7 +114,7 @@ PYWBEMCLI_NAME                  ``--name``
 PYWBEMCLI_USER                  ``--user``
 PYWBEMCLI_PASSWORD              ``--password``
 PYWBEMCLI_OUTPUT_FORMAT         ``--output-format``
-PYWBEMCLI_DEFAULT_NAMESPACE     ``--namespace``
+PYWBEMCLI_DEFAULT_NAMESPACE     ``--default-namespace``
 PYWBEMCLI_TIMEOUT               ``--timeout``
 PYWBEMCLI_KEYFILE               ``--keyfile``
 PYWBEMCLI_CERTFILE              ``--certfile``
@@ -412,7 +409,7 @@ The ouput of CIM objects allows multiple formats as follows:
 MOF is the format used to define the models released by the DMTF and SNIA. It
 textually defines the components and structure and data of these elements:
 
-  .. code-block:: text
+.. code-block:: text
 
     instance of CIM_Foo {
        InstanceID = "CIM_Foo1";
@@ -423,7 +420,7 @@ textually defines the components and structure and data of these elements:
 
 This is the format used in the DMTF CIM/XML protocol:
 
-  .. code-block:: text
+.. code-block:: text
 
     <VALUE.OBJECTWITHLOCALPATH>
         <LOCALINSTANCEPATH>
@@ -453,7 +450,7 @@ This is the structure and data of the pywbem Python objects representing these
 CIM objects and can be useful in understanding the pywbem interpretation of the
 CIM objects:
 
-  .. code-block:: text
+.. code-block:: text
 
     CIMInstance(classname='CIM_Foo', path=CIMInstanceName(classname='CIM_Foo',
         keybindings=NocaseDict({'InstanceID': 'CIM_Foo1'}), namespace='root/cimv2',
@@ -585,6 +582,8 @@ pywbemcli.log as follows showing the input parameters to the pywbem method
 
 The format is::
 
+.. code-block:: text
+
     <Date time>-<Component>.<ref:`connection id`>-<Direction>:<connection id> <PywbemOperation>(<data>)
 
 
@@ -601,15 +600,15 @@ saved in a a JSON formatted file(see :term:`connections file`) in the current
 directory from which pywbemcli was executed.
 
 To create a new persistent connection definition, pywbemcli should be executed with
-either the ``--server``, or the ``mock-server`` option, and the ``--name`` option and
+either the ``--server``, or the ``--mock-server`` option, and the ``--name`` option and
 any other general parameters desired for the connection.  Then executing the
-``connection save`` COMMAND will save the new connection in the connections
+``connection save`` command will save the new connection in the connections
 file. For example the following example creates a new connection in the
 interactive mode:
 
 .. code-block:: text
 
-    $ pywbemcli --server http://localhost --user usr1 -passowrd blah --name testconn
+    $ pywbemcli --server http://localhost --user usr1 -password blah --name testconn
     pywbemcli> connection list
     Name: testconn
       WBEMServer uri: http://localhost
@@ -636,6 +635,8 @@ Note: The * indicates that this is the current connection.
 
 Other connections can be added from either the command mode or interactive mode.
 
+.. code-block:: text
+
     pywbemcli> connection add Ronald http://blah2 -u you -p xxx
     pywbemcli> connection list
     WBEMServer Connections:
@@ -646,11 +647,15 @@ Other connections can be added from either the command mode or interactive mode.
 
 Connections can be deleted with the ``connection delete`` command either with
 the command argument containing the connection name or with no name provided so
-pywbemcli presents a list of connections::
+pywbemcli presents a list of connections:
+
+.. code-block:: text
 
     $ pywbemcli connection delete Ronald
 
-or::
+or:
+
+.. code-block:: text
 
     $ pywbemcli connection delete
     Select a connection or CTRL_C to abort.

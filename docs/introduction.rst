@@ -212,7 +212,7 @@ Pywbemtools attempts to comply to the maximum possible with the relevant standar
 
 Pywbemtools uses pywbem for communication with the WBEM server. Therefore
 pywbemtools conformance to the relevant standards is defined in the `pywbem
-standards conformance documentation`.
+standards conformance documentation`_.
 
 Therefore, the level of conformance and limitations for pywbemtools is the same
 as pywbem except for any specific notations in this document.
