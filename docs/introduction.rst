@@ -58,8 +58,8 @@ platforms. It provides functionality to:
 
 * Inspect/manage WBEM server functionality including:
 
-  * CIM namespaces as (see :term:`CIM namespace`) ,
-  * WBEM registered profiles (see :term:`WBEM management profile`),
+  * CIM namespaces in a WBEM server (see :term:`CIM namespace`) ,
+  * WBEM registered profiles in a WBEM server (see :term:`WBEM management profile`),
   * WBEM server brand and version information.
 
 * Capture detailed information on interactions with the WBEM server including
@@ -140,7 +140,7 @@ Python environment, and must have at least the following packages
 installed:
 
 - Python, either python 2.7 or Python 3.4-3.7. Pywbemtools does not support
-  Python 2.6
+  Python 2.6.
 
 - Python installation support packages(all platforms):
 
@@ -157,11 +157,11 @@ Other installation support packages:
       that is are normally available with unix style OSs (ex. make). See
       https://chocolatey.org/ for the installation instructions for Chocolatey.
 - Windows Cygwin
-    - wget - wget can be installed as part of the cygwin installation or
-      added cygwin package update.
+    - wget - wget can be installed as part of the Cygwin installation or
+      added with Cygwin package update.
     - python-devel - Probably named python2-devel / python3-devel
 
-Pywbemtools does install the``pywbem`` package which has a number of
+Pywbemtools installs the``pywbem`` package which has a number of
 prerequisites for installation as documented in the `pywbem installation
 documentation`_. These requirements should be covered by the list above.
 
@@ -332,7 +332,7 @@ Since Python 2.7, :exc:`~py:exceptions.DeprecationWarning` warnings are
 suppressed by default. They can be shown for example in any of these ways:
 
 
-* by invoking pywbemcl with the environment variable:
+* by invoking pywbemcli with the environment variable:
 
   ``PYTHONWARNINGS=default``
 

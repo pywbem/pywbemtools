@@ -694,7 +694,7 @@ options for pywbemcli. The data includes:
 * **output-format** optional output format.
 * **mock_server** optional definition of the files that define a mock server
   environment using the pywbem mock module. This parameter is used, the
-  server_url must not be defined.
+  ``--server_url`` must not be defined.
 
 The :term:`connections file` is named ``pywbemcliservers.json`` in the directory
 in which pywbemcli is executed. The data is stored in JSON format within this
@@ -760,7 +760,7 @@ The subcommands include:
 * **select** select a connection from the connection table.  A connection
   may be selected either by using the name argument or if no argument is
   provided by selecting from a list presented on the console. The following
-  example shows changing connection from within the interactive mode of pywemcli::
+  example shows changing connection from within the interactive mode of pywbemcli::
 
     pywbemcli> connection select
     Select a connection or Ctrl_C to abort.

@@ -87,7 +87,7 @@ without specifying any command-group or command:
     $ pywbemcli [GENERAL-OPTIONS]
     pywbemcli> _
 
-Alternatively, the pywbemcl shell can also be started by specifying the ``repl``
+Alternatively, the pywbemcli shell can also be started by specifying the ``repl``
 command:
 
 .. code-block:: text
@@ -105,7 +105,7 @@ pywbemcli commands and arguments that can be typed in the pywbemcli shell.
 The pywbemcli commands that can be typed in the pywbemcli shell are the
 command or command-group that would follow the ``pywbemcli`` command and
 general options when used in `command mode`_. The following example
-starts a pywbemcli shell in interactive mode and executes serveral commands
+starts a pywbemcli shell in interactive mode and executes several commands
 (ex. ``class enumerate -o``).
 
 .. code-block:: text
@@ -126,7 +126,7 @@ above has the same effect as the standalone command:
 .. code-block:: text
 
     $ pywbemcli -s http://localhost -u username class get CIM_System
-    . . . <MOF formated display of the CIM_System class>
+    . . . <MOF formatted display of the CIM_System class>
 
 The internal commands ``:?``, ``:h``, or ``:help`` display general help
 information for external and internal commands:
@@ -146,7 +146,7 @@ information for external and internal commands:
 
 In addition to using one of the internal shell commands shown in the help text
 above, you can also exit the pywbemcli shell by typing `Ctrl-D`. Note: the
-pywbemshell exit command may vary by operating system.
+pywbemcli shell exit command may vary by operating system.
 
 Typing ``--help`` or ``-h`` in the pywbemcli shell displays general help
 information for the pywbemcli commands, which includes general options and a
@@ -335,5 +335,6 @@ interactive mode and as a table:
    pywbemcli>
 
 **Note:** - With this use of the general options as part of an interactive mode
-command, the options redefinitions may not be retained between command executions.
+command, general the options redefinition's may not be retained between command
+executions.
 

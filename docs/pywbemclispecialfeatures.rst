@@ -59,14 +59,14 @@ operations, of traditional operations, or to let pywbem try them both.
 The input parameter ``--use-pull-ops`` allows the choice of pull or traditional
 operations with the default being to allow pywbem to decide.  The input
 parameter ``max_object_cnt`` sets the ``MaxObjectCount`` variable on the operation
-request if the pull operations are to be set which tells the WBEM server to
+request if the pull operations are to be used which tells the WBEM server to
 limit the size of the response.  For example::
 
     pywbemcli --server http/localhost use-pull-ops=yes max_object_cnt=10
 
 would force the use of the pull operations and return an error if the target
-server did not implement them and would set the ``MaxObjCount`` parameter on the
-api to 10, telling the server that a maximum of 10 object can be returned for
+server did not implement them and would set the ``MaxObjectCount`` parameter on the
+api to 10, telling the server that a maximum of 10 objects can be returned for
 each of the requests in an enumeration sequence.
 
 Since the default for use-pull-ops is ``either``, normally pywbem first tries
@@ -84,6 +84,7 @@ corresponding pywbem request operations.
 =================================  ==============================================
 WBEM CIM-XML Operation             pywbemtools command-group & subcommand
 =================================  ==============================================
+**Instance Operations:**
 EnumerateInstances                 instance enumerate INSTANCENAME
 EnumerateInstanceNames             instance enumerate INSTANCENAME --name_only
 GetInstance                        instance get INSTANCENAME
@@ -108,7 +109,7 @@ IterAssociatorInstancePaths        instance associators INSTANCENAME --name_only
 IterReferenceInstances             instance references INSTANCENAME
 IterReferenceInstancePaths         instance references INSTANCENAME --name_only
 IterQueryInstances                 instance query
-When --use-pull-ops either or yes  TODO
+**When --use-pull-ops is ``either`` or ``yes``:**
 OpenEnumerateInstances             instance enumerate INSTANCENAME
 OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
 OpenAssociatorInstances            instance associators INSTANCENAME
@@ -120,12 +121,14 @@ PullInstancesWithPath              part of pull sequence
 PullInstancePaths                  part of pull sequence
 PullInstances                      part of pull sequence
 CloseEnumeration                   Not implemented
+**Class Operations:**
 EnumerateClasses                   class enumerate CLASSNAME
 EnumerateClassNames                class enumerate --name-only
 GetClass                           class get CLASSNAME
 ModifyClass                        Not implemented
 CreateClass                        Not implemented
 DeleteClass                        class delete CLASSNAME
+**QualifierDeclaration operations:**
 EnumerateQualifiers                qualifier enumerate
 GetQualifier                       qualifier get QUALIFIERNAME
 SetQualifier                       Not implemented
@@ -145,11 +148,11 @@ Displaying CIM instances or CIM instance names
 The pywbem API includes different WBEM operations (ex. ``EnumerateInstances`` and
 ``EnumerateInstanceNames``) to request CIM objects or just their names. To
 simplify the overall command line syntax pywbemcli combines these into a single
-subcommand (i.e. enumerate, references, associators) and includes an option
-(``-o,`` or ``--names-only``) that determines whether the instance names or
-instances are retrieved from the WBEM Server.
+subcommand (i.e. ``enumerate``, ``references``, ``associators``) and includes
+an option (``-o,`` or ``--names-only``) that determines whether the instance
+names or instances are retrieved from the WBEM Server.
 
-Thus, for example an `instance enumerate` with and without the ``-o`` option::
+Thus, for example an ``instance enumerate`` with and without the ``-o`` option::
 
 
     $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
@@ -181,7 +184,7 @@ Interactively selecting INSTANCENAME
 ------------------------------------
 
 Arguments like the INSTANCENAME on some of the instance group subcommands (
-get, references, associators, etc) can be very difficult to correctly enter
+``get``, ``references``, ``associators``, etc) can be very difficult to correctly enter
 since it can involve multiple keybindings, use of quotation marks, etc.  To
 simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
 these commands that allows the user to specify only the class name, retrieves

@@ -31,8 +31,9 @@ This documentation uses a few special terms to refer to Python types:
       an argument of several of the command-group ``instance`` subcommands that
       allows two possible inputs based on another subcommand option(``--interactive``).
 
-      When ``interactive`` is set the INSTANCENAME is a string representation of
-      a CIMInstanceName formatted as defined by  :term:`WBEM-URI`
+      When the ``interactive`` option is not set, the INSTANCENAME is a string
+      representation of a CIMInstanceName must be formatted as defined by
+      :term:`WBEM-URI`
 
       Otherwise the INSTANCENAME should be a classname in which case pywbemcli
         will get the instance names from the WBEM server and present a
@@ -79,7 +80,7 @@ This documentation uses a few special terms to refer to Python types:
    WBEM management profile
       The DMTF and SNIA define specific profiles of manageability that are
       published as specifications in the DMTF and within the SMI-S specification
-      in SNIA. A management profile defines the managability characteristics
+      in SNIA. A management profile defines the manageability characteristics
       of a specic set of services in terms of the CIM model and WBEM operations.
       These profiles are documented by name and version and are incorporated into
       compliant WBEM servers so that they can be discovered by WBEM clients to
@@ -89,7 +90,8 @@ This documentation uses a few special terms to refer to Python types:
    WBEM-URI
       The wbem-uri is a standardized text form for CIM instance names. It is
       documented in DMTF :term:`DSP0207`. Pywbemcli uses the untyped WBEM URI
-      as the format for instance names in cli input parameters
+
+      as the format for instance names in CLI input parameters
       (i.e. :term:`INSTANCENAME`)::
 
             WBEM-URI = WBEM-URI-UntypedNamespacePath /
@@ -162,7 +164,7 @@ implemented, but pywbem supports it nevertheless.
 
 All three profile advertisement methodologies start from the
 `CIM_RegisteredProfile` instance that identifies the management profile, by
-means of registered organisation, registered name, and registered version.
+means of registered organization, registered name, and registered version.
 
 It is important to understand that the `CIM_RegisteredProfile` instance not
 only identifies the management profile, but represents a particular use of the
@@ -211,7 +213,7 @@ advertisement methodology is obviously the most complex one of the three.
 
 Pywbem encapsulates the complexity and choice of these methodologies into
 a single invocation of an easy-to use method
-:meth:`~pywbem.WBEMServer.get_central_instances`.
+:meth:`pywbem.WBEMServer.get_central_instances`.
 
 Profile implementations in a WBEM server are not entirely free when making a
 choice of which methodology to implement:
