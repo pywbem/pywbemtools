@@ -348,13 +348,6 @@ The due date on the milestone definition is the planned release date.
 There is usually also an issue that sets out the major goals for an upcoming
 release.
 
-Planned Next Release
---------------------
-
-Pywbemtools |pywbemtools-next-version| is in development.
-
-Pywbemtools |pywbemtools-next-issue-link| defines the basic direction for version
-|pywbemtools-next-version|.
 
 Contributing
 ------------
@@ -363,6 +356,7 @@ For information on how to contribute to this project, see
 `Development documentation`_.
 
 .. _Development documentation: https://github.com/pywbem/pywbemtools/blob/master/DEVELOP.md
+
 
 License
 -------

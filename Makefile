@@ -198,7 +198,7 @@ doc_paper_format := a4
 
 # Documentation generator command
 doc_cmd := sphinx-build
-doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_elements.papersize=$(doc_paper_format) .
+doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_elements.papersize=$(doc_paper_format) docs
 
 # File names of automatically generated utility help message text output
 doc_utility_help_files := \
@@ -279,8 +279,8 @@ help:
 	@echo "Uses the currently active Python environment: Python $(python_version)"
 	@echo ""
 	@echo "Make targets:"
-	@echo "  install    - Install $(package_name) and its Python installation and runtime prereqs (includes install_os once after clobber)"
-	@echo "  develop    - Install Python development prereqs (includes develop_os once after clobber)"
+	@echo "  install    - Install $(package_name) and its installation and runtime prereqs"
+	@echo "  develop    - Install $(package_name) development prereqs"
 	@echo "  build      - Build the distribution archive files in: $(dist_dir)"
 	@echo "  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)"
 	@echo "  builddoc   - Build documentation in: $(doc_build_dir)"
@@ -418,22 +418,14 @@ install_$(pymn).done: Makefile install_os_$(pymn).done install_basic_$(pymn).don
 develop_os: develop_os_$(pymn).done
 	@echo "makefile: Target $@ done."
 
-# The develop_os target handles pywbem os level setup. pyuwbemtools has no
-# develop_os requirements however, pywbem does, the pywbem_os_setup.xxx scripts.
-# develop_os forces the execution of tasks defined by the develop argument of these scripts.
+# The following target is supposed to install any prerequisite OS-level packages
+# needed for development of pywbemtools. Pywbemtools has no such prerequisite
+# packages on its own. Pywbem has such prerequisite packages, but only for
+# development of pywbem itself. Therefore, this target does not need to do
+# anything. We still have it in the Makefile, for clarity.
 develop_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done pywbem_os_setup.sh pywbem_os_setup.bat
-	@echo "No OS-level development requirements defined"
-# TODO: Why should we have to do develop?  The install fails with failure to install typed-ast
-#       which apparently requires python3-devel
-#	@echo "makefile: Installing OS-level development requirements"
-#	-$(call RM_FUNC,$@)
-#ifeq ($(PLATFORM),Windows_native)
-#	pywbem_os_setup.bat develop
-#else
-#	./pywbem_os_setup.sh develop
-#endif
+	@echo "No OS-level development requirements needed for pywbemtools"
 	echo "done" >$@
-	@echo "makefile: Done installing OS-level development requirements"
 
 .PHONY: develop
 develop: develop_$(pymn).done

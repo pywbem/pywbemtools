@@ -49,9 +49,9 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
    This will install Python packages into the active Python environment,
    and OS-level packages.
 
-4. On Windows, perform the setup steps described in
-   :ref:`Manual setup on Windows`. On Linux and OS-X, the corresponding
-   setup is performed automatically as part of the next step.
+4. Unix-like environments on Windows (such as CygWin, MinGW, Babun, or Gow)
+   bring their own Python, so double check that the active Python environment
+   is the one you want to use.
 
 5. Install the prerequsites for pywbemtools development.
    This will install Python packages into the active Python environment,
@@ -72,28 +72,6 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
    target does.
 
 .. _virtual Python environment: https://docs.python-guide.org/en/latest/dev/virtualenvs/
-
-
-.. _`Manual setup on Windows`:
-
-Manual setup on Windows
-^^^^^^^^^^^^^^^^^^^^^^^
-
-For development of pywbemtools, you may use native windows or one of the Unix-like
-environments on Windows (such as CygWin, MinGW, Babun, or Gow).
-The pywbemtools tests that run on the Appveyor CI test with both CygWin
-and native windows.
-
-Note that Unix-like environments on Windows bring their own Python, so double
-check that the active Python environment is the one you want to install to.
-
-.. _`Prerequisites for development installation`:
-
-Prerequisites for development installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. _pywbem installation documentation: https://pywbem.readthedocs.io/en/stable/intro.html#installation/
-
-See :ref:`Installation prerequisites for install with pip`
 
 
 .. _`Building the documentation`:
@@ -195,17 +173,17 @@ There are multiple types of tests in pywbem:
 
 4. Running Tox
 
-To run the unit and function tests in all supported Python environments, the
-Tox tool can be used. It creates the necessary virtual Python environments and
-executes `make test` (i.e. the unit and function tests) in each of them.
+   To run the unit and function tests in all supported Python environments, the
+   Tox tool can be used. It creates the necessary virtual Python environments and
+   executes `make test` (i.e. the unit and function tests) in each of them.
 
-For running Tox, it does not matter which Python environment is currently
-active, as long as the Python `tox` package is installed in it:
+   For running Tox, it does not matter which Python environment is currently
+   active, as long as the Python `tox` package is installed in it:
 
-::
+   ::
 
-    $ tox                              # Run tests on all supported Python versions
-    $ tox -e py27                      # Run tests on Python 2.7
+       $ tox                              # Run tests on all supported Python versions
+       $ tox -e py27                      # Run tests on Python 2.7
 
 
 .. _`Contributing`:

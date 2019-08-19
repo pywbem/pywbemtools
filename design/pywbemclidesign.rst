@@ -9,7 +9,7 @@ Update: 11 Feb 2017
 
 Update: 20 Feb 2017 - Add more subcommands and define characteristics of
         create instances and invoke method.
-        
+
 Update: 27 Feb 2017 - Clarify further the taxonomy and try to reduce the
         number of different subcommands (i.e. list vs enumerate)
 
@@ -27,11 +27,11 @@ Goals
   * Interactive mode - Use a REPL so that within pywbemcli the user can
     execute multiple commands without exiting the pywbemcli shell. Thus, the
     user can make a connection and then explore that connection with multiple
-    commands.    
-  * Script mode (complete command entered from command line)  
+    commands.
+  * Script mode (complete command entered from command line)
 * Capable of executing all WBEM CIM/XML operations (with specific exceptions)
 * Include commands for other operations that will be a real advantage to
-  developers, users, etc.  
+  developers, users, etc.
 * Integrated help to minize requirement for external documentation.
 * Python based and pure python implementation so that it can be used almost
   any python environment.
@@ -85,7 +85,7 @@ The only negatives to this approach are:
 * It will be more difficult to consider using pywbemcli as a testtool for
   pywbem itself, in part because they are on different development and release
   cycles.
-  
+
 
 Command Taxonomy
 ----------------
@@ -122,13 +122,13 @@ options.  The commands and subcommands are shown in **bold**:
   * **get** <classname> --namespace <getclass options> (corresponds to getclass)
   * **invokemethod** <classname> <methodname > [--parameter <name>=<value>]* --namespace
   * **query** <query> --querylanguage <name> -- namespace
-  * **enumerate**  (corresponds to enumerateclasses) <classname> --namespace --names-only &lt;enumerateclass options>  
-  * **references**  <sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)  
-  * **associators** <sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)  
-  * **method** <classname> <methodname> [<param_name=value>]*  
+  * **enumerate**  (corresponds to enumerateclasses) <classname> --namespace --names-only &lt;enumerateclass options>
+  * **references**  <sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)
+  * **associators** <sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)
+  * **method** <classname> <methodname> [<param_name=value>]*
   * **find** Find a class across namespaces (regex names allowed)
   * **hierarchy** Show a tree of the class hiearchy
-  
+
 * **instance**
 
   * **get** <inst_name>  --namespace <get inst options> (corresponds to GetInstance)
@@ -143,31 +143,31 @@ options.  The commands and subcommands are shown in **bold**:
 
   * **get** <qualifier_name>  --namespace <get qualifier options> (corresponds to GetQualifier)
   * **enumerate**   --namespace <enumerate qualifier options> (corresponds to EnumerateQualifiers)
-  
+
 * **server**                # operations on the pywbem Server Class
-  
+
   * **namespaces**          # return list of all namespaces
   * **interop**             # return interop namespace
   * **branding**            #Present overall name/brand info
   * **profiles**            #List with options for filtering
   *  <possible other server objects, etc. adapters>
-  
+
 * **profiles**            # Further operations on the pywbem server class
 
   * **enumerate**         # Enumerae profiles
   * TODO can we show profile relationships (reference profiles)?
-  
+
 * **subscriptions**       # Operations on the PywbemSubscriptionManager Class
 
   * **enumerate** --filters --subs --dest
   * **create** <filter|destination|subscription>
   * **delete** <filter|destination|subscription>
   * TODO: Should there be capability for listener in some modes???
-   
+
 * **connection**          # changes to the WBEMConnection Class
 
   * **show**              # detailed info on current connection
-  * **save**              # save the detailed information on the connection as exports  
+  * **save**              # save the detailed information on the connection as exports
   * **setdefaultnamespace**
   * **THE FOLLOWING ARE FUTURE to allow multiple connections to be saved**
   * list                  # list connections saved in persistent storage
@@ -175,12 +175,12 @@ options.  The commands and subcommands are shown in **bold**:
   * create                # create new connection and save
   * delete                # delete a connection
   * NOTE: Probably needs new general options (ex. --severname, --configfile)
-  
+
 * **job FUTURE**                # Operations on a future Jobs Class *FUTURE*
 
   *  list
   *  TBD
-  
+
 * **profile FUTURE**             # Lots unknown here. This is where we can expand into profiles
 
   * **profilename**
@@ -210,7 +210,7 @@ This command requires:
 #. Multiple inputs arguments representing the values of the properties to be
    included in the request.  For each property the input parameters must be
    capable of representing:
-   
+
    #. The property name
    #. The property value type
    #. The scalar value if it is a scalar property. This might be any of the
@@ -232,7 +232,7 @@ limitations:
 
 1. Pywbemcli will make use of both the CIM class for the property from the server
    and the input arguments. Specifically:
-   
+
    1. The CIM class will be used to get the property type and whether it
       is an array.
    2. This information can be used to validate the input arguments
@@ -362,11 +362,11 @@ Lets consider that in a separate design document.
 Proposal
 --------
 
-single tool with git-like subcommand structure:
+single tool with git-like subcommand structure::
 
     pywbemcli [generat-option]* command usb-command [specific-option]*
 
-Examples:
+Examples::
 
     pywbemcli -s http://localhost -o mof class get CIM_ManagedElement
     # Returns the mof for CIM_ManagedElement
@@ -415,11 +415,10 @@ There are at least two possibilities for aliases:
   * general text aliasing where a combination of text elements could be
     aliased (as git does). Thus, the text 'class get' could be aliased to
     getclass or gc.
-    
+
 I believe that the current `alias` contrib handles the first but not the second
 form of aliasing.
 
 Manual level documentation
 --------------------------
- TODO 
-
+ TODO
