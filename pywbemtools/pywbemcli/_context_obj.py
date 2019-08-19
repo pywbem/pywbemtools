@@ -117,7 +117,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     @property
     def wbem_server(self):
         """
-        :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
+        :class:`~pywbem.WBEMServer` WBEMServer instance to be used for
         requests This is maintained in the pywbem_server object as
         _pywbem_server. This and/or the conn property are executed before
         any operation that is to contact the server.  This property enables any
@@ -147,7 +147,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     @property
     def pywbem_server(self):
         """
-        :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
+        :class:`~pywbem.WBEMServer` WBEMServer instance to be used for
         requests.
         """
         return self._pywbem_server
@@ -176,7 +176,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def execute_cmd(self, cmd):
         """
         Call the cmd executor defined by cmd with the spinner. If the
-        WBEMServer object has not been created it is created so that this wbem
+        WBEM server object has not been created it is created so that this wbem
         server can be used for interactive commands.
 
         This method is called by every subcommand execution to setup and
@@ -281,8 +281,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         used in pywbem_server.
 
         """
-        # TODO: FUTURE investigate putting this into parent context instead of
-        #       global
+        # TODO: FUTURE investigate putting this into parent context
 
         # If no server defined, do not try to connect. This allows
         # commands like help, connection new, select to execute without

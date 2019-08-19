@@ -111,9 +111,8 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -o, --names-only                Retrieve only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
@@ -129,14 +128,13 @@ Options:
                                   filter query defined by --filterquery.
                                   (Default: None)
   -h, --help                      Show this message and exit.
+
 """
 
 INST_GET_HELP = """
 Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
   Get a single CIMInstance.
-
-
 
   Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
   resolve to the instance name of the desired instance. This may be supplied
@@ -173,15 +171,15 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
                                   class from which the instance to process is
                                   selected.
   -h, --help                      Show this message and exit.
+
 """
 
 INST_CREATE_HELP = """
@@ -195,24 +193,24 @@ Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
   Pywbemcli creates the new instance using CLASSNAME retrieved from the
   current WBEM server as a template for property characteristics. Therefore
   pywbemcli will generate an exception if CLASSNAME does not exist in the
-  current WBEM Server or if the data definition in the properties options
+  current WBEM server or if the data definition in the properties options
   does not match the properties characteristics defined the returned class.
 
   ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
 Options:
   -P, --property name=value  Optional property definitions of the form
-                             name=value.Multiple definitions allowed, one for
+                             name=value. Multiple definitions allowed, one for
                              each property to be included in the
                              createdinstance. Array property values defined by
                              comma-separated-values. EmbeddedInstance not
                              allowed.
   -V, --verify               If set, The change is displayed and verification
                              requested before the change is executed
-  -n, --namespace <name>     Namespace to use for this operation. If defined
-                             that namespace overrides the general options
-                             namespace
+  -n, --namespace <name>     Namespace to use for this operation, instead of
+                             the default namespace of the connection
   -h, --help                 Show this message and exit.
+
 """
 
 INST_DELETE_HELP = """
@@ -233,9 +231,10 @@ Options:
                           rather than an instance and user is presented with a
                           list of instances of the class from which the
                           instance to process is selected.
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -h, --help              Show this message and exit.
+
 """
 
 INST_COUNT_HELP = """
@@ -267,9 +266,10 @@ Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
 Options:
   -s, --sort              Sort by instance count. Otherwise sorted by
                           classname
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -h, --help              Show this message and exit.
+
 """
 
 INST_REFERENCES_HELP = """
@@ -324,9 +324,8 @@ Options:
                                   empty string the server should return no
                                   properties.
   -o, --names-only                Retrieve only the returned object names.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -s, --sort                      Sort into alphabetical order by classname.
   -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
@@ -346,6 +345,7 @@ Options:
                                   filter query defined by --filterquery.
                                   (Default: None)
   -h, --help                      Show this message and exit.
+
 """
 
 INST_MODIFY_HELP = """
@@ -371,8 +371,8 @@ Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
 
 Options:
   -P, --property name=value       Optional property definitions of the form
-                                  name=value.Multiple definitions allowed, one
-                                  for each property to be included in the
+                                  name=value. Multiple definitions allowed,
+                                  one for each property to be included in the
                                   createdinstance. Array property values
                                   defined by comma-separated-values.
                                   EmbeddedInstance not allowed.
@@ -395,9 +395,8 @@ Options:
   -V, --verify                    If set, The change is displayed and
                                   verification requested before the change is
                                   executed
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -h, --help                      Show this message and exit.
 """
 
@@ -465,9 +464,8 @@ Options:
                                   empty string the server should return no
                                   properties.
   -o, --names-only                Retrieve only the returned object names.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -s, --sort                      Sort into alphabetical order by classname.
   -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
@@ -507,7 +505,7 @@ Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
   Pywbemcli creates the method call using the class in INSTANCENAME
   retrieved from the current WBEM server as a template for parameter
   characteristics. Therefore pywbemcli will generate an exception if
-  CLASSNAME does not exist in the current WBEM Server or if the data
+  CLASSNAME does not exist in the current WBEM server or if the data
   definition in the parameter options does not match the parameter
   characteristics defined the returned class.
 
@@ -527,10 +525,10 @@ Options:
                               rather than an instance and user is presented
                               with a list of instances of the class from which
                               the instance to process is selected.
-  -n, --namespace <name>      Namespace to use for this operation. If defined
-                              that namespace overrides the general options
-                              namespace
+  -n, --namespace <name>      Namespace to use for this operation, instead of
+                              the default namespace of the connection
   -h, --help                  Show this message and exit.
+
 """
 
 INST_QUERY_HELP = """
@@ -538,7 +536,7 @@ Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY_STRING
 
   Execute an execquery request.
 
-  Executes a query request on the target WBEM Server with the QUERY_STRING
+  Executes a query request on the target WBEM server with the QUERY_STRING
   argument and query language options.
 
   The results of the query are displayed as mof or xml.
@@ -549,12 +547,12 @@ Options:
   -l, --querylanguage QUERY LANGUAGE
                                   Use the query language defined. (Default:
                                   DMTF:CQL.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
   -h, --help                      Show this message and exit.
+
 """
 
 ENUM_INST_RESP = """instance of CIM_Foo {

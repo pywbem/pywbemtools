@@ -198,7 +198,7 @@ def instance_create(context, classname, **options):
     Pywbemcli creates the new instance using CLASSNAME retrieved from the
     current WBEM server as a template for property characteristics. Therefore
     pywbemcli will generate an exception if CLASSNAME does not exist in the
-    current WBEM Server or if the data definition in the properties options
+    current WBEM server or if the data definition in the properties options
     does not match the properties characteristics defined the returned class.
 
     ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
@@ -276,7 +276,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
     Pywbemcli creates the method call using the class in INSTANCENAME retrieved
     from the current WBEM server as a template for parameter characteristics.
     Therefore pywbemcli will generate an exception if CLASSNAME does not exist
-    in the current WBEM Server or if the data definition in the parameter
+    in the current WBEM server or if the data definition in the parameter
     options does not match the parameter characteristics defined the returned
     class.
 
@@ -448,7 +448,7 @@ def instance_query(context, query, **options):
     """
     Execute an execquery request.
 
-    Executes a query request on the target WBEM Server with the QUERY_STRING
+    Executes a query request on the target WBEM server with the QUERY_STRING
     argument and query language options.
 
     The results of the query are displayed as mof or xml.

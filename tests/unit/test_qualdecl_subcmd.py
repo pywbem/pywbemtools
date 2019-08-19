@@ -30,7 +30,7 @@ QD_HELP = """Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
   Command group to view QualifierDeclarations.
 
   Includes the capability to get and enumerate CIM qualifier declarations
-  defined in the WBEM Server.
+  defined in the WBEM server.
 
   pywbemcli does not provide the capability to create or delete CIM
   QualifierDeclarations
@@ -52,11 +52,11 @@ QD_ENUM_HELP = """Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
   Enumerate CIMQualifierDeclaractions.
 
   Displays all of the CIMQualifierDeclaration objects in the defined
-  namespace in the current WBEM Server
+  namespace in the current WBEM server
 
 Options:
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -S, --summary           Return only summary of objects (count).
   -h, --help              Show this message and exit.
 """
@@ -69,8 +69,8 @@ QD_GET_HELP = """Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME
   in the current WBEMServer
 
 Options:
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -h, --help              Show this message and exit.
 """
 

@@ -109,7 +109,7 @@ IterAssociatorInstancePaths        instance associators INSTANCENAME --name_only
 IterReferenceInstances             instance references INSTANCENAME
 IterReferenceInstancePaths         instance references INSTANCENAME --name_only
 IterQueryInstances                 instance query
-**When --use-pull-ops is ``either`` or ``yes``:**
+**Pull Operations:**               Option --use-pull-ops ``either`` or ``yes``
 OpenEnumerateInstances             instance enumerate INSTANCENAME
 OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
 OpenAssociatorInstances            instance associators INSTANCENAME
@@ -128,7 +128,7 @@ GetClass                           class get CLASSNAME
 ModifyClass                        Not implemented
 CreateClass                        Not implemented
 DeleteClass                        class delete CLASSNAME
-**QualifierDeclaration operations:**
+**QualifierDeclaration ops:**
 EnumerateQualifiers                qualifier enumerate
 GetQualifier                       qualifier get QUALIFIERNAME
 SetQualifier                       Not implemented
@@ -150,7 +150,7 @@ The pywbem API includes different WBEM operations (ex. ``EnumerateInstances`` an
 simplify the overall command line syntax pywbemcli combines these into a single
 subcommand (i.e. ``enumerate``, ``references``, ``associators``) and includes
 an option (``-o,`` or ``--names-only``) that determines whether the instance
-names or instances are retrieved from the WBEM Server.
+names or instances are retrieved from the WBEM server.
 
 Thus, for example an ``instance enumerate`` with and without the ``-o`` option::
 

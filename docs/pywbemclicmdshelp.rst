@@ -19,12 +19,12 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML
       protocol to communicate with WBEM servers. Pywbemcli can:
 
-          * Manage the information in WBEM Servers CIM objects using the
+          * Manage the information in WBEM servers CIM objects using the
             operations defined in the DMTF specification.  It can manage CIM
             classes, CIM instances and CIM qualifier declarations in the WBEM
             Server and execute CIM methods and queries on the server.
 
-          * Inspect WBEM Server characteristics including namespaces, registered
+          * Inspect WBEM server characteristics including namespaces, registered
             profiles, and other server information.
 
           * Capture detailed information on communication with the WBEM
@@ -40,13 +40,14 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       The general options shown below can also be specified on any of the
       (sub)commands as well as the command line.
 
-      For more detailed information, see:
+      For more detailed documentation, see:
 
           https://pywbemtools.readthedocs.io/en/latest/
+          https://pywbemtools.readthedocs.io/en/stable/
 
     Options:
       -s, --server URI                Hostname or IP address with scheme of the
-                                      WBEMServer in format:
+                                      WBEM server in format:
                                       [{scheme}://]{host}[:{port}]
                                       The server
                                       parameter is conditionally optional (see
@@ -78,9 +79,9 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       server if no namespace is defined in a
                                       subcommand(EnvVar: PYWBEMCLI_NAME)
                                       []Default: root/cimv2].
-      -u, --user USER                 User name for the WBEM Server connection.
+      -u, --user USER                 User name for the WBEM server connection.
                                       (EnvVar: PYWBEMCLI_NAME)
-      -p, --password PASSWORD         Password for the WBEM Server. Will be
+      -p, --password PASSWORD         Password for the WBEM server. Will be
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
                                       option.(EnvVar: PYWBEMCLI_PASSWORD).
@@ -198,7 +199,7 @@ The following defines the help output for the `pywbemcli class --help` subcomman
     Commands:
       associators   Get the associated classes for CLASSNAME.
       delete        Delete a single CIM class.
-      enumerate     Enumerate classes from the WBEM Server.
+      enumerate     Enumerate classes from the WBEM server.
       find          Find all classes that match CLASSNAME-GLOB.
       get           Get and display a single CIM class.
       invokemethod  Invoke the class method named methodname.
@@ -270,9 +271,8 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
@@ -293,14 +293,14 @@ The following defines the help output for the `pywbemcli class delete --help` su
 
       Delete a single CIM class.
 
-      Deletes the CIM class defined by CLASSNAME from the WBEM Server.
+      Deletes the CIM class defined by CLASSNAME from the WBEM server.
 
       If the class has instances, the command is refused unless the --force
       option is used. If --force is used, instances are also deleted.
 
       If the class has subclasses, the command is rejected.
 
-      WARNING: Removing classes from a WBEM Server can cause damage to the
+      WARNING: Removing classes from a WBEM server can cause damage to the
       server. Use this with caution.  It can impact instance providers and other
       components in the server.
 
@@ -309,9 +309,9 @@ The following defines the help output for the `pywbemcli class delete --help` su
     Options:
       -f, --force             Force the delete request to be issued even if there
                               are instances in the server or subclasses to this
-                              class. The WBEM Server may still refuse the request.
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+                              class. The WBEM server may still refuse the request.
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -h, --help              Show this message and exit.
 
 
@@ -329,11 +329,11 @@ The following defines the help output for the `pywbemcli class enumerate --help`
 
     Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
-      Enumerate classes from the WBEM Server.
+      Enumerate classes from the WBEM server.
 
-      Enumerates the classes (or classnames) from the WBEMServer starting either
-      at the top of the class hierarchy or from  the position in the class
-      hierarchy defined by `CLASSNAME` argument if provided.
+      Enumerates the classes (or classnames) from the WBEM server starting
+      either at the top of the class hierarchy or from  the position in the
+      class hierarchy defined by `CLASSNAME` argument if provided.
 
       The output format is defined by the output-format general option.
 
@@ -358,9 +358,8 @@ The following defines the help output for the `pywbemcli class enumerate --help`
                                 this option.
       -o, --names-only          Retrieve only the returned object names.
       -s, --sort                Sort into alphabetical order by classname.
-      -n, --namespace <name>    Namespace to use for this operation. If defined
-                                that namespace overrides the general options
-                                namespace
+      -n, --namespace <name>    Namespace to use for this operation, instead of
+                                the default namespace of the connection
       -S, --summary             Return only summary of objects (count).
       -h, --help                Show this message and exit.
 
@@ -381,7 +380,7 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
       Find all classes that match CLASSNAME-GLOB.
 
-      Find all classes in the namespace(s) of the target WBEMServer that match
+      Find all classes in the namespace(s) of the target WBEM server that match
       the CLASSNAME-GLOB regular expression argument and return the classnames.
       The CLASSNAME-GLOB argument is required.
 
@@ -430,7 +429,7 @@ The following defines the help output for the `pywbemcli class get --help` subco
       server and display it. Normally it is retrieved from the default namespace
       in the server.
 
-      If the class is not found in the WBEM Server, the server returns an
+      If the class is not found in the WBEM server, the server returns an
       exception.
 
       The --includeclassorigin, --includeclassqualifiers, and --propertylist
@@ -457,9 +456,8 @@ The following defines the help output for the `pywbemcli class get --help` subco
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -h, --help                      Show this message and exit.
 
 
@@ -492,9 +490,8 @@ The following defines the help output for the `pywbemcli class invokemethod --he
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
                                  name=value
-      -n, --namespace <name>     Namespace to use for this operation. If defined
-                                 that namespace overrides the general options
-                                 namespace
+      -n, --namespace <name>     Namespace to use for this operation, instead of
+                                 the default namespace of the connection
       -h, --help                 Show this message and exit.
 
 
@@ -548,9 +545,8 @@ The following defines the help output for the `pywbemcli class references --help
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
@@ -591,8 +587,8 @@ The following defines the help output for the `pywbemcli class tree --help` subc
       -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
                               When this option is set, the CLASSNAME argument is
                               required
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -h, --help              Show this message and exit.
 
 
@@ -671,7 +667,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
 
     Options:
       -s, --server SERVER             Required hostname or IP address with scheme
-                                      of the WBEMServer in format:
+                                      of the WBEM server in format:
                                       [{scheme}://]{host}[:{port}]
                                       * Scheme: must
                                       be "https" or "http" [Default: "https"]
@@ -687,15 +683,15 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       defined WBEM server in the connection file
                                       [required]
       -d, --default-namespace NAMESPACE
-                                      Default namespace to use in the target
-                                      WBEMServer if no namespace is defined in the
+                                      Default namespace to use in the target WBEM
+                                      server if no namespace is defined in the
                                       subcommand (Default: root/cimv2).
-      -u, --user TEXT                 User name for the WBEM Server connection.
-      -p, --password TEXT             Password for the WBEM Server. Will be
+      -u, --user TEXT                 User name for the WBEM server connection.
+      -p, --password TEXT             Password for the WBEM server. Will be
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
                                       option.
-      -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
+      -t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in
                                       seconds. Default: 30
       -N, --noverify                  If set, client does not verify server
                                       certificate.
@@ -1060,9 +1056,8 @@ The following defines the help output for the `pywbemcli instance associators --
                                       empty string the server should return no
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
@@ -1124,8 +1119,8 @@ The following defines the help output for the `pywbemcli instance count --help` 
     Options:
       -s, --sort              Sort by instance count. Otherwise sorted by
                               classname
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -h, --help              Show this message and exit.
 
 
@@ -1151,7 +1146,7 @@ The following defines the help output for the `pywbemcli instance create --help`
       Pywbemcli creates the new instance using CLASSNAME retrieved from the
       current WBEM server as a template for property characteristics. Therefore
       pywbemcli will generate an exception if CLASSNAME does not exist in the
-      current WBEM Server or if the data definition in the properties options
+      current WBEM server or if the data definition in the properties options
       does not match the properties characteristics defined the returned class.
 
       ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
@@ -1165,9 +1160,8 @@ The following defines the help output for the `pywbemcli instance create --help`
                                  allowed.
       -V, --verify               If set, The change is displayed and verification
                                  requested before the change is executed
-      -n, --namespace <name>     Namespace to use for this operation. If defined
-                                 that namespace overrides the general options
-                                 namespace
+      -n, --namespace <name>     Namespace to use for this operation, instead of
+                                 the default namespace of the connection
       -h, --help                 Show this message and exit.
 
 
@@ -1200,8 +1194,8 @@ The following defines the help output for the `pywbemcli instance delete --help`
                               rather than an instance and user is presented with a
                               list of instances of the class from which the
                               instance to process is selected.
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -h, --help              Show this message and exit.
 
 
@@ -1266,9 +1260,8 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
@@ -1337,9 +1330,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
                                       -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                       empty string the server should return no
                                       properties.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
@@ -1377,7 +1369,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       Pywbemcli creates the method call using the class in INSTANCENAME
       retrieved from the current WBEM server as a template for parameter
       characteristics. Therefore pywbemcli will generate an exception if
-      CLASSNAME does not exist in the current WBEM Server or if the data
+      CLASSNAME does not exist in the current WBEM server or if the data
       definition in the parameter options does not match the parameter
       characteristics defined the returned class.
 
@@ -1397,9 +1389,8 @@ The following defines the help output for the `pywbemcli instance invokemethod -
                                   rather than an instance and user is presented
                                   with a list of instances of the class from which
                                   the instance to process is selected.
-      -n, --namespace <name>      Namespace to use for this operation. If defined
-                                  that namespace overrides the general options
-                                  namespace
+      -n, --namespace <name>      Namespace to use for this operation, instead of
+                                  the default namespace of the connection
       -h, --help                  Show this message and exit.
 
 
@@ -1461,9 +1452,8 @@ The following defines the help output for the `pywbemcli instance modify --help`
       -V, --verify                    If set, The change is displayed and
                                       verification requested before the change is
                                       executed
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -h, --help                      Show this message and exit.
 
 
@@ -1483,7 +1473,7 @@ The following defines the help output for the `pywbemcli instance query --help` 
 
       Execute an execquery request.
 
-      Executes a query request on the target WBEM Server with the QUERY_STRING
+      Executes a query request on the target WBEM server with the QUERY_STRING
       argument and query language options.
 
       The results of the query are displayed as mof or xml.
@@ -1494,9 +1484,8 @@ The following defines the help output for the `pywbemcli instance query --help` 
       -l, --querylanguage QUERY LANGUAGE
                                       Use the query language defined. (Default:
                                       DMTF:CQL.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
@@ -1565,9 +1554,8 @@ The following defines the help output for the `pywbemcli instance references --h
                                       empty string the server should return no
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
-      -n, --namespace <name>          Namespace to use for this operation. If
-                                      defined that namespace overrides the general
-                                      options namespace
+      -n, --namespace <name>          Namespace to use for this operation, instead
+                                      of the default namespace of the connection
       -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
@@ -1606,7 +1594,7 @@ The following defines the help output for the `pywbemcli qualifier --help` subco
       Command group to view QualifierDeclarations.
 
       Includes the capability to get and enumerate CIM qualifier declarations
-      defined in the WBEM Server.
+      defined in the WBEM server.
 
       pywbemcli does not provide the capability to create or delete CIM
       QualifierDeclarations
@@ -1640,11 +1628,11 @@ The following defines the help output for the `pywbemcli qualifier enumerate --h
       Enumerate CIMQualifierDeclaractions.
 
       Displays all of the CIMQualifierDeclaration objects in the defined
-      namespace in the current WBEM Server
+      namespace in the current WBEM server
 
     Options:
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -S, --summary           Return only summary of objects (count).
       -h, --help              Show this message and exit.
 
@@ -1669,8 +1657,8 @@ The following defines the help output for the `pywbemcli qualifier get --help` s
       in the current WBEMServer
 
     Options:
-      -n, --namespace <name>  Namespace to use for this operation. If defined that
-                              namespace overrides the general options namespace
+      -n, --namespace <name>  Namespace to use for this operation, instead of the
+                              default namespace of the connection
       -h, --help              Show this message and exit.
 
 
@@ -1733,12 +1721,12 @@ The following defines the help output for the `pywbemcli server --help` subcomma
 
     Commands:
       brand         Display information on the server.
-      centralinsts  Display Central Instances in the WBEM Server.
+      centralinsts  Display central instances in the WBEM server.
       connection    Display connection info used by this server.
       info          Display general information on the Server.
       interop       Display the interop namespace name.
       namespaces    Display the namespaces in the WBEM server
-      profiles      Display registered profiles from the WBEM Server.
+      profiles      Display registered profiles from the WBEM server.
       test_pull     Test existence of pull opeations.
 
 
@@ -1779,7 +1767,7 @@ The following defines the help output for the `pywbemcli server centralinsts --h
 
     Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
 
-      Display Central Instances in the WBEM Server.
+      Display central instances in the WBEM server.
 
       Displays central instances for management profiles registered in the
       server. Displays management profiles that adher to to the central class
@@ -1801,15 +1789,14 @@ The following defines the help output for the `pywbemcli server centralinsts --h
     Options:
       -o, --organization <org name>   Filter by the defined organization. (ex. -o
                                       DMTF
-      -n, --profilename <profile name>
-                                      Filter by the profile name. (ex. -n Array
+      -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
       -c, --central_class <classname>
                                       Optional. Required only if profiles supports
                                       only scopig methodology
       -s, --scoping_class <classname>
                                       Optional. Required only if profiles supports
                                       only scopig methodology
-      -p, --scoping_path <pathname>   Optional. Required only if profiles supports
+      -S, --scoping_path <pathname>   Optional. Required only if profiles supports
                                       only scopig methodology. Multiples allowed
       -r, --reference_direction [snia|dmtf]
                                       Navigation direction for association.
@@ -1881,7 +1868,7 @@ The following defines the help output for the `pywbemcli server interop --help` 
 
       Display the interop namespace name.
 
-      Displays the name of the interop namespace defined for the WBEM Server.
+      Displays the name of the interop namespace defined for the WBEM server.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1922,26 +1909,25 @@ The following defines the help output for the `pywbemcli server profiles --help`
 
     Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
-      Display registered profiles from the WBEM Server.
+      Display registered profiles from the WBEM server.
 
-      Displays the management profiles that have been registered for this
+      Displays the WBEM management profiles that have been registered for this
       server.  Within the DMTF and SNIA these are the definition of management
-      functionality supported by the server.
+      functionality supported by the WBEM server.
 
-      This display may be filtered by the optional organization and profile name
+      This display may be filtered by the optional organization and profile
       options that define the organization for each profile (ex. SNIA) and the
       name of the profile. This will display only the profiles that are
-      registered for the defined organization and/or name.
+      registered for the defined organization and/or profile name.
 
-      Profiles are display as a table showing the organization, name, and
+      Profiles are displayed as a table showing the organization, name, and
       version for each profile.
 
     Options:
-      -o, --organization <org name>   Filter by the defined organization. (ex. -o
-                                      DMTF
-      -n, --profilename <profile name>
-                                      Filter by the profile name. (ex. -n Array
-      -h, --help                      Show this message and exit.
+      -o, --organization <org name>  Filter by the defined organization. (ex. -o
+                                     DMTF
+      -p, --profile <profile name>   Filter by the profile name. (ex. -p Array
+      -h, --help                     Show this message and exit.
 
 
 .. _`pywbemcli server test_pull --help`:

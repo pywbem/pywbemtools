@@ -56,8 +56,8 @@ includeclassorigin_option = [            # pylint: disable=invalid-name
 namespace_option = [                     # pylint: disable=invalid-name
     click.option('-n', '--namespace', type=str,
                  required=False, metavar='<name>',
-                 help='Namespace to use for this operation. If defined that '
-                      'namespace overrides the general options namespace')]
+                 help='Namespace to use for this operation, instead of the '
+                      'default namespace of the connection')]
 
 summary_objects_option = [              # pylint: disable=invalid-name
     click.option('-S', '--summary', is_flag=True, required=False,

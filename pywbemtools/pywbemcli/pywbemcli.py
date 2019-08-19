@@ -58,7 +58,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
              options_metavar=GENERAL_OPTIONS_METAVAR)
 @click.option('-s', '--server', type=str, envvar=PywbemServer.server_envvar,
               metavar='URI',
-              help='Hostname or IP address with scheme of the WBEMServer in '
+              help='Hostname or IP address with scheme of the WBEM server in '
                    'format:\n[{scheme}://]{host}[:{port}]\n'
                    'The server parameter is conditionally optional '
                    '(see --name)\n'
@@ -92,12 +92,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    '[]Default: {of}].'.format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str, envvar=PywbemServer.user_envvar,
               metavar='USER',
-              help='User name for the WBEM Server connection. ' +
+              help='User name for the WBEM server connection. ' +
                    '(EnvVar: {ev}) ' .format(ev=PywbemServer.name_envvar))
 @click.option('-p', '--password', type=str,
               metavar='PASSWORD',
               envvar=PywbemServer.password_envvar,
-              help='Password for the WBEM Server. Will be requested as part '
+              help='Password for the WBEM server. Will be requested as part '
                    ' of initialization if user name exists and it is not '
                    ' provided by this option.' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.password_envvar))
@@ -203,13 +203,13 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     to communicate with WBEM servers. Pywbemcli can:
 
     \b
-        * Manage the information in WBEM Servers CIM objects using the
+        * Manage the information in WBEM servers CIM objects using the
           operations defined in the DMTF specification.  It can manage CIM
           classes, CIM instances and CIM qualifier declarations in the WBEM
           Server and execute CIM methods and queries on the server.
 
     \b
-        * Inspect WBEM Server characteristics including namespaces, registered
+        * Inspect WBEM server characteristics including namespaces, registered
           profiles, and other server information.
 
     \b
@@ -227,9 +227,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     The general options shown below can also be specified on any of the
     (sub)commands as well as the command line.
 
-    For more detailed information, see:
+    For more detailed documentation, see:
 
         https://pywbemtools.readthedocs.io/en/latest/
+        https://pywbemtools.readthedocs.io/en/stable/
     """
     # In interactive mode, general options specified in cmd line are used as
     # defaults for interactive commands.
@@ -356,7 +357,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                                'not exist and no --server or '
                                                '--mock-server options to '
                                                'define a '
-                                               'WBEMServer'.format(name))
+                                               'WBEM server'.format(name))
             else:
                 # try default but ignore if it does not exist
                 if 'default' in pywbemcli_servers:

@@ -35,7 +35,7 @@ def qualifier_group():
     Command group to view QualifierDeclarations.
 
     Includes the capability to get and enumerate CIM qualifier declarations
-    defined in the WBEM Server.
+    defined in the WBEM server.
 
     pywbemcli does not provide the capability to create or delete CIM
     QualifierDeclarations
@@ -72,7 +72,7 @@ def qualifier_enumerate(context, **options):
     Enumerate CIMQualifierDeclaractions.
 
     Displays all of the CIMQualifierDeclaration objects in the defined
-    namespace in the current WBEM Server
+    namespace in the current WBEM server
     """
     context.execute_cmd(lambda: cmd_qualifier_enumerate(context, options))
 

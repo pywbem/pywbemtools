@@ -118,7 +118,7 @@ The **class** group defines subcommands that act on CIM classes. see
   The input argument is a GLOB expression which is used to search the server
   CIM namespaces for matching class names.  This subcommand uses a :term:`GLOB`
   Unix style pathname pattern expansion on the classname to attempt to filter
-  the names and namespaces of all of the classes in the WBEM Server (or the
+  the names and namespaces of all of the classes in the WBEM server (or the
   namespaces defined with the ``--namespaces``/``-n`` option)::
 
       $ pywbemcli> class find .*_WBEMS*
@@ -489,7 +489,7 @@ namespaces, etc. The subcommands are:
     $ pywbemcli --name op server brand
     Server Brand:
     +---------------------+
-    | WBEM Server Brand   |
+    | WBEM server brand   |
     |---------------------|
     | OpenPegasus         |
     +---------------------+
@@ -513,7 +513,7 @@ namespaces, etc. The subcommands are:
   See :ref:`pywbemcli server connection --help` for details.
 * **info** to get general information on the server.  This subcommand returns
   information on the brand, namespaces, and other reasonable information on the
-  WBEM Server:
+  WBEM server:
 
   .. code-block:: text
 
