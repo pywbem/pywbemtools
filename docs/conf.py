@@ -58,7 +58,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     master_doc = 'index'
 else:
-    master_doc = 'docs/index'
+    master_doc = 'index'
 
 # General information about the project.
 project = u'pywbemtools'
@@ -216,7 +216,7 @@ html_static_path = ['_static']
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-html_extra_path = ['_extra']
+# html_extra_path = ['_extra']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
