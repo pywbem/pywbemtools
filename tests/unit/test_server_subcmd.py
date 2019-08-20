@@ -42,14 +42,13 @@ Options:
 
 Commands:
   brand         Display information on the server.
-  centralinsts  Display Central Instances in the WBEM Server.
+  centralinsts  Display central instances in the WBEM server.
   connection    Display connection info used by this server.
   info          Display general information on the Server.
   interop       Display the interop namespace name.
   namespaces    Display the namespaces in the WBEM server
-  profiles      Display registered profiles from the WBEM Server.
+  profiles      Display registered profiles from the WBEM server.
   test_pull     Test existence of pull opeations.
-
 """
 
 SVR_BRAND_HELP = """
@@ -67,7 +66,7 @@ Options:
 SVR_CENTRALINSTS_HELP = """
 Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
 
-  Display Central Instances in the WBEM Server.
+  Display central instances in the WBEM server.
 
   Displays central instances for management profiles registered in the
   server. Displays management profiles that adher to to the central class
@@ -89,21 +88,19 @@ Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
 Options:
   -o, --organization <org name>   Filter by the defined organization. (ex. -o
                                   DMTF
-  -n, --profilename <profile name>
-                                  Filter by the profile name. (ex. -n Array
+  -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
   -c, --central_class <classname>
                                   Optional. Required only if profiles supports
                                   only scopig methodology
   -s, --scoping_class <classname>
                                   Optional. Required only if profiles supports
                                   only scopig methodology
-  -p, --scoping_path <pathname>   Optional. Required only if profiles supports
+  -S, --scoping_path <pathname>   Optional. Required only if profiles supports
                                   only scopig methodology. Multiples allowed
   -r, --reference_direction [snia|dmtf]
                                   Navigation direction for association.
                                   [default: dmtf]
-  -h, --help                      Show this message and exit.
-"""
+  -h, --help                      Show this message and exit."""
 
 SVR_CONNECT_HELP = """
 Usage: pywbemcli  server connection [COMMAND-OPTIONS]
@@ -136,7 +133,7 @@ Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
   Display the interop namespace name.
 
-  Displays the name of the interop namespace defined for the WBEM Server.
+  Displays the name of the interop namespace defined for the WBEM server.
 
 Options:
   -h, --help  Show this message and exit.
@@ -155,26 +152,25 @@ Options:
 SVR_PROFILES_HELP = """
 Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
-  Display registered profiles from the WBEM Server.
+  Display registered profiles from the WBEM server.
 
-  Displays the management profiles that have been registered for this
+  Displays the WBEM management profiles that have been registered for this
   server.  Within the DMTF and SNIA these are the definition of management
-  functionality supported by the server.
+  functionality supported by the WBEM server.
 
-  This display may be filtered by the optional organization and profile name
+  This display may be filtered by the optional organization and profile
   options that define the organization for each profile (ex. SNIA) and the
   name of the profile. This will display only the profiles that are
-  registered for the defined organization and/or name.
+  registered for the defined organization and/or profile name.
 
-  Profiles are display as a table showing the organization, name, and
+  Profiles are displayed as a table showing the organization, name, and
   version for each profile.
 
 Options:
-  -o, --organization <org name>   Filter by the defined organization. (ex. -o
-                                  DMTF
-  -n, --profilename <profile name>
-                                  Filter by the profile name. (ex. -n Array
-  -h, --help                      Show this message and exit.
+  -o, --organization <org name>  Filter by the defined organization. (ex. -o
+                                 DMTF
+  -p, --profile <profile name>   Filter by the profile name. (ex. -p Array
+  -h, --help                     Show this message and exit.
 """
 
 OK = True  # mark tests OK when they execute correctly
@@ -278,8 +274,8 @@ TEST_CASES = [
     ['Verify server subcommand brand',
      {'args': ['brand'],
       'global': ['-d', 'interop', '-o', 'simple']},
-     {'stdout': ['Server Brand:',
-                 'WBEM Server Brand',
+     {'stdout': ['Server brand:',
+                 'WBEM server brand',
                  '-------------------',
                  'OpenPegasus'],
       'rc': 0,
@@ -331,7 +327,7 @@ TEST_CASES = [
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server subcommand profiles, filtered by name',
-     {'args': ['profiles', '-n', 'Profile Registration'],
+     {'args': ['profiles', '-p', 'Profile Registration'],
       'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
@@ -342,7 +338,7 @@ TEST_CASES = [
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server subcommand profiles, filtered by org, long',
-     {'args': ['profiles', '--profilename', 'Profile Registration'],
+     {'args': ['profiles', '--profile', 'Profile Registration'],
       'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',

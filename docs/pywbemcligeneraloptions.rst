@@ -7,7 +7,7 @@ The pywbemcli command line options are as follows (See the help in
 pywbemcli and section :ref:`pywbemcli Help Command Details` for more precise
 information on each command-group arguments and options):
 
-* **--server/-s** - Host name or IP address of the WBEMServer to which
+* **--server/-s** - Host name or IP address of the WBEM server to which
   pywbemcli will connect in the format::
 
     [{scheme}://]{host}[:{port}]
@@ -28,7 +28,7 @@ information on each command-group arguments and options):
 
   In the interactive mode this connection is not actually executed until a
   command or subcommand requiring access to the WBEM server is entered.
-* **--name/-n** - The name of a WBEMServer that is defined in the :term:``connection
+* **--name/-n** - The name of a WBEM server that is defined in the :term:``connection
   file`` or, if the ``--server`` parameter exists, to define a name for a
   connection that will be entered in the connection file.  The server
   parameters for this connection will be set in pywbemcli.
@@ -83,7 +83,7 @@ information on each command-group arguments and options):
   * ``either`` - (default )allows pywbem to try both pull and then traditional
       operations.
 
-* **--pull-max-cnt** -  MaxObjectCount of objects to be returned for each pull
+* **--pull-max-cnt** -  ``MaxObjectCount`` of objects to be returned for each pull
   operation if pull operations are used. This must be  a positive non-zero
   integer. Default is 1000. See :ref:`Pywbemcli and the DMTF pull operations`
   for more information on pull operations.
@@ -150,7 +150,7 @@ Avoiding password prompts
 
 If the WBEM operations performed by a particular pywbemcli command require a
 password, the password is prompted for if the ``--user`` option is set (in both
-modes of operation) and the ``--pasword`` option is not set:
+modes of operation) and the ``--password`` option is not set:
 
 .. code-block:: text
 
@@ -219,7 +219,7 @@ section:ref:`pywbemcli Help Command Details`. For example:
     . . . <general help, listing the general options and possible commands>
 
     $ pywbemcli class --help
-    . . . <help for cpc command, listing its subcommands, arguments and
+    . . . <help for class command-group, listing its subcommands, arguments and
           command-specific options>
 
 Note that the help text for any pywbemcli command-group (such as ``class``) will
@@ -252,7 +252,7 @@ Pywbemcli and the DMTF pull operations
 
 For DMTF CIM/XML operations that can return many objects the DMTF CIM/XML protocol
 allows two variations on the enumerate operations (enumerate and an operation
-sequence of OpenEnumerateInstances/PullInstances).
+sequence of ``OpenEnumerateInstances``/``PullInstances``).
 
 While the pull operation may not be supported by all WBEM servers  they can be
 significantly more efficient when they are available.  Pywbem implements the
@@ -281,7 +281,7 @@ operations through two general options:
   with the original operations that do not exist with the pull operations:
 
   * The original operations did not support the filtering of responses  with a
-    query language query (--FilterQueryLanguage and --FilterQuery) option which
+    query language query (``--FilterQueryLanguage`` and ``--FilterQuery``) option which
     passes a filter query to the WBEM server so that it filters the responses
     before they are returned. This can greatly reduce the size of the responses
     if effectively used but is used only when the pull operations are available
@@ -290,11 +290,11 @@ operations through two general options:
   * The pull operations do not support some of the options that traditional
     operations did including:
 
-    * IncludeQualifiers - Since even the traditional operations specification
+    * ``IncludeQualifiers`` - Since even the traditional operations specification
       deprecated this option and the user cannot depend on it being honored,
       the most logical solution is to never use this option.
 
-    * LocalOnly - Since even the traditional operations specification deprecated
+    * ``LocalOnly`` - Since even the traditional operations specification deprecated
       this options and the user cannot depend on it being honored by the
       WBEM server the most logical soltuion is to never use this option
 
@@ -326,7 +326,7 @@ Table formats
 ^^^^^^^^^^^^^
 
 The different variations of the table format define different
-formatting of the borders for tables or different ouput formats such as html.
+formatting of the borders for tables or different output formats such as HTML.
 The following are examples of the table formats with a single command ``class
 find CIM_Foo``:
 
@@ -478,7 +478,7 @@ ASCII tree format
 ^^^^^^^^^^^^^^^^^
 This output format it an ASCII based output that shows the tree structure of
 the results of certain subcommands.  It is used specifically to show the
-class class hiearchy tree as follows:
+class class hierarchy tree as follows:
 
 .. code-block:: text
 
@@ -576,7 +576,7 @@ like gisthe following:
 
 produces log output for the class enumerate operation in the log file
 pywbemcli.log as follows showing the input parameters to the pywbem method
-EnumerateClassName and the number of objects in the response:
+``EnumerateClassName`` and the number of objects in the response:
 
 .. code-block:: text
 

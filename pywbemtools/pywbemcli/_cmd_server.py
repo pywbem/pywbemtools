@@ -58,7 +58,7 @@ def server_interop(context):
     Display the interop namespace name.
 
     Displays the name of the interop namespace defined for the
-    WBEM Server.
+    WBEM server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_interop(context))
@@ -93,24 +93,24 @@ def server_info(context):
 @click.option('-o', '--organization', type=str, required=False,
               metavar='<org name>',
               help='Filter by the defined organization. (ex. -o DMTF')
-@click.option('-n', '--profilename', type=str, required=False,
+@click.option('-p', '--profile', type=str, required=False,
               metavar='<profile name>',
-              help='Filter by the profile name. (ex. -n Array')
+              help='Filter by the profile name. (ex. -p Array')
 @click.pass_obj
 def server_profiles(context, **options):
     """
-    Display registered profiles from the WBEM Server.
+    Display registered profiles from the WBEM server.
 
-    Displays the management profiles that have been registered for this
+    Displays the WBEM management profiles that have been registered for this
     server.  Within the DMTF and SNIA these are the definition of management
-    functionality supported by the server.
+    functionality supported by the WBEM server.
 
     This display may be filtered by the optional organization and profile
-    name options that define the organization for each profile (ex. SNIA)
+    options that define the organization for each profile (ex. SNIA)
     and the name of the profile. This will display only the profiles that
-    are registered for the defined organization and/or name.
+    are registered for the defined organization and/or profile name.
 
-    Profiles are display as a table showing the organization, name, and
+    Profiles are displayed as a table showing the organization, name, and
     version for each profile.
     """
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
@@ -120,9 +120,9 @@ def server_profiles(context, **options):
 @click.option('-o', '--organization', type=str, required=False,
               metavar='<org name>',
               help='Filter by the defined organization. (ex. -o DMTF')
-@click.option('-n', '--profilename', type=str, required=False,
+@click.option('-p', '--profile', type=str, required=False,
               metavar='<profile name>',
-              help='Filter by the profile name. (ex. -n Array')
+              help='Filter by the profile name. (ex. -p Array')
 @click.option('-c', '--central_class', type=str, required=False,
               metavar='<classname>',
               help='Optional. Required only if profiles supports only '
@@ -131,7 +131,7 @@ def server_profiles(context, **options):
               metavar='<classname>',
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-p', '--scoping_path', type=str, required=False,
+@click.option('-S', '--scoping_path', type=str, required=False,
               multiple=True,
               metavar='<pathname>',
               help='Optional. Required only if profiles supports only '
@@ -144,7 +144,7 @@ def server_profiles(context, **options):
 @click.pass_obj
 def server_centralinsts(context, **options):
     """
-    Display Central Instances in the WBEM Server.
+    Display central instances in the WBEM server.
 
     Displays central instances for management profiles registered in the
     server. Displays management profiles that adher to to the central
@@ -210,7 +210,7 @@ def cmd_server_test_pull(context):
 
 def cmd_server_namespaces(context, options):
     """
-    Display namespaces in the current WBEMServer
+    Display namespaces in the current WBEM server
     """
     try:
         namespaces = context.wbem_server.namespaces
@@ -231,7 +231,7 @@ def cmd_server_namespaces(context, options):
 
 def cmd_server_interop(context):
     """
-    Display interop namespace in the current WBEMServer
+    Display interop namespace in the current WBEM server
     """
     try:
         interop_ns = context.wbem_server.interop_ns
@@ -248,15 +248,15 @@ def cmd_server_interop(context):
 
 def cmd_server_brand(context):
     """
-    Display product and version info of the current WBEMServer
+    Display product and version info of the current WBEM server
     """
     try:
         brand = context.wbem_server.brand
         context.spinner.stop()
 
         rows = [[brand]]
-        click.echo(format_table(rows, ['WBEM Server Brand'],
-                                title='Server Brand:',
+        click.echo(format_table(rows, ['WBEM server brand'],
+                                title='Server brand:',
                                 table_format=context.output_format))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -264,7 +264,7 @@ def cmd_server_brand(context):
 
 def cmd_server_info(context):
     """
-    Display general overview of info from current WBEMServer
+    Display general overview of info from current WBEM server
     """
     try:
         # execute the namespaces to force contact with server before
@@ -305,13 +305,13 @@ def get_profile_info(org_vm, inst):
 
 def cmd_server_profiles(context, options):
     """
-    Display general overview of info from current WBEMServer
+    Display general overview of info from current WBEM server
     """
     server = context.wbem_server
     try:
         found_server_profiles = server.get_selected_profiles(
             registered_org=options['organization'],
-            registered_name=options['profilename'])
+            registered_name=options['profile'])
 
         org_vm = ValueMapping.for_property(server,
                                            server.interop_ns,
@@ -347,13 +347,13 @@ def cmd_server_connection(context):
 
 def cmd_server_centralinsts(context, options):
     """
-    Display general overview of info from current WBEMServer
+    Display general overview of info from current WBEM server
     """
     server = context.wbem_server
     try:
         found_server_profiles = server.get_selected_profiles(
             registered_org=options['organization'],
-            registered_name=options['profilename'])
+            registered_name=options['profile'])
 
         org_vm = ValueMapping.for_property(server,
                                            server.interop_ns,

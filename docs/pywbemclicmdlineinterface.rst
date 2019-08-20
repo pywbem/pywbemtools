@@ -87,7 +87,7 @@ without specifying any command-group or command:
     $ pywbemcli [GENERAL-OPTIONS]
     pywbemcli> _
 
-Alternatively, the pywbemcl shell can also be started by specifying the ``repl``
+Alternatively, the pywbemcli shell can also be started by specifying the ``repl``
 command:
 
 .. code-block:: text
@@ -105,7 +105,7 @@ pywbemcli commands and arguments that can be typed in the pywbemcli shell.
 The pywbemcli commands that can be typed in the pywbemcli shell are the
 command or command-group that would follow the ``pywbemcli`` command and
 general options when used in `command mode`_. The following example
-starts a pywbemcli shell in interactive mode and executes serveral commands
+starts a pywbemcli shell in interactive mode and executes several commands
 (ex. ``class enumerate -o``).
 
 .. code-block:: text
@@ -126,7 +126,7 @@ above has the same effect as the standalone command:
 .. code-block:: text
 
     $ pywbemcli -s http://localhost -u username class get CIM_System
-    . . . <MOF formated display of the CIM_System class>
+    . . . <MOF formatted display of the CIM_System class>
 
 The internal commands ``:?``, ``:h``, or ``:help`` display general help
 information for external and internal commands:
@@ -146,40 +146,21 @@ information for external and internal commands:
 
 In addition to using one of the internal shell commands shown in the help text
 above, you can also exit the pywbemcli shell by typing `Ctrl-D`. Note: the
-pywbemshell exit command may vary by operating system.
+pywbemcli shell exit command may vary by operating system.
 
 Typing ``--help`` or ``-h`` in the pywbemcli shell displays general help
-information for the pywbemcli commands, which includes general options and a
+information for the pywbemcli commands which includes general options and a
 list of the supported commands.
 
 .. code-block:: text
 
-    $ pywbemcli --help
+    $ pywbemcli
+    pywbemcli> --help
 
     Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML
     protocol to communicate with WBEM servers. Pywbemcli can:
 
     . . .
-
-    For more detailed information, see:
-
-      https://pywbemtools.readthedocs.io/en/latest/
-
-    Options:
-      -s, --server URI                Hostname or IP address of the WBEMServer
-                                      (Default: PYWBEMCLI_SERVER environment
-                                      variable).
-      -d, --default_namespace TEXT    Default Namespace to use in the target
-                                      WBEMServer if no namespace is defined in the
-                                      subcommand(Default: PYWBEMCLI_NAMESPACE
-                                      environment variable or pywbemcli default.
-
-      . . .
-
-      -v, --verbose                   Display extra information about the
-                                      processing.
-      --version                       Show the version of this command and exit.
-      --help                          Show this message and exit.
 
     Commands:
       class      Command group to manage CIM Classes.
@@ -201,20 +182,8 @@ specified pywbemcli command-group, for example:
     pywbemcli> class --help
     Usage: pywbemcli  class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group to manage CIM Classes.
-
-    Options:
-      --help  Show this message and exit.
-
-    Commands:
-      associators   Get the associated classes for the CLASSNAME...
-      enumerate     Enumerate classes from the WBEMServer...
-      find          Find all classes that match the CLASSNAME...
-      get           get and display a single class from the WBEM...
-      hierarchy     Display classnames inheritance hierarchy as a...
-      invokemethod  Invoke the class method named methodname in...
-      names         get and display a list of classnames from the...
-      references    Get the reference classes for the CLASSNAME...
+    . . .
+      references    Get the reference classes for the CLASSNAME.
 
 The pywbemcli shell command in the interactive mode supports popup help text
 while typing, where the valid choices are shown based upon what was typed so
@@ -224,12 +193,12 @@ following examples, an underscore ``_`` is shown as the cursor:
 
 .. code-block:: text
 
-    pywbemcli shell uses the >> --_
+    pywbemcli> --_
      --server             Hostname or IP address with scheme of the WBEMServer ...
      --name               Name for the connection(optional, see --server).  If ...
      --default_namespace  Default Namespace to use in the target WBEMServer if ...
 
-    pywbemcli shell uses the >> cl_
+    pywbemcli> cl_
       class      Command group to manage CIM Classes.
 
 The pywbemcli shell supports history across multiple invocations of the shell
@@ -307,8 +276,8 @@ result as a ``simple`` table:
 
     pywbemcli -o simple qualifier enumerate
 
-In the interactive mode, the general options are defined once and retain their
-value through the execution of the interactive mode.
+In the interactive mode, the general options from the command line are defined
+once and retain their value through the execution of the interactive mode.
 
 However, they may be modified in the interactive mode by entering them before
 the COMMAND.  Thus, for example to display the qualifier declarations in
@@ -335,5 +304,6 @@ interactive mode and as a table:
    pywbemcli>
 
 **Note:** - With this use of the general options as part of an interactive mode
-command, the options redefinitions may not be retained between command executions.
+command, general the options redefinition's is not be retained between command
+executions.
 

@@ -133,7 +133,7 @@ def connection_select(context, name):
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
 @click.option('-s', '--server', type=str, metavar='SERVER', required=False,
               help='Required hostname or IP address with scheme of the '
-                   'WBEMServer in format:\n[{scheme}://]{host}[:{port}]\n'
+                   'WBEM server in format:\n[{scheme}://]{host}[:{port}]\n'
                    '* Scheme: must be "https" or "http" [Default: "https"]\n'
                    '* Host: defines short/fully qualified DNS hostname, '
                    'literal IPV4 address (dotted), or literal IPV6 address\n'
@@ -146,18 +146,18 @@ def connection_select(context, name):
 @click.option('-d', '--default-namespace', type=str,
               metavar='NAMESPACE',
               default=DEFAULT_NAMESPACE,
-              help="Default namespace to use in the target WBEMServer if no "
+              help="Default namespace to use in the target WBEM server if no "
                    "namespace is defined in the subcommand"
                    " (Default: {of}).".format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str,
-              help="User name for the WBEM Server connection. ")
+              help="User name for the WBEM server connection. ")
 @click.option('-p', '--password', type=str,
               envvar=PywbemServer.password_envvar,
-              help="Password for the WBEM Server. Will be requested as part "
+              help="Password for the WBEM server. Will be requested as part "
                    " of initialization if user name exists and it is not "
                    " provided by this option.")
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
-              help="Operation timeout for the WBEM Server in seconds. "
+              help="Operation timeout for the WBEM server in seconds. "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
 @click.option('-N', '--noverify', is_flag=True,
               help='If set, client does not verify server certificate.')
@@ -388,7 +388,7 @@ def cmd_connection_test(context):
 
 def cmd_connection_select(context, name):
     """
-    Select an existing connection to use as the current WBEM Server. This
+    Select an existing connection to use as the current WBEM server. This
     command accepts the click_context since it updates that context.
     """
     connections = ConnectionRepository()
@@ -560,5 +560,5 @@ def cmd_connection_list(context):
 
     context.spinner.stop()
     click.echo(format_table(sorted(rows), headers,
-                            title='WBEMServer Connections:',
+                            title='WBEM server connections:',
                             table_format=context.output_format))

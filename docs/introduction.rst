@@ -50,7 +50,7 @@ Pywbemcli command line interface WBEM client
 Pywbemcli provides access to WBEM servers from the command line on multiple OS
 platforms. It provides functionality to:
 
-* Explore the CIM data of WBEM Servers. It can manage/inspect the CIM model
+* Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
   components including CIM classes, CIM instances, and CIM qualifiers and
   execute CIM methods and queries on the WBEM server. It implements subcommands
   to execute the :term:`CIM-XML` operations defined in the DMTF specification
@@ -58,8 +58,8 @@ platforms. It provides functionality to:
 
 * Inspect/manage WBEM server functionality including:
 
-  * CIM namespaces as (see :term:`CIM namespace`) ,
-  * WBEM registered profiles (see :term:`WBEM management profile`),
+  * CIM namespaces in a WBEM server (see :term:`CIM namespace`) ,
+  * WBEM registered profiles in a WBEM server (see :term:`WBEM management profile`),
   * WBEM server brand and version information.
 
 * Capture detailed information on interactions with the WBEM server including
@@ -79,12 +79,11 @@ Supported environments
 
 .. _pywbem documentation: https://pywbem.readthedocs.io/en/stable/intro.html#wbem-servers
 
-The pywbemcli module of the pywbemtools package is supported in these
-environments:
+The pywbemtools package is supported in these environments:
 
-* Operating systems: Linux, Windows, macOS
+* Operating systems: Linux, Windows (native and Unix-like environments
+  (ex. Cygwin), OS-X
 * Python versions: 2.7, 3.4, and greater
-* pywbem 0.14.4 or greater
 * WBEM servers: Any WBEM server that conforms to the DMTF specifications listed
   in :ref:`Standards conformance`. WBEM servers supporting older versions of
   these standards are also supported, but may have limitations.
@@ -99,11 +98,10 @@ Installation
 .. _PyPI: http://pypi.python.org/
 
 
-This section describes the complete installation of pywbemtools with all steps
-including prerequisite operating system packages and manual post-processing
-steps, for users of pywbemcli. As a user of pywbemcli, you can import the pywbemtools
-Python package into your environment so that pywbemcli can be executed from the
-command line.
+This section describes the complete of pywbemtools with all steps including
+prerequisite operating system packages and manual post-processing steps. You
+can import the pywbemtools Python package into your environment so that
+pywbemcli can be executed from the command line.
 
 The easiest way to install the pywbemtools package is using pip. Pip ensures
 that any dependent Python packages also get installed.
@@ -113,8 +111,8 @@ Pip will install the packages into your currently active Python environment
 
 It is beneficial to set up a `virtual Python environment`_ for your project,
 because that leaves your system Python installation unchanged, it does not
-require ``sudo`` rights, and last but not least it gives you better control
-about the installed packages and their versions.
+require ``sudo`` rights, and gives you better control about the installed
+packages and their versions.
 
 If you want to contribute to the pywbem project, you need to set up a
 development and test environment for pywbem. That has a larger set of OS-level
@@ -135,12 +133,8 @@ Installation prerequisites
 .. _pywbem installation documentation: https://pywbem.readthedocs.io/en/stable/intro.html#installation
 
 
-The Python environment into which you want to install must be the active
-Python environment, and must have at least the following packages
-installed:
-
-- Python, either python 2.7 or Python 3.4-3.7. Pywbemtools does not support
-  Python 2.6
+The Python environment into which you want to install must have the following
+packages installed:
 
 - Python installation support packages(all platforms):
 
@@ -157,11 +151,11 @@ Other installation support packages:
       that is are normally available with unix style OSs (ex. make). See
       https://chocolatey.org/ for the installation instructions for Chocolatey.
 - Windows Cygwin
-    - wget - wget can be installed as part of the cygwin installation or
-      added cygwin package update.
+    - wget - wget can be installed as part of the Cygwin installation or
+      added with Cygwin package update.
     - python-devel - Probably named python2-devel / python3-devel
 
-Pywbemtools does install the``pywbem`` package which has a number of
+Pywbemtools installs the``pywbem`` package which has a number of
 prerequisites for installation as documented in the `pywbem installation
 documentation`_. These requirements should be covered by the list above.
 
@@ -179,8 +173,7 @@ package from `PyPI`_ into the currently active Python environment:
     $ pip install pywbemtools
 
 This will download and install the latest released version of pywbemtools and
-its dependent packages into your current Python environment (e.g. into your
-system Python or into a virtual Python environment).
+its dependent packages into your current Python environment.
 
 As an alternative, if you want to install the latest development level of the
 pywbemtools package for some reason, install directly from the ``master``
@@ -208,12 +201,6 @@ shown in the following example:
       pywbem, version 0.14.4
 
 
-Installation for development
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-See the :ref:`Pywbemtools Development` chapter.
-
-
 .. _`Standards conformance`:
 
 Standards conformance
@@ -223,11 +210,11 @@ Standards conformance
 
 Pywbemtools attempts to comply to the maximum possible with the relevant standards.
 
-Pywbemtools/pywbemcli is based on  and uses pywbem and pywbem. Therefore
+Pywbemtools uses pywbem for communication with the WBEM server. Therefore
 pywbemtools conformance to the relevant standards is defined in the `pywbem
 standards conformance documentation`.
 
-Therefore, the level of conformance and limitations for pywbemcli is the same
+Therefore, the level of conformance and limitations for pywbemtools is the same
 as pywbem except for any specific notations in this document.
 
 
@@ -332,7 +319,7 @@ Since Python 2.7, :exc:`~py:exceptions.DeprecationWarning` warnings are
 suppressed by default. They can be shown for example in any of these ways:
 
 
-* by invoking pywbemcl with the environment variable:
+* by invoking pywbemcli with the environment variable:
 
   ``PYTHONWARNINGS=default``
 

@@ -82,7 +82,7 @@ def class_get(context, classname, **options):
     server and display it. Normally it is retrieved from the default namespace
     in the server.
 
-    If the class is not found in the WBEM Server, the server returns an
+    If the class is not found in the WBEM server, the server returns an
     exception.
 
     The --includeclassorigin, --includeclassqualifiers, and --propertylist
@@ -99,14 +99,14 @@ def class_get(context, classname, **options):
 @click.option('-f', '--force', is_flag=True, required=False,
               help='Force the delete request to be issued even if '
               'there are instances in the server or subclasses to this class. '
-              'The WBEM Server may still refuse the request.')
+              'The WBEM server may still refuse the request.')
 @add_options(namespace_option)
 @click.pass_obj
 def class_delete(context, classname, **options):
     """
     Delete a single CIM class.
 
-    Deletes the CIM class defined by CLASSNAME from the WBEM Server.
+    Deletes the CIM class defined by CLASSNAME from the WBEM server.
 
     If the class has instances, the command is refused unless the
     --force option is used. If --force is used, instances are also
@@ -114,7 +114,7 @@ def class_delete(context, classname, **options):
 
     If the class has subclasses, the command is rejected.
 
-    WARNING: Removing classes from a WBEM Server can cause damage to the
+    WARNING: Removing classes from a WBEM server can cause damage to the
     server. Use this with caution.  It can impact instance providers and
     other components in the server.
 
@@ -167,9 +167,9 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Enumerate classes from the WBEM Server.
+    Enumerate classes from the WBEM server.
 
-    Enumerates the classes (or classnames) from the WBEMServer starting
+    Enumerates the classes (or classnames) from the WBEM server starting
     either at the top of the class hierarchy or from  the position in the
     class hierarchy defined by `CLASSNAME` argument if provided.
 
@@ -284,7 +284,7 @@ def class_find(context, classname_glob, **options):
     """
     Find all classes that match CLASSNAME-GLOB.
 
-    Find all classes in the namespace(s) of the target WBEMServer that
+    Find all classes in the namespace(s) of the target WBEM server that
     match the CLASSNAME-GLOB regular expression argument and return the
     classnames. The CLASSNAME-GLOB argument is required.
 

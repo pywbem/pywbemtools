@@ -40,12 +40,12 @@ Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
   Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML
   protocol to communicate with WBEM servers. Pywbemcli can:
 
-      * Manage the information in WBEM Servers CIM objects using the
+      * Manage the information in WBEM servers CIM objects using the
         operations defined in the DMTF specification.  It can manage CIM
         classes, CIM instances and CIM qualifier declarations in the WBEM
         Server and execute CIM methods and queries on the server.
 
-      * Inspect WBEM Server characteristics including namespaces, registered
+      * Inspect WBEM server characteristics including namespaces, registered
         profiles, and other server information.
 
       * Capture detailed information on communication with the WBEM
@@ -61,13 +61,14 @@ Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
   The general options shown below can also be specified on any of the
   (sub)commands as well as the command line.
 
-  For more detailed information, see:
+  For more detailed documentation, see:
 
       https://pywbemtools.readthedocs.io/en/latest/
+      https://pywbemtools.readthedocs.io/en/stable/
 
 Options:
   -s, --server URI                Hostname or IP address with scheme of the
-                                  WBEMServer in format:
+                                  WBEM server in format:
                                   [{scheme}://]{host}[:{port}]
                                   The server
                                   parameter is conditionally optional (see
@@ -99,9 +100,9 @@ Options:
                                   server if no namespace is defined in a
                                   subcommand(EnvVar: PYWBEMCLI_NAME)
                                   []Default: root/cimv2].
-  -u, --user USER                 User name for the WBEM Server connection.
+  -u, --user USER                 User name for the WBEM server connection.
                                   (EnvVar: PYWBEMCLI_NAME)
-  -p, --password PASSWORD         Password for the WBEM Server. Will be
+  -p, --password PASSWORD         Password for the WBEM server. Will be
                                   requested as part  of initialization if user
                                   name exists and it is not  provided by this
                                   option.(EnvVar: PYWBEMCLI_PASSWORD).

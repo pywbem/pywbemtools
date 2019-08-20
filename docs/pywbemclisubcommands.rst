@@ -118,7 +118,7 @@ The **class** group defines subcommands that act on CIM classes. see
   The input argument is a GLOB expression which is used to search the server
   CIM namespaces for matching class names.  This subcommand uses a :term:`GLOB`
   Unix style pathname pattern expansion on the classname to attempt to filter
-  the names and namespaces of all of the classes in the WBEM Server (or the
+  the names and namespaces of all of the classes in the WBEM server (or the
   namespaces defined with the ``--namespaces``/``-n`` option)::
 
       $ pywbemcli> class find .*_WBEMS*
@@ -489,7 +489,7 @@ namespaces, etc. The subcommands are:
     $ pywbemcli --name op server brand
     Server Brand:
     +---------------------+
-    | WBEM Server Brand   |
+    | WBEM server brand   |
     |---------------------|
     | OpenPegasus         |
     +---------------------+
@@ -513,7 +513,7 @@ namespaces, etc. The subcommands are:
   See :ref:`pywbemcli server connection --help` for details.
 * **info** to get general information on the server.  This subcommand returns
   information on the brand, namespaces, and other reasonable information on the
-  WBEM Server:
+  WBEM server:
 
   .. code-block:: text
 
@@ -694,7 +694,7 @@ options for pywbemcli. The data includes:
 * **output-format** optional output format.
 * **mock_server** optional definition of the files that define a mock server
   environment using the pywbem mock module. This parameter is used, the
-  server_url must not be defined.
+  ``--server_url`` must not be defined.
 
 The :term:`connections file` is named ``pywbemcliservers.json`` in the directory
 in which pywbemcli is executed. The data is stored in JSON format within this
@@ -760,7 +760,7 @@ The subcommands include:
 * **select** select a connection from the connection table.  A connection
   may be selected either by using the name argument or if no argument is
   provided by selecting from a list presented on the console. The following
-  example shows changing connection from within the interactive mode of pywemcli::
+  example shows changing connection from within the interactive mode of pywbemcli::
 
     pywbemcli> connection select
     Select a connection or Ctrl_C to abort.

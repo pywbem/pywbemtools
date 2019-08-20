@@ -45,7 +45,7 @@ Options:
 Commands:
   associators   Get the associated classes for CLASSNAME.
   delete        Delete a single CIM class.
-  enumerate     Enumerate classes from the WBEM Server.
+  enumerate     Enumerate classes from the WBEM server.
   find          Find all classes that match CLASSNAME-GLOB.
   get           Get and display a single CIM class.
   invokemethod  Invoke the class method named methodname.
@@ -62,7 +62,7 @@ Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
   server and display it. Normally it is retrieved from the default namespace
   in the server.
 
-  If the class is not found in the WBEM Server, the server returns an
+  If the class is not found in the WBEM server, the server returns an
   exception.
 
   The --includeclassorigin, --includeclassqualifiers, and --propertylist
@@ -89,9 +89,8 @@ Options:
                                   -p pn1 -p pn22 or -p pn1,pn2). If defined as
                                   empty string the server should return no
                                   properties.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -h, --help                      Show this message and exit.
 """
 
@@ -99,11 +98,11 @@ Options:
 CLS_ENUM_HELP = """
 Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
-  Enumerate classes from the WBEM Server.
+  Enumerate classes from the WBEM server.
 
-  Enumerates the classes (or classnames) from the WBEMServer starting either
-  at the top of the class hierarchy or from  the position in the class
-  hierarchy defined by `CLASSNAME` argument if provided.
+  Enumerates the classes (or classnames) from the WBEM server starting
+  either at the top of the class hierarchy or from  the position in the
+  class hierarchy defined by `CLASSNAME` argument if provided.
 
   The output format is defined by the output-format general option.
 
@@ -128,9 +127,8 @@ Options:
                             this option.
   -o, --names-only          Retrieve only the returned object names.
   -s, --sort                Sort into alphabetical order by classname.
-  -n, --namespace <name>    Namespace to use for this operation. If defined
-                            that namespace overrides the general options
-                            namespace
+  -n, --namespace <name>    Namespace to use for this operation, instead of
+                            the default namespace of the connection
   -S, --summary             Return only summary of objects (count).
   -h, --help                Show this message and exit.
 """
@@ -140,7 +138,7 @@ Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
 
   Find all classes that match CLASSNAME-GLOB.
 
-  Find all classes in the namespace(s) of the target WBEMServer that match
+  Find all classes in the namespace(s) of the target WBEM server that match
   the CLASSNAME-GLOB regular expression argument and return the classnames.
   The CLASSNAME-GLOB argument is required.
 
@@ -193,8 +191,8 @@ Options:
   -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
                           When this option is set, the CLASSNAME argument is
                           required
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -h, --help              Show this message and exit.
 """
 
@@ -203,14 +201,14 @@ Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
 
   Delete a single CIM class.
 
-  Deletes the CIM class defined by CLASSNAME from the WBEM Server.
+  Deletes the CIM class defined by CLASSNAME from the WBEM server.
 
   If the class has instances, the command is refused unless the --force
   option is used. If --force is used, instances are also deleted.
 
   If the class has subclasses, the command is rejected.
 
-  WARNING: Removing classes from a WBEM Server can cause damage to the
+  WARNING: Removing classes from a WBEM server can cause damage to the
   server. Use this with caution.  It can impact instance providers and other
   components in the server.
 
@@ -219,9 +217,9 @@ Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
 Options:
   -f, --force             Force the delete request to be issued even if there
                           are instances in the server or subclasses to this
-                          class. The WBEM Server may still refuse the request.
-  -n, --namespace <name>  Namespace to use for this operation. If defined that
-                          namespace overrides the general options namespace
+                          class. The WBEM server may still refuse the request.
+  -n, --namespace <name>  Namespace to use for this operation, instead of the
+                          default namespace of the connection
   -h, --help              Show this message and exit.
 """
 
@@ -264,9 +262,8 @@ Options:
                                   properties.
   -o, --names-only                Retrieve only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
-  -n, --namespace <name>          Namespace to use for this operation. If
-                                  defined that namespace overrides the general
-                                  options namespace
+  -n, --namespace <name>          Namespace to use for this operation, instead
+                                  of the default namespace of the connection
   -S, --summary                   Return only summary of objects (count).
   -h, --help                      Show this message and exit.
 """

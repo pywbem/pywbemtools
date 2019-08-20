@@ -147,7 +147,7 @@ Usage: pywbemcli connection add [COMMAND-OPTIONS]
 
 Options:
   -s, --server SERVER             Required hostname or IP address with scheme
-                                  of the WBEMServer in format:
+                                  of the WBEM server in format:
                                   [{scheme}://]{host}[:{port}]
                                   * Scheme: must
                                   be "https" or "http" [Default: "https"]
@@ -163,15 +163,15 @@ Options:
                                   defined WBEM server in the connection file
                                   [required]
   -d, --default-namespace NAMESPACE
-                                  Default namespace to use in the target
-                                  WBEMServer if no namespace is defined in the
+                                  Default namespace to use in the target WBEM
+                                  server if no namespace is defined in the
                                   subcommand (Default: root/cimv2).
-  -u, --user TEXT                 User name for the WBEM Server connection.
-  -p, --password TEXT             Password for the WBEM Server. Will be
+  -u, --user TEXT                 User name for the WBEM server connection.
+  -p, --password TEXT             Password for the WBEM server. Will be
                                   requested as part  of initialization if user
                                   name exists and it is not  provided by this
                                   option.
-  -t, --timeout INTEGER RANGE     Operation timeout for the WBEM Server in
+  -t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in
                                   seconds. Default: 30
   -N, --noverify                  If set, client does not verify server
                                   certificate.
@@ -345,7 +345,7 @@ TEST_CASES = [
     # ['Verify connection subcommand new. test with show and delete  ',
     # # {'stdin': ['connection new test1 http://blah', 'connection show test1',
     #            # 'connection delete test1']},
-    # # {'stdout': ["Name: test1", "  WBEMServer uri: http://blah",
+    # # {'stdout': ["Name: test1", "  WBEM Server uri: http://blah",
     #  # "  Default-namespace: root/cimv2", "  User: None", "  Password: None",
     #  # "  Timeout: None", "  Noverify: False", "  Certfile: None",
     #  # "  Keyfile: None", "  use-pull-ops: None", "  mock: ",
@@ -357,7 +357,7 @@ TEST_CASES = [
      {'global': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEMServer Connections:", ""],
+         "WBEM server connections:", ""],
       'test': 'lines'},
      None, OK],
 
@@ -433,7 +433,7 @@ TEST_CASES = [
     ['Verify connection subcommand list  with 2 servers defined',
      {'global': ['--output-format', 'simple'],
       'args': ['list']},
-     {'stdout': ['WBEMServerConnections:',
+     {'stdout': ['WBEM server connections:',
                  'name    server uri namespace user timeout noverify    log',
                  '---------------------------------------------------------'
                  '------------',
@@ -460,7 +460,7 @@ TEST_CASES = [
      ' next pywbemcli call',
      {'global': ['--output-format', 'simple'],
       'args': ['list']},
-     {'stdout': ['WBEMServerConnections:',
+     {'stdout': ['WBEM server connections:',
                  'name    server uri namespace user timeout noverify    log',
                  '---------------------------------------------------------'
                  '------------',
@@ -494,7 +494,7 @@ TEST_CASES = [
      {'global': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEMServer Connections:", ""],
+         "WBEM server connections:", ""],
       'test': 'linesnows',
       'file': {'before': 'None', 'after': 'None'}},
 
