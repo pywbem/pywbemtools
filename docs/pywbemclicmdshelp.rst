@@ -92,7 +92,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       set. (EnvVar: PYWBEMCLI_CERTFILE).
       -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                       PYWBEMCLI_KEYFILE).
-      --ca_certs TEXT                 File or directory containing certificates
+      --ca-certs TEXT                 File or directory containing certificates
                                       that will be matched against certificate
                                       received from WBEM server. Set --no-verify-
                                       cert option to bypass client verification of
@@ -223,19 +223,20 @@ The following defines the help output for the `pywbemcli class associators --hel
       Get the associated classes for CLASSNAME.
 
       Get the classes(or class names) that are associated with the CLASSNAME
-      argument filtered by the --assocclass, --resultclass, --role and
-      --resultrole options and modified by the other options.
+      argument filtered by the --assoc-class, --result-class, --role and
+      --result-role options and modified by the other options.
 
       Results are formatted as defined by the output format general option.
 
     Options:
-      -a, --assocclass <class name>   Filter by the association class name
+      -a, --assoc-class <class name>  Filter by the association class name
                                       provided. Each returned class (or class
                                       name) should be associated to the source
                                       class through this class or its subclasses.
                                       Optional.
-      -C, --resultclass <class name>  Filter by the association result class name
-                                      provided. Each returned class (or class
+      -C, --result-class <class name>
+                                      Filter the returned objects by the class
+                                      name provided. Each returned class (or class
                                       name) should be this class or one of its
                                       subclasses. Optional
       -r, --role <role name>          Filter by the role name provided. Each
@@ -244,7 +245,7 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       through an association with this role
                                       (property name in the association that
                                       matches this parameter). Optional.
-      -R, --resultrole <role name>    Filter by the result role name provided.
+      -R, --result-role <role name>   Filter by the result role name provided.
                                       Each returned class (or class name)should be
                                       associated with the source class (CLASSNAME)
                                       through an association with returned object
@@ -255,7 +256,7 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       qualifiers in the returned class(s). The
                                       default behavior is to request qualifiers in
                                       returned class(s).
-      -c, --includeclassorigin        Request that server include classorigin in
+      -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
       -p, --propertylist <property name>
@@ -336,31 +337,32 @@ The following defines the help output for the `pywbemcli class enumerate --help`
 
       The output format is defined by the output-format general option.
 
-      The includeclassqualifiers, includeclassorigin options define optional
-      information to be included in the output.
+      The --local-only and --no-qualifiers options define optional information
+      to be included in the output.
 
-      The deepinheritance option defines whether the complete hiearchy is
-      retrieved or just the next level in the hiearchy.
+      The --deep-inheritance option defines whether the complete class hierarchy
+      is retrieved or just the next level in the hierarchy.
 
       Results are formatted as defined by the output format general option.
 
     Options:
-      -d, --deepinheritance     Return complete subclass hierarchy for this class
-                                if set. Otherwise retrieve only the next hierarchy
-                                level.
-      -l, --localonly           Show only local properties of the class.
-      --no-qualifiers           If set, request server to not include qualifiers
-                                in the returned class(s). The default behavior is
-                                to request qualifiers in returned class(s).
-      -c, --includeclassorigin  Request that server include classorigin in the
-                                result.On some WBEM operations, server may ignore
-                                this option.
-      -o, --names-only          Retrieve only the returned object names.
-      -s, --sort                Sort into alphabetical order by classname.
-      -n, --namespace <name>    Namespace to use for this operation, instead of
-                                the default namespace of the connection
-      -S, --summary             Return only summary of objects (count).
-      -h, --help                Show this message and exit.
+      -d, --deep-inheritance     If set, request server to return complete
+                                 subclass hiearchy for this class. The default is
+                                 False which requests only one level of
+                                 subclasses.
+      -l, --local-only           Show only local properties of the class(s).
+      --no-qualifiers            If set, request server to not include qualifiers
+                                 in the returned class(s). The default behavior is
+                                 to request qualifiers in returned class(s).
+      -c, --include-classorigin  Request that server include classorigin in the
+                                 result.On some WBEM operations, server may ignore
+                                 this option.
+      -o, --names-only           Retrieve only the returned object names.
+      -s, --sort                 Sort into alphabetical order by classname.
+      -n, --namespace <name>     Namespace to use for this operation, instead of
+                                 the default namespace of the connection
+      -S, --summary              Return only summary of objects (count).
+      -h, --help                 Show this message and exit.
 
 
 .. _`pywbemcli class find --help`:
@@ -431,18 +433,18 @@ The following defines the help output for the `pywbemcli class get --help` subco
       If the class is not found in the WBEM server, the server returns an
       exception.
 
-      The --includeclassorigin, --includeclassqualifiers, and --propertylist
-      options determine what parts of the class definition are retrieved.
+      The --include-classorigin, --no-qualifiers, and --propertylist options
+      determine what parts of the class definition are retrieved.
 
       Results are formatted as defined by the output format general option.
 
     Options:
-      -l, --localonly                 Show only local properties of the class.
+      -l, --local-only                Show only local properties of the class(s).
       --no-qualifiers                 If set, request server to not include
                                       qualifiers in the returned class(s). The
                                       default behavior is to request qualifiers in
                                       returned class(s).
-      -c, --includeclassorigin        Request that server include classorigin in
+      -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
       -p, --propertylist <property name>
@@ -517,9 +519,10 @@ The following defines the help output for the `pywbemcli class references --help
       Results are displayed as defined by the output format general option.
 
     Options:
-      -R, --resultclass <class name>  Filter by the result classname provided.
-                                      Each returned class (or classname) should be
-                                      this class or its subclasses. Optional.
+      -R, --result-class <class name>
+                                      Filter by the classname provided. Each
+                                      returned class (or classname) should be this
+                                      class or its subclasses. Optional.
       -r, --role <role name>          Filter by the role name provided. Each
                                       returned class (or classname) should refer
                                       to the target class through a property with
@@ -529,7 +532,7 @@ The following defines the help output for the `pywbemcli class references --help
                                       qualifiers in the returned class(s). The
                                       default behavior is to request qualifiers in
                                       returned class(s).
-      -c, --includeclassorigin        Request that server include classorigin in
+      -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
       -p, --propertylist <property name>
@@ -566,17 +569,18 @@ The following defines the help output for the `pywbemcli class tree --help` subc
 
       Display CIM class inheritance hierarchy tree.
 
-      Displays a tree of the class hiearchy to show superclasses and subclasses.
+      Displays a tree of the class hierarchy to show superclasses and
+      subclasses.
 
-      CLASSNAMe is an optional argument that defines the starting point for the
-      hiearchy display
+      CLASSNAME is an optional argument that defines the starting point for the
+      hierarchy display
 
-      If the --superclasses option not specified the hiearchy starting either at
-      the top most classes of the class hiearchy or at the class defined by
-      CLASSNAME is displayed.
+      If the --superclasses option is not specified, the hierarchy starting
+      either at the top most classes of the class hierarchy or at the class
+      defined by CLASSNAME is displayed.
 
-      if the --superclasses options is specified and a CLASSNAME is defined the
-      class hiearchy of superclasses leading to CLASSNAME is displayed.
+      If the --superclasses options is specified and a CLASSNAME is defined the
+      class hierarchy of superclasses leading to CLASSNAME is displayed.
 
       This is a separate subcommand because it is tied specifically to
       displaying in a tree format.so that the --output-format general option is
@@ -989,13 +993,13 @@ The following defines the help output for the `pywbemcli instance --help` subcom
 
     Commands:
       associators   Get associated instances or names.
-      count         Get instance count for classes.
+      count         Get CIM instance count for classes.
       create        Create a CIM instance of CLASSNAME.
       delete        Delete a single CIM instance.
       enumerate     Enumerate instances or names of CLASSNAME.
       get           Get a single CIMInstance.
       invokemethod  Invoke a CIM method on a CIMInstance.
-      modify        Modify an existing instance.
+      modify        Modify an existing CIM instance.
       query         Execute an execquery request.
       references    Get the reference instances or names.
 
@@ -1017,8 +1021,8 @@ The following defines the help output for the `pywbemcli instance associators --
       Get associated instances or names.
 
       Returns the associated instances or names (--names-only option) for the
-      `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
-      --role and --resultrole options.
+      `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
+      --role and --result-role options.
 
       INSTANCENAME must be a CIM instance name in the format defined by DMTF
       `DSP0207`.
@@ -1030,12 +1034,13 @@ The following defines the help output for the `pywbemcli instance associators --
       Results are formatted as defined by the --output_format general option.
 
     Options:
-      -a, --assocclass <class name>   Filter by the association class name
+      -a, --assoc-class <class name>  Filter by the association class name
                                       provided.Each returned instance (or instance
                                       name) should be associated to the source
                                       instance through this class or its
                                       subclasses. Optional.
-      -c, --resultclass <class name>  Filter by the result class name provided.
+      -c, --result-class <class name>
+                                      Filter by the result class name provided.
                                       Each returned instance (or instance name)
                                       should be a member of this class or one of
                                       its subclasses. Optional
@@ -1045,14 +1050,14 @@ The following defines the help output for the `pywbemcli instance associators --
                                       (INSTANCENAME) through an association with
                                       this role (property name in the association
                                       that matches this parameter). Optional.
-      -R, --resultrole <role name>    Filter by the result role name provided.
+      -R, --result-role <role name>   Filter by the result role name provided.
                                       Each returned instance (or instance
                                       name)should be associated with the source
                                       instance name (`INSTANCENAME`) through an
                                       association with returned object having this
                                       role (property name in the association that
                                       matches this parameter). Optional.
-      -q, --includequalifiers         If set, requests server to include
+      -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
@@ -1062,8 +1067,9 @@ The following defines the help output for the `pywbemcli instance associators --
                                       this option is specified. If traditional
                                       operations are used, inclusion of qualifiers
                                       depends on the server.
-      -c, --includeclassorigin        Include class origin attribute in returned
-                                      instance(s).
+      -c, --include-classorigin       Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
@@ -1084,16 +1090,16 @@ The following defines the help output for the `pywbemcli instance associators --
                                       class from which the instance to process is
                                       selected.
       -S, --summary                   Return only summary of objects (count).
-      -f, --filterquery TEXT          A filter query to be passed to the server if
+      -f, --filter-query TEXT         A filter query to be passed to the server if
                                       the pull operations are used. If this option
-                                      is defined and the --filterquerylanguage is
-                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      is defined and the --filter-query-language
+                                      is None, pywbemcli assumes DMTF:FQL. If this
                                       option is defined and the traditional
                                       operations are used, the filter is not sent
                                       to the server. See the documentation for
                                       more information. (Default: None)
-      --filterquerylanguage TEXT      A filterquery language to be used with a
-                                      filter query defined by --filterquery.
+      --filter-query-language TEXT    A filter-query language to be used with a
+                                      filter query defined by --filter-query.
                                       (Default: None)
       -h, --help                      Show this message and exit.
 
@@ -1112,7 +1118,7 @@ The following defines the help output for the `pywbemcli instance count --help` 
 
     Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-      Get instance count for classes.
+      Get CIM instance count for classes.
 
       Displays the count of instances for the classes defined by the `CLASSNAME-
       GLOB` argument in one or more namespaces.
@@ -1171,12 +1177,11 @@ The following defines the help output for the `pywbemcli instance create --help`
       ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
     Options:
-      -P, --property name=value  Optional property definitions of the form
-                                 name=value. Multiple definitions allowed, one for
-                                 each property to be included in the
-                                 createdinstance. Array property values defined by
-                                 comma-separated-values. EmbeddedInstance not
-                                 allowed.
+      -P, --property name=value  Optional property names of the form name=value.
+                                 Multiple definitions allowed, one for each
+                                 property to be included in the createdinstance.
+                                 Array property values defined by comma-separated-
+                                 values. EmbeddedInstance not allowed.
       -V, --verify               If set, The change is displayed and verification
                                  requested before the change is executed
       -n, --namespace <name>     Namespace to use for this operation, instead of
@@ -1238,26 +1243,26 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
       provided) or from the CLASSNAME argument if provided.
 
-      Displays the returned instances in mof, xml, or table formats or the
+      Displays the returned instances in mof, xml, or table formats, or the
       instance names as a string or XML formats (--names-only option).
 
       Results are formatted as defined by the --output_format general option.
 
     Options:
-      -l, --localonly                 Show only local properties of the instances.
+      -l, --local-only                Show only local properties of the instances.
                                       This subcommand may use either pull or
                                       traditional operations depending on the
-                                      server and the "--use--pull-ops" general
+                                      server and the --use-pull-ops general
                                       option. If pull operations are used, this
                                       parameters will not be included, even if
                                       specified. If traditional operations are
                                       used, some servers do not process the
                                       parameter.
-      -d, --deepinheritance           If set, requests server to return properties
+      -d, --deep-inheritance          If set, requests server to return properties
                                       in subclasses of the target instances class.
                                       If option not specified only properties from
                                       target class are returned
-      -q, --includequalifiers         If set, requests server to include
+      -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
@@ -1267,8 +1272,9 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       this option is specified. If traditional
                                       operations are used, inclusion of qualifiers
                                       depends on the server.
-      -c, --includeclassorigin        Include class origin attribute in returned
-                                      instance(s).
+      -c, --include-classorigin       Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
@@ -1284,16 +1290,16 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -o, --names-only                Retrieve only the returned object names.
       -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
-      -f, --filterquery TEXT          A filter query to be passed to the server if
+      -f, --filter-query TEXT         A filter query to be passed to the server if
                                       the pull operations are used. If this option
-                                      is defined and the --filterquerylanguage is
-                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      is defined and the --filter-query-language
+                                      is None, pywbemcli assumes DMTF:FQL. If this
                                       option is defined and the traditional
                                       operations are used, the filter is not sent
                                       to the server. See the documentation for
                                       more information. (Default: None)
-      --filterquerylanguage TEXT      A filterquery language to be used with a
-                                      filter query defined by --filterquery.
+      --filter-query-language TEXT    A filter-query language to be used with a
+                                      filter query defined by --filter-query.
                                       (Default: None)
       -h, --help                      Show this message and exit.
 
@@ -1331,14 +1337,15 @@ The following defines the help output for the `pywbemcli instance get --help` su
       Results are formatted as defined by the --output_format general option.
 
     Options:
-      -l, --localonly                 Request that server show only local
+      -l, --local-only                Request that server show only local
                                       properties of the returned instance. Some
                                       servers may not process this parameter.
-      -q, --includequalifiers         If set, requests server to include
+      -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. Not
                                       all servers return qualifiers on instances
-      -c, --includeclassorigin        Include class origin attribute in returned
-                                      instance(s).
+      -c, --include-classorigin       Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
@@ -1427,26 +1434,26 @@ The following defines the help output for the `pywbemcli instance modify --help`
 
     Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
 
-      Modify an existing instance.
+      Modify an existing CIM instance.
 
       Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
       property names and values defined by the property option and the CIM class
-      defined by the instance name.  The propertylist option if provided is
-      passed to the WBEM server as part of the ModifyInstance operation
-      (normally the WBEM server limits modifications) to just those properties
-      defined in the property list.
+      defined by the instance name.  The --propertylist option if provided is
+      passed to the WBEM server as part of the ModifyInstance operation (the
+      WBEM server limits modifications to just those properties defined in the
+      property list).
 
       INSTANCENAME must be a CIM instance name in the format defined by DMTF
       `DSP0207`.
 
-      Pywbemcli builds only the properties defined with the --property option
-      into an instance based on the CIMClass and forwards that to the WBEM
-      server with the ModifyInstance method.
+      Pywbemcli builds only properties defined with the --property option into
+      an instance based on the CIMClass and forwards that to the WBEM server
+      with the ModifyInstance method.
 
       ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
 
     Options:
-      -P, --property name=value       Optional property definitions of the form
+      -P, --property name=value       Optional property names of the form
                                       name=value. Multiple definitions allowed,
                                       one for each property to be included in the
                                       createdinstance. Array property values
@@ -1550,7 +1557,7 @@ The following defines the help output for the `pywbemcli instance references --h
                                       refer to the target instance through a
                                       property with aname that matches the value
                                       of this parameter. Optional.
-      -q, --includequalifiers         If set, requests server to include
+      -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
@@ -1560,8 +1567,9 @@ The following defines the help output for the `pywbemcli instance references --h
                                       this option is specified. If traditional
                                       operations are used, inclusion of qualifiers
                                       depends on the server.
-      -c, --includeclassorigin        Include class origin attribute in returned
-                                      instance(s).
+      -c, --include-classorigin       Request that server include classorigin in
+                                      the result.On some WBEM operations, server
+                                      may ignore this option.
       -p, --propertylist <property name>
                                       Define a propertylist for the request. If
                                       option not specified a Null property list is
@@ -1582,16 +1590,16 @@ The following defines the help output for the `pywbemcli instance references --h
                                       class from which the instance to process is
                                       selected.
       -S, --summary                   Return only summary of objects (count).
-      -f, --filterquery TEXT          A filter query to be passed to the server if
+      -f, --filter-query TEXT         A filter query to be passed to the server if
                                       the pull operations are used. If this option
-                                      is defined and the --filterquerylanguage is
-                                      None, pywbemcli assumes DMTF:FQL. If this
+                                      is defined and the --filter-query-language
+                                      is None, pywbemcli assumes DMTF:FQL. If this
                                       option is defined and the traditional
                                       operations are used, the filter is not sent
                                       to the server. See the documentation for
                                       more information. (Default: None)
-      --filterquerylanguage TEXT      A filterquery language to be used with a
-                                      filter query defined by --filterquery.
+      --filter-query-language TEXT    A filter-query language to be used with a
+                                      filter query defined by --filter-query.
                                       (Default: None)
       -h, --help                      Show this message and exit.
 
@@ -1731,6 +1739,10 @@ The following defines the help output for the `pywbemcli server --help` subcomma
 
       Command Group for WBEM server operations.
 
+      The server command-group defines commands to inspect and manage core
+      components of the server including namespaces, the interop namespace,
+      profiles, and access to profile central instances.
+
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       command. These are NOT retained after the command is executed.
@@ -1739,13 +1751,13 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       -h, --help  Show this message and exit.
 
     Commands:
-      brand         Display information on the server.
-      centralinsts  Display central instances in the WBEM server.
-      connection    Display connection info used by this server.
-      info          Display general information on the Server.
-      interop       Display the interop namespace name.
-      namespaces    Display the namespaces in the WBEM server.
-      profiles      Display registered profiles from the WBEM server.
+      brand             Display information on the WBEM server.
+      connection        Display connection info used by this server.
+      get-centralinsts  Display central instances in the WBEM server.
+      info              Display general information on the server.
+      interop           Display the server interop namespace name.
+      namespaces        Display the namespaces in the WBEM server.
+      profiles          Display registered profiles from the WBEM server.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1762,64 +1774,13 @@ The following defines the help output for the `pywbemcli server brand --help` su
 
     Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
-      Display information on the server.
+      Display information on the WBEM server.
 
       Display brand information on the current server if it is available. This
       is typically the definition of the server implementor.
 
     Options:
       -h, --help  Show this message and exit.
-
-
-.. _`pywbemcli server centralinsts --help`:
-
-pywbemcli server centralinsts --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli server centralinsts --help` subcommand
-
-
-::
-
-    Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
-
-      Display central instances in the WBEM server.
-
-      Displays central instances for management profiles registered in the
-      server. Displays management profiles that adher to to the central class
-      methodology with none of the extra parameters (ex. scoping_class)
-
-      However, profiles that only use the scoping methodology require extra
-      information that is dependent on the profile itself. These profiles will
-      only be accessed when the correct values of central_class, scoping_class,
-      and scoping path for the particular profile is provided.
-
-      This display may be filtered by the optional organization and profile name
-      options that define the organization for each profile (ex. SNIA) and the
-      name of the profile. This will display only the profiles that are
-      registered for the defined organization and/or name.
-
-      Profiles are display as a table showing the organization, name, and
-      version for each profile.
-
-    Options:
-      -o, --organization <org name>   Filter by the defined organization. (ex. -o
-                                      DMTF
-      -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
-      -c, --central_class <classname>
-                                      Optional. Required only if profiles supports
-                                      only scopig methodology
-      -s, --scoping_class <classname>
-                                      Optional. Required only if profiles supports
-                                      only scopig methodology
-      -S, --scoping_path <pathname>   Optional. Required only if profiles supports
-                                      only scopig methodology. Multiples allowed
-      -r, --reference_direction [snia|dmtf]
-                                      Navigation direction for association.
-                                      [default: dmtf]
-      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli server connection --help`:
@@ -1847,6 +1808,57 @@ The following defines the help output for the `pywbemcli server connection --hel
       -h, --help  Show this message and exit.
 
 
+.. _`pywbemcli server get-centralinsts --help`:
+
+pywbemcli server get-centralinsts --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+The following defines the help output for the `pywbemcli server get-centralinsts --help` subcommand
+
+
+::
+
+    Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]
+
+      Display central instances in the WBEM server.
+
+      Displays central instances for management profiles registered in the
+      server. Displays management profiles that adher to to the central class
+      methodology with none of the extra parameters (ex. scoping_class)
+
+      However, profiles that only use the scoping methodology require extra
+      information that is dependent on the profile itself. These profiles will
+      only be accessed when the correct values of central_class, scoping_class,
+      and scoping path for the particular profile is provided.
+
+      This display may be filtered by the optional organization and profile name
+      options that define the organization for each profile (ex. SNIA) and the
+      name of the profile. This will display only the profiles that are
+      registered for the defined organization and/or name.
+
+      Profiles are display as a table showing the organization, name, and
+      version for each profile.
+
+    Options:
+      -o, --organization <org name>   Filter by the defined organization. (ex. -o
+                                      DMTF
+      -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
+      -c, --central-class <classname>
+                                      Optional. Required only if profiles supports
+                                      only scopig methodology
+      -s, --scoping-class <classname>
+                                      Optional. Required only if profiles supports
+                                      only scopig methodology
+      -S, --scoping-path <pathname>   Optional. Required only if profiles supports
+                                      only scopig methodology. Multiples allowed
+      -r, --reference-direction [snia|dmtf]
+                                      Navigation direction for association.
+                                      [default: dmtf]
+      -h, --help                      Show this message and exit.
+
+
 .. _`pywbemcli server info --help`:
 
 pywbemcli server info --help
@@ -1861,7 +1873,7 @@ The following defines the help output for the `pywbemcli server info --help` sub
 
     Usage: pywbemcli server info [COMMAND-OPTIONS]
 
-      Display general information on the Server.
+      Display general information on the server.
 
       Displays general information on the current server includeing brand,
       namespaces, etc.
@@ -1884,7 +1896,7 @@ The following defines the help output for the `pywbemcli server interop --help` 
 
     Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
-      Display the interop namespace name.
+      Display the server interop namespace name.
 
       Displays the name of the interop namespace defined for the WBEM server.
 

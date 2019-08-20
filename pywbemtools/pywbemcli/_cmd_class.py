@@ -15,7 +15,7 @@
 # limitations under the License.
 """
 Click Command definition for the class command group which includes
-cmds for get, enumerate, associators, references, find, etc. of the objects
+commands for get, enumerate, associators, references, find, etc. of the objects
 CIMClass on a WBEM server
 """
 from __future__ import absolute_import
@@ -47,10 +47,14 @@ includeclassqualifiers_option = [              # pylint: disable=invalid-name
                       'request qualifiers in returned class(s).')]
 
 deepinheritance_option = [              # pylint: disable=invalid-name
-    click.option('-d', '--deepinheritance', is_flag=True, required=False,
+    click.option('-d', '--deep-inheritance', is_flag=True, required=False,
                  help='If set, request server to return complete subclass '
                       'hiearchy for this class. The default is False which '
                       'requests only one level of subclasses.')]
+
+localonly_option = [              # pylint: disable=invalid-name
+    click.option('-l', '--local-only', is_flag=True, required=False,
+                 help='Show only local properties of the class(s).')]
 
 
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
@@ -67,8 +71,7 @@ def class_group():
 
 @class_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
-@click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Show only local properties of the class.')
+@add_options(localonly_option)
 @add_options(includeclassqualifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -85,7 +88,7 @@ def class_get(context, classname, **options):
     If the class is not found in the WBEM server, the server returns an
     exception.
 
-    The --includeclassorigin, --includeclassqualifiers, and --propertylist
+    The --include-classorigin, --no-qualifiers, and --propertylist
     options determine what parts of the class definition are retrieved.
 
     Results are formatted as defined by the output format general option.
@@ -153,11 +156,8 @@ def class_invokemethod(context, classname, methodname, **options):
 
 @class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
-@click.option('-d', '--deepinheritance', is_flag=True, required=False,
-              help='Return complete subclass hierarchy for this class if '
-                   'set. Otherwise retrieve only the next hierarchy level.')
-@click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Show only local properties of the class.')
+@add_options(deepinheritance_option)
+@add_options(localonly_option)
 @add_options(includeclassqualifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(names_only_option)
@@ -175,11 +175,11 @@ def class_enumerate(context, classname, **options):
 
     The output format is defined by the output-format general option.
 
-    The includeclassqualifiers, includeclassorigin options define optional
+    The --local-only and --no-qualifiers options define optional
     information to be included in the output.
 
-    The deepinheritance option defines whether the complete hiearchy is
-    retrieved or just the next level in the hiearchy.
+    The --deep-inheritance option defines whether the complete class hierarchy
+    is retrieved or just the next level in the hierarchy.
 
     Results are formatted as defined by the output format general option.
     """
@@ -189,9 +189,9 @@ def class_enumerate(context, classname, **options):
 
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-R', '--resultclass', type=str, required=False,
+@click.option('-R', '--result-class', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the result classname provided. Each returned '
+              help='Filter by the classname provided. Each returned '
                    'class (or classname) should be this class or its '
                    'subclasses. Optional.')
 @click.option('-r', '--role', type=str, required=False,
@@ -224,24 +224,24 @@ def class_references(context, classname, **options):
 
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-a', '--assocclass', type=str, required=False,
+@click.option('-a', '--assoc-class', type=str, required=False,
               metavar='<class name>',
               help='Filter by the association class name provided. Each '
                    'returned class (or class name) should be associated to the '
                    'source class through this class or its subclasses. '
                    'Optional.')
-@click.option('-C', '--resultclass', type=str, required=False,
+@click.option('-C', '--result-class', type=str, required=False,
               metavar='<class name>',
-              help='Filter by the association result class name provided. Each '
-                   'returned class (or class name) should be this class or one '
-                   'of its subclasses. Optional')
+              help='Filter the returned objects by the class name provided. '
+                   'Each returned class (or class name) should be this class '
+                   'or one of its subclasses. Optional')
 @click.option('-r', '--role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the role name provided. Each returned class '
               '(or class name)should be associated with the source class '
               '(CLASSNAME) through an association with this role (property '
               'name in the association that matches this parameter). Optional.')
-@click.option('-R', '--resultrole', type=str, required=False,
+@click.option('-R', '--result-role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the result role name provided. Each returned '
               'class (or class name)should be associated with the source class '
@@ -261,8 +261,8 @@ def class_associators(context, classname, **options):
     Get the associated classes for CLASSNAME.
 
     Get the classes(or class names) that are associated with the CLASSNAME
-    argument filtered by the --assocclass, --resultclass, --role and
-    --resultrole options and modified by the other options.
+    argument filtered by the --assoc-class, --result-class, --role and
+    --result-role options and modified by the other options.
 
     Results are formatted as defined by the output format general option.
     """
@@ -321,17 +321,17 @@ def class_tree(context, classname, **options):
     """
     Display CIM class inheritance hierarchy tree.
 
-    Displays a tree of the class hiearchy to show superclasses and subclasses.
+    Displays a tree of the class hierarchy to show superclasses and subclasses.
 
-    CLASSNAMe is an optional argument that defines the starting point for the
-    hiearchy display
+    CLASSNAME is an optional argument that defines the starting point for the
+    hierarchy display
 
-    If the --superclasses option not specified the hiearchy starting either
-    at the top most classes of the class hiearchy or at the class defined by
+    If the --superclasses option is not specified, the hierarchy starting either
+    at the top most classes of the class hierarchy or at the class defined by
     CLASSNAME is displayed.
 
-    if the --superclasses options is specified and a CLASSNAME is defined
-    the class hiearchy of superclasses leading to CLASSNAME is displayed.
+    If the --superclasses options is specified and a CLASSNAME is defined
+    the class hierarchy of superclasses leading to CLASSNAME is displayed.
 
     This is a separate subcommand because it is tied specifically to displaying
     in a tree format.so that the --output-format general option is ignored.
@@ -349,7 +349,7 @@ def cmd_class_get(context, classname, options):
     """
     Get the class defined by the argument.
 
-    Gets the class defined by CLASSNAME from thw wbem server and displays
+    Gets the class defined by CLASSNAME from the WBEM server and displays
     the class. If the class cannot be found, the server returns a CIMError
     exception.
 
@@ -358,9 +358,9 @@ def cmd_class_get(context, classname, options):
         result_class = context.conn.GetClass(
             classname,
             namespace=options['namespace'],
-            LocalOnly=options['localonly'],
+            LocalOnly=options['local_only'],
             IncludeQualifiers=options['includequalifiers'],
-            IncludeClassOrigin=options['includeclassorigin'],
+            IncludeClassOrigin=options['include_classorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, result_class,
@@ -371,7 +371,7 @@ def cmd_class_get(context, classname, options):
 
 def cmd_class_invokemethod(context, classname, methodname, options):
     """
-    Create an instance and submit to wbemserver
+    Create an instance and submit to a WBEM server
     """
     try:
         process_invokemethod(context, classname, methodname, options)
@@ -389,15 +389,15 @@ def cmd_class_enumerate(context, classname, options):
             results = context.conn.EnumerateClassNames(
                 ClassName=classname,
                 namespace=options['namespace'],
-                DeepInheritance=options['deepinheritance'])
+                DeepInheritance=options['deep_inheritance'])
         else:
             results = context.conn.EnumerateClasses(
                 ClassName=classname,
                 namespace=options['namespace'],
-                LocalOnly=options['localonly'],
-                DeepInheritance=options['deepinheritance'],
+                LocalOnly=options['local_only'],
+                DeepInheritance=options['deep_inheritance'],
                 IncludeQualifiers=options['includequalifiers'],
-                IncludeClassOrigin=options['includeclassorigin'])
+                IncludeClassOrigin=options['include_classorigin'])
 
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=options['sort'])
@@ -417,15 +417,15 @@ def cmd_class_references(context, classname, options):
         if options['names_only']:
             results = context.conn.ReferenceNames(
                 classname,
-                ResultClass=options['resultclass'],
+                ResultClass=options['result_class'],
                 Role=options['role'])
         else:
             results = context.conn.References(
                 classname,
-                ResultClass=options['resultclass'],
+                ResultClass=options['result_class'],
                 Role=options['role'],
                 IncludeQualifiers=options['includequalifiers'],
-                IncludeClassOrigin=options['includeclassorigin'],
+                IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
@@ -446,19 +446,19 @@ def cmd_class_associators(context, classname, options):
         if options['names_only']:
             results = context.conn.AssociatorNames(
                 classname,
-                AssocClass=options['assocclass'],
+                AssocClass=options['assoc_class'],
                 Role=options['role'],
-                ResultClass=options['resultclass'],
-                ResultRole=options['resultrole'])
+                ResultClass=options['result_class'],
+                ResultRole=options['result_role'])
         else:
             results = context.conn.Associators(
                 classname,
-                AssocClass=options['assocclass'],
+                AssocClass=options['assoc_class'],
                 Role=options['role'],
-                ResultClass=options['resultclass'],
-                ResultRole=options['resultrole'],
+                ResultClass=options['result_class'],
+                ResultRole=options['result_role'],
                 IncludeQualifiers=options['includequalifiers'],
-                IncludeClassOrigin=options['includeclassorigin'],
+                IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
@@ -560,7 +560,7 @@ def cmd_class_tree(context, classname, options):
 
 
 def cmd_class_delete(context, classname, options):
-    """Delete a class from the wbemserver repository"""
+    """Delete a class from the WBEM server repository"""
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
 

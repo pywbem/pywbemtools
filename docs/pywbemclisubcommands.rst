@@ -812,8 +812,9 @@ namespaces, etc. The subcommands are:
 
 
   See :ref:`pywbemcli server profiles --help` for details.
-* **centralinsts** to get the instance names of the central/scoping instances of
-  one or more :term:`WBEM management profile` s defined in the target WBEM server:
+* **get_centralinsts** to get the instance names of the central/scoping
+  instances of one or more :term:`WBEM management profile` s defined in the
+  target WBEM server:
 
   .. code-block:: text
 
@@ -826,7 +827,7 @@ namespaces, etc. The subcommands are:
     | DMTF:Computer System:1.0.0      | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance1",CreationClassName="Test_StorageSystem"://leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem" |
     +---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-  See :ref:`pywbemcli server centralinsts --help` for details.
+  See :ref:`pywbemcli server get-centralinsts --help` for details.
 
 .. _`Connection command-group`:
 

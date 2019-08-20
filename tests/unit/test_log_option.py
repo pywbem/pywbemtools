@@ -50,10 +50,10 @@ TEST_CASES = [
       'rc': 1},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log of class subcommand get localonly. Test stdoit',
+    ['Verify log of class subcommand get local-only. Test stdoit',
      {'global': ['-l', 'all=stderr:summary'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
                  '   string cimfoo_sub2;',
@@ -63,11 +63,11 @@ TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify Log of class subcommand get localonly. test stderr'
+    ['Verify Log of class subcommand get local-only. test stderr'
      'Cannot test stderr and stdout in same test.',
      {'global': ['-l', 'all=stderr:summary'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [r'-pywbem.api.',
                  r'FakedWBEMConnection',
                  r'-Request:',
@@ -76,11 +76,11 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log of class subcommand get localonly. Test stderr'
+    ['Verify log of class subcommand get local-only. Test stderr'
      'Cannot test stderr and stdout in same test.',
      {'global': ['-l', 'api=stderr:summary'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [r'-pywbem.api.',
                  r'FakedWBEMConnection',
                  r'-Request:',
@@ -89,12 +89,12 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log http class subcommand get localonly. Should be no log because '
-     'mock does not use http'
+    ['Verify log http class subcommand get local-only. Should be no log '
+     'because mock does not use http'
      'Cannot test stderr and stdout in same test.',
      {'global': ['-l', 'http=stderr:summary'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -103,7 +103,7 @@ TEST_CASES = [
      'same test.',
      {'global': ['-l', 'httpx=stderr'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Error: Logger configuration error. input: "],
       'rc': 1,
       'test': 'regex'},
@@ -112,7 +112,7 @@ TEST_CASES = [
     ['Verify log with error in definition. invalid type',
      {'global': ['-l', 'allx=stderr'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Error: Logger configuration error. input: allx=stderr. "
                  "Exception: Invalid simple logger name:"],
       'rc': 1,
@@ -124,7 +124,7 @@ TEST_CASES = [
      'same test.',
      {'global': ['-l'],
       'subcmd': 'class',
-      'args': ['get', 'CIM_Foo_sub2', '--localonly']},
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]"],
       'rc': 2,
       'test': 'in'},

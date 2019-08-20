@@ -33,6 +33,10 @@ def server_group():
     """
     Command Group for WBEM server operations.
 
+    The server command-group defines commands to inspect and manage core
+    components of the server including namespaces, the interop namespace,
+    profiles, and access to profile central instances.
+
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
     command. These are NOT retained after the command is executed.
@@ -55,7 +59,7 @@ def server_namespaces(context, **options):
 @click.pass_obj
 def server_interop(context):
     """
-    Display the interop namespace name.
+    Display the server interop namespace name.
 
     Displays the name of the interop namespace defined for the
     WBEM server.
@@ -68,7 +72,7 @@ def server_interop(context):
 @click.pass_obj
 def server_brand(context):
     """
-    Display information on the server.
+    Display information on the WBEM server.
 
     Display brand information on the current server if it is available.
     This is typically the definition of the server implementor.
@@ -81,7 +85,7 @@ def server_brand(context):
 @click.pass_obj
 def server_info(context):
     """
-    Display general information on the Server.
+    Display general information on the server.
 
     Displays general information on the current server includeing brand,
     namespaces, etc.
@@ -116,27 +120,27 @@ def server_profiles(context, **options):
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
 
-@server_group.command('centralinsts', options_metavar=CMD_OPTS_TXT)
+@server_group.command('get-centralinsts', options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, required=False,
               metavar='<org name>',
               help='Filter by the defined organization. (ex. -o DMTF')
 @click.option('-p', '--profile', type=str, required=False,
               metavar='<profile name>',
               help='Filter by the profile name. (ex. -p Array')
-@click.option('-c', '--central_class', type=str, required=False,
+@click.option('-c', '--central-class', type=str, required=False,
               metavar='<classname>',
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-s', '--scoping_class', type=str, required=False,
+@click.option('-s', '--scoping-class', type=str, required=False,
               metavar='<classname>',
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-S', '--scoping_path', type=str, required=False,
+@click.option('-S', '--scoping-path', type=str, required=False,
               multiple=True,
               metavar='<pathname>',
               help='Optional. Required only if profiles supports only '
               'scopig methodology. Multiples allowed')
-@click.option('-r', '--reference_direction',
+@click.option('-r', '--reference-direction',
               type=click.Choice(['snia', 'dmtf']),
               default='dmtf',
               show_default=True,
