@@ -90,7 +90,6 @@ This documentation uses a few special terms to refer to Python types:
    WBEM-URI
       The wbem-uri is a standardized text form for CIM instance names. It is
       documented in DMTF :term:`DSP0207`. Pywbemcli uses the untyped WBEM URI
-
       as the format for instance names in CLI input parameters
       (i.e. :term:`INSTANCENAME`)::
 
