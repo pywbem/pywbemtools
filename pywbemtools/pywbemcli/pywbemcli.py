@@ -116,7 +116,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.keyfile_envvar,
               help='Client private key file. '
                    '(EnvVar: {}).'.format(PywbemServer.keyfile_envvar))
-@click.option('--ca_certs', type=str,
+@click.option('--ca-certs', type=str,
               envvar=PywbemServer.ca_certs_envvar,
               help='File or directory containing certificates that will be '
                    'matched against certificate received from WBEM '

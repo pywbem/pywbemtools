@@ -65,18 +65,18 @@ Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
   If the class is not found in the WBEM server, the server returns an
   exception.
 
-  The --includeclassorigin, --includeclassqualifiers, and --propertylist
-  options determine what parts of the class definition are retrieved.
+  The --include-classorigin, --no-qualifiers, and --propertylist options
+  determine what parts of the class definition are retrieved.
 
   Results are formatted as defined by the output format general option.
 
 Options:
-  -l, --localonly                 Show only local properties of the class.
+  -l, --local-only                Show only local properties of the class(s).
   --no-qualifiers                 If set, request server to not include
                                   qualifiers in the returned class(s). The
                                   default behavior is to request qualifiers in
                                   returned class(s).
-  -c, --includeclassorigin        Request that server include classorigin in
+  -c, --include-classorigin       Request that server include classorigin in
                                   the result.On some WBEM operations, server
                                   may ignore this option.
   -p, --propertylist <property name>
@@ -106,31 +106,32 @@ Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
   The output format is defined by the output-format general option.
 
-  The includeclassqualifiers, includeclassorigin options define optional
-  information to be included in the output.
+  The --local-only and --no-qualifiers options define optional information
+  to be included in the output.
 
-  The deepinheritance option defines whether the complete hiearchy is
-  retrieved or just the next level in the hiearchy.
+  The --deep-inheritance option defines whether the complete class hierarchy
+  is retrieved or just the next level in the hierarchy.
 
   Results are formatted as defined by the output format general option.
 
 Options:
-  -d, --deepinheritance     Return complete subclass hierarchy for this class
-                            if set. Otherwise retrieve only the next hierarchy
-                            level.
-  -l, --localonly           Show only local properties of the class.
-  --no-qualifiers           If set, request server to not include qualifiers
-                            in the returned class(s). The default behavior is
-                            to request qualifiers in returned class(s).
-  -c, --includeclassorigin  Request that server include classorigin in the
-                            result.On some WBEM operations, server may ignore
-                            this option.
-  -o, --names-only          Retrieve only the returned object names.
-  -s, --sort                Sort into alphabetical order by classname.
-  -n, --namespace <name>    Namespace to use for this operation, instead of
-                            the default namespace of the connection
-  -S, --summary             Return only summary of objects (count).
-  -h, --help                Show this message and exit.
+  -d, --deep-inheritance     If set, request server to return complete
+                             subclass hiearchy for this class. The default is
+                             False which requests only one level of
+                             subclasses.
+  -l, --local-only           Show only local properties of the class(s).
+  --no-qualifiers            If set, request server to not include qualifiers
+                             in the returned class(s). The default behavior is
+                             to request qualifiers in returned class(s).
+  -c, --include-classorigin  Request that server include classorigin in the
+                             result.On some WBEM operations, server may ignore
+                             this option.
+  -o, --names-only           Retrieve only the returned object names.
+  -s, --sort                 Sort into alphabetical order by classname.
+  -n, --namespace <name>     Namespace to use for this operation, instead of
+                             the default namespace of the connection
+  -S, --summary              Return only summary of objects (count).
+  -h, --help                 Show this message and exit.
 """
 
 CLASS_FIND_HELP = """
@@ -171,17 +172,18 @@ Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
 
   Display CIM class inheritance hierarchy tree.
 
-  Displays a tree of the class hiearchy to show superclasses and subclasses.
+  Displays a tree of the class hierarchy to show superclasses and
+  subclasses.
 
-  CLASSNAMe is an optional argument that defines the starting point for the
-  hiearchy display
+  CLASSNAME is an optional argument that defines the starting point for the
+  hierarchy display
 
-  If the --superclasses option not specified the hiearchy starting either at
-  the top most classes of the class hiearchy or at the class defined by
-  CLASSNAME is displayed.
+  If the --superclasses option is not specified, the hierarchy starting
+  either at the top most classes of the class hierarchy or at the class
+  defined by CLASSNAME is displayed.
 
-  if the --superclasses options is specified and a CLASSNAME is defined the
-  class hiearchy of superclasses leading to CLASSNAME is displayed.
+  If the --superclasses options is specified and a CLASSNAME is defined the
+  class hierarchy of superclasses leading to CLASSNAME is displayed.
 
   This is a separate subcommand because it is tied specifically to
   displaying in a tree format.so that the --output-format general option is
@@ -235,9 +237,10 @@ Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
   Results are displayed as defined by the output format general option.
 
 Options:
-  -R, --resultclass <class name>  Filter by the result classname provided.
-                                  Each returned class (or classname) should be
-                                  this class or its subclasses. Optional.
+  -R, --result-class <class name>
+                                  Filter by the classname provided. Each
+                                  returned class (or classname) should be this
+                                  class or its subclasses. Optional.
   -r, --role <role name>          Filter by the role name provided. Each
                                   returned class (or classname) should refer
                                   to the target class through a property with
@@ -247,7 +250,7 @@ Options:
                                   qualifiers in the returned class(s). The
                                   default behavior is to request qualifiers in
                                   returned class(s).
-  -c, --includeclassorigin        Request that server include classorigin in
+  -c, --include-classorigin       Request that server include classorigin in
                                   the result.On some WBEM operations, server
                                   may ignore this option.
   -p, --propertylist <property name>
@@ -457,8 +460,8 @@ TEST_CASES = [
 
     ['Verify class subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
-     {'stdout': '   [Description ( "Subclass of CIM_Foo" )]',
-      'test': 'startswith'},
+     {'stdout': ['[Description ( "Subclass of CIM_Foo" )]', ],
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo local only',
@@ -474,8 +477,8 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo localonly',
-     ['enumerate', 'CIM_Foo', '--localonly'],
+    ['Verify class subcommand enumerate CIM_Foo local-only',
+     ['enumerate', 'CIM_Foo', '--local-only'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -494,8 +497,8 @@ TEST_CASES = [
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo --deepinheritance',
-     ['enumerate', 'CIM_Foo', '--deepinheritance'],
+    ['Verify class subcommand enumerate CIM_Foo --deep-inheritance',
+     ['enumerate', 'CIM_Foo', '--deep-inheritance'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -508,8 +511,8 @@ TEST_CASES = [
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo --includeclassorigin',
-     ['enumerate', 'CIM_Foo', '--includeclassorigin'],
+    ['Verify class subcommand enumerate CIM_Foo --include-classorigin',
+     ['enumerate', 'CIM_Foo', '--include-classorigin'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -552,7 +555,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo names and deepinheritance',
+    ['Verify class subcommand enumerate CIM_Foo names and -d -o',
      ['enumerate', 'CIM_Foo', '-do'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'in'},
@@ -584,15 +587,15 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    # subcommand get localonly option
-    ['Verify class subcommand get not localonly. Tests for property names',
+    # subcommand get local-only option
+    ['Verify class subcommand get not local-only. Tests for property names',
      ['get', 'CIM_Foo_sub2'],
      {'stdout': ['string cimfoo_sub2;', 'InstanceID', 'IntegerProp', 'Fuzzy',
                  'Key ( true )', 'IN ( false )'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly(-l)).',
+    ['Verify class subcommand get local-only(-l)).',
      ['get', 'CIM_Foo_sub2', '-l'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -602,8 +605,8 @@ TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get localonly. Tests whole response',
-     ['get', 'CIM_Foo_sub2', '--localonly'],
+    ['Verify class subcommand get local-only. Tests whole response',
+     ['get', 'CIM_Foo_sub2', '--local-only'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
                  '   string cimfoo_sub2;',
@@ -982,15 +985,14 @@ TEST_CASES = [
      {'stdout': ['Usage: pywbemcli class associators [COMMAND-OPTIONS] '
                  'CLASSNAME',
                  'Get the associated classes for CLASSNAME.',
-                 '-a, --assocclass <class name>   Filter by the association '
+                 '-a, --assoc-class <class name>  Filter by the association '
                  'class name',
-                 '-C, --resultclass <class name>  Filter by the association '
-                 'result class name',
+                 '-C, --result-class <class name>',
                  '-r, --role <role name>          Filter by the role name '
                  'provided.',
-                 '-R, --resultrole <role name>    Filter by the result role '
+                 '-R, --result-role <role name>   Filter by the result role '
                  'name provided.',
-                 '-c, --includeclassorigin', ],
+                 '-c, --include-classorigin', ],
       'test': 'in'},
      None, OK],
 
@@ -1035,10 +1037,10 @@ TEST_CASES = [
 
     ['Verify class subcommand associators request, all filters long',
      ['associators', 'TST_Person',
-      '--assocclass', 'TST_MemberOfFamilyCollection',
+      '--assoc-class', 'TST_MemberOfFamilyCollection',
       '--role', 'member',
-      '--resultrole', 'family',
-      '--resultclass', 'TST_Person'],
+      '--result-role', 'family',
+      '--result-class', 'TST_Person'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
@@ -1165,7 +1167,7 @@ TEST_CASES = [
     ['Verify class subcommand references request, all filters long',
      ['references', 'TST_Person',
       '--role', 'member',
-      '--resultclass', 'TST_MemberOfFamilyCollection'],
+      '--result-class', 'TST_MemberOfFamilyCollection'],
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
@@ -1277,7 +1279,7 @@ TEST_CASES = [
 # TODO subcommand class delete. Extend this test to use stdin (delete, test)
 # namespace
 # TODO: add test for  errors: class invalid, namespace invalid
-# other tests.  Test localonly on top level
+# other tests.  Test local-only on top level
 
 
 # TODO the following two test classes should be removed as I believe they

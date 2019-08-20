@@ -113,7 +113,7 @@ Options:
                                   set. (EnvVar: PYWBEMCLI_CERTFILE).
   -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                   PYWBEMCLI_KEYFILE).
-  --ca_certs TEXT                 File or directory containing certificates
+  --ca-certs TEXT                 File or directory containing certificates
                                   that will be matched against certificate
                                   received from WBEM server. Set --no-verify-
                                   cert option to bypass client verification of

@@ -47,7 +47,7 @@ sort_option = [                            # pylint: disable=invalid-name
                  help='Sort into alphabetical order by classname.')]
 
 includeclassorigin_option = [            # pylint: disable=invalid-name
-    click.option('-c', '--includeclassorigin', is_flag=True,
+    click.option('-c', '--include-classorigin', is_flag=True,
                  required=False,
                  help='Request that server include classorigin in the result.'
                       'On some WBEM operations, server may ignore this '

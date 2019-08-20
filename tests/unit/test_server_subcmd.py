@@ -33,6 +33,10 @@ Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
 
   Command Group for WBEM server operations.
 
+  The server command-group defines commands to inspect and manage core
+  components of the server including namespaces, the interop namespace,
+  profiles, and access to profile central instances.
+
   In addition to the command-specific options shown in this help text, the
   general options (see 'pywbemcli --help') can also be specified before the
   command. These are NOT retained after the command is executed.
@@ -41,20 +45,19 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  brand         Display information on the server.
-  centralinsts  Display central instances in the WBEM server.
-  connection    Display connection info used by this server.
-  info          Display general information on the Server.
-  interop       Display the interop namespace name.
-  namespaces    Display the namespaces in the WBEM server.
-  profiles      Display registered profiles from the WBEM server.
-
+  brand             Display information on the WBEM server.
+  connection        Display connection info used by this server.
+  get-centralinsts  Display central instances in the WBEM server.
+  info              Display general information on the server.
+  interop           Display the server interop namespace name.
+  namespaces        Display the namespaces in the WBEM server.
+  profiles          Display registered profiles from the WBEM server.
 """
 
 SVR_BRAND_HELP = """
 Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
-  Display information on the server.
+  Display information on the WBEM server.
 
   Display brand information on the current server if it is available. This
   is typically the definition of the server implementor.
@@ -63,8 +66,8 @@ Options:
   -h, --help  Show this message and exit.
 """
 
-SVR_CENTRALINSTS_HELP = """
-Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
+SVR_GETCENTRALINSTS_HELP = """
+Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]
 
   Display central instances in the WBEM server.
 
@@ -89,18 +92,19 @@ Options:
   -o, --organization <org name>   Filter by the defined organization. (ex. -o
                                   DMTF
   -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
-  -c, --central_class <classname>
+  -c, --central-class <classname>
                                   Optional. Required only if profiles supports
                                   only scopig methodology
-  -s, --scoping_class <classname>
+  -s, --scoping-class <classname>
                                   Optional. Required only if profiles supports
                                   only scopig methodology
-  -S, --scoping_path <pathname>   Optional. Required only if profiles supports
+  -S, --scoping-path <pathname>   Optional. Required only if profiles supports
                                   only scopig methodology. Multiples allowed
-  -r, --reference_direction [snia|dmtf]
+  -r, --reference-direction [snia|dmtf]
                                   Navigation direction for association.
                                   [default: dmtf]
-  -h, --help                      Show this message and exit."""
+  -h, --help                      Show this message and exit.
+  """
 
 SVR_CONNECT_HELP = """
 Usage: pywbemcli  server connection [COMMAND-OPTIONS]
@@ -119,7 +123,7 @@ Options:
 SVR_INFO_HELP = """
 Usage: pywbemcli server info [COMMAND-OPTIONS]
 
-  Display general information on the Server.
+  Display general information on the server.
 
   Displays general information on the current server includeing brand,
   namespaces, etc.
@@ -131,7 +135,7 @@ Options:
 SVR_INTEROP_HELP = """
 Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
-  Display the interop namespace name.
+  Display the server interop namespace name.
 
   Displays the name of the interop namespace defined for the WBEM server.
 
@@ -200,8 +204,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify class subcommand profiles  --help response',
-     ['centralinsts', '--help'],
-     {'stdout': SVR_CENTRALINSTS_HELP,
+     ['get-centralinsts', '--help'],
+     {'stdout': SVR_GETCENTRALINSTS_HELP,
       'test': 'linesnows'},
      None, OK],
 
@@ -357,8 +361,8 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify server subcommand centralinsts, ',
-     {'args': ['centralinsts', '-o', 'SNIA',
+    ['Verify server subcommand get-centralinsts, ',
+     {'args': ['get-centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
       'global': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',

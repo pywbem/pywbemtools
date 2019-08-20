@@ -37,16 +37,16 @@ from .config import DEFAULT_QUERY_LANGUAGE
 #
 
 
-# This is instance-only because the default is False for includequalifiers
+# This is instance-only because the default is False for include-qualifiers
 # on instances but True on classes
 includequalifiers_option = [              # pylint: disable=invalid-name
-    click.option('-q', '--includequalifiers', is_flag=True, required=False,
+    click.option('-q', '--include-qualifiers', is_flag=True, required=False,
                  help='If set, requests server to include qualifiers in the '
                  'returned instances. Not all servers return qualifiers on '
                  'instances')]
 
 includequalifiersenum_option = [              # pylint: disable=invalid-name
-    click.option('-q', '--includequalifiers', is_flag=True, required=False,
+    click.option('-q', '--include-qualifiers', is_flag=True, required=False,
                  help='If set, requests server to include qualifiers in the '
                  'returned instances. This subcommand may use either pull '
                  'or traditional operations depending on the server '
@@ -55,14 +55,31 @@ includequalifiersenum_option = [              # pylint: disable=invalid-name
                  'option is specified. If traditional operations are used, '
                  'inclusion of qualifiers depends on the server.')]
 
-# specific to instance because deepinheritance differs between class and
+# specific to instance because DeepInheritance differs between class and
 # instance operations.
 deepinheritance_option = [              # pylint: disable=invalid-name
-    click.option('-d', '--deepinheritance', is_flag=True, required=False,
+    click.option('-d', '--deep-inheritance', is_flag=True, required=False,
                  help='If set, requests server to return properties in '
                       'subclasses of the target instances class. If option not '
                       'specified only properties from target class are '
                       'returned')]
+
+localonlyget_option = [              # pylint: disable=invalid-name
+    click.option('-l', '--local-only', is_flag=True, required=False,
+                 help='Request that server show only local properties of the '
+                      'returned instance. Some servers may not process this '
+                      'parameter.')]
+
+
+localonlyenum_option = [              # pylint: disable=invalid-name
+    click.option('-l', '--local-only', is_flag=True, required=False,
+                 help='Show only local properties of the instances. This '
+                      'subcommand may use either pull or traditional '
+                      'operations depending on the server and the '
+                      '--use-pull-ops general option. If pull operations '
+                      'are used, this parameters will not be included, even if '
+                      'specified. If traditional operations are used, some '
+                      'servers do not process the parameter.')]
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
@@ -75,32 +92,28 @@ instance_property_option = [              # pylint: disable=invalid-name
     click.option('-P', '--property', type=str, metavar='name=value',
                  required=False,
                  multiple=True,
-                 help='Optional property definitions of the form name=value. '
+                 help='Optional property names of the form name=value. '
                  'Multiple definitions allowed, one for each property to be '
                  'included in the createdinstance. Array property values '
                  'defined by comma-separated-values. EmbeddedInstance not '
                  'allowed.')]
 
 filterquerylanguage_option = [              # pylint: disable=invalid-name
-    click.option('--filterquerylanguage', type=str, required=False,
+    click.option('--filter-query-language', type=str, required=False,
                  default=None,
-                 help='A filterquery language to be used with a filter query '
-                 'defined by --filterquery. (Default: None)')]
+                 help='A filter-query language to be used with a filter query '
+                 'defined by --filter-query. (Default: None)')]
 
 filterquery_option = [              # pylint: disable=invalid-name
-    click.option('-f', '--filterquery', type=str, required=False,
+    click.option('-f', '--filter-query', type=str, required=False,
                  default=None,
                  help='A filter query to be passed to the server if the pull '
                  'operations are used. If this option is defined and the '
-                 '--filterquerylanguage is None, pywbemcli assumes DMTF:FQL. '
+                 '--filter-query-language is None, pywbemcli assumes DMTF:FQL. '
                  'If this option is defined and the traditional operations are '
                  'used, the filter is not sent to the server. See the '
                  'documentation for more information. (Default: None)')]
 
-includeclassorigin_option = [              # pylint: disable=invalid-name
-    click.option('-c', '--includeclassorigin', is_flag=True, required=False,
-                 help='Include class origin attribute in returned '
-                      'instance(s).')]
 
 ##########################################################################
 #
@@ -127,10 +140,7 @@ def instance_group():
 
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Request that server show only local properties of the '
-                   'returned instance. '
-                   'Some servers may not process this parameter.')
+@add_options(localonlyget_option)
 @add_options(includequalifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
@@ -226,19 +236,19 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_modify(context, instancename, **options):
     """
-    Modify an existing instance.
+    Modify an existing CIM instance.
 
     Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
     property names and values defined by the property option and the CIM class
-    defined by the instance name.  The propertylist option if provided is
-    passed to the WBEM server as part of the ModifyInstance operation (normally
-    the WBEM server limits modifications) to just those properties defined in
-    the property list.
+    defined by the instance name.  The --propertylist option if provided is
+    passed to the WBEM server as part of the ModifyInstance operation
+    (the WBEM server limits modifications to just those properties defined in
+    the property list).
 
     INSTANCENAME must be a CIM instance name in the format defined by DMTF
     `DSP0207`.
 
-    Pywbemcli builds only the properties defined with the --property option
+    Pywbemcli builds only properties defined with the --property option
     into an instance based on the CIMClass and forwards that to the WBEM
     server with the ModifyInstance method.
 
@@ -294,14 +304,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
 
 @instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-l', '--localonly', is_flag=True, required=False,
-              help='Show only local properties of the instances. This '
-                   'subcommand may use either pull or traditional operations '
-                   'depending on the server and the "--use--pull-ops" general '
-                   'option. If pull operations are used, this parameters will '
-                   'not be included, even if specified. If '
-                   'traditional operations are used, some servers do not '
-                   'process the parameter.')
+@add_options(localonlyenum_option)
 @add_options(deepinheritance_option)
 @add_options(includequalifiersenum_option)
 @add_options(includeclassorigin_option)
@@ -321,7 +324,7 @@ def instance_enumerate(context, classname, **options):
     the WBEMServer starting either at the top  of the hierarchy (if no
     CLASSNAME provided) or from the CLASSNAME argument if provided.
 
-    Displays the returned instances in mof, xml, or table formats or the
+    Displays the returned instances in mof, xml, or table formats, or the
     instance names as a string or XML formats (--names-only option).
 
     Results are formatted as defined by the --output_format general option.
@@ -378,13 +381,13 @@ def instance_references(context, instancename, **options):
 
 @instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-a', '--assocclass', type=str, required=False,
+@click.option('-a', '--assoc-class', type=str, required=False,
               metavar='<class name>',
               help='Filter by the association class name provided.Each '
                    'returned instance (or instance name) should be associated '
                    'to the source instance through this class or its '
                    'subclasses. Optional.')
-@click.option('-c', '--resultclass', type=str, required=False,
+@click.option('-c', '--result-class', type=str, required=False,
               metavar='<class name>',
               help='Filter by the result class name provided. Each '
                    'returned instance (or instance name) should be a member '
@@ -395,7 +398,7 @@ def instance_references(context, instancename, **options):
               '(or instance name)should be associated with the source instance '
               '(INSTANCENAME) through an association with this role (property '
               'name in the association that matches this parameter). Optional.')
-@click.option('-R', '--resultrole', type=str, required=False,
+@click.option('-R', '--result-role', type=str, required=False,
               metavar='<role name>',
               help='Filter by the result role name provided. Each returned '
               'instance (or instance name)should be associated with the source '
@@ -418,8 +421,8 @@ def instance_associators(context, instancename, **options):
     Get associated instances or names.
 
     Returns the associated instances or names (--names-only option) for the
-    `INSTANCENAME` argument filtered by the --assocclass, --resultclass, --role
-    and --resultrole options.
+    `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
+    --role and --result-role options.
 
     INSTANCENAME must be a CIM instance name in the format defined by DMTF
     `DSP0207`.
@@ -468,7 +471,7 @@ def instance_query(context, query, **options):
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
-    Get instance count for classes.
+    Get CIM instance count for classes.
 
     Displays the count of instances for the classes defined by the
     `CLASSNAME-GLOB` argument in one or more namespaces.
@@ -549,9 +552,9 @@ def cmd_instance_get(context, instancename, options):
     try:
         instance = context.conn.GetInstance(
             instancepath,
-            LocalOnly=options['localonly'],
-            IncludeQualifiers=options['includequalifiers'],
-            IncludeClassOrigin=options['includeclassorigin'],
+            LocalOnly=options['local_only'],
+            IncludeQualifiers=options['include_qualifiers'],
+            IncludeClassOrigin=options['include_classorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, instance, context.output_format)
@@ -697,10 +700,10 @@ def get_filterquerylanguage(options):
     the filter query language.
     if filterquery does not exist but filterquerylanguage does, just return it
     """
-    if options['filterquery']:
-        fql = options['filterquerylanguage'] or 'DMTF:FQL'
+    if options['filter_query']:
+        fql = options['filter_query_language'] or 'DMTF:FQL'
     else:
-        fql = options['filterquerylanguage']
+        fql = options['filter_query_language']
     return fql
 
 
@@ -714,18 +717,18 @@ def cmd_instance_enumerate(context, classname, options):
             results = context.conn.PyWbemcliEnumerateInstancePaths(
                 ClassName=classname,
                 namespace=options['namespace'],
-                FilterQuery=options['filterquery'],
+                FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt)
         else:
             results = context.conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
                 namespace=options['namespace'],
-                LocalOnly=options['localonly'],
-                IncludeQualifiers=options['includequalifiers'],
-                DeepInheritance=options['deepinheritance'],
-                IncludeClassOrigin=options['includeclassorigin'],
-                FilterQuery=options['filterquery'],
+                LocalOnly=options['local_only'],
+                IncludeQualifiers=options['include_qualifiers'],
+                DeepInheritance=options['deep_inheritance'],
+                IncludeClassOrigin=options['include_classorigin'],
+                FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
@@ -733,7 +736,7 @@ def cmd_instance_enumerate(context, classname, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=options['sort'])
 
-    except (Error, ValueError) as er:
+    except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
     except ValueError as ve:
         raise click.ClickException('instance enumerate failed because '
@@ -762,7 +765,7 @@ def cmd_instance_references(context, instancename, options):
                 instancepath,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
-                FilterQuery=options['filterquery'],
+                FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt)
         else:
@@ -770,9 +773,9 @@ def cmd_instance_references(context, instancename, options):
                 instancepath,
                 ResultClass=options['resultclass'],
                 Role=options['role'],
-                IncludeQualifiers=options["includequalifiers"],
-                IncludeClassOrigin=options['includeclassorigin'],
-                FilterQuery=options['filterquery'],
+                IncludeQualifiers=options["include_qualifiers"],
+                IncludeClassOrigin=options['include_classorigin'],
+                FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
@@ -780,7 +783,7 @@ def cmd_instance_references(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=options['sort'])
 
-    except (Error, ValueError) as er:
+    except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
     except ValueError as ve:
         raise click.ClickException('instance references failed because '
@@ -804,23 +807,23 @@ def cmd_instance_associators(context, instancename, options):
         if options['names_only']:
             results = context.conn.PyWbemcliAssociatorInstancePaths(
                 instancepath,
-                AssocClass=options['assocclass'],
+                AssocClass=options['assoc_class'],
                 Role=options['role'],
-                ResultClass=options['resultclass'],
-                ResultRole=options['resultrole'],
-                FilterQuery=options['filterquery'],
+                ResultClass=options['result_class'],
+                ResultRole=options['result_role'],
+                FilterQuery=options['filter_query'],
                 MaxObjectCount=context.pull_max_cnt,
                 FilterQueryLanguage=get_filterquerylanguage(options))
         else:
             results = context.conn.PyWbemcliAssociatorInstances(
                 instancepath,
-                AssocClass=options['assocclass'],
+                AssocClass=options['assoc_class'],
                 Role=options['role'],
-                ResultClass=options['resultclass'],
-                ResultRole=options['resultrole'],
-                IncludeQualifiers=options["includequalifiers"],
-                IncludeClassOrigin=options['includeclassorigin'],
-                FilterQuery=options['filterquery'],
+                ResultClass=options['result_class'],
+                ResultRole=options['result_role'],
+                IncludeQualifiers=options["include_qualifiers"],
+                IncludeClassOrigin=options['include_classorigin'],
+                FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
@@ -828,7 +831,7 @@ def cmd_instance_associators(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=options['sort'])
 
-    except (Error, ValueError) as er:
+    except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
     except ValueError as ve:
         raise click.ClickException('instance associators failed because '

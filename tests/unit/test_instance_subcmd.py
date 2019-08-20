@@ -49,13 +49,13 @@ Options:
 
 Commands:
   associators   Get associated instances or names.
-  count         Get instance count for classes.
+  count         Get CIM instance count for classes.
   create        Create a CIM instance of CLASSNAME.
   delete        Delete a single CIM instance.
   enumerate     Enumerate instances or names of CLASSNAME.
   get           Get a single CIMInstance.
   invokemethod  Invoke a CIM method on a CIMInstance.
-  modify        Modify an existing instance.
+  modify        Modify an existing CIM instance.
   query         Execute an execquery request.
   references    Get the reference instances or names.
 """
@@ -70,26 +70,26 @@ Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
   WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
   provided) or from the CLASSNAME argument if provided.
 
-  Displays the returned instances in mof, xml, or table formats or the
+  Displays the returned instances in mof, xml, or table formats, or the
   instance names as a string or XML formats (--names-only option).
 
   Results are formatted as defined by the --output_format general option.
 
 Options:
-  -l, --localonly                 Show only local properties of the instances.
+  -l, --local-only                Show only local properties of the instances.
                                   This subcommand may use either pull or
                                   traditional operations depending on the
-                                  server and the "--use--pull-ops" general
+                                  server and the --use-pull-ops general
                                   option. If pull operations are used, this
                                   parameters will not be included, even if
                                   specified. If traditional operations are
                                   used, some servers do not process the
                                   parameter.
-  -d, --deepinheritance           If set, requests server to return properties
+  -d, --deep-inheritance          If set, requests server to return properties
                                   in subclasses of the target instances class.
                                   If option not specified only properties from
                                   target class are returned
-  -q, --includequalifiers         If set, requests server to include
+  -q, --include-qualifiers        If set, requests server to include
                                   qualifiers in the returned instances. This
                                   subcommand may use either pull or
                                   traditional operations depending on the
@@ -99,8 +99,9 @@ Options:
                                   this option is specified. If traditional
                                   operations are used, inclusion of qualifiers
                                   depends on the server.
-  -c, --includeclassorigin        Include class origin attribute in returned
-                                  instance(s).
+  -c, --include-classorigin       Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
@@ -116,19 +117,18 @@ Options:
   -o, --names-only                Retrieve only the returned object names.
   -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
-  -f, --filterquery TEXT          A filter query to be passed to the server if
+  -f, --filter-query TEXT         A filter query to be passed to the server if
                                   the pull operations are used. If this option
-                                  is defined and the --filterquerylanguage is
-                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  is defined and the --filter-query-language
+                                  is None, pywbemcli assumes DMTF:FQL. If this
                                   option is defined and the traditional
                                   operations are used, the filter is not sent
                                   to the server. See the documentation for
                                   more information. (Default: None)
-  --filterquerylanguage TEXT      A filterquery language to be used with a
-                                  filter query defined by --filterquery.
+  --filter-query-language TEXT    A filter-query language to be used with a
+                                  filter query defined by --filter-query.
                                   (Default: None)
   -h, --help                      Show this message and exit.
-
 """
 
 INST_GET_HELP = """
@@ -153,14 +153,15 @@ Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
   Results are formatted as defined by the --output_format general option.
 
 Options:
-  -l, --localonly                 Request that server show only local
+  -l, --local-only                Request that server show only local
                                   properties of the returned instance. Some
                                   servers may not process this parameter.
-  -q, --includequalifiers         If set, requests server to include
+  -q, --include-qualifiers        If set, requests server to include
                                   qualifiers in the returned instances. Not
                                   all servers return qualifiers on instances
-  -c, --includeclassorigin        Include class origin attribute in returned
-                                  instance(s).
+  -c, --include-classorigin       Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
@@ -199,18 +200,16 @@ Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
   ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
 
 Options:
-  -P, --property name=value  Optional property definitions of the form
-                             name=value. Multiple definitions allowed, one for
-                             each property to be included in the
-                             createdinstance. Array property values defined by
-                             comma-separated-values. EmbeddedInstance not
-                             allowed.
+  -P, --property name=value  Optional property names of the form name=value.
+                             Multiple definitions allowed, one for each
+                             property to be included in the createdinstance.
+                             Array property values defined by comma-separated-
+                             values. EmbeddedInstance not allowed.
   -V, --verify               If set, The change is displayed and verification
                              requested before the change is executed
   -n, --namespace <name>     Namespace to use for this operation, instead of
                              the default namespace of the connection
   -h, --help                 Show this message and exit.
-
 """
 
 INST_DELETE_HELP = """
@@ -240,7 +239,7 @@ Options:
 INST_COUNT_HELP = """
 Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-  Get instance count for classes.
+  Get CIM instance count for classes.
 
   Displays the count of instances for the classes defined by the `CLASSNAME-
   GLOB` argument in one or more namespaces.
@@ -301,7 +300,7 @@ Options:
                                   refer to the target instance through a
                                   property with aname that matches the value
                                   of this parameter. Optional.
-  -q, --includequalifiers         If set, requests server to include
+  -q, --include-qualifiers        If set, requests server to include
                                   qualifiers in the returned instances. This
                                   subcommand may use either pull or
                                   traditional operations depending on the
@@ -311,8 +310,9 @@ Options:
                                   this option is specified. If traditional
                                   operations are used, inclusion of qualifiers
                                   depends on the server.
-  -c, --includeclassorigin        Include class origin attribute in returned
-                                  instance(s).
+  -c, --include-classorigin       Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
@@ -333,44 +333,43 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -f, --filterquery TEXT          A filter query to be passed to the server if
+  -f, --filter-query TEXT         A filter query to be passed to the server if
                                   the pull operations are used. If this option
-                                  is defined and the --filterquerylanguage is
-                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  is defined and the --filter-query-language
+                                  is None, pywbemcli assumes DMTF:FQL. If this
                                   option is defined and the traditional
                                   operations are used, the filter is not sent
                                   to the server. See the documentation for
                                   more information. (Default: None)
-  --filterquerylanguage TEXT      A filterquery language to be used with a
-                                  filter query defined by --filterquery.
+  --filter-query-language TEXT    A filter-query language to be used with a
+                                  filter query defined by --filter-query.
                                   (Default: None)
   -h, --help                      Show this message and exit.
-
 """
 
 INST_MODIFY_HELP = """
 Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
 
-  Modify an existing instance.
+  Modify an existing CIM instance.
 
   Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
   property names and values defined by the property option and the CIM class
-  defined by the instance name.  The propertylist option if provided is
-  passed to the WBEM server as part of the ModifyInstance operation
-  (normally the WBEM server limits modifications) to just those properties
-  defined in the property list.
+  defined by the instance name.  The --propertylist option if provided is
+  passed to the WBEM server as part of the ModifyInstance operation (the
+  WBEM server limits modifications to just those properties defined in the
+  property list).
 
   INSTANCENAME must be a CIM instance name in the format defined by DMTF
   `DSP0207`.
 
-  Pywbemcli builds only the properties defined with the --property option
-  into an instance based on the CIMClass and forwards that to the WBEM
-  server with the ModifyInstance method.
+  Pywbemcli builds only properties defined with the --property option into
+  an instance based on the CIMClass and forwards that to the WBEM server
+  with the ModifyInstance method.
 
   ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
 
 Options:
-  -P, --property name=value       Optional property definitions of the form
+  -P, --property name=value       Optional property names of the form
                                   name=value. Multiple definitions allowed,
                                   one for each property to be included in the
                                   createdinstance. Array property values
@@ -406,8 +405,8 @@ Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
   Get associated instances or names.
 
   Returns the associated instances or names (--names-only option) for the
-  `INSTANCENAME` argument filtered by the --assocclass, --resultclass,
-  --role and --resultrole options.
+  `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
+  --role and --result-role options.
 
   INSTANCENAME must be a CIM instance name in the format defined by DMTF
   `DSP0207`.
@@ -419,12 +418,13 @@ Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
   Results are formatted as defined by the --output_format general option.
 
 Options:
-  -a, --assocclass <class name>   Filter by the association class name
+  -a, --assoc-class <class name>  Filter by the association class name
                                   provided.Each returned instance (or instance
                                   name) should be associated to the source
                                   instance through this class or its
                                   subclasses. Optional.
-  -c, --resultclass <class name>  Filter by the result class name provided.
+  -c, --result-class <class name>
+                                  Filter by the result class name provided.
                                   Each returned instance (or instance name)
                                   should be a member of this class or one of
                                   its subclasses. Optional
@@ -434,14 +434,14 @@ Options:
                                   (INSTANCENAME) through an association with
                                   this role (property name in the association
                                   that matches this parameter). Optional.
-  -R, --resultrole <role name>    Filter by the result role name provided.
+  -R, --result-role <role name>   Filter by the result role name provided.
                                   Each returned instance (or instance
                                   name)should be associated with the source
                                   instance name (`INSTANCENAME`) through an
                                   association with returned object having this
                                   role (property name in the association that
                                   matches this parameter). Optional.
-  -q, --includequalifiers         If set, requests server to include
+  -q, --include-qualifiers        If set, requests server to include
                                   qualifiers in the returned instances. This
                                   subcommand may use either pull or
                                   traditional operations depending on the
@@ -451,8 +451,9 @@ Options:
                                   this option is specified. If traditional
                                   operations are used, inclusion of qualifiers
                                   depends on the server.
-  -c, --includeclassorigin        Include class origin attribute in returned
-                                  instance(s).
+  -c, --include-classorigin       Request that server include classorigin in
+                                  the result.On some WBEM operations, server
+                                  may ignore this option.
   -p, --propertylist <property name>
                                   Define a propertylist for the request. If
                                   option not specified a Null property list is
@@ -473,16 +474,16 @@ Options:
                                   class from which the instance to process is
                                   selected.
   -S, --summary                   Return only summary of objects (count).
-  -f, --filterquery TEXT          A filter query to be passed to the server if
+  -f, --filter-query TEXT         A filter query to be passed to the server if
                                   the pull operations are used. If this option
-                                  is defined and the --filterquerylanguage is
-                                  None, pywbemcli assumes DMTF:FQL. If this
+                                  is defined and the --filter-query-language
+                                  is None, pywbemcli assumes DMTF:FQL. If this
                                   option is defined and the traditional
                                   operations are used, the filter is not sent
                                   to the server. See the documentation for
                                   more information. (Default: None)
-  --filterquerylanguage TEXT      A filterquery language to be used with a
-                                  filter query defined by --filterquery.
+  --filter-query-language TEXT    A filter-query language to be used with a
+                                  filter query defined by --filter-query.
                                   (Default: None)
   -h, --help                      Show this message and exit.
 """
@@ -737,15 +738,15 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo --includequalifiers',
-     ['enumerate', 'CIM_Foo', '--includequalifiers'],
+    ['Verify instance subcommand enumerate CIM_Foo --include-qualifiers',
+     ['enumerate', 'CIM_Foo', '--include-qualifiers'],
      {'stdout': ENUM_INST_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo includequalifiers and '
+    ['Verify instance subcommand enumerate CIM_Foo include-qualifiers and '
      ' --use-pull-ops no',
-     {'args': ['enumerate', 'CIM_Foo', '--includequalifiers'],
+     {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'global': ['--use-pull-ops', 'no']},
      {'stdout': ENUM_INST_RESP,
       'test': 'linesnows'},
@@ -753,7 +754,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate CIM_Foo with --use-pull-ops yes and '
      '--pull_max_cnt=2',
-     {'args': ['enumerate', 'CIM_Foo', '--includequalifiers'],
+     {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '2', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(pull_inst_result_tuple\(context='
@@ -775,20 +776,20 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate deepinheritance CIM_Foo -d',
+    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
      {'stdout': ENUM_INST_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate deepinheritance CIM_Foo '
-     '--deepinheritance',
-     ['enumerate', 'CIM_Foo', '--deepinheritance'],
+    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo '
+     '--deep-inheritance',
+     ['enumerate', 'CIM_Foo', '--deep-inheritance'],
      {'stdout': ENUM_INST_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate deepinheritance CIM_Foo -d',
+    ['Verify instance subcommand -o grid enumerate deep-inheritance CIM_Foo -d',
      {'args': ['enumerate', 'CIM_Foo', '-d'],
       'global': ['--output-format', 'grid']},
      {'stdout': ENUM_INST_TABLE_RESP,
@@ -847,13 +848,13 @@ TEST_CASES = [
     # TODO: modify this to output log and test for info in return and log
 
     ['Verify instance subcommand enumerate with query.',
-     ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+     ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
      {'stdout': ENUM_INST_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate with query, traditional ops fails',
-     {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+     {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
      {'stderr': ["ValueError",
                  "EnumerateInstances does not support FilterQuery"],
@@ -892,10 +893,10 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    # TODO the following uses deepinheritance because of issue in pywbem_mock
+    # TODO the following uses deep-inheritance because of issue in pywbem_mock
     ['Verify subcommand enumerate with PyWBEM_AllTypes table with scalar '
      'properties returns instance with all property types',
-     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deepinheritance',
+     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,scalbool,scaluint32,scalsint32'],
       'global': ['--output-format', 'grid']},
@@ -913,7 +914,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify subcommand enumerate with PyWBEM_AllTypes with array properties '
      'returns instance with all property types',
-     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deepinheritance',
+     {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,arraybool,arrayuint32,arraysint32'],
       'global': ['--output-format', 'grid']},
@@ -958,15 +959,15 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate fails invalid query language',
-     ['enumerate', 'CIM_Foo', '--filterquerylanguage', 'blah',
-      '--filterquery', 'InstanceID = 3'],
+     ['enumerate', 'CIM_Foo', '--filter-query-language', 'blah',
+      '--filter-query', 'InstanceID = 3'],
      {'stderr': ['CIMError', '14', 'CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED'],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate fails using traditional op',
-     {'args': ['enumerate', 'CIM_Foo', '--filterquery', 'InstanceID = 3'],
+     {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
      {'stderr':
       ['ValueError', 'EnumerateInstances does not support FilterQuery'],
@@ -1018,9 +1019,9 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --localonly returns '
+    ['Verify instance subcommand get with instancename --local-only returns '
      ' data',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--localonly'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--local-only'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -1030,9 +1031,9 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --includequalifiers '
+    ['Verify instance subcommand get with instancename --include-qualifiers '
      'returns data',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--includequalifiers'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -1042,9 +1043,9 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --includequalifiers and '
-     'general --use-pull-ops returns data',
-     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--includequalifiers'],
+    ['Verify instance subcommand get with instancename --include-qualifiers '
+     'and general --use-pull-ops returns data',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
       'global': ['--use-pull-ops', 'no']},
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
@@ -1683,15 +1684,15 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references --includequalifiers',
-     ['references', 'TST_Person.name="Mike"', '--includequalifiers'],
+    ['Verify instance subcommand references --include-qualifiers',
+     ['references', 'TST_Person.name="Mike"', '--include-qualifiers'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references includequalifiers and '
+    ['Verify instance subcommand references include-qualifiers and '
      ' --use-pull-ops no',
-     {'args': ['references', 'TST_Person.name="Mike"', '--includequalifiers'],
+     {'args': ['references', 'TST_Person.name="Mike"', '--include-qualifiers'],
       'global': ['--use-pull-ops', 'no']},
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
@@ -1744,14 +1745,14 @@ Instances: PyWBEM_AllTypes
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand references with query.',
-     ['references', 'TST_Person.name="Mike"', '--filterquery',
+     ['references', 'TST_Person.name="Mike"', '--filter-query',
       'InstanceID = 3'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references with query, traditional ops fails',
-     {'args': ['references', 'TST_Person.name="Mike"', '--filterquery',
+     {'args': ['references', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
      {'stderr': ["ValueError:",
@@ -1779,16 +1780,17 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators, --includequalifiers',
-     ['associators', 'TST_Person.name="Mike"', '--includequalifiers'],
+    ['Verify instance subcommand associators, --include-qualifiers',
+     ['associators', 'TST_Person.name="Mike"', '--include-qualifiers'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators, --includequalifiers wo pull',
+    ['Verify instance subcommand associators, --include-qualifiers wo pull',
      {'global': ['--use-pull-ops', 'no'],
-      'args': ['associators', 'TST_Person.name="Mike"', '--includequalifiers']},
+      'args': ['associators', 'TST_Person.name="Mike"',
+               '--include-qualifiers']},
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
@@ -1858,14 +1860,14 @@ Instances: PyWBEM_AllTypes
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     ['Verify instance subcommand associators with query.',
-     ['associators', 'TST_Person.name="Mike"', '--filterquery',
+     ['associators', 'TST_Person.name="Mike"', '--filter-query',
       'InstanceID = 3'],
      {'stdout': ASSOC_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators with query, traditional ops',
-     {'args': ['associators', 'TST_Person.name="Mike"', '--filterquery',
+     {'args': ['associators', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
       'global': ['--use-pull-ops', 'no']},
      {'stderr': ["ValueError:",
