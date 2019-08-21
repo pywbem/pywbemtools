@@ -46,9 +46,9 @@ Commands:
   connection    Display connection info used by this server.
   info          Display general information on the Server.
   interop       Display the interop namespace name.
-  namespaces    Display the namespaces in the WBEM server
+  namespaces    Display the namespaces in the WBEM server.
   profiles      Display registered profiles from the WBEM server.
-  test_pull     Test existence of pull opeations.
+
 """
 
 SVR_BRAND_HELP = """
@@ -142,7 +142,7 @@ Options:
 SVR_NAMESPACES_HELP = """
 Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 
-  Display the namespaces in the WBEM server
+  Display the namespaces in the WBEM server.
 
 Options:
   -s, --sort  Sort into alphabetical order by classname.

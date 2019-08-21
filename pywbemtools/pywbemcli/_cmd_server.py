@@ -45,7 +45,7 @@ def server_group():
 @click.pass_obj
 def server_namespaces(context, **options):
     """
-    Display the namespaces in the WBEM server
+    Display the namespaces in the WBEM server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
@@ -180,19 +180,20 @@ def server_connection(context):
     context.execute_cmd(lambda: cmd_server_connection(context))
 
 
-@server_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
-@click.pass_obj
-def server_test_pull(context):
-    """
-    Test existence of pull opeations.
-
-    Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
-    exist on the WBEM server.
-
-    This command tests all of the pull operations and reports any that
-    return a NOT_SUPPORTED response.
-    """
-    context.execute_cmd(lambda: cmd_server_test_pull(context))
+# TODO: reactivate and implement this in version 0.6.0
+# @server_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
+# @click.pass_obj
+# def server_test_pull(context):
+#    """
+#    Test existence of pull opeations.
+#
+#    Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
+#    exist on the WBEM server.
+#
+#    This command tests all of the pull operations and reports any that
+#    return a NOT_SUPPORTED response.
+#    """
+#    context.execute_cmd(lambda: cmd_server_test_pull(context))
 
 
 ###############################################################

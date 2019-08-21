@@ -45,6 +45,190 @@ Command Details`
 (``-m``\``--mock-server`` general option) with mock files in the pywbemtools
 tests/unit subdirectory to generate known results.
 
+.. _`Pywbemcli special command line features`:
+
+Pywbemcli special command line features
+---------------------------------------
+
+Pywbemcli includes several features in the command syntax that are worth
+presenting in detail to help the user understand the background purpose and
+syntactic implementation of the features. This includes:
+
+* The ability to execute either the pull or traditional operations with the
+  same command group.
+
+* The ability to receive either CIM instances or CIM instance names with only
+  a change of an option on the commands that request CIM instances. The option
+  ``-o`` or ``--names-only`` defines whether only the instance name or the complete
+  object will be displayed.
+
+* The ability to interactively select the data for certain objects as opposed
+  to having to enter the full name.
+
+
+.. _`Using pywbem Pull Operations from pywbemcli`:
+
+Using pywbem Pull Operations from pywbemcli
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pywbem includes multiple ways to execute the enumerate instance type operations
+(``Associators``, ``References``,`` EnumerateInstances``, ``ExecQuery``):
+
+* The traditional operations (ex. ``EnumerateInstances``)
+* The pull operations (ex. the pull sequence ``OpenEnumerateInstances``, etc.)
+* An overlay of the above two operations called the ``Iter..``. operations where
+  each ``Iter..`` operation executes either the traditional or pull operation
+  depending on a parameter of the connection.
+
+Pywbemcli implements these method calls to pywbem using the ``Iter...``
+operations so that either pull operations or traditional operation can be used
+simply by changing a pywbemcli input parameter (``--use-pull-ops``).
+
+Two options on the command line allow the user to either force the use of pull
+operations, of traditional operations, or to let pywbem try them both.
+
+The input parameter ``--use-pull-ops`` allows the choice of pull or traditional
+operations with the default being to allow pywbem to decide.  The input
+parameter ``max_object_cnt`` sets the ``MaxObjectCount`` variable on the operation
+request if the pull operations are to be used which tells the WBEM server to
+limit the size of the response.  For example::
+
+    pywbemcli --server http/localhost use-pull-ops=yes max_object_cnt=10
+
+would force the use of the pull operations and return an error if the target
+server did not implement them and would set the ``MaxObjectCount`` parameter on the
+api to 10, telling the server that a maximum of 10 objects can be returned for
+each of the requests in an enumeration sequence.
+
+Since the default for use-pull-ops is ``either``, normally pywbem first tries
+the pull operation and then if that fails, the traditional operation.  That
+is probably the most logical setting for ``use-pull-ops`` unless you are
+specifically testing the use of pull operations.
+
+
+.. _`pywbemcli commands to WBEM Operations`:
+
+pywbemcli commands to WBEM Operations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following table defines which pywbemcli commands are used for the
+corresponding pywbem request operations.
+
+=================================  ==============================================
+WBEM CIM-XML Operation             pywbemcli command-group & subcommand
+=================================  ==============================================
+**Instance Operations:**
+EnumerateInstances                 instance enumerate INSTANCENAME
+EnumerateInstanceNames             instance enumerate INSTANCENAME --name_only
+GetInstance                        instance get INSTANCENAME
+ModifyInstance                     instance modify
+CreateInstance                     instance create
+DeleteInstance                     instance delete INSTANCENAME
+Associators(instance)              instance associators INSTANCENAME
+Associators(class)                 class associators CLASSNAME
+AssociatorNames(instance)          instance associators INSTANCENAME --name_only
+AssociatorNames(class)             class associators CLASSNAME --name_only
+References(instance)               instance references INSTANCENAME
+References(class)                  class references CLASSNAME
+ReferenceNames(instance)           instance references INSTANCENAME --name_only
+ReferenceNames(class)              class references CLASSNAME --name_only
+InvokeMethod                       instance invokemethod INSTANCENAME --name_only
+ReferenceNames                     class invokemethod CLASSNAME --name_only
+ExecQuery                          instance query
+**Pull Operations:**               Option --use-pull-ops ``either`` or ``yes``
+OpenEnumerateInstances             instance enumerate INSTANCENAME
+OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
+OpenAssociatorInstances            instance associators INSTANCENAME
+OpenAssociatorInstancePaths        instance associators INSTANCENAME --name_only
+OpenReferenceInstances             instance references INSTANCENAME
+OpenReferenceInstancePaths         instance references INSTANCENAME --name_only
+OpenQueryInstances                 instance references INSTANCENAME --name_only
+PullInstancesWithPath              part of pull sequence
+PullInstancePaths                  part of pull sequence
+PullInstances                      part of pull sequence
+CloseEnumeration                   Not implemented
+**Class Operations:**
+EnumerateClasses                   class enumerate CLASSNAME
+EnumerateClassNames                class enumerate --names-only
+GetClass                           class get CLASSNAME
+ModifyClass                        Not implemented
+CreateClass                        Not implemented
+DeleteClass                        class delete CLASSNAME
+**QualifierDeclaration ops:**
+EnumerateQualifiers                qualifier enumerate
+GetQualifier                       qualifier get QUALIFIERNAME
+SetQualifier                       Not implemented
+DeleteQualifier                    Not Implemented
+=================================  ==============================================
+
+1. The pywbem ``Iter...`` operations are all used as the common code path by
+pywbemcli to access CIM instances from the WBEM server. It is these operations
+that determine whether the original operations (ex. ``EnumerateInstances``)
+
+
+.. _`Displaying CIM instances or CIM instance names`:
+
+Displaying CIM instances or CIM instance names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The pywbem API includes different WBEM operations (ex. ``EnumerateInstances`` and
+``EnumerateInstanceNames``) to request CIM objects or just their names. To
+simplify the overall command line syntax pywbemcli combines these into a single
+subcommand (i.e. ``enumerate``, ``references``, ``associators``) and includes
+an option (``-o,`` or ``--names-only``) that determines whether the instance
+names or instances are retrieved from the WBEM server.
+
+Thus, for example an ``instance enumerate`` with and without the ``-o`` option::
+
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo1";
+       IntegerProp = 1;
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo2";
+       IntegerProp = 2;
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo3";
+    };
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo -o
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+
+.. _`Interactively selecting INSTANCENAME`:
+
+Interactively selecting INSTANCENAME
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Arguments like the INSTANCENAME on some of the instance group subcommands (
+``get``, ``references``, ``associators``, etc) can be very difficult to correctly enter
+since it can involve multiple keybindings, use of quotation marks, etc.  To
+simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
+these commands that allows the user to specify only the class name, retrieves
+all the instance names from the server and presents the user with a select list
+from which an instance name can be chosen. The following is an example::
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo --interactive
+    Pick Instance name to process
+    0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+    1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+    2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 0  << user enters 0
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo1";
+       IntegerProp = 1;
+    };
+
+
 .. _`Class command-group`:
 
 Class command-group
@@ -76,7 +260,7 @@ The **class** group defines subcommands that act on CIM classes. see
   the class level references,not the instance references. The :ref:`Instance
   command-group` includes a corresponding instance references operation::
 
-    $pywbemcli --mock-server mockassoc class references TST_Person --name-only
+    $pywbemcli --mock-server mockassoc class references TST_Person --names-only
 
     //FakedUrl/root/cimv2:TST_Lineage
     //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
@@ -106,7 +290,7 @@ The **class** group defines subcommands that act on CIM classes. see
   the class names starting at the root of the class hiearchy for a simple
   mocked CIM schema definition::
 
-    $ pywbemcli --mock-server mockassoc class enumerate --name-only
+    $ pywbemcli --mock-server mockassoc class enumerate --names-only
     TST_Person
     TST_Lineage
     TST_MemberOfFamilyCollection
@@ -189,7 +373,7 @@ The **class** group defines subcommands that act on CIM classes. see
       $
 
   See :ref:`pywbemcli class get --help` for details.
-* **invokemetho** to invoke a method defined for the CLASSNAME argument. This
+* **invokemethod** to invoke a method defined for the CLASSNAME argument. This
   subcommand executes the invokemethod with a class name, not an instance name
   and any input parameters for the InvokeMethod defined with the
   ``--parameter``\`-p`` option. If successful it returns the method return
@@ -233,7 +417,7 @@ The **instance** group defines subcommands that act on CIM instances including:
   or instance in the :term:`CIM model output formats` or the table formats` (see
   :ref:`Output formats`).::
 
-    $ pywbemcli --name mockassoc instance references TST_Person --name-only --interactive
+    $ pywbemcli --name mockassoc instance references TST_Person --names-only --interactive
     Pick Instance name to process: 0
     0: root/cimv2:TST_Person.name="Mike"
     1: root/cimv2:TST_Person.name="Saara"
@@ -311,7 +495,7 @@ The **instance** group defines subcommands that act on CIM instances including:
 
     $pywbemcli instance create TST_Blah InstancId="blah1", intprop=3, intarr=3,6,9
 
-  See :ref:`pywbemcli instance delete --help` for details.
+  See :ref:`pywbemcli instance create --help` for details.
 * **delete** delete an instance defined by the :term:`INSTANCENAME` argument
     in a namespace defined by either the ``--namespace` option or the general
     `--default-namespace`` The form of INSTANCENAME is determined by the
@@ -381,7 +565,7 @@ The **instance** group defines subcommands that act on CIM instances including:
   If successful, this subcommand displays nothing, otherwise it displays the
   received exception.
 
-  See :ref:`pywbemcli instance delete --help` for details.
+  See :ref:`pywbemcli instance modify --help` for details.
 * **references** to get the reference instances or paths for a
   instance defined as the :term:`INSTANCENAME` input argument in the default
   namespace or the namespace defined with this subcommand displayed in the
@@ -643,10 +827,6 @@ namespaces, etc. The subcommands are:
     +---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
   See :ref:`pywbemcli server centralinsts --help` for details.
-* **test_pull** test for the existence of the pull operations in the target
-  WBEM server. NOTE: This subcommand not implemented.
-
-  See :ref:`pywbemcli server test_pull --help` for details.
 
 .. _`Connection command-group`:
 
@@ -656,7 +836,7 @@ Connection command-group
 The **connection** command-group defines subcommands that provide for a
 persistent file (:term:`connections file`) of WBEM server connection
 parameters and allow selecting entries in this file as well as adding entries
-to the file, deleting entries from the file and viewing servers defined in the
+to the file, deleting entries from the file and viewing WBEM servers defined in the
 the file. This allows multiple connections to be defined and then used by name
 rather than through the detailed parameters of the connection.
 
@@ -709,7 +889,9 @@ The subcommands include:
   The following example shows creating a new connection from within the
   interactive mode of pywbemcli. The parameters for the connection are defined
   through the input options for the subcommand. These use the same option names
-  as the corresponding general options to define the WBEM server::
+  as the corresponding general options to define the WBEM server:
+
+  .. code-block:: text
 
     pywbemcli> connection add --name me --server http://localhost --user me --password mypw -no-verify
     pywbemcli> connection list
@@ -730,11 +912,15 @@ The subcommands include:
 
   See :ref:`pywbemcli connection add --help` for details.
 * **delete** delete a specific connection by name or by selection. The following
-  example deletes the connection defined in the add subcommand above::
+  example deletes the connection defined in the add subcommand above:
+
+  .. code-block:: text
 
     $ pywbemcli connection delete me
 
   To delete by selection:
+
+  .. code-block:: text
 
     $ pywbemcli connection delete
     Select a connection or Ctrl_C to abort.
@@ -760,7 +946,9 @@ The subcommands include:
 * **select** select a connection from the connection table.  A connection
   may be selected either by using the name argument or if no argument is
   provided by selecting from a list presented on the console. The following
-  example shows changing connection from within the interactive mode of pywbemcli::
+  example shows changing connection from within the interactive mode of pywbemcli:
+
+  .. code-block:: text
 
     pywbemcli> connection select
     Select a connection or Ctrl_C to abort.
@@ -827,13 +1015,17 @@ Repl command
 ------------
 
 This command sets pywbemcli into the :ref:`interactive mode`.  Pywbemcli can be
-started in the :ref:`interactive mode` either by entering::
+started in the :ref:`interactive mode` either by entering:
+
+  .. code-block:: text
 
    $ pywbemcli repl
    Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.
    pywbemcli>
 
-or by executing the script without any command or command-group::
+or by executing the script without any command or command-group:
+
+  .. code-block:: text
 
    $ pywbemcli
    Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.

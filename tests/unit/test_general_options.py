@@ -70,33 +70,30 @@ Options:
   -s, --server URI                Hostname or IP address with scheme of the
                                   WBEM server in format:
                                   [{scheme}://]{host}[:{port}]
-                                  The server
-                                  parameter is conditionally optional (see
-                                  --name)
-                                  * Scheme: must be "https" or "http"
-                                  [Default: "https"]
-                                  * Host: defines
-                                  short/fully qualified DNS hostname, literal
-                                  IPV4 address (dotted), or literal IPV6
-                                  address
-                                  * Port: (optional) defines WBEM
-                                  server port to be used [Defaults: 5988(HTTP)
-                                  and 5989(HTTPS)].
+                                  * Scheme: must
+                                  be "https" or "http" [Default: "https"]
+                                  *
+                                  Host: defines short/fully qualified DNS
+                                  hostname, literal IPV4 address (dotted), or
+                                  literal IPV6 address
+                                  * Port: (optional)
+                                  defines WBEM server port to be used
+                                  [Defaults: 5988(HTTP) and 5989(HTTPS)].
+                                  Thhis option the --name option and the
+                                  --mock-server are mututally exclusive since
+                                  each defines a WBEM server.
                                   (EnvVar:
                                   PYWBEMCLI_SERVER).
   -n, --name NAME                 Name for the connection.  If this option
                                   exists and the server option does not exist
                                   pywbemcli retrieves the connection
                                   information from the connections file
-                                  (pywbemcliservers.json). If the server
-                                  option and this option does not exist
-                                  --server is used as the connection
-                                  definition with  "default" as the name.This
-                                  option and --server are mutually exclusive
-                                  except when defining a new server from the
-                                  command line(EnvVar: PYWBEMCLI_NAME).
+                                  (pywbemcliservers.json). This option
+                                  --server  and --mock-server are mutually
+                                  exclusive since each defines a WBEM server
+                                  (EnvVar: PYWBEMCLI_NAME).
   -d, --default-namespace NAMESPACE
-                                  Default Namespace to use in the target WBEM
+                                  Default namespace to use in the target WBEM
                                   server if no namespace is defined in a
                                   subcommand(EnvVar: PYWBEMCLI_NAME)
                                   []Default: root/cimv2].
@@ -177,9 +174,11 @@ Options:
                                   or Python file path used to populate the
                                   mock repository. This option may be used
                                   multiple times where each use defines a
-                                  single file_path.See the pywbemtools
-                                  documentation for more information.(EnvVar:
-                                  PYWBEMCLI_MOCK_SERVER).
+                                  single file_path.This parameter the --server
+                                  option and the --name option are mutually
+                                  exclusive since each defines a WBEM server.
+                                  See the pywbemtools documentation for more
+                                  information.(EnvVar: PYWBEMCLI_MOCK_SERVER).
   --version                       Show the version of this command and the
                                   pywbem package and exit.
   -h, --help                      Show this message and exit.
@@ -424,36 +423,19 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify --mock option one file and name OK',
+    ['Verify --mock option one file and name fails',
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['Name: MyConnName',
-                 'WBEMServer uri: None',
-                 'mock: ',
-                 'pywbemtools', 'tests', 'simple_mock_model.mof',
-                 'Default-namespace: root/cimv2'],
-      'rc': 0,
-      'test': 'regex'},
-     None, OK],
-
-    ['Verify --mock option one file and name OK',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
-                 'MyConnName'],
-      'subcmd': 'connection',
-      'args': ['show']},
-     {'stdout': ['Name: MyConnName',
-                 'WBEMServer uri: None',
-                 'mock: ',
-                 'pywbemtools', 'tests', 'simple_mock_model.mof',
-                 'Default-namespace: root/cimv2'],
-      'rc': 0,
+     {'stderr': [r'The --name argument',
+                 r'server argument',
+                 r'are mutually exclusive and may not be used simultaneiously'],
+      'rc': 1,
       'test': 'regex'},
      None, OK],
 
     ['Verify --timestats',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
-                 'MyConnName', '--timestats'],
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
       'subcmd': 'class',
       'args': ['enumerate']},
      {'stdout': ['class CIM_Foo {',
@@ -465,8 +447,7 @@ TEST_CASES = [
 
 
     ['Verify --timestats -T',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--name',
-                 'MyConnName', '-T'],
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-T'],
       'subcmd': 'class',
       'args': ['enumerate']},
      {'stdout': ['class CIM_Foo {',
@@ -476,17 +457,6 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
-    ['Verify uses pull Operation when us. Uses timestats for output test',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
-      'subcmd': 'instance',
-      'args': ['enumerate', 'CIM_Foo']},
-     {'stdout': ['instance of CIM_Foo {',
-                 '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
-                 'EnumerateInstances'],
-      'rc': 0,
-      'test': 'regex'},
-     None, OK],
 
     ['Verify uses pull Operation  with option either',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
@@ -514,7 +484,6 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
     ['Verify uses pull Operation with option no',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                  '--timestats',
@@ -528,6 +497,19 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+
+    ['Verify --mock-server and -server not allowed',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                 '--server', 'http://blah'],
+      'subcmd': 'instance',
+      'args': ['enumerate', 'CIM_Foo']},
+     {'stderr': ['Conflicting server definitions. '],
+      'rc': 1,
+      'test': 'regex'},
+     None, OK],
+
+
+
     #
     #   The following is a new sequence but depends on the repo being empty
     #   It creates, shows and deletes a single server definition to demo
@@ -535,18 +517,18 @@ TEST_CASES = [
     #
 
     ['Verify Create a connection for test.',
-     {'args': ['save'],
-      'subcmd': 'connection',
-      'global': ['--name', 'globaltest1',
-                 '--server', 'http://blah',
-                 '--timeout', '45',
-                 '--use-pull-ops', 'no',
-                 '--default-namespace', 'root/blah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--noverify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem']},
+     {'args': ['add',
+               '--name', 'globaltest1',
+               '--server', 'http://blah',
+               '--timeout', '45',
+               '--use-pull-ops', 'no',
+               '--default-namespace', 'root/blah',
+               '--user', 'john',
+               '--password', 'pw',
+               '--noverify',
+               '--certfile', 'mycertfile.pem',
+               '--keyfile', 'mykeyfile.pem'],
+      'subcmd': 'connection', },
      {'stdout': "",
       'test': 'lines'},
      None, OK],

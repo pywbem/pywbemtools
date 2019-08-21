@@ -49,33 +49,30 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -s, --server URI                Hostname or IP address with scheme of the
                                       WBEM server in format:
                                       [{scheme}://]{host}[:{port}]
-                                      The server
-                                      parameter is conditionally optional (see
-                                      --name)
-                                      * Scheme: must be "https" or "http"
-                                      [Default: "https"]
-                                      * Host: defines
-                                      short/fully qualified DNS hostname, literal
-                                      IPV4 address (dotted), or literal IPV6
-                                      address
-                                      * Port: (optional) defines WBEM
-                                      server port to be used [Defaults: 5988(HTTP)
-                                      and 5989(HTTPS)].
+                                      * Scheme: must
+                                      be "https" or "http" [Default: "https"]
+                                      *
+                                      Host: defines short/fully qualified DNS
+                                      hostname, literal IPV4 address (dotted), or
+                                      literal IPV6 address
+                                      * Port: (optional)
+                                      defines WBEM server port to be used
+                                      [Defaults: 5988(HTTP) and 5989(HTTPS)].
+                                      Thhis option the --name option and the
+                                      --mock-server are mututally exclusive since
+                                      each defines a WBEM server.
                                       (EnvVar:
                                       PYWBEMCLI_SERVER).
       -n, --name NAME                 Name for the connection.  If this option
                                       exists and the server option does not exist
                                       pywbemcli retrieves the connection
                                       information from the connections file
-                                      (pywbemcliservers.json). If the server
-                                      option and this option does not exist
-                                      --server is used as the connection
-                                      definition with  "default" as the name.This
-                                      option and --server are mutually exclusive
-                                      except when defining a new server from the
-                                      command line(EnvVar: PYWBEMCLI_NAME).
+                                      (pywbemcliservers.json). This option
+                                      --server  and --mock-server are mutually
+                                      exclusive since each defines a WBEM server
+                                      (EnvVar: PYWBEMCLI_NAME).
       -d, --default-namespace NAMESPACE
-                                      Default Namespace to use in the target WBEM
+                                      Default namespace to use in the target WBEM
                                       server if no namespace is defined in a
                                       subcommand(EnvVar: PYWBEMCLI_NAME)
                                       []Default: root/cimv2].
@@ -156,9 +153,11 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       or Python file path used to populate the
                                       mock repository. This option may be used
                                       multiple times where each use defines a
-                                      single file_path.See the pywbemtools
-                                      documentation for more information.(EnvVar:
-                                      PYWBEMCLI_MOCK_SERVER).
+                                      single file_path.This parameter the --server
+                                      option and the --name option are mutually
+                                      exclusive since each defines a WBEM server.
+                                      See the pywbemtools documentation for more
+                                      information.(EnvVar: PYWBEMCLI_MOCK_SERVER).
       --version                       Show the version of this command and the
                                       pywbem package and exit.
       -h, --help                      Show this message and exit.
@@ -698,6 +697,23 @@ The following defines the help output for the `pywbemcli connection add --help` 
       -c, --certfile TEXT             Server certfile. Ignored if noverify flag
                                       set.
       -k, --keyfile TEXT              Client private key file.
+      -U, --use-pull-ops [yes|no|either]
+                                      Determines whether pull operations are used
+                                      for EnumerateInstances, AssociatorInstances,
+                                      ReferenceInstances, and ExecQuery
+                                      operations.
+                                      * "yes": pull operations
+                                      required; if server does not support pull,
+                                      the operation fails.
+                                      * "no": forces
+                                      pywbemcli to use only the traditional non-
+                                      pull operations.
+                                      * "either": pywbemcli trys
+                                      first pull and then  traditional operations.
+      --pull-max-cnt INTEGER          Maximium object count of objects to be
+                                      returned for each request if pull operations
+                                      are used. Must be  a positive non-zero
+                                      integer.[Default: 1000]
       -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
                                       component to destination, and detail level
                                       (COMP: [api|http|all], Default: all) DEST:
@@ -830,9 +846,12 @@ The following defines the help output for the `pywbemcli connection save --help`
       want to set it into the connections file.
 
     Options:
-      -V, --verify  If set, The change is displayed and verification requested
-                    before the change is executed
-      -h, --help    Show this message and exit.
+      -n, --name Connection name  If defined, this changes the name of the
+                                  connection to be saved. This allows renaming the
+                                  current connection as part of saving it.
+      -V, --verify                If set, The change is displayed and verification
+                                  requested before the change is executed
+      -h, --help                  Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:
@@ -1725,9 +1744,8 @@ The following defines the help output for the `pywbemcli server --help` subcomma
       connection    Display connection info used by this server.
       info          Display general information on the Server.
       interop       Display the interop namespace name.
-      namespaces    Display the namespaces in the WBEM server
+      namespaces    Display the namespaces in the WBEM server.
       profiles      Display registered profiles from the WBEM server.
-      test_pull     Test existence of pull opeations.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1888,7 +1906,7 @@ The following defines the help output for the `pywbemcli server namespaces --hel
 
     Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 
-      Display the namespaces in the WBEM server
+      Display the namespaces in the WBEM server.
 
     Options:
       -s, --sort  Sort into alphabetical order by classname.
@@ -1928,30 +1946,4 @@ The following defines the help output for the `pywbemcli server profiles --help`
                                      DMTF
       -p, --profile <profile name>   Filter by the profile name. (ex. -p Array
       -h, --help                     Show this message and exit.
-
-
-.. _`pywbemcli server test_pull --help`:
-
-pywbemcli server test_pull --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli server test_pull --help` subcommand
-
-
-::
-
-    Usage: pywbemcli server test_pull [COMMAND-OPTIONS]
-
-      Test existence of pull opeations.
-
-      Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
-      exist on the WBEM server.
-
-      This command tests all of the pull operations and reports any that return
-      a NOT_SUPPORTED response.
-
-    Options:
-      -h, --help  Show this message and exit.
 

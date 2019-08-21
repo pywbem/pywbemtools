@@ -116,9 +116,12 @@ Usage: pywbemcli connection save [COMMAND-OPTIONS]
   want to set it into the connections file.
 
 Options:
-  -V, --verify  If set, The change is displayed and verification requested
-                before the change is executed
-  -h, --help    Show this message and exit.
+  -n, --name Connection name  If defined, this changes the name of the
+                              connection to be saved. This allows renaming the
+                              current connection as part of saving it.
+  -V, --verify                If set, The change is displayed and verification
+                              requested before the change is executed
+  -h, --help                  Show this message and exit.
 """
 
 CONN_ADD_HELP = """
@@ -178,6 +181,23 @@ Options:
   -c, --certfile TEXT             Server certfile. Ignored if noverify flag
                                   set.
   -k, --keyfile TEXT              Client private key file.
+  -U, --use-pull-ops [yes|no|either]
+                                  Determines whether pull operations are used
+                                  for EnumerateInstances, AssociatorInstances,
+                                  ReferenceInstances, and ExecQuery
+                                  operations.
+                                  * "yes": pull operations
+                                  required; if server does not support pull,
+                                  the operation fails.
+                                  * "no": forces
+                                  pywbemcli to use only the traditional non-
+                                  pull operations.
+                                  * "either": pywbemcli trys
+                                  first pull and then  traditional operations.
+  --pull-max-cnt INTEGER          Maximium object count of objects to be
+                                  returned for each request if pull operations
+                                  are used. Must be  a positive non-zero
+                                  integer.[Default: 1000]
   -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
                                   component to destination, and detail level
                                   (COMP: [api|http|all], Default: all) DEST:
@@ -683,7 +703,7 @@ TEST_CASES = [
       'global': ['--name', 'mocktest']},
      {'stdout': "Connection successful",
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
+     None, OK],
 
     ['Verify connection subcommand select mocktest with prompt',
      ['select'],
@@ -722,11 +742,10 @@ TEST_CASES = [
     #  The following test is artifical in that the first create actually
     #  uses the mock but not to really create a server
     #
-    ['Verify save server with cmd line params to empty connections file. Use '
+    ['Verify save server with cmd line params to empty connections file. Using '
      '--verify',
-     {'args': ['save', '--verify'],
+     {'args': ['save', '--verify', '--name', 'svrtest2'],
       'global': ['--server', 'http://blah',
-                 '--name', 'svrtest2',
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
                  '--default-namespace', 'root/blah',
@@ -741,9 +760,8 @@ TEST_CASES = [
      MOCK_CONFIRMY_FILE, OK],
 
     ['Verify save mock server with cmd line params to empty connections file.',
-     {'args': ['save'],
-      'global': ['--name', 'mocktest2',
-                 '--mock-server', MOCK_FILE_PATH,
+     {'args': ['save', '--name', 'mocktest2'],
+      'global': ['--mock-server', MOCK_FILE_PATH,
                  '--timeout', '45',
                  '--use-pull-ops', 'no',
                  '--default-namespace', 'root/blah',
