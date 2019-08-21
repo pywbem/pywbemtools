@@ -27,7 +27,7 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
     process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
-    sort_option, includeclassorigin_option, namespace_option, add_options, \
+    includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option, verify_option
 from .config import DEFAULT_QUERY_LANGUAGE
 
@@ -311,7 +311,6 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(names_only_option)
-@add_options(sort_option)
 @add_options(summary_objects_option)
 @add_options(filterquery_option)
 @add_options(filterquerylanguage_option)
@@ -352,7 +351,6 @@ def instance_enumerate(context, classname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(sort_option)
 @add_options(interactive_option)
 @add_options(summary_objects_option)
 @add_options(filterquery_option)
@@ -410,7 +408,6 @@ def instance_references(context, instancename, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(sort_option)
 @add_options(interactive_option)
 @add_options(summary_objects_option)
 @add_options(filterquery_option)
@@ -444,7 +441,6 @@ def instance_associators(context, instancename, **options):
               help='Use the query language defined. '
                    '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
-@add_options(sort_option)
 @add_options(summary_objects_option)
 @click.pass_obj
 def instance_query(context, query, **options):
@@ -734,7 +730,7 @@ def cmd_instance_enumerate(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -781,7 +777,7 @@ def cmd_instance_references(context, instancename, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -829,7 +825,7 @@ def cmd_instance_associators(context, instancename, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except (Error) as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -922,7 +918,7 @@ def cmd_instance_query(context, query, options):
             MaxObjectCount=context.pull_max_cnt)
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))

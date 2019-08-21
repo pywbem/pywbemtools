@@ -29,7 +29,7 @@ from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
     format_table, process_invokemethod
 from ._common_options import propertylist_option, names_only_option, \
-    sort_option, includeclassorigin_option, namespace_option, add_options, \
+    includeclassorigin_option, namespace_option, add_options, \
     summary_objects_option
 
 from ._displaytree import display_class_tree
@@ -161,7 +161,6 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(includeclassqualifiers_option)
 @add_options(includeclassorigin_option)
 @add_options(names_only_option)
-@add_options(sort_option)
 @add_options(namespace_option)
 @add_options(summary_objects_option)
 @click.pass_obj
@@ -204,7 +203,6 @@ def class_enumerate(context, classname, **options):
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
-@add_options(sort_option)
 @add_options(namespace_option)
 @add_options(summary_objects_option)
 @click.pass_obj
@@ -252,7 +250,6 @@ def class_references(context, classname, **options):
 @add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
-@add_options(sort_option)
 @add_options(namespace_option)
 @add_options(summary_objects_option)
 @click.pass_obj
@@ -273,7 +270,6 @@ def class_associators(context, classname, **options):
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
                 required=True)
-@add_options(sort_option)
 @click.option('-n', '--namespace', type=str, multiple=True,
               required=False, metavar='<name>',
               help='Namespace(s) to use for this operation. If defined only '
@@ -400,7 +396,7 @@ def cmd_class_enumerate(context, classname, options):
                 IncludeClassOrigin=options['include_classorigin'])
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -429,7 +425,7 @@ def cmd_class_references(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -462,7 +458,7 @@ def cmd_class_associators(context, classname, options):
                 PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, context.output_format,
-                            summary=options['summary'], sort=options['sort'])
+                            summary=options['summary'], sort=True)
 
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
@@ -478,13 +474,12 @@ def cmd_class_find(context, classname_glob, options):
     else:
         try:
             ns_names = context.wbem_server.namespaces
+            ns_names.sort()
         except CIMError as ce:
             # allow processing to continue if no interop namespace
             if ce.status_code == CIM_ERR_NOT_FOUND:
                 click.echo('WARNING: %s' % ce)
                 ns_names = [context.conn.default_namespace]
-        if options['sort']:
-            ns_names.sort()
 
     try:
         names_dict = {}
