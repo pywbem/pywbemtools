@@ -25,6 +25,7 @@ TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
+SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
@@ -115,7 +116,6 @@ Options:
   -n, --namespace <name>          Namespace to use for this operation, instead
                                   of the default namespace of the connection
   -o, --names-only                Retrieve only the returned object names.
-  -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
   -f, --filter-query TEXT         A filter query to be passed to the server if
                                   the pull operations are used. If this option
@@ -326,7 +326,6 @@ Options:
   -o, --names-only                Retrieve only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation, instead
                                   of the default namespace of the connection
-  -s, --sort                      Sort into alphabetical order by classname.
   -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
@@ -467,7 +466,6 @@ Options:
   -o, --names-only                Retrieve only the returned object names.
   -n, --namespace <name>          Namespace to use for this operation, instead
                                   of the default namespace of the connection
-  -s, --sort                      Sort into alphabetical order by classname.
   -i, --interactive               If set, `INSTANCENAME` argument must be a
                                   class rather than an instance and user is
                                   presented with a list of instances of the
@@ -550,7 +548,6 @@ Options:
                                   DMTF:CQL.
   -n, --namespace <name>          Namespace to use for this operation, instead
                                   of the default namespace of the connection
-  -s, --sort                      Sort into alphabetical order by classname.
   -S, --summary                   Return only summary of objects (count).
   -h, --help                      Show this message and exit.
 
@@ -635,41 +632,40 @@ InstanceID      IntegerProp
 """
 
 REF_INSTS = """instance of TST_Lineage {
-   InstanceID = "MikeSofi";
-   parent = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
-   child = "/root/cimv2:TST_Person.name=\\\"Sofi\\\"";
-};
-
-instance of TST_Lineage {
    InstanceID = "MikeGabi";
    parent = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
    child = "/root/cimv2:TST_Person.name=\\\"Gabi\\\"";
+};
+
+instance of TST_Lineage {
+   InstanceID = "MikeSofi";
+   parent = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
+   child = "/root/cimv2:TST_Person.name=\\\"Sofi\\\"";
 };
 
 instance of TST_MemberOfFamilyCollection {
    family = "/root/cimv2:TST_FamilyCollection.name=\\\"Family2\\\"";
    member = "/root/cimv2:TST_Person.name=\\\"Mike\\\"";
 };
-
 """
 
-ASSOC_INSTS = """instance of TST_Person {
-   name = "Sofi";
+ASSOC_INSTS = """instance of TST_FamilyCollection {
+   name = "Family2";
 };
 
 instance of TST_Person {
    name = "Gabi";
 };
 
-instance of TST_FamilyCollection {
-   name = "Family2";
+instance of TST_Person {
+   name = "Sofi";
 };
 
 """
 
 # pylint: enable=line-too-long
 
-OK = True    # mark tests OK when they execute correctly
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -724,14 +720,6 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate names CIM_Foo -o --namespace',
      ['enumerate', 'CIM_Foo', '-o', '--namespace', 'root/cimv2'],
-     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance subcommand enumerate names CIM_Foo -o --sort',
-     ['enumerate', 'CIM_Foo', '--names-only', '--sort'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
@@ -1572,23 +1560,23 @@ Instances: PyWBEM_AllTypes
      ['references', 'TST_Person.name="Mike"'],
      {'stdout': REF_INSTS,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'lineswons'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references, returns instances, explicit ns',
      ['references', 'TST_Person.name="Mike"', '-n', 'root/cimv2'],
      {'stdout': REF_INSTS,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'lineswons'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references -o, returns paths',
      ['references', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+     {'stdout': ['"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
+                 '=\"root/cimv2:TST_Person.name=\\"Mike\\""',
+                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family',
-                 '"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
-                 '=\"root/cimv2:TST_Person.name=\\"Mike\\""'],
+                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
@@ -1631,7 +1619,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand references -o, returns paths with resultclass '
      'valid returns paths sorted',
-     ['references', 'TST_Person.name="Mike"', '-o', '-s',
+     ['references', 'TST_Person.name="Mike"', '-o',
       '--resultclass', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
@@ -1798,12 +1786,11 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '-o'],
-     {'stdout': ['', '//FakedUrl/root/cimv2:TST_Person.name="Sofi"',
-                 '', '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
-                 '',
-                 '//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'],
+     {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'
+                 '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
+                 '//FakedUrl/root/cimv2:TST_Person.name="Sofi"'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators CIM_Foo with --use-pull-ops yes '
@@ -1829,8 +1816,6 @@ Instances: PyWBEM_AllTypes
                  r'TST_Person'],
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
-
-
 
     # Invalid associators tests
 
@@ -1900,30 +1885,33 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-
-    ['Verify instance subcommand count, Return table of instances',
+    ['Verify instance subcommand count sorted, Return table of instances',
      ['count', 'CIM_*', '--sort'],
      {'stdout': ['Count of instances per class',
-                 '+---------+---------+',
-                 '| Class   |   count |',
-                 '|---------+---------|',
-                 '| CIM_Foo |       3 |',
-                 '+---------+---------+', ],
+                 '+-----------------+---------+',
+                 '| Class           |   count |',
+                 '|-----------------+---------|',
+                 '| CIM_Foo_sub_sub |       3 |',
+                 '| CIM_Foo_sub     |       4 |',
+                 '| CIM_Foo         |       5 |',
+                 '+-----------------+---------+'],
       'rc': 0,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_FILE_EXT, RUN],
 
-    ['Verify instance subcommand count, --sort. Return table of instances',
+    ['Verify instance subcommand count. Return table of instances',
      ['count', 'CIM_*'],
      {'stdout': ['Count of instances per class',
-                 '+---------+---------+',
-                 '| Class   |   count |',
-                 '|---------+---------|',
-                 '| CIM_Foo |       3 |',
-                 '+---------+---------+', ],
+                 '+-----------------+---------+',
+                 '| Class           |   count |',
+                 '|-----------------+---------|',
+                 '| CIM_Foo         |       5 |',
+                 '| CIM_Foo_sub     |       4 |',
+                 '| CIM_Foo_sub_sub |       3 |',
+                 '+-----------------+---------+'],
       'rc': 0,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_FILE_EXT, RUN],
 
     # TODO add subclass instances to the count test.
 

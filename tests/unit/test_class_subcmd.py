@@ -95,7 +95,7 @@ Options:
 """
 
 
-CLS_ENUM_HELP = """
+CLS_ENUMERATE_HELP = """
 Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
   Enumerate classes from the WBEM server.
@@ -127,7 +127,6 @@ Options:
                              result.On some WBEM operations, server may ignore
                              this option.
   -o, --names-only           Retrieve only the returned object names.
-  -s, --sort                 Sort into alphabetical order by classname.
   -n, --namespace <name>     Namespace to use for this operation, instead of
                              the default namespace of the connection
   -S, --summary              Return only summary of objects (count).
@@ -160,7 +159,6 @@ Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
   the form <namespace>:<classname>
 
 Options:
-  -s, --sort              Sort into alphabetical order by classname.
   -n, --namespace <name>  Namespace(s) to use for this operation. If defined
                           only those namespaces are searched rather than all
                           available namespaces. ex: -n root/interop -n
@@ -264,7 +262,6 @@ Options:
                                   empty string the server should return no
                                   properties.
   -o, --names-only                Retrieve only the returned object names.
-  -s, --sort                      Sort into alphabetical order by classname.
   -n, --namespace <name>          Namespace to use for this operation, instead
                                   of the default namespace of the connection
   -S, --summary                   Return only summary of objects (count).
@@ -448,13 +445,13 @@ TEST_CASES = [
     #
     ['Verify class subcommand enumerate  --help response',
      ['enumerate', '--help'],
-     {'stdout': CLS_ENUM_HELP,
+     {'stdout': CLS_ENUMERATE_HELP,
       'test': 'linesnows'},
      None, OK],
 
     ['Verify class subcommand enumerate  -h response.',
      ['enumerate', '-h'],
-     {'stdout': CLS_ENUM_HELP,
+     {'stdout': CLS_ENUMERATE_HELP,
       'test': 'linesnows'},
      None, OK],
 
@@ -805,27 +802,10 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand find simple name in known namespace with -s',
-     ['find', 'CIM_*', '-n', 'root/cimv2', '-s'],
-     {'stdout': ["  root/cimv2:CIM_Foo",
-                 "  root/cimv2:CIM_Foo_sub",
-                 "  root/cimv2:CIM_Foo_sub2",
-                 "  root/cimv2:CIM_Foo_sub_sub"],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand find simple name in known namespace with --sort',
-     ['find', 'CIM_*', '-n', 'root/cimv2', '-s'],
-     {'stdout': ["  root/cimv2:CIM_Foo",
-                 "  root/cimv2:CIM_Foo_sub",
-                 "  root/cimv2:CIM_Foo_sub2",
-                 "  root/cimv2:CIM_Foo_sub_sub"],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class subcommand find name in known namespace with -s, 0 grid',
+    ['Verify class subcommand find name in known namespace -o grid',
      {'global': ['-o', 'grid'],
-      'args': ['find', 'CIM_*', '-n', 'root/cimv2', '-s']},
+      'args': ['find', 'CIM_*', '-n', 'root/cimv2']},
      {'stdout': ['Find class CIM_*',
                  '+-------------+-----------------+',
                  '| Namespace   | Classname       |',
@@ -1151,14 +1131,14 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify class subcommand references simple request, -s',
-     ['references', 'TST_Person', '-s'],
+    ['Verify class subcommand references simple request',
+     ['references', 'TST_Person'],
      {'stdout': REFERENCES_CLASS_RTN_QUALS1,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class subcommand references simple request -o -s',
-     ['references', 'TST_Person', '-o', '-s'],
+    ['Verify class subcommand references simple request -o',
+     ['references', 'TST_Person', '-o'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage',
                  '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection'],
       'test': 'linesnows'},

@@ -270,7 +270,6 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       empty string the server should return no
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
-      -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
       -S, --summary                   Return only summary of objects (count).
@@ -358,7 +357,6 @@ The following defines the help output for the `pywbemcli class enumerate --help`
                                  result.On some WBEM operations, server may ignore
                                  this option.
       -o, --names-only           Retrieve only the returned object names.
-      -s, --sort                 Sort into alphabetical order by classname.
       -n, --namespace <name>     Namespace to use for this operation, instead of
                                  the default namespace of the connection
       -S, --summary              Return only summary of objects (count).
@@ -402,7 +400,6 @@ The following defines the help output for the `pywbemcli class find --help` subc
       the form <namespace>:<classname>
 
     Options:
-      -s, --sort              Sort into alphabetical order by classname.
       -n, --namespace <name>  Namespace(s) to use for this operation. If defined
                               only those namespaces are searched rather than all
                               available namespaces. ex: -n root/interop -n
@@ -546,7 +543,6 @@ The following defines the help output for the `pywbemcli class references --help
                                       empty string the server should return no
                                       properties.
       -o, --names-only                Retrieve only the returned object names.
-      -s, --sort                      Sort into alphabetical order by classname.
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
       -S, --summary                   Return only summary of objects (count).
@@ -1083,7 +1079,6 @@ The following defines the help output for the `pywbemcli instance associators --
       -o, --names-only                Retrieve only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
-      -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
@@ -1288,7 +1283,6 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
       -o, --names-only                Retrieve only the returned object names.
-      -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
       -f, --filter-query TEXT         A filter query to be passed to the server if
                                       the pull operations are used. If this option
@@ -1512,7 +1506,6 @@ The following defines the help output for the `pywbemcli instance query --help` 
                                       DMTF:CQL.
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
-      -s, --sort                      Sort into alphabetical order by classname.
       -S, --summary                   Return only summary of objects (count).
       -h, --help                      Show this message and exit.
 
@@ -1583,7 +1576,6 @@ The following defines the help output for the `pywbemcli instance references --h
       -o, --names-only                Retrieve only the returned object names.
       -n, --namespace <name>          Namespace to use for this operation, instead
                                       of the default namespace of the connection
-      -s, --sort                      Sort into alphabetical order by classname.
       -i, --interactive               If set, `INSTANCENAME` argument must be a
                                       class rather than an instance and user is
                                       presented with a list of instances of the
