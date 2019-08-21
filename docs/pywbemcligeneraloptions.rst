@@ -18,27 +18,29 @@ information on each command-group arguments and options):
   * Host: defines short/fully qualified DNS hostname, literal
     IPV4 address (dotted), or literal IPV6 address. see :term:`RFC3986` and
     :term:`RFC6874`
-  * Port: (optional) defines WBEM server port to be used [Defaults: 5988(HTTP)
-    and 5989(HTTPS)]. (EnvVar: PYWBEMCLI_SERVER).
+  * Port: (optional) defines WBEM server port to be used [Default: 5988(HTTP)
+    and 5989(HTTPS)]..
 
-  The server parameter is mutually exclusive with the ``--name`` option and the
-  ``mock-server option since each define a connection to a WBEM server.
+  This option is mutually exclusive with the ``--name`` option and the
+  ``--mock-server`` option since each defines a connection to a WBEM server.
 
   In the interactive mode this connection is not actually executed until a
   command or subcommand requiring access to the WBEM server is entered.
+  (EnvVar: PYWBEMCLI_SERVER)
 * **--name/-n** - The name of a WBEM server that is defined in the
-  :term:``connection file`` or, if the ``--server`` parameter exists, to define a name for a
-  connection that will be entered in the connection file.  The server
-  parameters for this connection will be set in pywbemcli.
-  In the interactive mode a connection is not actually used until
-  a command requiring access to the WBEM server is entered.
+  :term:`connection file`.  The server parameters for this connection name will
+  be loaded from the :term:`connections file` to become the current WBEM
+  connection in pywbemcli. Note: In the interactive mode a connection is not
+  actually used until a command requiring access to the WBEM server is entered.
+  This option is mutually exclusive with ``--server`` and ``--mock-server``
+  since each option defines a WBEM server for pywbemcli.
 
-  A new server (``myserver``)may be defined and saved in the connection file with a
-  name is defined as follows::
+  A new WBEM server (``myserver``) may be defined and saved in the connection
+  file with a name defined as follows::
 
     $ pywbemcli add -s http://localhost --name myserver --user user --password password
 
-  To use an existing server named ``myserver`` in the defined connections::
+  To use an existing WBEM server named ``myserver`` in the defined connections::
 
     $ pywbemcli --name myserver class get CIM_ManagedElement
 
@@ -55,23 +57,24 @@ information on each command-group arguments and options):
   * Using the ``--namespace`` or ``-n`` command option to define a namespace
     on subcommands that specify this option.
   * Executing a command that looks in multiple namespaces (ex. ``class find``).
-* **--user/-u** - Username for the WBEM server if a user name is required to
+* **--user/-u** - User name for the WBEM server if a user name is required to
   authenticate the client.
 * **--password/-p** - Password for the WBEM server. This option is normally
   required if the ``--user`` option is defined.  If the user does not enter a
   password when ``--user`` - is set, pywbemcli will prompt for the password.
-  See :ref:``Avoiding password prompts``
+  See :ref:`Avoiding password prompts`.
 * **--noverify/-n** - If set, client does not verify server certificate. Any
   certificate returned by the server is accepted.
-* **--certfile** - Server certificate file. Not used if ``--noverify`` set or
+* **--certfile** - Server certificate file. Not used if ``--no-verify`` set or
   the connection does not use SSL (i.e. ``--server http://blah``)
 * **--keyfile** - Client private key file for the server to use to authenticate
   the client if that is required by the WBEM server.
 * **--output-format/-o** - Output format choice (Default: mof).
   Note that the actual output format may differ from this value because some
-  subcommands only allow selected formats. See :ref:`Output formats`.
-* **--use-pull-ops** [``yes``|``no``|``either``] - Determines whether the pull
-  operations are used for ``EnumerateInstances``, ``AssociatorInstances``,
+  subcommands only allow selected formats. Thus, for example, the
+  ``class tree`` always displays as an ascii tree. See :ref:`Output formats`.
+* **--use-pull-ops** [ ``yes`` | ``no`` | ``either`` ] - Determines whether the
+  pull operations are used for ``EnumerateInstances``, ``AssociatorInstances``,
   ``ReferenceInstances``, and ``ExecQuery`` operations See :ref:`Pywbemcli and
   the DMTF pull operations` for more information on pull operations:
 
@@ -81,16 +84,38 @@ information on each command-group arguments and options):
   * ``either`` - (default )allows pywbem to try both pull and then traditional
       operations.
 
-* **--pull-max-cnt** -  ``MaxObjectCount`` of objects to be returned for each pull
-  operation if pull operations are used. This must be  a positive non-zero
+* **--pull-max-cnt** -  ``MaxObjectCount`` of objects to be returned for each
+  pull request if pull operations are used. This must be  a positive non-zero
   integer. Default is 1000. See :ref:`Pywbemcli and the DMTF pull operations`
   for more information on pull operations.
 
 * **--mock-server** - Defines one or more files that define a mock server that
-  can be used to execute pywbemcli commands without access to a real server.
-  See chapter :ref:`Mock WBEM server support` for information on defining
+  can be used to define a mock WBEM server in the pywbemcli process so that
+  pywbemcli commands without access to a real server. When this option is used
+  to define a WBEM server the security options (ex. ``--user``) are irrevalent;
+  they may be included but are not used.
+
+  The following example creates a mock server with two files defining the
+  mock data, shows what parameters are defined for the connection, and then
+  saves that connection named ``mymockserver``:
+
+  .. code-block:: text
+
+      $ pywbemcli --mock-server classdefs.mof --mock-server insts.py --default-namespace root/myhome
+      pywbemcli> connection show
+        Name: default
+          WBEMServer uri: None
+          Default-namespace: root/myhome
+          . . .
+          use-pull-ops: either
+          pull-max-cnt: 1000
+          mock: classdefs.mof, insts.py
+          log: None
+      pywbecli> connection save --name mymockserver
+
+  See chapter :ref:`Mock WBEM server support` for more information on defining
   mock servers.
-* **--log/-l** - See:ref:`Pywbemcli defined logging`.
+* **--log/-l** - See :ref:`Pywbemcli defined logging`.
 * **--verbose/-v** -  Display extra information about the processing.
 * **--version** - Show the version of this command and of the pywbem package
       imported then exit.
@@ -107,7 +132,7 @@ Pywbemcli has environment variable options corresponding to the
 command line general options as follows:
 
 ==============================  ============================
-Export Name                     Corresponding general option
+Environment variable            Corresponding general option
 ==============================  ============================
 PYWBEMCLI_SERVER                ``--server``
 PYWBEMCLI_NAME                  ``--name``
@@ -310,11 +335,11 @@ applicable to all subcommands:
 * **Table output formats** - There are a variety of table formats:ref:`Table formats`.
 * **CIM model formats** - These formats provide display of returned CIM objects in
   formats that are specific to the CIM Model (ex. MOF, XML, etc.).
-  see:ref:`CIM object formats`.
+  See :ref:`CIM object formats`.
 * **ASCII tree format** - This format option provides a tree display of outputs that
   are logical to display as a tree.  Thus, the command ``pywbemcli class tree . . .``
   which shows the hierarchy of the CIM classes defined by a WBEM server uses the
-  tree output format. See:ref:`ASCII tree format`.
+  tree output format. See :ref:`ASCII tree format`.
 
 
 .. _`Table formats`:
@@ -542,7 +567,7 @@ The COMPONENT field defines the component for which logging is enabled:
 
 The DESTINATION field specified the log destination:
 
-  * `stderr` - Log to stderr
+  * `stderr` - Output log to stderr.
   * 'file' - (default) Log to the predefined pywbemcli file. The pywbemcli
     log file is `pywbemcli.log` in the current directory.
 
@@ -565,7 +590,7 @@ The log output is routed to the output defined by DESTINATION and includes the
 information determined by the COMPONENT and DETAIL fields.
 
 For example, logging only of the summary  API information would look something
-like gisthe following:
+like dthe following:
 
 .. code-block:: text
 
@@ -594,17 +619,17 @@ Pywbemcli connections file
 
 Pywbemcli provides the capability to save the definition of parameters
 for connecting to WBEM servers identified by name using the ``connection``
-command-group (see:ref:`pywbemcli connection --help` and
+command-group (see :ref:`pywbemcli connection --help` and
 :ref:`Connection command-group`). Once defined, these named connections are
 saved in a a JSON formatted file(see :term:`connections file`) in the current
 directory from which pywbemcli was executed.
 
-To create a new persistent connection definition, pywbemcli should be executed with
-either the ``--server``, or the ``--mock-server`` option, and the ``--name`` option and
-any other general parameters desired for the connection.  Then executing the
-``connection save`` command will save the new connection in the connections
-file. For example the following example creates a new connection in the
-interactive mode:
+To create a new persistent connection definition, pywbemcli should be executed
+with either the ``--server``, or the ``--mock-server`` option, and the
+``--name`` option and any other general options/arguments desired for the
+connection.  Then executing the ``connection save`` command will save the new
+connection in the connections file. For example the following example creates a
+new connection in the interactive mode:
 
 .. code-block:: text
 

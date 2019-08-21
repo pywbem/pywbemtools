@@ -59,7 +59,7 @@ syntactic implementation of the features. This includes:
 
 * The ability to receive either CIM instances or CIM instance names with only
   a change of an option on the commands that request CIM instances. The option
-  ``-o`` or ``--name-only`` defines whether only the instance name or the complete
+  ``-o`` or ``--names-only`` defines whether only the instance name or the complete
   object will be displayed.
 
 * The ability to interactively select the data for certain objects as opposed
@@ -149,7 +149,7 @@ PullInstances                      part of pull sequence
 CloseEnumeration                   Not implemented
 **Class Operations:**
 EnumerateClasses                   class enumerate CLASSNAME
-EnumerateClassNames                class enumerate --name-only
+EnumerateClassNames                class enumerate --names-only
 GetClass                           class get CLASSNAME
 ModifyClass                        Not implemented
 CreateClass                        Not implemented
