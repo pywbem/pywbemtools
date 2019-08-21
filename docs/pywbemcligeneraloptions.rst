@@ -68,6 +68,27 @@ The pywbemcli command line options are as follows (The following complements
 the exact help text output shown in section :ref:`pywbemcli Help Command
 Details`):
 
+.. _`Defining the WBEM Server`:
+Defining the WBEM Server
+------------------------
+
+The WBEM server to which pywbemcli will communicate can be defined on the
+command line in the following arguments. Pywbemcli allows defining a
+target WBEM connection (i.e. a WBEM server) in several ways:
+
+1. Define the url, default-namespace of the server, security information including:
+   user name, password, certificate file, keyfile, ca-certs) with command line
+   arguments.
+
+2. Define a mock-server. A mock server substitutes a local mock WBEMConnection
+   for a WBEM server that allows testing or demonstrating pywbemcli without
+   having access to a real WBEM server.
+
+3. Define the characteristics for either a WBEM server or mock WBEM server
+   and add the data to a pywbemcli :term:`connections file`.  Then pywbemcli
+   can access the server data by simply defining the name on with the
+   pywbem call.
+
 * **--server/-s** - Host name or IP address of the WBEM server to which
   pywbemcli will connect in the format::
 
@@ -170,6 +191,50 @@ Details`):
   ``AssociatorInstances``, ``ReferenceInstances``, and ``ExecQuery`` operations,
   See :ref:`Pywbemcli and the DMTF pull operations` for more information on
   pull operations:
+* **--mock-server** - Defines one or more files that define a mock server that
+  can be used to execute pywbemcli commands without access to a real server.
+  See chapter :ref:`Mock WBEM server support` for information on defining
+  mock servers.
+* **--timeout** ``--timeout`` defines the client side timeout for a request
+  made to the server
+
+Controlling result output formats
+---------------------------------
+
+Pywbemcli allows multiple output formats for command responses as follows:
+
+The output formats fall into three groups. However, not all formats are
+applicable to all subcommands:
+
+* **Table output formats** - There are a variety of table
+  formats:ref:`Table formats` and many of the results types allow tables formatted
+  response display including:
+  * instance get, enumerate, references, associators where it is an alternate
+    to the CIM model formats that shows the properties for each instance as
+    a column in a table.
+  * instance count
+  * server namespaces, introp, profiles
+  * class find
+  * connection list
+* **CIM model formats** - These formats provide display of returned CIM objects in
+  formats that are specific to the CIM Model (ex. MOF, XML, etc.).
+  see:ref:`CIM object formats`.
+* **ASCII tree format** - This format option provides a tree display of outputs that
+  are logical to display as a tree.  Thus, the command ``pywbemcli class tree . . .``
+  which shows the hierarchy of the CIM classes defined by a WBEM server uses the
+  tree output format. See:ref:`ASCII tree format`.
+
+* **--output-format/-o** - Output format choice (Default: mof).
+  Note that the actual output format may differ from this value because some
+  subcommands only allow selected formats. See :ref:`Output formats`.
+
+Controlling operation behavior and monitoring operations
+--------------------------------------------------------
+
+* **--use-pull-ops** [``yes``|``no``|``either``] - Determines whether the pull
+  operations are used for ``EnumerateInstances``, ``AssociatorInstances``,
+  ``ReferenceInstances``, and ``ExecQuery`` operations See :ref:`Pywbemcli and
+  the DMTF pull operations` for more information on pull operations:
 
   * ``yes`` -  pull requests will be used and if the server does not
     support pull, the operation will fail.
@@ -209,6 +274,10 @@ Details`):
   See chapter :ref:`Mock WBEM server support` for more information on defining
   mock servers.
 * **--log/-l** - See :ref:`Pywbemcli defined logging`.
+
+Other general arguments
+-----------------------
+
 * **--verbose/-v** -  Display extra information about the processing.
 * **--version/-V** - Show the version of this command and of the pywbem package
   imported then exit.
