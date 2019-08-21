@@ -22,15 +22,22 @@ Pywbemcli command groups, commands, and subcommands
 This section defines the characteristics of each of the pywbemcli command
 groups and subcommands including examples.
 
-The command syntax of pywbemcli is::
+The command syntax of pywbemcli is:
+
+.. code-block:: text
 
     $ pywbemcli <general-options> <cmd-group>|<command> <args>
 
-    where:
+where:
+
+.. code-block:: text
+
         cmd-group := <command> <subcommand>
 
 Within pywbemcli each command-group name is a noun, referencing an entity (ex.
 class, instance, server).
+
+.. code-block:: text
 
     $ pywbemcli -s http://localhost class get CIM_ManagedElement
 
@@ -178,7 +185,9 @@ subcommand (i.e. ``enumerate``, ``references``, ``associators``) and includes
 an option (``-o,`` or ``--names-only``) that determines whether the instance
 names or instances are retrieved from the WBEM server.
 
-Thus, for example an ``instance enumerate`` with and without the ``-o`` option::
+Thus, for example an ``instance enumerate`` with and without the ``-o`` option:
+
+.. code-block:: text
 
 
     $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
@@ -215,7 +224,9 @@ since it can involve multiple keybindings, use of quotation marks, etc.  To
 simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
 these commands that allows the user to specify only the class name, retrieves
 all the instance names from the server and presents the user with a select list
-from which an instance name can be chosen. The following is an example::
+from which an instance name can be chosen. The following is an example:
+
+.. code-block:: text
 
     $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo --interactive
     Pick Instance name to process
@@ -245,7 +256,9 @@ The **class** group defines subcommands that act on CIM classes. see
   :ref:`Output formats`). If unsuccesful it an exception. This subcommand
   returns the class associators, not the instance associators. The
   :ref:`Instance command-group` includes the corresponding associators
-  operation for instances::
+  operation for instances:
+
+  .. code-block:: text
 
       $ pywbemcli --name mockassoc class associators TST_Person --names_only
         //FakedUrl/root/cimv2:TST_Person
@@ -258,7 +271,9 @@ The **class** group defines subcommands that act on CIM classes. see
   it displays the classes/classnames in the :term:`CIM model output formats`
   (see :ref:`Output formats`). If unsuccesful it an exception.. This returns
   the class level references,not the instance references. The :ref:`Instance
-  command-group` includes a corresponding instance references operation::
+  command-group` includes a corresponding instance references operation:
+
+  .. code-block:: text
 
     $pywbemcli --mock-server mockassoc class references TST_Person --names-only
 
@@ -271,7 +286,9 @@ The **class** group defines subcommands that act on CIM classes. see
   conditions under which a class can be deleted from the server.  If successful
   it returns nothing, otherwise it displays an exception.
 
-  To delete the class ``CIM_Blah``::
+  To delete the class ``CIM_Blah``:
+
+  .. code-block:: text
 
     $ pywbemcli class delete CIM_blah
     $
@@ -288,7 +305,9 @@ The **class** group defines subcommands that act on CIM classes. see
   classes/classnames in the :term:`CIM model output formats` (see
   :ref:`Output formats`). The following example enumerates
   the class names starting at the root of the class hiearchy for a simple
-  mocked CIM schema definition::
+  mocked CIM schema definition:
+
+  .. code-block:: text
 
     $ pywbemcli --mock-server mockassoc class enumerate --names-only
     TST_Person
@@ -303,7 +322,9 @@ The **class** group defines subcommands that act on CIM classes. see
   CIM namespaces for matching class names.  This subcommand uses a :term:`GLOB`
   Unix style pathname pattern expansion on the classname to attempt to filter
   the names and namespaces of all of the classes in the WBEM server (or the
-  namespaces defined with the ``--namespaces``/``-n`` option)::
+  namespaces defined with the ``--namespaces``/``-n`` option):
+
+  .. code-block:: text
 
       $ pywbemcli> class find .*_WBEMS*
       root/PG_InterOp:CIM_WBEMServer
@@ -334,7 +355,9 @@ The **class** group defines subcommands that act on CIM classes. see
 
   The following example shows getting the MOF representation of the class
   ``CIM_Foo`` from a mock repository that is named mock1 in the
-  :term:`connections file`::
+  :term:`connections file`:
+
+  .. code-block:: text
 
       $ pywbemcli> --name mock1 class get CIM_Foo
 
@@ -384,7 +407,9 @@ The **class** group defines subcommands that act on CIM classes. see
   --help` for details.
 * **tree** to display the class hierarchy as a tree.  This subcommand
   outputs a tree format in ASCII defining the either the subclass or superclass
-  hierarchy of the class name input parameter as a tree::
+  hierarchy of the class name input parameter as a tree:
+
+  .. code-block:: text
 
       $ pywbemcli class tree CIM_Foo
 
@@ -415,7 +440,9 @@ The **instance** group defines subcommands that act on CIM instances including:
   instances or instancenames associated with INSTANCENAME otherwise it returns any
   exception generated by the response This subcommand displays the returned instances
   or instance in the :term:`CIM model output formats` or the table formats` (see
-  :ref:`Output formats`).::
+  :ref:`Output formats`).:
+
+  .. code-block:: text
 
     $ pywbemcli --name mockassoc instance references TST_Person --names-only --interactive
     Pick Instance name to process: 0
@@ -435,7 +462,9 @@ The **instance** group defines subcommands that act on CIM instances including:
     $
 
   See :ref:`pywbemcli instance associators --help` for details.
-* **count** count the number of CIM instances in a namespace. For example::
+* **count** count the number of CIM instances in a namespace. For example:
+
+  .. code-block:: text
 
         $ pywbemcli --name mockassoc instance count
         Count of instances per class
@@ -469,13 +498,17 @@ The **instance** group defines subcommands that act on CIM instances including:
   CIMProperty.
 
   For a single property in the new instance this is simply the `--property`` option
-  with the property name and value.:
+  with the property name and value:
+
+  .. code-block:: text
 
     --property <property-name>=<property-value"
 
     where quotes are only required if the value includes whitespace.
 
-  For array properties the values are defined separated by commas::
+  For array properties the values are defined separated by commas:
+
+  .. code-block:: text
 
     -p <property-name>=<value>(,<value>)
 
@@ -491,7 +524,8 @@ The **instance** group defines subcommands that act on CIM instances including:
 
   The following example creates an instance of the class TST_Blah with one
   scalar and one array property.
-  ::
+
+  .. code-block:: text
 
     $pywbemcli instance create TST_Blah InstancId="blah1", intprop=3, intarr=3,6,9
 
@@ -508,7 +542,9 @@ The **instance** group defines subcommands that act on CIM instances including:
 
   The following example deletes the instance defined by the explicit instance
   name (Note the extra backslash required to escape the double quote on the
-  terminal)::
+  terminal):
+
+  .. code-block:: text
 
     $ pywbemcli --name mockassoc instance delete root/cimv2:TST_Person.name=\"Saara\"
     $
@@ -521,7 +557,9 @@ The **instance** group defines subcommands that act on CIM instances including:
   or the table formats` (see :ref:`Output formats`).
 
   The following example returns a two instanced to an ``instance enumerate``
-  command as MOF::
+  command as MOF:
+
+  .. code-block:: text
 
     $ pywbemcli --name mockassoc instance enumerate TST_FamilyCollection
 

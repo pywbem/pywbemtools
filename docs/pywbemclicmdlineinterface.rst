@@ -26,8 +26,11 @@ Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
 The command line can contain the following components:
 
-* **general-options** - see :ref:`Command line general options`
-* **command-group** - A name of a group of subcommands
+* **general-options** - Options that apply to all commands.
+  See :ref:`Pywbemcli command line general options` for infomation on the
+  pywbemcli general options
+* **command-group** - A name of a group of subcommands.
+  See :ref:`Pywbemcli command groups, commands, and subcommands`
 * **command** - Alternative to command-group when there are no
   subcommands.
 * **subcommand** - Command name within a command group
@@ -50,7 +53,9 @@ The syntax is:
 A command-group is the name of an object, referencing an entity (ex. ``class``
 refers to operation on CIM classes). The subcommands are generally actions on
 the objects defined by the command-group name. Thus ``class`` is a
-command-group name used to access CIM classes and ``get`` is a subcommand so::
+command-group name used to access CIM classes and ``get`` is a subcommand so:
+
+.. code-block:: text
 
     $ pywbemcli --output-format mof class get CIM_ManagedElement --namespace interop
 
@@ -72,7 +77,7 @@ Pywbemcli supports two modes of operation:
 .. _`Interactive mode`:
 
 Interactive mode
-^^^^^^^^^^^^^^^^
+----------------
 
 In interactive mode also known as :term:`REPL` mode, an interactive shell
 environment is within pywbemcli that allows typing pywbemcli commands, internal
@@ -207,13 +212,13 @@ using <up-arrow, down-arrow>.
 .. _`Command mode`:
 
 Command mode
-^^^^^^^^^^^^
+------------
 
 In command mode, the pywbemcli command performs its task and terminates
 like any other standalone non-interactive command.
 
 This mode is used when the pywbemcli command is invoked with a command or
-command-group name:
+command-group name and arguments/options:
 
 .. code-block:: text
 
@@ -252,58 +257,4 @@ completion:
     $ pywbemcli class <TAB><TAB>
     ... <shows the class sub-commands to select from>
 
-.. _`Command line general options`:
-
-Command line general options
-----------------------------
-
-The general options are entered before the command-group or command. They
-define:
-
-* Characteristics of the WBEM server against which the commands are to be
-  executed (i.e url, default-namespace, security paraemters, etc.)
-* Display and execution options that apply to multiple commands (i.e. output
-  formats, statistics keeping, etc.).
-
-For example the following enumerates the qualifier declarations and outputs the
-result as a ``simple`` table:
-
-.. code-block:: text
-
-    pywbemcli --output-format simple qualifier enumerate
-
-    or
-
-    pywbemcli -o simple qualifier enumerate
-
-In the interactive mode, the general options from the command line are defined
-once and retain their value through the execution of the interactive mode.
-
-However, they may be modified in the interactive mode by entering them before
-the COMMAND.  Thus, for example to display the qualifier declarations in
-interactive mode and as a table:
-
-.. code-block:: text
-
-   $ pywbemcli
-
-   pywbemcli> --output-format table qualifier enumerate
-
-    Qualifier Declarations
-    +-------------+---------+---------+---------+-----------+-----------------+
-    | Name        | Type    | Value   | Array   | Scopes    | Flavors         |
-    +=============+=========+=========+=========+===========+=================+
-    | Description | string  |         | False   | ANY       | EnableOverride  |
-    |             |         |         |         |           | ToSubclass      |
-    |             |         |         |         |           | Translatable    |
-    +-------------+---------+---------+---------+-----------+-----------------+
-    | Key         | boolean | False   | False   | PROPERTY  | DisableOverride |
-    |             |         |         |         | REFERENCE | ToSubclass      |
-    +-------------+---------+---------+---------+-----------+-----------------+
-
-   pywbemcli>
-
-**Note:** - With this use of the general options as part of an interactive mode
-command, general the options redefinition's is not be retained between command
-executions.
 

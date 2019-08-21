@@ -3,9 +3,70 @@
 Pywbemcli command line general options
 ======================================
 
+
+.. _`General options overview`:
+
+General options overview
+------------------------
+
+The general options are entered before the command-group or command. They
+define:
+
+* Characteristics of the WBEM server against which the commands are to be
+  executed (i.e url, default-namespace, security parameters, etc.)
+* Execution options that apply to multiple commands (i.e. output
+  formats, statistics keeping, logging and using pull operations).
+* General options to show version, display additional information.
+
+For example the following enumerates the qualifier declarations and outputs the
+result as a ``simple`` table:
+
+.. code-block:: text
+
+    pywbemcli --output-format simple qualifier enumerate
+
+    or
+
+    pywbemcli -o simple qualifier enumerate
+
+In the interactive mode, the general options from the command line are defined
+once and retain their value throughout the execution of the interactive mode.
+
+However, they may be modified in the interactive mode by entering them before
+the COMMAND.  Thus, for example to display the qualifier declarations in
+interactive mode and as a table:
+
+.. code-block:: text
+
+   $ pywbemcli
+
+   pywbemcli> --output-format table qualifier enumerate
+
+    Qualifier Declarations
+    +-------------+---------+---------+---------+-----------+-----------------+
+    | Name        | Type    | Value   | Array   | Scopes    | Flavors         |
+    +=============+=========+=========+=========+===========+=================+
+    | Description | string  |         | False   | ANY       | EnableOverride  |
+    |             |         |         |         |           | ToSubclass      |
+    |             |         |         |         |           | Translatable    |
+    +-------------+---------+---------+---------+-----------+-----------------+
+    | Key         | boolean | False   | False   | PROPERTY  | DisableOverride |
+    |             |         |         |         | REFERENCE | ToSubclass      |
+    +-------------+---------+---------+---------+-----------+-----------------+
+
+   pywbemcli>
+
+**Note:** - When using the general options as part of an interactive mode
+command, general the options redefinition's are not be retained between command
+executions.
+
+
+General options descriptions
+----------------------------
+
 The pywbemcli command line options are as follows (See the help in
 pywbemcli and section :ref:`pywbemcli Help Command Details` for more precise
-information on each command-group arguments and options):
+information on each command arguments and options):
 
 * **--server/-s** - Host name or IP address of the WBEM server to which
   pywbemcli will connect in the format::
@@ -26,7 +87,15 @@ information on each command-group arguments and options):
 
   In the interactive mode this connection is not actually executed until a
   command or subcommand requiring access to the WBEM server is entered.
-  (EnvVar: PYWBEMCLI_SERVER)
+
+  Some example of this option are:
+
+    .. code-block:: text
+
+    https://localhost:15345 (http port 5989, host name localhost)
+    http://10.2.3.9 (port 5988, ipv4 ip address 10.2.3.9)
+    http://[2001:db8::1234-eth0] -(http port 5988 ipv6, zone id eth0)
+
 * **--name/-n** - The name of a WBEM server that is defined in the
   :term:`connection file`.  The server parameters for this connection name will
   be loaded from the :term:`connections file` to become the current WBEM
@@ -36,17 +105,20 @@ information on each command-group arguments and options):
   since each option defines a WBEM server for pywbemcli.
 
   A new WBEM server (``myserver``) may be defined and saved in the connection
-  file with a name defined as follows::
+  file with a name defined as follows:
+
+    .. code-block:: text
 
     $ pywbemcli add -s http://localhost --name myserver --user user --password password
 
-  To use an existing WBEM server named ``myserver`` in the defined connections::
+  To use an existing WBEM server named ``myserver`` in the defined connections:
+
+    .. code-block:: text
 
     $ pywbemcli --name myserver class get CIM_ManagedElement
 
   See :ref:`Connection command-group` for more information on managing
   connections.
-
 * **--default-namespace/-d** - Default :term:`CIM namespace` to use in the target
   WBEM server if no namespace is defined in a command. If not defined the
   pywbemcli default is ``root/cimv2``.  This is the namespace used on all
@@ -88,7 +160,6 @@ information on each command-group arguments and options):
   pull request if pull operations are used. This must be  a positive non-zero
   integer. Default is 1000. See :ref:`Pywbemcli and the DMTF pull operations`
   for more information on pull operations.
-
 * **--mock-server** - Defines one or more files that define a mock server that
   can be used to define a mock WBEM server in the pywbemcli process so that
   pywbemcli commands without access to a real server. When this option is used
@@ -143,8 +214,8 @@ PYWBEMCLI_DEFAULT_NAMESPACE     ``--default-namespace``
 PYWBEMCLI_TIMEOUT               ``--timeout``
 PYWBEMCLI_KEYFILE               ``--keyfile``
 PYWBEMCLI_CERTFILE              ``--certfile``
-PYWBEWCLI_CACERTS               ``--ca_certs``
-PYWBEMCLI_USE_PULL              ``--use_pull_ops``
+PYWBEWCLI_CACERTS               ``--ca-certs``
+PYWBEMCLI_USE_PULL              ``--use-pull-ops``
 PYWBEMCLI_PULL_MAX_CNT          ``--pull-max-cnt``
 PYWBEMCLI_STATS_ENABLED         ``--timestats``
 PYWBEMCLI_MOCK_SERVER           ``--mock-server``
@@ -296,18 +367,17 @@ operations through two general options:
     * ``no`` - Forces the use of the non-pull operation.
 
 * ``--pull-max-cnt`` - Sets the maximum count of objects the server is allowed
-  to return for each open/pull operation. max_pull_cnt of 1000 objects is the
+  to return for each open/pull operation. ``pull-max-cnt`` of 1000 objects is the
   default size which from experience is a logical choice.
 
-  The one issue with using the the ``either`` choice is that there are limitations
-  with the original operations that do not exist with the pull operations:
+  There are issues with using the the ``either`` choice as follows"
 
   * The original operations did not support the filtering of responses  with a
     query language query (``--FilterQueryLanguage`` and ``--FilterQuery``) option which
     passes a filter query to the WBEM server so that it filters the responses
     before they are returned. This can greatly reduce the size of the responses
     if effectively used but is used only when the pull operations are available
-    on the server and used with pywbemcli.
+    on the server.
 
   * The pull operations do not support some of the options that traditional
     operations did including:
@@ -332,7 +402,7 @@ can be selected with the ``-o``\``--output-format`` option.
 The output formats fall into three groups however, not all formats are
 applicable to all subcommands:
 
-* **Table output formats** - There are a variety of table formats:ref:`Table formats`.
+* **Table output formats** - There are a variety of table formats :ref:`Table formats`.
 * **CIM model formats** - These formats provide display of returned CIM objects in
   formats that are specific to the CIM Model (ex. MOF, XML, etc.).
   See :ref:`CIM object formats`.
@@ -427,12 +497,13 @@ find CIM_Foo``:
 CIM object formats
 ^^^^^^^^^^^^^^^^^^
 
-The ouput of CIM objects allows multiple formats as follows:
+The output of CIM objects allows multiple formats as follows:
 
 * ``-o mof``: Format for CIM classes, CIM instances, and CIM Parameters:
 
-MOF is the format used to define the models released by the DMTF and SNIA. It
-textually defines the components and structure and data of these elements:
+:term:`MOF` is the format used to define and document the CIM models released
+by the DMTF and SNIA. It textually defines the components and structure and
+data of CIM elements such as CIMClass, CIMInstance, etc.:
 
 .. code-block:: text
 
@@ -605,7 +676,7 @@ pywbemcli.log as follows showing the input parameters to the pywbem method
     2019-07-09 18:27:22,103-pywbem.api.1-27716-Request:1-27716 EnumerateClassNames(ClassName=None, DeepInheritance=False, namespace=None)
     2019-07-09 18:27:22,142-pywbem.api.1-27716-Return:1-27716 EnumerateClassNames(list of str; count=103)
 
-The format is::
+The format is:
 
 .. code-block:: text
 
@@ -658,7 +729,8 @@ new connection in the interactive mode:
 
 Note: The * indicates that this is the current connection.
 
-Other connections can be added from either the command mode or interactive mode.
+Other connections can be added from either the command mode or interactive mode
+using the add subcommand:
 
 .. code-block:: text
 
