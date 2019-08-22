@@ -138,7 +138,7 @@ Details`):
   the password.  If passwords are saved into the :term:`connections file` they
   are not encrypted in the file.
   See :ref:`Avoiding password prompts`.
-* **--noverify/-n** - If set, client does not verify server certificate. Any
+* **--no-verify/-n** - If set, client does not verify server certificate. Any
   certificate returned by the server is accepted.
 * **--certfile** - Server certificate file. Not used if ``--no-verify/-n`` set or
   the connection does not use SSL (i.e. ``--server http://blah``)
@@ -759,25 +759,26 @@ session, the user can work with multiple WBEM servers. The server that was defin
 when pywbemcli was started or the server selected by ``connection select`` is the
 current server.
 
-For example the following example creates a new connection in the CLI command
-mode:
+For example the following example of a pywbemcli interactive session creates a
+new connection in the CLI command mode:
 
 .. code-block:: text
 
-    $ pywbemcli connection add --server http://localhost --user usr1 -password blah --name testconn
+    $ pywbemcli
+    pywbemcli> connection add --server http://localhost --user usr1 -password blah --name testconn
     pywbemcli> connection show
-    Name: testconn
-      WBEMServer uri: http://localhost
-      Default_namespace: root/cimv2
-      User: usr1
-      Password: blah
-      Timeout: 30
-      Noverify: False
-      Certfile: None
-      Keyfile: None
-      use-pull-ops: either
+    name: testconn
+      server: http://localhost
+      default-namespace: root/cimv2
+      user: usr1
+      password: blah
+      timeout: None
+      no-verify: False
+      certfile: None
+      keyfile: None
+      use-pull: None
       pull-max-cnt: 1000
-      mock:
+      mock-server:
       log: None
 
     pywbemcli> connection list

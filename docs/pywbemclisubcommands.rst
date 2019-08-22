@@ -938,7 +938,7 @@ The subcommands include:
     pywbemcli> connection list
     WBEM server connections:
     +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
-    | name         | server uri       | namespace   | user        |   timeout | noverify   | mock_server                            |
+    | name         | server uri       | namespace   | user        |   timeout | no-verify  | mock_server                            |
     |--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------|
     | blahblah     | http://blah      | root/cimv2  |             |        45 | False      |                                        |
     | mock1        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
@@ -1004,27 +1004,29 @@ The subcommands include:
     pywbemcli> connection list
     WBEMServer Connections:
     +------------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------+
-    | name       | server uri       | namespace   | user        | password   |   timeout | noverify   | certfile   | keyfile   | log   |
+    | name       | server uri       | namespace   | user        | password   |   timeout | no-verify  | certfile   | keyfile   | log   |
     |------------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------|
     | mock1      |                  | root/cimv2  |             |            |        30 | False      |            |           |       |
     | mockassoc* |                  | root/cimv2  |             |            |        30 | False      |            |           |       |
     | op         | http://localhost | root/cimv2  | kschopmeyer | test8play  |        30 | True       |            |           |       |
     +------------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------+
+
     $ pywbemcli> connection show
 
-    Name: mockassoc
-      WBEMServer uri: None
-      Default_namespace: root/cimv2
-      User: None
-      Password: None
-      Timeout: 30
-      Noverify: False
-      Certfile: None
-      Keyfile: None
-      use_pull: either
+    name: mockassoc
+      server: None
+      default-namespace: root/cimv2
+      user: None
+      password: None
+      timeout: 30
+      no-verify: False
+      certfile: None
+      keyfile: None
+      use-pull: either
       pull-max-cnt: 1000
-      mock: tests/unit/simple_assoc_mock_model.mof
+      mock-server: tests/unit/simple_assoc_mock_model.mof
       log: None
+
 
   See :ref:`pywbemcli connection select --help` for details.
 * **show** show information in the current connection.  See the the ``select``
