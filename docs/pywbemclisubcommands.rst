@@ -622,9 +622,9 @@ The **instance** group defines subcommands that act on CIM instances including:
 
   See :ref:`pywbemcli instance references --help` for details.
 * **query** to execute an execquery with query string defined as an argument.
-  The QUERY argument must be a valid query defined for the ``--querylanguage``
+  The QUERY argument must be a valid query defined for the ``--query-language``
   option and available in the WBEM server being queried.  The default for
-  the ``--querylanguage`` option is DMTF:CQL but any query language and query
+  the ``--query-language`` option is DMTF:CQL but any query language and query
   will be passed to the server.
 
   It displays any instances returned in the defined formats or any exception
@@ -641,10 +641,10 @@ The **qualifier** command-group defines subcommands that act on
 CIMQualifierDeclaration entities in the WBEM server including:
 
 * **get** to get a single qualifier declaration defined by the ``QUALIFIERNAME``
-  argument from the namespace in the target WBEM server defined with this command  or
-  the default_namespace and display in the defined output format. The output
-  formats can be either one  of the :term:`CIM model output formats` or the
-  table formats` (see :ref:`Output formats`).
+  argument from the namespace in the target WBEM server defined with this
+  command  or the default_namespace and display in the defined output format.
+  The output formats can be either one  of the :term:`CIM model output formats`
+  or the table formats` (see :ref:`Output formats`).
 
   The following example gets the ``Key`` qualifier declaration from the
   default namespace:
@@ -934,15 +934,19 @@ The subcommands include:
 
     pywbemcli> connection add --name me --server http://localhost --user me --password mypw -no-verify
     pywbemcli> connection list
-    WBEMServer Connections:
-    +-----------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------+
-    | name      | server uri       | namespace   | user        | password   |   timeout | noverify   | certfile   | keyfile   | log   |
-    |-----------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------|
-    | me*       | http://localhost | root/cimv2  | me          | mypw       |           | True       |            |           |       |
-    | mock1     |                  | root/cimv2  |             |            |        30 | False      |            |           |       |
-    | mockassoc |                  | root/cimv2  |             |            |        30 | False      |            |           |       |
-    | op        | http://localhost | root/cimv2  | kschopmeyer | test8play  |        30 | True       |            |           |       |
-    +-----------+------------------+-------------+-------------+------------+-----------+------------+------------+-----------+-------+
+    WBEM server connections:
+    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
+    | name         | server uri       | namespace   | user        |   timeout | noverify   | mock_server                            |
+    |--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------|
+    | blahblah     | http://blah      | root/cimv2  |             |        45 | False      |                                        |
+    | mock1        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
+    | mockalltypes |                  | root/cimv2  |             |        30 | False      | tests/unit/all_types.mof               |
+    | mockassoc    |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_assoc_mock_model.mof |
+    | mockext      |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model_ext.mof   |
+    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False      |                                        |
+    | test3        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
+    |              |                  |             |             |           |            | tests/unit/mock_confirm_y.py           |
+    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
     pywbemcli>
 
   NOTE: The ``*`` on the name indicates the current connection, the one that

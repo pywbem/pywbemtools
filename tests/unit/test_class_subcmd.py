@@ -453,6 +453,32 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+
+    ['Verify class subcommand get with xml output format).',
+     {'args': ['enumerate'],
+      'global': ['--output-format', 'repr']},
+     {'stdout': [r"CIMClass\(classname='CIM_Foo', superclass=None,",
+                 r"'InstanceID': CIMProperty\(name='InstanceID', value=None,"],
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand get with repr output format).',
+     {'args': ['enumerate'],
+      'global': ['--output-format', 'txt']},
+     {'stdout': ["CIMClass(classname='CIM_Foo', ...)"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify class subcommand get with repr output format).',
+     {'args': ['enumerate'],
+      'global': ['--output-format', 'xml']},
+     {'stdout': ['<CLASS NAME="CIM_Foo">',
+                 '<PROPERTY NAME="InstanceID"',
+                 '<PROPERTY NAME="IntegerProp" PROPAGATED="false"',
+                 '<METHOD NAME="DeleteNothing" PROPAGATED="false"'],
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
     #
     # Enumerate errors
     #
@@ -594,6 +620,33 @@ TEST_CASES = [
                  '};',
                  '', ],
       'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand get with xml output format).',
+     {'args': ['get', 'CIM_Foo'],
+      'global': ['--output-format', 'repr']},
+     {'stdout': [r"CIMClass\(classname='CIM_Foo', superclass=None,",
+                 r"'InstanceID': CIMProperty\(name='InstanceID', value=None,"],
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify class subcommand get with repr output format).',
+     {'args': ['get', 'CIM_Foo'],
+      'global': ['--output-format', 'txt']},
+     {'stdout': ["CIMClass(classname='CIM_Foo', ...)"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify class subcommand get with repr output format).',
+     {'args': ['get', 'CIM_Foo'],
+      'global': ['--output-format', 'xml']},
+     {'stdout': ['<CLASS NAME="CIM_Foo">',
+                 '<PROPERTY NAME="InstanceID"',
+                 '<PROPERTY NAME="IntegerProp" PROPAGATED="false"',
+                 '<METHOD NAME="DeleteNothing" PROPAGATED="false"'],
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     # pylint: enable=line-too-long

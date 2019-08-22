@@ -51,12 +51,10 @@ else:
 
 
 TABLE_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html')
-CIM_OBJECT_OUTPUT_FORMATS = ('mof', 'xml', 'txt', 'tree')
+CIM_OBJECT_OUTPUT_FORMATS = ('mof', 'xml', 'repr', 'txt')
 
-# TODO: ks for some reason extending one list with another causes a problem
-# in click with the help. Review with future versions
-OUTPUT_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html',
-                  'mof', 'xml', 'txt', 'tree')
+OUTPUT_FORMATS = [TABLE_FORMATS, CIM_OBJECT_OUTPUT_FORMATS]
+
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 
@@ -866,13 +864,14 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
             click.echo(repr(object_))
         except AttributeError:
             raise click.ClickException('"repr" display of %r failed' % object_)
+
     elif output_format == 'txt':
         try:
             click.echo(object_)
         except AttributeError:
             raise click.ClickException('"txt" display of %r failed' % object_)
-    elif output_format == 'tree':
-        raise click.ClickException('Tree output format not allowed')
+    # elif output_format == 'tree':
+    #    raise click.ClickException('Tree output format not allowed')
     else:
         raise click.ClickException('Invalid output format %s' %
                                    output_format)

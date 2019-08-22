@@ -366,7 +366,7 @@ Output formats
 Pywbemcli supports various output formats for the results. The output format
 can be selected with the ``--output-format/-o`` option.
 
-The output formats fall into three groups however, not all formats are
+The output formats fall into three groups. However, not all formats are
 applicable to all subcommands:
 
 * **Table formats** - The :ref:`Table formats` display the output as a table with
@@ -376,11 +376,33 @@ applicable to all subcommands:
   objects in formats specific to the CIM Model and also the pywbem implementation
   of the CIM model (ex. DMTF MOF and XML formats and pywbem repr and string
   formats).
-
 * **ASCII tree format** - The :ref:`ASCII tree format` provides a tree display
   of results that is logical to display as a tree.  Thus, the command
   ``pywbemcli class tree . . .`` which shows the hierarchy of the CIM classes
   defined by a WBEM server uses the tree output format.
+
+The goal of the ``--output-format`` general option is to define the prefered
+value for either the table output format or the CIM object format for the
+command or interactive session.
+
+Not all commands output in all possible formats.  There are be cases where
+even if the format set to a table format ``--output simple`` the display will
+be in the CIM model format. Some specific cases include:
+
+1. The output of the class commands enumerate, get, references, associators with
+   classes is always in one of the CIM model formats, not a table.
+
+2. Connection commands like ``list`` only output a table oriented
+   set of values, not CIM objects.  Therefore, they always output in table formats
+   and if the output_format is set to, for example, ``mof`` they still output
+   as a table using the default value of the table formats. If the the output
+   format definition is ``mof``, they will output in the default table format.
+
+3. The server commands only outputs table oriented information. not CIM
+   objects so the output is either the default or specified table format.
+
+3. The command ``class tree`` outputs a hiearchy of classes and therefore
+   the only defined output for this command is the ascii tree format.
 
 
 .. _`Table formats`:
@@ -578,13 +600,26 @@ CIM objects:
 NOTE: The above is output as a single line and has been manually formatted for
 this documentation.
 
+
+* ``-o txt``: Python str format of the objects.
+
+    This should be considered the output of last resort as it simply uses
+    the __str__ method of each command to output.
+
+    Thus, for example the a ``class enumerate`` of a model with only a single
+    class is of the form:
+
+    .. code-block:: text
+
+        CIMClass(classname='CIM_Foo', ...)
+
 .. _`ASCII tree format`:
 
 ASCII tree format
 ^^^^^^^^^^^^^^^^^
 This output format is an ASCII based output that shows the tree structure of
 the results of certain subcommands.  It is used specifically to show the
-class class hierarchy tree as follows:
+class class hierarchy tree from the command ``class tree`` as follows:
 
 .. code-block:: text
 
