@@ -32,17 +32,16 @@ from ._common_options import namespace_option, add_options, \
 @cli.group('qualifier', options_metavar=CMD_OPTS_TXT)
 def qualifier_group():
     """
-    Command group to view QualifierDeclarations.
+    Command group for CIM qualifier declarations.
 
-    Includes the capability to get and enumerate CIM qualifier declarations
-    defined in the WBEM server.
+    This command group defines commands to inspect qualifier declarations.
 
-    pywbemcli does not provide the capability to create or delete CIM
-    QualifierDeclarations
+    Creation, modification and deletion of qualifier declarations is not
+    currently supported.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
-    command. These are NOT retained after the command is executed.
+    'qualifier' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
 
@@ -54,10 +53,14 @@ def qualifier_group():
 @click.pass_obj
 def qualifier_get(context, qualifiername, **options):
     """
-    Display CIMQualifierDeclaration.
+    Get a CIM qualifier declaration.
 
-    Displays CIMQualifierDeclaration QUALIFIERNAME for the defined namespace in
-    the current WBEMServer
+    Get a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM
+    namespace (--namespace option). If no namespace was specified, the default
+    namespace of the connection is used.
+
+    In the output, the qualifier declaration will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_qualifier_get(context, qualifiername,
                                                   options))
@@ -69,10 +72,14 @@ def qualifier_get(context, qualifiername, **options):
 @click.pass_obj
 def qualifier_enumerate(context, **options):
     """
-    Enumerate CIMQualifierDeclaractions.
+    List the CIM qualifier declarations in a CIM namespace.
 
-    Displays all of the CIMQualifierDeclaration objects in the defined
-    namespace in the current WBEM server
+    Enumerate the CIM qualifier declarations in the specified CIM namespace
+    (--namespace option). If no namespace was specified, the default namespace
+    of the connection is used.
+
+    In the output, the qualifier declaration will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_qualifier_enumerate(context, options))
 

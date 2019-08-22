@@ -18,8 +18,8 @@ This documentation uses a few special terms to refer to Python types:
 .. glossary::
 
    CIM-XML
-     The name of the protocol used in the DMTF specification :term:`DSP0200`
-     that pywbem/pywbemcli use to communicate with WBEM servers.
+      The name of the protocol used in the DMTF specification :term:`DSP0200`
+      that pywbem/pywbemcli use to communicate with WBEM servers.
 
    CIM model output formats
       Several of the output formats defined and available in the
@@ -27,6 +27,7 @@ This documentation uses a few special terms to refer to Python types:
       of CIM objects(CIMClass, CIMInstance, CIMParameter, CIMMethod,
       CIMClassName and CIMInstanceName) This includes the format choices
       ``mof`` , ``xml`` , ``repr`` , and ``txt`` .
+
    INSTANCENAME
       an argument of several of the command-group ``instance`` subcommands that
       allows two possible inputs based on another subcommand option( ``--interactive`` ).
@@ -36,9 +37,9 @@ This documentation uses a few special terms to refer to Python types:
       :term:`WBEM-URI`
 
       Otherwise the INSTANCENAME should be a classname in which case pywbemcli
-        will get the instance names from the WBEM server and present a
-        selection list for the user to select an instance
-        name :ref:`Displaying CIM instances or CIM instance names`
+      will get the instance names from the WBEM server and present a
+      selection list for the user to select an instance
+      name :ref:`Displaying CIM instances or CIM instance names`
 
    connection id
       a string that uniquely identifies each :class:`pywbem.WBEMConnection`

@@ -125,15 +125,16 @@ filterquery_option = [              # pylint: disable=invalid-name
 @cli.group('instance', options_metavar=CMD_OPTS_TXT)
 def instance_group():
     """
-    Command group to manage CIM instances.
+    Command group for CIM instances.
 
-    This incudes functions to get, enumerate, create, modify, and delete
-    instances in a namspace and additional functions to get more general
-    information on instances (ex. counts) within the namespace
+    This command group defines commands to inspect instances, to invoke
+    methods on instances, and to create and delete instances.
+
+    Modification of instances is not currently supported.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
-    command. These are NOT retained after the command is executed.
+    'instance' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
 
@@ -149,23 +150,25 @@ def instance_group():
 @click.pass_obj
 def instance_get(context, instancename, **options):
     """
-    Get a single CIMInstance.
+    Get an instance.
 
-    Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
-    resolve to the instance name of the desired instance. This may be supplied
-    directly as an untyped wbem_uri formatted string or through the
-    --interactive option. The wbemuri may contain the namespace or the namespace
-    can be supplied with the --namespace option. If no namespace is supplied,
-    the connection default namespace is used.  Any host name in the wbem_uri is
-    ignored.
+    The instance can be specified in two ways:
 
-    This method may be executed interactively by providing only a classname and
-    the interactive option (-i).
+    * By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+      argument. The namespace in which the instance is looked up is the
+      namespace specified in the WBEM URI, or otherwise the namespace specified
+      in the --namespace option, or otherwise the default namespace of the
+      connection. Any host name in the WBEM URI will be ignored.
 
-    Otherwise the INSTANCENAME must be a CIM instance name in the format
-    defined by DMTF `DSP0207`.
+    * By specifying the --interactive option and a class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance.
+      The namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace
+      of the connection.
 
-    Results are formatted as defined by the --output_format general option.
+    In the output, the instance will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_instance_get(context, instancename,
                                                  options))
@@ -178,15 +181,22 @@ def instance_get(context, instancename, **options):
 @click.pass_obj
 def instance_delete(context, instancename, **options):
     """
-    Delete a single CIM instance.
+    Delete an instance.
 
-    Delete the instanced defined by INSTANCENAME from the WBEM server.
+    The CIM instance to be deleted can be specified in two ways:
 
-    This may be executed interactively by providing only a class name and the
-    interactive option.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The CIM namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    Otherwise the INSTANCENAME must be a CIM instance name in the format
-    defined by DMTF `DSP0207`.
+    2. By specifying the --interactive option and a CIM class name in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The CIM namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
     """
     context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
                                                     options))
@@ -200,18 +210,24 @@ def instance_delete(context, instancename, **options):
 @click.pass_obj
 def instance_create(context, classname, **options):
     """
-    Create a CIM instance of CLASSNAME.
+    Create an instance of a class in a namespace.
 
-    Creates an instance of the class CLASSNAME with the properties defined
-    in the property option.
+    Create a CIM instance of the specified creation class (CLASSNAME
+    argument) in the specified CIM namespace (--namespace option), with
+    the specified properties (--property options) and display the CIM instance
+    path of the created instance. If no namespace was specified, the default
+    namespace of the connection is used.
 
-    Pywbemcli creates the new instance using CLASSNAME retrieved from the
-    current WBEM server as a template for property characteristics. Therefore
-    pywbemcli will generate an exception if CLASSNAME does not exist in the
-    current WBEM server or if the data definition in the properties options
-    does not match the properties characteristics defined the returned class.
+    The properties to be initialized and their new values are specified using
+    the --property option, which can be specified multiple times.
 
-    ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
+    Pywbemcli retrieves the class definition from the server in order to
+    verify that the specified properties are consistent with the property
+    characteristics in the class definition.
+
+    Example:
+
+      pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla"
     """
     context.execute_cmd(lambda: cmd_instance_create(context, classname,
                                                     options))
@@ -236,23 +252,29 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_modify(context, instancename, **options):
     """
-    Modify an existing CIM instance.
+    Modify an instance.
 
-    Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
-    property names and values defined by the property option and the CIM class
-    defined by the instance name.  The --propertylist option if provided is
-    passed to the WBEM server as part of the ModifyInstance operation
-    (the WBEM server limits modifications to just those properties defined in
-    the property list).
+    The CIM instance to be modified can be specified in two ways:
 
-    INSTANCENAME must be a CIM instance name in the format defined by DMTF
-    `DSP0207`.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The CIM namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    Pywbemcli builds only properties defined with the --property option
-    into an instance based on the CIMClass and forwards that to the WBEM
-    server with the ModifyInstance method.
+    2. By specifying the --interactive option and a CIM class name in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The CIM namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
 
-    ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+    The properties to be modified and their new values are specified using the
+    --property option, which can be specified multiple times.
+
+    Example:
+
+      pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
     """
     context.execute_cmd(lambda: cmd_instance_modify(context, instancename,
                                                     options))
@@ -272,29 +294,40 @@ def instance_modify(context, instancename, **options):
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
-    Invoke a CIM method on a CIMInstance.
+    Invoke a method on an instance.
 
-    Invoke the method defined by INSTANCENAME and METHODNAME arguments with
-    parameters defined by the --parameter options.
+    Invoke a CIM method (METHODNAME argument) on a CIM instance with the
+    specified input parameters (--parameter options), and display the method
+    return value and output parameters.
 
-    This issues an instance level invokemethod request and displays the
-    results.
+    The CIM instance can be specified in two ways:
 
-    INSTANCENAME must be a CIM instance name in the format defined by  DMTF
-    `DSP0207`.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The CIM namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    Pywbemcli creates the method call using the class in INSTANCENAME retrieved
-    from the current WBEM server as a template for parameter characteristics.
-    Therefore pywbemcli will generate an exception if CLASSNAME does not exist
-    in the current WBEM server or if the data definition in the parameter
-    options does not match the parameter characteristics defined the returned
-    class.
+    2. By specifying the --interactive option and a CIM class name in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The CIM namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
 
-    A class level invoke method is available as `pywbemcli class invokemethod`.
+    The method input parameters are specified using the --parameter option,
+    which can be specified multiple times.
+
+    Pywbemcli retrieves the class definition of the creation class of the
+    instance from the server in order to verify that the specified input
+    parameters are consistent with the parameter characteristics in the method
+    definition.
+
+    Use the 'class invokemethod' command to invoke CIM methods on CIM classes.
 
     Example:
 
-    pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
+      pywbemcli -n myconn instance invokemethod CIM_x.id='hi" methodx -p id=3
     """
     context.execute_cmd(lambda: cmd_instance_invokemethod(context,
                                                           instancename,
@@ -317,17 +350,22 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
-    Enumerate instances or names of CLASSNAME.
+    Get the instances of a class.
 
-    Get CIMInstance or CIMInstanceName (--name_only option) objects from
-    the WBEMServer starting either at the top  of the hierarchy (if no
-    CLASSNAME provided) or from the CLASSNAME argument if provided.
+    Enumerate the CIM instances of the specified class (CLASSNAME argument),
+    including instances of subclasses in the specified CIM namespace
+    (--namespace option), and display the returned instances, or instance paths
+    if --names-only was specified. If no namespace was specified, the default
+    namespace of the connection is used.
 
-    Displays the returned instances in mof, xml, or table formats, or the
-    instance names as a string or XML formats (--names-only option).
+    The instances to be retrieved can be filtered by the --filter-query option.
 
-    Results are formatted as defined by the --output_format general option.
+    The --local-only, --deep-inheritance, --include-qualifiers,
+    --include-classorigin, and --propertylist options determine which parts
+    are included in each retrieved instance.
 
+    In the output, the instances will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -358,20 +396,35 @@ def instance_enumerate(context, classname, **options):
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
-    Get the reference instances or names.
+    Get the instances referencing an instance.
 
-    Gets the reference instances or instance names(--names-only option) for a
-    target `INSTANCENAME` in the target WBEM server filtered by the
-    `role` and `resultclass` options.
+    List the CIM (association) instances that reference the specified CIM
+    instance, and display the returned instances, or instance paths if
+    --names-only was specified.
 
-    INSTANCENAME must be a CIM instance name in the format defined by DMTF
-    `DSP0207`.
+    The CIM instance can be specified in two ways:
 
-    This may be executed interactively by providing only a class name for
-    `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
-    of instances names in the class from which you can be chosen as the target.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The CIM namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    Results are formatted as defined by the --output_format general option.
+    2. By specifying the --interactive option and a CIM class name in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The CIM namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
+
+    The instances to be retrieved can be filtered by the --filter-query, --role
+    and --result-class options.
+
+    The --include-qualifiers, --include-classorigin, and --propertylist options
+    determine which parts are included in each retrieved instance.
+
+    In the output, the instances will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -415,20 +468,35 @@ def instance_references(context, instancename, **options):
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
-    Get associated instances or names.
+    Get the instances associated with an instance.
 
-    Returns the associated instances or names (--names-only option) for the
-    `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
-    --role and --result-role options.
+    List the CIM instances that are associated with the specified CIM instance,
+    and display the returned instances, or instance paths if --names-only was
+    specified.
 
-    INSTANCENAME must be a CIM instance name in the format defined by DMTF
-    `DSP0207`.
+    The CIM instance can be specified in two ways:
 
-    This may be executed interactively by providing only a classname and the
-    interactive option. Pywbemcli presents a list of instances in the class
-    from which one can be chosen as the target.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The CIM namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    Results are formatted as defined by the --output_format general option.
+    2. By specifying the --interactive option and a CIM class name in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The CIM namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
+
+    The instances to be retrieved can be filtered by the --filter-query,
+    --role, --result-role, --assoc-class, and --result-class options.
+
+    The --include-qualifiers, --include-classorigin, and --propertylist options
+    determine which parts are included in each retrieved instance.
+
+    In the output, the instances will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))
@@ -436,7 +504,7 @@ def instance_associators(context, instancename, **options):
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)
 @click.argument('query', type=str, required=True, metavar='QUERY_STRING')
-@click.option('-l', '--querylanguage', type=str, required=False,
+@click.option('-l', '--query-language', type=str, required=False,
               metavar='QUERY LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
               help='Use the query language defined. '
                    '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
@@ -445,15 +513,14 @@ def instance_associators(context, instancename, **options):
 @click.pass_obj
 def instance_query(context, query, **options):
     """
-    Execute an execquery request.
+    Execute a query on instances in a namespace.
 
-    Executes a query request on the target WBEM server with the QUERY_STRING
-    argument and query language options.
+    Execute the specified query (QUERY_STRING argument) in the specified CIM
+    namespace (--namespace option), and display the returned instances. If no
+    namespace was specified, the default namespace of the connection is used.
 
-    The results of the query are displayed as mof or xml.
-
-    Results are formatted as defined by the --output_format general option.
-
+    In the output, the instances will formatted as defined by the
+    --output-format general option.
     """
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
@@ -467,29 +534,25 @@ def instance_query(context, query, **options):
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
-    Get CIM instance count for classes.
+    Count the instances of each class with matching class name.
 
-    Displays the count of instances for the classes defined by the
-    `CLASSNAME-GLOB` argument in one or more namespaces.
+    Display the count of the instances of each CIM class whose class name
+    matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
+    namespaces of the WBEM server, or in the specified namespace
+    (--namespace option).
 
-    The size of the response may be limited by CLASSNAME-GLOB argument which
-    defines a regular expression based on the desired class names so that only
-    classes that match the regex are counted. The CLASSNAME-GLOB argument is
-    optional.
+    The CLASSNAME-GLOB argument is a wildcard expression that is matched on
+    the class names case insensitively. The special characters known from file
+    nme wildcarding are supported: `*` to match zero or more characters, and
+    `?` to match a single character. In order to not have the shell expand
+    the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-    The CLASSNAME-GLOB argument may be either a complete classname or a regular
-    expression that can be matched to one or more classnames. To limit the
-    filter to a single classname, terminate the classname with $.
+    For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
+    `pywbem_`, etc. '*system*' returns classes whose names include the case
+    insensitive string `system`.
 
-    The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-    is case insensitive and uses the standard GLOB special characters
-    (*(match everything), ?(match single character)).
-    Thus, `pywbem_*` returns all classes that begin with
-    `PyWBEM_`, `pywbem_`, etc. '.*system*' returns classnames that include
-    the case insensitive string `system`.
-
-    This operation can take a long time to execute since it enumerates all
-    classes in the namespace.
+    This operation can take a long time to execute since it potentially
+    enumerates all classes in all namespaces.
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 

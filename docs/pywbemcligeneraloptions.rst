@@ -742,7 +742,7 @@ connections are persisted in a :term:`connections file` named
 `pywbemcli_connections.json` in the current directory. A connection has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined
 these connections can be accessed with the general option ``--name`` or in the
-interactive mode the ``connection select` command.
+interactive mode the ``connection select`` command.
 
 A new persistent connection definition can be created  by executing
 pywbemcli with the ``connection add`` command. The options on this command will
@@ -872,4 +872,3 @@ or:
     name      server uri        namespace    user         timeout  noverify
     --------  ----------------  -----------  -----------  ---------  ----------
     testconn  http://localhost  root/blah    kschopmeyer         30  False
-
