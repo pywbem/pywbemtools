@@ -46,7 +46,7 @@ PYWBEM_VERSION = "pywbem, version {}".format(pywbem.__version__)
 # Defaults for some options
 DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
-USE_PULL_OPS_CHOICE = {'either': None, 'yes': True, 'no': False}
+USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
 
 # enable -h as additional help option
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -103,13 +103,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               help='Client timeout completion of WBEM server operation in '
                    'seconds.\n' +
                    '(EnvVar: PYWBEMCLI_{})'.format(PywbemServer.timeout_envvar))
-@click.option('-N', '--noverify', is_flag=True,
-              envvar=PywbemServer.noverify_envvar,
+@click.option('-N', '--no-verify', is_flag=True,
+              envvar=PywbemServer.no_verify_envvar,
               help='If set, client does not verify WBEM server certificate.' +
-                   '(EnvVar: {ev}).'.format(ev=PywbemServer.noverify_envvar))
+                   '(EnvVar: {ev}).'.format(ev=PywbemServer.no_verify_envvar))
 @click.option('-c', '--certfile', type=str,
               envvar=PywbemServer.certfile_envvar,
-              help="Server certfile. Ignored if --noverify flag set. " +
+              help="Server certfile. Ignored if --no-verify flag set. " +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.certfile_envvar))
 @click.option('-k', '--keyfile', type=str,
               metavar='FILE PATH',
@@ -120,7 +120,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.ca_certs_envvar,
               help='File or directory containing certificates that will be '
                    'matched against certificate received from WBEM '
-                   'server. Set --no-verify-cert option to bypass '
+                   'server. Set --no-verify option to bypass '
                    'client verification of the WBEM server certificate. '
                    ' (EnvVar: PYWBEMCLI_CA_CERTS).\n'
                    '[Default: Searches for matching certificates in the '
@@ -139,8 +139,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    .format(tb='|'.join(TABLE_FORMATS),
                            ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)) +
                    '[Default: "{}"]'.format(DEFAULT_OUTPUT_FORMAT))
-@click.option('-U', '--use-pull-ops',
-              envvar=PywbemServer.use_pull_ops_envvar,
+@click.option('-U', '--use-pull',
+              envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),
               help='Determines whether pull operations are used for '
                    'EnumerateInstances, AssociatorInstances, '
@@ -151,7 +151,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'traditional non-pull operations.\n'
                    '* "either": pywbemcli trys first pull and then '
                    ' traditional operations.\n' +
-                   '(EnvVar: {}) '.format(PywbemServer.use_pull_ops_envvar) +
+                   '(EnvVar: {}) '.format(PywbemServer.use_pull_envvar) +
                    '[Default: {}]'.format(DEFAULT_PULL_CHOICE))
 @click.option('--pull-max-cnt', type=int,
               help='Maximium object count of objects to be returned for '
@@ -193,9 +193,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
     help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
-def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
-        certfile, keyfile, ca_certs, output_format, use_pull_ops, pull_max_cnt,
-        verbose, mock_server, pywbem_server=None, timestats=None, log=None):
+def cli(ctx, server, name, default_namespace, user, password, timeout,
+        no_verify, certfile, keyfile, ca_certs, output_format, use_pull,
+        pull_max_cnt, verbose, mock_server, pywbem_server=None, timestats=None,
+        log=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -321,14 +322,14 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                        'simultaneiously' % (name, mock_server), err=True)
             raise click.Abort()
 
-        if use_pull_ops:
+        if use_pull:
             try:
-                resolved_use_pull_ops = USE_PULL_OPS_CHOICE[use_pull_ops]
+                resolved_use_pull = USE_PULL_CHOICE[use_pull]
             except KeyError:
                 raise click.ClickException(
-                    'Invalid choice for --use_pull_ops %s' % use_pull_ops)
+                    'Invalid choice for --use_pull %s' % use_pull)
         else:
-            resolved_use_pull_ops = DEFAULT_PULL_CHOICE
+            resolved_use_pull = DEFAULT_PULL_CHOICE
 
         resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 
@@ -347,11 +348,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                                          user=user,
                                          password=password,
                                          timeout=resolved_timeout,
-                                         noverify=noverify,
+                                         no_verify=no_verify,
                                          certfile=certfile,
                                          keyfile=keyfile,
                                          ca_certs=ca_certs,
-                                         use_pull_ops=resolved_use_pull_ops,
+                                         use_pull=resolved_use_pull,
                                          pull_max_cnt=resolved_pull_max_cnt,
                                          stats_enabled=resolved_timestats,
                                          verbose=verbose,
@@ -384,10 +385,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
                 # The following options are part of each PywbemServer object
                 # TODO: FUTURE should really put this into pywbemserver itself.
                 other_options = ((default_namespace, 'default_namespace'),
-                                 (use_pull_ops, 'use_pull_ops'),
+                                 (use_pull, 'use_pull'),
                                  (pull_max_cnt, ''),
                                  (timeout, 'timeout'),
-                                 (noverify, 'noverify'),
+                                 (no_verify, 'no_verify'),
                                  (user, 'user'),
                                  (certfile, 'certfile'),
                                  (keyfile, 'keyfile'),
@@ -416,10 +417,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
             pywbem_server = ctx.obj.pywbem_server
         if output_format is None:
             output_format = ctx.obj.output_format
-        if use_pull_ops is None:
-            resolved_use_pull_ops = ctx.obj.use_pull_ops
+        if use_pull is None:
+            resolved_use_pull = ctx.obj.use_pull
         if pull_max_cnt is None:
-            resolved_pull_max_cnt = ctx.obj.use_pull_ops
+            resolved_pull_max_cnt = ctx.obj.use_pull
         if not timestats:  # Defaults to False, not None
             resolved_timestats = ctx.obj.timestats
         if log is None:
@@ -431,7 +432,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout, noverify,
     # command line.
 
     ctx.obj = ContextObj(pywbem_server, output_format,
-                         resolved_use_pull_ops,
+                         resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose)

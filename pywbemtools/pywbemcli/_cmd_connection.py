@@ -160,14 +160,14 @@ def connection_select(context, name):
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               help="Operation timeout for the WBEM server in seconds. "
                    "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
-@click.option('-N', '--noverify', is_flag=True,
+@click.option('-N', '--no-verify', is_flag=True,
               help='If set, client does not verify server certificate.')
 @click.option('-c', '--certfile', type=str,
-              help="Server certfile. Ignored if noverify flag set. ")
+              help="Server certfile. Ignored if no-verify flag set. ")
 @click.option('-k', '--keyfile', type=str,
               help="Client private key file. ")
-@click.option('-U', '--use-pull-ops',
-              envvar=PywbemServer.use_pull_ops_envvar,
+@click.option('-U', '--use-pull',
+              envvar=PywbemServer.use_pull_envvar,
               type=click.Choice(['yes', 'no', 'either']),
               default='either',
               help='Determines whether pull operations are used for '
@@ -322,20 +322,20 @@ def show_connection_information(context, svr, separate_line=True):
     sep = '\n  ' if separate_line else ', '
     context.spinner.stop()
 
-    click.echo('\nName: %s%sWBEMServer uri: %s%sDefault-namespace: %s'
-               '%sUser: %s%sPassword: %s%sTimeout: %s%sNoverify: %s%s'
-               'Certfile: %s%sKeyfile: %s%suse-pull-ops: %s%spull-max-cnt: %s%s'
-               'mock: %s%slog: %s'
+    click.echo('\nname: %s%sserver: %s%sdefault-namespace: %s'
+               '%suser: %s%spassword: %s%stimeout: %s%sno-verify: %s%s'
+               'certfile: %s%skeyfile: %s%suse-pull: %s%spull-max-cnt: %s%s'
+               'mock-server: %s%slog: %s'
                % (svr.name, sep,
                   svr.server_url, sep,
                   svr.default_namespace, sep,
                   svr.user, sep,
                   svr.password, sep,
                   svr.timeout, sep,
-                  svr.noverify, sep,
+                  svr.no_verify, sep,
                   svr.certfile, sep,
                   svr.keyfile, sep,
-                  svr.use_pull_ops, sep,
+                  svr.use_pull, sep,
                   svr.pull_max_cnt, sep,
                   ", ".join(svr.mock_server), sep,
                   svr.log))
@@ -367,7 +367,7 @@ def cmd_connection_export(context):
     if_export_statement(PywbemServer.user_envvar, svr.user)
     if_export_statement(PywbemServer.password_envvar, svr.password)
     if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
-    if_export_statement(PywbemServer.noverify_envvar, svr.noverify)
+    if_export_statement(PywbemServer.no_verify_envvar, svr.no_verify)
     if_export_statement(PywbemServer.certfile_envvar, svr.certfile)
     if_export_statement(PywbemServer.keyfile_envvar, svr.keyfile)
     if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
@@ -432,7 +432,7 @@ def cmd_connection_select(context, name):
         pywbem_server = connections[name]
         new_ctx = ContextObj(pywbem_server,
                              context.output_format,
-                             pywbem_server.use_pull_ops,
+                             pywbem_server.use_pull,
                              pywbem_server.pull_max_cnt,
                              context.timestats,
                              context.log,
@@ -512,7 +512,7 @@ def cmd_connection_add(context, options):
                                   user=options['user'],
                                   password=options['password'],
                                   timeout=options['timeout'],
-                                  noverify=options['noverify'],
+                                  no_verify=options['no_verify'],
                                   certfile=options['certfile'],
                                   keyfile=options['keyfile'],
                                   ca_certs=options['ca_certs'],
@@ -574,12 +574,12 @@ def cmd_connection_list(context):
             if name == current_server_name:
                 name = name + "*"
         row = [name, svr.server_url, svr.default_namespace, svr.user,
-               svr.timeout, svr.noverify, svr.certfile,
+               svr.timeout, svr.no_verify, svr.certfile,
                svr.keyfile, svr.log, "\n".join(svr.mock_server)]
         rows.append(row)
 
     headers = ['name', 'server uri', 'namespace', 'user',
-               'timeout', 'noverify', 'certfile', 'keyfile', 'log',
+               'timeout', 'no-verify', 'certfile', 'keyfile', 'log',
                'mock_server']
 
     headers, rows = hide_empty_columns(headers, rows)

@@ -89,27 +89,27 @@ Pywbem includes multiple ways to execute the enumerate instance type operations
 
 Pywbemcli implements these method calls to pywbem using the ``Iter...``
 operations so that either pull operations or traditional operation can be used
-simply by changing a pywbemcli input parameter (``--use-pull-ops``).
+simply by changing a pywbemcli input parameter (``--use-pull``).
 
 Two options on the command line allow the user to either force the use of pull
 operations, of traditional operations, or to let pywbem try them both.
 
-The input parameter ``--use-pull-ops`` allows the choice of pull or traditional
+The input parameter ``--use_pull`` allows the choice of pull or traditional
 operations with the default being to allow pywbem to decide.  The input
 parameter ``max_object_cnt`` sets the ``MaxObjectCount`` variable on the operation
 request if the pull operations are to be used which tells the WBEM server to
 limit the size of the response.  For example::
 
-    pywbemcli --server http/localhost use-pull-ops=yes max_object_cnt=10
+    pywbemcli --server http/localhost use_pull=yes max_object_cnt=10
 
 would force the use of the pull operations and return an error if the target
 server did not implement them and would set the ``MaxObjectCount`` parameter on the
 api to 10, telling the server that a maximum of 10 objects can be returned for
 each of the requests in an enumeration sequence.
 
-Since the default for use-pull-ops is ``either``, normally pywbem first tries
+Since the default for use_pull is ``either``, normally pywbem first tries
 the pull operation and then if that fails, the traditional operation.  That
-is probably the most logical setting for ``use-pull-ops`` unless you are
+is probably the most logical setting for ``use_pull`` unless you are
 specifically testing the use of pull operations.
 
 
@@ -142,7 +142,7 @@ ReferenceNames(class)              class references CLASSNAME --name_only
 InvokeMethod                       instance invokemethod INSTANCENAME --name_only
 ReferenceNames                     class invokemethod CLASSNAME --name_only
 ExecQuery                          instance query
-**Pull Operations:**               Option --use-pull-ops ``either`` or ``yes``
+**Pull Operations:**               Option --use_pull ``either`` or ``yes``
 OpenEnumerateInstances             instance enumerate INSTANCENAME
 OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
 OpenAssociatorInstances            instance associators INSTANCENAME
@@ -899,11 +899,13 @@ options for pywbemcli. The data includes:
   (required).
 * **user** the user name for the connection (optional).
 * **password** the password for the connection (optional).
-* **noverify** the boolean value of the certificate noverify option.  The
-  default is False.
+* **no-verify** a boolean flag option that, if set causes the pywbem client not
+  to verify any certificate received from the WBEM server certificate. Otherwise
+  the ssh client software verifies the validity of the server certificate
+  received from the WBEM server during connection setup.
 * **certfile** optional server certificate filename.
 * **keyfile** optional client private keyfile filename.
-* **use_pull_ops** optional parameter that defines whether pull operations are
+* **use_pull** optional parameter that defines whether pull operations are
   to be required, used if they exist or not used.
 * **pull_max_cnt** optional count of object per pull operation.
 * **timeout** optional timeout value.
@@ -1019,7 +1021,7 @@ The subcommands include:
       Noverify: False
       Certfile: None
       Keyfile: None
-      use-pull-ops: either
+      use_pull: either
       pull-max-cnt: 1000
       mock: tests/unit/simple_assoc_mock_model.mof
       log: None

@@ -211,7 +211,10 @@ class CLITestsBase(object):
             cmd_line.extend(local_args)
 
         if verbose:
-            print('\nCMDLINE %s' % cmd_line)
+            print('\nCMDLINE: %s' % cmd_line)
+
+        if verbose and env:
+            print('ENV: %s' % env)
 
         rc, stdout, stderr = execute_pywbemcli(cmd_line, env=env, stdin=stdin)
 

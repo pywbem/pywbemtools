@@ -86,17 +86,17 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       operation in seconds.
                                       (EnvVar:
                                       PYWBEMCLI_PYWBEMCLI_TIMEOUT)
-      -N, --noverify                  If set, client does not verify WBEM server
-                                      certificate.(EnvVar: PYWBEMCLI_NOVERIFY).
-      -c, --certfile TEXT             Server certfile. Ignored if --noverify flag
+      -N, --no-verify                 If set, client does not verify WBEM server
+                                      certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
+      -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
                                       set. (EnvVar: PYWBEMCLI_CERTFILE).
       -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                       PYWBEMCLI_KEYFILE).
       --ca-certs TEXT                 File or directory containing certificates
                                       that will be matched against certificate
-                                      received from WBEM server. Set --no-verify-
-                                      cert option to bypass client verification of
-                                      the WBEM server certificate.  (EnvVar:
+                                      received from WBEM server. Set --no-verify
+                                      option to bypass client verification of the
+                                      WBEM server certificate.  (EnvVar:
                                       PYWBEMCLI_CA_CERTS).
                                       [Default: Searches for
                                       matching certificates in the following
@@ -115,8 +115,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       Object: [mof|xml|repr|txt]
                                       [Default:
                                       "simple"]
-      -U, --use-pull-ops [yes|no|either]
-                                      Determines whether pull operations are used
+      -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for EnumerateInstances, AssociatorInstances,
                                       ReferenceInstances, and ExecQuery
                                       operations.
@@ -128,7 +127,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       pull operations.
                                       * "either": pywbemcli trys
                                       first pull and then  traditional operations.
-                                      (EnvVar: PYWBEMCLI_USE_PULL_OPS) [Default:
+                                      (EnvVar: PYWBEMCLI_USE_PULL) [Default:
                                       either]
       --pull-max-cnt INTEGER          Maximium object count of objects to be
                                       returned for each request if pull operations
@@ -692,13 +691,12 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       option.
       -t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in
                                       seconds. Default: 30
-      -N, --noverify                  If set, client does not verify server
+      -N, --no-verify                 If set, client does not verify server
                                       certificate.
-      -c, --certfile TEXT             Server certfile. Ignored if noverify flag
+      -c, --certfile TEXT             Server certfile. Ignored if no-verify flag
                                       set.
       -k, --keyfile TEXT              Client private key file.
-      -U, --use-pull-ops [yes|no|either]
-                                      Determines whether pull operations are used
+      -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for EnumerateInstances, AssociatorInstances,
                                       ReferenceInstances, and ExecQuery
                                       operations.
@@ -1247,12 +1245,11 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -l, --local-only                Show only local properties of the instances.
                                       This subcommand may use either pull or
                                       traditional operations depending on the
-                                      server and the --use-pull-ops general
-                                      option. If pull operations are used, this
-                                      parameters will not be included, even if
-                                      specified. If traditional operations are
-                                      used, some servers do not process the
-                                      parameter.
+                                      server and the --use-pull general option. If
+                                      pull operations are used, this parameters
+                                      will not be included, even if specified. If
+                                      traditional operations are used, some
+                                      servers do not process the parameter.
       -d, --deep-inheritance          If set, requests server to return properties
                                       in subclasses of the target instances class.
                                       If option not specified only properties from

@@ -107,17 +107,17 @@ Options:
                                   operation in seconds.
                                   (EnvVar:
                                   PYWBEMCLI_PYWBEMCLI_TIMEOUT)
-  -N, --noverify                  If set, client does not verify WBEM server
-                                  certificate.(EnvVar: PYWBEMCLI_NOVERIFY).
-  -c, --certfile TEXT             Server certfile. Ignored if --noverify flag
+  -N, --no-verify                 If set, client does not verify WBEM server
+                                  certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
+  -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
                                   set. (EnvVar: PYWBEMCLI_CERTFILE).
   -k, --keyfile FILE PATH         Client private key file. (EnvVar:
                                   PYWBEMCLI_KEYFILE).
   --ca-certs TEXT                 File or directory containing certificates
                                   that will be matched against certificate
-                                  received from WBEM server. Set --no-verify-
-                                  cert option to bypass client verification of
-                                  the WBEM server certificate.  (EnvVar:
+                                  received from WBEM server. Set --no-verify
+                                  option to bypass client verification of the
+                                  WBEM server certificate.  (EnvVar:
                                   PYWBEMCLI_CA_CERTS).
                                   [Default: Searches for
                                   matching certificates in the following
@@ -136,8 +136,7 @@ Options:
                                   Object: [mof|xml|repr|txt]
                                   [Default:
                                   "simple"]
-  -U, --use-pull-ops [yes|no|either]
-                                  Determines whether pull operations are used
+  -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                   for EnumerateInstances, AssociatorInstances,
                                   ReferenceInstances, and ExecQuery
                                   operations.
@@ -149,7 +148,7 @@ Options:
                                   pull operations.
                                   * "either": pywbemcli trys
                                   first pull and then  traditional operations.
-                                  (EnvVar: PYWBEMCLI_USE_PULL_OPS) [Default:
+                                  (EnvVar: PYWBEMCLI_USE_PULL) [Default:
                                   either]
   --pull-max-cnt INTEGER          Maximium object count of objects to be
                                   returned for each request if pull operations
@@ -239,37 +238,37 @@ TEST_CASES = [
      None, OK],
 
     ['Verify valid pull_ops parameter yes.',
-     {'global': ['-s', 'http://blah', '--use-pull-ops', 'yes'],
+     {'global': ['-s', 'http://blah', '--use-pull', 'yes'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['use-pull-ops: True'],
+     {'stdout': ['use-pull: True'],
       'rc': 0,
       'test': 'in'},
      None, OK],
 
     ['Verify valid pull_ops parameter no.',
-     {'global': ['-s', 'http://blah', '--use-pull-ops', 'no'],
+     {'global': ['-s', 'http://blah', '--use-pull', 'no'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['use-pull-ops: False'],
+     {'stdout': ['use-pull: False'],
       'rc': 0,
       'test': 'in'},
      None, OK],
 
-    ['Verify valid --use-pull_ops parameter.',
-     {'global': ['-s', 'http://blah', '--use-pull-ops', 'either'],
+    ['Verify valid --use-pull parameter.',
+     {'global': ['-s', 'http://blah', '--use-pull', 'either'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['use-pull-ops: None'],
+     {'stdout': ['use-pull: None'],
       'rc': 0,
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid --use-pull-ops parameter fails.',
-     {'global': ['-s', 'http://blah', '--use-pull-ops', 'blah'],
+    ['Verify invalid --use-pull parameter fails.',
+     {'global': ['-s', 'http://blah', '--use-pull', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stderr': ['Invalid value for "-U" / "--use-pull-ops": invalid choice: '
+     {'stderr': ['Invalid value for "-U" / "--use-pull": invalid choice: '
                  'blah. (choose from yes, no, either)'],
       'rc': 2,
       'test': 'in'},
@@ -308,11 +307,11 @@ TEST_CASES = [
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['Name: default',
-                 'WBEMServer uri: None',
-                 'mock:',
+     {'stdout': ['name: default',
+                 'server: None',
+                 'mock-server:',
                  'simple_mock_model.mof',
-                 'Default-namespace: root/cimv2'],
+                 'default-namespace: root/cimv2'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -322,14 +321,14 @@ TEST_CASES = [
                  '-m', PYTHON_MOCK_FILE_PATH],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['Name: default',
-                 'WBEMServer uri: None',
-                 'mock: ',
-                 r'simple_mock_model\.mof',
-                 r'simple_python_mock_script\.py',
-                 'Default-namespace: root/cimv2'],
+     {'stdout': ['name', 'default',
+                 'server', 'None',
+                 'mock-server',
+                 'simple_mock_model.mof',
+                 'simple_python_mock_script.py',
+                 'default-namespace: root/cimv2'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify --mock option, file does not exist',
@@ -461,7 +460,7 @@ TEST_CASES = [
     ['Verify uses pull Operation  with option either',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                  '--timestats',
-                 '--use-pull-ops', 'either'],
+                 '--use-pull', 'either'],
       'subcmd': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
@@ -474,7 +473,7 @@ TEST_CASES = [
     ['Verify uses pull Operation with option yes',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                  '--timestats',
-                 '--use-pull-ops', 'yes'],
+                 '--use-pull', 'yes'],
       'subcmd': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
@@ -487,7 +486,7 @@ TEST_CASES = [
     ['Verify uses pull Operation with option no',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                  '--timestats',
-                 '--use-pull-ops', 'no'],
+                 '--use-pull', 'no'],
       'subcmd': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
@@ -521,11 +520,11 @@ TEST_CASES = [
                '--name', 'globaltest1',
                '--server', 'http://blah',
                '--timeout', '45',
-               '--use-pull-ops', 'no',
+               '--use-pull', 'no',
                '--default-namespace', 'root/blah',
                '--user', 'john',
                '--password', 'pw',
-               '--noverify',
+               '--no-verify',
                '--certfile', 'mycertfile.pem',
                '--keyfile', 'mykeyfile.pem'],
       'subcmd': 'connection', },
@@ -564,6 +563,88 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+    #
+    # Test environment variables
+    #
+    ['Verify setting one env vars for input.',
+     {'env': {'PYWBEMCLI_SERVER': 'http://blah'},
+      'subcmd': 'connection',
+      'args': 'show'},
+     {'stdout': ['name', 'default',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/cimv2',
+                 'user', 'None',
+                 'password', 'None',
+                 'timeout', '30',
+                 'no-verify', 'False',
+                 'certfile', 'None',
+                 'keyfile', 'None',
+                 'use-pull', 'either',
+                 'pull-max-cnt', '1000',
+                 'mock-server',
+                 'log', 'None'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify setting all env vars for input.',
+     {'env': {'PYWBEMCLI_SERVER': 'http://blah',
+              'PYWBEMCLI_DEFAULT_NAMESPACE': 'fred/fred',
+              'PYWBEMCLI_USER': 'RonaldMcDonald',
+              'PYWBEMCLI_PASSWORD': 'abcxdfG',
+              'PYWBEMCLI_TIMEOUT': '99',
+              'PYWBEMCLI_NO_VERIFY': 'True',
+              'PYWBEMCLI_CERTFILE': 'certfile.pem',
+              'PYWBEMCLI_KEYFILE': 'keyfile.pem',
+              'PYWBEMCLI_USE_PULL': 'no',
+              'PYWBEMCLI_PULL_MAX_CNT': '10',
+              'PYWBEMCLI_LOG': 'api=all', },
+      'subcmd': 'connection',
+      'args': 'show'},
+     {'stdout': ['name', 'default',
+                 'server', 'http://blah',
+                 'default-namespace', 'fred/fred',
+                 'user', 'RonaldMcDonald',
+                 'password', 'abcxdfG',
+                 'timeout', '99',
+                 'no-verify', 'True',
+                 'certfile', 'certfile.pem',
+                 'keyfile', 'keyfile.pem',
+                 'use-pull', 'no',
+                 'pull-max-cnt', '10',
+                 'log', 'api=all'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['erify mixed env var and input options.',
+     {'env': {'PYWBEMCLI_DEFAULT_NAMESPACE': 'fred/fred',
+              'PYWBEMCLI_USER': 'RonaldMcDonald',
+              'PYWBEMCLI_PASSWORD': 'abcxdfG',
+              'PYWBEMCLI_TIMEOUT': '99',
+              'PYWBEMCLI_NO_VERIFY': 'True',
+              'PYWBEMCLI_CERTFILE': 'certfile.pem',
+              'PYWBEMCLI_KEYFILE': 'keyfile.pem',
+              'PYWBEMCLI_USE_PULL': 'no',
+              'PYWBEMCLI_PULL_MAX_CNT': '10',
+              'PYWBEMCLI_LOG': 'api=all', },
+      'subcmd': 'connection',
+      'global': ['--server', 'http://blah'],
+      'args': 'show'},
+     {'stdout': ['server', 'http://blah',
+                 'default-namespace', 'fred/fred',
+                 'user', 'RonaldMcDonald',
+                 'password', 'abcxdfG',
+                 'timeout', '99',
+                 'no-verify', 'True',
+                 'certfile', 'certfile.pem',
+                 'keyfile', 'keyfile.pem',
+                 'use-pull', 'False',
+                 'pull-max-cnt', '10',
+                 'log', 'api=all'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
 ]
 
 # TODO add test for pull operations with pull ops max size variations

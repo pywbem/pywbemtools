@@ -76,7 +76,7 @@ localonlyenum_option = [              # pylint: disable=invalid-name
                  help='Show only local properties of the instances. This '
                       'subcommand may use either pull or traditional '
                       'operations depending on the server and the '
-                      '--use-pull-ops general option. If pull operations '
+                      '--use-pull general option. If pull operations '
                       'are used, this parameters will not be included, even if '
                       'specified. If traditional operations are used, some '
                       'servers do not process the parameter.')]
@@ -737,9 +737,9 @@ def cmd_instance_enumerate(context, classname, options):
     except ValueError as ve:
         raise click.ClickException('instance enumerate failed because '
                                    'FilterQuery not allowed with traditional '
-                                   'EnumerateInstance. use_pull_ops: '
+                                   'EnumerateInstance. --use-pull: '
                                    '%s. Exception: %s: %s' %
-                                   (context.use_pull_ops,
+                                   (context.use_pull,
                                     ve.__class__.__name__, ve))
 
 
@@ -784,9 +784,9 @@ def cmd_instance_references(context, instancename, options):
     except ValueError as ve:
         raise click.ClickException('instance references failed because '
                                    'FilterQuery not allowed with traditional '
-                                   'References. use_pull_ops: '
+                                   'References. --use-pull: '
                                    '%s. Exception: %s: %s' %
-                                   (context.use_pull_ops,
+                                   (context.use_pull,
                                     ve.__class__.__name__, ve))
 
 
@@ -832,9 +832,9 @@ def cmd_instance_associators(context, instancename, options):
     except ValueError as ve:
         raise click.ClickException('instance associators failed because '
                                    'FilterQuery not allowed with traditional '
-                                   'Associators. use_pull_ops: '
+                                   'Associators. --use-pull: '
                                    '%s. Exception: %s: %s' %
-                                   (context.use_pull_ops,
+                                   (context.use_pull,
                                     ve.__class__.__name__, ve))
 
 

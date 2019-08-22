@@ -80,7 +80,7 @@ Options:
   -l, --local-only                Show only local properties of the instances.
                                   This subcommand may use either pull or
                                   traditional operations depending on the
-                                  server and the --use-pull-ops general
+                                  server and the --use-pull general
                                   option. If pull operations are used, this
                                   parameters will not be included, even if
                                   specified. If traditional operations are
@@ -735,17 +735,17 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate CIM_Foo include-qualifiers and '
-     ' --use-pull-ops no',
+     ' --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stdout': ENUM_INST_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo with --use-pull-ops yes and '
+    ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
      '--pull_max_cnt=2',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '2', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(pull_inst_result_tuple\(context='
                  'None, eos=True,',
@@ -754,10 +754,10 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo with --use-pull-ops yes and '
+    ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
      '--pull_max_cnt=2 and --namesonly',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '2', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(pull_path_result_tuple\(context='
                  'None, eos=True,',
@@ -845,7 +845,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate with query, traditional ops fails',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stderr': ["ValueError",
                  "EnumerateInstances does not support FilterQuery"],
       'rc': 1,
@@ -958,7 +958,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand enumerate fails using traditional op',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stderr':
       ['ValueError', 'EnumerateInstances does not support FilterQuery'],
       'rc': 1,
@@ -1034,9 +1034,9 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with instancename --include-qualifiers '
-     'and general --use-pull-ops returns data',
+     'and general --use-pull returns data',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -1593,10 +1593,10 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references CIM_Foo with --use-pull-ops yes '
+    ['Verify instance subcommand references CIM_Foo with --use-pull yes '
      'and --pull_max_cnt=1',
      {'args': ['references', 'TST_Person.name="Mike"'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
                  r'OpenReferenceInstances\(pull_inst_result_tuple\('
@@ -1606,10 +1606,10 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand reference paths CIM_Foo with --use-pull-ops '
+    ['Verify instance subcommand reference paths CIM_Foo with --use-pull '
      'yes and --pull_max_cnt=1 and --names_only',
      {'args': ['references', 'TST_Person.name="Mike"', '--names-only'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
                  r'OpenReferenceInstancePaths\(pull_path_result_tuple\('
@@ -1681,9 +1681,9 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references include-qualifiers and '
-     ' --use-pull-ops no',
+     ' --use-pull no',
      {'args': ['references', 'TST_Person.name="Mike"', '--include-qualifiers'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
@@ -1744,7 +1744,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand references with query, traditional ops fails',
      {'args': ['references', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stderr': ["ValueError:",
                  "References does not support FilterQuery"],
       'rc': 1,
@@ -1778,7 +1778,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators, --include-qualifiers wo pull',
-     {'global': ['--use-pull-ops', 'no'],
+     {'global': ['--use-pull', 'no'],
       'args': ['associators', 'TST_Person.name="Mike"',
                '--include-qualifiers']},
      {'stdout': ASSOC_INSTS,
@@ -1795,10 +1795,10 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators CIM_Foo with --use-pull-ops yes '
+    ['Verify instance subcommand associators CIM_Foo with --use-pull yes '
      'and --pull_max_cnt=1',
      {'args': ['associators', 'TST_Person.name="Mike"'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
                  r'OpenAssociatorInstances\(pull_inst_result_tuple\('
@@ -1807,10 +1807,10 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associator paths CIM_Foo with --use-pull-ops '
+    ['Verify instance subcommand associator paths CIM_Foo with --use-pull '
      'yes and --pull_max_cnt=1 and --names_only',
      {'args': ['associators', 'TST_Person.name="Mike"', '--names-only'],
-      'global': ['--use-pull-ops', 'yes', '--pull-max-cnt', '1', '--log',
+      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
                  r'OpenAssociatorInstancePaths\(pull_path_result_tuple\('
@@ -1856,7 +1856,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand associators with query, traditional ops',
      {'args': ['associators', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
-      'global': ['--use-pull-ops', 'no']},
+      'global': ['--use-pull', 'no']},
      {'stderr': ["ValueError:",
                  "Associators does not support FilterQuery"],
       'rc': 1,
