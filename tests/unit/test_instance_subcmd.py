@@ -247,17 +247,6 @@ ENUM_INSTANCE_TABLE_RESP = """Instances: CIM_Foo
 +--------------+---------------+
 """
 
-ENUM_INSTNAME_TABLE_RESP = """InstanceNames: CIM_Foo
-+--------+-------------+----------------------------------------+
-| host   | namespace   | keybindings                            |
-+========+=============+========================================+
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo1'}) |
-+--------+-------------+----------------------------------------+
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo2'}) |
-+--------+-------------+----------------------------------------+
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo3'}) |
-+--------+-------------+----------------------------------------+
-"""
 
 ENUM_INSTANCE_GET_TABLE_RESP = """Instances: CIM_Foo
 InstanceID      IntegerProp
@@ -435,7 +424,17 @@ TEST_CASES = [
     ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
      {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
       'global': ['--output-format', 'grid']},
-     {'stdout': ENUM_INSTNAME_TABLE_RESP,
+     {'stdout': """InstanceNames: CIM_Foo
++--------+-------------+---------+-----------------------+
+| host   | namespace   | class   | keysbindings          |
++========+=============+=========+=======================+
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo1" |
++--------+-------------+---------+-----------------------+
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo2" |
++--------+-------------+---------+-----------------------+
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo3" |
++--------+-------------+---------+-----------------------+
+""",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -499,17 +498,18 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify subcommand enumerate with CIM_Foo summary table output',
+    ['Verify subcommand enumerate with CIM_Foo inst name table output',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'global': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
-+--------+-------------+----------------------------------------+
-| host   | namespace   | keybindings                            |
-|--------+-------------+----------------------------------------|
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo1'}) |
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo2'}) |
-|        | root/cimv2  | NocaseDict({'InstanceID': 'CIM_Foo3'}) |
-+--------+-------------+----------------------------------------+
++--------+-------------+---------+-----------------------+
+| host   | namespace   | class   | keysbindings          |
+|--------+-------------+---------+-----------------------|
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo1" |
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo2" |
+|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo3" |
++--------+-------------+---------+-----------------------+
+
 """,
       'rc': 0,
       'test': 'linesnows'},

@@ -33,14 +33,15 @@ except ImportError:
     from ordereddict import OrderedDict  # pylint: disable=import-error
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
-    CIMQualifierDeclaration, CIMInstanceName, Uint32, Uint64, Sint32, \
+    CIMQualifierDeclaration, CIMInstanceName, Uint8, Uint32, Uint64, Sint32, \
     CIMDateTime, CIMClassName
+from pywbem._nocasedict import NocaseDict
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
-    verify_operation, split_str_w_esc
+    verify_operation, split_str_w_esc, format_keys
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
@@ -89,6 +90,116 @@ def test_is_classname(testcase, name, exp_rtn):
     # The code to be tested
 
     act_rtn = is_classname(name)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_FORMAT_KEYBINDINGS = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * kb: keybinding
+    #   * width - integer representing width of resulting field
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify simple keybinding',
+     dict(kb=NocaseDict([('kEY1', u'Ham')]),
+          width=100,
+          exp_rtn='kEY1="Ham"'),
+     None, None, True),
+
+    ('Verify multiple keys keybinding',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          width=100,
+          exp_rtn='kEY1="Ham",key2=3'),
+     None, None, True),
+
+    ('Verify multiple keys binding with spaces in keys',
+     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+          width=100,
+          exp_rtn='kEY1="Ham and eggs",key2="More eggs"'),
+     None, None, True),
+
+    ('Verify multiple keys binding multiple key types',
+     dict(kb=NocaseDict([('Name', 'Foo'),
+                         ('Number', Uint8(42)),
+                         ('Boolean', False),
+                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+          width=100,
+          exp_rtn='Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
+     None, None, True),
+
+    ('Verify mutliple keys that fold into multiple lines',
+     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+          width=14,
+          exp_rtn='kEY1="Ham"\nkey2=3'),
+     None, None, True),
+
+    ('Verify multiple keys binding with spaces in keys that fold',
+     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+          width=25,
+          exp_rtn='kEY1="Ham and eggs"\nkey2="More eggs"'),
+     None, None, True),
+
+    ('Verify multiple keys binding with many keys keys without fold',
+     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+          width=100,
+          exp_rtn=('k1=1,k2=2,k3=3,k4=4,k5=5,k6=6,k7=7,k8=8')),
+     None, None, True),
+
+    ('Verify multiple keys binding with many keys every key folds',
+     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+          width=3,
+          exp_rtn=('k1=1\nk2=2\nk3=3\nk4=4\nk5=5\nk6=6\nk7=7\nk8=8')),
+     None, None, True),
+
+
+    ('Verify multiple keys binding with many keys keys some fold',
+     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+          width=8,
+          exp_rtn=('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')),
+     None, None, False),
+
+    ('Verify multiple keys binding with spaces in keys',
+     dict(kb=NocaseDict([('Name', 'Foo'),
+                         ('Number', Uint8(42)),
+                         ('Boolean', False),
+                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+          width=4,
+          exp_rtn='Name="Foo"\nNumber=42\nBoolean=FALSE\nRef="/:CIM_Bar"'),
+     None, None, True),
+
+    # Test no keys
+    ('Verify no keys',
+     dict(kb=NocaseDict(),
+          width=100,
+          exp_rtn=''),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_FORMAT_KEYBINDINGS)
+@simplified_test_function
+def test_format_keybindings(testcase, kb, width, exp_rtn):
+    """Test for resolve_propertylist function"""
+    # The code to be tested
+
+    kbs = CIMInstanceName('blah', kb)
+    act_rtn = format_keys(kbs, width)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions

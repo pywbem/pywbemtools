@@ -602,7 +602,7 @@ def split_array_value(string, delimiter):
     return rslt
 
 
-def split_str_w_esc(str, delimiter, escape='\\'):
+def split_str_w_esc(str_, delimiter, escape='\\'):
     """
     Split string based on delimiter defined in call and the escape character \\
     To escape use of the delimiter in the strings. Delimiter may be multi
@@ -611,7 +611,7 @@ def split_str_w_esc(str, delimiter, escape='\\'):
     """
     ret = []
     current_element = []
-    iterator = iter(str)
+    iterator = iter(str_)
     for ch in iterator:
         if ch == escape:
             try:
@@ -895,6 +895,49 @@ def _print_classes_as_table(classes, table_width, table_format):
         click.echo(class_.tomof())
 
 
+def format_keys(obj, max_width):
+    """
+    Format the keys of a dictionary of keybindings as text for display. Formats
+    multiple keybindings on each line within the max_width
+    """
+    def get_wbemurikeys(obj):
+        """
+        Create wbem_uri from CIMInstanceName and separate out key component
+        for return.
+        """
+        wbem_uri = obj.to_wbem_uri()
+        wbem_uri_keys = wbem_uri[wbem_uri.find('.'):]
+        wbem_uri_keys = wbem_uri_keys[1:]
+        return wbem_uri_keys
+
+    assert isinstance(obj, CIMInstanceName)
+    # clear the host and namespace
+    myobj = obj.copy()
+    myobj.host = None
+    myobj.namespace = None
+    wbem_uri_keys = get_wbemurikeys(myobj)
+
+    # Too long for width. Fold the keys on multiple lines
+    if len(wbem_uri_keys) > max_width:
+        wbem_uri_keys = ''
+        line_len = 0
+        for key, value in myobj.keybindings.items():
+            one_key_obj = get_wbemurikeys((CIMInstanceName('x', {key: value})))
+            if wbem_uri_keys:
+                if line_len + len(one_key_obj) > max_width:
+                    wbem_uri_keys += '\n%s' % one_key_obj
+                    line_len = 0
+                else:
+                    wbem_uri_keys += ',%s' % one_key_obj
+                    line_len += len(one_key_obj) + 1
+
+            else:  # must put on first line even if too long
+                wbem_uri_keys += one_key_obj
+                line_len = len(one_key_obj) + 1
+
+    return wbem_uri_keys
+
+
 def _print_paths_as_table(objects, table_width, table_format):
     # pylint: disable=unused-argument
     """
@@ -905,10 +948,29 @@ def _print_paths_as_table(objects, table_width, table_format):
         if isinstance(objects[0], six.string_types):
             headers = ('path')
             rows = [obj for obj in objects]
-        elif isinstance(objects[0], (CIMInstanceName, CIMClassName)):
-            headers = ('host', 'namespace', 'keybindings')
-            rows = [[obj.host, obj.namespace, obj.keybindings]
-                    for obj in objects]
+        elif isinstance(objects[0], CIMClassName):
+            headers = ('host', 'namespace', 'class')
+            rows = [[obj.host, obj.namespace, obj.classname] for obj in objects]
+
+        elif isinstance(objects[0], CIMInstanceName):
+            host_hdr = 'host'
+            ns_hdr = 'namespace'
+            class_hdr = 'class'
+            host_hdr_len = len(host_hdr) + 4
+            ns_hdr_len = len(ns_hdr) + 3
+            class_hdr_len = len(class_hdr) + 3
+            headers = (host_hdr, ns_hdr, class_hdr, 'keysbindings')
+
+            host_lens = [len(obj.host) for obj in objects if obj.host]
+            host_max = max(host_lens) if host_lens else host_hdr_len
+            ns_lens = [len(obj.namespace) for obj in objects if obj.namespace]
+            ns_max = max(ns_lens) if ns_lens else ns_hdr_len
+            class_lens = [len(obj.classname) for obj in objects]
+            class_max = max(class_lens) if class_lens else class_hdr_len
+
+            max_key_len = (table_width) - (host_max + ns_max + class_max + 3)
+            rows = [[obj.host, obj.namespace, obj.classname,
+                     format_keys(obj, max_key_len)] for obj in objects]
         else:
             raise click.ClickException("{0} invalid type ({1})for path display".
                                        format(objects[0], type(objects[0])))
