@@ -29,7 +29,7 @@ Servers. The tools are written in pure Python and support Python 2 and Python
 3.
 
 Pywbemtools provides a command line tool (pywbemcli) that uses the pywbem
-Python WBEM client infrastructure to issue operations to a WBEM server using
+package to issue operations to a WBEM server using
 the WBEM standards defined by the DMTF to perform system management tasks.
 
 WBEM standards are used for a wide variety of systems management tasks
@@ -77,7 +77,7 @@ platforms. It provides functionality to:
 Supported environments
 ----------------------
 
-.. _pywbem documentation: https://pywbem.readthedocs.io/en/stable/intro.html#wbem-servers
+.. _pywbem WBEM servers documentation: https://pywbem.readthedocs.io/en/stable/intro.html#wbem-servers
 
 The pywbemtools package is supported in these environments:
 
@@ -87,7 +87,7 @@ The pywbemtools package is supported in these environments:
 * WBEM servers: Any WBEM server that conforms to the DMTF specifications listed
   in :ref:`Standards conformance`. WBEM servers supporting older versions of
   these standards are also supported, but may have limitations.
-  See the `pywbem documentation` for more details.
+  See the `pywbem WBEM servers documentation`_ for more details.
 
 .. _`Installation`:
 
@@ -98,10 +98,8 @@ Installation
 .. _PyPI: http://pypi.python.org/
 
 
-This section describes the complete of pywbemtools with all steps including
-prerequisite operating system packages and manual post-processing steps. You
-can import the pywbemtools Python package into your environment so that
-pywbemcli can be executed from the command line.
+This section describes the complete installation of pywbemtools with all steps
+including prerequisite operating system packages.
 
 The easiest way to install the pywbemtools package is using pip. Pip ensures
 that any dependent Python packages also get installed.
@@ -155,7 +153,7 @@ Other installation support packages:
       added with Cygwin package update.
     - python-devel - Probably named python2-devel / python3-devel
 
-Pywbemtools installs the``pywbem`` package which has a number of
+Pywbemtools installs the pywbem package which has a number of
 prerequisites for installation as documented in the `pywbem installation
 documentation`_. These requirements should be covered by the list above.
 
@@ -165,15 +163,12 @@ documentation`_. These requirements should be covered by the list above.
 Installation with pip
 """""""""""""""""""""
 
-The following command installs the latest released version of the pywbemtools
-package from `PyPI`_ into the currently active Python environment:
+The following command downloads and installs the latest released version of the
+pywbemtools package from `PyPI`_ into the currently active Python environment:
 
 .. code-block:: text
 
     $ pip install pywbemtools
-
-This will download and install the latest released version of pywbemtools and
-its dependent packages into your current Python environment.
 
 As an alternative, if you want to install the latest development level of the
 pywbemtools package for some reason, install directly from the ``master``
@@ -181,7 +176,7 @@ branch of the Git repository of the package:
 
 .. code-block:: text
 
-    $ pip install git+https://github.com/pywbem/pywbemtools.git@master
+    $ pip install git+https://github.com/pywbem/pywbemtools.git@master#egg=pywbemtools
 
 
 .. _`Verification of the installation`:
@@ -189,8 +184,8 @@ branch of the Git repository of the package:
 Verification of the installation
 """"""""""""""""""""""""""""""""
 
-You can verify that the pywbemcli package and its dependent packages are
-installed correctly by invoking pywbemcli. Invoking with the --version
+You can verify that the pywbemtools package and its dependent packages are
+installed correctly by invoking pywbemcli. Invoking with the ``--version``
 option displays the installed version of both pywbem and pywbemtools as
 shown in the following example:
 

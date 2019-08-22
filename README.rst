@@ -147,7 +147,7 @@ returns instance names:
     root/cimv2:PyWBEM_Person.Name="Bob",CreationClassName="PyWBEM_Person"
     root/cimv2:PyWBEM_Person.Name="Charlie",CreationClassName="PyWBEM_Person"
 
-Executing the CIM/XML GetInstance operation that requests a single instance
+Executing the CIM-XML GetInstance operation that requests a single instance
 from the WBEM server with the instance name shown in the example:
 
 .. code-block:: text

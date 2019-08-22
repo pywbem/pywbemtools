@@ -16,7 +16,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
 
     Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
-      Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML
+      Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML
       protocol to communicate with WBEM servers. Pywbemcli can:
 
           * Manage the information in WBEM servers CIM objects using the
@@ -33,7 +33,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
           * Maintain a persistent list of named WBEM servers and execute
             operations on them by name.
 
-      Pywbemcli implements command groups and subcommands to execute the CIM/XML
+      Pywbemcli implements command groups and subcommands to execute the CIM-XML
       operations defined by the DMTF CIM Operations Over HTTP
       specification(DSP0201) specification.
 
