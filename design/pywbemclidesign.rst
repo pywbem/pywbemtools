@@ -29,7 +29,7 @@ Goals
     user can make a connection and then explore that connection with multiple
     commands.
   * Script mode (complete command entered from command line)
-* Capable of executing all WBEM CIM/XML operations (with specific exceptions)
+* Capable of executing all WBEM CIM-XML operations (with specific exceptions)
 * Include commands for other operations that will be a real advantage to
   developers, users, etc.
 * Integrated help to minize requirement for external documentation.

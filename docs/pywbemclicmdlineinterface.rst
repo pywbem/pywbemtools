@@ -18,9 +18,8 @@
 Pywbemcli command line interface
 ================================
 
-This section defines the command line interface specifically for the
-pywbemcli module within the pywbemtools package. This tool is a single
-python script executed with the name ``pywbemcli``.
+This section describes the command line interface of the pywbemcli command
+within the pywbemtools package.
 
 Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
@@ -100,8 +99,8 @@ command:
     $ pywbemcli [GENERAL-OPTIONS] repl
     pywbemcli> _
 
-The pywbemcli shell uses the prompt ``pywbemcli> ``, The cursor is shown in
-the examples above as an underscore ``_``.
+The pywbemcli shell uses the prompt "``pywbemcli>``\  ". The cursor is shown in
+the examples above as an underscore (\ ``_``\ ).
 
 General options are specified immediately after ``pywbemcli``; they serve
 as the parameters for the connection to a WBEM server and values for the
@@ -162,7 +161,7 @@ list of the supported commands.
     $ pywbemcli
     pywbemcli> --help
 
-    Pywbemcli is a command line WBEM client that uses the DMTF CIM/XML
+    Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML
     protocol to communicate with WBEM servers. Pywbemcli can:
 
     . . .

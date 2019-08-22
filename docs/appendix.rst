@@ -22,14 +22,14 @@ This documentation uses a few special terms to refer to Python types:
      that pywbem/pywbemcli use to communicate with WBEM servers.
 
    CIM model output formats
-      Several of the output formats defined and available in the ``-o``\``--output-format``
-      general option are specific for the presentation of CIM objects(CIMClass,
-      CIMInstance, CIMParameter, CIMMethod, CIMClassName and CIMInstanceName)
-      This includes the format choices ``MOF``, ``XML``, ``REPR``.
-
+      Several of the output formats defined and available in the
+      ``-o\--output-format`` general option are specific for the presentation
+      of CIM objects(CIMClass, CIMInstance, CIMParameter, CIMMethod,
+      CIMClassName and CIMInstanceName) This includes the format choices
+      ``mof`` , ``xml`` , ``repr`` , and ``txt`` .
    INSTANCENAME
       an argument of several of the command-group ``instance`` subcommands that
-      allows two possible inputs based on another subcommand option(``--interactive``).
+      allows two possible inputs based on another subcommand option( ``--interactive`` ).
 
       When the ``interactive`` option is not set, the INSTANCENAME is a string
       representation of a CIMInstanceName must be formatted as defined by
