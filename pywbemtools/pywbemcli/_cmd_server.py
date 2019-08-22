@@ -31,15 +31,15 @@ from ._common_options import add_options, sort_option
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
 def server_group():
     """
-    Command Group for WBEM server operations.
+    Command group for WBEM servers.
 
-    The server command-group defines commands to inspect and manage core
-    components of the server including namespaces, the interop namespace,
-    profiles, and access to profile central instances.
+    This command group defines commands to inspect and manage core components
+    of a WBEM server including server attributes, namespaces, the Interop
+    namespace, management profiles, and access to profile central instances.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
-    command. These are NOT retained after the command is executed.
+    'server' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
 
@@ -49,7 +49,7 @@ def server_group():
 @click.pass_obj
 def server_namespaces(context, **options):
     """
-    Display the namespaces in the WBEM server.
+    Display the namespaces of the server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
@@ -59,10 +59,7 @@ def server_namespaces(context, **options):
 @click.pass_obj
 def server_interop(context):
     """
-    Display the server interop namespace name.
-
-    Displays the name of the interop namespace defined for the
-    WBEM server.
+    Display the Interop namespace of the server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_interop(context))
@@ -72,10 +69,11 @@ def server_interop(context):
 @click.pass_obj
 def server_brand(context):
     """
-    Display information on the WBEM server.
+    Display the brand of the server.
 
-    Display brand information on the current server if it is available.
-    This is typically the definition of the server implementor.
+    Brand information is defined by the server implementor and may or may
+    not be available. Pywbem attempts to collect the brand information from
+    multiple sources.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_brand(context))
@@ -85,10 +83,9 @@ def server_brand(context):
 @click.pass_obj
 def server_info(context):
     """
-    Display general information on the server.
+    Display information about the server.
 
-    Displays general information on the current server includeing brand,
-    namespaces, etc.
+    The information includes CIM namespaces and server brand.
     """
     context.execute_cmd(lambda: cmd_server_info(context))
 
@@ -103,19 +100,19 @@ def server_info(context):
 @click.pass_obj
 def server_profiles(context, **options):
     """
-    Display registered profiles from the WBEM server.
+    Display management profiles advertized by the server.
 
-    Displays the WBEM management profiles that have been registered for this
-    server.  Within the DMTF and SNIA these are the definition of management
-    functionality supported by the WBEM server.
+    Retrieve the CIM instances representing the WBEM management profiles
+    advertized by the WBEM server, and display information about each profile.
+    WBEM management profiles are defined by DMTF and SNIA and define the
+    management functionality that is available.
 
-    This display may be filtered by the optional organization and profile
-    options that define the organization for each profile (ex. SNIA)
-    and the name of the profile. This will display only the profiles that
-    are registered for the defined organization and/or profile name.
+    The retrieved profiles can be filtered using the --organization and
+    --profile options.
 
-    Profiles are displayed as a table showing the organization, name, and
-    version for each profile.
+    The output is formatted as a table showing the organization, name, and
+    version for each profile. The --output-format option is ignored unless it
+    specifies a table format.
     """
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
@@ -148,24 +145,26 @@ def server_profiles(context, **options):
 @click.pass_obj
 def server_centralinsts(context, **options):
     """
-    Display central instances in the WBEM server.
+    Get central instances of mgmt profiles on the server.
 
-    Displays central instances for management profiles registered in the
-    server. Displays management profiles that adher to to the central
-    class methodology with none of the extra parameters (ex. scoping_class)
+    Retrieve the CIM instances that are central instances of the specified
+    WBEM management profiles, and display these instances. By default, all
+    management profiles advertized on the server are used. The profiles
+    can be filtered by using the --organization and --profile options.
 
-    However, profiles that only use the scoping methodology require extra
-    information that is dependent on the profile itself. These profiles
-    will only be accessed when the correct values of central_class,
-    scoping_class, and scoping path for the particular profile is provided.
+    The central instances are determined using all methodologies defined
+    in DSP1033 V1.1 in the order of GetCentralInstances, central class,
+    and scoping class methodology.
 
-    This display may be filtered by the optional organization and profile
-    name options that define the organization for each profile (ex. SNIA)
-    and the name of the profile. This will display only the profiles that
-    are registered for the defined organization and/or name.
+    Profiles that only use the scoping class methodology require the
+    specification of the --central-class, --scoping-class, and --scoping-path
+    options because additional information is needed to perform the scoping
+    class methodology.
 
-    Profiles are display as a table showing the organization, name, and
-    version for each profile.
+    The retrieved central instances are displayed along with the organization,
+    name, and version of the profile they belong to, formatted as a table.
+    The --output-format general option is ignored unless it specifies a table
+    format.
     """
     context.execute_cmd(lambda: cmd_server_centralinsts(context, options))
 
@@ -176,10 +175,10 @@ def server_connection(context):
     """
     Display connection info used by this server.
 
-    Displays the connection information for the WBEM connection
-    attached to this server.  This includes uri, default namespace, etc.
+    Display the information about the connection used to connect to the
+    WBEM server.
 
-    This is equivalent to the connection show subcommand.
+    This is equivalent to the 'connection show' subcommand.
     """
     context.execute_cmd(lambda: cmd_server_connection(context))
 

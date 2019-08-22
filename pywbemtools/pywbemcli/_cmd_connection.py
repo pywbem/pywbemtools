@@ -42,15 +42,16 @@ from ._context_obj import ContextObj
 @cli.group('connection', options_metavar=CMD_OPTS_TXT)
 def connection_group():
     """
-    Command group to manage WBEM connections.
+    Command group for persistent WBEM connections.
 
-    These command allow viewing and setting persistent connection definitions.
-    The connections are normally defined in the file pywbemcliconnections.json
-    in the current directory.
+    This command group defines commands to manage persistent WBEM connections
+    that have a name. The connections are stored in a connections file named
+    'pywbemcliservers.json' in the current directory. The connection name can
+    be used as a shorthand for the WBEM server via the '--name' general option.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
-    command. These are NOT retained after the command is executed.
+    'connection' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
 
@@ -59,7 +60,7 @@ def connection_group():
 @click.pass_obj
 def connection_export(context):
     """
-    Export  the current connection information.
+    Export the current connection information.
 
     Creates an export statement for each connection variable and outputs
     the statement to the conole.
@@ -75,12 +76,12 @@ def connection_show(context, name):
     """
     Show current or NAME connection information.
 
-    This subcommand displays  all the variables that make up the current
+    This subcommand displays all the variables that make up the current
     WBEM connection if the optional NAME argument is NOT provided. If NAME not
     supplied, a list of connections from the connections definition file
     is presented with a prompt for the user to select a NAME.
 
-    The information on the     connection named is displayed if that name is in
+    The information on the connection named is displayed if that name is in
     the persistent repository.
     """
     context.execute_cmd(lambda: cmd_connection_show(context, name))

@@ -60,11 +60,16 @@ localonly_option = [              # pylint: disable=invalid-name
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
-    Command group to manage CIM classes.
+    Command group for CIM classes.
+
+    This command group defines commands to inspect classes, to invoke
+    methods on classes, and to delete classes.
+
+    Creation and modification of classes is not currently supported.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
-    command. These are NOT retained after the command is executed.
+    'class' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
 
@@ -79,20 +84,22 @@ def class_group():
 @click.pass_obj
 def class_get(context, classname, **options):
     """
-    Get and display a single CIM class.
+    Get a class.
 
-    Get a single CIM class defined by the CLASSNAME argument from the WBEM
-    server and display it. Normally it is retrieved from the default namespace
-    in the server.
+    Get a CIM class (CLASSNAME argument) in a CIM namespace (--namespace
+    option). If no namespace was specified, the default namespace of the
+    connection is used.
 
-    If the class is not found in the WBEM server, the server returns an
-    exception.
+    The --local-only, --include-classorigin, --no-qualifiers, and
+    --propertylist options determine which parts are included in each retrieved
+    class.
 
-    The --include-classorigin, --no-qualifiers, and --propertylist
-    options determine what parts of the class definition are retrieved.
+    In the output, the class will formatted as defined by the --output-format
+    general option.
 
-    Results are formatted as defined by the output format general option.
+    Example:
 
+      pywbemcli -n myconn class get CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 
@@ -107,21 +114,26 @@ def class_get(context, classname, **options):
 @click.pass_obj
 def class_delete(context, classname, **options):
     """
-    Delete a single CIM class.
+    Delete a class.
 
-    Deletes the CIM class defined by CLASSNAME from the WBEM server.
-
-    If the class has instances, the command is refused unless the
-    --force option is used. If --force is used, instances are also
-    deleted.
+    Delete a CIM class (CLASSNAME argument) in a CIM namespace (--namespace
+    option). If no namespace was specified, the default namespace of the
+    connection is used.
 
     If the class has subclasses, the command is rejected.
 
-    WARNING: Removing classes from a WBEM server can cause damage to the
-    server. Use this with caution.  It can impact instance providers and
-    other components in the server.
+    If the class has instances, the command is rejected, unless the --force
+    option was specified, in which case the instances are also deleted.
 
-    Some servers may refuse the operation.
+    WARNING: Deleting classes can cause damage to the server: It can impact
+    instance providers and other components in the server. Use this with
+    command with caution.
+
+    Some servers may refuse the operation altogether.
+
+    Example:
+
+      pywbemcli -n myconn class delete CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_delete(context, classname, options))
 
@@ -136,17 +148,26 @@ def class_delete(context, classname, **options):
 @click.pass_obj
 def class_invokemethod(context, classname, methodname, **options):
     """
-    Invoke the class method named methodname.
+    Invoke a method on a class.
 
-    This invokes the method named METHODNAME on the class named CLASSNAME.
+    Invoke a static CIM method (METHODNAME argument) on a CIM class (CLASSNAME
+    argument) in a CIM namespace (--namespace option), and display the method
+    return value and output parameters. If no namespace was specified, the
+    default namespace of the connection is used.
 
-    This is the class level invokemethod and uses only the class name on the
-    invoke.The subcommand `instance invokemethod` invokes methods based on
-    class name.
+    The method input parameters are specified using the --parameter option,
+    which can be specified multiple times.
 
-    Examples:
+    Pywbemcli retrieves the class definition from the server in order to
+    verify that the specified input parameters are consistent with the
+    parameter characteristics in the method definition.
 
-      pywbemcli invokemethod CIM_Foo methodx -p param1=9 -p param2=Fred
+    Use the 'instance invokemethod' command to invoke CIM methods on CIM
+    instances.
+
+    Example:
+
+      pywbemcli -n myconn class invokemethod CIM_Foo methodx -p p1=9 -p p2=Fred
     """
     context.execute_cmd(lambda: cmd_class_invokemethod(context,
                                                        classname,
@@ -166,21 +187,27 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Enumerate classes from the WBEM server.
+    Get the top classes in a namespace or subclasses of a class.
 
-    Enumerates the classes (or classnames) from the WBEM server starting
-    either at the top of the class hierarchy or from  the position in the
-    class hierarchy defined by `CLASSNAME` argument if provided.
+    Enumerate CIM classes starting either at the top of the class hierarchy
+    in the specified CIM namespace (--namespace option), or at the specified
+    class (CLASSNAME argument) in the specified namespace. If no namespace was
+    specified, the default namespace of the connection is used.
 
-    The output format is defined by the output-format general option.
+    The --local-only, --include-classorigin, --no-qualifiers, and
+    --propertylist options determine which parts are included in each retrieved
+    class.
 
-    The --local-only and --no-qualifiers options define optional
-    information to be included in the output.
+    The --deep-inheritance option defines whether or not the complete subclass
+    hierarchy of the classes is retrieved as well.
 
-    The --deep-inheritance option defines whether the complete class hierarchy
-    is retrieved or just the next level in the hierarchy.
+    In the output, the classes will formatted as defined by the --output-format
+    general option.
 
-    Results are formatted as defined by the output format general option.
+    Examples:
+
+      pywbemcli -n myconn class enumerate -n interop
+      pywbemcli -n myconn class enumerate CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
                                                     options))
@@ -208,13 +235,25 @@ def class_enumerate(context, classname, **options):
 @click.pass_obj
 def class_references(context, classname, **options):
     """
-    Get the reference classes for CLASSNAME.
+    Get the classes referencing a class.
 
-    Get the reference classes (or class names) for the CLASSNAME argument
-    filtered by the role and result class options and modified by the
-    other options.
+    List the CIM (association) classes that reference the specified class
+    (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+    (--namespace option). If no namespace was specified, the default namespace
+    of the connection is used.
 
-    Results are displayed as defined by the output format general option.
+    The classes to be retrieved can be filtered by the --role and
+    --result-class options.
+
+    The --include-classorigin, --no-qualifiers, and --propertylist options
+    determine which parts are included in each retrieved class.
+
+    In the output, the classes will formatted as defined by the --output-format
+    general option.
+
+    Examples:
+
+      pywbemcli -n myconn class references CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_references(context, classname,
                                                      options))
@@ -255,13 +294,25 @@ def class_references(context, classname, **options):
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
-    Get the associated classes for CLASSNAME.
+    Get the classes associated with a class.
 
-    Get the classes(or class names) that are associated with the CLASSNAME
-    argument filtered by the --assoc-class, --result-class, --role and
-    --result-role options and modified by the other options.
+    List the CIM classes that are associated with the specified class
+    (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+    (--namespace option). If no namespace was specified, the default namespace
+    of the connection is used.
 
-    Results are formatted as defined by the output format general option.
+    The classes to be retrieved can be filtered by the --role, --result-role,
+    --assoc-class, and --result-class options.
+
+    The --include-classorigin, --no-qualifiers, and --propertylist options
+    determine which parts are included in each retrieved class.
+
+    In the output, the classes will formatted as defined by the --output-format
+    general option.
+
+    Examples:
+
+      pywbemcli -n myconn class associators CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_associators(context, classname,
                                                       options))
@@ -278,28 +329,33 @@ def class_associators(context, classname, **options):
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
-    Find all classes that match CLASSNAME-GLOB.
+    Get the classes with matching class names on the server.
 
-    Find all classes in the namespace(s) of the target WBEM server that
-    match the CLASSNAME-GLOB regular expression argument and return the
-    classnames. The CLASSNAME-GLOB argument is required.
+    Find the CIM classes whose class name matches the specified wildcard
+    expression (CLASSNAME-GLOB argument) in all CIM namespaces of the
+    WBEM server, or in the specified namespace (--namespace option).
 
-    The CLASSNAME-GLOB argument may be either a complete classname or a regular
-    expression that can be matched to one or more classnames. To limit the
-    filter to a single classname, terminate the classname with $.
+    The CLASSNAME-GLOB argument is a wildcard expression that is matched on
+    the class names case insensitively. The special characters known from file
+    nme wildcarding are supported: `*` to match zero or more characters, and
+    `?` to match a single character. In order to not have the shell expand
+    the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-    The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-    is case insensitive and uses the standard GLOB special characters
-    (*(match everything), ?(match single character)).
-    Thus, `pywbem_*` returns all classes that begin with
-    `PyWBEM_`, `pywbem_`, etc. '.*system*' returns classnames that include
-    the case insensitive string `system`.
-
-    The namespace option limits the search to the defined namespaces. Otherwise
-    all namespaces in the target server are searched.
+    For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
+    `pywbem_`, etc. '*system*' returns classes whose names include the case
+    insensitive string `system`.
 
     Output is in table format if table output specified. Otherwise it is in the
     form <namespace>:<classname>
+
+    In the output, the classes will formatted as defined by the --output-format
+    general option if it specifies table output. Otherwise the classes will
+    be in the form `<namespace>:<classname>`.
+
+    Examples:
+
+      pywbemcli -n myconn class find "CIM_*" -n interop
+      pywbemcli -n myconn class find CIM_Foo
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname_glob,
                                                options))
@@ -315,22 +371,32 @@ def class_find(context, classname_glob, **options):
 @click.pass_obj
 def class_tree(context, classname, **options):
     """
-    Display CIM class inheritance hierarchy tree.
+    Get the subclass or superclass inheritance tree of a class.
 
-    Displays a tree of the class hierarchy to show superclasses and subclasses.
+    List the subclass or superclass hierarchy of a CIM class (CLASSNAME
+    argument) or CIM namespace (--namespace option):
 
-    CLASSNAME is an optional argument that defines the starting point for the
-    hierarchy display
+    - If CLASSNAME is omitted, the complete class hierarchy of the specified
+      namespace is retrieved.
 
-    If the --superclasses option is not specified, the hierarchy starting either
-    at the top most classes of the class hierarchy or at the class defined by
-    CLASSNAME is displayed.
+    - If CLASSNAME is specified but not --superclasses, the class and its
+      subclass hierarchy in the specified namespace are retrieved.
 
-    If the --superclasses options is specified and a CLASSNAME is defined
-    the class hierarchy of superclasses leading to CLASSNAME is displayed.
+    - If CLASSNAME and --superclasses are specified, the class and its
+      superclass ancestry up to the top-level class in the specified namespace
+      are retrieved.
 
-    This is a separate subcommand because it is tied specifically to displaying
-    in a tree format.so that the --output-format general option is ignored.
+    If no namespace was specified, the default namespace of the connection is
+    used.
+
+    In the output, the classes will formatted as an ascii tree, and the
+    --output-format general option is ignored.
+
+    Examples:
+
+      pywbemcli -n myconn class tree -n interop
+      pywbemcli -n myconn class tree CIM_Foo -n interop
+      pywbemcli -n myconn class tree CIM_Foo --superclasses -n interop
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
