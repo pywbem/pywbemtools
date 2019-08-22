@@ -112,7 +112,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       pywbemcli documentation.
                                       Choices: Table:
                                       [table|plain|simple|grid|psql|rst|html],
-                                      Object: [mof|xml|txt|tree]
+                                      Object: [mof|xml|repr|txt]
                                       [Default:
                                       "simple"]
       -U, --use-pull-ops [yes|no|either]

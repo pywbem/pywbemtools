@@ -663,6 +663,8 @@ instance of TST_Person {
 
 """
 
+# TODO: Add tests for output format xml, repr, txt
+
 # pylint: enable=line-too-long
 
 OK = True     # mark tests OK when they execute correctly
