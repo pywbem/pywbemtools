@@ -327,11 +327,17 @@ command lists the connections in the connection file, and thethird executes
     $ pywbemcli -m tests/unit/simple_mock_model.mof -N mocksvr1 connection save
     $ pywbemcli connection list
     WBEMServer Connections:
-    +----------+--------------+-------------+--------+------------+-----------+------------+------------+-----------+-------+
-    | name     | server uri   | namespace   | user   | password   |   timeout | noverify   | certfile   | keyfile   | log   |
-    |----------+--------------+-------------+--------+------------+-----------+------------+------------+-----------+-------|
-    | mocksvr1 |              | root/cimv2  |        |            |        30 | False      |            |           |       |
-    +----------+--------------+-------------+--------+------------+-----------+------------+------------+-----------+-------+
+    +--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------+
+    | name         | server uri       | namespace   | user        |   timeout | no-verify   | mock_server                            |
+    |--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------|
+    | mock1        |                  | root/cimv2  |             |           | False       | tests/unit/simple_mock_model.mof       |
+    | mockalltypes |                  | root/cimv2  |             |        30 | False       | tests/unit/all_types.mof               |
+    | mockassoc    |                  | root/cimv2  |             |        30 | False       | tests/unit/simple_assoc_mock_model.mof |
+    | mockext      |                  | root/cimv2  |             |        30 | False       | tests/unit/simple_mock_model_ext.mof   |
+    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False       |                                        |
+    | test3        |                  | root/cimv2  |             |           | False       | tests/unit/simple_mock_model.mof       |
+    |              |                  |             |             |           |             | tests/unit/mock_confirm_y.py           |
+    +--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------+
     $ pywbemcli -N mocksvr1 class enumerate -o
 
     CIM_Foo

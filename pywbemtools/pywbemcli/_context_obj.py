@@ -38,12 +38,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         the information that is common to the multiple click subcommands
     """
     # pylint: disable=unused-argument
-    def __init__(self, pywbem_server, output_format, use_pull_ops,
+    def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, log, verbose):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
-        self._use_pull_ops = use_pull_ops
+        self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
         self._verbose = verbose
         self._timestats = timestats
@@ -53,9 +53,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
     def __repr__(self):
         return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
-               'use_pull_ops=%s, pull_max_cnt=%s, timestats=%s, verbose=%s' % \
+               'use_pull=%s, pull_max_cnt=%s, timestats=%s, verbose=%s' % \
                (id(self), self.pywbem_server, self.output_format,
-                self.use_pull_ops, self.pull_max_cnt, self.timestats,
+                self.use_pull, self.pull_max_cnt, self.timestats,
                 self.verbose)
 
     @property
@@ -75,13 +75,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return self._timestats
 
     @property
-    def use_pull_ops(self):
+    def use_pull(self):
         """
         :term:`string`: Choice of whether pull, traditional or either type
         of operation is to be used for the instance enumerates, references,
         or associator commands.
         """
-        return self._use_pull_ops
+        return self._use_pull
 
     @property
     def pull_max_cnt(self):

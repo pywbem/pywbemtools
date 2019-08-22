@@ -73,9 +73,8 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     else:
         env = copy(env)
 
-    # Unset pywbemcli env variables
-    # if 'PYWBEMCLI_HOST' not in env:
-    #    env['PYWBEMCLI_HOST'] = None
+    # TODO should we consider removing all env variables before each
+    # test???
 
     env['PYTHONPATH'] = '.'  # Use local files
     env['PYTHONWARNINGS'] = ''  # Disable for parsing output
@@ -90,6 +89,11 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
                 del os.environ[name]
         else:
             os.environ[name] = value
+
+    if verbose:
+        display_envvars = '\n'.join(
+            [var for var in os.environ if 'PYWBCLI' in var])
+        print('OS_ENVIRON %s' % display_envvars)
 
     assert isinstance(args, (list, tuple))
     cmd_args = [cli_cmd]
@@ -122,6 +126,9 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
 
     stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
+
+    for name in env:
+        del os.environ[name]
 
     if verbose:
         print('output type %s\nstdout:%r\nstderr:%r' % (type(stdout_str),

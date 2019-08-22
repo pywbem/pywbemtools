@@ -94,10 +94,10 @@ class PywbemServer(object):
     timeout_envvar = 'PYWBEMCLI_TIMEOUT'
     keyfile_envvar = 'PYWBEMCLI_KEYFILE'
     certfile_envvar = 'PYWBEMCLI_CERTFILE'
-    noverify_envvar = 'PYWBEMCLI_NOVERIFY'
+    no_verify_envvar = 'PYWBEMCLI_NO_VERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
-    use_pull_ops_envvar = 'PYWBEMCLI_USE_PULL_OPS'
-    stats_enabled_envvar = 'PYWBEMCLI_STATS_ENABLED'
+    timestats_envvar = 'PYWBEMCLI_TIMESTATS'
+    use_pull_envvar = 'PYWBEMCLI_USE_PULL'
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
     log_envvar = 'PYWBEMCLI_LOG'
@@ -105,8 +105,8 @@ class PywbemServer(object):
     def __init__(self, server_url=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
-                 noverify=True, certfile=None, keyfile=None, ca_certs=None,
-                 use_pull_ops=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
+                 no_verify=True, certfile=None, keyfile=None, ca_certs=None,
+                 use_pull=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
                  stats_enabled=False, verbose=False, mock_server=None,
                  log=None):
         """
@@ -127,7 +127,7 @@ class PywbemServer(object):
         self._user = user
         self._password = password
         self._timeout = timeout
-        self._noverify = noverify
+        self._no_verify = no_verify
         self._certfile = certfile
         self._keyfile = keyfile
         self._ca_certs = ca_certs
@@ -135,7 +135,7 @@ class PywbemServer(object):
         self._verbose = verbose
         self._wbem_server = None
         self._validate_timeout()
-        self._use_pull_ops = use_pull_ops
+        self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
 
         self._wbem_server = None
@@ -146,13 +146,13 @@ class PywbemServer(object):
         return 'PywbemServer(url=%s name=%s)' % (self.server_url, self.name)
 
     def __repr__(self):
-        return 'PywbemServer(url=%s name=%s ns=%s user=%s pw=%s timeout=%s ' \
-               'noverify=%s certfile=%s keyfile=%s ca_certs=%s ' \
-               'use_pull_ops=%s, pull_max_cnt=%s, stats_enabled=%s ' \
-               ' mock_server=%r, log=%r)' % \
+        return 'PywbemServer(server_url=%s name=%s ns=%s user=%s ' \
+               'password=%s timeout=%s no_verify=%s certfile=%s ' \
+               'keyfile=%s ca_certs=%s use_pull=%s, pull_max_cnt=%s, ' \
+               'stats_enabled=%s mock_server=%r, log=%r)' % \
                (self.server_url, self.name, self.default_namespace,
-                self.user, self.password, self.timeout, self.noverify,
-                self.certfile, self.keyfile, self.ca_certs, self.use_pull_ops,
+                self.user, self.password, self.timeout, self.no_verify,
+                self.certfile, self.keyfile, self.ca_certs, self.use_pull,
                 self.pull_max_cnt, self.stats_enabled, self.mock_server,
                 self._log)
 
@@ -173,18 +173,18 @@ class PywbemServer(object):
     @property
     def user(self):
         """
-        :term:`string`: Username on the WBEM Server.
+        :term:`string`: user name on the WBEM Server.
         """
         return self._user
 
     @property
-    def use_pull_ops(self):
+    def use_pull(self):
         """
         :term:`bool`: Flag to define if pull operations are to be used.
         True if pull operations are to be use. False if traditional operations
         and None if the system will decide.
         """
-        return self._use_pull_ops
+        return self._use_pull
 
     @property
     def pull_max_cnt(self):
@@ -222,12 +222,12 @@ class PywbemServer(object):
         return self._timeout
 
     @property
-    def noverify(self):
+    def no_verify(self):
         """
         :term: `bool`: Connection server verfication flag. If True
         server cert not verified during connection.
         """
-        return self._noverify
+        return self._no_verify
 
     @property
     def certfile(self):
@@ -321,18 +321,20 @@ class PywbemServer(object):
             self.password_prompt(ctx)
 
     def to_dict(self):
-        """Create dictionary from instance"""
+        """
+        Create dictionary from instance for persisting the connection
+        """
         dict_ = {"name": self.name,
                  "server_url": self.server_url,
                  "user": self.user,
                  "password": self.password,
                  "default_namespace": self.default_namespace,
                  "timeout": self.timeout,
-                 "noverify": self.noverify,
+                 "no_verify": self.no_verify,
                  "certfile": self.certfile,
                  "keyfile": self.keyfile,
                  "ca_certs": self.ca_certs,
-                 "use_pull_ops": self.use_pull_ops,
+                 "use_pull": self.use_pull,
                  "pull_max_cnt": self.pull_max_cnt,
                  "mock_server": self.mock_server,
                  "log": self.log}
@@ -364,7 +366,7 @@ class PywbemServer(object):
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(
                 default_namespace=self.default_namespace,
-                use_pull_operations=self.use_pull_ops,
+                use_pull_operations=self.use_pull,
                 stats_enabled=self.stats_enabled)
             try:
                 self._wbem_server = WBEMServer(conn)
@@ -401,10 +403,10 @@ class PywbemServer(object):
             conn = PYWBEMCLIConnection(
                 self.server_url, creds,
                 default_namespace=self.default_namespace,
-                no_verification=self.noverify,
+                no_verification=self.no_verify,
                 x509=x509_dict, ca_certs=self.ca_certs,
                 timeout=self.timeout,
-                use_pull_operations=self.use_pull_ops,
+                use_pull_operations=self.use_pull,
                 stats_enabled=self.stats_enabled)
             # Create a WBEMServer object
             self._wbem_server = WBEMServer(conn)
