@@ -133,33 +133,33 @@ def pick_one_from_list(context, options, title):
     TODO: Possible Future This could be replaced by the python pick library
     that would use curses for the selection process.
     """
-    try:
-        if context:
-            context.spinner.stop()
+    if context:
+        context.spinner.stop()
 
-        click.echo(title)
-        index = -1
-        for str_ in options:
-            index += 1
-            click.echo('%s: %s' % (index, str_))
-        selection = None
-        msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' \
-            % index
-        while True:
-            try:
-                selection_txt = click.prompt(msg)
-                selection = int(selection_txt)
-                if 0 <= selection <= index:
-                    if context:
-                        context.spinner.start()
-                    return options[selection]
-            except ValueError:  # This causes the retry of the request
-                pass
-            except KeyboardInterrupt:
-                raise click.ClickException("Pick Aborted.")
-            click.echo('"%s" Invalid response %s' % (selection_txt, msg))
-    except Exception:
-        raise click.ClickException('Selection exception %s. Command Aborted')
+    click.echo(title)
+    index = -1
+    for str_ in options:
+        index += 1
+        click.echo('%s: %s' % (index, str_))
+    selection = None
+    msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' \
+        % index
+    while True:
+        try:
+            selection_txt = click.prompt(msg)
+            selection = int(selection_txt)
+            if 0 <= selection <= index:
+                if context:
+                    context.spinner.start()
+                return options[selection]
+        except ValueError:  # This causes the retry of the request
+            pass
+        except KeyboardInterrupt:
+            raise click.ClickException("Pick Aborted. CTRL-C")
+        except Exception as ex:
+            raise click.ClickException(
+                'Selection exception: %s. Command Aborted' % ex)
+        click.echo('"%s" Invalid response %s' % (selection_txt, msg))
 
 
 def pick_instance(context, objectname, namespace=None):

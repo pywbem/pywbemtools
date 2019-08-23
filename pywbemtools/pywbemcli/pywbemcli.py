@@ -65,7 +65,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'literal IPV4 address (dotted), or literal IPV6 address\n'
                    '* Port: (optional) defines WBEM server port to be '
                    'used [Defaults: 5988(HTTP) and 5989(HTTPS)].\n'
-                   'This option the --name option and the --mock-server are '
+                   'This option, the --name, and --mock-server are '
                    'mututally exclusive since each defines a WBEM server.\n' +
                    '(EnvVar: {ev})'.format(ev=PywbemServer.server_envvar))
 @click.option('-n', '--name', type=str,
@@ -76,7 +76,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'pywbemcli retrieves the connection information from the '
                    'connections file ' +
                    '({cf}). '.format(cf=DEFAULT_CONNECTIONS_FILE) +
-                   'This option, --server and --mock-server are mutually '
+                   'This option, --server, and --mock-server are mutually '
                    'exclusive since each defines a WBEM server.\n' +
                    '(EnvVar: {ev})'.format(ev=PywbemServer.name_envvar))
 @click.option('-d', '--default-namespace', type=str,
@@ -102,7 +102,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.timeout_envvar,
               help='Client timeout completion of WBEM server operation in '
                    'seconds.\n' +
-                   '(EnvVar: PYWBEMCLI_{})'.format(PywbemServer.timeout_envvar))
+                   '(EnvVar: {ev})'.format(ev=PywbemServer.timeout_envvar))
 @click.option('-N', '--no-verify', is_flag=True,
               envvar=PywbemServer.no_verify_envvar,
               help='If set, client does not verify WBEM server certificate.' +
@@ -149,8 +149,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    '* "no": forces pywbemcli to use only the '
                    'traditional non-pull operations.\n'
                    '* "either": pywbemcli trys first pull and then '
-                   ' traditional operations.\n' +
-                   '(EnvVar: {}) '.format(PywbemServer.use_pull_envvar) +
+                   'traditional operations.\n' +
+                   '(EnvVar: {ev}) '.format(ev=PywbemServer.use_pull_envvar) +
                    '[Default: {}]'.format(DEFAULT_PULL_CHOICE))
 @click.option('--pull-max-cnt', type=int,
               help='Maximium object count of objects to be returned for '
@@ -185,7 +185,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'The option value defines a MOF or Python file path used to '
                    'populate the mock repository. This option may be used '
                    'multiple times where each use defines a single file_path.'
-                   'This option, --server and --name '
+                   'This option, --server, and --name '
                    'are mutually exclusive since each defines a WBEM server. '
                    'See the pywbemtools documentation for more '
                    'information.\n' +
@@ -320,7 +320,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         if resolved_mock_server and name:
             click.echo('The --name "%s" option and --server "%s" option '
                        'are mutually exclusive and may not be used '
-                       'simultaneiously' % (name, mock_server), err=True)
+                       'simultaneously' % (name, mock_server), err=True)
             raise click.Abort()
 
         if use_pull:

@@ -20,6 +20,11 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 from .cli_test_extensions import CLITestsBase
+from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
+    CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
+    CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
+    CMD_VERIFY_OPTION_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -32,528 +37,164 @@ MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
-INST_HELP = """
-Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
-
-  Command group to manage CIM instances.
-
-  This incudes functions to get, enumerate, create, modify, and delete
-  instances in a namspace and additional functions to get more general
-  information on instances (ex. counts) within the namespace
-
-  In addition to the command-specific options shown in this help text, the
-  general options (see 'pywbemcli --help') can also be specified before the
-  command. These are NOT retained after the command is executed.
-
-Options:
-  -h, --help  Show this message and exit.
-
-Commands:
-  associators   Get associated instances or names.
-  count         Get CIM instance count for classes.
-  create        Create a CIM instance of CLASSNAME.
-  delete        Delete a single CIM instance.
-  enumerate     Enumerate instances or names of CLASSNAME.
-  get           Get a single CIMInstance.
-  invokemethod  Invoke a CIM method on a CIMInstance.
-  modify        Modify an existing CIM instance.
-  query         Execute an execquery request.
-  references    Get the reference instances or names.
-"""
-
-# pylint: disable=line-too-long
-INST_ENUMERATE_HELP = """
-Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
-
-  Enumerate instances or names of CLASSNAME.
-
-  Get CIMInstance or CIMInstanceName (--name_only option) objects from the
-  WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
-  provided) or from the CLASSNAME argument if provided.
-
-  Displays the returned instances in mof, xml, or table formats, or the
-  instance names as a string or XML formats (--names-only option).
-
-  Results are formatted as defined by the --output_format general option.
-
-Options:
-  -l, --local-only                Show only local properties of the instances.
-                                  This subcommand may use either pull or
-                                  traditional operations depending on the
-                                  server and the --use-pull general
-                                  option. If pull operations are used, this
-                                  parameters will not be included, even if
-                                  specified. If traditional operations are
-                                  used, some servers do not process the
-                                  parameter.
-  -d, --deep-inheritance          If set, requests server to return properties
-                                  in subclasses of the target instances class.
-                                  If option not specified only properties from
-                                  target class are returned
-  -q, --include-qualifiers        If set, requests server to include
-                                  qualifiers in the returned instances. This
-                                  subcommand may use either pull or
-                                  traditional operations depending on the
-                                  server and the "--use--pull-ops" general
-                                  option. If pull operations are used,
-                                  qualifiers will not be included, even if
-                                  this option is specified. If traditional
-                                  operations are used, inclusion of qualifiers
-                                  depends on the server.
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -o, --names-only                Retrieve only the returned object names.
-  -S, --summary                   Return only summary of objects (count).
-  -f, --filter-query TEXT         A filter query to be passed to the server if
-                                  the pull operations are used. If this option
-                                  is defined and the --filter-query-language
-                                  is None, pywbemcli assumes DMTF:FQL. If this
-                                  option is defined and the traditional
-                                  operations are used, the filter is not sent
-                                  to the server. See the documentation for
-                                  more information. (Default: None)
-  --filter-query-language TEXT    A filter-query language to be used with a
-                                  filter query defined by --filter-query.
-                                  (Default: None)
-  -h, --help                      Show this message and exit.
-"""
-
-INST_GET_HELP = """
-Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
-
-  Get a single CIMInstance.
-
-  Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
-  resolve to the instance name of the desired instance. This may be supplied
-  directly as an untyped wbem_uri formatted string or through the
-  --interactive option. The wbemuri may contain the namespace or the
-  namespace can be supplied with the --namespace option. If no namespace is
-  supplied, the connection default namespace is used.  Any host name in the
-  wbem_uri is ignored.
-
-  This method may be executed interactively by providing only a classname
-  and the interactive option (-i).
-
-  Otherwise the INSTANCENAME must be a CIM instance name in the format
-  defined by DMTF `DSP0207`.
-
-  Results are formatted as defined by the --output_format general option.
-
-Options:
-  -l, --local-only                Request that server show only local
-                                  properties of the returned instance. Some
-                                  servers may not process this parameter.
-  -q, --include-qualifiers        If set, requests server to include
-                                  qualifiers in the returned instances. Not
-                                  all servers return qualifiers on instances
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -i, --interactive               If set, `INSTANCENAME` argument must be a
-                                  class rather than an instance and user is
-                                  presented with a list of instances of the
-                                  class from which the instance to process is
-                                  selected.
-  -h, --help                      Show this message and exit.
-
-"""
-
-INST_CREATE_HELP = """
-Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
-
-  Create a CIM instance of CLASSNAME.
-
-  Creates an instance of the class CLASSNAME with the properties defined in
-  the property option.
-
-  Pywbemcli creates the new instance using CLASSNAME retrieved from the
-  current WBEM server as a template for property characteristics. Therefore
-  pywbemcli will generate an exception if CLASSNAME does not exist in the
-  current WBEM server or if the data definition in the properties options
-  does not match the properties characteristics defined the returned class.
-
-  ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
-
-Options:
-  -P, --property name=value  Optional property names of the form name=value.
-                             Multiple definitions allowed, one for each
-                             property to be included in the createdinstance.
-                             Array property values defined by comma-separated-
-                             values. EmbeddedInstance not allowed.
-  -V, --verify               If set, The change is displayed and verification
-                             requested before the change is executed
-  -n, --namespace <name>     Namespace to use for this operation, instead of
-                             the default namespace of the connection
-  -h, --help                 Show this message and exit.
-"""
-
-INST_DELETE_HELP = """
-Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
-
-  Delete a single CIM instance.
-
-  Delete the instanced defined by INSTANCENAME from the WBEM server.
-
-  This may be executed interactively by providing only a class name and the
-  interactive option.
-
-  Otherwise the INSTANCENAME must be a CIM instance name in the format
-  defined by DMTF `DSP0207`.
-
-Options:
-  -i, --interactive       If set, `INSTANCENAME` argument must be a class
-                          rather than an instance and user is presented with a
-                          list of instances of the class from which the
-                          instance to process is selected.
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -h, --help              Show this message and exit.
-
-"""
-
-INST_COUNT_HELP = """
-Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
-
-  Get CIM instance count for classes.
-
-  Displays the count of instances for the classes defined by the `CLASSNAME-
-  GLOB` argument in one or more namespaces.
-
-  The size of the response may be limited by CLASSNAME-GLOB argument which
-  defines a regular expression based on the desired class names so that only
-  classes that match the regex are counted. The CLASSNAME-GLOB argument is
-  optional.
-
-  The CLASSNAME-GLOB argument may be either a complete classname or a
-  regular expression that can be matched to one or more classnames. To limit
-  the filter to a single classname, terminate the classname with $.
-
-  The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-  is case insensitive and uses the standard GLOB special characters (*(match
-  everything), ?(match single character)). Thus, `pywbem_*` returns all
-  classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
-  classnames that include the case insensitive string `system`.
-
-  This operation can take a long time to execute since it enumerates all
-  classes in the namespace.
-
-Options:
-  -s, --sort              Sort by instance count. Otherwise sorted by
-                          classname
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -h, --help              Show this message and exit.
-
-"""
-
-INST_REFERENCES_HELP = """
-Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
-
-  Get the reference instances or names.
-
-  Gets the reference instances or instance names(--names-only option) for a
-  target `INSTANCENAME` in the target WBEM server filtered by the `role` and
-  `resultclass` options.
-
-  INSTANCENAME must be a CIM instance name in the format defined by DMTF
-  `DSP0207`.
-
-  This may be executed interactively by providing only a class name for
-  `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
-  of instances names in the class from which you can be chosen as the
-  target.
-
-  Results are formatted as defined by the --output_format general option.
-
-Options:
-  -R, --resultclass <class name>  Filter by the result class name provided.
-                                  Each returned instance (or instance name)
-                                  should be a member of this class or its
-                                  subclasses. Optional
-  -r, --role <role name>          Filter by the role name provided. Each
-                                  returned instance (or instance name) should
-                                  refer to the target instance through a
-                                  property with aname that matches the value
-                                  of this parameter. Optional.
-  -q, --include-qualifiers        If set, requests server to include
-                                  qualifiers in the returned instances. This
-                                  subcommand may use either pull or
-                                  traditional operations depending on the
-                                  server and the "--use--pull-ops" general
-                                  option. If pull operations are used,
-                                  qualifiers will not be included, even if
-                                  this option is specified. If traditional
-                                  operations are used, inclusion of qualifiers
-                                  depends on the server.
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -o, --names-only                Retrieve only the returned object names.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -i, --interactive               If set, `INSTANCENAME` argument must be a
-                                  class rather than an instance and user is
-                                  presented with a list of instances of the
-                                  class from which the instance to process is
-                                  selected.
-  -S, --summary                   Return only summary of objects (count).
-  -f, --filter-query TEXT         A filter query to be passed to the server if
-                                  the pull operations are used. If this option
-                                  is defined and the --filter-query-language
-                                  is None, pywbemcli assumes DMTF:FQL. If this
-                                  option is defined and the traditional
-                                  operations are used, the filter is not sent
-                                  to the server. See the documentation for
-                                  more information. (Default: None)
-  --filter-query-language TEXT    A filter-query language to be used with a
-                                  filter query defined by --filter-query.
-                                  (Default: None)
-  -h, --help                      Show this message and exit.
-"""
-
-INST_MODIFY_HELP = """
-Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
-
-  Modify an existing CIM instance.
-
-  Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
-  property names and values defined by the property option and the CIM class
-  defined by the instance name.  The --propertylist option if provided is
-  passed to the WBEM server as part of the ModifyInstance operation (the
-  WBEM server limits modifications to just those properties defined in the
-  property list).
-
-  INSTANCENAME must be a CIM instance name in the format defined by DMTF
-  `DSP0207`.
-
-  Pywbemcli builds only properties defined with the --property option into
-  an instance based on the CIMClass and forwards that to the WBEM server
-  with the ModifyInstance method.
-
-  ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
-
-Options:
-  -P, --property name=value       Optional property names of the form
-                                  name=value. Multiple definitions allowed,
-                                  one for each property to be included in the
-                                  createdinstance. Array property values
-                                  defined by comma-separated-values.
-                                  EmbeddedInstance not allowed.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created. Multiple properties may be defined
-                                  with either a comma separated list defining
-                                  the option multiple times. (ex: -p pn1 -p
-                                  pn22 or -p pn1,pn2). If defined as empty
-                                  string an empty propertylist is created. The
-                                  server uses the propertylist to limit
-                                  changes made to the instance to properties
-                                  in the propertylist.
-  -i, --interactive               If set, `INSTANCENAME` argument must be a
-                                  class rather than an instance and user is
-                                  presented with a list of instances of the
-                                  class from which the instance to process is
-                                  selected.
-  -V, --verify                    If set, The change is displayed and
-                                  verification requested before the change is
-                                  executed
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -h, --help                      Show this message and exit.
-"""
-
-INST_ASSOCIATORS_HELP = """
-Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
-
-  Get associated instances or names.
-
-  Returns the associated instances or names (--names-only option) for the
-  `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
-  --role and --result-role options.
-
-  INSTANCENAME must be a CIM instance name in the format defined by DMTF
-  `DSP0207`.
-
-  This may be executed interactively by providing only a classname and the
-  interactive option. Pywbemcli presents a list of instances in the class
-  from which one can be chosen as the target.
-
-  Results are formatted as defined by the --output_format general option.
-
-Options:
-  -a, --assoc-class <class name>  Filter by the association class name
-                                  provided.Each returned instance (or instance
-                                  name) should be associated to the source
-                                  instance through this class or its
-                                  subclasses. Optional.
-  -c, --result-class <class name>
-                                  Filter by the result class name provided.
-                                  Each returned instance (or instance name)
-                                  should be a member of this class or one of
-                                  its subclasses. Optional
-  -r, --role <role name>          Filter by the role name provided. Each
-                                  returned instance (or instance name)should
-                                  be associated with the source instance
-                                  (INSTANCENAME) through an association with
-                                  this role (property name in the association
-                                  that matches this parameter). Optional.
-  -R, --result-role <role name>   Filter by the result role name provided.
-                                  Each returned instance (or instance
-                                  name)should be associated with the source
-                                  instance name (`INSTANCENAME`) through an
-                                  association with returned object having this
-                                  role (property name in the association that
-                                  matches this parameter). Optional.
-  -q, --include-qualifiers        If set, requests server to include
-                                  qualifiers in the returned instances. This
-                                  subcommand may use either pull or
-                                  traditional operations depending on the
-                                  server and the "--use--pull-ops" general
-                                  option. If pull operations are used,
-                                  qualifiers will not be included, even if
-                                  this option is specified. If traditional
-                                  operations are used, inclusion of qualifiers
-                                  depends on the server.
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -o, --names-only                Retrieve only the returned object names.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -i, --interactive               If set, `INSTANCENAME` argument must be a
-                                  class rather than an instance and user is
-                                  presented with a list of instances of the
-                                  class from which the instance to process is
-                                  selected.
-  -S, --summary                   Return only summary of objects (count).
-  -f, --filter-query TEXT         A filter query to be passed to the server if
-                                  the pull operations are used. If this option
-                                  is defined and the --filter-query-language
-                                  is None, pywbemcli assumes DMTF:FQL. If this
-                                  option is defined and the traditional
-                                  operations are used, the filter is not sent
-                                  to the server. See the documentation for
-                                  more information. (Default: None)
-  --filter-query-language TEXT    A filter-query language to be used with a
-                                  filter query defined by --filter-query.
-                                  (Default: None)
-  -h, --help                      Show this message and exit.
-"""
-
-INST_INVOKE_METHOD_HELP = """
-Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
-                                       METHODNAME
-
-  Invoke a CIM method on a CIMInstance.
-
-  Invoke the method defined by INSTANCENAME and METHODNAME arguments with
-  parameters defined by the --parameter options.
-
-  This issues an instance level invokemethod request and displays the
-  results.
-
-  INSTANCENAME must be a CIM instance name in the format defined by  DMTF
-  `DSP0207`.
-
-  Pywbemcli creates the method call using the class in INSTANCENAME
-  retrieved from the current WBEM server as a template for parameter
-  characteristics. Therefore pywbemcli will generate an exception if
-  CLASSNAME does not exist in the current WBEM server or if the data
-  definition in the parameter options does not match the parameter
-  characteristics defined the returned class.
-
-  A class level invoke method is available as `pywbemcli class
-  invokemethod`.
-
-  Example:
-
-  pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
-
-Options:
-  -p, --parameter name=value  Multiple definitions allowed, one for each
-                              parameter to be included in the new instance.
-                              Array parameter values defined by comma-
-                              separated-values. EmbeddedInstance not allowed.
-  -i, --interactive           If set, `INSTANCENAME` argument must be a class
-                              rather than an instance and user is presented
-                              with a list of instances of the class from which
-                              the instance to process is selected.
-  -n, --namespace <name>      Namespace to use for this operation, instead of
-                              the default namespace of the connection
-  -h, --help                  Show this message and exit.
-
-"""
-
-INST_QUERY_HELP = """
-Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY_STRING
-
-  Execute an execquery request.
-
-  Executes a query request on the target WBEM server with the QUERY_STRING
-  argument and query language options.
-
-  The results of the query are displayed as mof or xml.
-
-  Results are formatted as defined by the --output_format general option.
-
-Options:
-  -l, --querylanguage QUERY LANGUAGE
-                                  Use the query language defined. (Default:
-                                  DMTF:CQL.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit.
-
-"""
-
-ENUM_INST_RESP = """instance of CIM_Foo {
+CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE = \
+    '-q, --include-qualifiers If set, requests server to include'
+
+CMD_OPTION_ROLE_LINE = \
+    '-r, --role <role name> Filter by the role name provided'
+
+CMD_OPTION_FILTER_QUERY_LINE = \
+    '-f, --filter-query TEXT A filter query to be passed to the server'
+
+CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
+    '--filter-query-language TEXT A filter-query language to be used'
+
+CMD_INTERACTIVE_OPTION_HELP_LINE = \
+    "-i, --interactive If set, `INSTANCENAME` argument must"
+
+CMD_DEEPINHERITANCE_OPTION_HELP_LINE = \
+    '-d, --deep-inheritance If set, requests server to return properties'
+
+CMD_PROPERTY_OPTION_HELP_LINE = \
+    '-P, --property name=value Optional property names of the form name=value',
+
+CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE = \
+    '-q, --include-qualifiers If set, requests server to include'
+
+CMD_LOCALONLY_OPTION_HELP_LINE = \
+    '-l, --local-only Show only local properties of the'
+
+#
+# The following list define the help for each command in terms of particular
+# parts of lines that are to be tested.
+# For each test, try to include:
+# 1. The usage line and in particular the argument component
+# 2. The single
+# 2. The last line CMD_OPTION_HELP_HELP_LINE
+# Defined in alphabetical order
+
+INSTANCE_HELP_LINE = [
+    'Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...',
+    'Command group for persistent WBEM connections.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_ASSOCIATORS_HELP_LINE = [
+    'Usage: pywbemcli  instance associators [COMMAND-OPTIONS] INSTANCENAME',
+    'Get the instances associated with an instance.',
+    '-a, --assoc-class <class name>  Filter by the association class name',
+    '-c, --result-class <class name>',
+    '-r, --role <role name> Filter by the role name provided. Each',
+    '-R, --result-role <role name>   Filter by the result role name provided',
+    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_FILTER_QUERY_LINE,
+    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_COUNT_HELP_LINE = [
+    'Usage: pywbemcli  instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
+    'Count the instances of each class with matching class name.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_CREATE_HELP_LINE = [
+    'Usage: pywbemcli  instance create [COMMAND-OPTIONS] CLASSNAME',
+    'Create an instance of a class in a namespace.',
+    CMD_PROPERTY_OPTION_HELP_LINE,
+    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_DELETE_HELP_LINE = [
+    'Usage: pywbemcli  instance delete [COMMAND-OPTIONS] INSTANCENAME',
+    'Delete an instance of a class.',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_ENUMERATE_HELP_LINE = [
+    'Usage: pywbemcli  instance enumerate [COMMAND-OPTIONS] CLASSNAME',
+    'Get the instances of a class.',
+    CMD_LOCALONLY_OPTION_HELP_LINE,
+    CMD_DEEPINHERITANCE_OPTION_HELP_LINE,
+    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_FILTER_QUERY_LINE,
+    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_GET_HELP_LINE = [
+    'Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
+    'Get an instance of a class.',
+    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_INVOKEMETHOD_HELP_LINE = [
+    'Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME '
+    'METHODNAME',
+    'Invoke a method on an instance.',
+    '-p, --parameter name=value',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_MODIFY_HELP_LINE = [
+    'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
+    'Modify an instance of a class.',
+    CMD_PROPERTY_OPTION_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_QUERY_HELP_LINE = [
+    'Usage: pywbemcli instance query [COMMAND-OPTIONS] INSTANCENAME',
+    'Execute a query on instances in a namespace.',
+    '-l, --query-language QUERY LANGUAGE',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+INSTANCE_REFERENCES_HELP_LINE = [
+    'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
+    'Get the instances referencing an instance.',
+    '-R, --resultclass <class name>  Filter by the result class name',
+    '-r, --role <role name>  Filter by the role name provided',
+    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_FILTER_QUERY_LINE,
+    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+ENUM_INSTANCE_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
    IntegerProp = 1;
 };
@@ -569,7 +210,7 @@ instance of CIM_Foo {
 
 """
 
-GET_INST_ALL_TYPES = """instance of PyWBEM_AllTypes {
+GET_INSTANCE_ALL_TYPES = """instance of PyWBEM_AllTypes {
    InstanceId = "test_instance";
    scalBool = true;
    scalUint8 = 8;
@@ -601,7 +242,7 @@ GET_INST_ALL_TYPES = """instance of PyWBEM_AllTypes {
 
 """
 
-ENUM_INST_TABLE_RESP = """Instances: CIM_Foo
+ENUM_INSTANCE_TABLE_RESP = """Instances: CIM_Foo
 +--------------+---------------+
 | InstanceID   | IntegerProp   |
 +==============+===============+
@@ -625,7 +266,7 @@ ENUM_INSTNAME_TABLE_RESP = """InstanceNames: CIM_Foo
 +--------+-------------+----------------------------------------+
 """
 
-ENUM_INST_GET_TABLE_RESP = """Instances: CIM_Foo
+ENUM_INSTANCE_GET_TABLE_RESP = """Instances: CIM_Foo
 InstanceID      IntegerProp
 ------------  -------------
 "CIM_Foo1"                1
@@ -687,8 +328,8 @@ TEST_CASES = [
     #
     ['Verify instance subcommand help response',
      '--help',
-     {'stdout': INST_HELP,
-      'test': 'linesnows'},
+     {'stdout': INSTANCE_HELP_LINE,
+      'test': 'insnows'},
      None, OK],
 
     #
@@ -696,13 +337,13 @@ TEST_CASES = [
     #
     ['Verify instance subcommand enumerate  --help response',
      ['enumerate', '--help'],
-     {'stdout': INST_ENUMERATE_HELP,
-      'test': 'linesnows'},
+     {'stdout': INSTANCE_ENUMERATE_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -730,7 +371,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate CIM_Foo --include-qualifiers',
      ['enumerate', 'CIM_Foo', '--include-qualifiers'],
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -738,7 +379,7 @@ TEST_CASES = [
      ' --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'global': ['--use-pull', 'no']},
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -768,21 +409,21 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate deep-inheritance CIM_Foo -d',
      ['enumerate', 'CIM_Foo', '-d'],
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate deep-inheritance CIM_Foo '
      '--deep-inheritance',
      ['enumerate', 'CIM_Foo', '--deep-inheritance'],
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand -o grid enumerate deep-inheritance CIM_Foo -d',
      {'args': ['enumerate', 'CIM_Foo', '-d'],
       'global': ['--output-format', 'grid']},
-     {'stdout': ENUM_INST_TABLE_RESP,
+     {'stdout': ENUM_INSTANCE_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -839,7 +480,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand enumerate with query.',
      ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
-     {'stdout': ENUM_INST_RESP,
+     {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -971,9 +612,9 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename returns data',
      ['get', '--help'],
-     {'stdout': INST_GET_HELP,
+     {'stdout': INSTANCE_GET_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand get with instancename returns data',
@@ -1106,7 +747,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand get with instancename PyWBEM_AllTypes'
      ' returns instance with all property types',
      ['get', 'PyWBEM_AllTypes.InstanceID="test_instance"'],
-     {'stdout': GET_INST_ALL_TYPES,
+     {'stdout': GET_INSTANCE_ALL_TYPES,
       'rc': 0,
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
@@ -1114,7 +755,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand -o grid get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'global': ['-o', 'simple']},
-     {'stdout': ENUM_INST_GET_TABLE_RESP,
+     {'stdout': ENUM_INSTANCE_GET_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -1172,9 +813,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand create, --help response',
      ['create', '--help'],
-     {'stdout': INST_CREATE_HELP,
+     {'stdout': INSTANCE_CREATE_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand create, new instance of CIM_Foo one property',
@@ -1306,9 +947,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand modify, --help response',
      ['modify', '--help'],
-     {'stdout': INST_MODIFY_HELP,
+     {'stdout': INSTANCE_MODIFY_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand modify, single good change',
@@ -1471,9 +1112,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand delete, --help response',
      ['delete', '--help'],
-     {'stdout': INST_DELETE_HELP,
+     {'stdout': INSTANCE_DELETE_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand delete, valid delete',
@@ -1553,9 +1194,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand references, --help response',
      ['references', '--help'],
-     {'stdout': INST_REFERENCES_HELP,
+     {'stdout': INSTANCE_REFERENCES_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand references, returns instances',
@@ -1758,9 +1399,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand associators, --help response',
      ['associators', '--help'],
-     {'stdout': INST_ASSOCIATORS_HELP,
+     {'stdout': INSTANCE_ASSOCIATORS_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand associators, returns instances',
@@ -1870,9 +1511,9 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand count, --help response',
      ['count', '--help'],
-     {'stdout': INST_COUNT_HELP,
+     {'stdout': INSTANCE_COUNT_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand count, Return table of instances',
@@ -1923,8 +1564,8 @@ Instances: PyWBEM_AllTypes
 
     ['class subcommand invokemethod --help, . ',
      ['invokemethod', '--help'],
-     {'stdout': INST_INVOKE_METHOD_HELP,
-      'test': 'linesnows'},
+     {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance subcommand invokemethod',
@@ -1968,18 +1609,18 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand query, --help response',
      ['query', '--help'],
-     {'stdout': INST_QUERY_HELP,
+     {'stdout': INSTANCE_QUERY_HELP_LINE,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'linnows'},
      None, OK],
 
     ['Verify instance subcommand query execution. Returns error becasue '
      'mock does not support query',
      ['query', 'Select blah from blah'],
-     {'stderr': ['Error: CIMError: 14 (CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): '
+     {'stderr': ['Error: CIMError: 14 (CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): ',
                  "FilterQueryLanguage 'DMTF:CQL' not supported"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
 ]
 

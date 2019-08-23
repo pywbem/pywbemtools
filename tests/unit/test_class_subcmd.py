@@ -18,6 +18,10 @@ Tests the class subcommand
 import os
 import pytest
 from .cli_test_extensions import CLITestsBase
+from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
+    CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
+    CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE
 
 from .utils import execute_pywbemcli, assert_rc
 
@@ -36,27 +40,14 @@ CMD_OPTION_LOCAL_ONLY_HELP_LINE = \
 CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
     '--no-qualifiers If set, request server to not include qualifiers'
 
-CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
-    '-c, --include-classorigin Request that server include classorigin'
-
-CMD_OPTION_PROPERTYLIST_HELP_LINE = \
-    '-p, --propertylist <property name> Define a propertylist'
-
-CMD_OPTION_NAMES_ONLY_HELP_LINE = \
-    '-o, --names-only Retrieve only the returned object names.'
-
-CMD_OPTION_NAMESPACE_HELP_LINE = \
-    '-n, --namespace <name> Namespace to use for this operation'
-
-CMD_OPTION_NAMESPACE_HELP_LINE = \
-    '-n, --namespace <name> Namespace to use for this operation'
-
-CMD_OPTION_SUMMARY_HELP_LINE = \
-    '-S, --summary Return only summary of objects'
-
-CMD_OPTION_HELP_HELP_LINE = \
-    '-h, --help Show this message and exit.'
-
+#
+# The following list define the help for each command in terms of particular
+# parts of lines that are to be tested.
+# For each test, try to include:
+# 1. The usage line and in particular the argument component
+# 2. The single
+# 2. The last line CMD_OPTION_HELP_HELP_LINE
+#
 CLASS_HELP_LINES = [
     'Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...',
     'Command group for CIM classes.',
@@ -76,7 +67,7 @@ CLASS_GET_HELP_LINES = [
 
 CLASS_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME',
-    'Get the top classes in a namespace or subclasses of a class.',
+    'Get the top classes or subclasses of a class in a namespace.',
     '-d, --deep-inheritance If set, request server to return complete',
     CMD_OPTION_LOCAL_ONLY_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
@@ -89,7 +80,7 @@ CLASS_ENUMERATE_HELP_LINES = [
 
 CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
-    'Get the classes with matching class names on the server.',
+    'Get the classes with matching class names on the WBEM server.',
     '-n, --namespace <name> Namespace(s) to use for this operation',
     CMD_OPTION_HELP_HELP_LINE,
 ]

@@ -93,7 +93,7 @@ def connection_show(context, name):
 @click.pass_obj
 def connection_delete(context, name, **options):
     """
-    Delete connection information.
+    Delete a named WBEM connection.
 
     Delete connection information from the persistent store
     for the connection defined by NAME. The NAME argument is optional.
@@ -112,7 +112,7 @@ def connection_delete(context, name, **options):
 @click.pass_obj
 def connection_select(context, name):
     """
-    Select a connection from defined connections.
+    Select a connection from connections file.
 
     Selects a connection from the persistently stored set of named connections
     if NAME exists in the store. The NAME argument is optional.  If NAME not
@@ -144,7 +144,7 @@ def connection_select(context, name):
 @click.option('-n', '--name', type=str, metavar='NAME', required=True,
               help='Required name for the connection(optional, see --server).  '
                    'This is the name for this defined WBEM server in the'
-                   ' connection file')
+                   ' connections file')
 @click.option('-d', '--default-namespace', type=str,
               metavar='NAMESPACE',
               default=DEFAULT_NAMESPACE,
@@ -265,7 +265,7 @@ def connection_test(context):
 @click.pass_obj
 def connection_save(context, **options):
     """
-    Save current connection to repository.
+    Save current connection to connections file.
 
     Saves the current connection to the connections file if
     it does not already exist in that file.
@@ -280,11 +280,11 @@ def connection_save(context, **options):
 @click.pass_obj
 def connection_list(context):
     """
-    List the entries in the connection file.
+    List the entries in the connections file.
 
-    This subcommand displays all entries in the connection file as
+    This subcommand displays all entries in the connections file as
     a table using the command line output_format to define the
-    table format with default of simple format.
+    table format.
 
     An "*" after the name indicates the currently selected connection.
     """

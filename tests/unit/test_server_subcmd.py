@@ -18,6 +18,7 @@ Tests the class subcommand
 import os
 import pytest
 from .cli_test_extensions import CLITestsBase
+from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -28,154 +29,68 @@ SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 MOCK_SERVER_MODEL = os.path.join('utils', 'wbemserver_mock.py')
 
-SERVER_HELP = """
-Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
+#
+# The following list define the help for each command in terms of particular
+# parts of lines that are to be tested.
+# For each test, try to include:
+# 1. The usage line and in particular the argument component
+# 2. The first line of the command comment (i.e. the summary sentence)
+# 3. The last line CMD_OPTION_HELP_HELP_LINE
+# 4. Each option including at least the long and short names
+SERVER_HELP_LINE = [
+    'Usage: pywbemcli server [COMMAND-OPTIONS]',
+    'Command group for WBEM servers.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Command Group for WBEM server operations.
+SERVER_BRAND_HELP_LINE = [
+    'Usage: pywbemcli server brand [COMMAND-OPTIONS]',
+    'Display the brand of the server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  The server command-group defines commands to inspect and manage core
-  components of the server including namespaces, the interop namespace,
-  profiles, and access to profile central instances.
+SERVER_CONNECTION_HELP_LINE = [
+    'Usage: pywbemcli server connection [COMMAND-OPTIONS]',
+    'Display connection info used by this server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  In addition to the command-specific options shown in this help text, the
-  general options (see 'pywbemcli --help') can also be specified before the
-  command. These are NOT retained after the command is executed.
+SERVER_GETCENTRALINSTS_HELP_LINE = [
+    'Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]',
+    'Get central instances of mgmt profiles on the server.',
+    '-o, --organization <org name>   Filter by the defined organization',
+    '-p, --profile <profile name>    Filter by the profile name',
+    '-c, --central-class <classname>',
+    '-s, --scoping-class <classname>',
+    '-S, --scoping-path <pathname>   Optional. Required only if profiles',
+    '-r, --reference-direction [snia|dmtf]',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-Options:
-  -h, --help  Show this message and exit.
+SERVER_INFO_HELP_LINE = [
+    'Usage: pywbemcli server info [COMMAND-OPTIONS]',
+    'Display information about the server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-Commands:
-  brand             Display information on the WBEM server.
-  connection        Display connection info used by this server.
-  get-centralinsts  Display central instances in the WBEM server.
-  info              Display general information on the server.
-  interop           Display the server interop namespace name.
-  namespaces        Display the namespaces in the WBEM server.
-  profiles          Display registered profiles from the WBEM server.
-"""
+SERVER_INTEROP_HELP_LINE = [
+    'Usage: pywbemcli server interop [COMMAND-OPTIONS]',
+    'Display the Interop namespace of the server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-SVR_BRAND_HELP = """
-Usage: pywbemcli server brand [COMMAND-OPTIONS]
+SERVER_NAMESPACES_HELP_LINE = [
+    'Usage: pywbemcli server namespaces [COMMAND-OPTIONS]',
+    'Display the namespaces of the server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Display information on the WBEM server.
+SERVER_PROFILES_HELP_LINE = [
+    'Usage: pywbemcli server profiles [COMMAND-OPTIONS]',
+    'Display management profiles advertized by the server.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Display brand information on the current server if it is available. This
-  is typically the definition of the server implementor.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-SVR_GETCENTRALINSTS_HELP = """
-Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]
-
-  Display central instances in the WBEM server.
-
-  Displays central instances for management profiles registered in the
-  server. Displays management profiles that adher to to the central class
-  methodology with none of the extra parameters (ex. scoping_class)
-
-  However, profiles that only use the scoping methodology require extra
-  information that is dependent on the profile itself. These profiles will
-  only be accessed when the correct values of central_class, scoping_class,
-  and scoping path for the particular profile is provided.
-
-  This display may be filtered by the optional organization and profile name
-  options that define the organization for each profile (ex. SNIA) and the
-  name of the profile. This will display only the profiles that are
-  registered for the defined organization and/or name.
-
-  Profiles are display as a table showing the organization, name, and
-  version for each profile.
-
-Options:
-  -o, --organization <org name>   Filter by the defined organization. (ex. -o
-                                  DMTF
-  -p, --profile <profile name>    Filter by the profile name. (ex. -p Array
-  -c, --central-class <classname>
-                                  Optional. Required only if profiles supports
-                                  only scopig methodology
-  -s, --scoping-class <classname>
-                                  Optional. Required only if profiles supports
-                                  only scopig methodology
-  -S, --scoping-path <pathname>   Optional. Required only if profiles supports
-                                  only scopig methodology. Multiples allowed
-  -r, --reference-direction [snia|dmtf]
-                                  Navigation direction for association.
-                                  [default: dmtf]
-  -h, --help                      Show this message and exit.
-  """
-
-SVR_CONNECT_HELP = """
-Usage: pywbemcli  server connection [COMMAND-OPTIONS]
-
-  Display connection info used by this server.
-
-  Displays the connection information for the WBEM connection attached to
-  this server.  This includes uri, default namespace, etc.
-
-  This is equivalent to the connection show subcommand.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-SVR_INFO_HELP = """
-Usage: pywbemcli server info [COMMAND-OPTIONS]
-
-  Display general information on the server.
-
-  Displays general information on the current server includeing brand,
-  namespaces, etc.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-SVR_INTEROP_HELP = """
-Usage: pywbemcli server interop [COMMAND-OPTIONS]
-
-  Display the server interop namespace name.
-
-  Displays the name of the interop namespace defined for the WBEM server.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-SVR_NAMESPACES_HELP = """
-Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
-
-  Display the namespaces in the WBEM server.
-
-Options:
-  -s, --sort  Sort into alphabetical order by classname.
-  -h, --help  Show this message and exit.
-"""
-
-SVR_PROFILES_HELP = """
-Usage: pywbemcli server profiles [COMMAND-OPTIONS]
-
-  Display registered profiles from the WBEM server.
-
-  Displays the WBEM management profiles that have been registered for this
-  server.  Within the DMTF and SNIA these are the definition of management
-  functionality supported by the WBEM server.
-
-  This display may be filtered by the optional organization and profile
-  options that define the organization for each profile (ex. SNIA) and the
-  name of the profile. This will display only the profiles that are
-  registered for the defined organization and/or profile name.
-
-  Profiles are displayed as a table showing the organization, name, and
-  version for each profile.
-
-Options:
-  -o, --organization <org name>  Filter by the defined organization. (ex. -o
-                                 DMTF
-  -p, --profile <profile name>   Filter by the profile name. (ex. -p Array
-  -h, --help                     Show this message and exit.
-"""
 
 OK = True  # mark tests OK when they execute correctly
 RUN = True  # Mark OK = False and current test case being created RUN
@@ -193,50 +108,50 @@ TEST_CASES = [
 
     ['Verify server subcommand help response',
      '--help',
-     {'stdout': SERVER_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand brand  --help response',
      ['brand', '--help'],
-     {'stdout': SVR_BRAND_HELP,
-      'test': 'linesnows'},
-     None, OK],
-
-    ['Verify class subcommand profiles  --help response',
-     ['get-centralinsts', '--help'],
-     {'stdout': SVR_GETCENTRALINSTS_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_BRAND_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand connection --help response',
      ['connection', '--help'],
-     {'stdout': SVR_CONNECT_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_CONNECTION_HELP_LINE,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand get-centralinsts  --help response',
+     ['get-centralinsts', '--help'],
+     {'stdout': SERVER_GETCENTRALINSTS_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand info --help response',
      ['info', '--help'],
-     {'stdout': SVR_INFO_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_INFO_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand interop --help response',
      ['interop', '--help'],
-     {'stdout': SVR_INTEROP_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_INTEROP_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand namespaces --help response',
      ['namespaces', '--help'],
-     {'stdout': SVR_NAMESPACES_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_NAMESPACES_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand profiles  --help response',
      ['profiles', '--help'],
-     {'stdout': SVR_PROFILES_HELP,
-      'test': 'linesnows'},
+     {'stdout': SERVER_PROFILES_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     #

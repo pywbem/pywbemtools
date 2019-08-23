@@ -23,6 +23,8 @@ import os
 import pytest
 
 from .cli_test_extensions import CLITestsBase
+from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
+    CMD_VERIFY_OPTION_HELP_LINE
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -41,256 +43,77 @@ TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
 CONFIRM_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_CONFIRMY_FILE)
 
-CONN_HELP = """
-Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
+CONNECTION_HELP_LINE = [
+    'Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...',
+    'Command group for persistent WBEM connections.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Command group to manage WBEM connections.
+CONNECTION_ADD_HELP_LINE = [
+    'Usage: pywbemcli connection add [COMMAND-OPTIONS]',
+    'Create a new named WBEM connection.',
+    '-s, --server SERVER Required hostname or IP address with scheme',
+    '-n, --name NAME Required name for the connection(optional',
+    '-d, --default-namespace NAMESPACE',
+    '-u, --user TEXT User name for the WBEM server connection',
+    '-p, --password TEXT Password for the WBEM server. Will be',
+    '-t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in',
+    '-N, --noverify                  If set, client does not verify server',
+    '-k, --keyfile TEXT              Client private key file',
+    '-U, --use-pull-ops [yes|no|either]',
+    '--pull-max-cnt INTEGER          Maximium object count of objects',
+    '-l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations',
+    '-m, --mock-server FILENAME      If this option is defined',
+    '--ca_certs TEXT                 File or directory containing',
+    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  These command allow viewing and setting persistent connection definitions.
-  The connections are normally defined in the file pywbemcliconnections.json
-  in the current directory.
+CONNECTION_DELETE_HELP_LINE = [
+    'Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME',
+    'Delete a named WBEM connection.',
+    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  In addition to the command-specific options shown in this help text, the
-  general options (see 'pywbemcli --help') can also be specified before the
-  command. These are NOT retained after the command is executed.
+CONNECTION_EXPORT_HELP_LINE = [
+    'Usage: pywbemcli connection export [COMMAND-OPTIONS]',
+    'Export the current connection information.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-Options:
-  -h, --help  Show this message and exit.
+CONNECTION_LIST_HELP_LINE = [
+    'Usage: pywbemcli connection list [COMMAND-OPTIONS]',
+    'List the entries in the connections file.',
+    'An "*" after the name indicates the currently selected',
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-Commands:
-  add     Create a new named WBEM connection.
-  delete  Delete connection information.
-  export  Export the current connection information.
-  list    List the entries in the connection file.
-  save    Save current connection to repository.
-  select  Select a connection from defined connections.
-  show    Show current or NAME connection information.
-  test    Execute a predefined WBEM request.
-"""
+CONNECTION_SAVE_HELP_LINE = [
+    'Usage: pywbemcli connection save [COMMAND-OPTIONS]',
+    'Save current connection to connections file.',
+    '-n, --name Connection name  If defined, this changes the name of',
+    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-CONN_SHOW_HELP = """
-Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
+CONNECTION_SELECT_HELP_LINE = [
+    'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
+    'Select a connection from connections file.',
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-  Show current or NAME connection information.
+CONNECTION_SHOW_HELP_LINE = [
+    'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
+    'Show current or NAME connection information.',
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-  This subcommand displays  all the variables that make up the current WBEM
-  connection if the optional NAME argument is NOT provided. If NAME not
-  supplied, a list of connections from the connections definition file is
-  presented with a prompt for the user to select a NAME.
-
-  The information on the     connection named is displayed if that name is
-  in the persistent repository.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-CONN_DEL_HELP = """
-Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
-
-  Delete connection information.
-
-  Delete connection information from the persistent store for the connection
-  defined by NAME. The NAME argument is optional.
-
-  If NAME not supplied, a select list presents the list of connection
-  definitions for selection.
-
-  Example:   connection delete blah
-
-Options:
-  -V, --verify  If set, The change is displayed and verification requested
-                before the change is executed
-  -h, --help    Show this message and exit.
-"""
-
-CONN_SAVE_HELP = """
-Usage: pywbemcli connection save [COMMAND-OPTIONS]
-
-  Save current connection to repository.
-
-  Saves the current connection to the connections file if it does not
-  already exist in that file.
-
-  This is useful when you have defined a connection on the command line and
-  want to set it into the connections file.
-
-Options:
-  -n, --name Connection name  If defined, this changes the name of the
-                              connection to be saved. This allows renaming the
-                              current connection as part of saving it.
-  -V, --verify                If set, The change is displayed and verification
-                              requested before the change is executed
-  -h, --help                  Show this message and exit.
-"""
-
-CONN_ADD_HELP = """
-Usage: pywbemcli connection add [COMMAND-OPTIONS]
-
-  Create a new named WBEM connection.
-
-  This subcommand creates and saves a named connection from the input
-  options in the connections file.
-
-  The new connection can be referenced by the name argument in the future.
-  This connection object is capable of managing all of the properties
-  defined for WBEMConnections.
-
-  The NAME and URI arguments MUST exist. They define the server uri and the
-  unique name under which this server connection information will be stored.
-  All other properties are optional.
-
-  Adding a connection does not the new connection as the current connection.
-  Use `connection select` to set a particular stored connection definition
-  as the current connection.
-
-  A new connection can also be defined by supplying the parameters on the
-  command line and using the `connection save` command to put it into the
-  connection repository.
-
-Options:
-  -s, --server SERVER             Required hostname or IP address with scheme
-                                  of the WBEM server in format:
-                                  [{scheme}://]{host}[:{port}]
-                                  * Scheme: must
-                                  be "https" or "http" [Default: "https"]
-                                  *
-                                  Host: defines short/fully qualified DNS
-                                  hostname, literal IPV4 address (dotted), or
-                                  literal IPV6 address
-                                  * Port: (optional)
-                                  defines WBEM server port to be used
-                                  [Defaults: 5988(HTTP) and 5989(HTTPS)].
-  -n, --name NAME                 Required name for the connection(optional,
-                                  see --server).  This is the name for this
-                                  defined WBEM server in the connection file
-                                  [required]
-  -d, --default-namespace NAMESPACE
-                                  Default namespace to use in the target WBEM
-                                  server if no namespace is defined in the
-                                  subcommand (Default: root/cimv2).
-  -u, --user TEXT                 User name for the WBEM server connection.
-  -p, --password TEXT             Password for the WBEM server. Will be
-                                  requested as part  of initialization if user
-                                  name exists and it is not  provided by this
-                                  option.
-  -t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in
-                                  seconds. Default: 30
-  -N, --no-verify                  If set, client does not verify server
-                                  certificate.
-  -c, --certfile TEXT             Server certfile. Ignored if no-verify flag
-                                  set.
-  -k, --keyfile TEXT              Client private key file.
-  -U, --use-pull [yes|no|either]
-                                  Determines whether pull operations are used
-                                  for EnumerateInstances, AssociatorInstances,
-                                  ReferenceInstances, and ExecQuery
-                                  operations.
-                                  * "yes": pull operations
-                                  required; if server does not support pull,
-                                  the operation fails.
-                                  * "no": forces
-                                  pywbemcli to use only the traditional non-
-                                  pull operations.
-                                  * "either": pywbemcli trys
-                                  first pull and then  traditional operations.
-  --pull-max-cnt INTEGER          Maximium object count of objects to be
-                                  returned for each request if pull operations
-                                  are used. Must be  a positive non-zero
-                                  integer.[Default: 1000]
-  -l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations and set a
-                                  component to destination, and detail level
-                                  (COMP: [api|http|all], Default: all) DEST:
-                                  [file|stderr], Default: file)
-                                  DETAIL:[all|paths|summary], Default: all)
-  -m, --mock-server FILENAME      If this option is defined, a mock WBEM
-                                  server is constructed as the target WBEM
-                                  server and the option value defines a MOF or
-                                  Python file to be used to populate the mock
-                                  repository. This option may be used multiple
-                                  times where each use defines a single file
-                                  or file_path.See the pywbemcli documentation
-                                  for more information.
-  --ca_certs TEXT                 File or directory containing certificates
-                                  that will be matched against a certificate
-                                  received from the WBEM server. Set the --no-
-                                  verify-cert option to bypass client
-                                  verification of the WBEM server certificate.
-                                  Default: Searches for matching certificates
-                                  in the following system directories:
-                                  /etc/pki/ca-trust/extracted/openssl/ca-
-                                  bundle.trust.crt
-                                  /etc/ssl/certs
-                                  /etc/ssl/certificates
-  -V, --verify                    If set, The change is displayed and
-                                  verification requested before the change is
-                                  executed
-  -h, --help                      Show this message and exit.
-"""
-
-CONN_LIST_HELP = """
-Usage: pywbemcli connection list [COMMAND-OPTIONS]
-
-  List the entries in the connection file.
-
-  This subcommand displays all entries in the connection file as a table
-  using the command line output_format to define the table format with
-  default of simple format.
-
-  An "*" after the name indicates the currently selected connection.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-CONN_TEST_HELP = """
-Usage: pywbemcli connection test [COMMAND-OPTIONS]
-
-  Execute a predefined WBEM request.
-
-  This executes a predefined request against the current WBEM server to
-  confirm that the connection exists and is working.
-
-  It executes EnumerateClassNames on the default namespace as the test.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-CONN_EXPORT_HELP = """
-Usage: pywbemcli connection export [COMMAND-OPTIONS]
-
-  Export  the current connection information.
-
-  Creates an export statement for each connection variable and outputs the
-  statement to the conole.
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
-CONN_SELECT_HELP = """
-Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
-
-  Select a connection from defined connections.
-
-  Selects a connection from the persistently stored set of named connections
-  if NAME exists in the store. The NAME argument is optional.  If NAME not
-  supplied, a list of connections from the connections definition file is
-  presented with a prompt for the user to select a NAME.
-
-  Select state is not persistent.
-
-  Examples:
-
-     connection select <name>    # select the defined <name>
-
-     connection select           # presents select list to pick connection
-
-Options:
-  -h, --help  Show this message and exit.
-"""
-
+CONNECTION_TEST_HELP_LINE = [
+    'Usage: pywbemcli connection test [COMMAND-OPTIONS]',
+    'Execute a predefined WBEM request.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
@@ -310,56 +133,56 @@ TEST_CASES = [
 
     ['Verify connection subcommand help response',
      '--help',
-     {'stdout': CONN_HELP,
-      'test': 'linesnows'},
-     None, OK],
-
-    ['Verify connection subcommand show --help response',
-     ['show', '--help'],
-     {'stdout': CONN_SHOW_HELP,
-      'test': 'linesnows'},
-     None, OK],
-
-    ['Verify connection subcommand delete --help response',
-     ['delete', '--help'],
-     {'stdout': CONN_DEL_HELP,
-      'test': 'linesnows'},
-     None, OK],
-
-    ['Verify connection subcommand save --help response',
-     ['save', '--help'],
-     {'stdout': CONN_SAVE_HELP,
-      'test': 'linesnows'},
+     {'stdout': CONNECTION_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand add --help response',
      ['add', '--help'],
-     {'stdout': CONN_ADD_HELP,
-      'test': 'linesnows'},
+     {'stdout': CONNECTION_ADD_HELP_LINE,
+      'test': 'inows'},
      None, OK],
 
-    ['Verify connection subcommand list --help response',
-     ['list', '--help'],
-     {'stdout': CONN_LIST_HELP,
-      'test': 'linesnows'},
-     None, OK],
-
-    ['Verify connection subcommand test --help response',
-     ['test', '--help'],
-     {'stdout': CONN_TEST_HELP,
-      'test': 'linesnows'},
+    ['Verify connection subcommand delete --help response',
+     ['delete', '--help'],
+     {'stdout': CONNECTION_DELETE_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand export --help response',
      ['export', '--help'],
-     {'stdout': CONN_EXPORT_HELP,
-      'test': 'linesnows'},
+     {'stdout': CONNECTION_EXPORT_HELP_LINE,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand list --help response',
+     ['list', '--help'],
+     {'stdout': CONNECTION_LIST_HELP_LINE,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand save --help response',
+     ['save', '--help'],
+     {'stdout': CONNECTION_SAVE_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand select  --help response',
      ['select', '--help'],
-     {'stdout': CONN_SELECT_HELP,
-      'test': 'linesnows'},
+     {'stdout': CONNECTION_SELECT_HELP_LINE,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand show --help response',
+     ['show', '--help'],
+     {'stdout': CONNECTION_SHOW_HELP_LINE,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand test --help response',
+     ['test', '--help'],
+     {'stdout': CONNECTION_TEST_HELP_LINE,
+      'test': 'innows'},
      None, OK],
 
     # ['Verify connection subcommand new. test with show and delete  ',
