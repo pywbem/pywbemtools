@@ -150,7 +150,7 @@ def instance_group():
 @click.pass_obj
 def instance_get(context, instancename, **options):
     """
-    Get an instance.
+    Get an instance of a class.
 
     The instance can be specified in two ways:
 
@@ -181,9 +181,9 @@ def instance_get(context, instancename, **options):
 @click.pass_obj
 def instance_delete(context, instancename, **options):
     """
-    Delete an instance.
+    Delete an instance of a class.
 
-    The CIM instance to be deleted can be specified in two ways:
+    The CIM instance to be deleted can be specified as follows:
 
     1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
     argument. The CIM namespace in which the instance is looked up is the
@@ -252,7 +252,7 @@ def instance_create(context, classname, **options):
 @click.pass_obj
 def instance_modify(context, instancename, **options):
     """
-    Modify an instance.
+    Modify an instance of a class.
 
     The CIM instance to be modified can be specified in two ways:
 
@@ -382,7 +382,7 @@ def instance_enumerate(context, classname, **options):
               metavar='<role name>',
               help='Filter by the role name provided. Each returned instance '
                    '(or instance name) should refer to the target instance '
-                   'through a property with aname that matches the value of '
+                   'through a property with a name that matches the value of '
                    'this parameter. Optional.')
 @add_options(includequalifiersenum_option)
 @add_options(includeclassorigin_option)
@@ -975,7 +975,7 @@ def cmd_instance_query(context, query, options):
 
     try:
         results = context.conn.PyWbemcliQueryInstances(
-            options['querylanguage'],
+            options['query_language'],
             query,
             namespace=options['namespace'],
             MaxObjectCount=context.pull_max_cnt)

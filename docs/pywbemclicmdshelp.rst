@@ -19,30 +19,29 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML
       protocol to communicate with WBEM servers. Pywbemcli can:
 
-          * Manage the information in WBEM servers CIM objects using the
-            operations defined in the DMTF specification.  It can manage CIM
-            classes, CIM instances and CIM qualifier declarations in the WBEM
-            Server and execute CIM methods and queries on the server.
+      * Manage the information in WBEM servers CIM objects using the
+        operations defined in the DMTF specification.  It can manage CIM
+        classes, CIM instances and CIM qualifier declarations in the WBEM
+        Server and execute CIM methods and queries on the server.
 
-          * Inspect WBEM server characteristics including namespaces, registered
-            profiles, and other server information.
+      * Inspect WBEM server characteristics including namespaces, registered
+        profiles, and other server information.
 
-          * Capture detailed information on communication with the WBEM
-            server including time statistics and logs of the operations.
+      * Capture detailed information on communication with the WBEM
+        server including time statistics and logs of the operations.
 
-          * Maintain a persistent list of named WBEM servers and execute
-            operations on them by name.
+      * Maintain a persistent list of named connections to WBEM servers
+        and execute operations on them by name.
 
       Pywbemcli implements command groups and subcommands to execute the CIM-XML
-      operations defined by the DMTF CIM Operations Over HTTP
-      specification(DSP0201) specification.
+      operations defined by the DMTF CIM Operations Over HTTP specification
+      (DSP0200).
 
       The general options shown below can also be specified on any of the
       (sub)commands as well as the command line.
 
       For more detailed documentation, see:
 
-          https://pywbemtools.readthedocs.io/en/latest/
           https://pywbemtools.readthedocs.io/en/stable/
 
     Options:
@@ -58,30 +57,32 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       * Port: (optional)
                                       defines WBEM server port to be used
                                       [Defaults: 5988(HTTP) and 5989(HTTPS)].
-                                      Thhis option the --name option and the
-                                      --mock-server are mututally exclusive since
-                                      each defines a WBEM server.
-                                      (EnvVar:
-                                      PYWBEMCLI_SERVER).
+                                      This
+                                      option, the --name, and --mock-server are
+                                      mututally exclusive since each defines a
+                                      WBEM server.
+                                      (EnvVar: PYWBEMCLI_SERVER)
       -n, --name NAME                 Name for the connection.  If this option
                                       exists and the server option does not exist
                                       pywbemcli retrieves the connection
                                       information from the connections file
-                                      (pywbemcliservers.json). This option
-                                      --server  and --mock-server are mutually
-                                      exclusive since each defines a WBEM server
-                                      (EnvVar: PYWBEMCLI_NAME).
+                                      (pywbemcliservers.json). This option,
+                                      --server, and --mock-server are mutually
+                                      exclusive since each defines a WBEM server.
+                                      (EnvVar: PYWBEMCLI_NAME)
       -d, --default-namespace NAMESPACE
                                       Default namespace to use in the target WBEM
                                       server if no namespace is defined in a
-                                      subcommand(EnvVar: PYWBEMCLI_NAME)
-                                      []Default: root/cimv2].
-      -u, --user USER                 User name for the WBEM server connection.
+                                      subcommand.
                                       (EnvVar: PYWBEMCLI_NAME)
+                                      [Default: root/cimv2]
+      -u, --user USER                 User name for the WBEM server connection.
+                                      (EnvVar: PYWBEMCLI_USER)
       -p, --password PASSWORD         Password for the WBEM server. Will be
                                       requested as part  of initialization if user
                                       name exists and it is not  provided by this
-                                      option.(EnvVar: PYWBEMCLI_PASSWORD).
+                                      option.
+                                      (EnvVar: PYWBEMCLI_PASSWORD)
       -t, --timeout INTEGER           Client timeout completion of WBEM server
                                       operation in seconds.
                                       (EnvVar:
@@ -90,19 +91,22 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
       -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
                                       set. (EnvVar: PYWBEMCLI_CERTFILE).
-      -k, --keyfile FILE PATH         Client private key file. (EnvVar:
-                                      PYWBEMCLI_KEYFILE).
+      -k, --keyfile FILE PATH         Client private key file.
+                                      (EnvVar:
+                                      PYWBEMCLI_KEYFILE)
       --ca-certs TEXT                 File or directory containing certificates
                                       that will be matched against certificate
                                       received from WBEM server. Set --no-verify
                                       option to bypass client verification of the
-                                      WBEM server certificate.  (EnvVar:
-                                      PYWBEMCLI_CA_CERTS).
+                                      WBEM server certificate.
+                                      (EnvVar:
+                                      PYWBEMCLI_CA_CERTS)
                                       [Default: Searches for
                                       matching certificates in the following
-                                      system directories: /etc/pki/ca-
-                                      trust/extracted/openssl/ca-bundle.trust.crt]
-                                      /etc/ssl/certs]
+                                      system directories:
+                                      /etc/pki/ca-
+                                      trust/extracted/openssl/ca-bundle.trust.crt,
+                                      /etc/ssl/certs,
                                       /etc/ssl/certificates]
       -o, --output-format <choice>    Choice for command output data format.
                                       pywbemcli may override the format choice
@@ -132,7 +136,8 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       --pull-max-cnt INTEGER          Maximium object count of objects to be
                                       returned for each request if pull operations
                                       are used. Must be  a positive non-zero
-                                      integer.(EnvVar: PYWBEMCLI_PULL_MAX_CNT)
+                                      integer.
+                                      (EnvVar: PYWBEMCLI_PULL_MAX_CNT)
                                       [Default: 1000]
       -T, --timestats                 Show time statistics of WBEM server
                                       operations after each command execution.
@@ -152,23 +157,24 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       or Python file path used to populate the
                                       mock repository. This option may be used
                                       multiple times where each use defines a
-                                      single file_path.This parameter the --server
-                                      option and the --name option are mutually
-                                      exclusive since each defines a WBEM server.
-                                      See the pywbemtools documentation for more
-                                      information.(EnvVar: PYWBEMCLI_MOCK_SERVER).
+                                      single file_path.This option, --server, and
+                                      --name are mutually exclusive since each
+                                      defines a WBEM server. See the pywbemtools
+                                      documentation for more information.
+                                      (EnvVar:
+                                      PYWBEMCLI_MOCK_SERVER)
       --version                       Show the version of this command and the
                                       pywbem package and exit.
       -h, --help                      Show this message and exit.
 
     Commands:
-      class       Command group to manage CIM classes.
-      connection  Command group to manage WBEM connections.
+      class       Command group for CIM classes.
+      connection  Command group for persistent WBEM connections.
       help        Show help message for interactive mode.
-      instance    Command group to manage CIM instances.
-      qualifier   Command group to view QualifierDeclarations.
-      repl        Enter interactive (REPL) mode (default).
-      server      Command Group for WBEM server operations.
+      instance    Command group for CIM instances.
+      qualifier   Command group for CIM qualifier declarations.
+      repl        Enter interactive mode (default).
+      server      Command group for WBEM servers.
 
 
 .. _`pywbemcli class --help`:
@@ -185,24 +191,29 @@ The following defines the help output for the `pywbemcli class --help` subcomman
 
     Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group to manage CIM classes.
+      Command group for CIM classes.
+
+      This command group defines commands to inspect classes, to invoke methods
+      on classes, and to delete classes.
+
+      Creation and modification of classes is not currently supported.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
-      command. These are NOT retained after the command is executed.
+      'class' keyword.
 
     Options:
       -h, --help  Show this message and exit.
 
     Commands:
-      associators   Get the associated classes for CLASSNAME.
-      delete        Delete a single CIM class.
-      enumerate     Enumerate classes from the WBEM server.
-      find          Find all classes that match CLASSNAME-GLOB.
-      get           Get and display a single CIM class.
-      invokemethod  Invoke the class method named methodname.
-      references    Get the reference classes for CLASSNAME.
-      tree          Display CIM class inheritance hierarchy tree.
+      associators   Get the classes associated with a class.
+      delete        Delete a class.
+      enumerate     Get the top classes or subclasses of a class in a namespace.
+      find          Get the classes with matching class names on the WBEM...
+      get           Get a class.
+      invokemethod  Invoke a method on a class.
+      references    Get the classes referencing a class.
+      tree          Get the subclass or superclass inheritance tree of a class.
 
 
 .. _`pywbemcli class associators --help`:
@@ -219,13 +230,25 @@ The following defines the help output for the `pywbemcli class associators --hel
 
     Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME
 
-      Get the associated classes for CLASSNAME.
+      Get the classes associated with a class.
 
-      Get the classes(or class names) that are associated with the CLASSNAME
-      argument filtered by the --assoc-class, --result-class, --role and
-      --result-role options and modified by the other options.
+      List the CIM classes that are associated with the specified class
+      (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+      (--namespace option). If no namespace was specified, the default namespace
+      of the connection is used.
 
-      Results are formatted as defined by the output format general option.
+      The classes to be retrieved can be filtered by the --role, --result-role,
+      --assoc-class, and --result-class options.
+
+      The --include-classorigin, --no-qualifiers, and --propertylist options
+      determine which parts are included in each retrieved class.
+
+      In the output, the classes will formatted as defined by the --output-
+      format general option.
+
+      Examples:
+
+        pywbemcli -n myconn class associators CIM_Foo -n interop
 
     Options:
       -a, --assoc-class <class name>  Filter by the association class name
@@ -289,20 +312,26 @@ The following defines the help output for the `pywbemcli class delete --help` su
 
     Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
 
-      Delete a single CIM class.
+      Delete a class.
 
-      Deletes the CIM class defined by CLASSNAME from the WBEM server.
-
-      If the class has instances, the command is refused unless the --force
-      option is used. If --force is used, instances are also deleted.
+      Delete a CIM class (CLASSNAME argument) in a CIM namespace (--namespace
+      option). If no namespace was specified, the default namespace of the
+      connection is used.
 
       If the class has subclasses, the command is rejected.
 
-      WARNING: Removing classes from a WBEM server can cause damage to the
-      server. Use this with caution.  It can impact instance providers and other
-      components in the server.
+      If the class has instances, the command is rejected, unless the --force
+      option was specified, in which case the instances are also deleted.
 
-      Some servers may refuse the operation.
+      WARNING: Deleting classes can cause damage to the server: It can impact
+      instance providers and other components in the server. Use this with
+      command with caution.
+
+      Some servers may refuse the operation altogether.
+
+      Example:
+
+        pywbemcli -n myconn class delete CIM_Foo -n interop
 
     Options:
       -f, --force             Force the delete request to be issued even if there
@@ -327,21 +356,27 @@ The following defines the help output for the `pywbemcli class enumerate --help`
 
     Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
 
-      Enumerate classes from the WBEM server.
+      Get the top classes or subclasses of a class in a namespace.
 
-      Enumerates the classes (or classnames) from the WBEM server starting
-      either at the top of the class hierarchy or from  the position in the
-      class hierarchy defined by `CLASSNAME` argument if provided.
+      Enumerate CIM classes starting either at the top of the class hierarchy in
+      the specified CIM namespace (--namespace option), or at the specified
+      class (CLASSNAME argument) in the specified namespace. If no namespace was
+      specified, the default namespace of the connection is used.
 
-      The output format is defined by the output-format general option.
+      The --local-only, --include-classorigin, --no-qualifiers, and
+      --propertylist options determine which parts are included in each
+      retrieved class.
 
-      The --local-only and --no-qualifiers options define optional information
-      to be included in the output.
+      The --deep-inheritance option defines whether or not the complete subclass
+      hierarchy of the classes is retrieved.
 
-      The --deep-inheritance option defines whether the complete class hierarchy
-      is retrieved or just the next level in the hierarchy.
+      In the output, the classes will formatted as defined by the --output-
+      format general option.
 
-      Results are formatted as defined by the output format general option.
+      Examples:
+
+        pywbemcli -n myconn class enumerate -n interop   pywbemcli -n myconn
+        class enumerate CIM_Foo -n interop
 
     Options:
       -d, --deep-inheritance     If set, request server to return complete
@@ -376,27 +411,33 @@ The following defines the help output for the `pywbemcli class find --help` subc
 
     Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-      Find all classes that match CLASSNAME-GLOB.
+      Get the classes with matching class names on the WBEM server.
 
-      Find all classes in the namespace(s) of the target WBEM server that match
-      the CLASSNAME-GLOB regular expression argument and return the classnames.
-      The CLASSNAME-GLOB argument is required.
+      Find the CIM classes whose class name matches the specified wildcard
+      expression (CLASSNAME-GLOB argument) in all CIM namespaces of the WBEM
+      server, or in the specified namespace (--namespace option).
 
-      The CLASSNAME-GLOB argument may be either a complete classname or a
-      regular expression that can be matched to one or more classnames. To limit
-      the filter to a single classname, terminate the classname with $.
+      The CLASSNAME-GLOB argument is a wildcard expression that is matched on
+      the class names case insensitively. The special characters known from file
+      nme wildcarding are supported: `*` to match zero or more characters, and
+      `?` to match a single character. In order to not have the shell expand the
+      wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-      The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-      is case insensitive and uses the standard GLOB special characters (*(match
-      everything), ?(match single character)). Thus, `pywbem_*` returns all
-      classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
-      classnames that include the case insensitive string `system`.
-
-      The namespace option limits the search to the defined namespaces.
-      Otherwise all namespaces in the target server are searched.
+      For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
+      `pywbem_`, etc. '*system*' returns classes whose names include the case
+      insensitive string `system`.
 
       Output is in table format if table output specified. Otherwise it is in
       the form <namespace>:<classname>
+
+      In the output, the classes will formatted as defined by the --output-
+      format general option if it specifies table output. Otherwise the classes
+      will be in the form `<namespace>:<classname>`.
+
+      Examples:
+
+        pywbemcli -n myconn class find "CIM_*" -n interop   pywbemcli -n myconn
+        class find CIM_Foo
 
     Options:
       -n, --namespace <name>  Namespace(s) to use for this operation. If defined
@@ -420,19 +461,22 @@ The following defines the help output for the `pywbemcli class get --help` subco
 
     Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
 
-      Get and display a single CIM class.
+      Get a class.
 
-      Get a single CIM class defined by the CLASSNAME argument from the WBEM
-      server and display it. Normally it is retrieved from the default namespace
-      in the server.
+      Get a CIM class (CLASSNAME argument) in a CIM namespace (--namespace
+      option). If no namespace was specified, the default namespace of the
+      connection is used.
 
-      If the class is not found in the WBEM server, the server returns an
-      exception.
+      The --local-only, --include-classorigin, --no-qualifiers, and
+      --propertylist options determine which parts are included in each
+      retrieved class.
 
-      The --include-classorigin, --no-qualifiers, and --propertylist options
-      determine what parts of the class definition are retrieved.
+      In the output, the class will formatted as defined by the --output-format
+      general option.
 
-      Results are formatted as defined by the output format general option.
+      Example:
+
+        pywbemcli -n myconn class get CIM_Foo -n interop
 
     Options:
       -l, --local-only                Show only local properties of the class(s).
@@ -472,17 +516,27 @@ The following defines the help output for the `pywbemcli class invokemethod --he
 
     Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME METHODNAME
 
-      Invoke the class method named methodname.
+      Invoke a method on a class.
 
-      This invokes the method named METHODNAME on the class named CLASSNAME.
+      Invoke a static CIM method (METHODNAME argument) on a CIM class (CLASSNAME
+      argument) in a CIM namespace (--namespace option), and display the method
+      return value and output parameters. If no namespace was specified, the
+      default namespace of the connection is used.
 
-      This is the class level invokemethod and uses only the class name on the
-      invoke.The subcommand `instance invokemethod` invokes methods based on
-      class name.
+      The method input parameters are specified using the --parameter option,
+      which can be specified multiple times.
 
-      Examples:
+      Pywbemcli retrieves the class definition from the server in order to
+      verify that the specified input parameters are consistent with the
+      parameter characteristics in the method definition.
 
-        pywbemcli invokemethod CIM_Foo methodx -p param1=9 -p param2=Fred
+      Use the 'instance invokemethod' command to invoke CIM methods on CIM
+      instances.
+
+      Example:
+
+        pywbemcli -n myconn class invokemethod CIM_Foo methodx -p p1=9 -p
+        p2=Fred
 
     Options:
       -p, --parameter parameter  Optional multiple method parameters of form
@@ -506,13 +560,25 @@ The following defines the help output for the `pywbemcli class references --help
 
     Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
 
-      Get the reference classes for CLASSNAME.
+      Get the classes referencing a class.
 
-      Get the reference classes (or class names) for the CLASSNAME argument
-      filtered by the role and result class options and modified by the other
-      options.
+      List the CIM (association) classes that reference the specified class
+      (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+      (--namespace option). If no namespace was specified, the default namespace
+      of the connection is used.
 
-      Results are displayed as defined by the output format general option.
+      The classes to be retrieved can be filtered by the --role and --result-
+      class options.
+
+      The --include-classorigin, --no-qualifiers, and --propertylist options
+      determine which parts are included in each retrieved class.
+
+      In the output, the classes will formatted as defined by the --output-
+      format general option.
+
+      Examples:
+
+        pywbemcli -n myconn class references CIM_Foo -n interop
 
     Options:
       -R, --result-class <class name>
@@ -562,24 +628,32 @@ The following defines the help output for the `pywbemcli class tree --help` subc
 
     Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
 
-      Display CIM class inheritance hierarchy tree.
+      Get the subclass or superclass inheritance tree of a class.
 
-      Displays a tree of the class hierarchy to show superclasses and
-      subclasses.
+      List the subclass or superclass hierarchy of a CIM class (CLASSNAME
+      argument) or CIM namespace (--namespace option):
 
-      CLASSNAME is an optional argument that defines the starting point for the
-      hierarchy display
+      - If CLASSNAME is omitted, the complete class hierarchy of the specified
+      namespace is retrieved.
 
-      If the --superclasses option is not specified, the hierarchy starting
-      either at the top most classes of the class hierarchy or at the class
-      defined by CLASSNAME is displayed.
+      - If CLASSNAME is specified but not --superclasses, the class and its
+      subclass hierarchy in the specified namespace are retrieved.
 
-      If the --superclasses options is specified and a CLASSNAME is defined the
-      class hierarchy of superclasses leading to CLASSNAME is displayed.
+      - If CLASSNAME and --superclasses are specified, the class and its
+      superclass ancestry up to the top-level class in the specified namespace
+      are retrieved.
 
-      This is a separate subcommand because it is tied specifically to
-      displaying in a tree format.so that the --output-format general option is
-      ignored.
+      If no namespace was specified, the default namespace of the connection is
+      used.
+
+      In the output, the classes will formatted as a ASCII graphical tree; the
+      --output-format general option is ignored.
+
+      Examples:
+
+        pywbemcli -n myconn class tree -n interop   pywbemcli -n myconn class
+        tree CIM_Foo -n interop   pywbemcli -n myconn class tree CIM_Foo
+        --superclasses -n interop
 
     Options:
       -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
@@ -604,26 +678,28 @@ The following defines the help output for the `pywbemcli connection --help` subc
 
     Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group to manage WBEM connections.
+      Command group for persistent WBEM connections.
 
-      These command allow viewing and setting persistent connection definitions.
-      The connections are normally defined in the file pywbemcliconnections.json
-      in the current directory.
+      This command group defines commands to manage persistent WBEM connections
+      that have a name. The connections are stored in a connections file named
+      'pywbemcliservers.json' in the current directory. The connection name can
+      be used as a shorthand for the WBEM server via the '--name' general
+      option.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
-      command. These are NOT retained after the command is executed.
+      'connection' keyword.
 
     Options:
       -h, --help  Show this message and exit.
 
     Commands:
       add     Create a new named WBEM connection.
-      delete  Delete connection information.
+      delete  Delete a named WBEM connection.
       export  Export the current connection information.
-      list    List the entries in the connection file.
-      save    Save current connection to repository.
-      select  Select a connection from defined connections.
+      list    List the entries in the connections file.
+      save    Save current connection to connections file.
+      select  Select a connection from connections file.
       show    Show current or NAME connection information.
       test    Execute a predefined WBEM request.
 
@@ -678,7 +754,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       [Defaults: 5988(HTTP) and 5989(HTTPS)].
       -n, --name NAME                 Required name for the connection(optional,
                                       see --server).  This is the name for this
-                                      defined WBEM server in the connection file
+                                      defined WBEM server in the connections file
                                       [required]
       -d, --default-namespace NAMESPACE
                                       Default namespace to use in the target WBEM
@@ -756,7 +832,7 @@ The following defines the help output for the `pywbemcli connection delete --hel
 
     Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
 
-      Delete connection information.
+      Delete a named WBEM connection.
 
       Delete connection information from the persistent store for the connection
       defined by NAME. The NAME argument is optional.
@@ -786,7 +862,7 @@ The following defines the help output for the `pywbemcli connection export --hel
 
     Usage: pywbemcli connection export [COMMAND-OPTIONS]
 
-      Export  the current connection information.
+      Export the current connection information.
 
       Creates an export statement for each connection variable and outputs the
       statement to the conole.
@@ -809,11 +885,10 @@ The following defines the help output for the `pywbemcli connection list --help`
 
     Usage: pywbemcli connection list [COMMAND-OPTIONS]
 
-      List the entries in the connection file.
+      List the entries in the connections file.
 
-      This subcommand displays all entries in the connection file as a table
-      using the command line output_format to define the table format with
-      default of simple format.
+      This subcommand displays all entries in the connections file as a table
+      using the command line output_format to define the table format.
 
       An "*" after the name indicates the currently selected connection.
 
@@ -835,7 +910,7 @@ The following defines the help output for the `pywbemcli connection save --help`
 
     Usage: pywbemcli connection save [COMMAND-OPTIONS]
 
-      Save current connection to repository.
+      Save current connection to connections file.
 
       Saves the current connection to the connections file if it does not
       already exist in that file.
@@ -866,7 +941,7 @@ The following defines the help output for the `pywbemcli connection select --hel
 
     Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
 
-      Select a connection from defined connections.
+      Select a connection from connections file.
 
       Selects a connection from the persistently stored set of named connections
       if NAME exists in the store. The NAME argument is optional.  If NAME not
@@ -901,13 +976,13 @@ The following defines the help output for the `pywbemcli connection show --help`
 
       Show current or NAME connection information.
 
-      This subcommand displays  all the variables that make up the current WBEM
+      This subcommand displays all the variables that make up the current WBEM
       connection if the optional NAME argument is NOT provided. If NAME not
       supplied, a list of connections from the connections definition file is
       presented with a prompt for the user to select a NAME.
 
-      The information on the     connection named is displayed if that name is
-      in the persistent repository.
+      The information on the connection named is displayed if that name is in
+      the persistent repository.
 
     Options:
       -h, --help  Show this message and exit.
@@ -972,30 +1047,31 @@ The following defines the help output for the `pywbemcli instance --help` subcom
 
     Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group to manage CIM instances.
+      Command group for CIM instances.
 
-      This incudes functions to get, enumerate, create, modify, and delete
-      instances in a namspace and additional functions to get more general
-      information on instances (ex. counts) within the namespace
+      This command group defines commands to inspect instances, to invoke
+      methods on instances, and to create and delete instances.
+
+      Modification of instances is not currently supported.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
-      command. These are NOT retained after the command is executed.
+      'instance' keyword.
 
     Options:
       -h, --help  Show this message and exit.
 
     Commands:
-      associators   Get associated instances or names.
-      count         Get CIM instance count for classes.
-      create        Create a CIM instance of CLASSNAME.
-      delete        Delete a single CIM instance.
-      enumerate     Enumerate instances or names of CLASSNAME.
-      get           Get a single CIMInstance.
-      invokemethod  Invoke a CIM method on a CIMInstance.
-      modify        Modify an existing CIM instance.
-      query         Execute an execquery request.
-      references    Get the reference instances or names.
+      associators   Get the instances associated with an instance.
+      count         Count the instances of each class with matching class name.
+      create        Create an instance of a class in a namespace.
+      delete        Delete an instance of a class.
+      enumerate     Get the instances of a class.
+      get           Get an instance of a class.
+      invokemethod  Invoke a method on an instance.
+      modify        Modify an instance of a class.
+      query         Execute a query on instances in a namespace.
+      references    Get the instances referencing an instance.
 
 
 .. _`pywbemcli instance associators --help`:
@@ -1012,20 +1088,35 @@ The following defines the help output for the `pywbemcli instance associators --
 
     Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
 
-      Get associated instances or names.
+      Get the instances associated with an instance.
 
-      Returns the associated instances or names (--names-only option) for the
-      `INSTANCENAME` argument filtered by the --assoc-class, --result-class,
-      --role and --result-role options.
+      List the CIM instances that are associated with the specified CIM
+      instance, and display the returned instances, or instance paths if
+      --names-only was specified.
 
-      INSTANCENAME must be a CIM instance name in the format defined by DMTF
-      `DSP0207`.
+      The CIM instance can be specified in two ways:
 
-      This may be executed interactively by providing only a classname and the
-      interactive option. Pywbemcli presents a list of instances in the class
-      from which one can be chosen as the target.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      Results are formatted as defined by the --output_format general option.
+      2. By specifying the --interactive option and a CIM class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance. The
+      CIM namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection.
+
+      The instances to be retrieved can be filtered by the --filter-query,
+      --role, --result-role, --assoc-class, and --result-class options.
+
+      The --include-qualifiers, --include-classorigin, and --propertylist
+      options determine which parts are included in each retrieved instance.
+
+      In the output, the instances will formatted as defined by the --output-
+      format general option.
 
     Options:
       -a, --assoc-class <class name>  Filter by the association class name
@@ -1111,28 +1202,25 @@ The following defines the help output for the `pywbemcli instance count --help` 
 
     Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
 
-      Get CIM instance count for classes.
+      Count the instances of each class with matching class name.
 
-      Displays the count of instances for the classes defined by the `CLASSNAME-
-      GLOB` argument in one or more namespaces.
+      Display the count of the instances of each CIM class whose class name
+      matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
+      namespaces of the WBEM server, or in the specified namespace (--namespace
+      option).
 
-      The size of the response may be limited by CLASSNAME-GLOB argument which
-      defines a regular expression based on the desired class names so that only
-      classes that match the regex are counted. The CLASSNAME-GLOB argument is
-      optional.
+      The CLASSNAME-GLOB argument is a wildcard expression that is matched on
+      the class names case insensitively. The special characters known from file
+      nme wildcarding are supported: `*` to match zero or more characters, and
+      `?` to match a single character. In order to not have the shell expand the
+      wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-      The CLASSNAME-GLOB argument may be either a complete classname or a
-      regular expression that can be matched to one or more classnames. To limit
-      the filter to a single classname, terminate the classname with $.
+      For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
+      `pywbem_`, etc. '*system*' returns classes whose names include the case
+      insensitive string `system`.
 
-      The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-      is case insensitive and uses the standard GLOB special characters (*(match
-      everything), ?(match single character)). Thus, `pywbem_*` returns all
-      classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
-      classnames that include the case insensitive string `system`.
-
-      This operation can take a long time to execute since it enumerates all
-      classes in the namespace.
+      This operation can take a long time to execute since it potentially
+      enumerates all classes in all namespaces.
 
     Options:
       -s, --sort              Sort by instance count. Otherwise sorted by
@@ -1156,18 +1244,24 @@ The following defines the help output for the `pywbemcli instance create --help`
 
     Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
 
-      Create a CIM instance of CLASSNAME.
+      Create an instance of a class in a namespace.
 
-      Creates an instance of the class CLASSNAME with the properties defined in
-      the property option.
+      Create a CIM instance of the specified creation class (CLASSNAME argument)
+      in the specified CIM namespace (--namespace option), with the specified
+      properties (--property options) and display the CIM instance path of the
+      created instance. If no namespace was specified, the default namespace of
+      the connection is used.
 
-      Pywbemcli creates the new instance using CLASSNAME retrieved from the
-      current WBEM server as a template for property characteristics. Therefore
-      pywbemcli will generate an exception if CLASSNAME does not exist in the
-      current WBEM server or if the data definition in the properties options
-      does not match the properties characteristics defined the returned class.
+      The properties to be initialized and their new values are specified using
+      the --property option, which can be specified multiple times.
 
-      ex. pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla", -p p3=3
+      Pywbemcli retrieves the class definition from the server in order to
+      verify that the specified properties are consistent with the property
+      characteristics in the class definition.
+
+      Example:
+
+        pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla"
 
     Options:
       -P, --property name=value  Optional property names of the form name=value.
@@ -1196,15 +1290,22 @@ The following defines the help output for the `pywbemcli instance delete --help`
 
     Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
 
-      Delete a single CIM instance.
+      Delete an instance of a class.
 
-      Delete the instanced defined by INSTANCENAME from the WBEM server.
+      The CIM instance to be deleted can be specified as follows:
 
-      This may be executed interactively by providing only a class name and the
-      interactive option.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      Otherwise the INSTANCENAME must be a CIM instance name in the format
-      defined by DMTF `DSP0207`.
+      2. By specifying the --interactive option and a CIM class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance. The
+      CIM namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection.
 
     Options:
       -i, --interactive       If set, `INSTANCENAME` argument must be a class
@@ -1230,16 +1331,23 @@ The following defines the help output for the `pywbemcli instance enumerate --he
 
     Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
 
-      Enumerate instances or names of CLASSNAME.
+      Get the instances of a class.
 
-      Get CIMInstance or CIMInstanceName (--name_only option) objects from the
-      WBEMServer starting either at the top  of the hierarchy (if no CLASSNAME
-      provided) or from the CLASSNAME argument if provided.
+      Enumerate the CIM instances of the specified class (CLASSNAME argument),
+      including instances of subclasses in the specified CIM namespace
+      (--namespace option), and display the returned instances, or instance
+      paths if --names-only was specified. If no namespace was specified, the
+      default namespace of the connection is used.
 
-      Displays the returned instances in mof, xml, or table formats, or the
-      instance names as a string or XML formats (--names-only option).
+      The instances to be retrieved can be filtered by the --filter-query
+      option.
 
-      Results are formatted as defined by the --output_format general option.
+      The --local-only, --deep-inheritance, --include-qualifiers, --include-
+      classorigin, and --propertylist options determine which parts are included
+      in each retrieved instance.
+
+      In the output, the instances will formatted as defined by the --output-
+      format general option.
 
     Options:
       -l, --local-only                Show only local properties of the instances.
@@ -1309,23 +1417,25 @@ The following defines the help output for the `pywbemcli instance get --help` su
 
     Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
 
-      Get a single CIMInstance.
+      Get an instance of a class.
 
-      Gets the instance defined by `INSTANCENAME` where `INSTANCENAME` must
-      resolve to the instance name of the desired instance. This may be supplied
-      directly as an untyped wbem_uri formatted string or through the
-      --interactive option. The wbemuri may contain the namespace or the
-      namespace can be supplied with the --namespace option. If no namespace is
-      supplied, the connection default namespace is used.  Any host name in the
-      wbem_uri is ignored.
+      The instance can be specified in two ways:
 
-      This method may be executed interactively by providing only a classname
-      and the interactive option (-i).
+      * By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME   argument. The namespace in which the instance is looked up
+      is the   namespace specified in the WBEM URI, or otherwise the namespace
+      specified   in the --namespace option, or otherwise the default namespace
+      of the   connection. Any host name in the WBEM URI will be ignored.
 
-      Otherwise the INSTANCENAME must be a CIM instance name in the format
-      defined by DMTF `DSP0207`.
+      * By specifying the --interactive option and a class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance.   The
+      namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace
+      of the connection.
 
-      Results are formatted as defined by the --output_format general option.
+      In the output, the instance will formatted as defined by the --output-
+      format general option.
 
     Options:
       -l, --local-only                Request that server show only local
@@ -1372,30 +1482,40 @@ The following defines the help output for the `pywbemcli instance invokemethod -
     Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME
                                            METHODNAME
 
-      Invoke a CIM method on a CIMInstance.
+      Invoke a method on an instance.
 
-      Invoke the method defined by INSTANCENAME and METHODNAME arguments with
-      parameters defined by the --parameter options.
+      Invoke a CIM method (METHODNAME argument) on a CIM instance with the
+      specified input parameters (--parameter options), and display the method
+      return value and output parameters.
 
-      This issues an instance level invokemethod request and displays the
-      results.
+      The CIM instance can be specified in two ways:
 
-      INSTANCENAME must be a CIM instance name in the format defined by  DMTF
-      `DSP0207`.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      Pywbemcli creates the method call using the class in INSTANCENAME
-      retrieved from the current WBEM server as a template for parameter
-      characteristics. Therefore pywbemcli will generate an exception if
-      CLASSNAME does not exist in the current WBEM server or if the data
-      definition in the parameter options does not match the parameter
-      characteristics defined the returned class.
+      2. By specifying the --interactive option and a CIM class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance. The
+      CIM namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection.
 
-      A class level invoke method is available as `pywbemcli class
-      invokemethod`.
+      The method input parameters are specified using the --parameter option,
+      which can be specified multiple times.
+
+      Pywbemcli retrieves the class definition of the creation class of the
+      instance from the server in order to verify that the specified input
+      parameters are consistent with the parameter characteristics in the method
+      definition.
+
+      Use the 'class invokemethod' command to invoke CIM methods on CIM classes.
 
       Example:
 
-      pywbmcli instance invokemethod  CIM_x.InstanceID='hi" methodx -p id=3
+        pywbemcli -n myconn instance invokemethod CIM_x.id='hi" methodx -p id=3
 
     Options:
       -p, --parameter name=value  Multiple definitions allowed, one for each
@@ -1425,23 +1545,29 @@ The following defines the help output for the `pywbemcli instance modify --help`
 
     Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
 
-      Modify an existing CIM instance.
+      Modify an instance of a class.
 
-      Modifies CIM instance defined by INSTANCENAME in the WBEM server using the
-      property names and values defined by the property option and the CIM class
-      defined by the instance name.  The --propertylist option if provided is
-      passed to the WBEM server as part of the ModifyInstance operation (the
-      WBEM server limits modifications to just those properties defined in the
-      property list).
+      The CIM instance to be modified can be specified in two ways:
 
-      INSTANCENAME must be a CIM instance name in the format defined by DMTF
-      `DSP0207`.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      Pywbemcli builds only properties defined with the --property option into
-      an instance based on the CIMClass and forwards that to the WBEM server
-      with the ModifyInstance method.
+      2. By specifying the --interactive option and a CIM class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance. The
+      CIM namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection.
 
-      ex. pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+      The properties to be modified and their new values are specified using the
+      --property option, which can be specified multiple times.
+
+      Example:
+
+        pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
 
     Options:
       -P, --property name=value       Optional property names of the form
@@ -1488,17 +1614,17 @@ The following defines the help output for the `pywbemcli instance query --help` 
 
     Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY_STRING
 
-      Execute an execquery request.
+      Execute a query on instances in a namespace.
 
-      Executes a query request on the target WBEM server with the QUERY_STRING
-      argument and query language options.
+      Execute the specified query (QUERY_STRING argument) in the specified CIM
+      namespace (--namespace option), and display the returned instances. If no
+      namespace was specified, the default namespace of the connection is used.
 
-      The results of the query are displayed as mof or xml.
-
-      Results are formatted as defined by the --output_format general option.
+      In the output, the instances will formatted as defined by the --output-
+      format general option.
 
     Options:
-      -l, --querylanguage QUERY LANGUAGE
+      -l, --query-language QUERY LANGUAGE
                                       Use the query language defined. (Default:
                                       DMTF:CQL.
       -n, --namespace <name>          Namespace to use for this operation, instead
@@ -1521,21 +1647,35 @@ The following defines the help output for the `pywbemcli instance references --h
 
     Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
 
-      Get the reference instances or names.
+      Get the instances referencing an instance.
 
-      Gets the reference instances or instance names(--names-only option) for a
-      target `INSTANCENAME` in the target WBEM server filtered by the `role` and
-      `resultclass` options.
+      List the CIM (association) instances that reference the specified CIM
+      instance, and display the returned instances, or instance paths if
+      --names-only was specified.
 
-      INSTANCENAME must be a CIM instance name in the format defined by DMTF
-      `DSP0207`.
+      The CIM instance can be specified in two ways:
 
-      This may be executed interactively by providing only a class name for
-      `INSTANCENAME` and the `interactive` option(-i). Pywbemcli presents a list
-      of instances names in the class from which you can be chosen as the
-      target.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The CIM namespace in which the instance is looked
+      up is the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      Results are formatted as defined by the --output_format general option.
+      2. By specifying the --interactive option and a CIM class name in the
+      INSTANCENAME argument. The instances of the specified class are displayed
+      and the user is prompted for an index number to select an instance. The
+      CIM namespace in which the instances are looked up is the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection.
+
+      The instances to be retrieved can be filtered by the --filter-query,
+      --role and --result-class options.
+
+      The --include-qualifiers, --include-classorigin, and --propertylist
+      options determine which parts are included in each retrieved instance.
+
+      In the output, the instances will formatted as defined by the --output-
+      format general option.
 
     Options:
       -R, --resultclass <class name>  Filter by the result class name provided.
@@ -1545,7 +1685,7 @@ The following defines the help output for the `pywbemcli instance references --h
       -r, --role <role name>          Filter by the role name provided. Each
                                       returned instance (or instance name) should
                                       refer to the target instance through a
-                                      property with aname that matches the value
+                                      property with a name that matches the value
                                       of this parameter. Optional.
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
@@ -1607,24 +1747,23 @@ The following defines the help output for the `pywbemcli qualifier --help` subco
 
     Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group to view QualifierDeclarations.
+      Command group for CIM qualifier declarations.
 
-      Includes the capability to get and enumerate CIM qualifier declarations
-      defined in the WBEM server.
+      This command group defines commands to inspect qualifier declarations.
 
-      pywbemcli does not provide the capability to create or delete CIM
-      QualifierDeclarations
+      Creation, modification and deletion of qualifier declarations is not
+      currently supported.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
-      command. These are NOT retained after the command is executed.
+      'qualifier' keyword.
 
     Options:
       -h, --help  Show this message and exit.
 
     Commands:
-      enumerate  Enumerate CIMQualifierDeclaractions.
-      get        Display CIMQualifierDeclaration.
+      enumerate  List the CIM qualifier declarations in a CIM namespace.
+      get        Get a CIM qualifier declaration.
 
 
 .. _`pywbemcli qualifier enumerate --help`:
@@ -1641,10 +1780,14 @@ The following defines the help output for the `pywbemcli qualifier enumerate --h
 
     Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
 
-      Enumerate CIMQualifierDeclaractions.
+      List the CIM qualifier declarations in a CIM namespace.
 
-      Displays all of the CIMQualifierDeclaration objects in the defined
-      namespace in the current WBEM server
+      Enumerate the CIM qualifier declarations in the specified CIM namespace
+      (--namespace option). If no namespace was specified, the default namespace
+      of the connection is used.
+
+      In the output, the qualifier declaration will formatted as defined by the
+      --output-format general option.
 
     Options:
       -n, --namespace <name>  Namespace to use for this operation, instead of the
@@ -1667,10 +1810,14 @@ The following defines the help output for the `pywbemcli qualifier get --help` s
 
     Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME
 
-      Display CIMQualifierDeclaration.
+      Get a CIM qualifier declaration.
 
-      Displays CIMQualifierDeclaration QUALIFIERNAME for the defined namespace
-      in the current WBEMServer
+      Get a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM
+      namespace (--namespace option). If no namespace was specified, the default
+      namespace of the connection is used.
+
+      In the output, the qualifier declaration will formatted as defined by the
+      --output-format general option.
 
     Options:
       -n, --namespace <name>  Namespace to use for this operation, instead of the
@@ -1692,15 +1839,15 @@ The following defines the help output for the `pywbemcli repl --help` subcommand
 
     Usage: pywbemcli repl [OPTIONS]
 
-      Enter interactive (REPL) mode (default).
+      Enter interactive mode (default).
 
       Enters the interactive mode where subcommands can be entered interactively
       and load the command history file.
 
-      If no options are specified on the command line,  the interactive mode is
-      entered. The prompt is changed to `pywbemcli>' in the interactive mode.
+      If no options are specified on the command line, the interactive mode is
+      entered. The prompt is changed to 'pywbemcli>' in the interactive mode.
 
-      Pywbemcli may be terminated form this mode by entering <CTRL-D>, :q,
+      Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q,
       :quit, :exit
 
       Parameters:
@@ -1726,27 +1873,27 @@ The following defines the help output for the `pywbemcli server --help` subcomma
 
     Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command Group for WBEM server operations.
+      Command group for WBEM servers.
 
-      The server command-group defines commands to inspect and manage core
-      components of the server including namespaces, the interop namespace,
-      profiles, and access to profile central instances.
+      This command group defines commands to inspect and manage core components
+      of a WBEM server including server attributes, namespaces, the Interop
+      namespace, management profiles, and access to profile central instances.
 
       In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
-      command. These are NOT retained after the command is executed.
+      'server' keyword.
 
     Options:
       -h, --help  Show this message and exit.
 
     Commands:
-      brand             Display information on the WBEM server.
+      brand             Display the brand of the server.
       connection        Display connection info used by this server.
-      get-centralinsts  Display central instances in the WBEM server.
-      info              Display general information on the server.
-      interop           Display the server interop namespace name.
-      namespaces        Display the namespaces in the WBEM server.
-      profiles          Display registered profiles from the WBEM server.
+      get-centralinsts  Get central instances of mgmt profiles on the server.
+      info              Display information about the server.
+      interop           Display the Interop namespace of the server.
+      namespaces        Display the namespaces of the server.
+      profiles          Display management profiles advertized by the server.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1763,10 +1910,11 @@ The following defines the help output for the `pywbemcli server brand --help` su
 
     Usage: pywbemcli server brand [COMMAND-OPTIONS]
 
-      Display information on the WBEM server.
+      Display the brand of the server.
 
-      Display brand information on the current server if it is available. This
-      is typically the definition of the server implementor.
+      Brand information is defined by the server implementor and may or may not
+      be available. Pywbem attempts to collect the brand information from
+      multiple sources.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1788,10 +1936,10 @@ The following defines the help output for the `pywbemcli server connection --hel
 
       Display connection info used by this server.
 
-      Displays the connection information for the WBEM connection attached to
-      this server.  This includes uri, default namespace, etc.
+      Display the information about the connection used to connect to the WBEM
+      server.
 
-      This is equivalent to the connection show subcommand.
+      This is equivalent to the 'connection show' subcommand.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1811,24 +1959,26 @@ The following defines the help output for the `pywbemcli server get-centralinsts
 
     Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]
 
-      Display central instances in the WBEM server.
+      Get central instances of mgmt profiles on the server.
 
-      Displays central instances for management profiles registered in the
-      server. Displays management profiles that adher to to the central class
-      methodology with none of the extra parameters (ex. scoping_class)
+      Retrieve the CIM instances that are central instances of the specified
+      WBEM management profiles, and display these instances. By default, all
+      management profiles advertized on the server are used. The profiles can be
+      filtered by using the --organization and --profile options.
 
-      However, profiles that only use the scoping methodology require extra
-      information that is dependent on the profile itself. These profiles will
-      only be accessed when the correct values of central_class, scoping_class,
-      and scoping path for the particular profile is provided.
+      The central instances are determined using all methodologies defined in
+      DSP1033 V1.1 in the order of GetCentralInstances, central class, and
+      scoping class methodology.
 
-      This display may be filtered by the optional organization and profile name
-      options that define the organization for each profile (ex. SNIA) and the
-      name of the profile. This will display only the profiles that are
-      registered for the defined organization and/or name.
+      Profiles that only use the scoping class methodology require the
+      specification of the --central-class, --scoping-class, and --scoping-path
+      options because additional information is needed to perform the scoping
+      class methodology.
 
-      Profiles are display as a table showing the organization, name, and
-      version for each profile.
+      The retrieved central instances are displayed along with the organization,
+      name, and version of the profile they belong to, formatted as a table. The
+      --output-format general option is ignored unless it specifies a table
+      format.
 
     Options:
       -o, --organization <org name>   Filter by the defined organization. (ex. -o
@@ -1862,10 +2012,9 @@ The following defines the help output for the `pywbemcli server info --help` sub
 
     Usage: pywbemcli server info [COMMAND-OPTIONS]
 
-      Display general information on the server.
+      Display information about the server.
 
-      Displays general information on the current server includeing brand,
-      namespaces, etc.
+      The information includes CIM namespaces and server brand.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1885,9 +2034,7 @@ The following defines the help output for the `pywbemcli server interop --help` 
 
     Usage: pywbemcli server interop [COMMAND-OPTIONS]
 
-      Display the server interop namespace name.
-
-      Displays the name of the interop namespace defined for the WBEM server.
+      Display the Interop namespace of the server.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1907,7 +2054,7 @@ The following defines the help output for the `pywbemcli server namespaces --hel
 
     Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
 
-      Display the namespaces in the WBEM server.
+      Display the namespaces of the server.
 
     Options:
       -s, --sort  Sort into alphabetical order by classname.
@@ -1928,19 +2075,19 @@ The following defines the help output for the `pywbemcli server profiles --help`
 
     Usage: pywbemcli server profiles [COMMAND-OPTIONS]
 
-      Display registered profiles from the WBEM server.
+      Display management profiles advertized by the server.
 
-      Displays the WBEM management profiles that have been registered for this
-      server.  Within the DMTF and SNIA these are the definition of management
-      functionality supported by the WBEM server.
+      Retrieve the CIM instances representing the WBEM management profiles
+      advertized by the WBEM server, and display information about each profile.
+      WBEM management profiles are defined by DMTF and SNIA and define the
+      management functionality that is available.
 
-      This display may be filtered by the optional organization and profile
-      options that define the organization for each profile (ex. SNIA) and the
-      name of the profile. This will display only the profiles that are
-      registered for the defined organization and/or profile name.
+      The retrieved profiles can be filtered using the --organization and
+      --profile options.
 
-      Profiles are displayed as a table showing the organization, name, and
-      version for each profile.
+      The output is formatted as a table showing the organization, name, and
+      version for each profile. The --output-format option is ignored unless it
+      specifies a table format.
 
     Options:
       -o, --organization <org name>  Filter by the defined organization. (ex. -o

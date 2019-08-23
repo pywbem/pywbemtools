@@ -187,7 +187,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Get the top classes in a namespace or subclasses of a class.
+    Get the top classes or subclasses of a class in a namespace.
 
     Enumerate CIM classes starting either at the top of the class hierarchy
     in the specified CIM namespace (--namespace option), or at the specified
@@ -199,7 +199,7 @@ def class_enumerate(context, classname, **options):
     class.
 
     The --deep-inheritance option defines whether or not the complete subclass
-    hierarchy of the classes is retrieved as well.
+    hierarchy of the classes is retrieved.
 
     In the output, the classes will formatted as defined by the --output-format
     general option.
@@ -329,7 +329,7 @@ def class_associators(context, classname, **options):
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
-    Get the classes with matching class names on the server.
+    Get the classes with matching class names on the WBEM server.
 
     Find the CIM classes whose class name matches the specified wildcard
     expression (CLASSNAME-GLOB argument) in all CIM namespaces of the
@@ -389,7 +389,7 @@ def class_tree(context, classname, **options):
     If no namespace was specified, the default namespace of the connection is
     used.
 
-    In the output, the classes will formatted as an ascii tree, and the
+    In the output, the classes will formatted as a ASCII graphical tree; the
     --output-format general option is ignored.
 
     Examples:
@@ -469,8 +469,9 @@ def cmd_class_enumerate(context, classname, options):
 
 
 def cmd_class_references(context, classname, options):
-    """Execute the references request operation to get references for
-       the classname defined
+    """
+    Execute the references request operation to get references for
+    the classname defined
     """
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
@@ -498,8 +499,9 @@ def cmd_class_references(context, classname, options):
 
 
 def cmd_class_associators(context, classname, options):
-    """Execute the references request operation to get references for
-       the classname defined
+    """
+    Execute the references request operation to get references for
+    the classname defined
     """
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])

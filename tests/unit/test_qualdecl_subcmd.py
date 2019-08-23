@@ -25,54 +25,42 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 
-QD_HELP = """Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
+# The following are common across multiple groups
+CMD_OPTION_HELP_HELP_LINE = \
+    '-h, --help Show this message and exit.'
 
-  Command group to view QualifierDeclarations.
+CMD_OPTION_NAMESPACE_HELP_LINE = \
+    '-n, --namespace <name> Namespace to use for this operation'
 
-  Includes the capability to get and enumerate CIM qualifier declarations
-  defined in the WBEM server.
+CMD_OPTION_SUMMARY_HELP_LINE = \
+    '-S, --summary Return only summary of objects'
 
-  pywbemcli does not provide the capability to create or delete CIM
-  QualifierDeclarations
+# The following are particular to this group
+GRP_HELP_USAGE = \
+    'Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...'
 
-  In addition to the command-specific options shown in this help text, the
-  general options (see 'pywbemcli --help') can also be specified before the
-  command. These are NOT retained after the command is executed.
+QD_HELP_LINES = [
+    GRP_HELP_USAGE,
+    'Command group for CIM qualifier declarations.',
+    'enumerate  List the CIM qualifier declarations in a CIM namespace.',
+    'get        Get a CIM qualifier declaration.',
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-Options:
-  -h, --help  Show this message and exit.
+QD_ENUM_HELP_LINES = [
+    'Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]',
+    'List the CIM qualifier declarations in a CIM namespace.',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE
+]
 
-Commands:
-  enumerate  Enumerate CIMQualifierDeclaractions.
-  get        Display CIMQualifierDeclaration.
-"""
-
-QD_ENUM_HELP = """Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
-
-  Enumerate CIMQualifierDeclaractions.
-
-  Displays all of the CIMQualifierDeclaration objects in the defined
-  namespace in the current WBEM server
-
-Options:
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -S, --summary           Return only summary of objects (count).
-  -h, --help              Show this message and exit.
-"""
-
-QD_GET_HELP = """Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME
-
-  Display CIMQualifierDeclaration.
-
-  Displays CIMQualifierDeclaration QUALIFIERNAME for the defined namespace
-  in the current WBEMServer
-
-Options:
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -h, --help              Show this message and exit.
-"""
+QD_GET_HELP_LINES = [
+    'Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME',
+    "Get a CIM qualifier declaration.",
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE
+]
 
 QD_ENUM_MOCK = """Qualifier Abstract : boolean = false,
     Scope(class, association, indication),
@@ -191,26 +179,26 @@ TEST_CASES = [
 
     ['Verify qualifier subcommand help response',
      '--help',
-     {'stdout': QD_HELP,
-      'test': 'linesnows'},
+     {'stdout': QD_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate  --help response',
      ['enumerate', '--help'],
-     {'stdout': QD_ENUM_HELP,
-      'test': 'linesnows'},
+     {'stdout': QD_ENUM_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate  -h response.',
      ['enumerate', '-h'],
-     {'stdout': QD_ENUM_HELP,
-      'test': 'linesnows'},
+     {'stdout': QD_ENUM_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify qualifier subcommand get  -h response.',
      ['get', '-h'],
-     {'stdout': QD_GET_HELP,
-      'test': 'linesnows'},
+     {'stdout': QD_GET_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify qualifier subcommand enumerate returns qual decls.',
