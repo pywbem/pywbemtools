@@ -184,7 +184,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
             group_list.append(words[0])
 
         # test for line that matchs the word Commands
-        if line == 'Commands:':
+        if line.strip() == 'Commands:':
             group_state = True
     return group_list
 
@@ -225,7 +225,6 @@ def create_help_cmd_list(script_cmd, script_name):
               'command group and subcommand.\n' % script_name)
 
     for name in help_groups_result:
-        command = '%s %s --help' % (script_cmd, name)
         command_name = '%s %s --help' % (script_name, name)
         out = HELP_DICT[name]
         if USE_RST:
@@ -237,10 +236,11 @@ def create_help_cmd_list(script_cmd, script_name):
                   '`%s` subcommand\n' % command_name)
             print_rst_verbatum_text(out.decode())
         else:
-            print('%s\n%s COMMAND: %s' % (('=' * 50), script_name, command_name))
+            print('%s\n%s COMMAND: %s' %
+                  (('=' * 50), script_name, command_name))
             print(out.decode())
 
-    return help_groups_result
+    return help_groups_resul
 
 
 if __name__ == '__main__':
