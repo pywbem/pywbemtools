@@ -240,7 +240,7 @@ def create_help_cmd_list(script_cmd, script_name):
                   (('=' * 50), script_name, command_name))
             print(out.decode())
 
-    return help_groups_resul
+    return help_groups_result
 
 
 if __name__ == '__main__':
