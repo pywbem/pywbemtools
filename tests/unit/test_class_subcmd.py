@@ -30,243 +30,125 @@ SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 
-CLS_HELP = """
-Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
+CMD_OPTION_LOCAL_ONLY_HELP_LINE = \
+    '-l, --local-only Show only local properties'
 
-  Command group to manage CIM classes.
+CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
+    '--no-qualifiers If set, request server to not include qualifiers'
 
-  In addition to the command-specific options shown in this help text, the
-  general options (see 'pywbemcli --help') can also be specified before the
-  command. These are NOT retained after the command is executed.
+CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
+    '-c, --include-classorigin Request that server include classorigin'
 
-Options:
-  -h, --help  Show this message and exit.
+CMD_OPTION_PROPERTYLIST_HELP_LINE = \
+    '-p, --propertylist <property name> Define a propertylist'
 
-Commands:
-  associators   Get the associated classes for CLASSNAME.
-  delete        Delete a single CIM class.
-  enumerate     Enumerate classes from the WBEM server.
-  find          Find all classes that match CLASSNAME-GLOB.
-  get           Get and display a single CIM class.
-  invokemethod  Invoke the class method named methodname.
-  references    Get the reference classes for CLASSNAME.
-  tree          Display CIM class inheritance hierarchy tree.
-"""
+CMD_OPTION_NAMES_ONLY_HELP_LINE = \
+    '-o, --names-only Retrieve only the returned object names.'
 
-CLS_GET_HELP = """
-Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
+CMD_OPTION_NAMESPACE_HELP_LINE = \
+    '-n, --namespace <name> Namespace to use for this operation'
 
-  Get and display a single CIM class.
+CMD_OPTION_NAMESPACE_HELP_LINE = \
+    '-n, --namespace <name> Namespace to use for this operation'
 
-  Get a single CIM class defined by the CLASSNAME argument from the WBEM
-  server and display it. Normally it is retrieved from the default namespace
-  in the server.
+CMD_OPTION_SUMMARY_HELP_LINE = \
+    '-S, --summary Return only summary of objects'
 
-  If the class is not found in the WBEM server, the server returns an
-  exception.
+CMD_OPTION_HELP_HELP_LINE = \
+    '-h, --help Show this message and exit.'
 
-  The --include-classorigin, --no-qualifiers, and --propertylist options
-  determine what parts of the class definition are retrieved.
+CLASS_HELP_LINES = [
+    'Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...',
+    'Command group to manage CIM classes.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Results are formatted as defined by the output format general option.
+CLASS_GET_HELP_LINES = [
+    'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
+    'Get and display a single CIM class.',
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-Options:
-  -l, --local-only                Show only local properties of the class(s).
-  --no-qualifiers                 If set, request server to not include
-                                  qualifiers in the returned class(s). The
-                                  default behavior is to request qualifiers in
-                                  returned class(s).
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -h, --help                      Show this message and exit.
-"""
+CLASS_ENUMERATE_HELP_LINES = [
+    'Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME',
+    'Enumerate classes from the WBEM server.',
+    '-d, --deep-inheritance If set, request server to return complete',
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
+CLASS_FIND_HELP_LINES = [
+    'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
+    'Find all classes that match CLASSNAME-GLOB.',
+    '-n, --namespace <name> Namespace(s) to use for this operation',
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-CLS_ENUMERATE_HELP = """
-Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
+CLASS_TREE_HELP_LINES = [
+    'Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME',
+    'Display CIM class inheritance hierarchy tree.',
+    '-s, --superclasses Display the superclasses',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Enumerate classes from the WBEM server.
+CLASS_DELETE_HELP_LINES = [
+    'Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME',
+    'Delete a single CIM class.',
+    '-f, --force Force the delete request',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  Enumerates the classes (or classnames) from the WBEM server starting
-  either at the top of the class hierarchy or from  the position in the
-  class hierarchy defined by `CLASSNAME` argument if provided.
+CLASS_ASSOCIATORS_HELP_LINES = [
+    'Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME',
+    'Get the associated classes for CLASSNAME.',
+    '-a, --assoc-class <class name> Filter by the association class name',
+    '-C, --result-class <class name> Filter the returned objects by the class '
+    'name',
+    '-r, --role <role name> Filter by the role name',
+    '-R, --result-role <role name> Filter by the result role name',
+    CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  The output format is defined by the output-format general option.
+CLASS_REFERENCES_HELP_LINES = [
+    'Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME',
+    'Get the reference classes for CLASSNAME.',
+    '-R, --result-class <class name> Filter by the classname provided.',
+    '-r, --role <role name> Filter by the role name provided.',
+    CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
+    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
-  The --local-only and --no-qualifiers options define optional information
-  to be included in the output.
-
-  The --deep-inheritance option defines whether the complete class hierarchy
-  is retrieved or just the next level in the hierarchy.
-
-  Results are formatted as defined by the output format general option.
-
-Options:
-  -d, --deep-inheritance     If set, request server to return complete
-                             subclass hiearchy for this class. The default is
-                             False which requests only one level of
-                             subclasses.
-  -l, --local-only           Show only local properties of the class(s).
-  --no-qualifiers            If set, request server to not include qualifiers
-                             in the returned class(s). The default behavior is
-                             to request qualifiers in returned class(s).
-  -c, --include-classorigin  Request that server include classorigin in the
-                             result.On some WBEM operations, server may ignore
-                             this option.
-  -o, --names-only           Retrieve only the returned object names.
-  -n, --namespace <name>     Namespace to use for this operation, instead of
-                             the default namespace of the connection
-  -S, --summary              Return only summary of objects (count).
-  -h, --help                 Show this message and exit.
-"""
-
-CLASS_FIND_HELP = """
-Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
-
-  Find all classes that match CLASSNAME-GLOB.
-
-  Find all classes in the namespace(s) of the target WBEM server that match
-  the CLASSNAME-GLOB regular expression argument and return the classnames.
-  The CLASSNAME-GLOB argument is required.
-
-  The CLASSNAME-GLOB argument may be either a complete classname or a
-  regular expression that can be matched to one or more classnames. To limit
-  the filter to a single classname, terminate the classname with $.
-
-  The GLOB expression is anchored to the beginning of the CLASSNAME-GLOB, is
-  is case insensitive and uses the standard GLOB special characters (*(match
-  everything), ?(match single character)). Thus, `pywbem_*` returns all
-  classes that begin with `PyWBEM_`, `pywbem_`, etc. '.*system*' returns
-  classnames that include the case insensitive string `system`.
-
-  The namespace option limits the search to the defined namespaces.
-  Otherwise all namespaces in the target server are searched.
-
-  Output is in table format if table output specified. Otherwise it is in
-  the form <namespace>:<classname>
-
-Options:
-  -n, --namespace <name>  Namespace(s) to use for this operation. If defined
-                          only those namespaces are searched rather than all
-                          available namespaces. ex: -n root/interop -n
-                          root/cimv2
-  -h, --help              Show this message and exit.
-"""
-CLASS_TREE_HELP = """
-Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
-
-  Display CIM class inheritance hierarchy tree.
-
-  Displays a tree of the class hierarchy to show superclasses and
-  subclasses.
-
-  CLASSNAME is an optional argument that defines the starting point for the
-  hierarchy display
-
-  If the --superclasses option is not specified, the hierarchy starting
-  either at the top most classes of the class hierarchy or at the class
-  defined by CLASSNAME is displayed.
-
-  If the --superclasses options is specified and a CLASSNAME is defined the
-  class hierarchy of superclasses leading to CLASSNAME is displayed.
-
-  This is a separate subcommand because it is tied specifically to
-  displaying in a tree format.so that the --output-format general option is
-  ignored.
-
-Options:
-  -s, --superclasses      Display the superclasses to CLASSNAME as a tree.
-                          When this option is set, the CLASSNAME argument is
-                          required
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -h, --help              Show this message and exit.
-"""
-
-CLASS_DELETE_HELP = """
-Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
-
-  Delete a single CIM class.
-
-  Deletes the CIM class defined by CLASSNAME from the WBEM server.
-
-  If the class has instances, the command is refused unless the --force
-  option is used. If --force is used, instances are also deleted.
-
-  If the class has subclasses, the command is rejected.
-
-  WARNING: Removing classes from a WBEM server can cause damage to the
-  server. Use this with caution.  It can impact instance providers and other
-  components in the server.
-
-  Some servers may refuse the operation.
-
-Options:
-  -f, --force             Force the delete request to be issued even if there
-                          are instances in the server or subclasses to this
-                          class. The WBEM server may still refuse the request.
-  -n, --namespace <name>  Namespace to use for this operation, instead of the
-                          default namespace of the connection
-  -h, --help              Show this message and exit.
-"""
-
-CLS_REFERENCES_HELP = """
-Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
-
-  Get the reference classes for CLASSNAME.
-
-  Get the reference classes (or class names) for the CLASSNAME argument
-  filtered by the role and result class options and modified by the other
-  options.
-
-  Results are displayed as defined by the output format general option.
-
-Options:
-  -R, --result-class <class name>
-                                  Filter by the classname provided. Each
-                                  returned class (or classname) should be this
-                                  class or its subclasses. Optional.
-  -r, --role <role name>          Filter by the role name provided. Each
-                                  returned class (or classname) should refer
-                                  to the target class through a property with
-                                  a name that matches the value of this
-                                  parameter. Optional.
-  --no-qualifiers                 If set, request server to not include
-                                  qualifiers in the returned class(s). The
-                                  default behavior is to request qualifiers in
-                                  returned class(s).
-  -c, --include-classorigin       Request that server include classorigin in
-                                  the result.On some WBEM operations, server
-                                  may ignore this option.
-  -p, --propertylist <property name>
-                                  Define a propertylist for the request. If
-                                  option not specified a Null property list is
-                                  created and the server returns all
-                                  properties. Multiple properties may be
-                                  defined with either a comma separated list
-                                  or by using the option multiple times. (ex:
-                                  -p pn1 -p pn22 or -p pn1,pn2). If defined as
-                                  empty string the server should return no
-                                  properties.
-  -o, --names-only                Retrieve only the returned object names.
-  -n, --namespace <name>          Namespace to use for this operation, instead
-                                  of the default namespace of the connection
-  -S, --summary                   Return only summary of objects (count).
-  -h, --help                      Show this message and exit.
-"""
+CLASS_INVOKEMETHOD_HELP_LINES = [
+    'Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME '
+    'METHODNAME',
+    'Invoke the class method named methodname.',
+    '-p, --parameter parameter Optional multiple method parameters of form',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
 
 CIMFOO_SUB_SUB = """
    [Description ( "Subclass of CIM_Foo_sub" )]
@@ -435,24 +317,31 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify class subcommand help response',
-     '--help',
-     {'stdout': CLS_HELP,
-      'test': 'linesnows'},
+    ['Verify class --help response (light)',
+     ['--help'],
+     {'stdout': CLASS_HELP_LINES,
+      'test': 'innows'},
      None, OK],
+
+    ['Verify class -h response (light)',
+     ['-h'],
+     {'stdout': CLASS_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
     #
     # Enumerate subcommand and its options
     #
-    ['Verify class subcommand enumerate  --help response',
+    ['Verify class subcommand enumerate --help response (light)',
      ['enumerate', '--help'],
-     {'stdout': CLS_ENUMERATE_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_ENUMERATE_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand enumerate  -h response.',
+    ['Verify class subcommand enumerate -h response (light)',
      ['enumerate', '-h'],
-     {'stdout': CLS_ENUMERATE_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_ENUMERATE_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand enumerate CIM_Foo',
@@ -578,10 +467,16 @@ TEST_CASES = [
     #
     # Test class get
     #
-    ['Verify class subcommand get --help response',
+    ['Verify class subcommand get --help response (light)',
      ['get', '--help'],
-     {'stdout': CLS_GET_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_GET_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand get -h response (light)',
+     ['get', '-h'],
+     {'stdout': CLASS_GET_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     # subcommand get local-only option
@@ -750,16 +645,16 @@ TEST_CASES = [
     #
     # find subcommand
     #
-    ['Verify class subcommand find -h, ',
-     ['find', '-h'],
-     {'stdout': CLASS_FIND_HELP,
-      'test': 'linesnows'},
+    ['Verify class subcommand find --help response (light)',
+     ['find', '--help'],
+     {'stdout': CLASS_FIND_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand find  --help',
-     ['find', '--help'],
-     {'stdout': CLASS_FIND_HELP,
-      'test': 'linesnows'},
+    ['Verify class subcommand find -h response (light)',
+     ['find', '-h'],
+     {'stdout': CLASS_FIND_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand find simple name in all namespaces',
@@ -836,10 +731,16 @@ TEST_CASES = [
     #
     # subcommand "class delete"
     #
-    ['Verify class subcommand delete --help response',
+    ['Verify class subcommand delete --help response (light)',
      ['delete', '--help'],
-     {'stdout': CLASS_DELETE_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_DELETE_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand delete -h response (light)',
+     ['delete', '-h'],
+     {'stdout': CLASS_DELETE_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     # Class delete successful
@@ -897,13 +798,20 @@ TEST_CASES = [
     #
     # subcommand "class tree"
     #
-    ['Verify class subcommand tree --help response',
+    ['Verify class subcommand tree --help response (light)',
      ['tree', '--help'],
-     {'stdout': CLASS_TREE_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_TREE_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand tree -h response (light)',
+     ['tree', '-h'],
+     {'stdout': CLASS_TREE_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     # Order inconsistent on output. so we just test that some of the lines are
+
     # in the output
     # root
     #  +-- CIM_Foo
@@ -960,20 +868,17 @@ TEST_CASES = [
     #
     # associators subcommand tests
     #
-    ['Verify class subcommand associators --help, . ',
+    #
+    ['Verify class subcommand associators --help response (light)',
      ['associators', '--help'],
-     {'stdout': ['Usage: pywbemcli class associators [COMMAND-OPTIONS] '
-                 'CLASSNAME',
-                 'Get the associated classes for CLASSNAME.',
-                 '-a, --assoc-class <class name>  Filter by the association '
-                 'class name',
-                 '-C, --result-class <class name>',
-                 '-r, --role <role name>          Filter by the role name '
-                 'provided.',
-                 '-R, --result-role <role name>   Filter by the result role '
-                 'name provided.',
-                 '-c, --include-classorigin', ],
-      'test': 'in'},
+     {'stdout': CLASS_ASSOCIATORS_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand associators -h response (light)',
+     ['associators', '-h'],
+     {'stdout': CLASS_ASSOCIATORS_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand associators simple request,',
@@ -1125,10 +1030,16 @@ TEST_CASES = [
     #
     # references subcommand tests
     #
-    ['Verify class subcommand references --help, . ',
+    ['Verify class subcommand references --help response (light)',
      ['references', '--help'],
-     {'stdout': CLS_REFERENCES_HELP,
-      'test': 'linesnows'},
+     {'stdout': CLASS_REFERENCES_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand references -h response (light)',
+     ['references', '-h'],
+     {'stdout': CLASS_REFERENCES_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     ['Verify class subcommand references simple request',
@@ -1178,14 +1089,16 @@ TEST_CASES = [
     #
     # invokemethod subcommand tests
     #
-    ['Verify class subcommand invokemethod --help, . ',
+    ['Verify class subcommand invokemethod --help response (light)',
      ['invokemethod', '--help'],
-     {'stdout': ['Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] '
-                 'CLASSNAME METHODNAME',
-                 'Invoke the class method named methodname.',
-                 '-p, --parameter parameter  Optional multiple method '
-                 'parameters of form', ],
-      'test': 'in'},
+     {'stdout': CLASS_INVOKEMETHOD_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify class subcommand invokemethod -h response (light)',
+     ['invokemethod', '-h'],
+     {'stdout': CLASS_INVOKEMETHOD_HELP_LINES,
+      'test': 'innows'},
      None, OK],
 
     #

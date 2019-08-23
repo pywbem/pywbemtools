@@ -129,6 +129,9 @@ class CLITestsBase(object):
                  entry in expected response is in the response data as a single
                  test.
 
+                 'innows' - Like 'in, except that differences in whitespace are
+                 ignored.
+
                  Executes a single regex search of the entire
                  response data to match with each entry in the expected
                  response
@@ -294,6 +297,13 @@ class CLITestsBase(object):
                         assert test_str in rtn_value, \
                             "Desc: {}\nString: {}\nNot in:\n{!r}".format(
                                 desc, test_str, rtn_value)
+                elif test_definition == 'innows':
+                    if isinstance(test_value, six.string_types):
+                        test_value = [test_value]
+                    for test_str in test_value:
+                        assert remove_ws(test_str) in remove_ws(rtn_value), \
+                            "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
+                            "{!r}".format(desc, test_str, rtn_value)
                 else:
                     assert 'test %s is invalid. Skipped' % test_definition
 
