@@ -37,55 +37,62 @@ MOCK_SERVER_MODEL = os.path.join('utils', 'wbemserver_mock.py')
 # 2. The first line of the command comment (i.e. the summary sentence)
 # 3. The last line CMD_OPTION_HELP_HELP_LINE
 # 4. Each option including at least the long and short names
-SERVER_HELP_LINE = [
+SERVER_HELP_LINES = [
     'Usage: pywbemcli server [COMMAND-OPTIONS]',
     'Command group for WBEM servers.',
     CMD_OPTION_HELP_HELP_LINE,
+    'brand             Display the brand of the server.',
+    'connection        Display connection info used by this server.',
+    'get-centralinsts  Get central instances of mgmt profiles on the server.',
+    'info              Display information about the server.',
+    'interop           Display the Interop namespace of the server.',
+    'namespaces        Display the namespaces of the server.',
+    'profiles          Display management profiles advertized by the server.',
 ]
 
-SERVER_BRAND_HELP_LINE = [
+SERVER_BRAND_HELP_LINES = [
     'Usage: pywbemcli server brand [COMMAND-OPTIONS]',
     'Display the brand of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_CONNECTION_HELP_LINE = [
+SERVER_CONNECTION_HELP_LINES = [
     'Usage: pywbemcli server connection [COMMAND-OPTIONS]',
     'Display connection info used by this server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_GETCENTRALINSTS_HELP_LINE = [
+SERVER_GETCENTRALINSTS_HELP_LINES = [
     'Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]',
     'Get central instances of mgmt profiles on the server.',
-    '-o, --organization <org name>   Filter by the defined organization',
-    '-p, --profile <profile name>    Filter by the profile name',
-    '-c, --central-class <classname>',
-    '-s, --scoping-class <classname>',
-    '-S, --scoping-path <pathname>   Optional. Required only if profiles',
-    '-r, --reference-direction [snia|dmtf]',
+    '-o, --organization <org name> Filter by the defined organization',
+    '-p, --profile <profile name> Filter by the profile name',
+    '-c, --central-class <classname> Optional. Required only if profiles',
+    '-s, --scoping-class <classname> Optional. Required only if profiles',
+    '-S, --scoping-path <pathname> Optional. Required only if profiles',
+    '-r, --reference-direction [snia|dmtf] Navigation direction',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_INFO_HELP_LINE = [
+SERVER_INFO_HELP_LINES = [
     'Usage: pywbemcli server info [COMMAND-OPTIONS]',
     'Display information about the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_INTEROP_HELP_LINE = [
+SERVER_INTEROP_HELP_LINES = [
     'Usage: pywbemcli server interop [COMMAND-OPTIONS]',
     'Display the Interop namespace of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_NAMESPACES_HELP_LINE = [
+SERVER_NAMESPACES_HELP_LINES = [
     'Usage: pywbemcli server namespaces [COMMAND-OPTIONS]',
     'Display the namespaces of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_PROFILES_HELP_LINE = [
+SERVER_PROFILES_HELP_LINES = [
     'Usage: pywbemcli server profiles [COMMAND-OPTIONS]',
     'Display management profiles advertized by the server.',
     CMD_OPTION_HELP_HELP_LINE,
@@ -106,51 +113,99 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify server subcommand help response',
+    ['Verify server subcommand --help response',
      '--help',
-     {'stdout': SERVER_HELP_LINE,
+     {'stdout': SERVER_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand -h response',
+     '-h',
+     {'stdout': SERVER_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand brand  --help response',
      ['brand', '--help'],
-     {'stdout': SERVER_BRAND_HELP_LINE,
+     {'stdout': SERVER_BRAND_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand brand  -h response',
+     ['brand', '-h'],
+     {'stdout': SERVER_BRAND_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand connection --help response',
      ['connection', '--help'],
-     {'stdout': SERVER_CONNECTION_HELP_LINE,
+     {'stdout': SERVER_CONNECTION_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand connection -h response',
+     ['connection', '-h'],
+     {'stdout': SERVER_CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand get-centralinsts  --help response',
      ['get-centralinsts', '--help'],
-     {'stdout': SERVER_GETCENTRALINSTS_HELP_LINE,
+     {'stdout': SERVER_GETCENTRALINSTS_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand get-centralinsts  -h response',
+     ['get-centralinsts', '-h'],
+     {'stdout': SERVER_GETCENTRALINSTS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand info --help response',
      ['info', '--help'],
-     {'stdout': SERVER_INFO_HELP_LINE,
+     {'stdout': SERVER_INFO_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand info -h response',
+     ['info', '-h'],
+     {'stdout': SERVER_INFO_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify server subcommand interop --help response',
      ['interop', '--help'],
-     {'stdout': SERVER_INTEROP_HELP_LINE,
+     {'stdout': SERVER_INTEROP_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand namespaces --help response',
+    ['Verify server subcommand interop -h response',
+     ['interop', '-h'],
+     {'stdout': SERVER_INTEROP_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand namespaces --help response',
      ['namespaces', '--help'],
-     {'stdout': SERVER_NAMESPACES_HELP_LINE,
+     {'stdout': SERVER_NAMESPACES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand profiles  --help response',
+    ['Verify server subcommand namespaces -h response',
+     ['namespaces', '-h'],
+     {'stdout': SERVER_NAMESPACES_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand profiles --help response',
      ['profiles', '--help'],
-     {'stdout': SERVER_PROFILES_HELP_LINE,
+     {'stdout': SERVER_PROFILES_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server subcommand profiles -h response',
+     ['profiles', '-h'],
+     {'stdout': SERVER_PROFILES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 

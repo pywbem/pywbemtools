@@ -23,8 +23,10 @@ from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
-    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
-    CMD_VERIFY_OPTION_HELP_LINE
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, CMD_OPTION_VERIFY_HELP_LINE, \
+    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE, \
+    CMD_OPTION_INTERACTIVE_HELP_LINE, CMD_OPTION_FILTER_QUERY_LINE, \
+    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, CMD_OPTION_LOCAL_ONLY_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -37,32 +39,8 @@ MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
-CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE = \
-    '-q, --include-qualifiers If set, requests server to include'
-
-CMD_OPTION_ROLE_LINE = \
-    '-r, --role <role name> Filter by the role name provided'
-
-CMD_OPTION_FILTER_QUERY_LINE = \
-    '-f, --filter-query TEXT A filter query to be passed to the server'
-
-CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
-    '--filter-query-language TEXT A filter-query language to be used'
-
-CMD_INTERACTIVE_OPTION_HELP_LINE = \
-    "-i, --interactive If set, `INSTANCENAME` argument must"
-
-CMD_DEEPINHERITANCE_OPTION_HELP_LINE = \
-    '-d, --deep-inheritance If set, requests server to return properties'
-
-CMD_PROPERTY_OPTION_HELP_LINE = \
+INSTANCE_OPTION_PROPERTY_HELP_LINE = \
     '-P, --property name=value Optional property names of the form name=value',
-
-CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE = \
-    '-q, --include-qualifiers If set, requests server to include'
-
-CMD_LOCALONLY_OPTION_HELP_LINE = \
-    '-l, --local-only Show only local properties of the'
 
 #
 # The following list define the help for each command in terms of particular
@@ -73,61 +51,73 @@ CMD_LOCALONLY_OPTION_HELP_LINE = \
 # 2. The last line CMD_OPTION_HELP_HELP_LINE
 # Defined in alphabetical order
 
-INSTANCE_HELP_LINE = [
+INSTANCE_HELP_LINES = [
     'Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...',
-    'Command group for persistent WBEM connections.',
+    'Command group for CIM instances.',
     CMD_OPTION_HELP_HELP_LINE,
+    'associators   Get the instances associated with an instance.',
+    'count         Count the instances of each class with matching class '
+    'name.',
+    'create        Create an instance of a class in a namespace.',
+    'delete        Delete an instance of a class.',
+    'enumerate     Get the instances of a class.',
+    'get           Get an instance of a class.',
+    'invokemethod  Invoke a method on an instance.',
+    'modify        Modify an instance of a class.',
+    'query         Execute a query on instances in a namespace.',
+    'references    Get the instances referencing an instance.',
 ]
 
-INSTANCE_ASSOCIATORS_HELP_LINE = [
+INSTANCE_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli  instance associators [COMMAND-OPTIONS] INSTANCENAME',
     'Get the instances associated with an instance.',
     '-a, --assoc-class <class name>  Filter by the association class name',
     '-c, --result-class <class name>',
     '-r, --role <role name> Filter by the role name provided. Each',
     '-R, --result-role <role name>   Filter by the result role name provided',
-    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_COUNT_HELP_LINE = [
+INSTANCE_COUNT_HELP_LINES = [
     'Usage: pywbemcli  instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'Count the instances of each class with matching class name.',
+    '-s, --sort Sort by instance count.',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_CREATE_HELP_LINE = [
+INSTANCE_CREATE_HELP_LINES = [
     'Usage: pywbemcli  instance create [COMMAND-OPTIONS] CLASSNAME',
     'Create an instance of a class in a namespace.',
-    CMD_PROPERTY_OPTION_HELP_LINE,
-    CMD_VERIFY_OPTION_HELP_LINE,
+    INSTANCE_OPTION_PROPERTY_HELP_LINE,
+    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_DELETE_HELP_LINE = [
+INSTANCE_DELETE_HELP_LINES = [
     'Usage: pywbemcli  instance delete [COMMAND-OPTIONS] INSTANCENAME',
     'Delete an instance of a class.',
-    CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_ENUMERATE_HELP_LINE = [
+INSTANCE_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli  instance enumerate [COMMAND-OPTIONS] CLASSNAME',
     'Get the instances of a class.',
-    CMD_LOCALONLY_OPTION_HELP_LINE,
-    CMD_DEEPINHERITANCE_OPTION_HELP_LINE,
-    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    '-d, --deep-inheritance If set, requests server to return properties',
+    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -138,56 +128,59 @@ INSTANCE_ENUMERATE_HELP_LINE = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_GET_HELP_LINE = [
+INSTANCE_GET_HELP_LINES = [
     'Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
     'Get an instance of a class.',
-    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_INVOKEMETHOD_HELP_LINE = [
+INSTANCE_INVOKEMETHOD_HELP_LINES = [
     'Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME '
     'METHODNAME',
     'Invoke a method on an instance.',
-    '-p, --parameter name=value',
+    '-p, --parameter name=value Multiple definitions allowed',
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_INTERACTIVE_OPTION_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_MODIFY_HELP_LINE = [
+INSTANCE_MODIFY_HELP_LINES = [
     'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
     'Modify an instance of a class.',
-    CMD_PROPERTY_OPTION_HELP_LINE,
+    INSTANCE_OPTION_PROPERTY_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
-    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
+    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_QUERY_HELP_LINE = [
+INSTANCE_QUERY_HELP_LINES = [
     'Usage: pywbemcli instance query [COMMAND-OPTIONS] INSTANCENAME',
     'Execute a query on instances in a namespace.',
-    '-l, --query-language QUERY LANGUAGE',
+    '-l, --query-language QUERY LANGUAGE Use the query language',
     CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-INSTANCE_REFERENCES_HELP_LINE = [
+INSTANCE_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
     'Get the instances referencing an instance.',
-    '-R, --resultclass <class name>  Filter by the result class name',
-    '-r, --role <role name>  Filter by the role name provided',
-    CMD_INCLUDEQUALIFIERS_OPTION_HELP_LINE,
+    '-R, --resultclass <class name> Filter by the result class name',
+    '-r, --role <role name> Filter by the role name provided',
+    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_INTERACTIVE_OPTION_HELP_LINE,
+    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
@@ -326,18 +319,30 @@ TEST_CASES = [
     #
     #   instance --help
     #
-    ['Verify instance subcommand help response',
+    ['Verify instance subcommand --help response',
      '--help',
-     {'stdout': INSTANCE_HELP_LINE,
+     {'stdout': INSTANCE_HELP_LINES,
+      'test': 'insnows'},
+     None, OK],
+
+    ['Verify instance subcommand -h response',
+     '-h',
+     {'stdout': INSTANCE_HELP_LINES,
       'test': 'insnows'},
      None, OK],
 
     #
     #  Instance Enumerate subcommand good responses
     #
-    ['Verify instance subcommand enumerate  --help response',
+    ['Verify instance subcommand enumerate --help response',
      ['enumerate', '--help'],
-     {'stdout': INSTANCE_ENUMERATE_HELP_LINE,
+     {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand enumerate -h response',
+     ['enumerate', '-h'],
+     {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -610,9 +615,16 @@ Instances: PyWBEM_AllTypes
     #  instance get subcommand
     #
 
-    ['Verify instance subcommand get with instancename returns data',
+    ['Verify instance subcommand get --help response',
      ['get', '--help'],
-     {'stdout': INSTANCE_GET_HELP_LINE,
+     {'stdout': INSTANCE_GET_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand get -h response',
+     ['get', '-h'],
+     {'stdout': INSTANCE_GET_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -811,9 +823,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance create subcommand
     #
-    ['Verify instance subcommand create, --help response',
+    ['Verify instance subcommand create --help response',
      ['create', '--help'],
-     {'stdout': INSTANCE_CREATE_HELP_LINE,
+     {'stdout': INSTANCE_CREATE_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand create -h response',
+     ['create', '-h'],
+     {'stdout': INSTANCE_CREATE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -945,9 +964,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance modify subcommand
     #
-    ['Verify instance subcommand modify, --help response',
+    ['Verify instance subcommand modify --help response',
      ['modify', '--help'],
-     {'stdout': INSTANCE_MODIFY_HELP_LINE,
+     {'stdout': INSTANCE_MODIFY_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand modify -h response',
+     ['modify', '-h'],
+     {'stdout': INSTANCE_MODIFY_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1110,9 +1136,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance delete subcommand
     #
-    ['Verify instance subcommand delete, --help response',
+    ['Verify instance subcommand delete --help response',
      ['delete', '--help'],
-     {'stdout': INSTANCE_DELETE_HELP_LINE,
+     {'stdout': INSTANCE_DELETE_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand delete -h response',
+     ['delete', '-h'],
+     {'stdout': INSTANCE_DELETE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1192,9 +1225,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance references subcommand
     #
-    ['Verify instance subcommand references, --help response',
+    ['Verify instance subcommand references --help response',
      ['references', '--help'],
-     {'stdout': INSTANCE_REFERENCES_HELP_LINE,
+     {'stdout': INSTANCE_REFERENCES_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand references -h response',
+     ['references', '-h'],
+     {'stdout': INSTANCE_REFERENCES_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1397,9 +1437,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance associators subcommand
     #
-    ['Verify instance subcommand associators, --help response',
+    ['Verify instance subcommand associators --help response',
      ['associators', '--help'],
-     {'stdout': INSTANCE_ASSOCIATORS_HELP_LINE,
+     {'stdout': INSTANCE_ASSOCIATORS_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand associators -h response',
+     ['associators', '-h'],
+     {'stdout': INSTANCE_ASSOCIATORS_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1509,9 +1556,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance count subcommand
     #
-    ['Verify instance subcommand count, --help response',
+    ['Verify instance subcommand count --help response',
      ['count', '--help'],
-     {'stdout': INSTANCE_COUNT_HELP_LINE,
+     {'stdout': INSTANCE_COUNT_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand count -h response',
+     ['count', '-h'],
+     {'stdout': INSTANCE_COUNT_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1562,9 +1616,15 @@ Instances: PyWBEM_AllTypes
     #  instance invokemethod tests
     #
 
-    ['class subcommand invokemethod --help, . ',
+    ['class subcommand invokemethod --help',
      ['invokemethod', '--help'],
-     {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINE,
+     {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['class subcommand invokemethod -h',
+     ['invokemethod', '-h'],
+     {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -1607,9 +1667,16 @@ Instances: PyWBEM_AllTypes
     #
     #  instance query subcommand. We have not implemented this command
     #
-    ['Verify instance subcommand query, --help response',
+    ['Verify instance subcommand query --help response',
      ['query', '--help'],
-     {'stdout': INSTANCE_QUERY_HELP_LINE,
+     {'stdout': INSTANCE_QUERY_HELP_LINES,
+      'rc': 0,
+      'test': 'linnows'},
+     None, OK],
+
+    ['Verify instance subcommand query -h response',
+     ['query', '-h'],
+     {'stdout': INSTANCE_QUERY_HELP_LINES,
       'rc': 0,
       'test': 'linnows'},
      None, OK],

@@ -21,7 +21,8 @@ from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
-    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE
+    CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE
 
 from .utils import execute_pywbemcli, assert_rc
 
@@ -34,11 +35,6 @@ SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 
-CMD_OPTION_LOCAL_ONLY_HELP_LINE = \
-    '-l, --local-only Show only local properties'
-
-CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
-    '--no-qualifiers If set, request server to not include qualifiers'
 
 #
 # The following list define the help for each command in terms of particular
@@ -52,15 +48,36 @@ CLASS_HELP_LINES = [
     'Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...',
     'Command group for CIM classes.',
     CMD_OPTION_HELP_HELP_LINE,
+    'associators   Get the classes associated with a class.',
+    'delete        Delete a class.',
+    'enumerate     Get the top classes or subclasses of a class in a',
+    'find          Get the classes with matching class names on the',
+    'get           Get a class.',
+    'invokemethod  Invoke a method on a class.',
+    'references    Get the classes referencing a class.',
+    'tree          Get the subclass or superclass inheritance tree of a',
 ]
 
-CLASS_GET_HELP_LINES = [
-    'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
-    'Get a class.',
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+CLASS_ASSOCIATORS_HELP_LINES = [
+    'Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME',
+    'Get the classes associated with a class.',
+    '-a, --assoc-class <class name> Filter by the association class name',
+    '-C, --result-class <class name> Filter the returned objects by the class',
+    '-r, --role <role name> Filter by the role name',
+    '-R, --result-role <role name> Filter by the result role name',
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    CMD_OPTION_NAMES_ONLY_HELP_LINE,
+    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+CLASS_DELETE_HELP_LINES = [
+    'Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME',
+    'Delete a class.',
+    '-f, --force Force the delete request',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -81,40 +98,27 @@ CLASS_ENUMERATE_HELP_LINES = [
 CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'Get the classes with matching class names on the WBEM server.',
-    '-n, --namespace <name> Namespace(s) to use for this operation',
-    CMD_OPTION_HELP_HELP_LINE,
-]
-
-CLASS_TREE_HELP_LINES = [
-    'Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME',
-    'Get the subclass or superclass inheritance tree of a class.',
-    '-s, --superclasses Display the superclasses',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-CLASS_DELETE_HELP_LINES = [
-    'Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME',
-    'Delete a class.',
-    '-f, --force Force the delete request',
-    CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
-]
-
-CLASS_ASSOCIATORS_HELP_LINES = [
-    'Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME',
-    'Get the classes associated with a class.',
-    '-a, --assoc-class <class name> Filter by the association class name',
-    '-C, --result-class <class name> Filter the returned objects by the class '
-    'name',
-    '-r, --role <role name> Filter by the role name',
-    '-R, --result-role <role name> Filter by the result role name',
+CLASS_GET_HELP_LINES = [
+    'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
+    'Get a class.',
+    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
-    CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_SUMMARY_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+CLASS_INVOKEMETHOD_HELP_LINES = [
+    'Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME '
+    'METHODNAME',
+    'Invoke a method on a class.',
+    '-p, --parameter parameter Optional multiple method parameters of form',
+    CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -132,11 +136,10 @@ CLASS_REFERENCES_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-CLASS_INVOKEMETHOD_HELP_LINES = [
-    'Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME '
-    'METHODNAME',
-    'Invoke a method on a class.',
-    '-p, --parameter parameter Optional multiple method parameters of form',
+CLASS_TREE_HELP_LINES = [
+    'Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME',
+    'Get the subclass or superclass inheritance tree of a class.',
+    '-s, --superclasses Display the superclasses',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -308,13 +311,13 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify class --help response (light)',
+    ['Verify class subcommand --help response',
      ['--help'],
      {'stdout': CLASS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class -h response (light)',
+    ['Verify class subcommand -h response',
      ['-h'],
      {'stdout': CLASS_HELP_LINES,
       'test': 'innows'},
@@ -323,13 +326,13 @@ TEST_CASES = [
     #
     # Enumerate subcommand and its options
     #
-    ['Verify class subcommand enumerate --help response (light)',
+    ['Verify class subcommand enumerate --help response',
      ['enumerate', '--help'],
      {'stdout': CLASS_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand enumerate -h response (light)',
+    ['Verify class subcommand enumerate -h response',
      ['enumerate', '-h'],
      {'stdout': CLASS_ENUMERATE_HELP_LINES,
       'test': 'innows'},
@@ -484,13 +487,13 @@ TEST_CASES = [
     #
     # Test class get
     #
-    ['Verify class subcommand get --help response (light)',
+    ['Verify class subcommand get --help response',
      ['get', '--help'],
      {'stdout': CLASS_GET_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand get -h response (light)',
+    ['Verify class subcommand get -h response',
      ['get', '-h'],
      {'stdout': CLASS_GET_HELP_LINES,
       'test': 'innows'},
@@ -689,13 +692,13 @@ TEST_CASES = [
     #
     # find subcommand
     #
-    ['Verify class subcommand find --help response (light)',
+    ['Verify class subcommand find --help response',
      ['find', '--help'],
      {'stdout': CLASS_FIND_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand find -h response (light)',
+    ['Verify class subcommand find -h response',
      ['find', '-h'],
      {'stdout': CLASS_FIND_HELP_LINES,
       'test': 'innows'},
@@ -775,13 +778,13 @@ TEST_CASES = [
     #
     # subcommand "class delete"
     #
-    ['Verify class subcommand delete --help response (light)',
+    ['Verify class subcommand delete --help response',
      ['delete', '--help'],
      {'stdout': CLASS_DELETE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand delete -h response (light)',
+    ['Verify class subcommand delete -h response',
      ['delete', '-h'],
      {'stdout': CLASS_DELETE_HELP_LINES,
       'test': 'innows'},
@@ -842,13 +845,13 @@ TEST_CASES = [
     #
     # subcommand "class tree"
     #
-    ['Verify class subcommand tree --help response (light)',
+    ['Verify class subcommand tree --help response',
      ['tree', '--help'],
      {'stdout': CLASS_TREE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand tree -h response (light)',
+    ['Verify class subcommand tree -h response',
      ['tree', '-h'],
      {'stdout': CLASS_TREE_HELP_LINES,
       'test': 'innows'},
@@ -913,13 +916,13 @@ TEST_CASES = [
     # associators subcommand tests
     #
     #
-    ['Verify class subcommand associators --help response (light)',
+    ['Verify class subcommand associators --help response',
      ['associators', '--help'],
      {'stdout': CLASS_ASSOCIATORS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand associators -h response (light)',
+    ['Verify class subcommand associators -h response',
      ['associators', '-h'],
      {'stdout': CLASS_ASSOCIATORS_HELP_LINES,
       'test': 'innows'},
@@ -1074,13 +1077,13 @@ TEST_CASES = [
     #
     # references subcommand tests
     #
-    ['Verify class subcommand references --help response (light)',
+    ['Verify class subcommand references --help response',
      ['references', '--help'],
      {'stdout': CLASS_REFERENCES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand references -h response (light)',
+    ['Verify class subcommand references -h response',
      ['references', '-h'],
      {'stdout': CLASS_REFERENCES_HELP_LINES,
       'test': 'innows'},
@@ -1133,13 +1136,13 @@ TEST_CASES = [
     #
     # invokemethod subcommand tests
     #
-    ['Verify class subcommand invokemethod --help response (light)',
+    ['Verify class subcommand invokemethod --help response',
      ['invokemethod', '--help'],
      {'stdout': CLASS_INVOKEMETHOD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify class subcommand invokemethod -h response (light)',
+    ['Verify class subcommand invokemethod -h response',
      ['invokemethod', '-h'],
      {'stdout': CLASS_INVOKEMETHOD_HELP_LINES,
       'test': 'innows'},

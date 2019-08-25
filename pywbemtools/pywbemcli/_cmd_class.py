@@ -323,7 +323,7 @@ def class_associators(context, classname, **options):
                 required=True)
 @click.option('-n', '--namespace', type=str, multiple=True,
               required=False, metavar='<name>',
-              help='Namespace(s) to use for this operation. If defined only '
+              help='Namespace to use for this operation. If defined only '
               'those namespaces are searched rather than all available '
               'namespaces. ex: -n root/interop -n root/cimv2')
 @click.pass_obj

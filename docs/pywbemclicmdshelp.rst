@@ -86,7 +86,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -t, --timeout INTEGER           Client timeout completion of WBEM server
                                       operation in seconds.
                                       (EnvVar:
-                                      PYWBEMCLI_PYWBEMCLI_TIMEOUT)
+                                      PYWBEMCLI_TIMEOUT)
       -N, --no-verify                 If set, client does not verify WBEM server
                                       certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
       -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
@@ -130,7 +130,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       pywbemcli to use only the traditional non-
                                       pull operations.
                                       * "either": pywbemcli trys
-                                      first pull and then  traditional operations.
+                                      first pull and then traditional operations.
                                       (EnvVar: PYWBEMCLI_USE_PULL) [Default:
                                       either]
       --pull-max-cnt INTEGER          Maximium object count of objects to be
@@ -440,8 +440,8 @@ The following defines the help output for the `pywbemcli class find --help` subc
         class find CIM_Foo
 
     Options:
-      -n, --namespace <name>  Namespace(s) to use for this operation. If defined
-                              only those namespaces are searched rather than all
+      -n, --namespace <name>  Namespace to use for this operation. If defined only
+                              those namespaces are searched rather than all
                               available namespaces. ex: -n root/interop -n
                               root/cimv2
       -h, --help              Show this message and exit.
@@ -1146,12 +1146,12 @@ The following defines the help output for the `pywbemcli instance associators --
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
-                                      server and the "--use--pull-ops" general
-                                      option. If pull operations are used,
-                                      qualifiers will not be included, even if
-                                      this option is specified. If traditional
-                                      operations are used, inclusion of qualifiers
-                                      depends on the server.
+                                      server and the "--use-pull" general option.
+                                      If pull operations are used, qualifiers will
+                                      not be included, even if this option is
+                                      specified. If traditional operations are
+                                      used, inclusion of qualifiers depends on the
+                                      server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
@@ -1366,12 +1366,12 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
-                                      server and the "--use--pull-ops" general
-                                      option. If pull operations are used,
-                                      qualifiers will not be included, even if
-                                      this option is specified. If traditional
-                                      operations are used, inclusion of qualifiers
-                                      depends on the server.
+                                      server and the "--use-pull" general option.
+                                      If pull operations are used, qualifiers will
+                                      not be included, even if this option is
+                                      specified. If traditional operations are
+                                      used, inclusion of qualifiers depends on the
+                                      server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
@@ -1438,9 +1438,8 @@ The following defines the help output for the `pywbemcli instance get --help` su
       format general option.
 
     Options:
-      -l, --local-only                Request that server show only local
-                                      properties of the returned instance. Some
-                                      servers may not process this parameter.
+      -l, --local-only                Show only local properties of the instance.
+                                      Some servers may not process this parameter.
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. Not
                                       all servers return qualifiers on instances
@@ -1691,12 +1690,12 @@ The following defines the help output for the `pywbemcli instance references --h
                                       qualifiers in the returned instances. This
                                       subcommand may use either pull or
                                       traditional operations depending on the
-                                      server and the "--use--pull-ops" general
-                                      option. If pull operations are used,
-                                      qualifiers will not be included, even if
-                                      this option is specified. If traditional
-                                      operations are used, inclusion of qualifiers
-                                      depends on the server.
+                                      server and the "--use-pull" general option.
+                                      If pull operations are used, qualifiers will
+                                      not be included, even if this option is
+                                      specified. If traditional operations are
+                                      used, inclusion of qualifiers depends on the
+                                      server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
                                       may ignore this option.
