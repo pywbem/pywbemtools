@@ -243,7 +243,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify valid pull_ops parameter yes.',
+    ['Verify valid --use-pull option parameter yes.',
      {'global': ['-s', 'http://blah', '--use-pull', 'yes'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -252,7 +252,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify valid pull_ops parameter no.',
+    ['Verify valid --use-pull option parameter no.',
      {'global': ['-s', 'http://blah', '--use-pull', 'no'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -261,7 +261,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify valid --use-pull parameter.',
+    ['Verify valid --use-pull option parameter.',
      {'global': ['-s', 'http://blah', '--use-pull', 'either'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -270,7 +270,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid --use-pull parameter fails.',
+    ['Verify invalid --use-pull option parameter fails.',
      {'global': ['-s', 'http://blah', '--use-pull', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -280,7 +280,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify valid pull-max-cnt parameter.',
+    ['Verify valid --pull-max-cnt option parameter.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -289,7 +289,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid pull-max-cnt parameter fails.',
+    ['Verify invalid --pull-max-cnt option parameter fails.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'subcmd': 'connection',
       'args': ['show']},
@@ -659,7 +659,7 @@ TEST_CASES = [
 class TestGlobalOptions(CLITestsBase):
     """
     Test the global options including statistics,  --server,
-    --timeout, --use-pull_ops, --pull-max-cnt, --output-format
+    --timeout, --use-pull, --pull-max-cnt, --output-format
     """
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition", TEST_CASES)

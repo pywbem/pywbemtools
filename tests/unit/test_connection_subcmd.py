@@ -24,7 +24,7 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
-    CMD_VERIFY_OPTION_HELP_LINE
+    CMD_OPTION_VERIFY_HELP_LINE
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -43,13 +43,21 @@ TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
 CONFIRM_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_CONFIRMY_FILE)
 
-CONNECTION_HELP_LINE = [
+CONNECTION_HELP_LINES = [
     'Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...',
     'Command group for persistent WBEM connections.',
     CMD_OPTION_HELP_HELP_LINE,
+    'add     Create a new named WBEM connection.',
+    'delete  Delete a named WBEM connection.',
+    'export  Export the current connection information.',
+    'list    List the entries in the connections file.',
+    'save    Save current connection to connections file.',
+    'select  Select a connection from connections file.',
+    'show    Show current or NAME connection information.',
+    'test    Execute a predefined WBEM request.',
 ]
 
-CONNECTION_ADD_HELP_LINE = [
+CONNECTION_ADD_HELP_LINES = [
     'Usage: pywbemcli connection add [COMMAND-OPTIONS]',
     'Create a new named WBEM connection.',
     '-s, --server SERVER Required hostname or IP address with scheme',
@@ -57,59 +65,59 @@ CONNECTION_ADD_HELP_LINE = [
     '-d, --default-namespace NAMESPACE',
     '-u, --user TEXT User name for the WBEM server connection',
     '-p, --password TEXT Password for the WBEM server. Will be',
-    '-t, --timeout INTEGER RANGE     Operation timeout for the WBEM server in',
-    '-N, --noverify                  If set, client does not verify server',
-    '-k, --keyfile TEXT              Client private key file',
-    '-U, --use-pull-ops [yes|no|either]',
-    '--pull-max-cnt INTEGER          Maximium object count of objects',
-    '-l, --log COMP=DEST:DETAIL,...  Enable logging of CIM Operations',
-    '-m, --mock-server FILENAME      If this option is defined',
-    '--ca_certs TEXT                 File or directory containing',
-    CMD_VERIFY_OPTION_HELP_LINE,
+    '-t, --timeout INTEGER RANGE Operation timeout for the WBEM server in',
+    '-N, --no-verify If set, client does not verify server',
+    '-k, --keyfile TEXT Client private key file',
+    '-U, --use-pull [yes|no|either] Determines whether pull operations',
+    '--pull-max-cnt INTEGER Maximium object count of objects',
+    '-l, --log COMP=DEST:DETAIL,... Enable logging of CIM Operations',
+    '-m, --mock-server FILENAME If this option is defined',
+    '--ca_certs TEXT File or directory containing',
+    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-CONNECTION_DELETE_HELP_LINE = [
+CONNECTION_DELETE_HELP_LINES = [
     'Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME',
     'Delete a named WBEM connection.',
-    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-CONNECTION_EXPORT_HELP_LINE = [
+CONNECTION_EXPORT_HELP_LINES = [
     'Usage: pywbemcli connection export [COMMAND-OPTIONS]',
     'Export the current connection information.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-CONNECTION_LIST_HELP_LINE = [
+CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli connection list [COMMAND-OPTIONS]',
     'List the entries in the connections file.',
     'An "*" after the name indicates the currently selected',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
-CONNECTION_SAVE_HELP_LINE = [
+CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS]',
     'Save current connection to connections file.',
     '-n, --name Connection name  If defined, this changes the name of',
-    CMD_VERIFY_OPTION_HELP_LINE,
+    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
 ]
 
-CONNECTION_SELECT_HELP_LINE = [
+CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
     'Select a connection from connections file.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
-CONNECTION_SHOW_HELP_LINE = [
+CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
     'Show current or NAME connection information.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
-CONNECTION_TEST_HELP_LINE = [
+CONNECTION_TEST_HELP_LINES = [
     'Usage: pywbemcli connection test [COMMAND-OPTIONS]',
     'Execute a predefined WBEM request.',
     CMD_OPTION_HELP_HELP_LINE,
@@ -131,57 +139,111 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify connection subcommand help response',
+    ['Verify connection subcommand --help response',
      '--help',
-     {'stdout': CONNECTION_HELP_LINE,
+     {'stdout': CONNECTION_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand -h response',
+     '-h',
+     {'stdout': CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand add --help response',
      ['add', '--help'],
-     {'stdout': CONNECTION_ADD_HELP_LINE,
+     {'stdout': CONNECTION_ADD_HELP_LINES,
+      'test': 'inows'},
+     None, OK],
+
+    ['Verify connection subcommand add -h response',
+     ['add', '-h'],
+     {'stdout': CONNECTION_ADD_HELP_LINES,
       'test': 'inows'},
      None, OK],
 
     ['Verify connection subcommand delete --help response',
      ['delete', '--help'],
-     {'stdout': CONNECTION_DELETE_HELP_LINE,
+     {'stdout': CONNECTION_DELETE_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand delete -h response',
+     ['delete', '-h'],
+     {'stdout': CONNECTION_DELETE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand export --help response',
      ['export', '--help'],
-     {'stdout': CONNECTION_EXPORT_HELP_LINE,
+     {'stdout': CONNECTION_EXPORT_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand export -h response',
+     ['export', '-h'],
+     {'stdout': CONNECTION_EXPORT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand list --help response',
      ['list', '--help'],
-     {'stdout': CONNECTION_LIST_HELP_LINE,
+     {'stdout': CONNECTION_LIST_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand list -h response',
+     ['list', '-h'],
+     {'stdout': CONNECTION_LIST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand save --help response',
      ['save', '--help'],
-     {'stdout': CONNECTION_SAVE_HELP_LINE,
+     {'stdout': CONNECTION_SAVE_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand save -h response',
+     ['save', '-h'],
+     {'stdout': CONNECTION_SAVE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand select  --help response',
      ['select', '--help'],
-     {'stdout': CONNECTION_SELECT_HELP_LINE,
+     {'stdout': CONNECTION_SELECT_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand select  -h response',
+     ['select', '-h'],
+     {'stdout': CONNECTION_SELECT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand show --help response',
      ['show', '--help'],
-     {'stdout': CONNECTION_SHOW_HELP_LINE,
+     {'stdout': CONNECTION_SHOW_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand show -h response',
+     ['show', '-h'],
+     {'stdout': CONNECTION_SHOW_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand test --help response',
      ['test', '--help'],
-     {'stdout': CONNECTION_TEST_HELP_LINE,
+     {'stdout': CONNECTION_TEST_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand test -h response',
+     ['test', '-h'],
+     {'stdout': CONNECTION_TEST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 

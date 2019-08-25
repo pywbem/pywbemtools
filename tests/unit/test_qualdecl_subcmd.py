@@ -18,6 +18,8 @@ Tests the qualifier grop of  subcommands
 import os
 import pytest
 from .cli_test_extensions import CLITestsBase
+from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
+    CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -25,41 +27,27 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 
-# The following are common across multiple groups
-CMD_OPTION_HELP_HELP_LINE = \
-    '-h, --help Show this message and exit.'
-
-CMD_OPTION_NAMESPACE_HELP_LINE = \
-    '-n, --namespace <name> Namespace to use for this operation'
-
-CMD_OPTION_SUMMARY_HELP_LINE = \
-    '-S, --summary Return only summary of objects'
-
-# The following are particular to this group
-GRP_HELP_USAGE = \
-    'Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...'
-
 QD_HELP_LINES = [
-    GRP_HELP_USAGE,
+    'Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...'
     'Command group for CIM qualifier declarations.',
+    CMD_OPTION_HELP_HELP_LINE,
     'enumerate  List the CIM qualifier declarations in a CIM namespace.',
     'get        Get a CIM qualifier declaration.',
-    CMD_OPTION_HELP_HELP_LINE
 ]
 
-QD_ENUM_HELP_LINES = [
+QD_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]',
     'List the CIM qualifier declarations in a CIM namespace.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 QD_GET_HELP_LINES = [
     'Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME',
     "Get a CIM qualifier declaration.",
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 QD_ENUM_MOCK = """Qualifier Abstract : boolean = false,
@@ -177,25 +165,37 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify qualifier subcommand help response',
+    ['Verify qualifier subcommand --help response',
      '--help',
      {'stdout': QD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand enumerate  --help response',
+    ['Verify qualifier subcommand -h response',
+     '-h',
+     {'stdout': QD_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify qualifier subcommand enumerate --help response',
      ['enumerate', '--help'],
-     {'stdout': QD_ENUM_HELP_LINES,
+     {'stdout': QD_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand enumerate  -h response.',
+    ['Verify qualifier subcommand enumerate -h response.',
      ['enumerate', '-h'],
-     {'stdout': QD_ENUM_HELP_LINES,
+     {'stdout': QD_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand get  -h response.',
+    ['Verify qualifier subcommand get --help response.',
+     ['get', '--help'],
+     {'stdout': QD_GET_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify qualifier subcommand get -h response.',
      ['get', '-h'],
      {'stdout': QD_GET_HELP_LINES,
       'test': 'innows'},

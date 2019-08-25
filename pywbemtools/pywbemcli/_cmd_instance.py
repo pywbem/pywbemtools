@@ -50,7 +50,7 @@ includequalifiersenum_option = [              # pylint: disable=invalid-name
                  help='If set, requests server to include qualifiers in the '
                  'returned instances. This subcommand may use either pull '
                  'or traditional operations depending on the server '
-                 'and the "--use--pull-ops" general option. If pull operations '
+                 'and the "--use-pull" general option. If pull operations '
                  'are used, qualifiers will not be included, even if this '
                  'option is specified. If traditional operations are used, '
                  'inclusion of qualifiers depends on the server.')]
@@ -66,10 +66,8 @@ deepinheritance_option = [              # pylint: disable=invalid-name
 
 localonlyget_option = [              # pylint: disable=invalid-name
     click.option('-l', '--local-only', is_flag=True, required=False,
-                 help='Request that server show only local properties of the '
-                      'returned instance. Some servers may not process this '
-                      'parameter.')]
-
+                 help='Show only local properties of the instance. '
+                 'Some servers may not process this parameter.')]
 
 localonlyenum_option = [              # pylint: disable=invalid-name
     click.option('-l', '--local-only', is_flag=True, required=False,
