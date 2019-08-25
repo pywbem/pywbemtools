@@ -363,46 +363,34 @@ operations through two general options:
 Output formats
 --------------
 
-Pywbemcli supports various output formats for the results. The output format
-can be selected with the ``--output-format/-o`` option.
+Pywbemcli supports various output formats for the command result. The output
+format can be selected with the ``--output-format/-o`` option.
 
-The output formats fall into three groups. However, not all formats are
-applicable to all subcommands:
+The output formats fall into three groups:
 
-* **Table formats** - The :ref:`Table formats` display the output as a table with
-  rows and columns. For example output of CIM instances shows each property as
-  a column with the data for each instance in a row.
-* **CIM object formats** - The :ref:`CIM object formats` display of returned CIM
-  objects in formats specific to the CIM Model and also the pywbem implementation
-  of the CIM model (ex. DMTF MOF and XML formats and pywbem repr and string
-  formats).
-* **ASCII tree format** - The :ref:`ASCII tree format` provides a tree display
-  of results that is logical to display as a tree.  Thus, the command
-  ``pywbemcli class tree . . .`` which shows the hierarchy of the CIM classes
-  defined by a WBEM server uses the tree output format.
+* **Table formats** - The :ref:`Table formats` format the result as a table
+  with rows and columns.
 
-The goal of the ``--output-format`` general option is to define the prefered
-value for either the table output format or the CIM object format for the
-command or interactive session.
+* **CIM object formats** - The :ref:`CIM object formats` format a result that
+  consists of CIM objects in MOF, CIM-XML or pywbem repr format.
 
-Not all commands output in all possible formats.  There are be cases where
-even if the format set to a table format ``--output simple`` the display will
-be in the CIM model format. Some specific cases include:
+* **ASCII tree format** - The :ref:`ASCII tree format` formats the result
+  as a tree, using ASCII characters to represent the tree. The only command
+  supporting the ASCII tree format is ``class tree``, and it supports only
+  that one output format.
 
-1. The output of the class commands enumerate, get, references, associators with
-   classes is always in one of the CIM model formats, not a table.
+However, not all commands support all output format groups. The following
+restrictions apply:
 
-2. Connection commands like ``list`` only output a table oriented
-   set of values, not CIM objects.  Therefore, they always output in table formats
-   and if the output_format is set to, for example, ``mof`` they still output
-   as a table using the default value of the table formats. If the the output
-   format definition is ``mof``, they will output in the default table format.
+1. The only command supporting the ASCII tree format is ``class tree``.
 
-3. The server commands only outputs table oriented information. not CIM
-   objects so the output is either the default or specified table format.
+2. The ``class`` commands returning classes only support CIM object formats.
 
-3. The command ``class tree`` outputs a hiearchy of classes and therefore
-   the only defined output for this command is the ascii tree format.
+3. The commands of the ``connection`` and ``server`` command groups only
+   support table formats.
+
+When an unsupported output format is specified on a command, it is ignored and
+a default output format is used instead.
 
 
 .. _`Table formats`:
@@ -532,94 +520,96 @@ The output of CIM objects allows multiple formats as follows:
 
 * ``--output-format mof``: Format for CIM classes, CIM instances, and CIM Parameters:
 
-:term:`MOF` is the format used to define and document the CIM models released
-by the DMTF and SNIA. It textually defines the components and structure and
-data of CIM elements such as classes, instances, and qualifier declarations.:
+  :term:`MOF` is the format used to define and document the CIM models released
+  by the DMTF and SNIA. It textually defines the components and structure and
+  data of CIM elements such as classes, instances, and qualifier declarations.:
 
-.. code-block:: text
+  .. code-block:: text
 
-    instance of CIM_Foo {
-       InstanceID = "CIM_Foo1";
-       IntegerProp = 1;
-    };
+      instance of CIM_Foo {
+         InstanceID = "CIM_Foo1";
+         IntegerProp = 1;
+      };
 
-* ``output-format mof xml``: :term:`CIM-XML` format for CIM elements such as classes,
+* ``--output-format xml``: :term:`CIM-XML` format for CIM elements such as classes,
   instances and qualifier declarations. Besides being used as a protocol for WBEM
   servers, CIM-XML is also an alternative format for representing the CIM models
   released by the DMTF and SNIA. The XML syntax is defined in  the DMTF
   specification :term:`DSP0201`.
 
-This is the format used in the DMTF CIM-XML protocol:
+  This is the format used in the DMTF CIM-XML protocol:
 
-.. code-block:: text
+  .. code-block:: text
 
-    <VALUE.OBJECTWITHLOCALPATH>
-        <LOCALINSTANCEPATH>
-            <LOCALNAMESPACEPATH>
-                <NAMESPACE NAME="root"/>
-                <NAMESPACE NAME="cimv2"/>
-            </LOCALNAMESPACEPATH>
-            <INSTANCENAME CLASSNAME="CIM_Foo">
-                <KEYBINDING NAME="InstanceID">
-                    <KEYVALUE VALUETYPE="string">CIM_Foo1</KEYVALUE>
-                </KEYBINDING>
-            </INSTANCENAME>
-        </LOCALINSTANCEPATH>
-        <INSTANCE CLASSNAME="CIM_Foo">
-            <PROPERTY NAME="InstanceID" PROPAGATED="false" TYPE="string">
-                <VALUE>CIM_Foo1</VALUE>
-            </PROPERTY>
-            <PROPERTY NAME="IntegerProp" PROPAGATED="false" TYPE="uint32">
-                <VALUE>1</VALUE>
-            </PROPERTY>
-        </INSTANCE>
-    </VALUE.OBJECTWITHLOCALPATH>
+      <VALUE.OBJECTWITHLOCALPATH>
+          <LOCALINSTANCEPATH>
+              <LOCALNAMESPACEPATH>
+                  <NAMESPACE NAME="root"/>
+                  <NAMESPACE NAME="cimv2"/>
+              </LOCALNAMESPACEPATH>
+              <INSTANCENAME CLASSNAME="CIM_Foo">
+                  <KEYBINDING NAME="InstanceID">
+                      <KEYVALUE VALUETYPE="string">CIM_Foo1</KEYVALUE>
+                  </KEYBINDING>
+              </INSTANCENAME>
+          </LOCALINSTANCEPATH>
+          <INSTANCE CLASSNAME="CIM_Foo">
+              <PROPERTY NAME="InstanceID" PROPAGATED="false" TYPE="string">
+                  <VALUE>CIM_Foo1</VALUE>
+              </PROPERTY>
+              <PROPERTY NAME="IntegerProp" PROPAGATED="false" TYPE="uint32">
+                  <VALUE>1</VALUE>
+              </PROPERTY>
+          </INSTANCE>
+      </VALUE.OBJECTWITHLOCALPATH>
 
-* ``output-format mof repr``: Python repr format of the objects.
+* ``--output-format repr``: Python repr format of the objects.
 
-This is the structure and data of the pywbem Python objects representing these
-CIM objects and can be useful in understanding the pywbem interpretation of the
-CIM objects:
+  This is the structure and data of the pywbem Python objects representing these
+  CIM objects and can be useful in understanding the pywbem interpretation of the
+  CIM objects:
 
-.. code-block:: text
+  .. code-block:: text
 
-    CIMInstance(classname='CIM_Foo', path=CIMInstanceName(classname='CIM_Foo',
-        keybindings=NocaseDict({'InstanceID': 'CIM_Foo1'}), namespace='root/cimv2',
-        host=None),
-        properties=NocaseDict({
-          'InstanceID': CIMProperty(name='InstanceID',
-            value='CIM_Foo1', type='string', reference_class=None, embedded_object=None,
-            is_array=False, array_size=None, class_origin=None, propagated=False,
-            qualifiers=NocaseDict({})),
-          'IntegerProp': CIMProperty(name='IntegerProp', value=1, type='uint32',
-              reference_class=None, embedded_object=None, is_array=False,
-              array_size=None, class_origin=None, propagated=False,
-              qualifiers=NocaseDict({}))}), property_list=None,
-              qualifiers=NocaseDict({}))
+      CIMInstance(classname='CIM_Foo', path=CIMInstanceName(classname='CIM_Foo',
+          keybindings=NocaseDict({'InstanceID': 'CIM_Foo1'}), namespace='root/cimv2',
+          host=None),
+          properties=NocaseDict({
+            'InstanceID': CIMProperty(name='InstanceID',
+              value='CIM_Foo1', type='string', reference_class=None, embedded_object=None,
+              is_array=False, array_size=None, class_origin=None, propagated=False,
+              qualifiers=NocaseDict({})),
+            'IntegerProp': CIMProperty(name='IntegerProp', value=1, type='uint32',
+                reference_class=None, embedded_object=None, is_array=False,
+                array_size=None, class_origin=None, propagated=False,
+                qualifiers=NocaseDict({}))}), property_list=None,
+                qualifiers=NocaseDict({}))
 
-NOTE: The above is output as a single line and has been manually formatted for
-this documentation.
+  NOTE: The above is output as a single line and has been manually formatted for
+  this documentation.
 
+* ``--output-format txt``: Python str format of the objects.
 
-* ``-o txt``: Python str format of the objects.
+  This should be considered the output of last resort as it simply uses
+  the __str__ method of each command to output.
 
-    This should be considered the output of last resort as it simply uses
-    the __str__ method of each command to output.
+  Thus, for example the a ``class enumerate`` of a model with only a single
+  class is of the form:
 
-    Thus, for example the a ``class enumerate`` of a model with only a single
-    class is of the form:
+  .. code-block:: text
 
-    .. code-block:: text
+      CIMClass(classname='CIM_Foo', ...)
 
-        CIMClass(classname='CIM_Foo', ...)
 
 .. _`ASCII tree format`:
 
 ASCII tree format
 ^^^^^^^^^^^^^^^^^
+
 This output format is an ASCII based output that shows the tree structure of
-the results of certain subcommands.  It is used specifically to show the
-class class hierarchy tree from the command ``class tree`` as follows:
+the results of the ``class tree`` command. It is the only output format
+supported by this command, and therefore it is automatically selected and
+cannot be specified explicitly with the ``--output-format`` option.
 
 .. code-block:: text
 
@@ -742,12 +732,12 @@ connections are persisted in a :term:`connections file` named
 `pywbemcli_connections.json` in the current directory. A connection has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined
 these connections can be accessed with the general option ``--name`` or in the
-interactive mode the ``connection select` command.
+interactive mode the ``connection select`` command.
 
 A new persistent connection definition can be created  by executing
 pywbemcli with the ``connection add`` command. The options on this command will
 define the WBEM server and its security characteristics, a name for that server
-and save the result to the :term:`connections file`
+and save the result to the :term:`connections file`.
 
 At any point in time, pywbemcli can communicate with only a single WBEM server. That
 is the current connection.
@@ -872,4 +862,3 @@ or:
     name      server uri        namespace    user         timeout  noverify
     --------  ----------------  -----------  -----------  ---------  ----------
     testconn  http://localhost  root/blah    kschopmeyer         30  False
-
