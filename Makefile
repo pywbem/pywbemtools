@@ -186,6 +186,9 @@ package_py_files := \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
 
+doc_help_source_files := \
+    $(wildcard $(pywbemcli_module_path)/_cmd_*.py)
+
 # Directory for generated API documentation
 doc_build_dir := build_doc
 
@@ -608,7 +611,7 @@ test: develop_$(pymn).done
  	@echo "makefile: Done running tests"
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
-$(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(pywbemcli_module_path)/_cmd*.py
+$(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
 	@echo 'makefile: Creating $@ for documentation'
 	$(PYTHON_CMD) tools/click_help_capture.py >$@.tmp
 	-$(call RM_FUNC,$@)
