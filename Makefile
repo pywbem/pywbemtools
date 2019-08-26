@@ -376,7 +376,6 @@ pywbem_os_setup.sh:
 
 pywbem_os_setup.bat:
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-	chmod 755 pywbem_os_setup.bat
 
 .PHONY: install_os
 install_os: install_os_$(pymn).done
