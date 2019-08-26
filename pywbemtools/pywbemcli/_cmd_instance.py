@@ -348,7 +348,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
-    Get the instances of a class.
+    List the instances of a class.
 
     Enumerate the CIM instances of the specified class (CLASSNAME argument),
     including instances of subclasses in the specified CIM namespace
@@ -362,8 +362,11 @@ def instance_enumerate(context, classname, **options):
     --include-classorigin, and --propertylist options determine which parts
     are included in each retrieved instance.
 
-    In the output, the instances will formatted as defined by the
-    --output-format general option.
+    The --names-only option can be used to show only the instance paths.
+
+    In the output, the instances and instance paths will be formatted as
+    defined by the --output-format general option. Table formats on instances
+    will be replaced with MOF format.
     """
     context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
                                                        options))
@@ -394,7 +397,7 @@ def instance_enumerate(context, classname, **options):
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
-    Get the instances referencing an instance.
+    List the instances referencing an instance.
 
     List the CIM (association) instances that reference the specified CIM
     instance, and display the returned instances, or instance paths if
@@ -421,8 +424,11 @@ def instance_references(context, instancename, **options):
     The --include-qualifiers, --include-classorigin, and --propertylist options
     determine which parts are included in each retrieved instance.
 
-    In the output, the instances will formatted as defined by the
-    --output-format general option.
+    The --names-only option can be used to show only the instance paths.
+
+    In the output, the instances and instance paths will be formatted as
+    defined by the --output-format general option. Table formats on instances
+    will be replaced with MOF format.
     """
     context.execute_cmd(lambda: cmd_instance_references(context, instancename,
                                                         options))
@@ -466,7 +472,7 @@ def instance_references(context, instancename, **options):
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
-    Get the instances associated with an instance.
+    List the instances associated with an instance.
 
     List the CIM instances that are associated with the specified CIM instance,
     and display the returned instances, or instance paths if --names-only was
@@ -493,8 +499,11 @@ def instance_associators(context, instancename, **options):
     The --include-qualifiers, --include-classorigin, and --propertylist options
     determine which parts are included in each retrieved instance.
 
-    In the output, the instances will formatted as defined by the
-    --output-format general option.
+    The --names-only option can be used to show only the instance paths.
+
+    In the output, the instances and instance paths will be formatted as
+    defined by the --output-format general option. Table formats on instances
+    will be replaced with MOF format.
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))

@@ -55,22 +55,22 @@ INSTANCE_HELP_LINES = [
     'Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...',
     'Command group for CIM instances.',
     CMD_OPTION_HELP_HELP_LINE,
-    'associators   Get the instances associated with an instance.',
+    'associators   List the instances associated with an instance.',
     'count         Count the instances of each class with matching class '
     'name.',
     'create        Create an instance of a class in a namespace.',
     'delete        Delete an instance of a class.',
-    'enumerate     Get the instances of a class.',
+    'enumerate     List the instances of a class.',
     'get           Get an instance of a class.',
     'invokemethod  Invoke a method on an instance.',
     'modify        Modify an instance of a class.',
     'query         Execute a query on instances in a namespace.',
-    'references    Get the instances referencing an instance.',
+    'references    List the instances referencing an instance.',
 ]
 
 INSTANCE_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli  instance associators [COMMAND-OPTIONS] INSTANCENAME',
-    'Get the instances associated with an instance.',
+    'List the instances associated with an instance.',
     '-a, --assoc-class <class name>  Filter by the association class name',
     '-c, --result-class <class name>',
     '-r, --role <role name> Filter by the role name provided. Each',
@@ -114,7 +114,7 @@ INSTANCE_DELETE_HELP_LINES = [
 
 INSTANCE_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli  instance enumerate [COMMAND-OPTIONS] CLASSNAME',
-    'Get the instances of a class.',
+    'List the instances of a class.',
     CMD_OPTION_LOCAL_ONLY_HELP_LINE,
     '-d, --deep-inheritance If set, requests server to return properties',
     CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
@@ -172,7 +172,7 @@ INSTANCE_QUERY_HELP_LINES = [
 
 INSTANCE_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
-    'Get the instances referencing an instance.',
+    'List the instances referencing an instance.',
     '-R, --resultclass <class name> Filter by the result class name',
     '-r, --role <role name> Filter by the role name provided',
     CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,

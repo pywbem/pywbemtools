@@ -94,8 +94,9 @@ def class_get(context, classname, **options):
     --propertylist options determine which parts are included in each retrieved
     class.
 
-    In the output, the class will formatted as defined by the --output-format
-    general option.
+    In the output, the class will be formatted as defined by the
+    --output-format general option. Table formats are replaced with MOF
+    format.
 
     Example:
 
@@ -187,7 +188,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    Get the top classes or subclasses of a class in a namespace.
+    List the top classes or subclasses of a class in a namespace.
 
     Enumerate CIM classes starting either at the top of the class hierarchy
     in the specified CIM namespace (--namespace option), or at the specified
@@ -201,8 +202,11 @@ def class_enumerate(context, classname, **options):
     The --deep-inheritance option defines whether or not the complete subclass
     hierarchy of the classes is retrieved.
 
-    In the output, the classes will formatted as defined by the --output-format
-    general option.
+    The --names-only option can be used to show only the class paths.
+
+    In the output, the classes and class paths will be formatted as defined
+    by the --output-format general option. Table formats on classes will be
+    replaced with MOF format.
 
     Examples:
 
@@ -235,7 +239,7 @@ def class_enumerate(context, classname, **options):
 @click.pass_obj
 def class_references(context, classname, **options):
     """
-    Get the classes referencing a class.
+    List the classes referencing a class.
 
     List the CIM (association) classes that reference the specified class
     (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
@@ -248,8 +252,11 @@ def class_references(context, classname, **options):
     The --include-classorigin, --no-qualifiers, and --propertylist options
     determine which parts are included in each retrieved class.
 
-    In the output, the classes will formatted as defined by the --output-format
-    general option.
+    The --names-only option can be used to show only the class paths.
+
+    In the output, the classes and class paths will be formatted as defined
+    by the --output-format general option. Table formats on classes will be
+    replaced with MOF format.
 
     Examples:
 
@@ -294,7 +301,7 @@ def class_references(context, classname, **options):
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
-    Get the classes associated with a class.
+    List the classes associated with a class.
 
     List the CIM classes that are associated with the specified class
     (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
@@ -307,8 +314,11 @@ def class_associators(context, classname, **options):
     The --include-classorigin, --no-qualifiers, and --propertylist options
     determine which parts are included in each retrieved class.
 
-    In the output, the classes will formatted as defined by the --output-format
-    general option.
+    The --names-only option can be used to show only the class paths.
+
+    In the output, the classes and class paths will be formatted as defined
+    by the --output-format general option. Table formats on classes will be
+    replaced with MOF format.
 
     Examples:
 
@@ -329,7 +339,7 @@ def class_associators(context, classname, **options):
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
-    Get the classes with matching class names on the WBEM server.
+    List the classes with matching class names on the server.
 
     Find the CIM classes whose class name matches the specified wildcard
     expression (CLASSNAME-GLOB argument) in all CIM namespaces of the
@@ -344,9 +354,6 @@ def class_find(context, classname_glob, **options):
     For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
     `pywbem_`, etc. '*system*' returns classes whose names include the case
     insensitive string `system`.
-
-    Output is in table format if table output specified. Otherwise it is in the
-    form <namespace>:<classname>
 
     In the output, the classes will formatted as defined by the --output-format
     general option if it specifies table output. Otherwise the classes will
@@ -371,7 +378,7 @@ def class_find(context, classname_glob, **options):
 @click.pass_obj
 def class_tree(context, classname, **options):
     """
-    Get the subclass or superclass inheritance tree of a class.
+    Show the subclass or superclass inheritance tree of a class.
 
     List the subclass or superclass hierarchy of a CIM class (CLASSNAME
     argument) or CIM namespace (--namespace option):
