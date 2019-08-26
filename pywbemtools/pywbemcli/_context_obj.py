@@ -17,7 +17,7 @@
 pybemcli context object. This is the common object for click command calls for
 pywbemcli context information.
 
-It contains data that is set in the top level and used in subcommand calls
+It contains data that is set in the top level and used in command calls
 
 This object is attached to the Click Context in pywbemcli.py
 """
@@ -35,7 +35,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         Manage the pywbemcli context that is carried within the Click
         context object in the obj parameter. This is the object that
         communicates between the cli commands and command groups. It contains
-        the information that is common to the multiple click subcommands
+        the information that is common to the multiple click commands
     """
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
@@ -136,7 +136,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                     self.conn.statistics.enable()
             return self._pywbem_server.wbem_server
         else:
-            raise click.ClickException('No server defined for subcommand '
+            raise click.ClickException('No server defined for command '
                                        'that requires server. Define a server '
                                        'with "--server", "--mock-server", or '
                                        '"--name" general options; or in '
@@ -179,8 +179,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         WBEM server object has not been created it is created so that this wbem
         server can be used for interactive commands.
 
-        This method is called by every subcommand execution to setup and
-        execute the command. Thus, each subcommand has the line similar to:
+        This method is called by every command execution to setup and
+        execute the command. Thus, each command has the line similar to:
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """

@@ -5,11 +5,11 @@ pywbemcli Help Command Details
 ==============================
 
 
-This section defines the help output for each pywbemcli command group and subcommand.
+This section defines the help output for each pywbemcli command-group and command.
 
 
 
-The following defines the help output for the `pywbemcli  --help` subcommand
+The following defines the help output for the `pywbemcli  --help` command
 
 
 ::
@@ -33,7 +33,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       * Maintain a persistent list of named connections to WBEM servers
         and execute operations on them by name.
 
-      Pywbemcli implements command groups and subcommands to execute the CIM-XML
+      Pywbemcli implements command groups and commands to execute the CIM-XML
       operations defined by the DMTF CIM Operations Over HTTP specification
       (DSP0200).
 
@@ -73,9 +73,10 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -d, --default-namespace NAMESPACE
                                       Default namespace to use in the target WBEM
                                       server if no namespace is defined in a
-                                      subcommand.
+                                      command.
                                       (EnvVar: PYWBEMCLI_NAME)
-                                      [Default: root/cimv2]
+                                      [Default:
+                                      root/cimv2]
       -u, --user USER                 User name for the WBEM server connection.
                                       (EnvVar: PYWBEMCLI_USER)
       -p, --password PASSWORD         Password for the WBEM server. Will be
@@ -116,7 +117,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       /etc/ssl/certificates]
       -o, --output-format <choice>    Choice for command output data format.
                                       pywbemcli may override the format choice
-                                      depending on the command group and command
+                                      depending on the command-group and command
                                       since not all formats apply to all output
                                       data types. Choices further defined in
                                       pywbemcli documentation.
@@ -174,7 +175,7 @@ The following defines the help output for the `pywbemcli  --help` subcommand
       -h, --help                      Show this message and exit.
 
     Commands:
-      class       Command group for CIM classes.
+      class       Command-group for CIM classes.
       connection  Command group for persistent WBEM connections.
       help        Show help message for interactive mode.
       instance    Command group for CIM instances.
@@ -190,16 +191,16 @@ pywbemcli class --help
 
 
 
-The following defines the help output for the `pywbemcli class --help` subcommand
+The following defines the help output for the `pywbemcli class --help` command
 
 
 ::
 
     Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group for CIM classes.
+      Command-group for CIM classes.
 
-      This command group defines commands to inspect classes, to invoke methods
+      This command-group defines commands to inspect classes, to invoke methods
       on classes, and to delete classes.
 
       Creation and modification of classes is not currently supported.
@@ -229,7 +230,7 @@ pywbemcli class associators --help
 
 
 
-The following defines the help output for the `pywbemcli class associators --help` subcommand
+The following defines the help output for the `pywbemcli class associators --help` command
 
 
 ::
@@ -314,7 +315,7 @@ pywbemcli class delete --help
 
 
 
-The following defines the help output for the `pywbemcli class delete --help` subcommand
+The following defines the help output for the `pywbemcli class delete --help` command
 
 
 ::
@@ -358,7 +359,7 @@ pywbemcli class enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli class enumerate --help` subcommand
+The following defines the help output for the `pywbemcli class enumerate --help` command
 
 
 ::
@@ -416,7 +417,7 @@ pywbemcli class find --help
 
 
 
-The following defines the help output for the `pywbemcli class find --help` subcommand
+The following defines the help output for the `pywbemcli class find --help` command
 
 
 ::
@@ -463,7 +464,7 @@ pywbemcli class get --help
 
 
 
-The following defines the help output for the `pywbemcli class get --help` subcommand
+The following defines the help output for the `pywbemcli class get --help` command
 
 
 ::
@@ -518,7 +519,7 @@ pywbemcli class invokemethod --help
 
 
 
-The following defines the help output for the `pywbemcli class invokemethod --help` subcommand
+The following defines the help output for the `pywbemcli class invokemethod --help` command
 
 
 ::
@@ -562,7 +563,7 @@ pywbemcli class references --help
 
 
 
-The following defines the help output for the `pywbemcli class references --help` subcommand
+The following defines the help output for the `pywbemcli class references --help` command
 
 
 ::
@@ -633,7 +634,7 @@ pywbemcli class tree --help
 
 
 
-The following defines the help output for the `pywbemcli class tree --help` subcommand
+The following defines the help output for the `pywbemcli class tree --help` command
 
 
 ::
@@ -683,7 +684,7 @@ pywbemcli connection --help
 
 
 
-The following defines the help output for the `pywbemcli connection --help` subcommand
+The following defines the help output for the `pywbemcli connection --help` command
 
 
 ::
@@ -723,7 +724,7 @@ pywbemcli connection add --help
 
 
 
-The following defines the help output for the `pywbemcli connection add --help` subcommand
+The following defines the help output for the `pywbemcli connection add --help` command
 
 
 ::
@@ -732,8 +733,8 @@ The following defines the help output for the `pywbemcli connection add --help` 
 
       Add a persistent WBEM connection from specified conn info.
 
-      This subcommand creates and saves a named connection from the input
-      options in the connections file.
+      This command creates and saves a named connection from the input options
+      in the connections file.
 
       The new connection can be referenced by the name argument in the future.
       This connection object is capable of managing all of the properties
@@ -771,7 +772,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
       -d, --default-namespace NAMESPACE
                                       Default namespace to use in the target WBEM
                                       server if no namespace is defined in the
-                                      subcommand (Default: root/cimv2).
+                                      command (Default: root/cimv2).
       -u, --user TEXT                 User name for the WBEM server connection.
       -p, --password TEXT             Password for the WBEM server. Will be
                                       requested as part  of initialization if user
@@ -837,7 +838,7 @@ pywbemcli connection delete --help
 
 
 
-The following defines the help output for the `pywbemcli connection delete --help` subcommand
+The following defines the help output for the `pywbemcli connection delete --help` command
 
 
 ::
@@ -867,7 +868,7 @@ pywbemcli connection export --help
 
 
 
-The following defines the help output for the `pywbemcli connection export --help` subcommand
+The following defines the help output for the `pywbemcli connection export --help` command
 
 
 ::
@@ -890,7 +891,7 @@ pywbemcli connection list --help
 
 
 
-The following defines the help output for the `pywbemcli connection list --help` subcommand
+The following defines the help output for the `pywbemcli connection list --help` command
 
 
 ::
@@ -899,8 +900,8 @@ The following defines the help output for the `pywbemcli connection list --help`
 
       List the persistent WBEM connections.
 
-      This subcommand displays all entries in the connections file as a table
-      using the command line output_format to define the table format.
+      This command displays all entries in the connections file as a table using
+      the command line output_format to define the table format.
 
       An "*" after the name indicates the currently selected connection.
 
@@ -915,7 +916,7 @@ pywbemcli connection save --help
 
 
 
-The following defines the help output for the `pywbemcli connection save --help` subcommand
+The following defines the help output for the `pywbemcli connection save --help` command
 
 
 ::
@@ -946,7 +947,7 @@ pywbemcli connection select --help
 
 
 
-The following defines the help output for the `pywbemcli connection select --help` subcommand
+The following defines the help output for the `pywbemcli connection select --help` command
 
 
 ::
@@ -979,7 +980,7 @@ pywbemcli connection show --help
 
 
 
-The following defines the help output for the `pywbemcli connection show --help` subcommand
+The following defines the help output for the `pywbemcli connection show --help` command
 
 
 ::
@@ -988,7 +989,7 @@ The following defines the help output for the `pywbemcli connection show --help`
 
       Show connection info of current or persistent WBEM connection.
 
-      This subcommand displays all the variables that make up the current WBEM
+      This command displays all the variables that make up the current WBEM
       connection if the optional NAME argument is NOT provided. If NAME not
       supplied, a list of connections from the connections definition file is
       presented with a prompt for the user to select a NAME.
@@ -1007,7 +1008,7 @@ pywbemcli connection test --help
 
 
 
-The following defines the help output for the `pywbemcli connection test --help` subcommand
+The following defines the help output for the `pywbemcli connection test --help` command
 
 
 ::
@@ -1032,7 +1033,7 @@ pywbemcli help --help
 
 
 
-The following defines the help output for the `pywbemcli help --help` subcommand
+The following defines the help output for the `pywbemcli help --help` command
 
 
 ::
@@ -1052,7 +1053,7 @@ pywbemcli instance --help
 
 
 
-The following defines the help output for the `pywbemcli instance --help` subcommand
+The following defines the help output for the `pywbemcli instance --help` command
 
 
 ::
@@ -1061,7 +1062,7 @@ The following defines the help output for the `pywbemcli instance --help` subcom
 
       Command group for CIM instances.
 
-      This command group defines commands to inspect instances, to invoke
+      This command-group  defines commands to inspect instances, to invoke
       methods on instances, and to create and delete instances.
 
       Modification of instances is not currently supported.
@@ -1093,7 +1094,7 @@ pywbemcli instance associators --help
 
 
 
-The following defines the help output for the `pywbemcli instance associators --help` subcommand
+The following defines the help output for the `pywbemcli instance associators --help` command
 
 
 ::
@@ -1159,13 +1160,13 @@ The following defines the help output for the `pywbemcli instance associators --
                                       matches this parameter). Optional.
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
-                                      subcommand may use either pull or
-                                      traditional operations depending on the
-                                      server and the "--use-pull" general option.
-                                      If pull operations are used, qualifiers will
-                                      not be included, even if this option is
-                                      specified. If traditional operations are
-                                      used, inclusion of qualifiers depends on the
+                                      command may use either pull or traditional
+                                      operations depending on the server and the "
+                                      --use-pull" general option. If pull
+                                      operations are used, qualifiers will not be
+                                      included, even if this option is specified.
+                                      If traditional operations are used,
+                                      inclusion of qualifiers depends on the
                                       server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
@@ -1210,7 +1211,7 @@ pywbemcli instance count --help
 
 
 
-The following defines the help output for the `pywbemcli instance count --help` subcommand
+The following defines the help output for the `pywbemcli instance count --help` command
 
 
 ::
@@ -1252,7 +1253,7 @@ pywbemcli instance create --help
 
 
 
-The following defines the help output for the `pywbemcli instance create --help` subcommand
+The following defines the help output for the `pywbemcli instance create --help` command
 
 
 ::
@@ -1298,7 +1299,7 @@ pywbemcli instance delete --help
 
 
 
-The following defines the help output for the `pywbemcli instance delete --help` subcommand
+The following defines the help output for the `pywbemcli instance delete --help` command
 
 
 ::
@@ -1339,7 +1340,7 @@ pywbemcli instance enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli instance enumerate --help` subcommand
+The following defines the help output for the `pywbemcli instance enumerate --help` command
 
 
 ::
@@ -1369,7 +1370,7 @@ The following defines the help output for the `pywbemcli instance enumerate --he
 
     Options:
       -l, --local-only                Show only local properties of the instances.
-                                      This subcommand may use either pull or
+                                      This command may use either pull or
                                       traditional operations depending on the
                                       server and the --use-pull general option. If
                                       pull operations are used, this parameters
@@ -1382,13 +1383,13 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       target class are returned
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
-                                      subcommand may use either pull or
-                                      traditional operations depending on the
-                                      server and the "--use-pull" general option.
-                                      If pull operations are used, qualifiers will
-                                      not be included, even if this option is
-                                      specified. If traditional operations are
-                                      used, inclusion of qualifiers depends on the
+                                      command may use either pull or traditional
+                                      operations depending on the server and the "
+                                      --use-pull" general option. If pull
+                                      operations are used, qualifiers will not be
+                                      included, even if this option is specified.
+                                      If traditional operations are used,
+                                      inclusion of qualifiers depends on the
                                       server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
@@ -1428,7 +1429,7 @@ pywbemcli instance get --help
 
 
 
-The following defines the help output for the `pywbemcli instance get --help` subcommand
+The following defines the help output for the `pywbemcli instance get --help` command
 
 
 ::
@@ -1491,7 +1492,7 @@ pywbemcli instance invokemethod --help
 
 
 
-The following defines the help output for the `pywbemcli instance invokemethod --help` subcommand
+The following defines the help output for the `pywbemcli instance invokemethod --help` command
 
 
 ::
@@ -1555,7 +1556,7 @@ pywbemcli instance modify --help
 
 
 
-The following defines the help output for the `pywbemcli instance modify --help` subcommand
+The following defines the help output for the `pywbemcli instance modify --help` command
 
 
 ::
@@ -1624,7 +1625,7 @@ pywbemcli instance query --help
 
 
 
-The following defines the help output for the `pywbemcli instance query --help` subcommand
+The following defines the help output for the `pywbemcli instance query --help` command
 
 
 ::
@@ -1657,7 +1658,7 @@ pywbemcli instance references --help
 
 
 
-The following defines the help output for the `pywbemcli instance references --help` subcommand
+The following defines the help output for the `pywbemcli instance references --help` command
 
 
 ::
@@ -1709,13 +1710,13 @@ The following defines the help output for the `pywbemcli instance references --h
                                       of this parameter. Optional.
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
-                                      subcommand may use either pull or
-                                      traditional operations depending on the
-                                      server and the "--use-pull" general option.
-                                      If pull operations are used, qualifiers will
-                                      not be included, even if this option is
-                                      specified. If traditional operations are
-                                      used, inclusion of qualifiers depends on the
+                                      command may use either pull or traditional
+                                      operations depending on the server and the "
+                                      --use-pull" general option. If pull
+                                      operations are used, qualifiers will not be
+                                      included, even if this option is specified.
+                                      If traditional operations are used,
+                                      inclusion of qualifiers depends on the
                                       server.
       -c, --include-classorigin       Request that server include classorigin in
                                       the result.On some WBEM operations, server
@@ -1760,7 +1761,7 @@ pywbemcli qualifier --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier --help` subcommand
+The following defines the help output for the `pywbemcli qualifier --help` command
 
 
 ::
@@ -1769,7 +1770,7 @@ The following defines the help output for the `pywbemcli qualifier --help` subco
 
       Command group for CIM qualifier declarations.
 
-      This command group defines commands to inspect qualifier declarations.
+      This command-group  defines commands to inspect qualifier declarations.
 
       Creation, modification and deletion of qualifier declarations is not
       currently supported.
@@ -1793,7 +1794,7 @@ pywbemcli qualifier enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier enumerate --help` subcommand
+The following defines the help output for the `pywbemcli qualifier enumerate --help` command
 
 
 ::
@@ -1823,7 +1824,7 @@ pywbemcli qualifier get --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier get --help` subcommand
+The following defines the help output for the `pywbemcli qualifier get --help` command
 
 
 ::
@@ -1852,7 +1853,7 @@ pywbemcli repl --help
 
 
 
-The following defines the help output for the `pywbemcli repl --help` subcommand
+The following defines the help output for the `pywbemcli repl --help` command
 
 
 ::
@@ -1861,7 +1862,7 @@ The following defines the help output for the `pywbemcli repl --help` subcommand
 
       Enter interactive mode (default).
 
-      Enters the interactive mode where subcommands can be entered interactively
+      Enters the interactive mode where commands can be entered interactively
       and load the command history file.
 
       If no options are specified on the command line, the interactive mode is
@@ -1886,7 +1887,7 @@ pywbemcli server --help
 
 
 
-The following defines the help output for the `pywbemcli server --help` subcommand
+The following defines the help output for the `pywbemcli server --help` command
 
 
 ::
@@ -1923,7 +1924,7 @@ pywbemcli server brand --help
 
 
 
-The following defines the help output for the `pywbemcli server brand --help` subcommand
+The following defines the help output for the `pywbemcli server brand --help` command
 
 
 ::
@@ -1947,7 +1948,7 @@ pywbemcli server connection --help
 
 
 
-The following defines the help output for the `pywbemcli server connection --help` subcommand
+The following defines the help output for the `pywbemcli server connection --help` command
 
 
 ::
@@ -1959,7 +1960,7 @@ The following defines the help output for the `pywbemcli server connection --hel
       Display the information about the connection used to connect to the WBEM
       server.
 
-      This is equivalent to the 'connection show' subcommand.
+      This is equivalent to the 'connection show' command.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1972,7 +1973,7 @@ pywbemcli server get-centralinsts --help
 
 
 
-The following defines the help output for the `pywbemcli server get-centralinsts --help` subcommand
+The following defines the help output for the `pywbemcli server get-centralinsts --help` command
 
 
 ::
@@ -2025,7 +2026,7 @@ pywbemcli server info --help
 
 
 
-The following defines the help output for the `pywbemcli server info --help` subcommand
+The following defines the help output for the `pywbemcli server info --help` command
 
 
 ::
@@ -2047,7 +2048,7 @@ pywbemcli server interop --help
 
 
 
-The following defines the help output for the `pywbemcli server interop --help` subcommand
+The following defines the help output for the `pywbemcli server interop --help` command
 
 
 ::
@@ -2067,7 +2068,7 @@ pywbemcli server namespaces --help
 
 
 
-The following defines the help output for the `pywbemcli server namespaces --help` subcommand
+The following defines the help output for the `pywbemcli server namespaces --help` command
 
 
 ::
@@ -2088,7 +2089,7 @@ pywbemcli server profiles --help
 
 
 
-The following defines the help output for the `pywbemcli server profiles --help` subcommand
+The following defines the help output for the `pywbemcli server profiles --help` command
 
 
 ::

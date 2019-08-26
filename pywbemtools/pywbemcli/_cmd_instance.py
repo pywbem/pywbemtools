@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the class command group which includes
+Click Command definition for the class command-group  which includes
 cmds for get, enumerate, list of classes.
 """
 from __future__ import absolute_import, print_function
@@ -48,7 +48,7 @@ includequalifiers_option = [              # pylint: disable=invalid-name
 includequalifiersenum_option = [              # pylint: disable=invalid-name
     click.option('-q', '--include-qualifiers', is_flag=True, required=False,
                  help='If set, requests server to include qualifiers in the '
-                 'returned instances. This subcommand may use either pull '
+                 'returned instances. This command may use either pull '
                  'or traditional operations depending on the server '
                  'and the "--use-pull" general option. If pull operations '
                  'are used, qualifiers will not be included, even if this '
@@ -72,7 +72,7 @@ localonlyget_option = [              # pylint: disable=invalid-name
 localonlyenum_option = [              # pylint: disable=invalid-name
     click.option('-l', '--local-only', is_flag=True, required=False,
                  help='Show only local properties of the instances. This '
-                      'subcommand may use either pull or traditional '
+                      'command may use either pull or traditional '
                       'operations depending on the server and the '
                       '--use-pull general option. If pull operations '
                       'are used, this parameters will not be included, even if '
@@ -115,7 +115,7 @@ filterquery_option = [              # pylint: disable=invalid-name
 
 ##########################################################################
 #
-#   Click command group and subcommand definitions
+#   Click command-group  and command definitions
 #
 ###########################################################################
 
@@ -125,7 +125,7 @@ def instance_group():
     """
     Command group for CIM instances.
 
-    This command group defines commands to inspect instances, to invoke
+    This command-group  defines commands to inspect instances, to invoke
     methods on instances, and to create and delete instances.
 
     Modification of instances is not currently supported.

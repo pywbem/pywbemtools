@@ -83,7 +83,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               metavar='NAMESPACE',
               envvar=PywbemServer.defaultnamespace_envvar,
               help='Default namespace to use in the target WBEM server if no '
-                   'namespace is defined in a subcommand.\n' +
+                   'namespace is defined in a command.\n' +
                    '(EnvVar: {ev})\n' .format(ev=PywbemServer.name_envvar) +
                    '[Default: {of}]'.format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str, envvar=PywbemServer.user_envvar,
@@ -135,7 +135,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.timeout_envvar,
               help='Choice for command output data format. '
                    'pywbemcli may override the format choice depending on the '
-                   'command group and command since not all formats apply to '
+                   'command-group and command since not all formats apply to '
                    'all output data types. Choices further defined in '
                    'pywbemcli documentation.\n' +
                    'Choices: Table: [{tb}], Object: [{ob}]\n'
@@ -225,7 +225,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     * Maintain a persistent list of named connections to WBEM servers
       and execute operations on them by name.
 
-    Pywbemcli implements command groups and subcommands to execute the CIM-XML
+    Pywbemcli implements command groups and commands to execute the CIM-XML
     operations defined by the DMTF CIM Operations Over HTTP specification
     (DSP0200).
 
@@ -483,7 +483,7 @@ def repl(ctx):
     """
     Enter interactive mode (default).
 
-    Enters the interactive mode where subcommands can be entered interactively
+    Enters the interactive mode where commands can be entered interactively
     and load the command history file.
 
     If no options are specified on the command line, the interactive mode

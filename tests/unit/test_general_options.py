@@ -54,7 +54,7 @@ Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
   * Maintain a persistent list of named connections to WBEM servers
     and execute operations on them by name.
 
-  Pywbemcli implements command groups and subcommands to execute the CIM-XML
+  Pywbemcli implements command groups and commands to execute the CIM-XML
   operations defined by the DMTF CIM Operations Over HTTP specification
   (DSP0200).
 
@@ -94,9 +94,10 @@ Options:
   -d, --default-namespace NAMESPACE
                                   Default namespace to use in the target WBEM
                                   server if no namespace is defined in a
-                                  subcommand.
+                                  command.
                                   (EnvVar: PYWBEMCLI_NAME)
-                                  [Default: root/cimv2]
+                                  [Default:
+                                  root/cimv2]
   -u, --user USER                 User name for the WBEM server connection.
                                   (EnvVar: PYWBEMCLI_USER)
   -p, --password PASSWORD         Password for the WBEM server. Will be
@@ -137,7 +138,7 @@ Options:
                                   /etc/ssl/certificates]
   -o, --output-format <choice>    Choice for command output data format.
                                   pywbemcli may override the format choice
-                                  depending on the command group and command
+                                  depending on the command-group and command
                                   since not all formats apply to all output
                                   data types. Choices further defined in
                                   pywbemcli documentation.
@@ -195,7 +196,7 @@ Options:
   -h, --help                      Show this message and exit.
 
 Commands:
-  class       Command group for CIM classes.
+  class       Command-group for CIM classes.
   connection  Command group for persistent WBEM connections.
   help        Show help message for interactive mode.
   instance    Command group for CIM instances.
@@ -557,21 +558,22 @@ TEST_CASES = [
     ['Verify connection already deleted.',
      {'subcmd': 'connection',
       'args': ['delete', 'globaltest1']},
-     {'stderr': "Error: globaltest1 not a defined connection name",
+     {'stderr': "globaltest1 not a defined connection name",
       'rc': 1,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection without server definition and subcommand that '
      ' requires connection fails.',
      {'subcmd': 'class',
       'args': ['enumerate']},
-     {'stderr': 'No server defined for subcommand that requires server. '
-                'Define a server with "--server", "--mock-server", or '
-                '"--name" general options; or in interactive mode, use '
-                '"connection select" to enable a connection',
+     {'stderr': ['No server defined for command that requires server. ',
+                 'Define a server with "--server", "--mock-server", or ',
+                 '"--name" general options; or in interactive mode, use ',
+                 '"connection select" or "connection add" to define a '
+                 'connection'],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
 

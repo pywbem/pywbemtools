@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the connection command group which includes
+Click Command definition for the connection command-group  which includes
 cmds to list add, delete, show, and test server definitions in the
 connection information.  This also maintains a definition of servers on
-disk which is kept in sync with changes made with the add/delete subcommands.
+disk which is kept in sync with changes made with the add/delete commands.
 """
 from __future__ import absolute_import
 
@@ -75,7 +75,7 @@ def connection_show(context, name):
     """
     Show connection info of current or persistent WBEM connection.
 
-    This subcommand displays all the variables that make up the current
+    This command displays all the variables that make up the current
     WBEM connection if the optional NAME argument is NOT provided. If NAME not
     supplied, a list of connections from the connections definition file
     is presented with a prompt for the user to select a NAME.
@@ -148,7 +148,7 @@ def connection_select(context, name):
               metavar='NAMESPACE',
               default=DEFAULT_NAMESPACE,
               help="Default namespace to use in the target WBEM server if no "
-                   "namespace is defined in the subcommand"
+                   "namespace is defined in the command"
                    " (Default: {of}).".format(of=DEFAULT_NAMESPACE))
 @click.option('-u', '--user', type=str,
               help="User name for the WBEM server connection. ")
@@ -218,7 +218,7 @@ def connection_add(context, **options):
     """
     Add a persistent WBEM connection from specified conn info.
 
-    This subcommand creates and saves a named connection from the
+    This command creates and saves a named connection from the
     input options in the connections file.
 
     The new connection can be referenced by the name argument in
@@ -281,7 +281,7 @@ def connection_list(context):
     """
     List the persistent WBEM connections.
 
-    This subcommand displays all entries in the connections file as
+    This command displays all entries in the connections file as
     a table using the command line output_format to define the
     table format.
 

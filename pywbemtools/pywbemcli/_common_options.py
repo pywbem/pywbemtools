@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Defines click options that are used for multiple subcommands and that have
+Defines click options that are used for multiple scommands and that have
 the same definition throughout the environment.  This allows the characteristics
 and help to be defined once and used multiple times.
 """

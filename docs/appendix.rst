@@ -29,8 +29,8 @@ This documentation uses a few special terms to refer to Python types:
       ``mof`` , ``xml`` , ``repr`` , and ``txt`` .
 
    INSTANCENAME
-      an argument of several of the command-group ``instance`` subcommands that
-      allows two possible inputs based on another subcommand option( ``--interactive`` ).
+      an argument of several of the command-group ``instance`` commands that
+      allows two possible inputs based on another command option( ``--interactive`` ).
 
       When the ``interactive`` option is not set, the INSTANCENAME is a string
       representation of a CIMInstanceName must be formatted as defined by
@@ -128,12 +128,12 @@ This documentation uses a few special terms to refer to Python types:
    REPL
       Stands for "Read-Execute-Print-Loop" which is a term that denotes the
       pywbemcli shell interactive mode where multiple command-groups and
-      subcommands may be executed within the context of a connection defined
+      commands may be executed within the context of a connection defined
       by a set of general options.
 
    GLOB
       A pathname pattern pattern expansion used in Unix environments. It is
-      used by pywbemcli to expand classnames in the ``class find`` subcommand.
+      used by pywbemcli to expand classnames in the ``class find`` command.
       No tilde expansion is done, but ``*``, ``?``, and character ranges
       expressed with ``[]`` will be correctly matched.
 

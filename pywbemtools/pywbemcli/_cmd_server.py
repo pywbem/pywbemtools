@@ -178,7 +178,7 @@ def server_connection(context):
     Display the information about the connection used to connect to the
     WBEM server.
 
-    This is equivalent to the 'connection show' subcommand.
+    This is equivalent to the 'connection show' command.
     """
     context.execute_cmd(lambda: cmd_server_connection(context))
 

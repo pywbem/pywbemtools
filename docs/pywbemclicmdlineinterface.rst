@@ -28,31 +28,31 @@ The command line can contain the following components:
 * **general-options** - Options that apply to all commands.
   See :ref:`Pywbemcli command line general options` for infomation on the
   pywbemcli general options
-* **command-group** - A name of a group of subcommands.
-  See :ref:`Pywbemcli command groups, commands, and subcommands`
-* **command** - Alternative to command-group when there are no
-  subcommands.
-* **subcommand** - Command name within a command group
+* **command-group** - A name of a group of commands.
+  See :ref:`Pywbemcli command groups and commands`
+* **command** - A command name normally within a command-group.
+  There are however some special commands that exist outside of any
+  command-group; they are not in any command-group.
 * **args** - Arguments and options that are defined for a particular
-  command or subcommand. Options are proceeded by the characters '-' for the
+  command. Options are proceeded by the characters '-' for the
   short form or '--' for the long form. (ex. ``-n`` or ``--namespace``).
-  Arguments do not have a prefix and are the first string following the
-  command/subcommand name. (ex. ``pywbemcli class get CIM_Foo``. CIM_Foo is
-  an argument.)
+  Arguments do not have a ``-`` or ``--``prefix and follow the
+  command name. (ex. ``pywbemcli class get CIM_Foo``. CIM_Foo is
+  an argument.). Options include the ``-`` or ``--`` prefix.
 
 The syntax is:
 
 .. code-block:: text
 
-    pywbemcli <general-options> <command-group>|<command> <args>
+    pywbemcli <general-options> <command-group> <command> <args>
 
-    where:
-        command-group = <command> <subcommand>
+**NOTE:** pywbemcli has two special commands that are not a part of any
+command-group ``repl`` and ``help``.
 
-A command-group is the name of an object, referencing an entity (ex. ``class``
-refers to operation on CIM classes). The subcommands are generally actions on
-the objects defined by the command-group name. Thus ``class`` is a
-command-group name used to access CIM classes and ``get`` is a subcommand so:
+A command-group is the name of an object, (ex. ``class`` refers to operation on
+CIM classes). The commands are generally actions on the objects defined by the
+command-group name (``get``, ``list``, etc.). Thus ``class`` is a command-group
+name used to access CIM classes and ``get`` is a command so:
 
 .. code-block:: text
 
@@ -167,18 +167,18 @@ list of the supported commands.
     . . .
 
     Commands:
-      class      Command group to manage CIM Classes.
-      instance   Command Group to manage CIM instances.
-      qualifier  Command Group to manage CIM...
+      class      Command-group to manage CIM Classes.
+      instance   Command-Group to manage CIM instances.
+      qualifier  Command-Group to manage CIM...
       repl       Start an interactive shell.
-      server     Command group for server operations
+      server     Command-group for server operations
 
 The usage line in this help text shows the standalone command use. Within the
 pywbemcli shell (interactive mode), the ``pywbemcli`` word is omitted and the
-subcommand and options is typed in.
+command and options is typed in.
 
 Typing ``command-group --help``,  or ``command-group -h``, or ``command-group
-subcommand --help`` in the pywbemcli shell displays help information for the
+command --help`` in the pywbemcli shell displays help information for the
 specified pywbemcli command-group, for example:
 
 .. code-block:: text
@@ -254,6 +254,6 @@ completion:
     ... <shows the commands to select from>
 
     $ pywbemcli class <TAB><TAB>
-    ... <shows the class sub-commands to select from>
+    ... <shows the class commands to select from>
 
 

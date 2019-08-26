@@ -14,13 +14,13 @@
 ..
 
 
-.. _`Pywbemcli command groups, commands, and subcommands`:
+.. _`Pywbemcli command groups and commands`:
 
-Pywbemcli command groups, commands, and subcommands
-===================================================
+Pywbemcli command groups and commands
+=====================================
 
 This section defines the characteristics of each of the pywbemcli command
-groups and subcommands including examples.
+groups and commands including examples.
 
 The command syntax of pywbemcli is:
 
@@ -32,7 +32,7 @@ where:
 
 .. code-block:: text
 
-        cmd-group := <command> <subcommand>
+        cmd-group := <command-group name> <command>
 
 Within pywbemcli each command-group name is a noun, referencing an entity (ex.
 class, instance, server).
@@ -122,7 +122,7 @@ The following table defines which pywbemcli commands are used for the
 corresponding pywbem request operations.
 
 =================================  ==============================================
-WBEM CIM-XML Operation             pywbemcli command-group & subcommand
+WBEM CIM-XML Operation             pywbemcli command-group & command
 =================================  ==============================================
 **Instance Operations:**
 EnumerateInstances                 instance enumerate INSTANCENAME
@@ -181,7 +181,7 @@ Displaying CIM instances or CIM instance names
 The pywbem API includes different WBEM operations (ex. ``EnumerateInstances`` and
 ``EnumerateInstanceNames``) to request CIM objects or just their names. To
 simplify the overall command line syntax pywbemcli combines these into a single
-subcommand (i.e. ``enumerate``, ``references``, ``associators``) and includes
+command (i.e. ``enumerate``, ``references``, ``associators``) and includes
 an option (``-o,`` or ``--names-only``) that determines whether the instance
 names or instances are retrieved from the WBEM server.
 
@@ -218,7 +218,7 @@ Thus, for example an ``instance enumerate`` with and without the ``-o`` option:
 Interactively selecting INSTANCENAME
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Arguments like the INSTANCENAME on some of the instance group subcommands (
+Arguments like the INSTANCENAME on some of the instance group commands (
 ``get``, ``references``, ``associators``, etc) can be very difficult to correctly enter
 since it can involve multiple keybindings, use of quotation marks, etc.  To
 simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
@@ -245,15 +245,15 @@ from which an instance name can be chosen. The following is an example:
 Class command-group
 -------------------
 
-The **class** group defines subcommands that act on CIM classes. see
+The **class** group defines commands that act on CIM classes. see
 :ref:`pywbemcli class --help`. This group includes the following commands:
 
 * **associators** to retrieve the class associators classes or classnames if the
   (``-o``/``--names-only``) option is set for a class defined by the CLASSNAME
-  argument in the namespace with this subcommand or the default
+  argument in the namespace with this command or the default
   namespace and displayed in the defined format. If successful it displays the
   classes/classnames in the :term:`CIM model output formats` (see
-  :ref:`Output formats`). If unsuccesful it an exception. This subcommand
+  :ref:`Output formats`). If unsuccesful it an exception. This command
   returns the class associators, not the instance associators. The
   :ref:`Instance command-group` includes the corresponding associators
   operation for instances:
@@ -267,7 +267,7 @@ The **class** group defines subcommands that act on CIM classes. see
   See :ref:`pywbemcli class associators --help` for details.
 * **references** to get the class level reference classes or classnames for a
   class defined by the CLASSNAME argument in the default namespace or the namespace
-  defined with this subcommand displayed in the defined format. If successful
+  defined with this command displayed in the defined format. If successful
   it displays the classes/classnames in the :term:`CIM model output formats`
   (see :ref:`Output formats`). If unsuccesful it an exception.. This returns
   the class level references,not the instance references. The :ref:`Instance
@@ -296,7 +296,7 @@ The **class** group defines subcommands that act on CIM classes. see
   Pywbemcli will not delete a class that has subclasses.
   See :ref:`pywbemcli class delete --help` for details.
 * **enumerate** to enumerate classes or their classnames in the default
-  namespace or the namespace defined with this subcommand. If the CLASSNAME
+  namespace or the namespace defined with this command. If the CLASSNAME
   input property the enumeration starts at the subclasses of CLASSNAME. Otherwise
   it starts at the top of the class hierarchy if the
   ``--DeepInheritance``/``-d``  option is set it shows all the classes in the
@@ -319,7 +319,7 @@ The **class** group defines subcommands that act on CIM classes. see
   See :ref:`pywbemcli class enumerate --help` for details.
 * **find** to find classes in the target WBEM server across multiple namespaces.
   The input argument is a GLOB expression which is used to search the server
-  CIM namespaces for matching class names.  This subcommand uses a :term:`GLOB`
+  CIM namespaces for matching class names.  This command uses a :term:`GLOB`
   Unix style pathname pattern expansion on the classname to attempt to filter
   the names and namespaces of all of the classes in the WBEM server (or the
   namespaces defined with the ``--namespaces``/``-n`` option):
@@ -347,7 +347,7 @@ The **class** group defines subcommands that act on CIM classes. see
 
   See :ref:`pywbemcli class find --help` for details.
 * **get** to get a single class defined by the required CLASSNAME argument in the
-  default namespace or the namespace defined with this subcommand displayed in
+  default namespace or the namespace defined with this command displayed in
   the format defined by the ``--output-format``/``-o`` general option. If
   successul it displays the returned class, otherwise it displays the exception
   generated.  It can display the classes/classnames in the :term:`CIM model
@@ -397,7 +397,7 @@ The **class** group defines subcommands that act on CIM classes. see
 
   See :ref:`pywbemcli class get --help` for details.
 * **invokemethod** to invoke a method defined for the CLASSNAME argument. This
-  subcommand executes the invokemethod with a class name, not an instance name
+  command executes the invokemethod with a class name, not an instance name
   and any input parameters for the InvokeMethod defined with the
   ``--parameter``\`-p`` option. If successful it returns the method return
   value and output parameters received from the server. If unsuccessful it
@@ -405,7 +405,7 @@ The **class** group defines subcommands that act on CIM classes. see
   any returned CIM parameters in the :term:`CIM model
   output formats` (see :ref:`Output formats`)See :ref:`pywbemcli class invokemethod
   --help` for details.
-* **tree** to display the class hierarchy as a tree.  This subcommand
+* **tree** to display the class hierarchy as a tree.  This command
   outputs a tree format in ASCII defining the either the subclass or superclass
   hierarchy of the class name input parameter as a tree:
 
@@ -421,7 +421,7 @@ The **class** group defines subcommands that act on CIM classes. see
   It can show either the subclasses or the superclasses of the defined class
   using the (``--superclasses`` option).
 
-  This subcommand ignores the ``--output-format``\``-o' general option and
+  This command ignores the ``--output-format``\``-o' general option and
   always outputs the tree format.
 
   See :ref:`pywbemcli class tree --help` for details.
@@ -432,13 +432,13 @@ The **class** group defines subcommands that act on CIM classes. see
 Instance command-group
 ----------------------
 
-The **instance** group defines subcommands that act on CIM instances including:
+The **instance** group defines commands that act on CIM instances including:
 
 * **associators** to get the associator instances for the instance name defined
   as the :term:`INSTANCENAME` argument in the default namespace or the namespace defined with this
-  subcommand displayed in the defined format. If successful it returns the
+  command displayed in the defined format. If successful it returns the
   instances or instancenames associated with INSTANCENAME otherwise it returns any
-  exception generated by the response This subcommand displays the returned instances
+  exception generated by the response This command displays the returned instances
   or instance in the :term:`CIM model output formats` or the table formats` (see
   :ref:`Output formats`).:
 
@@ -482,13 +482,13 @@ The **instance** group defines subcommands that act on CIM instances including:
   subclasses.
 
   Count is useful to determine which classes in the environment are actually
-  implemented. However this subcommand can take a long time to execute because
+  implemented. However this command can take a long time to execute because
   it must a) enumerate all the classes in the namespaces, b) enumerate the
   instances for each class.
 
   See :ref:`pywbemcli instance count --help` for details.
 * **create** create a CIMInstance of the CLASSNAME argument in a namespace
-  defined with as an option to the subcommand or the default namespace in the
+  defined with as an option to the command or the default namespace in the
   WBEM server. The command build the CIMInstance from the class defined by
   CLASSNAME and the properties defined by the ``--property``\``-p`` option The
   properties are defined as name/value pairs, one property for each instance of
@@ -552,7 +552,7 @@ The **instance** group defines subcommands that act on CIM instances including:
   See :ref:`pywbemcli instance delete --help` for details.
 * **enumerate** to enumerate instances or their paths defined by the CLASSNAME
   argument in the namespace defined by ``-o``\``--namespace`` or the general option
-  ``-o``\``--default-namespace`` in the defined format. This subcommand displays the
+  ``-o``\``--default-namespace`` in the defined format. This command displays the
   returned instances or instance names in the :term:`CIM model output formats`
   or the table formats` (see :ref:`Output formats`).
 
@@ -574,7 +574,7 @@ The **instance** group defines subcommands that act on CIM instances including:
   See :ref:`pywbemcli instance enumerate --help` for details.
 * **get** to get a single CIM instance defined by the :term:`INSTANCENAME`
     argument from the default namespace or the namespace defined with the
-    subcommand displayed in the defined format. The form of :term:`INSTANCENAME` is
+    command displayed in the defined format. The form of :term:`INSTANCENAME` is
     determined by the ``--interactive`` option. It can display the returned
     instance in the :term:`CIM model output formats` or the table formats`
     (see :ref:`Output formats`). Otherwise it returns the received exception.
@@ -596,17 +596,17 @@ The **instance** group defines subcommands that act on CIM instances including:
 * **modify** modify an existing instance of the class defined by the CLASSNAME argument
   in the WBEM server  namespace defined by either the default namespace or
   namespace option. The user provides the definition of an instance in the same
-  form as the ``add`` subcommand but the instance must already exist in the
+  form as the ``add`` command but the instance must already exist in the
   WBEM server and the instance created from the command line must include all
   of the key properties so that it can be identified in the server.
 
-  If successful, this subcommand displays nothing, otherwise it displays the
+  If successful, this command displays nothing, otherwise it displays the
   received exception.
 
   See :ref:`pywbemcli instance modify --help` for details.
 * **references** to get the reference instances or paths for a
   instance defined as the :term:`INSTANCENAME` input argument in the default
-  namespace or the namespace defined with this subcommand displayed in the
+  namespace or the namespace defined with this command displayed in the
   defined format. It can display any returned instances in the
   :term:`CIM model output formats` or the table formats`
   (see :ref:`Output formats`). Otherwise it returns the received exception.:
@@ -637,7 +637,7 @@ The **instance** group defines subcommands that act on CIM instances including:
 Qualifier command-group
 -----------------------
 
-The **qualifier** command-group defines subcommands that act on
+The **qualifier** command-group defines commands that act on
 CIMQualifierDeclaration entities in the WBEM server including:
 
 * **get** to get a single qualifier declaration defined by the ``QUALIFIERNAME``
@@ -659,7 +659,7 @@ CIMQualifierDeclaration entities in the WBEM server including:
   See :ref:`pywbemcli qualifier get --help` for details.
 
 * **enumerate** to enumerate all qualifier declarations within the namespace
-  defined with this subcommand or the default namespace in the target WBEM
+  defined with this command or the default namespace in the target WBEM
   server . The output formats can be either one  of the
   :term:`CIM model output formats` or the table formats`
   (see :ref:`Output formats`).
@@ -695,15 +695,15 @@ CIMQualifierDeclaration entities in the WBEM server including:
 Server command-group
 --------------------
 
-The **server** command-group defines subcommands that interact with a WBEM
-server to access information about the WBEM server itself. These subcommands
+The **server** command-group defines commands that interact with a WBEM
+server to access information about the WBEM server itself. These commands
 are generally not namespace specific but access information about the server,
-namespaces, etc. The subcommands are:
+namespaces, etc. The commands are:
 
 * **brand** to get general information on the server.  Brand information is an
   attempt by pywbem and pywbemtools to determine the product that represents
   the WBEM server infrastructure.  Since that was not clearly defined in the DMTF
-  specifications, this subcommand may return strange results but it returns
+  specifications, this command may return strange results but it returns
   legitimate results for most servers:
 
   .. code-block:: text
@@ -733,7 +733,7 @@ namespaces, etc. The subcommands are:
     ca_certs: None
 
   See :ref:`pywbemcli server connection --help` for details.
-* **info** to get general information on the server.  This subcommand returns
+* **info** to get general information on the server.  This command returns
   information on the brand, namespaces, and other reasonable information on the
   WBEM server:
 
@@ -872,7 +872,7 @@ namespaces, etc. The subcommands are:
 Connection command-group
 ------------------------
 
-The **connection** command-group defines subcommands that provide for a
+The **connection** command-group defines commands that provide for a
 persistent file (:term:`connections file`) of WBEM server connection
 parameters and allow selecting entries in this file as well as adding entries
 to the file, deleting entries from the file and viewing WBEM servers defined in the
@@ -881,10 +881,10 @@ rather than through the detailed parameters of the connection.
 
 Connections in the :term:`connections file` can be created by:
 
-* Using the ``connection add`` subcommand. This allows defining the parameters
-  of a connection as a subcommand.
+* Using the ``connection add`` command. This allows defining the parameters
+  of a connection as a command.
 
-* Using the ``connection save`` subcommand with the current connection. This options
+* Using the ``connection save`` command with the current connection. This options
   uses the parameters current connection to define and save a connection in the
   connections file.
 
@@ -921,15 +921,15 @@ The :term:`connections file` is named ``pywbemcliservers.json`` in the directory
 in which pywbemcli is executed. The data is stored in JSON format within this
 file.  Multiple connection files may be maintained in separate directories.
 
-The subcommands include:
+The commands include:
 
-* **add** creates a new connection using the subcommand arguments and sets the new
-  connection as the current connection. This subcommand saves the
+* **add** creates a new connection using the command arguments and sets the new
+  connection as the current connection. This command saves the
   new connection to the :term:`connections file` (see ``connection save``).
 
   The following example shows creating a new connection from within the
   interactive mode of pywbemcli. The parameters for the connection are defined
-  through the input options for the subcommand. These use the same option names
+  through the input options for the command. These use the same option names
   as the corresponding general options to define the WBEM server:
 
   .. code-block:: text
@@ -957,7 +957,7 @@ The subcommands include:
 
   See :ref:`pywbemcli connection add --help` for details.
 * **delete** delete a specific connection by name or by selection. The following
-  example deletes the connection defined in the add subcommand above:
+  example deletes the connection defined in the add command above:
 
   .. code-block:: text
 
@@ -1030,7 +1030,7 @@ The subcommands include:
 
   See :ref:`pywbemcli connection select --help` for details.
 * **show** show information in the current connection.  See the the ``select``
-  above for an example of this subcommand.
+  above for an example of this command.
 
   See :ref:`pywbemcli connection show --help` for details.
 * **test** execute a single predefined operation on the current connection
@@ -1088,6 +1088,6 @@ Help command
 
 The help command provides information on special commands and controls that can
 be executed in the :ref:`interactive mode`. This is different from the
-``--help`` option that provides information on command groups, and subcommands.
+``--help`` option that provides information on command groups, and commands.
 
 

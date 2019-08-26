@@ -5,8 +5,8 @@ This tool can capture the help outputs from a click application and output
 the result either as text or in restructured text format.
 
 It executes the click script --help and recursively scrapes all of the
-subcommands from the output, generating an output that is the help text for
-every groupt/subcommand in the script.
+commands from the output, generating an output that is the help text for
+every group/command in the script.
 
 All output is to stdout.
 
@@ -78,7 +78,7 @@ def rst_headline(title, level):
     except IndexError:
         level_char = '='
 
-    # output anchor in form .. _`smicli subcommands`:
+    # output anchor in form .. _`smicli commands`:
     anchor = '.. _`%s`:' % title
     title_marker = level_char * len(title)
     if level == 0:
@@ -142,10 +142,10 @@ def cmd_exists(cmd):
 
 def get_subcmd_group_names(script_cmd, script_name, cmd):
     """
-    Execute the script with defined subcommand and help and get the
+    Execute the script with defined command and help and get the
     groups defined for that help.
 
-    returns list of subcommands/groups
+    returns list of command-groups/commands
     """
     command = '%s %s --help' % (script_cmd, cmd)
     # Disable python warnings for script call.
@@ -179,7 +179,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
     group_state = False
     for line in lines:
         if group_state and line:
-            # split line into list of words and get first word as subcommand
+            # split line into list of words and get first word as command
             words = line.split()
             group_list.append(words[0])
 
@@ -191,7 +191,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
 
 def get_subgroup_names(group_name, script_cmd, script_name):
     """
-    Get all the subcommands for the help_group_name defined on input.
+    Get all the commands for the help_group_name defined on input.
     Executes script and extracts groups after line with 'Commands'
     """
     subcmds_list = get_subcmd_group_names(script_cmd, script_name, group_name)
@@ -222,7 +222,7 @@ def create_help_cmd_list(script_cmd, script_name):
     if USE_RST:
         print(rst_headline("%s Help Command Details" % script_name, 2))
         print('\nThis section defines the help output for each %s '
-              'command group and subcommand.\n' % script_name)
+              'command-group and command.\n' % script_name)
 
     for name in help_groups_result:
         command_name = '%s %s --help' % (script_name, name)
@@ -233,7 +233,7 @@ def create_help_cmd_list(script_cmd, script_name):
             if name:
                 print(rst_headline(command_name, level))
             print('\n%s\n' % '\nThe following defines the help output for the '
-                  '`%s` subcommand\n' % command_name)
+                  '`%s` command\n' % command_name)
             print_rst_verbatum_text(out.decode())
         else:
             print('%s\n%s COMMAND: %s' %
