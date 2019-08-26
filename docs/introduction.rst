@@ -52,7 +52,7 @@ platforms. It provides functionality to:
 
 * Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
   components including CIM classes, CIM instances, and CIM qualifiers and
-  execute CIM methods and queries on the WBEM server. It implements subcommands
+  execute CIM methods and queries on the WBEM server. It implements commands
   to execute the :term:`CIM-XML` operations defined in the DMTF specification
   CIM Operations Over HTTP (:term:`DSP0200`).
 

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the class command group which includes
+Click Command definition for the class command-group which includes
 commands for get, enumerate, associators, references, find, etc. of the objects
 CIMClass on a WBEM server
 """
@@ -60,9 +60,9 @@ localonly_option = [              # pylint: disable=invalid-name
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
-    Command group for CIM classes.
+    Command-group for CIM classes.
 
-    This command group defines commands to inspect classes, to invoke
+    This command-group defines commands to inspect classes, to invoke
     methods on classes, and to delete classes.
 
     Creation and modification of classes is not currently supported.
@@ -409,7 +409,7 @@ def class_tree(context, classname, **options):
 
 #####################################################################
 #
-#  Command functions for each of the subcommands in the class group
+#  Command functions for each of the commands in the class group
 #
 #####################################################################
 

@@ -86,7 +86,7 @@ Details`):
   ``--mock-server`` option since each defines a connection to a WBEM server.
 
   In the interactive mode this connection is not actually executed until a
-  command or subcommand requiring access to the WBEM server is entered.
+  command requiring access to the WBEM server is entered.
 
   Examples for the `URL` parameter of this option:
 
@@ -128,7 +128,7 @@ Details`):
   * In the interactive mode prepending the command-group name with the
     ``--namespace`` option.
   * Using the ``--namespace/-n`` command option to define a namespace
-    on subcommands that specify this option.
+    on commands that specify this option.
   * Executing a command that looks in multiple namespaces (ex. ``class find``).
 * **--user/-u** - User name for the WBEM server if a user name is required to
   authenticate the client.
@@ -163,7 +163,7 @@ Details`):
   file defined by ``--certfile``.
 * **--output-format/-o** - Output format choice (Default: mof).
   Note that the actual output format may differ from this value because some
-  subcommands only allow selected formats.  See :ref:`Output formats` for
+  commands only allow selected formats.  See :ref:`Output formats` for
   detailed information on the output formats.
 * **--use-pull-ops** [ ``yes`` | ``no`` | ``either`` ] - Determines
   whether the pull operations are used for ``EnumerateInstances``,
@@ -248,8 +248,7 @@ command line are not required and the value of the environment variable is
 used. If both the env var and the command line option are included the
 command line option overrides the environment variable with no warning.
 
-Environment variable options are not provided for command/subcommand
-options or arguments.
+Environment variable options are not provided for command options or arguments.
 
 In the following example, the second line accesses the server
 ``http://localhost`` defined by the export command:
@@ -295,7 +294,7 @@ For script integration, it is important to have a way to avoid the interactive
 password prompt. This can be done by storing the password string in an
 environment variable or specifying it on the command line.
 
-The ``pywbemcli`` command supports a ``connection export`` (sub-)command that
+The ``pywbemcli`` command supports a ``connection export`` command that
 outputs the (bash/windows) shell commands to set all needed environment variables:
 
 .. code-block:: text
@@ -797,7 +796,7 @@ new connection in the CLI command mode:
 Note: The * indicates that this is the current connection.
 
 Other connections can be added from either the command mode or interactive mode
-using the add subcommand:
+using the add command:
 
 .. code-block:: text
 
