@@ -88,10 +88,14 @@ The following defines the help output for the `pywbemcli  --help` subcommand
                                       (EnvVar:
                                       PYWBEMCLI_TIMEOUT)
       -N, --no-verify                 If set, client does not verify WBEM server
-                                      certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
-      -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
-                                      set. (EnvVar: PYWBEMCLI_CERTFILE).
-      -k, --keyfile FILE PATH         Client private key file.
+                                      certificates.(EnvVar: PYWBEMCLI_NO_VERIFY).
+      -c, --certfile TEXT             X.509 client certificate presented to the
+                                      WBEM server during the TLS/SSL handshake for
+                                      2 way authentication(EnvVar:
+                                      PYWBEMCLI_CERTFILE).
+      -k, --keyfile FILE PATH         X.509 client private key file presented to
+                                      the WBEM server during the TLS/SSL handshake
+                                      for 2 way authentication.
                                       (EnvVar:
                                       PYWBEMCLI_KEYFILE)
       --ca-certs TEXT                 File or directory containing certificates

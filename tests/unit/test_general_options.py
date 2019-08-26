@@ -109,10 +109,16 @@ Options:
                                   (EnvVar:
                                   PYWBEMCLI_TIMEOUT)
   -N, --no-verify                 If set, client does not verify WBEM server
-                                  certificate.(EnvVar: PYWBEMCLI_NO_VERIFY).
-  -c, --certfile TEXT             Server certfile. Ignored if --no-verify flag
-                                  set. (EnvVar: PYWBEMCLI_CERTFILE).
-  -k, --keyfile FILE PATH         Client private key file.
+                                  certificates.(EnvVar: PYWBEMCLI_NO_VERIFY).
+  -c, --certfile TEXT             X.509 client certificate presented to the
+                                  WBEM server during the TLS/SSL handshake for
+                                  2 way authentication(EnvVar:
+                                  PYWBEMCLI_CERTFILE).
+  -k, --keyfile FILE PATH         X.509 client private key file containing
+                                  private key belonging to tpublic key in
+                                  X.509 certificate ``--certfile``. Not
+                                  required if private key is part of
+                                  --certfile file.
                                   (EnvVar:
                                   PYWBEMCLI_KEYFILE)
   --ca-certs TEXT                 File or directory containing certificates
@@ -556,7 +562,6 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
     ['Verify connection without server definition and subcommand that '
      ' requires connection fails.',
      {'subcmd': 'class',
@@ -567,6 +572,18 @@ TEST_CASES = [
                 '"connection select" to enable a connection',
       'rc': 1,
       'test': 'regex'},
+     None, OK],
+
+
+    ['Verify --keyfile allowed only if --certfile exists.',
+     {'subcmd': 'class',
+      'args': ['enumerate'],
+      'global': ['--keyfile', 'mykey.pem']},
+     {'stderr': ['The --keyfile option',
+                 'is allowed only if',
+                 'the --certfile option exists'],
+      'rc': 1,
+      'test': 'innows'},
      None, OK],
 
     #

@@ -105,16 +105,20 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    '(EnvVar: {ev})'.format(ev=PywbemServer.timeout_envvar))
 @click.option('-N', '--no-verify', is_flag=True,
               envvar=PywbemServer.no_verify_envvar,
-              help='If set, client does not verify WBEM server certificate.' +
+              help='If set, client does not verify WBEM server certificates.' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.no_verify_envvar))
 @click.option('-c', '--certfile', type=str,
               envvar=PywbemServer.certfile_envvar,
-              help="Server certfile. Ignored if --no-verify flag set. " +
+              help='X.509 client certificate presented to the WBEM server '
+                   'during the TLS/SSL handshake for 2 way authentication' +
                    '(EnvVar: {ev}).'.format(ev=PywbemServer.certfile_envvar))
 @click.option('-k', '--keyfile', type=str,
               metavar='FILE PATH',
               envvar=PywbemServer.keyfile_envvar,
-              help='Client private key file.\n'
+              help='X.509 client private key file containing private key '
+                   'belonging to tpublic key in X.509 certificate '
+                   '``--certfile``. Not required if private key is part of '
+                   '--certfile file. \n'
                    '(EnvVar: {ev})'.format(ev=PywbemServer.keyfile_envvar))
 @click.option('--ca-certs', type=str,
               envvar=PywbemServer.ca_certs_envvar,
@@ -251,6 +255,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
             click.echo('The --name option "%s" and --server option "%s" '
                        'are mutually exclusive and may not be used '
                        'simultaneously' % (name, server), err=True)
+            raise click.Abort()
+
+        if keyfile and not certfile:
+            click.echo('The --keyfile option "%s" is allowed only if the '
+                       '--certfile option exists' % keyfile, err=True)
             raise click.Abort()
 
         # process mock_server option
