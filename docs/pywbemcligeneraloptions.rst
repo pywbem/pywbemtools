@@ -140,10 +140,27 @@ Details`):
   See :ref:`Avoiding password prompts`.
 * **--no-verify/-n** - If set, client does not verify server certificate. Any
   certificate returned by the server is accepted.
-* **--certfile** - Server certificate file. Not used if ``--no-verify/-n`` set or
-  the connection does not use SSL (i.e. ``--server http://blah``)
-* **--keyfile** - Client private key file for the server to use to authenticate
-  the client if that is required by the WBEM server.
+* **--certfile** - X.509 client certificate to be presented to the
+  WBEM server along with the ``--keyfile`` option during the TLS/SSL handshake.
+  This parameter used only with HTTPS.  If None, no client certificate is
+  presented to the server, enabling 1-way authentication. Otherwise, the
+  client certificate is presented to the server, enabling 2-way (mutual)
+  authentication. This and the ``--keyfile`` are presented to the pywbem
+  :class:`pywbem.WBEMConnection` as a single parameter ``X-509``:
+
+  * ``--cert_file`` - The file path of a file containing an X.509 client
+    certificate.
+  * ``key_file`` - The file path of a file containing the private key belonging
+    to the public key that is part of the X.509 certificate file.
+
+  For more information on authentication types, see:
+  :https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-types
+* **--keyfile** - Client private key file containing the private key belonging
+  to the public key that is part of the X.509 certificate. See ``--certfile``
+  for more information. Not required if the private key is part of the file
+  defined in ``--certfile``. Not allowed if ``--certfile`` option not provided.
+  Default: No client key file. Client private key should then be part of the
+  file defined by ``--certfile``.
 * **--output-format/-o** - Output format choice (Default: mof).
   Note that the actual output format may differ from this value because some
   subcommands only allow selected formats.  See :ref:`Output formats` for
