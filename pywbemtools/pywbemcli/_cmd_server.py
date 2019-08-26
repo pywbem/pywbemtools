@@ -49,7 +49,7 @@ def server_group():
 @click.pass_obj
 def server_namespaces(context, **options):
     """
-    Display the namespaces of the server.
+    List the namespaces of the server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
@@ -59,7 +59,7 @@ def server_namespaces(context, **options):
 @click.pass_obj
 def server_interop(context):
     """
-    Display the Interop namespace of the server.
+    Get the Interop namespace of the server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_server_interop(context))
@@ -69,7 +69,7 @@ def server_interop(context):
 @click.pass_obj
 def server_brand(context):
     """
-    Display the brand of the server.
+    Get the brand of the server.
 
     Brand information is defined by the server implementor and may or may
     not be available. Pywbem attempts to collect the brand information from
@@ -83,7 +83,7 @@ def server_brand(context):
 @click.pass_obj
 def server_info(context):
     """
-    Display information about the server.
+    Get information about the server.
 
     The information includes CIM namespaces and server brand.
     """
@@ -100,7 +100,7 @@ def server_info(context):
 @click.pass_obj
 def server_profiles(context, **options):
     """
-    Display management profiles advertized by the server.
+    List management profiles advertized by the server.
 
     Retrieve the CIM instances representing the WBEM management profiles
     advertized by the WBEM server, and display information about each profile.
@@ -145,7 +145,7 @@ def server_profiles(context, **options):
 @click.pass_obj
 def server_centralinsts(context, **options):
     """
-    Get central instances of mgmt profiles on the server.
+    List central instances of mgmt profiles on the server.
 
     Retrieve the CIM instances that are central instances of the specified
     WBEM management profiles, and display these instances. By default, all
@@ -173,7 +173,7 @@ def server_centralinsts(context, **options):
 @click.pass_obj
 def server_connection(context):
     """
-    Display connection info used by this server.
+    Get connection info used by this server.
 
     Display the information about the connection used to connect to the
     WBEM server.

@@ -47,19 +47,19 @@ CONNECTION_HELP_LINES = [
     'Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...',
     'Command group for persistent WBEM connections.',
     CMD_OPTION_HELP_HELP_LINE,
-    'add     Create a new named WBEM connection.',
-    'delete  Delete a named WBEM connection.',
-    'export  Export the current connection information.',
-    'list    List the entries in the connections file.',
-    'save    Save current connection to connections file.',
-    'select  Select a connection from connections file.',
-    'show    Show current or NAME connection information.',
-    'test    Execute a predefined WBEM request.',
+    'add     Add a persistent WBEM connection from specified conn info.',
+    'delete  Delete a persistent WBEM connection.',
+    'export  Display the commands for exporting the current connection.',
+    'list    List the persistent WBEM connections.',
+    'save    Save current connection as a persistent WBEM connection.',
+    'select  Interactively select a persistent WBEM connection for use.',
+    'show    Show connection info of current or persistent WBEM connection.',
+    'test    Test current connection with a predefined WBEM request.',
 ]
 
 CONNECTION_ADD_HELP_LINES = [
     'Usage: pywbemcli connection add [COMMAND-OPTIONS]',
-    'Create a new named WBEM connection.',
+    'Add a persistent WBEM connection from specified conn info.',
     '-s, --server SERVER Required hostname or IP address with scheme',
     '-n, --name NAME Required name for the connection(optional',
     '-d, --default-namespace NAMESPACE',
@@ -79,27 +79,27 @@ CONNECTION_ADD_HELP_LINES = [
 
 CONNECTION_DELETE_HELP_LINES = [
     'Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME',
-    'Delete a named WBEM connection.',
+    'Delete a persistent WBEM connection.',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_EXPORT_HELP_LINES = [
     'Usage: pywbemcli connection export [COMMAND-OPTIONS]',
-    'Export the current connection information.',
+    'Display the commands for exporting the current connection.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli connection list [COMMAND-OPTIONS]',
-    'List the entries in the connections file.',
+    'List the persistent WBEM connections.',
     'An "*" after the name indicates the currently selected',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS]',
-    'Save current connection to connections file.',
+    'Save current connection as a persistent WBEM connection.',
     '-n, --name Connection name  If defined, this changes the name of',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
@@ -107,19 +107,19 @@ CONNECTION_SAVE_HELP_LINES = [
 
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
-    'Select a connection from connections file.',
+    'Interactively select a persistent WBEM connection for use.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
-    'Show current or NAME connection information.',
+    'Show connection info of current or persistent WBEM connection.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
 CONNECTION_TEST_HELP_LINES = [
     'Usage: pywbemcli connection test [COMMAND-OPTIONS]',
-    'Execute a predefined WBEM request.',
+    'Test current connection with a predefined WBEM request.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 

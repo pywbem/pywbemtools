@@ -53,7 +53,7 @@ def qualifier_group():
 @click.pass_obj
 def qualifier_get(context, qualifiername, **options):
     """
-    Get a CIM qualifier declaration.
+    Get a qualifier declaration.
 
     Get a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM
     namespace (--namespace option). If no namespace was specified, the default
@@ -72,7 +72,7 @@ def qualifier_get(context, qualifiername, **options):
 @click.pass_obj
 def qualifier_enumerate(context, **options):
     """
-    List the CIM qualifier declarations in a CIM namespace.
+    List the qualifier declarations in a namespace.
 
     Enumerate the CIM qualifier declarations in the specified CIM namespace
     (--namespace option). If no namespace was specified, the default namespace

@@ -31,13 +31,13 @@ QD_HELP_LINES = [
     'Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...'
     'Command group for CIM qualifier declarations.',
     CMD_OPTION_HELP_HELP_LINE,
-    'enumerate  List the CIM qualifier declarations in a CIM namespace.',
-    'get        Get a CIM qualifier declaration.',
+    'enumerate  List the qualifier declarations in a namespace.',
+    'get        Get a qualifier declaration.',
 ]
 
 QD_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]',
-    'List the CIM qualifier declarations in a CIM namespace.',
+    'List the qualifier declarations in a namespace.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -45,7 +45,7 @@ QD_ENUMERATE_HELP_LINES = [
 
 QD_GET_HELP_LINES = [
     'Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME',
-    "Get a CIM qualifier declaration.",
+    "Get a qualifier declaration.",
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]

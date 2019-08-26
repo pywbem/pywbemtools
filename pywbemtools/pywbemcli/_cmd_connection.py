@@ -60,11 +60,10 @@ def connection_group():
 @click.pass_obj
 def connection_export(context):
     """
-    Export the current connection information.
+    Display the commands for exporting the current connection.
 
     Creates an export statement for each connection variable and outputs
-    the statement to the conole.
-
+    the statements to the console.
     """
     context.execute_cmd(lambda: cmd_connection_export(context))
 
@@ -74,7 +73,7 @@ def connection_export(context):
 @click.pass_obj
 def connection_show(context, name):
     """
-    Show current or NAME connection information.
+    Show connection info of current or persistent WBEM connection.
 
     This subcommand displays all the variables that make up the current
     WBEM connection if the optional NAME argument is NOT provided. If NAME not
@@ -93,7 +92,7 @@ def connection_show(context, name):
 @click.pass_obj
 def connection_delete(context, name, **options):
     """
-    Delete a named WBEM connection.
+    Delete a persistent WBEM connection.
 
     Delete connection information from the persistent store
     for the connection defined by NAME. The NAME argument is optional.
@@ -112,7 +111,7 @@ def connection_delete(context, name, **options):
 @click.pass_obj
 def connection_select(context, name):
     """
-    Select a connection from connections file.
+    Interactively select a persistent WBEM connection for use.
 
     Selects a connection from the persistently stored set of named connections
     if NAME exists in the store. The NAME argument is optional.  If NAME not
@@ -217,7 +216,7 @@ def connection_select(context, name):
 @click.pass_obj
 def connection_add(context, **options):
     """
-    Create a new named WBEM connection.
+    Add a persistent WBEM connection from specified conn info.
 
     This subcommand creates and saves a named connection from the
     input options in the connections file.
@@ -245,7 +244,7 @@ def connection_add(context, **options):
 @click.pass_obj
 def connection_test(context):
     """
-    Execute a predefined WBEM request.
+    Test current connection with a predefined WBEM request.
 
     This executes a predefined request against the current WBEM server to
     confirm that the connection exists and is working.
@@ -265,7 +264,7 @@ def connection_test(context):
 @click.pass_obj
 def connection_save(context, **options):
     """
-    Save current connection to connections file.
+    Save current connection as a persistent WBEM connection.
 
     Saves the current connection to the connections file if
     it does not already exist in that file.
@@ -280,7 +279,7 @@ def connection_save(context, **options):
 @click.pass_obj
 def connection_list(context):
     """
-    List the entries in the connections file.
+    List the persistent WBEM connections.
 
     This subcommand displays all entries in the connections file as
     a table using the command line output_format to define the

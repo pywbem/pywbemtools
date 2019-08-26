@@ -41,30 +41,30 @@ SERVER_HELP_LINES = [
     'Usage: pywbemcli server [COMMAND-OPTIONS]',
     'Command group for WBEM servers.',
     CMD_OPTION_HELP_HELP_LINE,
-    'brand             Display the brand of the server.',
-    'connection        Display connection info used by this server.',
-    'get-centralinsts  Get central instances of mgmt profiles on the server.',
-    'info              Display information about the server.',
-    'interop           Display the Interop namespace of the server.',
-    'namespaces        Display the namespaces of the server.',
-    'profiles          Display management profiles advertized by the server.',
+    'brand             Get the brand of the server.',
+    'connection        Get connection info used by this server.',
+    'get-centralinsts  List central instances of mgmt profiles on the server.',
+    'info              Get information about the server.',
+    'interop           Get the Interop namespace of the server.',
+    'namespaces        List the namespaces of the server.',
+    'profiles          List management profiles advertized by the server.',
 ]
 
 SERVER_BRAND_HELP_LINES = [
     'Usage: pywbemcli server brand [COMMAND-OPTIONS]',
-    'Display the brand of the server.',
+    'Get the brand of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_CONNECTION_HELP_LINES = [
     'Usage: pywbemcli server connection [COMMAND-OPTIONS]',
-    'Display connection info used by this server.',
+    'Get connection info used by this server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_GETCENTRALINSTS_HELP_LINES = [
     'Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]',
-    'Get central instances of mgmt profiles on the server.',
+    'List central instances of mgmt profiles on the server.',
     '-o, --organization <org name> Filter by the defined organization',
     '-p, --profile <profile name> Filter by the profile name',
     '-c, --central-class <classname> Optional. Required only if profiles',
@@ -76,25 +76,25 @@ SERVER_GETCENTRALINSTS_HELP_LINES = [
 
 SERVER_INFO_HELP_LINES = [
     'Usage: pywbemcli server info [COMMAND-OPTIONS]',
-    'Display information about the server.',
+    'Get information about the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_INTEROP_HELP_LINES = [
     'Usage: pywbemcli server interop [COMMAND-OPTIONS]',
-    'Display the Interop namespace of the server.',
+    'Get the Interop namespace of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_NAMESPACES_HELP_LINES = [
     'Usage: pywbemcli server namespaces [COMMAND-OPTIONS]',
-    'Display the namespaces of the server.',
+    'List the namespaces of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_PROFILES_HELP_LINES = [
     'Usage: pywbemcli server profiles [COMMAND-OPTIONS]',
-    'Display management profiles advertized by the server.',
+    'List management profiles advertized by the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
