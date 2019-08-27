@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the connection command group  which includes
+Click Command definition for the connection command group which includes
 cmds to list add, delete, show, and test server definitions in the
 connection information.  This also maintains a definition of servers on
 disk which is kept in sync with changes made with the add/delete commands.
@@ -44,7 +44,7 @@ def connection_group():
     """
     Command group for persistent WBEM connections.
 
-    This command group defines commands to manage persistent WBEM connections
+    This command groupdefines commands to manage persistent WBEM connections
     that have a name. The connections are stored in a connections file named
     'pywbemcliservers.json' in the current directory. The connection name can
     be used as a shorthand for the WBEM server via the '--name' general option.

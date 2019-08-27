@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the class command group  which includes
+Click Command definition for the class command group which includes
 cmds for get, enumerate, list of classes.
 """
 from __future__ import absolute_import, print_function
@@ -115,7 +115,7 @@ filterquery_option = [              # pylint: disable=invalid-name
 
 ##########################################################################
 #
-#   Click command group  and command definitions
+#   Click command group and command definitions
 #
 ###########################################################################
 
@@ -125,7 +125,7 @@ def instance_group():
     """
     Command group for CIM instances.
 
-    This command group  defines commands to inspect instances, to invoke
+    This command group defines commands to inspect instances, to invoke
     methods on instances, and to create and delete instances.
 
     Modification of instances is not currently supported.

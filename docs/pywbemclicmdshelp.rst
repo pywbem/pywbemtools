@@ -693,7 +693,7 @@ The following defines the help output for the `pywbemcli connection --help` comm
 
       Command group for persistent WBEM connections.
 
-      This command group defines commands to manage persistent WBEM connections
+      This command groupdefines commands to manage persistent WBEM connections
       that have a name. The connections are stored in a connections file named
       'pywbemcliservers.json' in the current directory. The connection name can
       be used as a shorthand for the WBEM server via the '--name' general
@@ -1062,7 +1062,7 @@ The following defines the help output for the `pywbemcli instance --help` comman
 
       Command group for CIM instances.
 
-      This command group  defines commands to inspect instances, to invoke
+      This command group defines commands to inspect instances, to invoke
       methods on instances, and to create and delete instances.
 
       Modification of instances is not currently supported.
@@ -1161,8 +1161,8 @@ The following defines the help output for the `pywbemcli instance associators --
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       command may use either pull or traditional
-                                      operations depending on the server and the "
-                                      --use-pull" general option. If pull
+                                      operations depending on the server and the
+                                      "--use-pull" general option. If pull
                                       operations are used, qualifiers will not be
                                       included, even if this option is specified.
                                       If traditional operations are used,
@@ -1384,8 +1384,8 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       command may use either pull or traditional
-                                      operations depending on the server and the "
-                                      --use-pull" general option. If pull
+                                      operations depending on the server and the
+                                      "--use-pull" general option. If pull
                                       operations are used, qualifiers will not be
                                       included, even if this option is specified.
                                       If traditional operations are used,
@@ -1711,8 +1711,8 @@ The following defines the help output for the `pywbemcli instance references --h
       -q, --include-qualifiers        If set, requests server to include
                                       qualifiers in the returned instances. This
                                       command may use either pull or traditional
-                                      operations depending on the server and the "
-                                      --use-pull" general option. If pull
+                                      operations depending on the server and the
+                                      "--use-pull" general option. If pull
                                       operations are used, qualifiers will not be
                                       included, even if this option is specified.
                                       If traditional operations are used,
@@ -1770,7 +1770,7 @@ The following defines the help output for the `pywbemcli qualifier --help` comma
 
       Command group for CIM qualifier declarations.
 
-      This command group  defines commands to inspect CIM qualifier declarations
+      This command group defines commands to inspect CIM qualifier declarations
       in the WBEM Server.
 
       Creation, modification and deletion of qualifier declarations is not
