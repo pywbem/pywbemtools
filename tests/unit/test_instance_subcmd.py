@@ -40,7 +40,7 @@ MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
 INSTANCE_OPTION_PROPERTY_HELP_LINE = \
-    '-P, --property name=value Optional property names of the form name=value',
+    '-P, --property name=value Optional property names of the form name=value'
 
 #
 # The following list define the help for each command in terms of particular
