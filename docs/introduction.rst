@@ -56,14 +56,17 @@ platforms. It provides functionality to:
   to execute the :term:`CIM-XML` operations defined in the DMTF specification
   CIM Operations Over HTTP (:term:`DSP0200`).
 
-* Inspect/manage WBEM server functionality including:
+* Execute specific CIM/XML operations defined in the DMTF CIM Operations Over
+  HTTP (:term:`DSP0200`). See section :ref:`pywbemcli commands to WBEM Operations`
+
+* Inspect and manage WBEM server functionality including:
 
   * CIM namespaces in a WBEM server (see :term:`CIM namespace`) ,
   * WBEM registered profiles in a WBEM server (see :term:`WBEM management profile`),
   * WBEM server brand and version information.
 
-* Capture detailed information on interactions with the WBEM server including
-  time statistics and details of data flow.
+* Capture detailed information on  CIM-XML interactions with the WBEM server
+including time statistics and details of data flow.
 
 * Maintain a file of WBEM server definitions so that pywbemcli can access
   multiple servers by name.
