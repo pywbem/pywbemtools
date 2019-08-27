@@ -25,8 +25,7 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import display_cim_objects, CMD_OPTS_TXT, \
     output_format_is_table, sort_cimobjects
-from ._common_options import namespace_option, add_options, \
-    summary_objects_option
+from ._common_options import add_options, namespace_option, summary_option
 
 
 @cli.group('qualifier', options_metavar=CMD_OPTS_TXT)
@@ -69,7 +68,7 @@ def qualifier_get(context, qualifiername, **options):
 
 @qualifier_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
-@add_options(summary_objects_option)
+@add_options(summary_option)
 @click.pass_obj
 def qualifier_enumerate(context, **options):
     """

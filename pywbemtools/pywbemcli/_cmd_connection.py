@@ -69,16 +69,17 @@ def connection_export(context):
 
 
 @connection_group.command('show', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False)
 @click.pass_obj
 def connection_show(context, name):
     """
     Show connection info of current or persistent WBEM connection.
 
     This command displays all the variables that make up the current
-    WBEM connection if the optional NAME argument is NOT provided. If NAME not
-    supplied, a list of connections from the connections definition file
-    is presented with a prompt for the user to select a NAME.
+    WBEM connection if the optional NAME argument is NOT provided.
+    If NAME not supplied, a list of connections from the connections
+    definition file is presented with a prompt for the user to select a
+    connection.
 
     The information on the connection named is displayed if that name is in
     the persistent repository.
@@ -87,18 +88,18 @@ def connection_show(context, name):
 
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False)
 @add_options(verify_option)
 @click.pass_obj
 def connection_delete(context, name, **options):
     """
     Delete a persistent WBEM connection.
 
-    Delete connection information from the persistent store
-    for the connection defined by NAME. The NAME argument is optional.
+    Delete connection information from the persistent store for the connection
+    defined by NAME.
 
-    If NAME not supplied, a select list presents the list of connection
-    definitions for selection.
+    If NAME is not supplied, a select list presents the list of
+    connection definitions for selection.
 
     Example:
       connection delete blah
@@ -107,22 +108,23 @@ def connection_delete(context, name, **options):
 
 
 @connection_group.command('select', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=False,)
+@click.argument('name', type=str, metavar='NAME', required=False)
 @click.pass_obj
 def connection_select(context, name):
     """
     Interactively select a persistent WBEM connection for use.
 
     Selects a connection from the persistently stored set of named connections
-    if NAME exists in the store. The NAME argument is optional.  If NAME not
-    supplied, a list of connections from the connections definition file
-    is presented with a prompt for the user to select a NAME.
+    if NAME exists in the store. The NAME argument is
+    optional. If NAME not supplied, a list of connections from the
+    connections definition file is presented with a prompt for the user to
+    select a connection.
 
     Select state is not persistent.
 
     Examples:
 
-       connection select <name>    # select the defined <name>
+       connection select myconn    # select the connection named 'myconn'
 
        connection select           # presents select list to pick connection
     """
@@ -130,88 +132,112 @@ def connection_select(context, name):
     context.execute_cmd(lambda: cmd_connection_select(context, name))
 
 
-# pylint: disable=bad-continuation
 @connection_group.command('add', options_metavar=CMD_OPTS_TXT)
-@click.option('-s', '--server', type=str, metavar='SERVER', required=False,
-              help='Required hostname or IP address with scheme of the '
-                   'WBEM server in format:\n[{scheme}://]{host}[:{port}]\n'
-                   '* Scheme: must be "https" or "http" [Default: "https"]\n'
-                   '* Host: defines short/fully qualified DNS hostname, '
-                   'literal IPV4 address (dotted), or literal IPV6 address\n'
-                   '* Port: (optional) defines WBEM server port to be used '
-                   '[Defaults: 5988(HTTP) and 5989(HTTPS)].\n')
-@click.option('-n', '--name', type=str, metavar='NAME', required=True,
-              help='Required name for the connection(optional, see --server).  '
-                   'This is the name for this defined WBEM server in the'
-                   ' connections file')
-@click.option('-d', '--default-namespace', type=str,
-              metavar='NAMESPACE',
-              default=DEFAULT_NAMESPACE,
-              help="Default namespace to use in the target WBEM server if no "
-                   "namespace is defined in the command"
-                   " (Default: {of}).".format(of=DEFAULT_NAMESPACE))
-@click.option('-u', '--user', type=str,
-              help="User name for the WBEM server connection. ")
-@click.option('-p', '--password', type=str,
-              envvar=PywbemServer.password_envvar,
-              help="Password for the WBEM server. Will be requested as part "
-                   " of initialization if user name exists and it is not "
-                   " provided by this option.")
-@click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
-              help="Operation timeout for the WBEM server in seconds. "
-                   "Default: " + "%s" % DEFAULT_CONNECTION_TIMEOUT)
+@click.option('-n', '--name', type=str, metavar='NAME',
+              required=True,
+              help='Name of the persistent WBEM connection to be added.')
+@click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
+              default=None,
+              help='Use a mock WBEM server that is created under the covers '
+                   'and populated with CIM objects that are defined in the '
+                   'specified MOF file or Python script file. '
+                   'See the pywbemcli documentation for more information. '
+                   'This option may be specified multiple times, and is '
+                   'mutually exclusive with the --server option, '
+                   'since each defines a WBEM server. '
+                   'Default: None.')
+@click.option('-s', '--server', type=str, metavar='URL',
+              default=None,
+              help='Use the WBEM server at the specified URL of format: '
+                   '[SCHEME://]HOST[:PORT]. '
+                   'SCHEME must be "https" (default) or "http". '
+                   'HOST is a short or long hostname or literal IPV4/v6 '
+                   'address. '
+                   'PORT defaults to 5989 for https and 5988 for http. '
+                   'This option is mutually exclusive with the --mock-server '
+                   'option. '
+                   'Default: None.'.
+                   format(ev=PywbemServer.server_envvar))
+@click.option('-u', '--user', type=str, metavar="TEXT",
+              default=None,
+              help='User name for the WBEM server. '
+                   'Default: None.')
+@click.option('-p', '--password', type=str, metavar="TEXT",
+              default=None,
+              help='Password for the WBEM server. '
+                   'Default: Prompted for if --user specified.')
 @click.option('-N', '--no-verify', is_flag=True,
-              help='If set, client does not verify server certificate.')
-@click.option('-c', '--certfile', type=str,
-              help="Server certfile. Ignored if no-verify flag set. ")
-@click.option('-k', '--keyfile', type=str,
-              help="Client private key file. ")
-@click.option('-U', '--use-pull',
-              envvar=PywbemServer.use_pull_envvar,
-              type=click.Choice(['yes', 'no', 'either']),
+              default=False,
+              help='If true, client does not verify the X.509 server '
+                   'certificate presented by the WBEM server during TLS/SSL '
+                   'handshake. '
+                   'Default: False.')
+@click.option('--ca-certs', type=str, metavar="FILE",
+              default=None,
+              help='Path name of a file or directory containing certificates '
+                   'that will be matched against the server certificate '
+                   'presented by the WBEM server during TLS/SSL handshake. '
+                   'Default: [{dirs}].'.
+                   format(dirs=', '.join(DEFAULT_CA_CERT_PATHS)))
+@click.option('-c', '--certfile', type=str, metavar="FILE",
+              default=None,
+              help='Path name of a PEM file containing a X.509 client '
+                   'certificate that is used to enable TLS/SSL 2-way '
+                   'authentication by presenting the certificate to the '
+                   'WBEM server during TLS/SSL handshake. '
+                   'Default: None.')
+@click.option('-k', '--keyfile', type=str, metavar="FILE",
+              default=None,
+              help='Path name of a PEM file containing a X.509 private key '
+                   'that belongs to the certificate in the --certfile file. '
+                   'Not required if the private key is part of the '
+                   '--certfile file.'
+                   'Default: None.')
+@click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
+              metavar='INT',
+              default=DEFAULT_CONNECTION_TIMEOUT,
+              help='Timeout in seconds for operations with the WBEM server. '
+                   'Default: {default}.'.
+                   format(default=DEFAULT_CONNECTION_TIMEOUT))
+@click.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
               default='either',
               help='Determines whether pull operations are used for '
-                   'EnumerateInstances, AssociatorInstances, '
-                   'ReferenceInstances, and ExecQuery operations.\n'
-                   '* "yes": pull operations required; if server '
-                   'does not support pull, the operation fails.\n'
-                   '* "no": forces pywbemcli to use only the '
-                   'traditional non-pull operations.\n'
-                   '* "either": pywbemcli trys first pull and then '
-                   ' traditional operations.')
-@click.option('--pull-max-cnt', type=int,
-              help='Maximium object count of objects to be returned for '
-                   'each request if pull operations are used. Must be  a '
-                   'positive non-zero integer.' +
-                   '[Default: {}]'.format(DEFAULT_MAXPULLCNT))
-@click.option('-l', '--log', type=str, metavar='COMP=DEST:DETAIL,...',
-              help='Enable logging of CIM Operations and set a component '
-                   'to destination, and detail level\n'
-                   '(COMP: [{c}], Default: {cd}) '
-                   'DEST: [{d}], Default: {dd}) '
-                   'DETAIL:[{dl}], Default: {dll})'
-                   .format(c='|'.join(LOGGER_SIMPLE_NAMES),
-                           cd='all',
-                           d='|'.join(LOG_DESTINATIONS),
-                           dd=DEFAULT_LOG_DESTINATION,
-                           dl='|'.join(LOG_DETAIL_LEVELS),
-                           dll=DEFAULT_LOG_DETAIL_LEVEL))
-@click.option('-m', '--mock-server', type=str, multiple=True,
-              metavar="FILENAME",
-              help='If this option is defined, a mock WBEM server is '
-                   'constructed as the target WBEM server and the option value '
-                   'defines a MOF or Python file to be used to populate the '
-                   'mock repository. This option may be used multiple times '
-                   'where each use defines a single file or file_path.'
-                   'See the pywbemcli documentation for more information.')
-@click.option('--ca_certs', type=str,
-              help='File or directory containing certificates that will be '
-                   'matched against a certificate received from the WBEM '
-                   'server. Set the --no-verify-cert option to bypass '
-                   'client verification of the WBEM server certificate. '
-                   'Default: Searches for matching certificates in the '
-                   'following system directories:'
-                   ' ' + ("\n".join("%s" % p for p in DEFAULT_CA_CERT_PATHS)))
+                   'operations with the WBEM server that return lists of '
+                   'instances, as follows: '
+                   '"yes" uses pull operations and fails if not supported by '
+                   'the server; '
+                   '"no" uses traditional operations; '
+                   '"either" (default) uses pull operations if supported by '
+                   'the server and otherwise falls back to traditional '
+                   'operations. '
+                   'Default: "either".')
+@click.option('--pull-max-cnt', type=int, metavar='INT',
+              default=DEFAULT_MAXPULLCNT,
+              help='Maximum number of instances to be returned by the WBEM '
+                   'server in each response, if pull operations are used. '
+                   'This is a tuning parameter that does not affect the '
+                   'external behavior of the commands. '
+                   'Default: {default}'.
+                   format(default=DEFAULT_MAXPULLCNT))
+@click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
+              default=DEFAULT_NAMESPACE,
+              help='Default namespace, to be used when commands do not '
+                   'specify the --namespace command option. '
+                   'Default: {default}.'.
+                   format(default=DEFAULT_NAMESPACE))
+@click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
+              default=None,
+              help='Enable logging of the WBEM operations, defined by a list '
+                   'of log configuration strings with: '
+                   'COMP: [{comp_choices}], default: {comp_default}; '
+                   'DEST: [{dest_choices}], default: {dest_default}; '
+                   'DETAIL: [{detail_choices}], default: {detail_default}.'.
+                   format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
+                          comp_default='all',
+                          dest_choices='|'.join(LOG_DESTINATIONS),
+                          dest_default=DEFAULT_LOG_DESTINATION,
+                          detail_choices='|'.join(LOG_DETAIL_LEVELS),
+                          detail_default=DEFAULT_LOG_DETAIL_LEVEL))
 @add_options(verify_option)
 @click.pass_obj
 def connection_add(context, **options):
@@ -255,11 +281,9 @@ def connection_test(context):
 
 
 @connection_group.command('save', options_metavar=CMD_OPTS_TXT)
-@click.option('-n', '--name', type=str,
-              metavar="Connection name",
-              help='If defined, this changes the name of the connection to '
-              'be saved. This allows renaming the current connection '
-              'as part of saving it.')
+@click.option('-n', '--name', type=str, metavar="NAME",
+              default=None,
+              help='Name of the persistent WBEM connection that is saved.')
 @add_options(verify_option)
 @click.pass_obj
 def connection_save(context, **options):
@@ -507,17 +531,19 @@ def cmd_connection_add(context, options):
                                    '"--mock-server" required.')
 
     try:
-        new_server = PywbemServer(server, options['default_namespace'],
-                                  name,
-                                  user=options['user'],
-                                  password=options['password'],
-                                  timeout=options['timeout'],
-                                  no_verify=options['no_verify'],
-                                  certfile=options['certfile'],
-                                  keyfile=options['keyfile'],
-                                  ca_certs=options['ca_certs'],
-                                  mock_server=options['mock_server'],
-                                  log=options['log'])
+        new_server = PywbemServer(
+            server_url=server,
+            default_namespace=options['default_namespace'],
+            name=name,
+            user=options['user'],
+            password=options['password'],
+            timeout=options['timeout'],
+            no_verify=options['no_verify'],
+            certfile=options['certfile'],
+            keyfile=options['keyfile'],
+            ca_certs=options['ca_certs'],
+            mock_server=mock_server,
+            log=options['log'])
 
     except ValueError as ve:
         raise click.ClickException('Add failed. %s' % ve)

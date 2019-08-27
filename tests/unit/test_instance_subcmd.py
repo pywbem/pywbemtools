@@ -24,9 +24,12 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, CMD_OPTION_VERIFY_HELP_LINE, \
-    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE, \
+    CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE, \
+    CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE, \
     CMD_OPTION_INTERACTIVE_HELP_LINE, CMD_OPTION_FILTER_QUERY_LINE, \
-    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, CMD_OPTION_LOCAL_ONLY_HELP_LINE
+    CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, \
+    CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
+    CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -39,8 +42,6 @@ MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
-INSTANCE_OPTION_PROPERTY_HELP_LINE = \
-    '-P, --property name=value Optional property names of the form name=value'
 
 #
 # The following list define the help for each command in terms of particular
@@ -63,19 +64,19 @@ INSTANCE_HELP_LINES = [
     'enumerate     List the instances of a class.',
     'get           Get an instance of a class.',
     'invokemethod  Invoke a method on an instance.',
-    'modify        Modify an instance of a class.',
+    'modify        Modify properties of an instance.',
     'query         Execute a query on instances in a namespace.',
     'references    List the instances referencing an instance.',
 ]
 
 INSTANCE_ASSOCIATORS_HELP_LINES = [
-    'Usage: pywbemcli  instance associators [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME',
     'List the instances associated with an instance.',
-    '-a, --assoc-class <class name>  Filter by the association class name',
-    '-c, --result-class <class name>',
-    '-r, --role <role name> Filter by the role name provided. Each',
-    '-R, --result-role <role name>   Filter by the result role name provided',
-    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
+    '-a, --assoc-class CLASSNAME Filter the result set by association clas',
+    '-C, --result-class CLASSNAME Filter the result set by result class',
+    '-r, --role PROPERTYNAME Filter the result set by source end role',
+    '-R, --result-role PROPERTYNAME Filter the result set by far end role',
+    CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
@@ -88,7 +89,7 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
 ]
 
 INSTANCE_COUNT_HELP_LINES = [
-    'Usage: pywbemcli  instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
+    'Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -96,16 +97,16 @@ INSTANCE_COUNT_HELP_LINES = [
 ]
 
 INSTANCE_CREATE_HELP_LINES = [
-    'Usage: pywbemcli  instance create [COMMAND-OPTIONS] CLASSNAME',
+    'Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME',
     'Create an instance of a class in a namespace.',
-    INSTANCE_OPTION_PROPERTY_HELP_LINE,
+    '-P, --property PROPERTYNAME=VALUE Initial property value',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_DELETE_HELP_LINES = [
-    'Usage: pywbemcli  instance delete [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
     'Delete an instance of a class.',
     CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -113,11 +114,11 @@ INSTANCE_DELETE_HELP_LINES = [
 ]
 
 INSTANCE_ENUMERATE_HELP_LINES = [
-    'Usage: pywbemcli  instance enumerate [COMMAND-OPTIONS] CLASSNAME',
+    'Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME',
     'List the instances of a class.',
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
-    '-d, --deep-inheritance If set, requests server to return properties',
-    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE,
+    '-d, --deep-inheritance Include subclass properties in the returned',
+    CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -131,8 +132,8 @@ INSTANCE_ENUMERATE_HELP_LINES = [
 INSTANCE_GET_HELP_LINES = [
     'Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
     'Get an instance of a class.',
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
-    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
+    CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE,
+    CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -144,7 +145,7 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
     'Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME '
     'METHODNAME',
     'Invoke a method on an instance.',
-    '-p, --parameter name=value Multiple definitions allowed',
+    '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -152,9 +153,9 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
 
 INSTANCE_MODIFY_HELP_LINES = [
     'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
-    'Modify an instance of a class.',
-    INSTANCE_OPTION_PROPERTY_HELP_LINE,
-    CMD_OPTION_PROPERTYLIST_HELP_LINE,
+    'Modify properties of an instance.',
+    '-P, --property PROPERTYNAME=VALUE Property to be modified',
+    '-p, --propertylist PROPERTYLIST Reduce the properties to be modified',
     CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -164,7 +165,7 @@ INSTANCE_MODIFY_HELP_LINES = [
 INSTANCE_QUERY_HELP_LINES = [
     'Usage: pywbemcli instance query [COMMAND-OPTIONS] INSTANCENAME',
     'Execute a query on instances in a namespace.',
-    '-l, --query-language QUERY LANGUAGE Use the query language',
+    '-l, --query-language QUERY-LANGUAGE The query language to be used',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -173,9 +174,9 @@ INSTANCE_QUERY_HELP_LINES = [
 INSTANCE_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
     'List the instances referencing an instance.',
-    '-R, --resultclass <class name> Filter by the result class name',
-    '-r, --role <role name> Filter by the role name provided',
-    CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE,
+    '-R, --result-class CLASSNAME Filter the result set by result class',
+    '-r, --role PROPERTYNAME Filter the result set by source end role',
+    CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
@@ -1264,10 +1265,10 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'valid returns paths',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
-      '--resultclass', 'TST_Lineage'],
+      '--result-class', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
@@ -1300,18 +1301,18 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'valid returns paths sorted',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '-o',
-      '--resultclass', 'TST_Lineage'],
+      '--result-class', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short form valid returns paths',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o',
       '-R', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
@@ -1320,8 +1321,8 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short form valid returns paths',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-o', '--summary',
       '-R', 'TST_Lineage'],
      {'stdout': ['2 CIMInstanceName(s) returned'],
@@ -1330,8 +1331,8 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'short form valid returns paths',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class short form valid returns paths',
      {'args': ['references', 'TST_Person.name="Mike"', '-o', '--summary',
                '-R', 'TST_Lineage'],
       'global': ['--output-format', 'table']},
@@ -1346,8 +1347,8 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -S, returns paths with resultclass '
-     'short form valid returns paths',
+    ['Verify instance subcommand references -S, returns paths with result '
+     'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-S',
       '-R', 'TST_Lineage'],
      {'stdout': ['2 CIMInstance(s) returned'],
@@ -1370,10 +1371,10 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand references -o, returns paths with resultclass '
-     'not a real ref returns no paths',
+    ['Verify instance subcommand references -o, returns paths with result '
+     'class not a real ref returns no paths',
      ['references', 'TST_Person.name="Mike"', '-o',
-      '--resultclass', 'TST_Lineagex'],
+      '--result-class', 'TST_Lineagex'],
      {'stdout': [],
       'rc': 0,
       'test': 'lines'},

@@ -65,11 +65,11 @@ SERVER_CONNECTION_HELP_LINES = [
 SERVER_GETCENTRALINSTS_HELP_LINES = [
     'Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]',
     'List central instances of mgmt profiles on the server.',
-    '-o, --organization <org name> Filter by the defined organization',
-    '-p, --profile <profile name> Filter by the profile name',
-    '-c, --central-class <classname> Optional. Required only if profiles',
-    '-s, --scoping-class <classname> Optional. Required only if profiles',
-    '-S, --scoping-path <pathname> Optional. Required only if profiles',
+    '-o, --organization ORG-NAME Filter by the defined organization',
+    '-p, --profile PROFILE-NAME Filter by the profile name',
+    '-c, --central-class CLASSNAME Optional. Required only if profiles',
+    '-s, --scoping-class CLASSNAME Optional. Required only if profiles',
+    '-S, --scoping-path CLASSLIST Optional. Required only if profiles',
     '-r, --reference-direction [snia|dmtf] Navigation direction',
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -234,6 +234,7 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
+    # TODO: Remove this test once removal of --sort option is agreed.
     ['Verify server subcommand namespaces with sort option',
      {'args': ['namespaces', '-s'],
       'global': ['-d', 'interop', '-o', 'simple']},
@@ -243,7 +244,7 @@ TEST_CASES = [
                  'interop'],
       'rc': 0,
       'test': 'lines'},
-     MOCK_SERVER_MODEL, OK],
+     MOCK_SERVER_MODEL, FAIL],
 
     ['Verify server subcommand brand',
      {'args': ['brand'],

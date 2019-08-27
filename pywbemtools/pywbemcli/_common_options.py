@@ -28,45 +28,52 @@ import click
 #
 propertylist_option = [                      # pylint: disable=invalid-name
     click.option('-p', '--propertylist', multiple=True, type=str,
-                 default=None, metavar='<property name>',
-                 help='Define a propertylist for the request. If option '
-                      'not specified a Null property list is created and the '
-                      'server returns all properties. Multiple properties may '
-                      'be defined with either a comma separated list or by '
-                      'using the option multiple times. '
-                      '(ex: -p pn1 -p pn22 or -p pn1,pn2). '
-                      'If defined as empty string the server should return no '
-                      'properties.')]
+                 default=None, metavar='PROPERTYLIST',
+                 help='Filter the properties included in the returned '
+                      'object(s). '
+                      'Multiple properties may be specified with either a '
+                      'comma-separated list or by using the option multiple '
+                      'times. Properties specified in this option that are '
+                      'not in the object(s) will be ignored. '
+                      'The empty string will include no properties. '
+                      'Default: Do not filter properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name
     click.option('-o', '--names-only', is_flag=True, required=False,
-                 help='Retrieve only the returned object names.')]
+                 help='Retrieve only the object paths (names). '
+                      'Default: Retrieve the complete objects including '
+                      'object paths.')]
 
-sort_option = [                            # pylint: disable=invalid-name
-    click.option('-s', '--sort', is_flag=True, required=False,
-                 help='Sort into alphabetical order by classname.')]
-
-includeclassorigin_option = [            # pylint: disable=invalid-name
+include_classorigin_instance_option = [         # pylint: disable=invalid-name
     click.option('-c', '--include-classorigin', is_flag=True,
                  required=False,
-                 help='Request that server include classorigin in the result.'
-                      'On some WBEM operations, server may ignore this '
-                      'option.')]
+                 help='Include class origin information in the returned '
+                      'instance(s). '
+                      'Some servers may ignore this option. '
+                      'Default: Do not include class origin information.')]
+
+include_classorigin_class_option = [            # pylint: disable=invalid-name
+    click.option('-c', '--include-classorigin', is_flag=True,
+                 required=False,
+                 help='Include class origin information in the returned '
+                      'class(es). '
+                      'Default: Do not include class origin information.')]
 
 namespace_option = [                     # pylint: disable=invalid-name
     click.option('-n', '--namespace', type=str,
-                 required=False, metavar='<name>',
-                 help='Namespace to use for this operation, instead of the '
-                      'default namespace of the connection')]
+                 required=False, metavar='NAMESPACE',
+                 help='Namespace to use for this command, instead of the '
+                      'default namespace of the connection.')]
 
-summary_objects_option = [              # pylint: disable=invalid-name
+summary_option = [              # pylint: disable=invalid-name
     click.option('-S', '--summary', is_flag=True, required=False,
-                 help='Return only summary of objects (count).')]
+                 help='Show only a summary (count) of the objects.')]
 
 verify_option = [              # pylint: disable=invalid-name
     click.option('-V', '--verify', is_flag=True, required=False,
-                 help='If set, The change is displayed and verification '
-                      'requested before the change is executed')]
+                 help='Prompt for confirmation before performing a change, '
+                      'to allow for verification of parameters. '
+                      'Default: Do not prompt for confirmation.')]
 
 
 def add_options(options):

@@ -22,7 +22,7 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE
+    CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE
 
 from .utils import execute_pywbemcli, assert_rc
 
@@ -50,21 +50,21 @@ CLASS_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
     'associators   List the classes associated with a class.',
     'delete        Delete a class.',
-    'enumerate     List the top classes or subclasses of a class in a',
+    'enumerate     List top classes or subclasses of a class in a namespace.',
     'find          List the classes with matching class names on the server.',
     'get           Get a class.',
     'invokemethod  Invoke a method on a class.',
     'references    List the classes referencing a class.',
-    'tree          Show the subclass or superclass inheritance tree of a',
+    'tree          Show the subclass or superclass hierarchy for a class.',
 ]
 
 CLASS_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME',
     'List the classes associated with a class.',
-    '-a, --assoc-class <class name> Filter by the association class name',
-    '-C, --result-class <class name> Filter the returned objects by the class',
-    '-r, --role <role name> Filter by the role name',
-    '-R, --result-role <role name> Filter by the result role name',
+    '-a, --assoc-class CLASSNAME Filter the result set by association class',
+    '-C, --result-class CLASSNAME Filter the result set by result class',
+    '-r, --role PROPERTYNAME Filter the result set by source end role',
+    '-R, --result-role PROPERTYNAME Filter the result set by far end role',
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -77,16 +77,16 @@ CLASS_ASSOCIATORS_HELP_LINES = [
 CLASS_DELETE_HELP_LINES = [
     'Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME',
     'Delete a class.',
-    '-f, --force Force the delete request',
+    '-f, --force Delete any instances of the class as well.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CLASS_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME',
-    'List the top classes or subclasses of a class in a namespace.',
-    '-d, --deep-inheritance If set, request server to return complete',
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    'List top classes or subclasses of a class in a namespace.',
+    '-d, --deep-inheritance Include direct and indirect subclasses',
+    CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
@@ -98,14 +98,14 @@ CLASS_ENUMERATE_HELP_LINES = [
 CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'List the classes with matching class names on the server.',
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    '-n, --namespace NAMESPACE Add a namespace to the search scope',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CLASS_GET_HELP_LINES = [
     'Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME',
     'Get a class.',
-    CMD_OPTION_LOCAL_ONLY_HELP_LINE,
+    CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -117,7 +117,7 @@ CLASS_INVOKEMETHOD_HELP_LINES = [
     'Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME '
     'METHODNAME',
     'Invoke a method on a class.',
-    '-p, --parameter parameter Optional multiple method parameters of form',
+    '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -125,8 +125,8 @@ CLASS_INVOKEMETHOD_HELP_LINES = [
 CLASS_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME',
     'List the classes referencing a class.',
-    '-R, --result-class <class name> Filter by the classname provided.',
-    '-r, --role <role name> Filter by the role name provided.',
+    '-R, --result-class CLASSNAME Filter the result set by result class',
+    '-r, --role PROPERTYNAME Filter the result set by source end role',
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -138,8 +138,8 @@ CLASS_REFERENCES_HELP_LINES = [
 
 CLASS_TREE_HELP_LINES = [
     'Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME',
-    'Show the subclass or superclass inheritance tree of a class.',
-    '-s, --superclasses Display the superclasses',
+    'Show the subclass or superclass hierarchy for a class.',
+    '-s, --superclasses Show the superclass hierarchy.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -935,7 +935,8 @@ TEST_CASES = [
 
     ['Verify class subcommand tree with superclass option, no class',
      ['tree', '-s'],
-     {'stderr': ['Error: Classname argument required for superclasses option'],
+     {'stderr': ['Error: CLASSNAME argument required for --superclasses '
+                 'option'],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
