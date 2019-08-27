@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the qualifer command-group  which includes
+Click Command definition for the qualifer command group  which includes
 cmds for get and enumerate for CIM qualifier types.
 """
 

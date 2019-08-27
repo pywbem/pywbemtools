@@ -32,9 +32,9 @@ where:
 
 .. code-block:: text
 
-        cmd-group := <command-group name> <command>
+        cmd-group := <command group  name> <command>
 
-Within pywbemcli each command-group name is a noun, referencing an entity (ex.
+Within pywbemcli each command group  name is a noun, referencing an entity (ex.
 class, instance, server).
 
 .. code-block:: text
@@ -122,7 +122,7 @@ The following table defines which pywbemcli commands are used for the
 corresponding pywbem request operations.
 
 =================================  ==============================================
-WBEM CIM-XML Operation             pywbemcli command-group & command
+WBEM CIM-XML Operation             pywbemcli command group  & command
 =================================  ==============================================
 **Instance Operations:**
 EnumerateInstances                 instance enumerate INSTANCENAME
@@ -240,9 +240,9 @@ from which an instance name can be chosen. The following is an example:
     };
 
 
-.. _`Class command-group`:
+.. _`Class command group`:
 
-Class command-group
+Class command group
 -------------------
 
 The **class** group defines commands that act on CIM classes. see
@@ -255,7 +255,7 @@ The **class** group defines commands that act on CIM classes. see
   classes/classnames in the :term:`CIM model output formats` (see
   :ref:`Output formats`). If unsuccesful it an exception. This command
   returns the class associators, not the instance associators. The
-  :ref:`Instance command-group` includes the corresponding associators
+  :ref:`Instance command group` includes the corresponding associators
   operation for instances:
 
   .. code-block:: text
@@ -266,12 +266,13 @@ The **class** group defines commands that act on CIM classes. see
 
   See :ref:`pywbemcli class associators --help` for details.
 * **references** to get the class level reference classes or classnames for a
-  class defined by the CLASSNAME argument in the default namespace or the namespace
-  defined with this command displayed in the defined format. If successful
-  it displays the classes/classnames in the :term:`CIM model output formats`
-  (see :ref:`Output formats`). If unsuccesful it an exception.. This returns
-  the class level references,not the instance references. The :ref:`Instance
-  command-group` includes a corresponding instance references operation:
+  class defined by the CLASSNAME argument in the default namespace or the
+  namespace defined with this command displayed in the defined format. If
+  successful it displays the classes/classnames in the :term:`CIM model output
+  formats` (see :ref:`Output formats`). If unsuccesful it an exception.. This
+  returns the class level references,not the instance references. The
+  :ref:`Instance command group` includes a corresponding instance references
+  operation:
 
   .. code-block:: text
 
@@ -427,9 +428,9 @@ The **class** group defines commands that act on CIM classes. see
   See :ref:`pywbemcli class tree --help` for details.
 
 
-.. _`Instance command-group`:
+.. _`Instance command group`:
 
-Instance command-group
+Instance command group
 ----------------------
 
 The **instance** group defines commands that act on CIM instances including:
@@ -632,12 +633,12 @@ The **instance** group defines commands that act on CIM instances including:
   output formats` or the table formats` (see :ref:`Output formats`)
   See :ref:`pywbemcli instance query --help` for details.
 
-.. _`qualifier command-group`:
+.. _`qualifier command group`:
 
-Qualifier command-group
+Qualifier command group
 -----------------------
 
-The **qualifier** command-group defines commands that act on
+The **qualifier** command group  defines commands that act on
 CIMQualifierDeclaration entities in the WBEM server including:
 
 * **get** to get a single qualifier declaration defined by the ``QUALIFIERNAME``
@@ -690,12 +691,12 @@ CIMQualifierDeclaration entities in the WBEM server including:
 
   See :ref:`pywbemcli qualifier enumerate --help` for details.
 
-.. _`Server command-group`:
+.. _`Server command group`:
 
-Server command-group
+Server command group
 --------------------
 
-The **server** command-group defines commands that interact with a WBEM
+The **server** command group  defines commands that interact with a WBEM
 server to access information about the WBEM server itself. These commands
 are generally not namespace specific but access information about the server,
 namespaces, etc. The commands are:
@@ -867,12 +868,12 @@ namespaces, etc. The commands are:
 
   See :ref:`pywbemcli server get-centralinsts --help` for details.
 
-.. _`Connection command-group`:
+.. _`Connection command group`:
 
-Connection command-group
+Connection command group
 ------------------------
 
-The **connection** command-group defines commands that provide for a
+The **connection** command group  defines commands that provide for a
 persistent file (:term:`connections file`) of WBEM server connection
 parameters and allow selecting entries in this file as well as adding entries
 to the file, deleting entries from the file and viewing WBEM servers defined in the
@@ -1070,7 +1071,7 @@ started in the :ref:`interactive mode` either by entering:
    Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.
    pywbemcli>
 
-or by executing the script without any command or command-group:
+or by executing the script without any command or command group :
 
   .. code-block:: text
 

@@ -145,7 +145,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
     Execute the script with defined command and help and get the
     groups defined for that help.
 
-    returns list of command-groups/commands
+    returns list of command groups/commands
     """
     command = '%s %s --help' % (script_cmd, cmd)
     # Disable python warnings for script call.
@@ -222,7 +222,7 @@ def create_help_cmd_list(script_cmd, script_name):
     if USE_RST:
         print(rst_headline("%s Help Command Details" % script_name, 2))
         print('\nThis section defines the help output for each %s '
-              'command-group and command.\n' % script_name)
+              'command group and command.\n' % script_name)
 
     for name in help_groups_result:
         command_name = '%s %s --help' % (script_name, name)

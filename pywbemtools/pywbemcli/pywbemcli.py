@@ -135,7 +135,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.timeout_envvar,
               help='Choice for command output data format. '
                    'pywbemcli may override the format choice depending on the '
-                   'command-group and command since not all formats apply to '
+                   'command group and command since not all formats apply to '
                    'all output data types. Choices further defined in '
                    'pywbemcli documentation.\n' +
                    'Choices: Table: [{tb}], Object: [{ob}]\n'

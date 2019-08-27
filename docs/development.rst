@@ -133,9 +133,9 @@ There are multiple types of tests in pywbem:
    to emulate a WBEM server, while unit tests exercise single modules without
    using access to a WBEM server.
 
-   Generally, the function tests are organized by the command-group so that
-   the function tests for the class command-group are in the file
-   test_class_subcmd.py
+   Generally, the function tests are organized by the command group  so that
+   the function tests for the class command group are in the file
+   ``test_class_subcmd.py``
 
 
    Tests are run by executing:

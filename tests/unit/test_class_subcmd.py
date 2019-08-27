@@ -46,7 +46,7 @@ SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 #
 CLASS_HELP_LINES = [
     'Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...',
-    'Command-group for CIM classes.',
+    'Command group for CIM classes.',
     CMD_OPTION_HELP_HELP_LINE,
     'associators   List the classes associated with a class.',
     'delete        Delete a class.',

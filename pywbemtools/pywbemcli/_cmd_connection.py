@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the connection command-group  which includes
+Click Command definition for the connection command group  which includes
 cmds to list add, delete, show, and test server definitions in the
 connection information.  This also maintains a definition of servers on
 disk which is kept in sync with changes made with the add/delete commands.
