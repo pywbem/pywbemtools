@@ -404,6 +404,34 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify class subcommand enumerate -o names only - table',
+     {'args': ['enumerate', '-o'],
+      'global': ['--output-format', 'table']},
+     {'stdout': """Classnames:
++--------------+
+| Class Name   |
+|--------------|
+| CIM_Foo      |
++--------------+
+""",
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate CIM_Foo -o names only - table',
+     {'args': ['enumerate', 'CIM_Foo', '-o'],
+      'global': ['--output-format', 'table']},
+     {'stdout': """Classnames:
++--------------+
+| Class Name   |
+|--------------|
+| CIM_Foo_sub  |
+| CIM_Foo_sub2 |
++--------------+
+""",
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+
     ['Verify class subcommand enumerate CIM_Foo --names-only',
      ['enumerate', 'CIM_Foo', '--names-only'],
      {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],

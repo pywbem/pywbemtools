@@ -620,7 +620,7 @@ def split_str_w_esc(str_, delimiter, escape='\\'):
                 # delimiter or the escape character itself. Copy the escape
                 # character if it is not in use to escape one of these
                 # characters.
-                if next_character != delimiter and next_character != escape:
+                if next_character not in [delimiter, escape]:
                     current_element.append(escape)
                 current_element.append(next_character)
             except StopIteration:
@@ -944,15 +944,18 @@ def _print_paths_as_table(objects, table_width, table_format):
     Display paths as a table. This include CIMInstanceName, ClassPath,
     and unicode (the return type for enumerateClasses).
     """
+    title = None
     if objects:
         if isinstance(objects[0], six.string_types):
-            headers = ('path')
-            rows = [obj for obj in objects]
+            title = 'Classnames:'
+            headers = ['Class Name']
+            rows = [[obj] for obj in objects]
         elif isinstance(objects[0], CIMClassName):
+            title = 'Classnames'
             headers = ('host', 'namespace', 'class')
             rows = [[obj.host, obj.namespace, obj.classname] for obj in objects]
-
         elif isinstance(objects[0], CIMInstanceName):
+            title = 'InstanceNames: %s' % objects[0].classname
             host_hdr = 'host'
             ns_hdr = 'namespace'
             class_hdr = 'class'
@@ -975,7 +978,6 @@ def _print_paths_as_table(objects, table_width, table_format):
             raise click.ClickException("{0} invalid type ({1})for path display".
                                        format(objects[0], type(objects[0])))
 
-        title = 'InstanceNames: %s' % objects[0].classname
         click.echo(format_table(rows, headers, title=title,
                                 table_format=table_format))
 

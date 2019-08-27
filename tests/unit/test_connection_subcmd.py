@@ -277,7 +277,7 @@ TEST_CASES = [
      ['add', '--mock-server', 'test1.mof', '--server', 'http://blah',
       '--name', 'fred'],
      {'stderr': 'Add failed. Simultaneous "--server" and '
-      '"--mock-server" not allowed',
+                '"--mock-server" not allowed',
       'rc': 1,
       'test': 'regex'},
      None, OK],
