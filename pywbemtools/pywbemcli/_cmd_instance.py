@@ -26,9 +26,9 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
     process_invokemethod
-from ._common_options import propertylist_option, names_only_option, \
-    includeclassorigin_option, namespace_option, add_options, \
-    summary_objects_option, verify_option
+from ._common_options import add_options, propertylist_option, \
+    names_only_option, include_classorigin_instance_option, namespace_option, \
+    summary_option, verify_option
 from .config import DEFAULT_QUERY_LANGUAGE
 
 
@@ -39,78 +39,84 @@ from .config import DEFAULT_QUERY_LANGUAGE
 
 # This is instance-only because the default is False for include-qualifiers
 # on instances but True on classes
-includequalifiers_option = [              # pylint: disable=invalid-name
+include_qualifiers_get_option = [              # pylint: disable=invalid-name
     click.option('-q', '--include-qualifiers', is_flag=True, required=False,
-                 help='If set, requests server to include qualifiers in the '
-                 'returned instances. Not all servers return qualifiers on '
-                 'instances')]
+                 help='Include qualifiers in the returned instance. '
+                      'Not all servers return qualifiers on instances. '
+                      'Default: Do not include qualifiers.')]
 
-includequalifiersenum_option = [              # pylint: disable=invalid-name
+include_qualifiers_list_option = [              # pylint: disable=invalid-name
     click.option('-q', '--include-qualifiers', is_flag=True, required=False,
-                 help='If set, requests server to include qualifiers in the '
-                 'returned instances. This command may use either pull '
-                 'or traditional operations depending on the server '
-                 'and the "--use-pull" general option. If pull operations '
-                 'are used, qualifiers will not be included, even if this '
-                 'option is specified. If traditional operations are used, '
-                 'inclusion of qualifiers depends on the server.')]
+                 help='When traditional operations are used, include '
+                      'qualifiers in the returned instances. '
+                      'Some servers may ignore this option. '
+                      'By default, and when pull operations are used, '
+                      'qualifiers will never be included.')]
 
 # specific to instance because DeepInheritance differs between class and
 # instance operations.
-deepinheritance_option = [              # pylint: disable=invalid-name
+deep_inheritance_enum_option = [              # pylint: disable=invalid-name
     click.option('-d', '--deep-inheritance', is_flag=True, required=False,
-                 help='If set, requests server to return properties in '
-                      'subclasses of the target instances class. If option not '
-                      'specified only properties from target class are '
-                      'returned')]
+                 help='Include subclass properties in the returned '
+                      'instances. '
+                      'Default: Do not include subclass properties.')]
 
-localonlyget_option = [              # pylint: disable=invalid-name
+local_only_get_option = [              # pylint: disable=invalid-name
     click.option('-l', '--local-only', is_flag=True, required=False,
-                 help='Show only local properties of the instance. '
-                 'Some servers may not process this parameter.')]
+                 help='Do not include superclass properties in the returned '
+                      'instance. '
+                      'Some servers may ignore this option. '
+                      'Default: Include superclass properties.')]
 
-localonlyenum_option = [              # pylint: disable=invalid-name
+local_only_list_option = [              # pylint: disable=invalid-name
     click.option('-l', '--local-only', is_flag=True, required=False,
-                 help='Show only local properties of the instances. This '
-                      'command may use either pull or traditional '
-                      'operations depending on the server and the '
-                      '--use-pull general option. If pull operations '
-                      'are used, this parameters will not be included, even if '
-                      'specified. If traditional operations are used, some '
-                      'servers do not process the parameter.')]
+                 help='When traditional operations are used, do not include '
+                      'superclass properties in the returned instances. '
+                      'Some servers may ignore this option. '
+                      'By default, and when pull operations are used, '
+                      'superclass properties will always be included.')]
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='If set, `INSTANCENAME` argument must be a class rather '
-                      'than an instance and user is presented with a list of '
-                      'instances of the class from which the instance to '
-                      'process is selected.')]
+                 help='Prompt for selecting an instance from a list. '
+                      'If used, the INSTANCENAME argument must be a class '
+                      'name, and the instances of that class are presented.')]
 
-instance_property_option = [              # pylint: disable=invalid-name
-    click.option('-P', '--property', type=str, metavar='name=value',
-                 required=False,
-                 multiple=True,
-                 help='Optional property names of the form name=value. '
-                 'Multiple definitions allowed, one for each property to be '
-                 'included in the createdinstance. Array property values '
-                 'defined by comma-separated-values. EmbeddedInstance not '
-                 'allowed.')]
+property_create_option = [              # pylint: disable=invalid-name
+    click.option('-P', '--property', type=str, metavar='PROPERTYNAME=VALUE',
+                 required=False, multiple=True,
+                 help='Initial property value for the new instance. '
+                      'May be specified multiple times. '
+                      'Array property values are specified as a '
+                      'comma-separated list; embedded instances are not '
+                      'supported. '
+                      'Default: No initial properties provided.')]
 
-filterquerylanguage_option = [              # pylint: disable=invalid-name
-    click.option('--filter-query-language', type=str, required=False,
+property_modify_option = [              # pylint: disable=invalid-name
+    click.option('-P', '--property', type=str, metavar='PROPERTYNAME=VALUE',
+                 required=False, multiple=True,
+                 help='Property to be modified, with its new value. '
+                      'May be specified once for each property to be '
+                      'modified. '
+                      'Array property values are specified as a '
+                      'comma-separated list; embedded instances are not '
+                      'supported. '
+                      'Default: No properties modified.')]
+
+filter_query_language_option = [              # pylint: disable=invalid-name
+    click.option('--filter-query-language', type=str, metavar='QUERY-LANGUAGE',
                  default=None,
-                 help='A filter-query language to be used with a filter query '
-                 'defined by --filter-query. (Default: None)')]
+                 help='The filter query language to be used with '
+                      '--filter-query. '
+                      'Default: DMTF:FQL.')]
 
-filterquery_option = [              # pylint: disable=invalid-name
-    click.option('-f', '--filter-query', type=str, required=False,
+filter_query_option = [              # pylint: disable=invalid-name
+    click.option('-f', '--filter-query', type=str, metavar='QUERY-STRING',
                  default=None,
-                 help='A filter query to be passed to the server if the pull '
-                 'operations are used. If this option is defined and the '
-                 '--filter-query-language is None, pywbemcli assumes DMTF:FQL. '
-                 'If this option is defined and the traditional operations are '
-                 'used, the filter is not sent to the server. See the '
-                 'documentation for more information. (Default: None)')]
+                 help='When pull operations are used, filter the instances in '
+                      'the result via a filter query. '
+                      'By default, and when traditional operations are used, '
+                      'no such filtering takes place.')]
 
 
 ##########################################################################
@@ -139,9 +145,9 @@ def instance_group():
 
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@add_options(localonlyget_option)
-@add_options(includequalifiers_option)
-@add_options(includeclassorigin_option)
+@add_options(local_only_get_option)
+@add_options(include_qualifiers_get_option)
+@add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
@@ -202,7 +208,7 @@ def instance_delete(context, instancename, **options):
 
 @instance_group.command('create', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@add_options(instance_property_option)
+@add_options(property_create_option)
 @add_options(verify_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -217,7 +223,7 @@ def instance_create(context, classname, **options):
     namespace of the connection is used.
 
     The properties to be initialized and their new values are specified using
-    the --property option, which can be specified multiple times.
+    the --property option, which may be specified multiple times.
 
     Pywbemcli retrieves the class definition from the server in order to
     verify that the specified properties are consistent with the property
@@ -225,7 +231,7 @@ def instance_create(context, classname, **options):
 
     Example:
 
-      pywbemcli instance create CIM_blah -p id=3 -p strp="bla bla"
+      pywbemcli instance create CIM_blah -P id=3 -P arr="bla bla",foo
     """
     context.execute_cmd(lambda: cmd_instance_create(context, classname,
                                                     options))
@@ -233,24 +239,23 @@ def instance_create(context, classname, **options):
 
 @instance_group.command('modify', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@add_options(instance_property_option)
+@add_options(property_modify_option)
 @click.option('-p', '--propertylist', multiple=True, type=str,
-              default=None, metavar='<property name>',
-              help='Define a propertylist for the request. If option '
-                   'not specified a Null property list is created. Multiple '
-                   'properties may be defined with either a comma '
-                   'separated list defining the option multiple times. '
-                   '(ex: -p pn1 -p pn22 or -p pn1,pn2). If defined as '
-                   'empty string an empty propertylist is created. The '
-                   'server uses the propertylist to limit changes made to '
-                   'the instance to properties in the propertylist.')
+              default=None, metavar='PROPERTYLIST',
+              help='Reduce the properties to be modified (as per '
+              '--property) to a specific property list. '
+              'Multiple properties may be specified with either a '
+              'comma-separated list or by using the option multiple '
+              'times. The empty string will cause no properties to '
+              'be modified. '
+              'Default: Do not reduce the properties to be modified.')
 @add_options(interactive_option)
 @add_options(verify_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_modify(context, instancename, **options):
     """
-    Modify an instance of a class.
+    Modify properties of an instance.
 
     The CIM instance to be modified can be specified in two ways:
 
@@ -268,11 +273,14 @@ def instance_modify(context, instancename, **options):
     of the connection.
 
     The properties to be modified and their new values are specified using the
-    --property option, which can be specified multiple times.
+    --property option, which may be specified multiple times.
+
+    The --propertylist option can be used to reduce the modifications to only
+    a specific list of properties.
 
     Example:
 
-      pywbemcli instance modify CIM_blah.fred=3 -p id=3 -p strp="bla bla"
+      pywbemcli instance modify CIM_blah.fred=3 -P id=3 -P arr="bla bla",foo
     """
     context.execute_cmd(lambda: cmd_instance_modify(context, instancename,
                                                     options))
@@ -281,12 +289,13 @@ def instance_modify(context, instancename, **options):
 @instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
-@click.option('-p', '--parameter', type=str, metavar='name=value',
+@click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
-              help='Multiple definitions allowed, one for each parameter to be '
-                   'included in the new instance. Array parameter values '
-                   'defined by comma-separated-values. EmbeddedInstance not '
-                   'allowed.')
+              help='Specify a method input parameter with its value. '
+                   'May be specified multiple times. '
+                   'Array property values are specified as a comma-separated '
+                   'list; embedded instances are not supported. '
+                   'Default: No input parameters.')
 @add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -314,7 +323,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
     of the connection.
 
     The method input parameters are specified using the --parameter option,
-    which can be specified multiple times.
+    which may be specified multiple times.
 
     Pywbemcli retrieves the class definition of the creation class of the
     instance from the server in order to verify that the specified input
@@ -335,16 +344,16 @@ def instance_invokemethod(context, instancename, methodname, **options):
 
 @instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@add_options(localonlyenum_option)
-@add_options(deepinheritance_option)
-@add_options(includequalifiersenum_option)
-@add_options(includeclassorigin_option)
+@add_options(local_only_list_option)
+@add_options(deep_inheritance_enum_option)
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @add_options(names_only_option)
-@add_options(summary_objects_option)
-@add_options(filterquery_option)
-@add_options(filterquerylanguage_option)
+@add_options(summary_option)
+@add_options(filter_query_option)
+@add_options(filter_query_language_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
@@ -374,26 +383,21 @@ def instance_enumerate(context, classname, **options):
 
 @instance_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('-R', '--resultclass', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the result class name provided. Each returned '
-                   'instance (or instance name) should be a member of this '
-                   'class or its subclasses. Optional')
+@click.option('-R', '--result-class', type=str, required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by result class name.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned instance '
-                   '(or instance name) should refer to the target instance '
-                   'through a property with a name that matches the value of '
-                   'this parameter. Optional.')
-@add_options(includequalifiersenum_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
-@add_options(summary_objects_option)
-@add_options(filterquery_option)
-@add_options(filterquerylanguage_option)
+@add_options(summary_option)
+@add_options(filter_query_option)
+@add_options(filter_query_language_option)
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
@@ -437,38 +441,26 @@ def instance_references(context, instancename, **options):
 @instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-a', '--assoc-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the association class name provided.Each '
-                   'returned instance (or instance name) should be associated '
-                   'to the source instance through this class or its '
-                   'subclasses. Optional.')
-@click.option('-c', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the result class name provided. Each '
-                   'returned instance (or instance name) should be a member '
-                   'of this class or one of its subclasses. Optional')
+              metavar='CLASSNAME',
+              help='Filter the result set by association class name.')
+@click.option('-C', '--result-class', type=str, required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by result class name.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned instance '
-              '(or instance name)should be associated with the source instance '
-              '(INSTANCENAME) through an association with this role (property '
-              'name in the association that matches this parameter). Optional.')
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
 @click.option('-R', '--result-role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the result role name provided. Each returned '
-              'instance (or instance name)should be associated with the source '
-              ' instance name (`INSTANCENAME`) through an association with '
-              'returned object having this role (property name in the '
-              'association that matches this parameter). Optional.')
-@add_options(includequalifiersenum_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by far end role name.')
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(interactive_option)
-@add_options(summary_objects_option)
-@add_options(filterquery_option)
-@add_options(filterquerylanguage_option)
+@add_options(summary_option)
+@add_options(filter_query_option)
+@add_options(filter_query_language_option)
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
@@ -510,13 +502,14 @@ def instance_associators(context, instancename, **options):
 
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)
-@click.argument('query', type=str, required=True, metavar='QUERY_STRING')
-@click.option('-l', '--query-language', type=str, required=False,
-              metavar='QUERY LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
-              help='Use the query language defined. '
-                   '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
+@click.argument('query', type=str, required=True, metavar='QUERY-STRING')
+@click.option('-l', '--query-language', type=str, metavar='QUERY-LANGUAGE',
+              default=DEFAULT_QUERY_LANGUAGE,
+              help='The query language to be used with --query. '
+              'Default: {default}.'.
+              format(default=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
-@add_options(summary_objects_option)
+@add_options(summary_option)
 @click.pass_obj
 def instance_query(context, query, **options):
     """
@@ -536,7 +529,7 @@ def instance_query(context, query, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help='Sort by instance count. Otherwise sorted by classname')
+              help='Sort by instance count. Otherwise sorted by class name')
 @add_options(namespace_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
@@ -558,8 +551,8 @@ def instance_count(context, classname, **options):
     `pywbem_`, etc. '*system*' returns classes whose names include the case
     insensitive string `system`.
 
-    This operation can take a long time to execute since it potentially
-    enumerates all classes in all namespaces.
+    This command can take a long time to execute since it potentially
+    enumerates all instance names in all namespaces.
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
@@ -829,7 +822,7 @@ def cmd_instance_references(context, instancename, options):
         if options['names_only']:
             results = context.conn.PyWbemcliReferenceInstancePaths(
                 instancepath,
-                ResultClass=options['resultclass'],
+                ResultClass=options['result_class'],
                 Role=options['role'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
@@ -837,7 +830,7 @@ def cmd_instance_references(context, instancename, options):
         else:
             results = context.conn.PyWbemcliReferenceInstances(
                 instancepath,
-                ResultClass=options['resultclass'],
+                ResultClass=options['result_class'],
                 Role=options['role'],
                 IncludeQualifiers=options["include_qualifiers"],
                 IncludeClassOrigin=options['include_classorigin'],

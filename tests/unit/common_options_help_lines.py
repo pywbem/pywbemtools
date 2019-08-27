@@ -24,37 +24,52 @@ CMD_OPTION_HELP_HELP_LINE = \
     '-h, --help Show this message and exit.'
 
 CMD_OPTION_INTERACTIVE_HELP_LINE = \
-    "-i, --interactive If set, `INSTANCENAME` argument must"
+    "-i, --interactive Prompt for selecting an instance from a list."
 
 CMD_OPTION_VERIFY_HELP_LINE = \
-    '-V, --verify If set, The change is displayed'
+    '-V, --verify Prompt for confirmation before performing a change'
 
 CMD_OPTION_NAMESPACE_HELP_LINE = \
-    '-n, --namespace <name> Namespace to use for this operation'
+    '-n, --namespace NAMESPACE Namespace to use for this command'
 
 CMD_OPTION_NAMES_ONLY_HELP_LINE = \
-    '-o, --names-only Retrieve only the returned object names.'
+    '-o, --names-only Retrieve only the object paths (names).'
 
 CMD_OPTION_SUMMARY_HELP_LINE = \
-    '-S, --summary Return only summary of objects'
+    '-S, --summary Show only a summary (count) of the objects.'
 
-CMD_OPTION_LOCAL_ONLY_HELP_LINE = \
-    '-l, --local-only Show only local properties'
+CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE = \
+    '-l, --local-only Do not include superclass properties and methods in ' \
+    'the returned'
+
+CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE = \
+    '-l, --local-only Do not include superclass properties in the returned'
+
+CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE = \
+    '-l, --local-only When traditional operations are used, do not include ' \
+    'superclass properties'
 
 CMD_OPTION_PROPERTYLIST_HELP_LINE = \
-    '-p, --propertylist <property name> Define a propertylist'
+    '-p, --propertylist PROPERTYLIST Filter the properties included in'
 
 CMD_OPTION_FILTER_QUERY_LINE = \
-    '-f, --filter-query TEXT A filter query to be passed to the server'
+    '-f, --filter-query QUERY-STRING When pull operations are used, filter ' \
+    'the instances in the result'
 
 CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
-    '--filter-query-language TEXT A filter-query language to be used'
+    '--filter-query-language QUERY-LANGUAGE The filter query language to be ' \
+    'used'
 
 CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
-    '--no-qualifiers If set, request server to not include qualifiers'
+    '--no-qualifiers Do not include qualifiers in the returned'
 
-CMD_OPTION_INCLUDE_QUALIFIERS_HELP_LINE = \
-    '-q, --include-qualifiers If set, requests server to include'
+CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE = \
+    '-q, --include-qualifiers Include qualifiers in the returned'
+
+CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE = \
+    '-q, --include-qualifiers When traditional operations are used, ' \
+    'include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
-    '-c, --include-classorigin Request that server include classorigin'
+    '-c, --include-classorigin Include class origin information in the ' \
+    'returned'

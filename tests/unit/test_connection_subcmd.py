@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Test the connection command group and its subcommands.. This test depends on
+Test the connection command group and its subcommands. This test depends on
 a pywbemcliservers.json file in the test directory.  It assumes that the
 test directory is the same as the current working directory where pywbemcli
 was called.
@@ -60,19 +60,20 @@ CONNECTION_HELP_LINES = [
 CONNECTION_ADD_HELP_LINES = [
     'Usage: pywbemcli connection add [COMMAND-OPTIONS]',
     'Add a persistent WBEM connection from specified conn info.',
-    '-s, --server SERVER Required hostname or IP address with scheme',
-    '-n, --name NAME Required name for the connection(optional',
-    '-d, --default-namespace NAMESPACE',
-    '-u, --user TEXT User name for the WBEM server connection',
-    '-p, --password TEXT Password for the WBEM server. Will be',
-    '-t, --timeout INTEGER RANGE Operation timeout for the WBEM server in',
-    '-N, --no-verify If set, client does not verify server',
-    '-k, --keyfile TEXT Client private key file',
-    '-U, --use-pull [yes|no|either] Determines whether pull operations',
-    '--pull-max-cnt INTEGER Maximium object count of objects',
-    '-l, --log COMP=DEST:DETAIL,... Enable logging of CIM Operations',
-    '-m, --mock-server FILENAME If this option is defined',
-    '--ca_certs TEXT File or directory containing',
+    '-n, --name NAME Name of the persistent WBEM connection.',
+    '-s, --server URL URL of a WBEM server',
+    '-u, --user TEXT User name for the WBEM server.',
+    '-p, --password TEXT Password for the WBEM server.',
+    '-t, --timeout INT Timeout in seconds for operations with the WBEM server.',
+    '-N, --no-verify Do not verify the X.509 server certificate',
+    '--ca-certs FILE Path name of a file or directory containing ',
+    '-c, --certfile FILE Path name of a PEM file containing a X.509 client',
+    '-k, --keyfile FILE Path name of a PEM file containing a X.509 private',
+    '-U, --use-pull [yes|no|either] Determines whether pull operations are',
+    '-m, --mock-server FILE Use a mock WBEM server',
+    '--pull-max-cnt INT Maximum number of instances to be returned',
+    '-d, --default-namespace NAMESPACE Default namespace',
+    '-l, --log COMP=DEST:DETAIL,... Enable logging of the WBEM operations',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -100,7 +101,7 @@ CONNECTION_LIST_HELP_LINES = [
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS]',
     'Save current connection as a persistent WBEM connection.',
-    '-n, --name Connection name  If defined, this changes the name of',
+    '-n, --name NAME Name of the persistent WBEM connection',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
 ]
@@ -298,8 +299,8 @@ TEST_CASES = [
      {'stdout': [
          "name: test1", "  server: http://blah",
          "  default-namespace: root/cimv2", "  user: None", "  password: None",
-         "  timeout: None", "  no-verify: False", "  certfile: None",
-         "  keyfile: None", "  use-pull: None", "  mock-server: ",
+         "  timeout: 30", "  no-verify: False", "  certfile: None",
+         "  keyfile: None", "  use-pull: None", "  mock-server:",
          "  log: None"],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -318,7 +319,7 @@ TEST_CASES = [
      {'stdout': [
          "name: test1", "  server: http://blah",
          "  default-namespace: root/cimv2", "  user: None", "  password: None",
-         "  timeout: None", "  no-verify: False", "  certfile: None",
+         "  timeout: 30", "  no-verify: False", "  certfile: None",
          "  keyfile: None", "  use-pull: None", "  mock-server:",
          "  log: None"],
       'test': 'innows'},
@@ -340,7 +341,7 @@ TEST_CASES = [
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  'name    server uri namespace user timeout no-verify    log',
-                 "test1   http://blah      root/cimv2   False",
+                 "test1   http://blah      root/cimv2         30  False",
                  "test2   http://blahblah  root/cimv2   fred  18  True "
                  "api=file,all"],
       'test': 'linesnows'},
@@ -365,7 +366,7 @@ TEST_CASES = [
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  'name    server uri namespace user timeout no-verify    log',
-                 'test1   http://blah      root/cimv2  False',
+                 'test1   http://blah      root/cimv2        30  False',
                  'test2   http://blahblah  root/cimv2   fred 18  True '
                  'api=file,all'],
       'test': 'linesnows'},
@@ -571,7 +572,7 @@ TEST_CASES = [
          "name: mocktest",
          "  default-namespace: root/cimv2",
          "  user: None", "  password: None",
-         "  timeout: None",
+         "  timeout: 30",
          "  no-verify: False", "  certfile: None",
          "  keyfile: None", "  use-pull: None",
          r"  mock-server:", r"simple_mock_model.mof",

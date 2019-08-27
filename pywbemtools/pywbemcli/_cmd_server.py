@@ -25,7 +25,6 @@ import click
 from pywbem import ValueMapping, Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, format_table
-from ._common_options import add_options, sort_option
 
 
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
@@ -45,7 +44,6 @@ def server_group():
 
 
 @server_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
-@add_options(sort_option)
 @click.pass_obj
 def server_namespaces(context, **options):
     """
@@ -91,11 +89,11 @@ def server_info(context):
 
 
 @server_group.command('profiles', options_metavar=CMD_OPTS_TXT)
-@click.option('-o', '--organization', type=str, required=False,
-              metavar='<org name>',
+@click.option('-o', '--organization', type=str, metavar='ORG-NAME',
+              required=False,
               help='Filter by the defined organization. (ex. -o DMTF')
-@click.option('-p', '--profile', type=str, required=False,
-              metavar='<profile name>',
+@click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
+              required=False,
               help='Filter by the profile name. (ex. -p Array')
 @click.pass_obj
 def server_profiles(context, **options):
@@ -118,23 +116,22 @@ def server_profiles(context, **options):
 
 
 @server_group.command('get-centralinsts', options_metavar=CMD_OPTS_TXT)
-@click.option('-o', '--organization', type=str, required=False,
-              metavar='<org name>',
+@click.option('-o', '--organization', type=str, metavar='ORG-NAME',
+              required=False,
               help='Filter by the defined organization. (ex. -o DMTF')
-@click.option('-p', '--profile', type=str, required=False,
-              metavar='<profile name>',
+@click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
+              required=False,
               help='Filter by the profile name. (ex. -p Array')
-@click.option('-c', '--central-class', type=str, required=False,
-              metavar='<classname>',
+@click.option('-c', '--central-class', type=str, metavar='CLASSNAME',
+              required=False,
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-s', '--scoping-class', type=str, required=False,
-              metavar='<classname>',
+@click.option('-s', '--scoping-class', type=str, metavar='CLASSNAME',
+              required=False,
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-S', '--scoping-path', type=str, required=False,
-              multiple=True,
-              metavar='<pathname>',
+@click.option('-S', '--scoping-path', type=str, metavar='CLASSLIST',
+              required=False, multiple=True,
               help='Optional. Required only if profiles supports only '
               'scopig methodology. Multiples allowed')
 @click.option('-r', '--reference-direction',
@@ -218,8 +215,7 @@ def cmd_server_namespaces(context, options):
     """
     try:
         namespaces = context.wbem_server.namespaces
-        if options['sort']:
-            namespaces.sort()
+        namespaces.sort()
         context.spinner.stop()
 
         # create list for each row

@@ -28,9 +28,9 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
     format_table, process_invokemethod
-from ._common_options import propertylist_option, names_only_option, \
-    includeclassorigin_option, namespace_option, add_options, \
-    summary_objects_option
+from ._common_options import add_options, propertylist_option, \
+    names_only_option, include_classorigin_class_option, namespace_option,  \
+    summary_option
 
 from ._displaytree import display_class_tree
 
@@ -39,22 +39,25 @@ from ._displaytree import display_class_tree
 #   Common option definitions for class group
 #
 
-includeclassqualifiers_option = [              # pylint: disable=invalid-name
+no_qualifiers_class_option = [              # pylint: disable=invalid-name
     click.option('--no-qualifiers', 'includequalifiers', is_flag=True,
-                 required=False, default=True,
-                 help='If set, request server to not include qualifiers in '
-                      'the returned class(s). The default behavior is to '
-                      'request qualifiers in returned class(s).')]
+                 default=True,
+                 help='Do not include qualifiers in the returned class(es). '
+                      'Default: Include qualifiers.')]
 
-deepinheritance_option = [              # pylint: disable=invalid-name
-    click.option('-d', '--deep-inheritance', is_flag=True, required=False,
-                 help='If set, request server to return complete subclass '
-                      'hiearchy for this class. The default is False which '
-                      'requests only one level of subclasses.')]
+deep_inheritance_class_option = [              # pylint: disable=invalid-name
+    click.option('-d', '--deep-inheritance', is_flag=True,
+                 default=False,
+                 help='Include the complete subclass hierarchy of the '
+                      'requested classes in the result set. '
+                      'Default: Do not include subclasses.')]
 
-localonly_option = [              # pylint: disable=invalid-name
-    click.option('-l', '--local-only', is_flag=True, required=False,
-                 help='Show only local properties of the class(s).')]
+local_only_class_option = [              # pylint: disable=invalid-name
+    click.option('-l', '--local-only', is_flag=True,
+                 default=False,
+                 help='Do not include superclass properties and methods in '
+                      'the returned class(es). '
+                      'Default: Include superclass properties and methods.')]
 
 
 @cli.group('class', options_metavar=CMD_OPTS_TXT)
@@ -76,9 +79,9 @@ def class_group():
 
 @class_group.command('get', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
-@add_options(localonly_option)
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
+@add_options(local_only_class_option)
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -107,10 +110,11 @@ def class_get(context, classname, **options):
 
 @class_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
-@click.option('-f', '--force', is_flag=True, required=False,
-              help='Force the delete request to be issued even if '
-              'there are instances in the server or subclasses to this class. '
-              'The WBEM server may still refuse the request.')
+@click.option('-f', '--force', is_flag=True,
+              default=False,
+              help='Delete any instances of the class as well. '
+                   'Some servers may still reject the class deletion. '
+                   'Default: Reject command if the class has any instances.')
 @add_options(namespace_option)
 @click.pass_obj
 def class_delete(context, classname, **options):
@@ -130,7 +134,7 @@ def class_delete(context, classname, **options):
     instance providers and other components in the server. Use this with
     command with caution.
 
-    Some servers may refuse the operation altogether.
+    Some servers may reject the command altogether.
 
     Example:
 
@@ -142,9 +146,11 @@ def class_delete(context, classname, **options):
 @class_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
-@click.option('-p', '--parameter', type=str, metavar='parameter',
+@click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
-              help='Optional multiple method parameters of form name=value')
+              help='Specify a method input parameter with its value. '
+                   'May be specified multiple times. '
+                   'Default: No input parameters.')
 @add_options(namespace_option)
 @click.pass_obj
 def class_invokemethod(context, classname, methodname, **options):
@@ -157,7 +163,7 @@ def class_invokemethod(context, classname, methodname, **options):
     default namespace of the connection is used.
 
     The method input parameters are specified using the --parameter option,
-    which can be specified multiple times.
+    which may be specified multiple times.
 
     Pywbemcli retrieves the class definition from the server in order to
     verify that the specified input parameters are consistent with the
@@ -178,17 +184,17 @@ def class_invokemethod(context, classname, methodname, **options):
 
 @class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
-@add_options(deepinheritance_option)
-@add_options(localonly_option)
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
+@add_options(deep_inheritance_class_option)
+@add_options(local_only_class_option)
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(summary_objects_option)
+@add_options(summary_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    List the top classes or subclasses of a class in a namespace.
+    List top classes or subclasses of a class in a namespace.
 
     Enumerate CIM classes starting either at the top of the class hierarchy
     in the specified CIM namespace (--namespace option), or at the specified
@@ -211,6 +217,7 @@ def class_enumerate(context, classname, **options):
     Examples:
 
       pywbemcli -n myconn class enumerate -n interop
+
       pywbemcli -n myconn class enumerate CIM_Foo -n interop
     """
     context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
@@ -220,22 +227,17 @@ def class_enumerate(context, classname, **options):
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-R', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the classname provided. Each returned '
-                   'class (or classname) should be this class or its '
-                   'subclasses. Optional.')
+              metavar='CLASSNAME',
+              help='Filter the result set by result class name.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned class '
-                   '(or classname) should refer to the target class through '
-                   'a property with a name that matches the value of this '
-                   'parameter. Optional.')
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(summary_objects_option)
+@add_options(summary_option)
 @click.pass_obj
 def class_references(context, classname, **options):
     """
@@ -269,35 +271,23 @@ def class_references(context, classname, **options):
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-a', '--assoc-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the association class name provided. Each '
-                   'returned class (or class name) should be associated to the '
-                   'source class through this class or its subclasses. '
-                   'Optional.')
+              metavar='CLASSNAME',
+              help='Filter the result set by association class name.')
 @click.option('-C', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter the returned objects by the class name provided. '
-                   'Each returned class (or class name) should be this class '
-                   'or one of its subclasses. Optional')
+              metavar='CLASSNAME',
+              help='Filter the result set by result class name.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned class '
-              '(or class name)should be associated with the source class '
-              '(CLASSNAME) through an association with this role (property '
-              'name in the association that matches this parameter). Optional.')
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
 @click.option('-R', '--result-role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the result role name provided. Each returned '
-              'class (or class name)should be associated with the source class '
-              '(CLASSNAME) through an association with returned object having '
-              'this role (property name in the association that matches this '
-              'parameter). Optional.')
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by far end role name.')
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(summary_objects_option)
+@add_options(summary_option)
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
@@ -332,10 +322,10 @@ def class_associators(context, classname, **options):
 @click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
                 required=True)
 @click.option('-n', '--namespace', type=str, multiple=True,
-              required=False, metavar='<name>',
-              help='Namespace to use for this operation. If defined only '
-              'those namespaces are searched rather than all available '
-              'namespaces. ex: -n root/interop -n root/cimv2')
+              required=False, metavar='NAMESPACE',
+              help='Add a namespace to the search scope. '
+                   'May be specified multiple times. '
+                   'Default: Search in all namespaces of the server.')
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
@@ -347,21 +337,22 @@ def class_find(context, classname_glob, **options):
 
     The CLASSNAME-GLOB argument is a wildcard expression that is matched on
     the class names case insensitively. The special characters known from file
-    nme wildcarding are supported: `*` to match zero or more characters, and
-    `?` to match a single character. In order to not have the shell expand
+    name wildcarding are supported: "*" to match zero or more characters, and
+    "?" to match a single character. In order to not have the shell expand
     the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-    For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
-    `pywbem_`, etc. '*system*' returns classes whose names include the case
-    insensitive string `system`.
+    For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
+    "pywbem_", etc. "*system*" returns classes whose names include the case
+    insensitive string "system".
 
     In the output, the classes will formatted as defined by the --output-format
     general option if it specifies table output. Otherwise the classes will
-    be in the form `<namespace>:<classname>`.
+    be in the form "NAMESPACE:CLASSNAME".
 
     Examples:
 
-      pywbemcli -n myconn class find "CIM_*" -n interop
+      pywbemcli -n myconn class find "CIM_*System*" -n interop
+
       pywbemcli -n myconn class find CIM_Foo
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname_glob,
@@ -370,15 +361,15 @@ def class_find(context, classname_glob, **options):
 
 @class_group.command('tree', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
-@click.option('-s', '--superclasses', is_flag=True, required=False,
+@click.option('-s', '--superclasses', is_flag=True,
               default=False,
-              help='Display the superclasses to CLASSNAME as a tree.  When '
-                   'this option is set, the CLASSNAME argument is required')
+              help='Show the superclass hierarchy. '
+                   'Default: Show the subclass hierarchy.')
 @add_options(namespace_option)
 @click.pass_obj
 def class_tree(context, classname, **options):
     """
-    Show the subclass or superclass inheritance tree of a class.
+    Show the subclass or superclass hierarchy for a class.
 
     List the subclass or superclass hierarchy of a CIM class (CLASSNAME
     argument) or CIM namespace (--namespace option):
@@ -402,8 +393,10 @@ def class_tree(context, classname, **options):
     Examples:
 
       pywbemcli -n myconn class tree -n interop
+
       pywbemcli -n myconn class tree CIM_Foo -n interop
-      pywbemcli -n myconn class tree CIM_Foo --superclasses -n interop
+
+      pywbemcli -n myconn class tree CIM_Foo -s -n interop
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
@@ -593,14 +586,14 @@ def cmd_class_tree(context, classname, options):
     Execute the command to enumerate classes from the top or starting at the
     classname argument. Then format the results to be displayed as a
     left-justified tree using the asciitree library.
-    The superclasses option determines if the superclass tree or the
+    The --superclasses option determines if the superclass tree or the
     subclass tree is displayed.
     """
     try:
         if options['superclasses']:
             if classname is None:
-                raise click.ClickException('Classname argument required for '
-                                           'superclasses option')
+                raise click.ClickException('CLASSNAME argument required for '
+                                           '--superclasses option')
 
             # get the superclasses into a list
             class_ = context.conn.GetClass(classname,
