@@ -5,7 +5,7 @@ pywbemcli Help Command Details
 ==============================
 
 
-This section defines the help output for each pywbemcli command-group and command.
+This section defines the help output for each pywbemcli command group and command.
 
 
 
@@ -117,7 +117,7 @@ The following defines the help output for the `pywbemcli  --help` command
                                       /etc/ssl/certificates]
       -o, --output-format <choice>    Choice for command output data format.
                                       pywbemcli may override the format choice
-                                      depending on the command-group and command
+                                      depending on the command group and command
                                       since not all formats apply to all output
                                       data types. Choices further defined in
                                       pywbemcli documentation.
@@ -175,7 +175,7 @@ The following defines the help output for the `pywbemcli  --help` command
       -h, --help                      Show this message and exit.
 
     Commands:
-      class       Command-group for CIM classes.
+      class       Command group for CIM classes.
       connection  Command group for persistent WBEM connections.
       help        Show help message for interactive mode.
       instance    Command group for CIM instances.
@@ -198,9 +198,9 @@ The following defines the help output for the `pywbemcli class --help` command
 
     Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command-group for CIM classes.
+      Command group for CIM classes.
 
-      This command-group defines commands to inspect classes, to invoke methods
+      This command group defines commands to inspect classes, to invoke methods
       on classes, and to delete classes.
 
       Creation and modification of classes is not currently supported.
@@ -1062,7 +1062,7 @@ The following defines the help output for the `pywbemcli instance --help` comman
 
       Command group for CIM instances.
 
-      This command-group  defines commands to inspect instances, to invoke
+      This command group  defines commands to inspect instances, to invoke
       methods on instances, and to create and delete instances.
 
       Modification of instances is not currently supported.
@@ -1770,7 +1770,8 @@ The following defines the help output for the `pywbemcli qualifier --help` comma
 
       Command group for CIM qualifier declarations.
 
-      This command-group  defines commands to inspect qualifier declarations.
+      This command group  defines commands to inspect CIM qualifier declarations
+      in the WBEM Server.
 
       Creation, modification and deletion of qualifier declarations is not
       currently supported.

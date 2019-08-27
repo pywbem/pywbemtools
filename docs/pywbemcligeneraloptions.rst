@@ -9,7 +9,7 @@ Pywbemcli command line general options
 General options overview
 ------------------------
 
-The general options are entered before the command-group or command. They
+The general options are entered before the command group  or command. They
 define:
 
 * Characteristics of the WBEM server against which the commands are to be
@@ -118,14 +118,14 @@ Details`):
      $ pywbemcli --name myserver class get CIM_ManagedElement
        <<... returns mof for CIM_ManagedElement>>>
 
-  See :ref:`Connection command-group` for more information on managing
+  See :ref:`Connection command group ` for more information on managing
   connections.
 * **--default-namespace/-d** - Default :term:`CIM namespace` to use in the target
   WBEM server if no namespace is defined in a command. If not defined the
   pywbemcli default is ``root/cimv2``.  This is the namespace used on all
   server operation requests unless a specific namespace is defined by:
 
-  * In the interactive mode prepending the command-group name with the
+  * In the interactive mode prepending the command group  name with the
     ``--namespace`` option.
   * Using the ``--namespace/-n`` command option to define a namespace
     on commands that specify this option.
@@ -743,7 +743,7 @@ pywbemcli.log as follows showing the input parameters to the pywbem method
 Pywbemcli persisted connection definitions
 ------------------------------------------
 
-Pywbemcli can manage connections via the :ref:`connection command-group`. These
+Pywbemcli can manage connections via the :ref:`connection command group `. These
 connections are persisted in a :term:`connections file` named
 `pywbemcli_connections.json` in the current directory. A connection has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined

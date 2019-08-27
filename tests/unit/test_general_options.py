@@ -138,7 +138,7 @@ Options:
                                   /etc/ssl/certificates]
   -o, --output-format <choice>    Choice for command output data format.
                                   pywbemcli may override the format choice
-                                  depending on the command-group and command
+                                  depending on the command group and command
                                   since not all formats apply to all output
                                   data types. Choices further defined in
                                   pywbemcli documentation.
@@ -196,7 +196,7 @@ Options:
   -h, --help                      Show this message and exit.
 
 Commands:
-  class       Command-group for CIM classes.
+  class       Command group for CIM classes.
   connection  Command group for persistent WBEM connections.
   help        Show help message for interactive mode.
   instance    Command group for CIM instances.
