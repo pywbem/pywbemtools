@@ -28,15 +28,15 @@ The command line can contain the following components:
 * **general-options** - Options that apply to all commands.
   See :ref:`Pywbemcli command line general options` for infomation on the
   pywbemcli general options
-* **command group ** - A name of a group of commands.
+* **command group** - A name of a group of commands.
   See :ref:`Pywbemcli command groups and commands`
-* **command** - A command name normally within a command group .
+* **command** - A command name normally within a command group.
   There are however some special commands that exist outside of any
-  command group ; they are not in any command group .
+  command group; they are not in any command group.
 * **args** - Arguments and options that are defined for a particular
   command. Options are proceeded by the characters '-' for the
   short form or '--' for the long form. (ex. ``-n`` or ``--namespace``).
-  Arguments do not have a ``-`` or ``--``prefix and follow the
+  Arguments do not have a ``-`` or ``--`` prefix and follow the
   command name. (ex. ``pywbemcli class get CIM_Foo``. CIM_Foo is
   an argument.). Options include the ``-`` or ``--`` prefix.
 
@@ -44,14 +44,14 @@ The syntax is:
 
 .. code-block:: text
 
-    pywbemcli <general-options> <command group > <command> <args>
+    pywbemcli <general-options> <command group> <command> <args>
 
 **NOTE:** pywbemcli has two special commands that are not a part of any
-command group  ``repl`` and ``help``.
+command group ``repl`` and ``help``.
 
-A command group  is the name of an object, (ex. ``class`` refers to operation on
+A command group is the name of an object, (ex. ``class`` refers to operation on
 CIM classes). The commands are generally actions on the objects defined by the
-command group  name (``get``, ``list``, etc.). Thus ``class`` is a command group
+command group name (``get``, ``list``, etc.). Thus ``class`` is a command group
 name used to access CIM classes and ``get`` is a command so:
 
 .. code-block:: text
@@ -84,7 +84,7 @@ commands (for operating the pywbemcli shell), and external commands (that are
 executed in the standard shell for the user).
 
 This pywbemcli shell is started when the ``pywbemcli`` command is invoked
-without specifying any command group  or command:
+without specifying any command group or command:
 
 .. code-block:: text
 
@@ -107,7 +107,7 @@ as the parameters for the connection to a WBEM server and values for the
 pywbemcli commands and arguments that can be typed in the pywbemcli shell.
 
 The pywbemcli commands that can be typed in the pywbemcli shell are the
-command or command group  that would follow the ``pywbemcli`` command and
+command or command group that would follow the ``pywbemcli`` command and
 general options when used in `command mode`_. The following example
 starts a pywbemcli shell in interactive mode and executes several commands
 (ex. ``class enumerate -o``).
@@ -177,9 +177,9 @@ The usage line in this help text shows the standalone command use. Within the
 pywbemcli shell (interactive mode), the ``pywbemcli`` word is omitted and the
 command and options is typed in.
 
-Typing ``command group  --help``,  or ``command group  -h``, or ``command group
+Typing ``command group --help``,  or ``command group -h``, or ``command group
 command --help`` in the pywbemcli shell displays help information for the
-specified pywbemcli command group , for example:
+specified pywbemcli command group, for example:
 
 .. code-block:: text
 
@@ -217,7 +217,7 @@ In command mode, the pywbemcli command performs its task and terminates
 like any other standalone non-interactive command.
 
 This mode is used when the pywbemcli command is invoked with a command or
-command group  name and arguments/options:
+command group name and arguments/options:
 
 .. code-block:: text
 
@@ -258,5 +258,3 @@ completion:
 
 The documentation for the python CLI tool click contains information on other
 shell tab completion solutions.
-
-

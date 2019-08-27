@@ -32,9 +32,9 @@ where:
 
 .. code-block:: text
 
-        cmd-group := <command group  name> <command>
+        cmd-group := <command group name> <command>
 
-Within pywbemcli each command group  name is a noun, referencing an entity (ex.
+Within pywbemcli each command group name is a noun, referencing an entity (ex.
 class, instance, server).
 
 .. code-block:: text
@@ -122,7 +122,7 @@ The following table defines which pywbemcli commands are used for the
 corresponding pywbem request operations.
 
 =================================  ==============================================
-WBEM CIM-XML Operation             pywbemcli command group  & command
+WBEM CIM-XML Operation             pywbemcli command group & command
 =================================  ==============================================
 **Instance Operations:**
 EnumerateInstances                 instance enumerate INSTANCENAME
@@ -638,7 +638,7 @@ The **instance** group defines commands that act on CIM instances including:
 Qualifier command group
 -----------------------
 
-The **qualifier** command group  defines commands that act on
+The **qualifier** command group defines commands that act on
 CIMQualifierDeclaration entities in the WBEM server including:
 
 * **get** to get a single qualifier declaration defined by the ``QUALIFIERNAME``
@@ -696,7 +696,7 @@ CIMQualifierDeclaration entities in the WBEM server including:
 Server command group
 --------------------
 
-The **server** command group  defines commands that interact with a WBEM
+The **server** command group defines commands that interact with a WBEM
 server to access information about the WBEM server itself. These commands
 are generally not namespace specific but access information about the server,
 namespaces, etc. The commands are:
@@ -873,7 +873,7 @@ namespaces, etc. The commands are:
 Connection command group
 ------------------------
 
-The **connection** command group  defines commands that provide for a
+The **connection** command group defines commands that provide for a
 persistent file (:term:`connections file`) of WBEM server connection
 parameters and allow selecting entries in this file as well as adding entries
 to the file, deleting entries from the file and viewing WBEM servers defined in the
@@ -1071,7 +1071,7 @@ started in the :ref:`interactive mode` either by entering:
    Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.
    pywbemcli>
 
-or by executing the script without any command or command group :
+or by executing the script without any command or command group:
 
   .. code-block:: text
 
@@ -1090,5 +1090,3 @@ Help command
 The help command provides information on special commands and controls that can
 be executed in the :ref:`interactive mode`. This is different from the
 ``--help`` option that provides information on command groups, and commands.
-
-
