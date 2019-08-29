@@ -85,7 +85,7 @@ CLASS_DELETE_HELP_LINES = [
 CLASS_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME',
     'List top classes or subclasses of a class in a namespace.',
-    '-d, --deep-inheritance Include direct and indirect subclasses',
+    '-d, --deep-inheritance Include the complete subclass hierarchy',
     CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,

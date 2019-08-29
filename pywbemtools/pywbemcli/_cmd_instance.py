@@ -385,7 +385,8 @@ def instance_enumerate(context, classname, **options):
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-R', '--result-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by result class name.')
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')
@@ -442,10 +443,12 @@ def instance_references(context, instancename, **options):
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('-a', '--assoc-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by association class name.')
+              help='Filter the result set by association class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-C', '--result-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by result class name.')
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')

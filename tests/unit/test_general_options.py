@@ -118,9 +118,9 @@ Options:
                                   in the --certfile file. Not required if the
                                   private key is part of the --certfile file.
                                   Default: EnvVar PYWBEMCLI_KEYFILE, or none.
-  -t, --timeout INT               Timeout in seconds for operations with the
-                                  WBEM server. Default: EnvVar
-                                  PYWBEMCLI_TIMEOUT, or 30.
+  -t, --timeout INT               Client-side timeout in seconds for
+                                  operations with the WBEM server. Default:
+                                  EnvVar PYWBEMCLI_TIMEOUT, or 30.
   -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                   for operations with the WBEM server that
                                   return lists of instances, as follows: "yes"
@@ -132,11 +132,12 @@ Options:
                                   operations. Default: EnvVar
                                   PYWBEMCLI_USE_PULL, or "either".
   --pull-max-cnt INT              Maximum number of instances to be returned
-                                  by the WBEM server in each response, if pull
-                                  operations are used. This is a tuning
-                                  parameter that does not affect the external
-                                  behavior of the commands. Default: EnvVar
-                                  PYWBEMCLI_PULL_MAX_CNT, or 1000
+                                  by the WBEM server in each open or pull
+                                  response, if pull operations are used. This
+                                  is a tuning parameter that does not affect
+                                  the external behavior of the commands.
+                                  Default: EnvVar PYWBEMCLI_PULL_MAX_CNT, or
+                                  1000
   -T, --timestats                 Show time statistics of WBEM server
                                   operations.
   -d, --default-namespace NAMESPACE

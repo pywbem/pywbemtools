@@ -97,9 +97,9 @@ The following defines the help output for the `pywbemcli  --help` command
                                       in the --certfile file. Not required if the
                                       private key is part of the --certfile file.
                                       Default: EnvVar PYWBEMCLI_KEYFILE, or none.
-      -t, --timeout INT               Timeout in seconds for operations with the
-                                      WBEM server. Default: EnvVar
-                                      PYWBEMCLI_TIMEOUT, or 30.
+      -t, --timeout INT               Client-side timeout in seconds for
+                                      operations with the WBEM server. Default:
+                                      EnvVar PYWBEMCLI_TIMEOUT, or 30.
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for operations with the WBEM server that
                                       return lists of instances, as follows: "yes"
@@ -111,11 +111,12 @@ The following defines the help output for the `pywbemcli  --help` command
                                       operations. Default: EnvVar
                                       PYWBEMCLI_USE_PULL, or "either".
       --pull-max-cnt INT              Maximum number of instances to be returned
-                                      by the WBEM server in each response, if pull
-                                      operations are used. This is a tuning
-                                      parameter that does not affect the external
-                                      behavior of the commands. Default: EnvVar
-                                      PYWBEMCLI_PULL_MAX_CNT, or 1000
+                                      by the WBEM server in each open or pull
+                                      response, if pull operations are used. This
+                                      is a tuning parameter that does not affect
+                                      the external behavior of the commands.
+                                      Default: EnvVar PYWBEMCLI_PULL_MAX_CNT, or
+                                      1000
       -T, --timestats                 Show time statistics of WBEM server
                                       operations.
       -d, --default-namespace NAMESPACE
@@ -231,8 +232,11 @@ The following defines the help output for the `pywbemcli class associators --hel
 
     Options:
       -a, --assoc-class CLASSNAME     Filter the result set by association class
-                                      name.
+                                      name. Subclasses of the specified class also
+                                      match.
       -C, --result-class CLASSNAME    Filter the result set by result class name.
+                                      Subclasses of the specified class also
+                                      match.
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
       -R, --result-role PROPERTYNAME  Filter the result set by far end role name.
@@ -246,7 +250,9 @@ The following defines the help output for the `pywbemcli class associators --hel
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -o, --names-only                Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
@@ -343,7 +349,7 @@ The following defines the help output for the `pywbemcli class enumerate --help`
         pywbemcli -n myconn class enumerate CIM_Foo -n interop
 
     Options:
-      -d, --deep-inheritance     Include direct and indirect subclasses of the
+      -d, --deep-inheritance     Include the complete subclass hierarchy of the
                                  requested classes in the result set. Default: Do
                                  not include subclasses.
       -l, --local-only           Do not include superclass properties and methods
@@ -455,7 +461,9 @@ The following defines the help output for the `pywbemcli class get --help` comma
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
@@ -547,6 +555,8 @@ The following defines the help output for the `pywbemcli class references --help
 
     Options:
       -R, --result-class CLASSNAME    Filter the result set by result class name.
+                                      Subclasses of the specified class also
+                                      match.
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
       --no-qualifiers                 Do not include qualifiers in the returned
@@ -559,7 +569,9 @@ The following defines the help output for the `pywbemcli class references --help
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -o, --names-only                Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
@@ -746,12 +758,12 @@ The following defines the help output for the `pywbemcli connection add --help` 
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for operations with the WBEM server that
                                       return lists of instances, as follows: "yes"
-                                      uses pull operations, failing if not
+                                      uses pull operations and fails if not
                                       supported by the server; "no" uses
                                       traditional operations; "either" (default)
                                       uses pull operations if supported by the
-                                      server, and otherwise traditional
-                                      operations. Default: "either".
+                                      server and otherwise falls back to
+                                      traditional operations. Default: "either".
       --pull-max-cnt INT              Maximum number of instances to be returned
                                       by the WBEM server in each response, if pull
                                       operations are used. This is a tuning
@@ -791,9 +803,9 @@ The following defines the help output for the `pywbemcli connection delete --hel
       Delete a persistent WBEM connection.
 
       Delete connection information from the persistent store for the connection
-      defined by NAME. The NAME argument is optional.
+      defined by NAME.
 
-      If NAME not supplied, a select list presents the list of connection
+      If NAME is not supplied, a select list presents the list of connection
       definitions for selection.
 
       Example:   connection delete blah
@@ -1079,8 +1091,11 @@ The following defines the help output for the `pywbemcli instance associators --
 
     Options:
       -a, --assoc-class CLASSNAME     Filter the result set by association class
-                                      name.
+                                      name. Subclasses of the specified class also
+                                      match.
       -C, --result-class CLASSNAME    Filter the result set by result class name.
+                                      Subclasses of the specified class also
+                                      match.
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
       -R, --result-role PROPERTYNAME  Filter the result set by far end role name.
@@ -1098,7 +1113,9 @@ The following defines the help output for the `pywbemcli instance associators --
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -o, --names-only                Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
@@ -1153,7 +1170,7 @@ The following defines the help output for the `pywbemcli instance count --help` 
       insensitive string `system`.
 
       This command can take a long time to execute since it potentially
-      enumerates all classes in all namespaces.
+      enumerates all instance names in all namespaces.
 
     Options:
       -s, --sort                 Sort by instance count. Otherwise sorted by class
@@ -1313,7 +1330,9 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
@@ -1384,7 +1403,9 @@ The following defines the help output for the `pywbemcli instance get --help` co
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
@@ -1505,10 +1526,11 @@ The following defines the help output for the `pywbemcli instance modify --help`
     Options:
       -P, --property PROPERTYNAME=VALUE
                                       Property to be modified, with its new value.
-                                      May be specified multiple times. Array
-                                      property values are specified as a comma-
-                                      separated list; embedded instances are not
-                                      supported. Default: No properties modified.
+                                      May be specified once for each property to
+                                      be modified. Array property values are
+                                      specified as a comma-separated list;
+                                      embedded instances are not supported.
+                                      Default: No properties modified.
       -p, --propertylist PROPERTYLIST
                                       Reduce the properties to be modified (as per
                                       --property) to a specific property list.
@@ -1613,6 +1635,8 @@ The following defines the help output for the `pywbemcli instance references --h
 
     Options:
       -R, --result-class CLASSNAME    Filter the result set by result class name.
+                                      Subclasses of the specified class also
+                                      match.
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
       -q, --include-qualifiers        When traditional operations are used,
@@ -1629,7 +1653,9 @@ The following defines the help output for the `pywbemcli instance references --h
                                       returned object(s). Multiple properties may
                                       be specified with either a comma-separated
                                       list or by using the option multiple times.
-                                      The empty string will include no properties.
+                                      Properties specified in this option that are
+                                      not in the object(s) will be ignored. The
+                                      empty string will include no properties.
                                       Default: Do not filter properties.
       -o, --names-only                Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
