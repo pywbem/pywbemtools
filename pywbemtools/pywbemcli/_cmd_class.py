@@ -226,10 +226,11 @@ def class_enumerate(context, classname, **options):
 
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-R', '--result-class', type=str, required=False,
-              metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
+@click.option('--rc', '--result-class', type=str, required=False,
+              metavar='<class name>',
+              help='Filter by the classname provided. Each returned '
+                   'class (or classname) should be this class or its '
+                   'subclasses. Optional.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')
@@ -271,22 +272,32 @@ def class_references(context, classname, **options):
 
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('-a', '--assoc-class', type=str, required=False,
-              metavar='CLASSNAME',
-              help='Filter the result set by association class name. '
-                   'Subclasses of the specified class also match.')
-@click.option('-C', '--result-class', type=str, required=False,
-              metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
+@click.option('--ac', '--assoc-class', type=str, required=False,
+              metavar='<class name>',
+              help='Filter by the association class name provided. Each '
+                   'returned class (or class name) should be associated to the '
+                   'source class through this class or its subclasses. '
+                   'Optional.')
+@click.option('--rc', '--result-class', type=str, required=False,
+              metavar='<class name>',
+              help='Filter the returned objects by the class name provided. '
+                   'Each returned class (or class name) should be this class '
+                   'or one of its subclasses. Optional')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
-@click.option('-R', '--result-role', type=str, required=False,
-              metavar='PROPERTYNAME',
-              help='Filter the result set by far end role name.')
-@add_options(no_qualifiers_class_option)
-@add_options(include_classorigin_class_option)
+              metavar='<role name>',
+              help='Filter by the role name provided. Each returned class '
+              '(or class name)should be associated with the source class '
+              '(CLASSNAME) through an association with this role (property '
+              'name in the association that matches this parameter). Optional.')
+@click.option('--rr', '--result-role', type=str, required=False,
+              metavar='<role name>',
+              help='Filter by the result role name provided. Each returned '
+              'class (or class name)should be associated with the source class '
+              '(CLASSNAME) through an association with returned object having '
+              'this role (property name in the association that matches this '
+              'parameter). Optional.')
+@add_options(includeclassqualifiers_option)
+@add_options(includeclassorigin_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
