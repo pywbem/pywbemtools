@@ -338,9 +338,6 @@ class BuildRepositoryMixin(object):
                               'global parameter %s. Must be "py" or "mof".'
                               % (ext, file_path))
 
-        if verbose:
-            self.display_repository()
-
 
 class PYWBEMCLIConnection(WBEMConnection, PYWBEMCLIConnectionMixin):
     """
