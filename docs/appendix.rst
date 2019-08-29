@@ -18,63 +18,64 @@ This documentation uses a few special terms to refer to Python types:
 .. glossary::
 
    CIM-XML
-      The name of the protocol used in the DMTF specification :term:`DSP0200`
-      that pywbem/pywbemcli use to communicate with WBEM servers.
+      The name of the protocol used in :term:`DSP0200` that pywbemcli uses to
+      communicate with WBEM servers.
 
-   CIM model output formats
-      Several of the output formats defined and available in the
-      ``-o\--output-format`` general option are specific for the presentation
-      of CIM objects(CIMClass, CIMInstance, CIMParameter, CIMMethod,
-      CIMClassName and CIMInstanceName) This includes the format choices
-      ``mof`` , ``xml`` , ``repr`` , and ``txt`` .
+   CIM object output formats
+      Pywbemcli output formats (specified with the ``-o\--output-format`` general
+      option) that represent CIM objects in MOF, CIM-XML or pywbem repr/str
+      formats.
 
    INSTANCENAME
-      an argument of several of the command group ``instance`` commands that
-      allows two possible inputs based on another command option( ``--interactive`` ).
+      A CIM instance path in a format that is suitable as a command line
+      argument or option value of pywbemcli. Several commands of the instance
+      command group use INSTANCENAME as a command line argument.
+      The only supported format for INSTANCENAME is a :term:`WBEM URI`.
+      See also :ref:`Interactively selecting INSTANCENAME`.
 
-      When the ``interactive`` option is not set, the INSTANCENAME is a string
-      representation of a CIMInstanceName must be formatted as defined by
-      :term:`WBEM-URI`
+      Examples::
 
-      Otherwise the INSTANCENAME should be a classname in which case pywbemcli
-      will get the instance names from the WBEM server and present a
-      selection list for the user to select an instance
-      name :ref:`Displaying CIM instances or CIM instance names`
+        CIM_RegisteredProfile.InstanceID="acme:1"
+        CIM_System.CreationClassName="ACME_System",Name="MySystem"
 
    connection id
-      a string that uniquely identifies each :class:`pywbem.WBEMConnection`
-      object created. The connection id is immutable and is accessible from
-      :attr:`pywbem.WBEMConnection.conn_id`. It is included in of each log
-      record created for pywbem log output and may be used to correlate pywbem
-      log records for a single connection.
+      A string that uniquely identifies each :class:`pywbem.WBEMConnection`
+      object created. The connection id is immutable and is accessible as
+      :attr:`pywbem.WBEMConnection.conn_id`. It is included in each log
+      record and may be used to relate pywbem log records to connections.
 
    DeprecationWarning
-      a standard Python warning that indicates a deprecated functionality.
+      A standard Python warning that indicates a deprecated functionality.
       See section :ref:`Deprecation and compatibility policy` and the standard
       Python module :mod:`py:warnings` for details.
 
    CIM namespace
       A CIM namespace (defined in :term:`DSP0004`) provides a scope of
-      uniqueness  for cim objects; specifically, the names of class objects and
+      uniqueness for CIM objects; specifically, the names of class objects and
       of qualifier type objects shall be unique in a namespace. The compound
-      key of non- embedded instance objects shall also be unique across all
+      key of non-embedded instance objects shall also be unique across all
       non-embedded instances of the class (not including subclasses) within the
       namespace.
 
+   WBEM connection definitions file
    connections file
-      A file maintained by pywbemcli and managed by the pywbemcli
-      ``connections`` command group.  The file name is ``pywbemcli_connections.json``
-      and the file must be in the directory in which pywbemcli is executed.
-      Multiple connection files may exist in different directories.
-      The connection file contains a JSON definition of the parameters for
-      each connection with a name for the connection so that connections may
-      be predefined and pywbemcli commands executed against them using only
-      the connection name.
+      A file maintained by pywbemcli and managed by the
+      :ref:`Connection command group`.
+      The connections file defines a list of named connections, each of which
+      is either the set of parameters for connecting to a real WBEM server, or
+      the set of files for creating a mock WBEM server.
+      The file name of the connections file is
+      ``pywbemcli_connection_definitions.json`` and it is created by pywbemcli
+      in the current directory.
+      Multiple connections files may exist in different directories.
+      This allows connection definitions to be predefined and pywbemcli
+      commands executed against them using only the connection name (via the
+      ``--name`` general option).
 
    MOF
-      MOF(Managed Object Format) is the language used by the DMTF to
+      MOF (Managed Object Format) is the language used by the DMTF to
       describe in textual form CIM objects including CIM classes,
-      CIM Instance, etc.  It is one of the output formats provided for
+      CIM instances, etc.  It is one of the output formats provided for
       the display of CIM objects in pywbemcli. See DMTF term:`DSP0004` for more
       information on the MOF format.
 
@@ -82,48 +83,16 @@ This documentation uses a few special terms to refer to Python types:
       The DMTF and SNIA define specific profiles of manageability that are
       published as specifications in the DMTF and within the SMI-S specification
       in SNIA. A management profile defines the manageability characteristics
-      of a specic set of services in terms of the CIM model and WBEM operations.
+      of a specific set of services in terms of the CIM model and WBEM operations.
       These profiles are documented by name and version and are incorporated into
       compliant WBEM servers so that they can be discovered by WBEM clients to
       determine the management capabilities of the WBEM server.
       See :ref:`Profile advertisement methodologies`
 
-   WBEM-URI
-      The wbem-uri is a standardized text form for CIM instance names. It is
-      documented in DMTF :term:`DSP0207`. Pywbemcli uses the untyped WBEM URI
-      as the format for instance names in CLI input parameters
-      (i.e. :term:`INSTANCENAME`)::
-
-            WBEM-URI = WBEM-URI-UntypedNamespacePath /
-                       WBEM-URI-UntypedClassPath /
-                       WBEM-URI-UntypedInstancePath
-
-            WBEM-URI-UntypedNamespacePath = namespacePath
-            WBEM-URI-UntypedClassPath     = namespacePath ":" className
-            WBEM-URI-UntypedInstancePath  = WBEM-URI-UntypedInstancePath
-                                            className "." key_value_pairs
-
-            namespacePath = [namespaceType ":"] namespaceHandle
-            namespaceType = ("http" ["s"]) / ("cimxml.wbem" ["s"])
-            namespaceHandle = ["//" authority] "/" [namespaceName]
-            namespaName     = IDENTIFIER *("/"IDENTIFIER))
-
-            // Untyped key value pairs
-            key_value_pairs  = key_value_pair *("," key_value_pair)
-            key_value_pair   = key_name "=" key_value
-            key_value        = stringValue / charValue / booleanValue /
-                               integerValue / realValue /
-                               "\"" datetimeValue "\"" /
-                               "\"" referenceValue "\""
-
-      In pywbemcli the WBEM-URI is used as the format for instance names on
-      commands such as ``instance get <instance-name>``
-
-      In these cases, the normal use is to specify only the classname and
-      keybindings so that examples of valid WBEM-URIs would be::
-
-        CIM_RegisteredProfile.InstanceID="acme:1"
-        CIM_RegisteredProfile.InstanceID=100
+   WBEM URI
+      WBEM URI is a standardized text form for CIM object paths and is
+      defined in :term:`DSP0207`. Pywbemcli uses the untyped WBEM URI format
+      for instance names in the command line (i.e. :term:`INSTANCENAME`).
 
    REPL
       Stands for "Read-Execute-Print-Loop" which is a term that denotes the
@@ -132,7 +101,7 @@ This documentation uses a few special terms to refer to Python types:
       by a set of general options.
 
    GLOB
-      A pathname pattern pattern expansion used in Unix environments. It is
+      A pathname pattern expansion used in Unix environments. It is
       used by pywbemcli to expand classnames in the ``class find`` command.
       No tilde expansion is done, but ``*``, ``?``, and character ranges
       expressed with ``[]`` will be correctly matched.
@@ -258,12 +227,6 @@ scoping class and scoping path. In such cases, the scoping class and scoping
 path can often be determined from the class diagram in the specification for
 the profile.
 Many times, ``CIM_System`` or ``CIM_ComputerSystem`` is the scoping class.
-.. _'Glossary`:
-
-Glossary
---------
-
-.. glossary::
 
 
 .. _`References`:
@@ -311,4 +274,5 @@ References
       * `Python 3.4 Glossary <https://docs.python.org/3.4/glossary.html>`_
 
    pywbem
-      pywbem is both a `github repository <http://pywbem.github.io/pywbemtools/index.html>`_ and the Python package pywbem, a WBEM client and  WBEM listener within this repository.
+      A WBEM client and WBEM listener written in Python. See `pywbem GitHub repository <http://pywbem.github.io/pywbemtools/index.html>`_ and the
+      `pywbem package on Pypi <https://pypi.org/project/pywbem/>`_.
