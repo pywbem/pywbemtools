@@ -13,14 +13,14 @@ General options must be entered on the command line  before the command group
 or command. They define:
 
 * Characteristics of the WBEM server against which the commands are to be
-  executed (i.e url, default-namespace, security parameters, etc.).
+  executed (i.e url, default CIM namespace, security parameters, etc.).
   See :ref:`Defining the WBEM Server`
 * Operation behavior of pywbemtools for requests; i.e. using the pull vs.
   the :term:`traditional operations` and defined in
   :ref:`Pywbemcli and the DMTF pull operations`, and the client side timeout.
   See :ref:`Controlling operation behavior and monitoring operations`
-* Execution options to monitor the requests and responses(statistics keeping, and
-  logging of operations) and to display the results like output formats.
+* Execution options to monitor the requests and responses(statistics keeping,
+  and logging of operations) and to display the results like output formats.
   See :ref:`Controlling operation behavior and monitoring operations`  and
   :ref:`Controlling result output formats`
 * General options to show the pywbemtools version, and display help for any of
@@ -923,8 +923,8 @@ CIM_Foo_sub_sub is the subclass of CIM_Foo_sub
 
 .. _`Pywbemcli defined logging`:
 
-Pywbemcli defined logging
--------------------------
+Output formats
+--------------
 
 Pywbemcli provides logging to either a file or the standard error stream
 of information passing between the pywbemcli client and a WBEM server using the
