@@ -137,6 +137,16 @@ This documentation uses a few special terms to refer to Python types:
       No tilde expansion is done, but ``*``, ``?``, and character ranges
       expressed with ``[]`` will be correctly matched.
 
+   source end role
+      The reference in an association class that is on the source side when
+      performing an association traversal. The source side is where the
+      traversal begins.
+
+   far end role
+      The reference in an association class that is on the far side when
+      performing an association traversal. The far side is where the traversal
+      ends.
+
 
 .. _`Profile advertisement methodologies`:
 

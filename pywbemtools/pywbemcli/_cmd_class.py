@@ -228,7 +228,8 @@ def class_enumerate(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-R', '--result-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by result class name.')
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')
@@ -272,10 +273,12 @@ def class_references(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('-a', '--assoc-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by association class name.')
+              help='Filter the result set by association class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-C', '--result-class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by result class name.')
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')

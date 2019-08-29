@@ -143,7 +143,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               metavar='INT',
               # defaulted in code
               envvar=PywbemServer.timeout_envvar,
-              help='Timeout in seconds for operations with the WBEM server. '
+              help='Client-side timeout in seconds for operations with the '
+                   'WBEM server. '
                    'Default: EnvVar {ev}, or {default}.'.
                    format(ev=PywbemServer.timeout_envvar,
                           default=DEFAULT_CONNECTION_TIMEOUT))
