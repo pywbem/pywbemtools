@@ -10,7 +10,7 @@ want to test the project are also considered developers for the purpose of
 this section.
 
 Generally development users will install pywbemtools by cloning the pywbemtools
-GitHub package and using the Make utility to handle the installation installation
+GitHub package and using the Make utility to handle the installation
 of pywbemtools and its prerequisites. This provides the user with all of the
 source of pywbemtools and in addition, the test environment and the documentation
 files.
@@ -53,7 +53,7 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
    bring their own Python, so double check that the active Python environment
    is the one you want to use.
 
-5. Install the prerequsites for pywbemtools development.
+5. Install the prerequisites for pywbemtools development.
    This will install Python packages into the active Python environment,
    and OS-level packages:
 
@@ -80,7 +80,7 @@ Building the documentation
 --------------------------
 
 The ReadTheDocs (RTD) site is used to publish the documentation for the
-pywbemtools package at https://pywbem.readthedocs.io/
+pywbemtools package at https://pywbemtools.readthedocs.io/
 
 This page is automatically updated whenever the Git repo for this package
 changes the branch from which this documentation is built.
@@ -104,9 +104,9 @@ Testing
 -------
 
 All of the following `make` commands run the tests in the currently active
-Python environment. Depending on how the `pywbem` package is installed in that
-Python environment, either the `pywbem` and `pywbem_mock` directories in the
-main repository directory are used, or the installed `pywbem` package.
+Python environment. Depending on how the `pywbemtools` package is installed in
+that Python environment, either the `pywbemtools` directory in the main
+repository directory is used, or the installed `pywbemtools` package.
 The test case files and any utility functions they use are always used from
 the `tests` directory in the main repository directory.
 
@@ -120,7 +120,7 @@ The `tests` directory has the following subdirectory structure:
      +-- manual              Manual tests
      +-- schema              The CIM schema MOF files used by some tests
 
-There are multiple types of tests in pywbem:
+There are multiple types of tests in pywbemtools:
 
 1. Unit tests and function tests
 
@@ -129,14 +129,13 @@ There are multiple types of tests in pywbem:
 
    The distinction between unit tests and function tests as used in pywbemtools is
    that function tests exercise the entire pywbemcli client component or entire
-   pywbem scripts using the pywbem mock module and mock CIM model definitions
+   scripts using the pywbem_mock module and mock CIM model definitions
    to emulate a WBEM server, while unit tests exercise single modules without
    using access to a WBEM server.
 
-   Generally, the function tests are organized by the command group  so that
-   the function tests for the class command group are in the file
-   ``test_class_subcmd.py``
-
+   Generally, the function tests are organized by the command group so that
+   for example the function tests for the class command group are in the file
+   ``test_class_subcmd.py``.
 
    Tests are run by executing:
 
@@ -145,7 +144,7 @@ There are multiple types of tests in pywbem:
        $ make test
 
    Test execution can be modified by a number of environment variables, as
-   documented in the make help (execute `make help`).
+   documented in the make help (execute ``make help``).
 
 3. Manual tests
 
@@ -165,7 +164,7 @@ There are multiple types of tests in pywbem:
 
        tests/manual/test_pegasus.py
 
-   Some of the scripts support a `--help` option that informs about their
+   Some of the scripts support a ``--help`` option that informs about their
    usage.
 
    Some tests depend on the existence of a DMTF Schema defining the classes and
@@ -175,10 +174,10 @@ There are multiple types of tests in pywbem:
 
    To run the unit and function tests in all supported Python environments, the
    Tox tool can be used. It creates the necessary virtual Python environments and
-   executes `make test` (i.e. the unit and function tests) in each of them.
+   executes ``make test`` (i.e. the unit and function tests) in each of them.
 
    For running Tox, it does not matter which Python environment is currently
-   active, as long as the Python `tox` package is installed in it:
+   active, as long as the Python tox package is installed in it:
 
    ::
 
@@ -227,13 +226,13 @@ For further discussion of good and bad practices regarding commits, see:
 Core Development Team
 ---------------------
 
-Anyone can contribute to pywbem via pull requests as described in the previous
+Anyone can contribute to pywbemtools via pull requests as described in the previous
 section.
 
-The pywbem project has a core development team that holds regular web conferences
+The pywbemtools project has a core development team that holds regular web conferences
 and that is using Slack for offline communication, on the Slack workspace:
 https://pywbem.slack.com.
 
 The web conference and the Slack workspace are by invitation, and if you want
 to participate in the core team, please
-`open an issue <https://github.com/pywbem/pywbem/issues>`_ to let us know.
+`open a pywbem issue <https://github.com/pywbem/pywbem/issues>`_ to let us know.
