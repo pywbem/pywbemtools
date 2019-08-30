@@ -23,12 +23,15 @@ allows setting the current active connection into the repository.
 from __future__ import absolute_import
 
 import os
-import json
-import codecs
+import yaml
 import six
 from ._pywbem_server import PywbemServer
 
-DEFAULT_CONNECTIONS_FILE = 'pywbemcliservers.json'
+if six.PY2:
+    import codecs  # pylint: disable=wrong-import-order
+
+
+DEFAULT_CONNECTIONS_FILE = 'pywbemcli_connection_definitions.yaml'
 
 DEFAULT_CONNECTIONS_PATH = os.path.join(os.getcwd(), DEFAULT_CONNECTIONS_FILE)
 
@@ -44,6 +47,7 @@ class ConnectionRepository(object):
     _pywbemcli_servers = {}
     _loaded = False
     _connections_file = None
+    connections_group_name = 'connection_definitions'
 
     # class level variable so
     def __init__(self, connections_file=None):
@@ -57,7 +61,7 @@ class ConnectionRepository(object):
                     DEFAULT_CONNECTIONS_PATH
             else:
                 ConnectionRepository._connections_file = connections_file
-            self._read_json_file()
+            self._read_connections_file()
 
         else:
             if connections_file is not None and \
@@ -141,19 +145,24 @@ class ConnectionRepository(object):
         for item in six.iteritems(self._pywbemcli_servers):
             yield item[1]
 
-    def _read_json_file(self):
+    def _read_connections_file(self):
         """
         If there is a file, read it in and install into the dictionary.
 
         """
         if os.path.isfile(self._connections_file):
-            with open(self._connections_file, 'r') as fh:
+            with self.open_file(self._connections_file, 'r') as _fp:
                 try:
-                    dict_ = json.load(fh)
+                    dict_ = yaml.safe_load(_fp)
+                    # put all the connection definitions into a group
+                    # in the connection file
+                    connections_dict = dict_[
+                        ConnectionRepository.connections_group_name]
                     try:
-                        for name, svr in six.iteritems(dict_):
+                        for name, svr in six.iteritems(connections_dict):
                             ConnectionRepository._pywbemcli_servers[name] = \
-                                PywbemServer.create(**svr)
+                                PywbemServer.create(
+                                    replace_underscores=True, **svr)
                             ConnectionRepository._loaded = True
                     except KeyError as ke:
                         raise KeyError("Items missing from json record %s in "
@@ -178,6 +187,37 @@ class ConnectionRepository(object):
         del ConnectionRepository._pywbemcli_servers[name]
         self._write_file()
 
+    @staticmethod
+    def open_file(filename, file_mode='w'):
+        """
+        A static convenience function that performs the open of the connection
+        definitions file correctly for different versions of Python.
+
+        This covers the issue where the file should be opened in text mode but
+        that is done differently in Python 2 and Python 3.
+
+        The returned file-like object must be closed by the caller.
+
+        Parameters:
+
+          filename(:term:`string`):
+            Name of the file where the recorder output will be written
+
+          file_mode(:term:`string`):
+            Optional file mode.  The default is 'w' which overwrites any
+            existing file.  if 'a' is used, the data is appended to any
+            existing file.
+
+        Returns:
+
+          File-like object.
+        """
+        if six.PY2:
+            # Open with codecs to define text mode
+            return codecs.open(filename, mode=file_mode, encoding='utf-8')
+
+        return open(filename, file_mode, encoding='utf8')
+
     def _write_file(self):  # pylint: disable=no-self-use
         """
         Write the connections file if one has been loaded.
@@ -186,23 +226,28 @@ class ConnectionRepository(object):
         If there is an existing file it is moved to filename.bak and a new
         current file written.
         """
-        jsondata = {}
+        data_dict = {}
         if self._pywbemcli_servers:
             if ConnectionRepository._pywbemcli_servers:
-                for name in ConnectionRepository._pywbemcli_servers:
-                    jsondata[name] = \
-                        ConnectionRepository._pywbemcli_servers[name].to_dict()
+                data_dict = \
+                    {name: value.to_dict() for name, value in
+                     ConnectionRepository._pywbemcli_servers.items()}
 
-            # Write to tmp file and if successful create backup file and move
-            # the tmpfile to be the new connections file contents.
+            grp_dict = {ConnectionRepository.connections_group_name: data_dict}
+
+            # Write to tmpfile and if successful create backup file and
+            # move the tmpfile to be the new connections file contents.
             tmpfile = "%s.tmp" % self._connections_file
-            with open(tmpfile, 'w') as fh:
-                if six.PY2:
-                    json.dump(jsondata, codecs.getwriter('utf-8')(fh),
-                              ensure_ascii=True, indent=4, sort_keys=True)
-                else:
-                    json.dump(jsondata, fh, ensure_ascii=True, indent=4,
-                              sort_keys=True)
+
+            with self.open_file(tmpfile, 'w') as _fp:
+                data = yaml.safe_dump(grp_dict,
+                                      encoding=None,
+                                      allow_unicode=True,
+                                      default_flow_style=False,
+                                      indent=4)
+                data = data.replace('\n\n', '\n')  # YAML dump dups newlines
+                _fp.write(data)
+                _fp.flush()
 
         # create bak file and then rename tmp file
         if os.path.isfile(self._connections_file):

@@ -50,10 +50,10 @@ CONNECTION_HELP_LINES = [
     'add     Add a persistent WBEM connection from specified conn info.',
     'delete  Delete a persistent WBEM connection.',
     'export  Display the commands for exporting the current connection.',
-    'list    List the persistent WBEM connections.',
+    'list    List the persistent WBEM connection definitions.',
     'save    Save current connection as a persistent WBEM connection.',
     'select  Interactively select a persistent WBEM connection for use.',
-    'show    Show connection info of current or persistent WBEM connection.',
+    'show    Show connection info of current or WBEM connection definition.',
     'test    Test current connection with a predefined WBEM request.',
 ]
 
@@ -61,7 +61,7 @@ CONNECTION_ADD_HELP_LINES = [
     'Usage: pywbemcli connection add [COMMAND-OPTIONS]',
     'Add a persistent WBEM connection from specified conn info.',
     '-n, --name NAME Name of the persistent WBEM connection.',
-    '-s, --server URL URL of a WBEM server',
+    '-s, --server URL Use the WBEM server at the specified URL',
     '-u, --user TEXT User name for the WBEM server.',
     '-p, --password TEXT Password for the WBEM server.',
     '-t, --timeout INT Timeout in seconds for operations with the WBEM server.',
@@ -93,7 +93,7 @@ CONNECTION_EXPORT_HELP_LINES = [
 
 CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli connection list [COMMAND-OPTIONS]',
-    'List the persistent WBEM connections.',
+    'List the persistent WBEM connection definitions.',
     'An "*" after the name indicates the currently selected',
     CMD_OPTION_HELP_HELP_LINE
 ]
@@ -114,7 +114,7 @@ CONNECTION_SELECT_HELP_LINES = [
 
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
-    'Show connection info of current or persistent WBEM connection.',
+    'Show connection info of current or WBEM connection definition.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
@@ -340,7 +340,7 @@ TEST_CASES = [
      {'global': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
-                 'name    server uri namespace user timeout no-verify    log',
+                 'name    server namespace user timeout no-verify    log',
                  "test1   http://blah      root/cimv2         30  False",
                  "test2   http://blahblah  root/cimv2   fred  18  True "
                  "api=file,all"],
@@ -365,7 +365,7 @@ TEST_CASES = [
      {'global': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
-                 'name    server uri namespace user timeout no-verify    log',
+                 'name    server namespace user timeout no-verify    log',
                  'test1   http://blah      root/cimv2        30  False',
                  'test2   http://blahblah  root/cimv2   fred 18  True '
                  'api=file,all'],

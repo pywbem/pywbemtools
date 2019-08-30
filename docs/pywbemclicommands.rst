@@ -937,7 +937,7 @@ used to create a connection and is largely the same information as is in the
 options for pywbemcli. The data includes:
 
 * **name** name of the connection (required).
-* **server_url** the url for the defined connection (required unless
+* **server** the url for the defined connection (required unless
   ``--mock-server``/``-m`` defined).
 * **default_namespace** the default namespace defined for the connection
   (required).
@@ -961,9 +961,9 @@ options for pywbemcli. The data includes:
   environment using the pywbem mock module. This parameter is used, the
   ``--server_url`` must not be defined.
 
-The :term:`connections file` is named ``pywbemcliservers.json`` in the directory
-in which pywbemcli is executed. The data is stored in JSON format within this
-file.  Multiple connection files may be maintained in separate directories.
+The connection information is saved in the :term:`connections file` when the
+``connection add`` or ``connection save`` command are executed. Multiple
+connection files may be maintained in separate directories.
 
 The commands include:
 

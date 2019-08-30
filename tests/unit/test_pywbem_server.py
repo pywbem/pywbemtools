@@ -41,7 +41,7 @@ class PywbemServerTests(unittest.TestCase):
         pw = 'blah'
         svr = PywbemServer(server, ns, user=user, password=pw)
 
-        self.assertEqual(svr.server_url, server)
+        self.assertEqual(svr.server, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
@@ -64,7 +64,7 @@ class PywbemServerTests(unittest.TestCase):
                            no_verify=no_verify, certfile=certfile,
                            keyfile=keyfile, verbose=verbose)
 
-        self.assertEqual(svr.server_url, server)
+        self.assertEqual(svr.server, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
@@ -88,7 +88,7 @@ class PywbemServerTests(unittest.TestCase):
                            no_verify=no_verify, certfile=certfile,
                            keyfile=keyfile, verbose=verbose)
 
-        self.assertEqual(svr.server_url, server)
+        self.assertEqual(svr.server, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
