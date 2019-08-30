@@ -199,7 +199,7 @@ syntax of each general option
 --server general option
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--server/-s`` general option is a string that is the host
+The argument value of the ``--server/-s`` general option is a string that is the host
 name or IP address of the WBEM server to which pywbemcli will connect in the
 format::
 
@@ -224,9 +224,10 @@ Examples for the `URL` parameter of this option include:
 
 .. code-block:: text
 
-  https://localhost:15345 (https port 5989, host name localhost)
-  http://10.2.3.9 (http port 5988, IPv4, address 10.2.3.9)
-  http://[2001:db8::1234-eth0] (http port 5988, IPv6 address 2001:db8::1234)
+  https://localhost:15345 (https, port 15345, host name localhost)
+  http://10.2.3.9 (http, port 5988, IPv4 address 10.2.3.9)
+  https://10.2.3.9 (http, port 5989, IPv4 address 10.2.3.9)
+  http://[2001:db8::1234-eth0] (http, port 5988, IPv6 address 2001:db8::1234)
 
 
 .. _`--name general option`:
@@ -234,7 +235,7 @@ Examples for the `URL` parameter of this option include:
 --name general option
 ^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--name/-n`` general option is a string that is the name of a
+The argument value of the ``--name/-n`` general option is a string that is the name of a
 WBEM server contained in the :term:`connections file`.  The server parameters
 for this connection name will be loaded from the :term:`connections file` to
 become the current WBEM connection in pywbemcli. Note: In the interactive mode
@@ -263,7 +264,7 @@ connections.
 --default-namespace general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--default-namespace/-d`` is a string that defines the default
+The argument value of the ``--default-namespace/-d`` is a string that defines the default
 :term:`CIM namespace` to use for the target WBEM server if no namespace is
 defined in a command. If this option is not defined the pywbemcli default is
 ``root/cimv2``.
@@ -282,7 +283,7 @@ namespace is defined by:
 --user general option
 ^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--user/-u`` general option is a string that is the user name
+The argument value of the ``--user/-u`` general option is a string that is the user name
 on the WBEM server if a user name is required by the WBEM server to
 authenticate the client.
 
@@ -291,7 +292,7 @@ authenticate the client.
 --password general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--password/-p`` general option is a string that is the
+The argument value of the ``--password/-p`` general option is a string that is the
 password for the WBEM server. This option is normally required if the
 :ref:`--user general option` is defined.  If passwords are saved into the
 :term:`connections file` they are not encrypted in the file.
@@ -360,10 +361,10 @@ any subsequent pywbemcli commands:
 --timeout general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--timeout\-t`` general option is an integer that defines the
+The argument value of the ``--timeout\-t`` general option is an integer that defines the
 client side timeout in seconds. The pywbem client includes a timeout mechanism
 that closes a WBEM connection if there is no response to a request to the WBEM
-server in the time defined by this value by this value. Pywbemcli defaults to a
+server in the time defined by this value. Pywbemcli defaults to a
 predefined timeout (normally 30 seconds) if this option is not defined.
 
 
@@ -382,7 +383,7 @@ by the WBEM server is accepted.
 --certfile general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--certfile`` general options is a file path for a X.509
+The argument value of the ``--certfile`` general options is a file path for a X.509
 client certificate to be presented to the WBEM server with the :ref:`--keyfile
 general option` during the TLS/SSL handshake. This parameter is used only with
 HTTPS.  If ``--certfile` is not defined no client certificate is presented to
@@ -398,12 +399,12 @@ For more information on authentication types, see:
 ----keyfile general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--keyfile`` general option is a file path of the client
+The argument value of the ``--keyfile`` general option is a file path of the client
 private key file containing the private key belonging to the public key that is
 part of the X.509 certificate. See :ref:`--certfile general option` for more
 information. Not required if the private key is part of the file defined in the
 :ref:`--certfile general option`. ``keyfile`` is not allowed if
-:ref:`--certfile general options` option is not provided. Default: No client
+:ref:`--certfile general option` is not provided. Default: No client
 key file. The client private key should then be part of the file defined by
 ``--certfile``.
 
@@ -413,7 +414,7 @@ key file. The client private key should then be part of the file defined by
 ----ca-certs general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--ca-certs`` general option is the path name of a  file or
+The argument value of the ``--ca-certs`` general option is the path name of a  file or
 directory containing certificates that will be matched against a certificate
 received from the WBEM server. The default is OS dependent and is a set of
 system directories where certificates are expected to be stored for the client
@@ -428,7 +429,7 @@ the WBEM server certificate.
 --use_pull general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--use-pull/-u`` general option is one of the following
+The argument value of the ``--use-pull/-u`` general option is one of the following
 strings: [``yes``|``no``|``either``] that determines whether the pull
 operations or :term:`traditional operations` are used for the
 ``instance enumerate``, ``instance references``, ``instance associators``
@@ -447,7 +448,7 @@ choices are as follows:
 --pull-max-cnt general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--pull-max-cnt`` general option is an integer passed to the
+The argument value of the ``--pull-max-cnt`` general option is an integer passed to the
 WBEM server with the open and pull operation requests. This integer,
 ``MaxObjectCount`` tells the server the maximum number of objects
 to be returned for each pull request if pull operations are used. This must
@@ -459,7 +460,7 @@ DMTF pull operations` for more information on pull operations.
 --mock-server general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--mock-server/-m`` general option is a file path that
+The argument value of the ``--mock-server/-m`` general option is a file path that
 defines MOF and python that can be used to define a mock WBEM server in the
 pywbemcli process. This allows pywbemcli to be used without access to a real server.
 When this option is used to define a WBEM server the security options (ex.
@@ -491,18 +492,19 @@ the files for a mock server.
 --output-format general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The value of the ``--output-format/-o`` general option is a string that defines
-the output format for the pywbemcli command or interactive session.  See
-:ref:`Output formats` for more information.
+The argument value of the ``--output-format/-o`` general option is a string
+that defines
+the output format for the pywbemcli command or interactive session. This argument
+values of this option are described in the :ref:`Output formats` section.
 
 .. _`--log general option`:
 
 --log general option
 ^^^^^^^^^^^^^^^^^^^^
 
-The value of the  ``--log/-l`` general option defines the destination and parameters
-of logging of the requests and responses to the WBEM Server.
-See :ref:`Pywbemcli defined logging`.
+The argument value of the  ``--log/-l`` general option defines the destination and
+parameters of logging of the requests and responses to the WBEM Server as
+documente in :ref:`Pywbemcli defined logging`.
 
 .. _`--verbose general option`:
 
@@ -643,8 +645,8 @@ the use of these operations through two general options:
 There are limitations with using the the ``either`` choice as follows"
 
 * The original operations did not support the filtering of responses  with a
-query language query (``--filter-query-language`` and ``--filter-query``)
-option which passes a filter query to the WBEM server so that it filters
+query language query (:ref:`--filter-query-language` and :ref:`--filter-query` )
+option which requests that the WBEM server filter
 the responses before they are returned. This can greatly reduce the size of
 the responses if effectively used but is used only when the pull operations
 are available on the server.
@@ -961,7 +963,7 @@ and their responses and the HTTP requests and responses.
 
 The default is no logging if the ``--log`` option is not specified.
 
-The value of the the `--log` option parameter and of the PYWBEMCLI_LOG
+The argument value of the the `--log` option parameter and of the PYWBEMCLI_LOG
 environment variable is a log configuration string with the format defined in
 the ABNF rule LOG_CONFIG_STRING. The log configuration string defines a list of
 one or more log configurations, each with fields COMPONENT, DESTINATION, and
