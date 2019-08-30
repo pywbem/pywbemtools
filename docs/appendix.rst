@@ -117,18 +117,17 @@ This documentation uses a few special terms to refer to Python types:
       ends.
 
    traditional operations
-      The CIM-XML operations originally defined by the DMTF in :term:`CIM-XML`
-      operations defined in the DMTF specification CIM Operations Over HTTP
-      (:term:`DSP0200`) for requesting multiple instances including
-      ``EnumerateInstances```, ``EnumerateInstanceNames``, ``Referencess``,
-      ``ReferenceNames``, ``Associators``, AssociatorNames``, and `ExecQuery`.
-      These are monolitic operations and expect the WBEM server to prepare
-      complete reponses before returning any results because they are
-      monolithic and also because the response must be either the response
-      of all of the requested instances or an error response. In later
-      versions of the specifications, an alternative generally named pull
-      operations were added as an alternative to the traditional operations
-      to improve memory and response efficiency.
+      The CIM-XML operations originally defined by the DMTF in
+      (:term:`DSP0200`) for requesting multiple instances from a WBEM server
+      are ``EnumerateInstances``, ``EnumerateInstanceNames``, ``Referencess``,
+      ``ReferenceNames``, ``Associators``, ``AssociatorNames``, and
+      ``ExecQuery``. These are monolithic operations and expect the WBEM server
+      to prepare complete responses before returning any results. Because the
+      response must be either contain all of the requested instances or
+      an error response they causes issues with very large reponses. In later
+      versions of (:term:`DSP0200`), an alternative  to the above operations
+      named pull operations were added to improve memory and response
+      efficiency.
 
 
 .. _`Profile advertisement methodologies`:
