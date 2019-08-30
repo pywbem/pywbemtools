@@ -48,9 +48,9 @@ The pywbemcli command groups and commands are described below and the help
 output from pywbemcli for each command documented in :ref:`pywbemcli Help
 Command Details`
 
-**NOTE:** Many of the examples below use the ``pywbem_mock`` module
-(``-m``\``--mock-server`` general option) with mock files in the pywbemtools
-tests/unit subdirectory to generate known results.
+**NOTE:** Many of the examples below use :ref:`--mock-server general option`
+with mock files that are located in the pywbemtools tests/unit subdirectory
+to generate known results.
 
 .. _`Pywbemcli special command line features`:
 
@@ -58,60 +58,17 @@ Pywbemcli special command line features
 ---------------------------------------
 
 Pywbemcli includes several features in the command syntax that are worth
-presenting in detail to help the user understand the background purpose and
+presenting in detail to help the user understand the background, purpose and
 syntactic implementation of the features. This includes:
-
-* The ability to execute either the pull or traditional operations with the
-  same command group.
 
 * The ability to receive either CIM instances or CIM instance names with only
   a change of an option on the commands that request CIM instances. The option
   ``-o`` or ``--names-only`` defines whether only the instance name or the complete
   object will be displayed.
 
-* The ability to interactively select the data for certain objects as opposed
-  to having to enter the full name.
-
-
-.. _`Using pywbem Pull Operations from pywbemcli`:
-
-Using pywbem Pull Operations from pywbemcli
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Pywbem includes multiple ways to execute the enumerate instance type operations
-(``Associators``, ``References``,`` EnumerateInstances``, ``ExecQuery``):
-
-* The traditional operations (ex. ``EnumerateInstances``)
-* The pull operations (ex. the pull sequence ``OpenEnumerateInstances``, etc.)
-* An overlay of the above two operations called the ``Iter..``. operations where
-  each ``Iter..`` operation executes either the traditional or pull operation
-  depending on a parameter of the connection.
-
-Pywbemcli implements these method calls to pywbem using the ``Iter...``
-operations so that either pull operations or traditional operation can be used
-simply by changing a pywbemcli input parameter (``--use-pull``).
-
-Two options on the command line allow the user to either force the use of pull
-operations, of traditional operations, or to let pywbem try them both.
-
-The input parameter ``--use_pull`` allows the choice of pull or traditional
-operations with the default being to allow pywbem to decide.  The input
-parameter ``max_object_cnt`` sets the ``MaxObjectCount`` variable on the operation
-request if the pull operations are to be used which tells the WBEM server to
-limit the size of the response.  For example::
-
-    pywbemcli --server http/localhost use_pull=yes max_object_cnt=10
-
-would force the use of the pull operations and return an error if the target
-server did not implement them and would set the ``MaxObjectCount`` parameter on the
-api to 10, telling the server that a maximum of 10 objects can be returned for
-each of the requests in an enumeration sequence.
-
-Since the default for use_pull is ``either``, normally pywbem first tries
-the pull operation and then if that fails, the traditional operation.  That
-is probably the most logical setting for ``use_pull`` unless you are
-specifically testing the use of pull operations.
-
+* The ability to interactively select the data from a list presented by
+  pywbemcli for certain objects rather than typing in long names the full name.
+  see :ref:`Interactively selecting INSTANCENAME`.
 
 .. _`pywbemcli commands to WBEM Operations`:
 
@@ -167,10 +124,6 @@ GetQualifier                       qualifier get QUALIFIERNAME
 SetQualifier                       Not implemented
 DeleteQualifier                    Not Implemented
 =================================  ==============================================
-
-1. The pywbem ``Iter...`` operations are all used as the common code path by
-pywbemcli to access CIM instances from the WBEM server. It is these operations
-that determine whether the original operations (ex. ``EnumerateInstances``)
 
 
 .. _`Displaying CIM instances or CIM instance names`:
