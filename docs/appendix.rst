@@ -61,16 +61,18 @@ This documentation uses a few special terms to refer to Python types:
    connections file
       A file maintained by pywbemcli and managed by the
       :ref:`Connection command group`.
-      The connections file defines a list of named connections, each of which
-      is either the set of parameters for connecting to a real WBEM server, or
-      the set of files for creating a mock WBEM server.
-      The file name of the connections file is
-      ``pywbemcli_connection_definitions.json`` and it is created by pywbemcli
-      in the current directory.
-      Multiple connections files may exist in different directories.
-      This allows connection definitions to be predefined and pywbemcli
-      commands executed against them using only the connection name (via the
-      ``--name`` general option).
+      The connections file defines a list of named WBEM connection definitions,
+      each of which is either the set of parameters for connecting to a real
+      WBEM server, or the set of files for creating a mock WBEM server. The
+      file name of the connections file is
+      :term:`WBEM connection definitions filename`; it is created by pywbemcli
+      in the current directory. Multiple connections files may exist in
+      different directories. This allows connection definitions to be
+      predefined and pywbemcli commands executed against them using only the
+      connection definition name (via the ``--name`` general option).
+
+   WBEM connection definitions filename
+      ``pywbemcli_connection_definitions.yaml``
 
    MOF
       MOF (Managed Object Format) is the language used by the DMTF to

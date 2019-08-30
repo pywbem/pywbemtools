@@ -44,13 +44,13 @@ def connection_group():
     """
     Command group for persistent WBEM connections.
 
-    This command groupdefines commands to manage persistent WBEM connections
-    that have a name. The connections are stored in a connections file named
-    'pywbemcliservers.json' in the current directory. The connection name can
-    be used as a shorthand for the WBEM server via the '--name' general option.
-
-    In addition to the command-specific options shown in this help text, the
-    general options (see 'pywbemcli --help') can also be specified before the
+    This command group defines commands to manage persistent WBEM connection
+    definitions that have a name. The connection definitions are stored in a
+    connections file named 'pywbemcli_connection_definitions.yaml' in the
+    current directory. The connection definition name can be used as a
+    shorthand for the WBEM server via the '--name' general option.  In addition
+    to the command-specific options shown in this help text, the general
+    options (see 'pywbemcli --help') can also be specified before the
     'connection' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
@@ -73,7 +73,7 @@ def connection_export(context):
 @click.pass_obj
 def connection_show(context, name):
     """
-    Show connection info of current or persistent WBEM connection.
+    Show connection info of current or WBEM connection definition.
 
     This command displays all the variables that make up the current
     WBEM connection if the optional NAME argument is NOT provided.
@@ -148,7 +148,7 @@ def connection_select(context, name):
                    'Default: None.')
 @click.option('-s', '--server', type=str, metavar='URL',
               default=None,
-              help='Use the WBEM server at the specified URL of format: '
+              help='Use the WBEM server at the specified URL with format: '
                    '[SCHEME://]HOST[:PORT]. '
                    'SCHEME must be "https" (default) or "http". '
                    'HOST is a short or long hostname or literal IPV4/v6 '
@@ -157,7 +157,7 @@ def connection_select(context, name):
                    'This option is mutually exclusive with the --mock-server '
                    'option. '
                    'Default: None.'.
-                   format(ev=PywbemServer.server_envvar))
+              format(ev=PywbemServer.server_envvar))
 @click.option('-u', '--user', type=str, metavar="TEXT",
               default=None,
               help='User name for the WBEM server. '
@@ -178,7 +178,7 @@ def connection_select(context, name):
                    'that will be matched against the server certificate '
                    'presented by the WBEM server during TLS/SSL handshake. '
                    'Default: [{dirs}].'.
-                   format(dirs=', '.join(DEFAULT_CA_CERT_PATHS)))
+              format(dirs=', '.join(DEFAULT_CA_CERT_PATHS)))
 @click.option('-c', '--certfile', type=str, metavar="FILE",
               default=None,
               help='Path name of a PEM file containing a X.509 client '
@@ -198,7 +198,7 @@ def connection_select(context, name):
               default=DEFAULT_CONNECTION_TIMEOUT,
               help='Timeout in seconds for operations with the WBEM server. '
                    'Default: {default}.'.
-                   format(default=DEFAULT_CONNECTION_TIMEOUT))
+              format(default=DEFAULT_CONNECTION_TIMEOUT))
 @click.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
               default='either',
               help='Determines whether pull operations are used for '
@@ -218,13 +218,13 @@ def connection_select(context, name):
                    'This is a tuning parameter that does not affect the '
                    'external behavior of the commands. '
                    'Default: {default}'.
-                   format(default=DEFAULT_MAXPULLCNT))
+              format(default=DEFAULT_MAXPULLCNT))
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
               default=DEFAULT_NAMESPACE,
               help='Default namespace, to be used when commands do not '
                    'specify the --namespace command option. '
                    'Default: {default}.'.
-                   format(default=DEFAULT_NAMESPACE))
+              format(default=DEFAULT_NAMESPACE))
 @click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
               default=None,
               help='Enable logging of the WBEM operations, defined by a list '
@@ -232,12 +232,12 @@ def connection_select(context, name):
                    'COMP: [{comp_choices}], default: {comp_default}; '
                    'DEST: [{dest_choices}], default: {dest_default}; '
                    'DETAIL: [{detail_choices}], default: {detail_default}.'.
-                   format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
-                          comp_default='all',
-                          dest_choices='|'.join(LOG_DESTINATIONS),
-                          dest_default=DEFAULT_LOG_DESTINATION,
-                          detail_choices='|'.join(LOG_DETAIL_LEVELS),
-                          detail_default=DEFAULT_LOG_DETAIL_LEVEL))
+              format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
+                     comp_default='all',
+                     dest_choices='|'.join(LOG_DESTINATIONS),
+                     dest_default=DEFAULT_LOG_DESTINATION,
+                     detail_choices='|'.join(LOG_DETAIL_LEVELS),
+                     detail_default=DEFAULT_LOG_DETAIL_LEVEL))
 @add_options(verify_option)
 @click.pass_obj
 def connection_add(context, **options):
@@ -303,7 +303,7 @@ def connection_save(context, **options):
 @click.pass_obj
 def connection_list(context):
     """
-    List the persistent WBEM connections.
+    List the persistent WBEM connection definitions.
 
     This command displays all entries in the connections file as
     a table using the command line output_format to define the
@@ -351,7 +351,7 @@ def show_connection_information(context, svr, separate_line=True):
                'certfile: %s%skeyfile: %s%suse-pull: %s%spull-max-cnt: %s%s'
                'mock-server: %s%slog: %s'
                % (svr.name, sep,
-                  svr.server_url, sep,
+                  svr.server, sep,
                   svr.default_namespace, sep,
                   svr.user, sep,
                   svr.password, sep,
@@ -384,7 +384,7 @@ def cmd_connection_export(context):
     if not svr:
         raise click.ClickException("No server currently defined as current")
 
-    export_statement(PywbemServer.server_envvar, svr.server_url)
+    export_statement(PywbemServer.server_envvar, svr.server)
 
     if_export_statement(PywbemServer.defaultnamespace_envvar,
                         svr.default_namespace)
@@ -532,7 +532,7 @@ def cmd_connection_add(context, options):
 
     try:
         new_server = PywbemServer(
-            server_url=server,
+            server=server,
             default_namespace=options['default_namespace'],
             name=name,
             user=options['user'],
@@ -565,7 +565,7 @@ def cmd_connection_save(context, options):
     current_svr = context.pywbem_server
     connections = ConnectionRepository()
     if options['name']:
-        current_svr._name = options['name']
+        current_svr._name = options['name']  # pylint: disable=protected-access
     if current_svr.name in connections:
         raise click.ClickException('%s is already defined as a server' %
                                    current_svr.name)
@@ -590,21 +590,21 @@ def cmd_connection_list(context):
         current_server_name = context.pywbem_server.name
     else:
         current_server_name = None
-
     # build the table structure
     rows = []
+
     for name, svr in connections.items():
         # if there is a current server, and it is this item in list
         # append * to name
         if context.pywbem_server:
             if name == current_server_name:
                 name = name + "*"
-        row = [name, svr.server_url, svr.default_namespace, svr.user,
+        row = [name, svr.server, svr.default_namespace, svr.user,
                svr.timeout, svr.no_verify, svr.certfile,
                svr.keyfile, svr.log, "\n".join(svr.mock_server)]
         rows.append(row)
 
-    headers = ['name', 'server uri', 'namespace', 'user',
+    headers = ['name', 'server', 'namespace', 'user',
                'timeout', 'no-verify', 'certfile', 'keyfile', 'log',
                'mock_server']
 

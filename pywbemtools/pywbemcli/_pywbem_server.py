@@ -22,6 +22,7 @@ from __future__ import absolute_import, unicode_literals
 
 import re
 import click
+from collections import OrderedDict
 
 from pywbem import WBEMServer, configure_loggers_from_string
 
@@ -34,7 +35,7 @@ WBEM_SERVER_OBJ = None
 PYWBEMCLI_LOG = 'pywbemcli.log'
 
 
-def _validate_server_url(server):
+def _validate_server(server):
     """
     Validate  and possibly complete the wbemserver url provided.
 
@@ -102,7 +103,7 @@ class PywbemServer(object):
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
     log_envvar = 'PYWBEMCLI_LOG'
 
-    def __init__(self, server_url=None, default_namespace=DEFAULT_NAMESPACE,
+    def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default',
                  user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
                  no_verify=True, certfile=None, keyfile=None, ca_certs=None,
@@ -115,11 +116,11 @@ class PywbemServer(object):
             and execute cim_operations on the server.
         """
 
-        if server_url and mock_server:
+        if server and mock_server:
             raise ValueError('Simultaneous "--server" and '
                              '"--mock-server" not allowed. Server: %s, '
-                             'mock_server %s' % (server_url, mock_server))
-        self._server_url = server_url
+                             'mock_server %s' % (server, mock_server))
+        self._server = server
         self._mock_server = mock_server
 
         self._name = name
@@ -143,25 +144,25 @@ class PywbemServer(object):
         self._log = log
 
     def __str__(self):
-        return 'PywbemServer(url=%s name=%s)' % (self.server_url, self.name)
+        return 'PywbemServer(url=%s name=%s)' % (self.server, self.name)
 
     def __repr__(self):
-        return 'PywbemServer(server_url=%s name=%s ns=%s user=%s ' \
+        return 'PywbemServer(server=%s name=%s ns=%s user=%s ' \
                'password=%s timeout=%s no_verify=%s certfile=%s ' \
                'keyfile=%s ca_certs=%s use_pull=%s, pull_max_cnt=%s, ' \
                'stats_enabled=%s mock_server=%r, log=%r)' % \
-               (self.server_url, self.name, self.default_namespace,
+               (self.server, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.no_verify,
                 self.certfile, self.keyfile, self.ca_certs, self.use_pull,
                 self.pull_max_cnt, self.stats_enabled, self.mock_server,
                 self._log)
 
     @property
-    def server_url(self):
+    def server(self):
         """
         :term:`string`: Scheme with Hostname or IP address of the WBEM Server.
         """
-        return self._server_url
+        return self._server
 
     @property
     def name(self):
@@ -322,27 +323,38 @@ class PywbemServer(object):
 
     def to_dict(self):
         """
-        Create dictionary from instance for persisting the connection
+        Create dictionary from instance for persisting the connection. All
+        key names that include _ are modified to - so that the dictionary
+        reflects the general option names.
         """
-        dict_ = {"name": self.name,
-                 "server_url": self.server_url,
-                 "user": self.user,
-                 "password": self.password,
-                 "default_namespace": self.default_namespace,
-                 "timeout": self.timeout,
-                 "no_verify": self.no_verify,
-                 "certfile": self.certfile,
-                 "keyfile": self.keyfile,
-                 "ca_certs": self.ca_certs,
-                 "use_pull": self.use_pull,
-                 "pull_max_cnt": self.pull_max_cnt,
-                 "mock_server": self.mock_server,
-                 "log": self.log}
-        return dict_
+
+        return OrderedDict({"name": self.name,
+                            "server": self.server,
+                            "user": self.user,
+                            "password": self.password,
+                            "default-namespace": self.default_namespace,
+                            "timeout": self.timeout,
+                            "no_verify": self.no_verify,
+                            "certfile": self.certfile,
+                            "keyfile": self.keyfile,
+                            "ca-certs": self.ca_certs,
+                            "use-pull": self.use_pull,
+                            "pull-max_cnt": self.pull_max_cnt,
+                            "mock-server": self.mock_server,
+                            "log": self.log})
 
     @staticmethod
-    def create(**kwargs):
-        """Create PywbemServer object from kwargs"""
+    def create(replace_underscores=False, **kwargs):
+        """Create PywbemServer object from kwargs. If replace_underscore is
+        True, replace any -  in names with _
+        """
+        if replace_underscores:
+            for name, value in kwargs.items():
+                if '-' in name:
+                    del kwargs[name]
+                    name = name.replace('-', '_')
+                    kwargs[name] = value
+
         return PywbemServer(**kwargs)
 
     def create_connection(self, verbose):
@@ -379,10 +391,10 @@ class PywbemServer(object):
                     ex.__class__.__name__, ex), err=True)
                 raise click.Abort()
         else:
-            if not self.server_url:
+            if not self.server:
                 raise click.ClickException('No server found. Cannot '
                                            'connect.')
-            self._server_url = _validate_server_url(self._server_url)
+            self._server = _validate_server(self._server)
             if self.keyfile is not None and self.certfile is None:
                 ValueError('keyfile option requires certfile option')
 
@@ -401,7 +413,7 @@ class PywbemServer(object):
             # Create the WBEMConnection object and the _wbem_server object
 
             conn = PYWBEMCLIConnection(
-                self.server_url, creds,
+                self.server, creds,
                 default_namespace=self.default_namespace,
                 no_verification=self.no_verify,
                 x509=x509_dict, ca_certs=self.ca_certs,
