@@ -670,7 +670,7 @@ The following defines the help output for the `pywbemcli connection --help` comm
       list    List the WBEM connection definitions.
       save    Save the current connection as a new WBEM connection definition.
       select  Select a WBEM connection definition as the current connection.
-      show    Show the current connection or a WBEM connection definition.
+      show    Show connection info of a WBEM connection definition.
       test    Test the current connection with a predefined WBEM request.
 
 
@@ -686,7 +686,7 @@ The following defines the help output for the `pywbemcli connection add --help` 
 
 ::
 
-    Usage: pywbemcli connection add [COMMAND-OPTIONS]
+    Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME
 
       Add a new WBEM connection definition from specified options.
 
@@ -694,15 +694,18 @@ The following defines the help output for the `pywbemcli connection add --help` 
       specified options. A connection definition with that name must not yet
       exist.
 
-      The current connection remains unchanged by this command.
+      The NAME argument MUST exist. It define the server uri and the unique name
+      under which this server connection information will be stored. A --server
+      or --mock-server must exist because they define the server. All other
+      properties are optional.
 
-      Examples:
+      Adding a connection does not set the new connection as the current
+      connection. Use `connection select` to set a particular stored connection
+      definition as the current connection.
 
         pywbemcli --name newsrv connection add --server https://srv1
 
     Options:
-      -n, --name NAME                 Name for the new WBEM connection definition.
-                                      [required]
       -m, --mock-server FILE          Use a mock WBEM server that is automatically
                                       created in pywbemcli and populated with CIM
                                       objects that are defined in the specified
@@ -858,13 +861,12 @@ The following defines the help output for the `pywbemcli connection list --help`
 
       List the WBEM connection definitions.
 
-      List the WBEM connection definitions in the connections file as a table.
+      This command displays all entries in the connections file and the current
+      connection if it is not in the connections file as a table using the
+      command line output_format to define the table format.
 
-      In the table, the current connection is marked with an "*" after its name.
-
-      Examples:
-
-        pywbemcli connection list
+      An "!" before the name indicates the selected connection. A '!' before the
+      name indicates that it is the current connection.
 
     Options:
       -h, --help  Show this message and exit.
@@ -882,27 +884,23 @@ The following defines the help output for the `pywbemcli connection save --help`
 
 ::
 
-    Usage: pywbemcli connection save [COMMAND-OPTIONS]
+    Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME
 
       Save the current connection as a new WBEM connection definition.
 
       Create a new WBEM connection definition in the connections file from the
-      current connection. A connection definition with that name must not yet
-      exist.
-
-      This command is useful when you have defined a connection on the command
-      line and want to save it in the connections file for later use.
+      current connection with the NAME argument as connection name. A connection
+      definition with that name must not yet exist.
 
       Examples:
 
-        pywbemcli --server https://srv1 connection save --name mysrv
+        pywbemcli --server https://srv1 connection save mysrv
 
     Options:
-      -n, --name NAME  Name for the new WBEM connection definition.
-      -V, --verify     Prompt for confirmation before performing a change, to
-                       allow for verification of parameters. Default: Do not
-                       prompt for confirmation.
-      -h, --help       Show this message and exit.
+      -V, --verify  Prompt for confirmation before performing a change, to allow
+                    for verification of parameters. Default: Do not prompt for
+                    confirmation.
+      -h, --help    Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:
@@ -925,18 +923,22 @@ The following defines the help output for the `pywbemcli connection select --hel
       connection. If the NAME argument is omitted, prompt for selecting one of
       the connection definitions in the connections file.
 
-      This command is useful in the interactive mode of pywbemcli.
+      Selects a connection from the persistently stored set of named connections
+      if NAME exists in the store. If NAME not supplied, a list of connections
+      from the connections definition file is presented with a prompt for the
+      user to select a connection.
 
-      The selection of the current connection is not saved across interactive
-      sessions of pywbemcli.
+      Selection is persistent; it is used as the server definition in commands
+      in the remainder of an interactive session and is saved in the connections
+      file and used as the current connection if there is no other server
+      definition (--server or --name or --mock-server).
 
       Examples:
 
-        pywbemcli
+        $ pywbemcli
 
-        > connection select myconn
-
-        > connection select          # prompts
+        pywbemcli> connection select myconn   pywbemcli> connection show
+        pywbemcli> CTRL-D   $ pywbemcli show     TODO     ...
 
     Options:
       -h, --help  Show this message and exit.
@@ -956,17 +958,25 @@ The following defines the help output for the `pywbemcli connection show --help`
 
     Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
-      Show the current connection or a WBEM connection definition.
+      Show connection info of a WBEM connection definition.
 
-      Display the parameters of the current connection, or if the optional NAME
-      argument is specified, of the named WBEM connection definition from the
-      connections file.
+      This command displays the WBEM connection definition of a single
+      connection as follows:
 
-      Examples:
+      * A named connection from the WBEM connections file if NAME argument
+      exists.
 
-        pywbemcli --name server1 connection show
+      * The current connection if NAME is not provided and a current connection
+      exists (selected, or defined on the command line).
+
+      * User selects from list presented if NAME argument is '?' or there is no
+      NAME argument and no current connection.
+
+      This command displays all the variables that make up the current WBEM.
 
         pywbemcli connection show server1
+
+        pywbemcli connection show ?
 
     Options:
       -h, --help  Show this message and exit.
