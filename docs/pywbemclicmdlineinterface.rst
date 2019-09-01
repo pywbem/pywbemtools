@@ -26,8 +26,8 @@ Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 The command line can contain the following components:
 
 * **general-options** - Options that apply to all commands.
-  See :ref:`Using the pywbemcli command line general options` for infomation on the
-  pywbemcli general options
+  See :ref:`Using the pywbemcli command line general options` for information
+  on the pywbemcli general options.
 * **command group** - A name of a group of commands.
   See :ref:`Pywbemcli command groups and commands`
 * **command** - A command name normally within a command group.

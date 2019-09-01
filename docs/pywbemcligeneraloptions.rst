@@ -1,4 +1,4 @@
-.. _`Pywbemcli command line general options`:
+.. _`Using the pywbemcli command line general options`:
 
 Using the pywbemcli command line general options
 ================================================
@@ -386,13 +386,13 @@ by the WBEM server is accepted.
 The argument value of the ``--certfile`` general options is a file path for a X.509
 client certificate to be presented to the WBEM server with the :ref:`--keyfile
 general option` during the TLS/SSL handshake. This parameter is used only with
-HTTPS.  If ``--certfile` is not defined no client certificate is presented to
-the server, enabling 1-way authentication. If ``--certfile` is defined, the
+HTTPS.  If ``--certfile`` is not defined no client certificate is presented to
+the server, enabling 1-way authentication. If ``--certfile`` is defined, the
 client certificate is presented to the server, enabling 2-way (mutual)
 authentication.
 
 For more information on authentication types, see:
-:https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-types
+https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-types
 
 .. _`--keyfile general option`:
 
@@ -644,15 +644,15 @@ the use of these operations through two general options:
 
 There are limitations with using the the ``either`` choice as follows"
 
-* The original operations did not support the filtering of responses  with a
-query language query (:ref:`--filter-query-language` and :ref:`--filter-query` )
-option which requests that the WBEM server filter
-the responses before they are returned. This can greatly reduce the size of
-the responses if effectively used but is used only when the pull operations
-are available on the server.
+* The original operations did not support the filtering of responses with a
+  query language query (``--filter-query-language`` and ``--filter-query`` )
+  which requests that the WBEM server filter
+  the responses before they are returned. This can greatly reduce the size of
+  the responses if effectively used but is used only when the pull operations
+  are available on the server.
 
 * The pull operations do not support some of the options that traditional
-operations do:
+  operations do:
 
 * ``--include-qualifiers`` - Since even the traditional operations specification
   deprecated this option and the user cannot depend on it being honored,
@@ -664,7 +664,7 @@ operations do:
 
 The following example forces the use of the pull operations  and expects the
 WBEM server to return no more that 10 instances per request. It returns an
-exception if the pull operations are not supported in the WBEM server:
+exception if the pull operations are not supported in the WBEM server::
 
     pywbemcli --server http/localhost use_pull=yes max_object_cnt=10
 
