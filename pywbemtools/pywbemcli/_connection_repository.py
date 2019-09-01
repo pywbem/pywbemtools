@@ -48,6 +48,11 @@ class ConnectionRepository(object):
     _loaded = False
     _connections_file = None
     connections_group_name = 'connection_definitions'
+    default_connection_grp_name = 'default_connection_name'
+
+    # default connection name Must be the name of a
+    # connection in the connections file or None.
+    default_connection_name = None
 
     # class level variable so
     def __init__(self, connections_file=None):
@@ -95,7 +100,8 @@ class ConnectionRepository(object):
         for key, value in self._pywbemcli_servers.items():
             items.append("%s: %s" % (key, value))
         items_str = ', '.join(items)
-        return "{0.__class__.__name__}({{{1}}})".format(self, items_str)
+        return "{0.__class__.__name__}({{{1}}}, default_connection {2})]". \
+            format(self, items_str, self.default_connection_name)
 
     def __contains__(self, key):
         return key in self._pywbemcli_servers
@@ -158,6 +164,9 @@ class ConnectionRepository(object):
                     # in the connection file
                     connections_dict = dict_[
                         ConnectionRepository.connections_group_name]
+
+                    ConnectionRepository.default_connection_name = dict_[
+                        ConnectionRepository.default_connection_grp_name]
                     try:
                         for name, svr in six.iteritems(connections_dict):
                             ConnectionRepository._pywbemcli_servers[name] = \
@@ -185,6 +194,9 @@ class ConnectionRepository(object):
     def delete(self, name):  # pylint: disable=no-self-use
         """Delete a definition from the connections repository"""
         del ConnectionRepository._pywbemcli_servers[name]
+        # remove default_name if it is the one being deleted
+        if name == self.default_connection_name:
+            self.default_connection_name = None
         self._write_file()
 
     @staticmethod
@@ -226,21 +238,24 @@ class ConnectionRepository(object):
         If there is an existing file it is moved to filename.bak and a new
         current file written.
         """
-        data_dict = {}
+        conn_dict = {}
         if self._pywbemcli_servers:
             if ConnectionRepository._pywbemcli_servers:
-                data_dict = \
+                conn_dict = \
                     {name: value.to_dict() for name, value in
                      ConnectionRepository._pywbemcli_servers.items()}
 
-            grp_dict = {ConnectionRepository.connections_group_name: data_dict}
+            # build dictionary for yaml output
+            yaml_dict = {ConnectionRepository.connections_group_name: conn_dict,
+                         ConnectionRepository.default_connection_grp_name:
+                             self.default_connection_name}
 
             # Write to tmpfile and if successful create backup file and
             # move the tmpfile to be the new connections file contents.
             tmpfile = "%s.tmp" % self._connections_file
 
             with self.open_file(tmpfile, 'w') as _fp:
-                data = yaml.safe_dump(grp_dict,
+                data = yaml.safe_dump(yaml_dict,
                                       encoding=None,
                                       allow_unicode=True,
                                       default_flow_style=False,
@@ -259,3 +274,27 @@ class ConnectionRepository(object):
 
         if self._pywbemcli_servers:
             os.rename(tmpfile, self._connections_file)
+
+    def set_default_connection(self, connection_name):
+        """
+        Set the connection defined by connection_name to be the current
+        connection in the connections file.
+
+        This is accomplished by modifying the "current_connection" entry
+        and rewriting the file.
+        """
+        if connection_name in self._pywbemcli_servers:
+            ConnectionRepository.default_connection_name = connection_name
+            self._write_file()
+
+        else:
+            raise ValueError('Connection name "%s" does not exist in set of '
+                             'connections' % connection_name)
+
+    def get_default_connection(self):
+        """
+        Returns the name of the current connection in the connections file.
+        This may be the name of a connection in the connections file or
+        None if no connection is defined as the current connection.
+        """
+        return self.default_connection_name

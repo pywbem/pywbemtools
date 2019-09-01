@@ -366,9 +366,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         # for the connection defined by the cmd line input)
         if server or mock_server:
             if name:
-                click.echo("Name found with server or mock-server", err=True)
-                click.Abort()
-            name = 'default'
+                click.echo('Option conflict: --name "%s" conflicts with '
+                           'existence of --server and --mock-server' %
+                           name, err=True)
+                raise click.Abort()
+            name = 'not-saved'
             pywbem_server = PywbemServer(server,
                                          resolved_default_namespace,
                                          name=name,
@@ -388,10 +390,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         else:  # Server and mock_server are None
             # if name cmd line option, get connection repo and
             # get name from the repo.
-            pywbemcli_servers = ConnectionRepository()
+            connections = ConnectionRepository()
             s_name = None
             if name:
-                if name in pywbemcli_servers:
+                if name in connections:
                     s_name = name
                 # exception when defined name does not exist
                 else:
@@ -400,14 +402,20 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                                                '--mock-server options to '
                                                'define a '
                                                'WBEM server'.format(name))
-            else:
-                # try default but ignore if it does not exist
-                if 'default' in pywbemcli_servers:
-                    s_name = name
+            else:  # no --name option
+                # get any persistent default_connection name
+                s_name = connections.get_default_connection()
+
+                if s_name and s_name not in connections:
+                    click.echo('Invalid selected connection "%s". This name '
+                               'not in connections repository. Deleting',
+                               err=True)
+                    connections.set_default_connection(None)
+                    raise click.Abort()
 
             # Get the named connection from the repo
             if s_name:
-                pywbem_server = pywbemcli_servers[name]
+                pywbem_server = connections[s_name]
                 # Test for invalid other options with the --name option
                 # The following options are part of each PywbemServer object
                 # TODO: FUTURE should really put this into pywbemserver itself.
@@ -425,8 +433,9 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
 
                 for option in other_options:
                     if option[0]:
-                        warning_msg('"%s %s" ignored when "-n/--name '
-                                    'used' % (option[1], option[0]))
+                        warning_msg('"%s %s" ignored when "-n/--name  or '
+                                    'default name used' %
+                                    (option[1], option[0]))
                 # NOTE: The log definition is only for this session.
                 if log:
                     # pylint: disable=protected-access
