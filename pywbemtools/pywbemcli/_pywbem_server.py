@@ -334,12 +334,12 @@ class PywbemServer(object):
                             "password": self.password,
                             "default-namespace": self.default_namespace,
                             "timeout": self.timeout,
-                            "no_verify": self.no_verify,
+                            "no-verify": self.no_verify,
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,
                             "ca-certs": self.ca_certs,
                             "use-pull": self.use_pull,
-                            "pull-max_cnt": self.pull_max_cnt,
+                            "pull-max-cnt": self.pull_max_cnt,
                             "mock-server": self.mock_server,
                             "log": self.log})
 
