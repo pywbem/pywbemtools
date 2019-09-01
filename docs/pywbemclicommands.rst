@@ -166,18 +166,106 @@ Thus, for example an ``instance enumerate`` with and without the ``-o`` option:
 
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
 
+.. _`Specifying the INSTANCENAME command argument`:
+
+Specifying the INSTANCENAME command argument
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The INSTANCENAME argument used by some pywbemcli commands (e.g ``instance get``)
+specifies the instance path (aka instance name) of a CIM instance in a CIM
+namespace of a WBEM server.
+
+The format used by pywbemcli for specifying INSTANCENAME arguments on the
+command line is an untyped WBEM URI for instance paths as defined in
+:term:`DSP0207`.
+Because pywbemcli always works with a single WBEM server at a time, the
+authority component of the WBEM URI is never specified in an INSTANCENAME.
+Because the namespace type of the WBEM URI (e.g. http or https) is not relevant
+for identifying the CIM instance, the namespace type is never specified in an
+INSTANCENAME.
+
+With these simplifications, the WBEM URI compatible ABNF for INSTANCENAME is:
+
+.. code-block:: text
+
+   INSTANCENAME = "/" [ NAMESPACE ] ":" CLASSNAME [ "." keybindings ]
+
+   keybindings = keybinding *( "," keybinding )
+
+   keybinding = PROPERTYNAME "=" value
+
+   value = integerValue / charValue / stringValue / datetimeValue / booleanValue / referenceValue
+
+   referenceValue = "\"" escaped_INSTANCENAME "\""
+
+where:
+
+* NAMESPACE, CLASSNAME and PROPERTYNAME are namespace, class and key
+  property name, respectively, as used elsewhere in pywbemcli.
+
+* integerValue, charValue, stringValue, datetimeValue and
+  booleanValue are defined in ANNEX A of :term:`DSP0004`.
+  Note that stringValue and datetimeValue when used in INSTANCENAME have exactly
+  one set of surrounding double quotes (i.e. they cannot be constructed via
+  string concatenation).
+  Note that charValue when used in INSTANCENAME has exactly one set of
+  surrounding single quotes.
+  Note that DSP0004 prevents the use of real32 or real64 typed properties as
+  keys.
+
+* escaped_INSTANCENAME is a backslash-escaped INSTANCENAME where at
+  least backslash and double quote characters are backslash-escaped
+
+Note that the UNIX-like shells interpret single and double quotes in a certain
+way and remove them before passing the arguments on to the program invoked.
+Because the single and double quotes in INSTANCENAME need to be passed on to
+pywbemcli, they need to be protected from removal by the shell.
+This can be achieved by putting INSTANCENAME into single quotes if it only
+includes double quotes, or into double quotes if it only includes single quotes.
+If there is a mix of single and double quotes in INSTANCENAME, or if shell
+variables need to be expanded, this can be achieved by backslash-escaping any
+double quotes in INSTANCENAME, and putting it into double quotes.
+
+Examples for UNIX-like shells:
+
+.. code-block:: text
+
+   pywbemcli instance get /root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get /MY_Foo.ID=42
+   pywbemcli instance get "/MY_Foo.CharKey='x'"
+   pywbemcli instance get '/MY_Foo.InstanceID="foo1"'
+   pywbemcli instance get "/MY_Foo.InstanceID=\"$value\""
+   pywbemcli instance get '/MY_CS.CreationClassName="MY_CS",Name="MyComp"'
+   pywbemcli instance get '/MY_LogEntry.Timestamp="20190901183853.762122+120"'
+
+Examples for Windows command processor:
+
+.. code-block:: text
+
+   pywbemcli instance get /root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get /MY_Foo.ID=42
+   pywbemcli instance get /MY_Foo.CharKey='x'
+   pywbemcli instance get /MY_Foo.InstanceID="foo1"
+   pywbemcli instance get /MY_Foo.InstanceID="%value%"
+   pywbemcli instance get /MY_CS.CreationClassName="MY_CS",Name="MyComp"
+   pywbemcli instance get /MY_LogEntry.Timestamp="20190901183853.762122+120"
+
+
 .. _`Interactively selecting INSTANCENAME`:
 
 Interactively selecting INSTANCENAME
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Arguments like the INSTANCENAME on some of the instance group commands (
-``get``, ``references``, ``associators``, etc) can be very difficult to correctly enter
-since it can involve multiple keybindings, use of quotation marks, etc.  To
-simplify this pywbemcli includes a option (``-i`` or ``--interactive``) on
-these commands that allows the user to specify only the class name, retrieves
-all the instance names from the server and presents the user with a select list
-from which an instance name can be chosen. The following is an example:
+The INSTANCENAME argument has a certain complexity, particularly for
+associations and for classes with multiple keys.
+
+To simplify this, pywbemcli provides an option (``-i`` or ``--interactive``) on
+commands that have an INSTANCENAME argument, that allows the user to specify
+only the class name (as the INSTANCENAME argument value), retrieves all the
+instance names of that class from the server and presents the user with a
+select list from which an instance name can be chosen.
+
+Example:
 
 .. code-block:: text
 
