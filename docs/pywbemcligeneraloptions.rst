@@ -424,6 +424,16 @@ Setting the :ref:`--no-verify general option` bypasses client verification of
 the WBEM server certificate.
 
 
+.. _`--timestats general option`:
+
+--timestats general option
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This boolean general options enables the gathering and display of time
+statistics on the interactions with the WBEM server.  If enabled, the
+timestatistics are output after each command is executed including the
+operations executed, the size of the operations, and the execution time.
+
 .. _`--use-pull general option`:
 
 --use-pull general option

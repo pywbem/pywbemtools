@@ -290,7 +290,7 @@ TEST_CASES = [
      {'global': ['-m', SIMPLE_MOCK_FILE_PATH],
       'subcmd': 'connection',
       'args': ['show']},
-     {'stdout': ['name: default',
+     {'stdout': ['name: not-saved',
                  'server: None',
                  'mock-server:',
                  'simple_mock_model.mof',
@@ -500,7 +500,7 @@ TEST_CASES = [
 
     ['Verify Create a connection for test.',
      {'args': ['add',
-               '--name', 'globaltest1',
+               'generaltest1',
                '--server', 'http://blah',
                '--timeout', '45',
                '--use-pull', 'no',
@@ -513,22 +513,31 @@ TEST_CASES = [
       'subcmd': 'connection', },
      {'stdout': "",
       'test': 'lines'},
-     None, OK],
+     None, RUN],
 
     ['Verify --name and other options generates warnings but works',
-     {'global': ['--name', 'globaltest1', '--timeout', '90'],
+     {'global': ['--name', 'generaltest1'],
       'subcmd': 'connection',
-      'args': ['delete', 'globaltest1']},
-     {'stdout': ['WARNING: "timeout 90" ignored when "-n/--name used',
-                 'globaltest1'],
+      'args': ['show', 'generaltest1']},
+     {'stdout': ['generaltest1'],
       'rc': 0,
-      'test': 'regex'},
-     None, OK],
+      'test': 'innows'},
+     None, RUN],
+
+    ['Verify --name and other options generates warnings but works',
+     {'global': ['--name', 'generaltest1', '--timeout', '90'],
+      'subcmd': 'connection',
+      'args': ['delete', 'generaltest1']},
+     {'stdout': ['WARNING:',
+                 'timeout 90" ignored when "-n/--name or default name used'],
+      'rc': 0,
+      'test': 'innows'},
+     None, RUN],
 
     ['Verify connection already deleted.',
      {'subcmd': 'connection',
-      'args': ['delete', 'globaltest1']},
-     {'stderr': "globaltest1 not a defined connection name",
+      'args': ['delete', 'generaltest1']},
+     {'stderr': 'Connection name "generaltest1" does not exist',
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -546,6 +555,15 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify Create a connection fails if no name.',
+     {'args': ['add',
+               '--server', 'http://blah'],
+      'subcmd': 'connection', },
+     {'stderr': 'Missing argument "NAME"',
+      'rc': 2,
+      'test': 'innows'},
+     None, RUN],
+
 
     ['Verify --keyfile allowed only if --certfile exists.',
      {'subcmd': 'class',
@@ -556,6 +574,49 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      None, OK],
+
+    #
+    #  Test use of default connection
+    #
+
+    ['Verify Create a connection.',
+     {'args': ['add', 'test-default',
+               '--server', 'http://blah'],
+      'subcmd': 'connection', },
+     {'stdout': '',
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify select of test-default.',
+     {'args': ['select', 'test-default'],
+      'subcmd': 'connection', },
+     {'stdout': ['test-default', 'selected'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify shows test-default.',
+     {'args': ['show'],
+      'subcmd': 'connection', },
+     {'stdout': ['test-default'],
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Delete test-default.',
+     {'args': ['delete', 'test-default'],
+      'subcmd': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify delete worked.',
+     {'args': ['delete', 'test-default'],
+      'subcmd': 'connection', },
+     {'stderr': 'Connection name "test-default" does not exist',
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
 
     #
     # Test environment variables
@@ -659,4 +720,4 @@ class TestGlobalOptions(CLITestsBase):
         subcmd = inputs['subcmd'] if inputs['subcmd'] else ''
 
         self.subcmd_test(desc, subcmd, inputs, exp_response,
-                         mock, condition, verbose=False)
+                         mock, condition, verbose=True)
