@@ -447,7 +447,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         if use_pull is None:
             resolved_use_pull = ctx.obj.use_pull
         if pull_max_cnt is None:
-            resolved_pull_max_cnt = ctx.obj.use_pull
+            resolved_pull_max_cnt = ctx.obj.pull_max_cnt
         if not timestats:  # Defaults to False, not None
             resolved_timestats = ctx.obj.timestats
         if log is None:
