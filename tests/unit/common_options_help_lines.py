@@ -33,10 +33,10 @@ CMD_OPTION_NAMESPACE_HELP_LINE = \
     '-n, --namespace NAMESPACE Namespace to use for this command'
 
 CMD_OPTION_NAMES_ONLY_HELP_LINE = \
-    '-o, --names-only Retrieve only the object paths (names).'
+    '--no, --names-only Retrieve only the object paths (names).'
 
 CMD_OPTION_SUMMARY_HELP_LINE = \
-    '-S, --summary Show only a summary (count) of the objects.'
+    '-s, --summary Show only a summary (count) of the objects.'
 
 CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE = \
     '-l, --local-only Do not include superclass properties and methods in ' \
@@ -50,7 +50,7 @@ CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE = \
     'superclass properties'
 
 CMD_OPTION_PROPERTYLIST_HELP_LINE = \
-    '-p, --propertylist PROPERTYLIST Filter the properties included in'
+    '--pl, --propertylist PROPERTYLIST Filter the properties included in'
 
 CMD_OPTION_FILTER_QUERY_LINE = \
     '-f, --filter-query QUERY-STRING When pull operations are used, filter ' \
@@ -61,15 +61,15 @@ CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
     'used'
 
 CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
-    '--no-qualifiers Do not include qualifiers in the returned'
+    '--nq, --no-qualifiers Do not include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE = \
-    '-q, --include-qualifiers Include qualifiers in the returned'
+    '--iq, --include-qualifiers Include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE = \
-    '-q, --include-qualifiers When traditional operations are used, ' \
+    '--iq, --include-qualifiers When traditional operations are used, ' \
     'include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
-    '-c, --include-classorigin Include class origin information in the ' \
+    '--ico, --include-classorigin Include class origin information in the ' \
     'returned'

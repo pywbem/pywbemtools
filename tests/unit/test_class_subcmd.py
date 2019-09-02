@@ -61,10 +61,10 @@ CLASS_HELP_LINES = [
 CLASS_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME',
     'List the classes associated with a class.',
-    '-a, --assoc-class CLASSNAME Filter the result set by association class',
-    '-C, --result-class CLASSNAME Filter the result set by result class',
+    '--ac, --assoc-class CLASSNAME Filter the result set by association class',
+    '--rc, --result-class CLASSNAME Filter the result set by result class',
     '-r, --role PROPERTYNAME Filter the result set by source end role',
-    '-R, --result-role PROPERTYNAME Filter the result set by far end role',
+    '--rr, --result-role PROPERTYNAME Filter the result set by far end role',
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -125,7 +125,7 @@ CLASS_INVOKEMETHOD_HELP_LINES = [
 CLASS_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME',
     'List the classes referencing a class.',
-    '-R, --result-class CLASSNAME Filter the result set by result class',
+    '--rc, --result-class CLASSNAME Filter the result set by result class',
     '-r, --role PROPERTYNAME Filter the result set by source end role',
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
@@ -384,8 +384,8 @@ TEST_CASES = [
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo -c',
-     ['enumerate', 'CIM_Foo', '-c'],
+    ['Verify class subcommand enumerate CIM_Foo --ico',
+     ['enumerate', 'CIM_Foo', '--ico'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -398,14 +398,20 @@ TEST_CASES = [
       'test': 'startswith'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo -o names only',
-     ['enumerate', 'CIM_Foo', '-o'],
+    ['Verify class subcommand enumerate CIM_Foo --no names only',
+     ['enumerate', 'CIM_Foo', '--no'],
      {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate -o names only - table',
-     {'args': ['enumerate', '-o'],
+    ['Verify class subcommand enumerate CIM_Foo --names only',
+     ['enumerate', 'CIM_Foo', '--names-only'],
+     {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate --no names only - table',
+     {'args': ['enumerate', '--no'],
       'global': ['--output-format', 'table']},
      {'stdout': """Classnames:
 +--------------+
@@ -417,8 +423,8 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo -o names only - table',
-     {'args': ['enumerate', 'CIM_Foo', '-o'],
+    ['Verify class subcommand enumerate CIM_Foo --no names only - table',
+     {'args': ['enumerate', 'CIM_Foo', '--no'],
       'global': ['--output-format', 'table']},
      {'stdout': """Classnames:
 +--------------+
@@ -439,7 +445,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class subcommand enumerate CIM_Foo summary',
-     ['enumerate', 'CIM_Foo', '-S'],
+     ['enumerate', 'CIM_Foo', '-s'],
      {'stdout': ['2 CIMClass(s) returned'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -463,8 +469,8 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo names and -d -o',
-     ['enumerate', 'CIM_Foo', '-do'],
+    ['Verify class subcommand enumerate CIM_Foo names and -d --no',
+     ['enumerate', 'CIM_Foo', '-d', '--no'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -581,7 +587,7 @@ TEST_CASES = [
 
     # pylint: disable=line-too-long
     ['Verify class subcommand get with propertylist. Tests whole response',
-     ['get', 'CIM_Foo_sub2', '-p', 'InstanceID'],
+     ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Key ( true ),',
                  '       Description ( "This is key property." )]', ''
@@ -615,7 +621,7 @@ TEST_CASES = [
 
     ['Verify class subcommand get with empty propertylist. Tests whole '
      'response',
-     ['get', 'CIM_Foo_sub2', '-p', '""'],
+     ['get', 'CIM_Foo_sub2', '--pl', '""'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Description ( "Method with in and out parameters" )'
                  ']',
@@ -674,7 +680,7 @@ TEST_CASES = [
     # pylint: enable=line-too-long
     # TODO include class origin. TODO not returning class origin correctly.
     ['Verify class subcommand get with propertylist and classorigin,',
-     ['get', 'CIM_Foo_sub2', '-p', 'InstanceID', '-c'],
+     ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID', '-c'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
                  '      [Key ( true ),',
                  '       Description ( "This is key property." )]', ''
@@ -981,7 +987,7 @@ TEST_CASES = [
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class subcommand associators simple request, one parameter',
-     ['associators', 'TST_Person', '-a', 'TST_MemberOfFamilyCollection'],
+     ['associators', 'TST_Person', '--ac', 'TST_MemberOfFamilyCollection'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
@@ -1018,10 +1024,10 @@ TEST_CASES = [
 
     ['Verify class subcommand associators request, all filters short',
      ['associators', 'TST_Person',
-      '-a', 'TST_MemberOfFamilyCollection',
+      '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'member',
-      '-R', 'family',
-      '-C', 'TST_Person'],
+      '--rr', 'family',
+      '--rc', 'TST_Person'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
@@ -1039,10 +1045,10 @@ TEST_CASES = [
     ['Verify class subcommand associators request, all filters short,  -a '
      'does not pass test',
      ['associators', 'TST_Person',
-      '-a', 'TST_MemberOfFamilyCollectionx',
+      '--ac', 'TST_MemberOfFamilyCollectionx',
       '-r', 'member',
-      '-R', 'family',
-      '-C', 'TST_Person'],
+      '--rr', 'family',
+      '--rc', 'TST_Person'],
      {'stdout': [],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
@@ -1050,32 +1056,43 @@ TEST_CASES = [
     ['Verify class subcommand associators request, all filters short,  -r '
      'does not pass test',
      ['associators', 'TST_Person',
-      '-a', 'TST_MemberOfFamilyCollection',
+      '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'memberx',
-      '-R', 'family',
-      '-C', 'TST_Person'],
+      '--rr', 'family',
+      '--rc', 'TST_Person'],
      {'stdout': [],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class subcommand associators request, all filters short,  -R '
+    ['Verify class subcommand associators request, all filters short,  -rr '
      'does not pass test',
      ['associators', 'TST_Person',
-      '-a', 'TST_MemberOfFamilyCollection',
+      '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'member',
-      '-R', 'familyx',
-      '-C', 'TST_Person'],
+      '--rr', 'familyx',
+      '--rc', 'TST_Person'],
      {'stdout': [],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class subcommand associators request, all filters short,  -C '
+    ['Verify class subcommand associators request, all filters short,  --rc '
      'does not pass test',
      ['associators', 'TST_Person',
-      '-a', 'TST_MemberOfFamilyCollection',
+      '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'member',
-      '-R', 'family',
-      '-C', 'TST_Personx'],
+      '--rr', 'family',
+      '--rc', 'TST_Personx'],
+     {'stdout': [],
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class subcommand associators request, all filters long '
+     'does not pass test',
+     ['associators', 'TST_Person',
+      '--assoc-class', 'TST_MemberOfFamilyCollection',
+      '--role', 'member',
+      '--result-role', 'family',
+      '--result-class', 'TST_Personx'],
      {'stdout': [],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
@@ -1125,7 +1142,7 @@ TEST_CASES = [
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class subcommand references simple request -o',
-     ['references', 'TST_Person', '-o'],
+     ['references', 'TST_Person', '--no'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage',
                  '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection'],
       'test': 'linesnows'},
@@ -1135,6 +1152,15 @@ TEST_CASES = [
      ['references', 'TST_Person',
       '--role', 'member',
       '--result-class', 'TST_MemberOfFamilyCollection'],
+     {'stdout': REFERENCES_CLASS_RTN_QUALS2,
+      'test': 'linesnows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+
+    ['Verify class subcommand references request, filters short',
+     ['references', 'TST_Person',
+      '-r', 'member',
+      '--rc', 'TST_MemberOfFamilyCollection'],
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],

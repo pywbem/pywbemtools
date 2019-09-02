@@ -39,21 +39,21 @@ from .config import DEFAULT_QUERY_LANGUAGE
 
 # This is instance-only because the default is False for include-qualifiers
 # on instances but True on classes
-includequalifiers_option = [              # pylint: disable=invalid-name
-    click.option('--iq', '--include-qualifiers', is_flag=True, required=False,
-                 help='If set, requests server to include qualifiers in the '
-                 'returned instances. Not all servers return qualifiers on '
-                 'instances')]
+include_qualifiers_get_option = [              # pylint: disable=invalid-name
+    click.option('--iq', '--include-qualifiers', 'include_qualifiers',
+                 is_flag=True, required=False,
+                 help='Include qualifiers in the returned instance. '
+                      'Not all servers return qualifiers on instances. '
+                      'Default: Do not include qualifiers.')]
 
-includequalifiersenum_option = [              # pylint: disable=invalid-name
-    click.option('--iq', '--include-qualifiers', is_flag=True, required=False,
-                 help='If set, requests server to include qualifiers in the '
-                 'returned instances. This command may use either pull '
-                 'or traditional operations depending on the server '
-                 'and the "--use-pull" general option. If pull operations '
-                 'are used, qualifiers will not be included, even if this '
-                 'option is specified. If traditional operations are used, '
-                 'inclusion of qualifiers depends on the server.')]
+include_qualifiers_list_option = [              # pylint: disable=invalid-name
+    click.option('--iq', '--include-qualifiers', 'include_qualifiers',
+                 is_flag=True, required=False,
+                 help='When traditional operations are used, include '
+                      'qualifiers in the returned instances. '
+                      'Some servers may ignore this option. '
+                      'By default, and when pull operations are used, '
+                      'qualifiers will never be included.')]
 
 # specific to instance because DeepInheritance differs between class and
 # instance operations.
@@ -80,7 +80,6 @@ local_only_list_option = [              # pylint: disable=invalid-name
 
 interactive_option = [              # pylint: disable=invalid-name
     click.option('-i', '--interactive', is_flag=True, required=False,
-<<<<<<< HEAD
                  help='Prompt for selecting an instance from a list. '
                       'If used, the INSTANCENAME argument must be a class '
                       'name, and the instances of that class are presented.')]
@@ -107,33 +106,15 @@ property_modify_option = [              # pylint: disable=invalid-name
                       'Default: No properties modified.')]
 
 filter_query_language_option = [              # pylint: disable=invalid-name
-    click.option('--filter-query-language', type=str, metavar='QUERY-LANGUAGE',
-=======
-                 help='If set, `INSTANCENAME` argument must be a class rather '
-                      'than an instance and user is presented with a list of '
-                      'instances of the class from which the instance to '
-                      'process is selected.')]
-
-instance_property_option = [              # pylint: disable=invalid-name
-    click.option('-P', '--property', type=str, metavar='name=value',
-                 required=False,
-                 multiple=True,
-                 help='Optional property names of the form name=value. '
-                 'Multiple definitions allowed, one for each property to be '
-                 'included in the createdinstance. Array property values '
-                 'defined by comma-separated-values. EmbeddedInstance not '
-                 'allowed.')]
-
-filterquerylanguage_option = [              # pylint: disable=invalid-name
-    click.option('--fql', '--filter-query-language', type=str, required=False,
->>>>>>> WIP
+    click.option('--filter-query-language', type=str,
+                 metavar='QUERY-LANGUAGE',
                  default=None,
                  help='The filter query language to be used with '
                       '--filter-query. '
                       'Default: DMTF:FQL.')]
 
-filterquery_option = [              # pylint: disable=invalid-name
-    click.option('-fq', '--filter-query', type=str, required=False,
+filter_query_option = [              # pylint: disable=invalid-name
+    click.option('-f', '--filter-query', type=str, metavar='QUERY-STRING',
                  default=None,
                  help='When pull operations are used, filter the instances in '
                       'the result via a filter query. '
@@ -261,17 +242,16 @@ def instance_create(context, classname, **options):
 
 @instance_group.command('modify', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@add_options(instance_property_option)
-@click.option('-pl', '--propertylist', multiple=True, type=str,
-              default=None, metavar='<property name>',
-              help='Define a propertylist for the request. If option '
-                   'not specified a Null property list is created. Multiple '
-                   'properties may be defined with either a comma '
-                   'separated list defining the option multiple times. '
-                   '(ex: -p pn1 -p pn22 or -p pn1,pn2). If defined as '
-                   'empty string an empty propertylist is created. The '
-                   'server uses the propertylist to limit changes made to '
-                   'the instance to properties in the propertylist.')
+@add_options(property_modify_option)
+@click.option('--pl', '--propertylist', 'propertylist', multiple=True, type=str,
+              default=None, metavar='PROPERTYLIST',
+              help='Reduce the properties to be modified (as per '
+              '--property) to a specific property list. '
+              'Multiple properties may be specified with either a '
+              'comma-separated list or by using the option multiple '
+              'times. The empty string will cause no properties to '
+              'be modified. '
+              'Default: Do not reduce the properties to be modified.')
 @add_options(interactive_option)
 @add_options(verify_option)
 @add_options(namespace_option)
@@ -312,7 +292,7 @@ def instance_modify(context, instancename, **options):
 @instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
-@click.option('--pa', '--parameter', type=str, metavar='name=value',
+@click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
               help='Specify a method input parameter with its value. '
                    'May be specified multiple times. '
@@ -406,11 +386,10 @@ def instance_enumerate(context, classname, **options):
 
 @instance_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('--rc', '--resultclass', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the result class name provided. Each returned '
-                   'instance (or instance name) should be a member of this '
-                   'class or its subclasses. Optional')
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False, metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')
@@ -465,32 +444,22 @@ def instance_references(context, instancename, **options):
 
 @instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('--ac', '--assoc-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the association class name provided.Each '
-                   'returned instance (or instance name) should be associated '
-                   'to the source instance through this class or its '
-                   'subclasses. Optional.')
-@click.option('--rc', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the result class name provided. Each '
-                   'returned instance (or instance name) should be a member '
-                   'of this class or one of its subclasses. Optional')
+@click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by association class name. '
+                   'Subclasses of the specified class also match.')
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False, metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned instance '
-              '(or instance name)should be associated with the source instance '
-              '(INSTANCENAME) through an association with this role (property '
-              'name in the association that matches this parameter). Optional.')
-@click.option('--rr', '--result-role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the result role name provided. Each returned '
-              'instance (or instance name)should be associated with the source '
-              ' instance name (`INSTANCENAME`) through an association with '
-              'returned object having this role (property name in the '
-              'association that matches this parameter). Optional.')
-@add_options(includequalifiersenum_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@click.option('--rr', '--result-role', 'result_role', type=str, required=False,
+              metavar='PROPERTYNAME',
+              help='Filter the result set by far end role name.')
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
@@ -539,11 +508,13 @@ def instance_associators(context, instancename, **options):
 
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)
-@click.argument('query', type=str, required=True, metavar='QUERY_STRING')
-@click.option('--ql', '--query-language', type=str, required=False,
-              metavar='QUERY LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
-              help='Use the query language defined. '
-                   '(Default: {of}.'.format(of=DEFAULT_QUERY_LANGUAGE))
+@click.argument('query', type=str, required=True, metavar='QUERY-STRING')
+@click.option('--ql', '--query-language', 'query_language', type=str,
+              metavar='QUERY-LANGUAGE',
+              default=DEFAULT_QUERY_LANGUAGE,
+              help='The query language to be used with --query. '
+              'Default: {default}.'.
+              format(default=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
 @add_options(summary_option)
 @click.pass_obj
@@ -868,7 +839,7 @@ def cmd_instance_references(context, instancename, options):
                 instancepath,
                 ResultClass=options['result_class'],
                 Role=options['role'],
-                IncludeQualifiers=options["include_qualifiers"],
+                IncludeQualifiers=options['include_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
@@ -907,8 +878,8 @@ def cmd_instance_associators(context, instancename, options):
                 ResultClass=options['result_class'],
                 ResultRole=options['result_role'],
                 FilterQuery=options['filter_query'],
-                MaxObjectCount=context.pull_max_cnt,
-                FilterQueryLanguage=get_filterquerylanguage(options))
+                FilterQueryLanguage=get_filterquerylanguage(options),
+                MaxObjectCount=context.pull_max_cnt)
         else:
             results = context.conn.PyWbemcliAssociatorInstances(
                 instancepath,
@@ -916,7 +887,7 @@ def cmd_instance_associators(context, instancename, options):
                 Role=options['role'],
                 ResultClass=options['result_class'],
                 ResultRole=options['result_role'],
-                IncludeQualifiers=options["include_qualifiers"],
+                IncludeQualifiers=options['include_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),

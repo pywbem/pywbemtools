@@ -40,7 +40,7 @@ from ._displaytree import display_class_tree
 #
 
 no_qualifiers_class_option = [              # pylint: disable=invalid-name
-    click.option('--no-qualifiers', 'includequalifiers', is_flag=True,
+    click.option('--nq', '--no-qualifiers', 'no_qualifiers', is_flag=True,
                  default=True,
                  help='Do not include qualifiers in the returned class(es). '
                       'Default: Include qualifiers.')]
@@ -226,11 +226,10 @@ def class_enumerate(context, classname, **options):
 
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('--rc', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the classname provided. Each returned '
-                   'class (or classname) should be this class or its '
-                   'subclasses. Optional.')
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False, metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
               help='Filter the result set by source end role name.')
@@ -272,32 +271,23 @@ def class_references(context, classname, **options):
 
 @class_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@click.option('--ac', '--assoc-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter by the association class name provided. Each '
-                   'returned class (or class name) should be associated to the '
-                   'source class through this class or its subclasses. '
-                   'Optional.')
-@click.option('--rc', '--result-class', type=str, required=False,
-              metavar='<class name>',
-              help='Filter the returned objects by the class name provided. '
-                   'Each returned class (or class name) should be this class '
-                   'or one of its subclasses. Optional')
+@click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by association class name. '
+                   'Subclasses of the specified class also match.')
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False,
+              metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the role name provided. Each returned class '
-              '(or class name)should be associated with the source class '
-              '(CLASSNAME) through an association with this role (property '
-              'name in the association that matches this parameter). Optional.')
-@click.option('--rr', '--result-role', type=str, required=False,
-              metavar='<role name>',
-              help='Filter by the result role name provided. Each returned '
-              'class (or class name)should be associated with the source class '
-              '(CLASSNAME) through an association with returned object having '
-              'this role (property name in the association that matches this '
-              'parameter). Optional.')
-@add_options(includeclassqualifiers_option)
-@add_options(includeclassorigin_option)
+              metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@click.option('--rr', '--result-role', 'result_role', type=str, required=False,
+              metavar='PROPERTYNAME',
+              help='Filter the result set by far end role name.')
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
@@ -435,7 +425,7 @@ def cmd_class_get(context, classname, options):
             classname,
             namespace=options['namespace'],
             LocalOnly=options['local_only'],
-            IncludeQualifiers=options['includequalifiers'],
+            IncludeQualifiers=options['no_qualifiers'],
             IncludeClassOrigin=options['include_classorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
@@ -472,7 +462,7 @@ def cmd_class_enumerate(context, classname, options):
                 namespace=options['namespace'],
                 LocalOnly=options['local_only'],
                 DeepInheritance=options['deep_inheritance'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'])
 
         display_cim_objects(context, results, context.output_format,
@@ -501,7 +491,7 @@ def cmd_class_references(context, classname, options):
                 classname,
                 ResultClass=options['result_class'],
                 Role=options['role'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 
@@ -535,7 +525,7 @@ def cmd_class_associators(context, classname, options):
                 Role=options['role'],
                 ResultClass=options['result_class'],
                 ResultRole=options['result_role'],
-                IncludeQualifiers=options['includequalifiers'],
+                IncludeQualifiers=options['no_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 

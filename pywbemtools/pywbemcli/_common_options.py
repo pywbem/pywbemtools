@@ -27,28 +27,36 @@ import click
 # multiple places in the command structure.
 #
 propertylist_option = [                      # pylint: disable=invalid-name
-    click.option('--pl', '--propertylist', multiple=True, type=str,
-                 default=None, metavar='<property name>',
-                 help='Define a propertylist for the request. If option '
-                      'not specified a Null property list is created and the '
-                      'server returns all properties. Multiple properties may '
-                      'be defined with either a comma separated list or by '
-                      'using the option multiple times. '
-                      '(ex: -p pn1 -p pn22 or -p pn1,pn2). '
-                      'If defined as empty string the server should return no '
-                      'properties.')]
+    click.option('--pl', '--propertylist', 'propertylist', multiple=True,
+                 type=str,
+                 default=None, metavar='PROPERTYLIST',
+                 help='Filter the properties included in the returned '
+                      'object(s). '
+                      'Multiple properties may be specified with either a '
+                      'comma-separated list or by using the option multiple '
+                      'times. Properties specified in this option that are '
+                      'not in the object(s) will be ignored. '
+                      'The empty string will include no properties. '
+                      'Default: Do not filter properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name
-    click.option('--no', '--names-only', is_flag=True, required=False,
-                 help='Retrieve only the returned object names.')]
-
-sort_option = [                            # pylint: disable=invalid-name
-    click.option('--so', '--sort', is_flag=True, required=False,
-                 help='Sort into alphabetical order by classname.')]
-
-includeclassorigin_option = [            # pylint: disable=invalid-name
-    click.option('--ico', '--include-classorigin', is_flag=True,
+    click.option('--no', '--names-only', 'names_only', is_flag=True,
                  required=False,
+                 help='Retrieve only the object paths (names). '
+                      'Default: Retrieve the complete objects including '
+                      'object paths.')]
+
+include_classorigin_instance_option = [         # pylint: disable=invalid-name
+    click.option('--ico', '--include-classorigin', 'include_classorigin',
+                 is_flag=True, required=False,
+                 help='Include class origin information in the returned '
+                      'instance(s). '
+                      'Some servers may ignore this option. '
+                      'Default: Do not include class origin information.')]
+
+include_classorigin_class_option = [            # pylint: disable=invalid-name
+    click.option('--ico', '--include-classorigin', 'include_classorigin',
+                 is_flag=True, required=False,
                  help='Include class origin information in the returned '
                       'class(es). '
                       'Default: Do not include class origin information.')]
@@ -59,9 +67,9 @@ namespace_option = [                     # pylint: disable=invalid-name
                  help='Namespace to use for this command, instead of the '
                       'default namespace of the connection.')]
 
-summary_objects_option = [              # pylint: disable=invalid-name
+summary_option = [              # pylint: disable=invalid-name
     click.option('-s', '--summary', is_flag=True, required=False,
-                 help='Return only summary of objects (count).')]
+                 help='Show only a summary (count) of the objects.')]
 
 verify_option = [              # pylint: disable=invalid-name
     click.option('-V', '--verify', is_flag=True, required=False,

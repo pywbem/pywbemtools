@@ -72,10 +72,10 @@ INSTANCE_HELP_LINES = [
 INSTANCE_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME',
     'List the instances associated with an instance.',
-    '-a, --assoc-class CLASSNAME Filter the result set by association clas',
-    '-C, --result-class CLASSNAME Filter the result set by result class',
+    '--ac, --assoc-class CLASSNAME Filter the result set by association clas',
+    '--rc, --result-class CLASSNAME Filter the result set by result class',
     '-r, --role PROPERTYNAME Filter the result set by source end role',
-    '-R, --result-role PROPERTYNAME Filter the result set by far end role',
+    '--rr, --result-role PROPERTYNAME Filter the result set by far end role',
     CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -155,7 +155,7 @@ INSTANCE_MODIFY_HELP_LINES = [
     'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
     'Modify properties of an instance.',
     '-P, --property PROPERTYNAME=VALUE Property to be modified',
-    '-p, --propertylist PROPERTYLIST Reduce the properties to be modified',
+    '--pl, --propertylist PROPERTYLIST Reduce the properties to be modified',
     CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -174,7 +174,7 @@ INSTANCE_QUERY_HELP_LINES = [
 INSTANCE_REFERENCES_HELP_LINES = [
     'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
     'List the instances referencing an instance.',
-    '-R, --result-class CLASSNAME Filter the result set by result class',
+    '--rc, --result-class CLASSNAME Filter the result set by result class',
     '-r, --role PROPERTYNAME Filter the result set by source end role',
     CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
@@ -342,22 +342,22 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo -o',
-     ['enumerate', 'CIM_Foo', '-o'],
+    ['Verify instance subcommand enumerate names CIM_Foo --no',
+     ['enumerate', 'CIM_Foo', '--no'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo -o -s',
-     ['enumerate', 'CIM_Foo', '-o', '--summary'],
+    ['Verify instance subcommand enumerate names CIM_Foo --no -s',
+     ['enumerate', 'CIM_Foo', '--no', '--summary'],
      {'stdout': ['3 CIMInstanceName(s) returned'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo -o --namespace',
-     ['enumerate', 'CIM_Foo', '-o', '--namespace', 'root/cimv2'],
+    ['Verify instance subcommand enumerate names CIM_Foo --no --namespace',
+     ['enumerate', 'CIM_Foo', '--no', '--namespace', 'root/cimv2'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
@@ -423,7 +423,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
-     {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
+     {'args': ['enumerate', 'CIM_Foo', '-d', '--no'],
       'global': ['--output-format', 'grid']},
      {'stdout': """InstanceNames: CIM_Foo
 +--------+-------------+---------+-----------------------+
@@ -440,7 +440,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
-     {'args': ['enumerate', 'CIM_Foo', '-d', '-o'],
+     {'args': ['enumerate', 'CIM_Foo', '-d', '--no'],
       'global': ['--output-format', 'txt']},
      {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
@@ -469,7 +469,7 @@ TEST_CASES = [
 
     ['Verify instance subcommand -o grid enumerate di alltypes, datetime',
      {'args': ['enumerate', 'Pywbem_Alltypes', '-d',
-               '--propertylist', 'scalDateTime', '-p', 'scalTimeDelta'],
+               '--propertylist', 'scalDateTime', '--pl', 'scalTimeDelta'],
       'global': ['--output-format', 'grid']},
      {'stdout': ["""Instances: PyWBEM_AllTypes
 +-----------------------------+
@@ -702,7 +702,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename prop list -p returns '
      ' one property',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-p', 'InstanceID'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '};',
@@ -724,7 +724,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename prop list -p  '
      ' InstanceID,IntegerProp returns 2 properties',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-p', 'InstanceID,IntegerProp'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID,IntegerProp'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -736,8 +736,8 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename prop list -p '
      ' multiple instances of option returns 2 properties',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-p', 'InstanceID',
-      '-p', 'IntegerProp'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID',
+      '--pl', 'IntegerProp'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -749,7 +749,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename empty  prop list '
      'returns  empty instance',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-p', '""'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', '""'],
      {'stdout': ['instance of CIM_Foo {',
                  '};',
                  ''],
@@ -1254,8 +1254,8 @@ Instances: PyWBEM_AllTypes
       'test': 'lineswons'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths',
-     ['references', 'TST_Person.name="Mike"', '-o'],
+    ['Verify instance subcommand references --no, returns paths',
+     ['references', 'TST_Person.name="Mike"', '--no'],
      {'stdout': ['"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
                  '=\"root/cimv2:TST_Person.name=\\"Mike\\""',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
@@ -1265,9 +1265,9 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance subcommand references --no, returns paths with result '
      'class valid returns paths',
-     ['references', 'TST_Person.name="Mike"', '-o',
+     ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
@@ -1303,7 +1303,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand references -o, returns paths with result '
      'class valid returns paths sorted',
-     ['references', 'TST_Person.name="Mike"', '-o',
+     ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
@@ -1313,28 +1313,28 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand references -o, returns paths with result '
      'class short form valid returns paths',
-     ['references', 'TST_Person.name="Mike"', '-o',
-      '-R', 'TST_Lineage'],
+     ['references', 'TST_Person.name="Mike"', '--no',
+      '--rc', 'TST_Lineage'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
                  '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance subcommand references --no, returns paths with result '
      'class short form valid returns paths',
-     ['references', 'TST_Person.name="Mike"', '-o', '--summary',
-      '-R', 'TST_Lineage'],
+     ['references', 'TST_Person.name="Mike"', '--no', '--summary',
+      '--rc', 'TST_Lineage'],
      {'stdout': ['2 CIMInstanceName(s) returned'],
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance subcommand references --no, returns paths with result '
      'class short form valid returns paths',
-     {'args': ['references', 'TST_Person.name="Mike"', '-o', '--summary',
-               '-R', 'TST_Lineage'],
+     {'args': ['references', 'TST_Person.name="Mike"', '--no', '--summary',
+               '--rc', 'TST_Lineage'],
       'global': ['--output-format', 'table']},
      {'stdout': ["""Summary of CIMInstanceName returned
 +---------+-----------------+
@@ -1347,10 +1347,10 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -S, returns paths with result '
+    ['Verify instance subcommand references -s, returns paths with result '
      'class short form valid returns paths',
-     ['references', 'TST_Person.name="Mike"', '-S',
-      '-R', 'TST_Lineage'],
+     ['references', 'TST_Person.name="Mike"', '-s',
+      '--rc', 'TST_Lineage'],
      {'stdout': ['2 CIMInstance(s) returned'],
       'rc': 0,
       'test': 'lines'},
@@ -1373,7 +1373,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand references -o, returns paths with result '
      'class not a real ref returns no paths',
-     ['references', 'TST_Person.name="Mike"', '-o',
+     ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineagex'],
      {'stdout': [],
       'rc': 0,
@@ -1476,7 +1476,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators -o, returns data',
-     ['associators', 'TST_Person.name="Mike"', '-o'],
+     ['associators', 'TST_Person.name="Mike"', '--no'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'
                  '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
                  '//FakedUrl/root/cimv2:TST_Person.name="Sofi"'],
