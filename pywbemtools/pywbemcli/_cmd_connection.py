@@ -306,7 +306,7 @@ def connection_list(context):
     List the persistent WBEM connection definitions.
 
     This command displays all entries in the connections file as
-    a table using the command line output_format to define the
+    a table using the command line output format to define the
     table format.
 
     An "*" after the name indicates the currently selected connection.
@@ -606,7 +606,7 @@ def cmd_connection_list(context):
 
     headers = ['name', 'server', 'namespace', 'user',
                'timeout', 'no-verify', 'certfile', 'keyfile', 'log',
-               'mock_server']
+               'mock-server']
 
     headers, rows = hide_empty_columns(headers, rows)
 

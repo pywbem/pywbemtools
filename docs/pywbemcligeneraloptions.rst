@@ -426,7 +426,7 @@ the WBEM server certificate.
 
 .. _`--use-pull general option`:
 
---use_pull general option
+--use-pull general option
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The argument value of the ``--use-pull/-u`` general option is one of the following
@@ -666,11 +666,11 @@ The following example forces the use of the pull operations  and expects the
 WBEM server to return no more that 10 instances per request. It returns an
 exception if the pull operations are not supported in the WBEM server::
 
-    pywbemcli --server http/localhost use_pull=yes max_object_cnt=10
+    pywbemcli --server http/localhost --use-pull=yes max_object_cnt=10
 
-Since the default for use_pull is ``either``, normally pywbem first tries
+Since the default for ``--use-pull`` is ``either``, normally pywbem first tries
 the pull operation and then if that fails, the traditional operation.  That
-is probably the most logical setting for ``use_pull`` unless you are
+is probably the most logical setting for ``--use-pull`` unless you are
 specifically testing the use of pull operations.
 
 

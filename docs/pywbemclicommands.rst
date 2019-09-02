@@ -99,7 +99,7 @@ ReferenceNames(class)              class references CLASSNAME --name_only
 InvokeMethod                       instance invokemethod INSTANCENAME --name_only
 ReferenceNames                     class invokemethod CLASSNAME --name_only
 ExecQuery                          instance query
-**Pull Operations:**               Option --use_pull ``either`` or ``yes``
+**Pull Operations:**               Option --use-pull ``either`` or ``yes``
 OpenEnumerateInstances             instance enumerate INSTANCENAME
 OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
 OpenAssociatorInstances            instance associators INSTANCENAME
@@ -686,7 +686,7 @@ CIMQualifierDeclaration entities in the WBEM server including:
 
 * **get** to get a single qualifier declaration defined by the ``QUALIFIERNAME``
   argument from the namespace in the target WBEM server defined with this
-  command  or the default_namespace and display in the defined output format.
+  command  or the default namespace and display in the defined output format.
   The output formats can be either one of the :term:`CIM object output formats`
   or the table formats` (see :ref:`Output formats`).
 
@@ -939,7 +939,7 @@ options for pywbemcli. The data includes:
 * **name** name of the connection (required).
 * **server** the url for the defined connection (required unless
   ``--mock-server``/``-m`` defined).
-* **default_namespace** the default namespace defined for the connection
+* **default-namespace** the default namespace defined for the connection
   (required).
 * **user** the user name for the connection (optional).
 * **password** the password for the connection (optional).
@@ -949,17 +949,17 @@ options for pywbemcli. The data includes:
   received from the WBEM server during connection setup.
 * **certfile** optional server certificate filename.
 * **keyfile** optional client private keyfile filename.
-* **use_pull** optional parameter that defines whether pull operations are
+* **use-pull** optional parameter that defines whether pull operations are
   to be required, used if they exist or not used.
-* **pull_max_cnt** optional count of object per pull operation.
+* **pull-max-cnt** optional count of object per pull operation.
 * **timeout** optional timeout value.
 * **timestats** boolean that determines if time stats are captured.
 * **log** optional log configuration.
 * **verbose** optional boolean that enables the verbose mode.
 * **output-format** optional output format.
-* **mock_server** optional definition of the files that define a mock server
+* **mock-server** optional definition of the files that define a mock server
   environment using the pywbem mock module. This parameter is used, the
-  ``--server_url`` must not be defined.
+  ``--server`` must not be defined.
 
 The connection information is saved in the :term:`connections file` when the
 ``connection add`` or ``connection save`` command are executed. Multiple
@@ -978,11 +978,11 @@ The commands include:
 
   .. code-block:: text
 
-    pywbemcli> connection add --name me --server http://localhost --user me --password mypw -no-verify
+    pywbemcli> connection add --name me --server http://localhost --user me --password mypw --no-verify
     pywbemcli> connection list
     WBEM server connections:
     +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
-    | name         | server uri       | namespace   | user        |   timeout | no-verify  | mock_server                            |
+    | name         | server           | namespace   | user        |   timeout | no-verify  | mock-server                            |
     |--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------|
     | blahblah     | http://blah      | root/cimv2  |             |        45 | False      |                                        |
     | mock1        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
