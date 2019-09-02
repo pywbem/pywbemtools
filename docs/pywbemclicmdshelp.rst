@@ -856,7 +856,7 @@ The following defines the help output for the `pywbemcli connection list --help`
       List the persistent WBEM connection definitions.
 
       This command displays all entries in the connections file as a table using
-      the command line output_format to define the table format.
+      the command line output format to define the table format.
 
       An "*" after the name indicates the currently selected connection.
 
