@@ -165,11 +165,11 @@ class ConnectionRepository(object):
                                     replace_underscores=True, **svr)
                             ConnectionRepository._loaded = True
                     except KeyError as ke:
-                        raise KeyError("Items missing from json record %s in "
-                                       "connection file %s" %
+                        raise KeyError("Items missing from record %s in "
+                                       "connections file %s" %
                                        (ke, self._connections_file))
                 except ValueError as ve:
-                    raise ValueError("Invalid json in connection file %s. "
+                    raise ValueError("Invalid YAML in connections file %s. "
                                      "Exception %s" %
                                      (self._connections_file, ve))
 

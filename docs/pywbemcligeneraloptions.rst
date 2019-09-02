@@ -1047,7 +1047,7 @@ Pywbemcli persisted connection definitions
 
 Pywbemcli can manage connections via the :ref:`connection command group`. These
 connections are persisted in a :term:`connections file` named
-`pywbemcli_connections.json` in the current directory. A connection has a name
+`pywbemcli_connection_definitions.yaml` in the current directory. A connection has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined
 these connections can be accessed with the general option ``--name`` or in the
 interactive mode the ``connection select`` command.
