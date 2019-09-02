@@ -66,26 +66,26 @@ Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
       https://pywbemtools.readthedocs.io/en/stable/
 
 Options:
-  -n, --name NAME                 Use the WBEM server defined by the
-                                  persistent WBEM connection NAME. This option
-                                  is mutually exclusive with the --server and
+  -n, --name NAME                 Use the WBEM server defined by the WBEM
+                                  connection definition NAME. This option is
+                                  mutually exclusive with the --server and
                                   --name options, since each defines a WBEM
                                   server. Default: EnvVar PYWBEMCLI_NAME, or
                                   none.
-  -m, --mock-server FILE          Use a mock WBEM server that is created under
-                                  the covers and populated with CIM objects
-                                  that are defined in the specified MOF file
-                                  or Python script file. See the pywbemcli
-                                  documentation for more information. This
-                                  option may be specified multiple times, and
-                                  is mutually exclusive with the --server and
-                                  --name options, since each defines a WBEM
-                                  server. Default: EnvVar
+  -m, --mock-server FILE          Use a mock WBEM server that is automatically
+                                  created in pywbemcli and populated with CIM
+                                  objects that are defined in the specified
+                                  MOF file or Python script file. See the
+                                  pywbemcli documentation for more
+                                  information. This option may be specified
+                                  multiple times, and is mutually exclusive
+                                  with the --server and --name options, since
+                                  each defines a WBEM server. Default: EnvVar
                                   PYWBEMCLI_MOCK_SERVER, or none.
-  -s, --server URL                Use the WBEM server at the specified URL of
-                                  format: [SCHEME://]HOST[:PORT]. SCHEME must
-                                  be "https" (default) or "http". HOST is a
-                                  short or long hostname or literal IPV4/v6
+  -s, --server URL                Use the WBEM server at the specified URL
+                                  with format: [SCHEME://]HOST[:PORT]. SCHEME
+                                  must be "https" (default) or "http". HOST is
+                                  a short or long hostname or literal IPV4/v6
                                   address. PORT defaults to 5989 for https and
                                   5988 for http. This option is mutually
                                   exclusive with the --mock-server and --name
@@ -124,7 +124,7 @@ Options:
   -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                   for operations with the WBEM server that
                                   return lists of instances, as follows: "yes"
-                                  uses pull operations, failing if not
+                                  uses pull operations and fails if not
                                   supported by the server; "no" uses
                                   traditional operations; "either" (default)
                                   uses pull operations if supported by the
@@ -167,7 +167,7 @@ Options:
 
 Commands:
   class       Command group for CIM classes.
-  connection  Command group for persistent WBEM connections.
+  connection  Command group for WBEM connection definitions.
   help        Show help message for interactive mode.
   instance    Command group for CIM instances.
   qualifier   Command group for CIM qualifier declarations.

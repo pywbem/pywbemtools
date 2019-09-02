@@ -61,8 +61,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-n', '--name', type=str, metavar='NAME',
               # defaulted in code
               envvar=PywbemServer.name_envvar,
-              help='Use the WBEM server defined by the persistent WBEM '
-                   'connection NAME. '
+              help='Use the WBEM server defined by the WBEM connection '
+                   'definition NAME. '
                    'This option is mutually exclusive with the --server '
                    'and --name options, since each defines a WBEM server. '
                    'Default: EnvVar {ev}, or none.'.
@@ -70,9 +70,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
               # defaulted in code
               envvar=PywbemServer.mock_server_envvar,
-              help='Use a mock WBEM server that is created under the covers '
-                   'and populated with CIM objects that are defined in the '
-                   'specified MOF file or Python script file. '
+              help='Use a mock WBEM server that is automatically created in '
+                   'pywbemcli and populated with CIM objects that are defined '
+                   'in the specified MOF file or Python script file. '
                    'See the pywbemcli documentation for more information. '
                    'This option may be specified multiple times, and is '
                    'mutually exclusive with the --server and --name options, '
@@ -82,7 +82,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-s', '--server', type=str, metavar='URL',
               # defaulted in code
               envvar=PywbemServer.server_envvar,
-              help='Use the WBEM server at the specified URL of format: '
+              help='Use the WBEM server at the specified URL with format: '
                    '[SCHEME://]HOST[:PORT]. '
                    'SCHEME must be "https" (default) or "http". '
                    'HOST is a short or long hostname or literal IPV4/v6 '
@@ -154,7 +154,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               help='Determines whether pull operations are used for '
                    'operations with the WBEM server that return lists of '
                    'instances, as follows: '
-                   '"yes" uses pull operations, failing if not supported by '
+                   '"yes" uses pull operations and fails if not supported by '
                    'the server; '
                    '"no" uses traditional operations; '
                    '"either" (default) uses pull operations if supported by '

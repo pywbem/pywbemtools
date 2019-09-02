@@ -45,26 +45,26 @@ The following defines the help output for the `pywbemcli  --help` command
           https://pywbemtools.readthedocs.io/en/stable/
 
     Options:
-      -n, --name NAME                 Use the WBEM server defined by the
-                                      persistent WBEM connection NAME. This option
-                                      is mutually exclusive with the --server and
+      -n, --name NAME                 Use the WBEM server defined by the WBEM
+                                      connection definition NAME. This option is
+                                      mutually exclusive with the --server and
                                       --name options, since each defines a WBEM
                                       server. Default: EnvVar PYWBEMCLI_NAME, or
                                       none.
-      -m, --mock-server FILE          Use a mock WBEM server that is created under
-                                      the covers and populated with CIM objects
-                                      that are defined in the specified MOF file
-                                      or Python script file. See the pywbemcli
-                                      documentation for more information. This
-                                      option may be specified multiple times, and
-                                      is mutually exclusive with the --server and
-                                      --name options, since each defines a WBEM
-                                      server. Default: EnvVar
+      -m, --mock-server FILE          Use a mock WBEM server that is automatically
+                                      created in pywbemcli and populated with CIM
+                                      objects that are defined in the specified
+                                      MOF file or Python script file. See the
+                                      pywbemcli documentation for more
+                                      information. This option may be specified
+                                      multiple times, and is mutually exclusive
+                                      with the --server and --name options, since
+                                      each defines a WBEM server. Default: EnvVar
                                       PYWBEMCLI_MOCK_SERVER, or none.
-      -s, --server URL                Use the WBEM server at the specified URL of
-                                      format: [SCHEME://]HOST[:PORT]. SCHEME must
-                                      be "https" (default) or "http". HOST is a
-                                      short or long hostname or literal IPV4/v6
+      -s, --server URL                Use the WBEM server at the specified URL
+                                      with format: [SCHEME://]HOST[:PORT]. SCHEME
+                                      must be "https" (default) or "http". HOST is
+                                      a short or long hostname or literal IPV4/v6
                                       address. PORT defaults to 5989 for https and
                                       5988 for http. This option is mutually
                                       exclusive with the --mock-server and --name
@@ -103,7 +103,7 @@ The following defines the help output for the `pywbemcli  --help` command
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for operations with the WBEM server that
                                       return lists of instances, as follows: "yes"
-                                      uses pull operations, failing if not
+                                      uses pull operations and fails if not
                                       supported by the server; "no" uses
                                       traditional operations; "either" (default)
                                       uses pull operations if supported by the
@@ -146,7 +146,7 @@ The following defines the help output for the `pywbemcli  --help` command
 
     Commands:
       class       Command group for CIM classes.
-      connection  Command group for persistent WBEM connections.
+      connection  Command group for WBEM connection definitions.
       help        Show help message for interactive mode.
       instance    Command group for CIM instances.
       qualifier   Command group for CIM qualifier declarations.
@@ -647,14 +647,15 @@ The following defines the help output for the `pywbemcli connection --help` comm
 
     Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
 
-      Command group for persistent WBEM connections.
+      Command group for WBEM connection definitions.
 
       This command group defines commands to manage persistent WBEM connection
       definitions that have a name. The connection definitions are stored in a
       connections file named 'pywbemcli_connection_definitions.yaml' in the
       current directory. The connection definition name can be used as a
-      shorthand for the WBEM server via the '--name' general option.  In
-      addition to the command-specific options shown in this help text, the
+      shorthand for the WBEM server via the '--name' general option.
+
+      In addition to the command-specific options shown in this help text, the
       general options (see 'pywbemcli --help') can also be specified before the
       'connection' keyword.
 
@@ -662,14 +663,14 @@ The following defines the help output for the `pywbemcli connection --help` comm
       -h, --help  Show this message and exit.
 
     Commands:
-      add     Add a persistent WBEM connection from specified conn info.
-      delete  Delete a persistent WBEM connection.
-      export  Display the commands for exporting the current connection.
-      list    List the persistent WBEM connection definitions.
-      save    Save current connection as a persistent WBEM connection.
-      select  Interactively select a persistent WBEM connection for use.
-      show    Show connection info of current or WBEM connection definition.
-      test    Test current connection with a predefined WBEM request.
+      add     Add a new WBEM connection definition from specified options.
+      delete  Delete a WBEM connection definition.
+      export  Export the current connection.
+      list    List the WBEM connection definitions.
+      save    Save the current connection as a new WBEM connection definition.
+      select  Select a WBEM connection definition as the current connection.
+      show    Show the current connection or a WBEM connection definition.
+      test    Test the current connection with a predefined WBEM request.
 
 
 .. _`pywbemcli connection add --help`:
@@ -686,47 +687,39 @@ The following defines the help output for the `pywbemcli connection add --help` 
 
     Usage: pywbemcli connection add [COMMAND-OPTIONS]
 
-      Add a persistent WBEM connection from specified conn info.
+      Add a new WBEM connection definition from specified options.
 
-      This command creates and saves a named connection from the input options
-      in the connections file.
+      Create a new WBEM connection definition in the connections file from the
+      specified options. A connection definition with that name must not yet
+      exist.
 
-      The new connection can be referenced by the name argument in the future.
-      This connection object is capable of managing all of the properties
-      defined for WBEMConnections.
+      The current connection remains unchanged by this command.
 
-      The NAME and URI arguments MUST exist. They define the server uri and the
-      unique name under which this server connection information will be stored.
-      All other properties are optional.
+      Examples:
 
-      Adding a connection does not the new connection as the current connection.
-      Use `connection select` to set a particular stored connection definition
-      as the current connection.
-
-      A new connection can also be defined by supplying the parameters on the
-      command line and using the `connection save` command to put it into the
-      connection repository.
+        pywbemcli --name newsrv connection add --server https://srv1
 
     Options:
-      -n, --name NAME                 Name of the persistent WBEM connection to be
-                                      added.  [required]
-      -m, --mock-server FILE          Use a mock WBEM server that is created under
-                                      the covers and populated with CIM objects
-                                      that are defined in the specified MOF file
-                                      or Python script file. See the pywbemcli
-                                      documentation for more information. This
-                                      option may be specified multiple times, and
-                                      is mutually exclusive with the --server
-                                      option, since each defines a WBEM server.
-                                      Default: None.
+      -n, --name NAME                 Name for the new WBEM connection definition.
+                                      [required]
+      -m, --mock-server FILE          Use a mock WBEM server that is automatically
+                                      created in pywbemcli and populated with CIM
+                                      objects that are defined in the specified
+                                      MOF file or Python script file. See the
+                                      pywbemcli documentation for more
+                                      information. This option may be specified
+                                      multiple times, and is mutually exclusive
+                                      with the --server option, since each defines
+                                      a WBEM server. Default: None.
       -s, --server URL                Use the WBEM server at the specified URL
                                       with format: [SCHEME://]HOST[:PORT]. SCHEME
                                       must be "https" (default) or "http". HOST is
                                       a short or long hostname or literal IPV4/v6
                                       address. PORT defaults to 5989 for https and
                                       5988 for http. This option is mutually
-                                      exclusive with the --mock-server option.
-                                      Default: None.
+                                      exclusive with the --mock-server option,
+                                      since each defines a WBEM server. Default:
+                                      None.
       -u, --user TEXT                 User name for the WBEM server. Default:
                                       None.
       -p, --password TEXT             Password for the WBEM server. Default:
@@ -752,8 +745,9 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       in the --certfile file. Not required if the
                                       private key is part of the --certfile
                                       file.Default: None.
-      -t, --timeout INT               Timeout in seconds for operations with the
-                                      WBEM server. Default: 30.
+      -t, --timeout INT               Client-side timeout in seconds for
+                                      operations with the WBEM server. Default:
+                                      30.
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for operations with the WBEM server that
                                       return lists of instances, as follows: "yes"
@@ -761,8 +755,8 @@ The following defines the help output for the `pywbemcli connection add --help` 
                                       supported by the server; "no" uses
                                       traditional operations; "either" (default)
                                       uses pull operations if supported by the
-                                      server and otherwise falls back to
-                                      traditional operations. Default: "either".
+                                      server, and otherwise traditional
+                                      operations. Default: "either".
       --pull-max-cnt INT              Maximum number of instances to be returned
                                       by the WBEM server in each response, if pull
                                       operations are used. This is a tuning
@@ -775,9 +769,10 @@ The following defines the help output for the `pywbemcli connection add --help` 
       -l, --log COMP[=DEST[:DETAIL]],...
                                       Enable logging of the WBEM operations,
                                       defined by a list of log configuration
-                                      strings with: COMP: [api|http|all], default:
-                                      all; DEST: [file|stderr], default: file;
-                                      DETAIL: [all|paths|summary], default: all.
+                                      strings with: COMP: [api|http|all]; DEST:
+                                      [file|stderr], default: file; DETAIL:
+                                      [all|paths|summary], default: all. Default:
+                                      all.
       -V, --verify                    Prompt for confirmation before performing a
                                       change, to allow for verification of
                                       parameters. Default: Do not prompt for
@@ -799,15 +794,15 @@ The following defines the help output for the `pywbemcli connection delete --hel
 
     Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
 
-      Delete a persistent WBEM connection.
+      Delete a WBEM connection definition.
 
-      Delete connection information from the persistent store for the connection
-      defined by NAME.
+      Delete a named connection definition from the connections file. If the
+      NAME argument is omitted, prompt for selecting one of the connection
+      definitions in the connections file.
 
-      If NAME is not supplied, a select list presents the list of connection
-      definitions for selection.
+      Example:
 
-      Example:   connection delete blah
+        pywbemcli connection delete blah
 
     Options:
       -V, --verify  Prompt for confirmation before performing a change, to allow
@@ -830,10 +825,17 @@ The following defines the help output for the `pywbemcli connection export --hel
 
     Usage: pywbemcli connection export [COMMAND-OPTIONS]
 
-      Display the commands for exporting the current connection.
+      Export the current connection.
 
-      Creates an export statement for each connection variable and outputs the
-      statements to the console.
+      Display commands that set pywbemcli environment variables to the
+      parameters of the current connection.
+
+      Examples:
+
+        pywbemcli --name srv1 connection export
+
+        pywbemcli --server https://srv1 --user me --password pw connection
+        export
 
     Options:
       -h, --help  Show this message and exit.
@@ -853,12 +855,15 @@ The following defines the help output for the `pywbemcli connection list --help`
 
     Usage: pywbemcli connection list [COMMAND-OPTIONS]
 
-      List the persistent WBEM connection definitions.
+      List the WBEM connection definitions.
 
-      This command displays all entries in the connections file as a table using
-      the command line output format to define the table format.
+      List the WBEM connection definitions in the connections file as a table.
 
-      An "*" after the name indicates the currently selected connection.
+      In the table, the current connection is marked with an "*" after its name.
+
+      Examples:
+
+        pywbemcli connection list
 
     Options:
       -h, --help  Show this message and exit.
@@ -878,16 +883,21 @@ The following defines the help output for the `pywbemcli connection save --help`
 
     Usage: pywbemcli connection save [COMMAND-OPTIONS]
 
-      Save current connection as a persistent WBEM connection.
+      Save the current connection as a new WBEM connection definition.
 
-      Saves the current connection to the connections file if it does not
-      already exist in that file.
+      Create a new WBEM connection definition in the connections file from the
+      current connection. A connection definition with that name must not yet
+      exist.
 
-      This is useful when you have defined a connection on the command line and
-      want to set it into the connections file.
+      This command is useful when you have defined a connection on the command
+      line and want to save it in the connections file for later use.
+
+      Examples:
+
+        pywbemcli --server https://srv1 connection save --name mysrv
 
     Options:
-      -n, --name NAME  Name of the persistent WBEM connection that is saved.
+      -n, --name NAME  Name for the new WBEM connection definition.
       -V, --verify     Prompt for confirmation before performing a change, to
                        allow for verification of parameters. Default: Do not
                        prompt for confirmation.
@@ -908,20 +918,24 @@ The following defines the help output for the `pywbemcli connection select --hel
 
     Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
 
-      Interactively select a persistent WBEM connection for use.
+      Select a WBEM connection definition as the current connection.
 
-      Selects a connection from the persistently stored set of named connections
-      if NAME exists in the store. The NAME argument is optional. If NAME not
-      supplied, a list of connections from the connections definition file is
-      presented with a prompt for the user to select a connection.
+      Make a named connection definition from the connections file the current
+      connection. If the NAME argument is omitted, prompt for selecting one of
+      the connection definitions in the connections file.
 
-      Select state is not persistent.
+      This command is useful in the interactive mode of pywbemcli.
+
+      The selection of the current connection is not saved across interactive
+      sessions of pywbemcli.
 
       Examples:
 
-         connection select myconn    # select the connection named 'myconn'
+        pywbemcli
 
-         connection select           # presents select list to pick connection
+        > connection select myconn
+
+        > connection select          # prompts
 
     Options:
       -h, --help  Show this message and exit.
@@ -941,15 +955,17 @@ The following defines the help output for the `pywbemcli connection show --help`
 
     Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
-      Show connection info of current or WBEM connection definition.
+      Show the current connection or a WBEM connection definition.
 
-      This command displays all the variables that make up the current WBEM
-      connection if the optional NAME argument is NOT provided. If NAME not
-      supplied, a list of connections from the connections definition file is
-      presented with a prompt for the user to select a connection.
+      Display the parameters of the current connection, or if the optional NAME
+      argument is specified, of the named WBEM connection definition from the
+      connections file.
 
-      The information on the connection named is displayed if that name is in
-      the persistent repository.
+      Examples:
+
+        pywbemcli --name server1 connection show
+
+        pywbemcli connection show server1
 
     Options:
       -h, --help  Show this message and exit.
@@ -969,12 +985,15 @@ The following defines the help output for the `pywbemcli connection test --help`
 
     Usage: pywbemcli connection test [COMMAND-OPTIONS]
 
-      Test current connection with a predefined WBEM request.
+      Test the current connection with a predefined WBEM request.
 
-      This executes a predefined request against the current WBEM server to
-      confirm that the connection exists and is working.
+      Execute the EnumerateClassNames operation on the default namespace against
+      the current connection to confirm that the connection exists and is
+      working.
 
-      It executes EnumerateClassNames on the default namespace as the test.
+      Examples:
+
+        pywbemcli --name mysrv connection test
 
     Options:
       -h, --help  Show this message and exit.
