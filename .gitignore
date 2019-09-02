@@ -26,8 +26,8 @@ wbemcli.log
 /build/
 /build_doc/
 /pywbem_os_setup.bat
-/pywbemcliservers.json
-/pywbemcliservers.json.bak
+/pywbemcli_connection_definitions.yaml
+/pywbemcli_connection_definitions.yaml.bak
 /tests/testtmp/
 /tests/schema/mof*/
 /tests/unit/.flake8
