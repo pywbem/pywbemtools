@@ -6,8 +6,16 @@ Qualifier Description : string = null,
     Scope(any),
     Flavor(EnableOverride, ToSubclass, Translatable);
 
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
 Qualifier Key : boolean = false,
     Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Out : boolean = false,
+    Scope(parameter),
     Flavor(DisableOverride, ToSubclass);
 
 // This class defines all of the primitive CIM data types to be used both
@@ -85,6 +93,37 @@ class PyWBEM_AllTypes {
    Real64  arrayReal64[];
    String  arrayString[];
    Datetime arrayDateTime[];
+
+        [Description ("Contains params with different cim types")]
+    uint32 AllTypesMethod(
+        [IN, OUT, Description("BooleanScalar")]
+      Boolean scalBool,
+        [IN, OUT, Description("Uint32Scalar")]
+      Uint32 scalUint32,
+        [IN, OUT, Description("Sint32Scalar")]
+      Sint32 scalSint32,
+        [IN, OUT, Description("Real32Scalar")]
+      Real32 scalReal32[],
+        [IN, OUT, Description("StringScalar")]
+      String scalString[],
+        [IN, OUT, Description("DatetimeScalar")]
+      Datetime scalDatetime[],
+        [IN, OUT, Description("RefScalar")]
+      PyWBEM_AllTypes REF scalRef,
+        [IN, OUT, Description("BooleanArray")]
+      Boolean arrBool[],
+        [IN, OUT, Description("Uint32Array")]
+      uint32 arrUint32[],
+        [IN, OUT, Description("Sint32Array")]
+      uint32 arrSint32[],
+        [IN, OUT, Description("Real32Array")]
+      Real32 arrReal32[],
+        [IN, OUT, Description("StringArray")]
+      String arrString[],
+        [IN, OUT, Description("DatetimeArray")]
+      Datetime arrDatetime[],
+        [IN, OUT, Description("RefArray")]
+      PyWBEM_AllTypes REF arrRef[]);
 };
 
 // Single instance defined for this class.  This instance is used in tests

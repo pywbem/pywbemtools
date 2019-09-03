@@ -20,6 +20,10 @@ def fuzzy_callback(conn, object_name, methodname, **params):
     params from the TestInvokeMethod object attributes.
     """
     return_params = params.get('TestOutParameter', [])
+
+    if 'TestInOutParameter' in params:
+        return_params.append(params['TestInOutParameter'])
+
     if 'TestRef' in params:
         return_params.append(params['TestRef'])
 

@@ -41,6 +41,7 @@ INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
+ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock.py'
 
 
 #
@@ -1596,7 +1597,7 @@ Instances: PyWBEM_AllTypes
                  '+-----------------+---------+'],
       'rc': 0,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE_EXT, RUN],
+     SIMPLE_MOCK_FILE_EXT, OK],
 
     ['Verify instance subcommand count. Return table of instances',
      ['count', 'CIM_*'],
@@ -1610,7 +1611,7 @@ Instances: PyWBEM_AllTypes
                  '+-----------------+---------+'],
       'rc': 0,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE_EXT, RUN],
+     SIMPLE_MOCK_FILE_EXT, OK],
 
     # TODO add subclass instances to the count test.
 
@@ -1630,20 +1631,46 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand invokemethod',
+    ['Verify instance subcommand invokemethod, returnvalue = 0',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy'],
      {'stdout': ['ReturnValue=0'],
       'rc': 0,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-    ['Verify instance subcommand invokemethod with param',
+    ['Verify instance subcommand invokemethod with multiple scalar params',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy',
-      '-p', 'TestInOutParameter="blah"'],
-     {'stdout': ["ReturnValue=0"],
+      '-p', 'TestInOutParameter="blah"',
+      '-p', 'TestRef=CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stdout': ['ReturnValue=0',
+                 'TestInOutParameter=', 'blah',
+                 'TestRef=', 'CIM_Foo.InstanceID=', 'CIM_Foo1'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+
+    ['Verify instance subcommand invokemethod with all_types method',
+     ['invokemethod', 'Pywbem_alltypes.InstanceID="test_instance"',
+      'AllTypesMethod',
+      '-p', 'scalBool=true',
+      '-p', 'arrBool=false,true',
+      '-p', 'scalUint32=9',
+      '-p', 'arrUint32=9,3,255',
+      '-p', 'scalString=abcdefjh',
+      '-p', 'arrString="abc","def"',
+      '-p', 'scalRef=PyWBEM_AllTypes.InstanceID="1"'],
+     {'stdout': ['ReturnValue=0',
+                 'scalBool=true',
+                 'arrBool=false, true',
+                 'scalUint32=9',
+                 'arrUint32=9, 3, 255',
+                 'scalString="abcdefjh"',
+                 'arrString=', 'abc', 'def',
+                 'scalRef=', 'PyWBEM_AllTypes.InstanceID='],
+      'rc': 0,
+      'test': 'innows'},
+     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
 
     ['Verify instance subcommand invokemethod fails Invalid Class',
      ['invokemethod', ':CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
@@ -1709,4 +1736,4 @@ class TestSubcmd(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+                         mock, condition, verbose=False)

@@ -1252,9 +1252,10 @@ TEST_CASES = [
 
     ['Verify class subcommand invokemethod',
      ['invokemethod', 'CIM_Foo', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
-     {'stdout': ["ReturnValue=0"],
+     {'stdout': ['ReturnValue=0',
+                 'TestInOutParameter=', 'blah'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class subcommand invokemethod fails Invalid Class',
@@ -1266,17 +1267,17 @@ TEST_CASES = [
 
     ['Verify class subcommand invokemethod fails Invalid Method',
      ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
-     {'stderr': ["Error: CIMError: 17"],
+     {'stderr': ["CIMError: 17"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
 
     ['Verify class subcommand invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stderr': ["Error: CIMError: 17"],
+     {'stderr': ["CIMError: 17"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
 
     ['Verify  --timestats gets stats output. Cannot test '

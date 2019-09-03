@@ -562,7 +562,21 @@ See :ref:`pywbemcli instance get --help` for details.
 Instance invokemethod command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The invokemethod command  invokes a method defined for the INSTANCENAME argument.
+The invokemethod command  invokes a method defined for the INSTANCENAME  and
+METHOD arguments using any CIM parameters defined with the --parameter arguments.
+If successful, it returns a ReturnValue and and CIM parameters included in
+the response. This command only formats in a simple text format.
+
+As as example:
+
+.. code-block:: text
+
+    $ pywbemcli -m tests/unit/all_types.mof -m tests/unit/all_types_method.py
+    pywbemcli> instance invokemethod PyWBEM_AllTypes.InstanceId=\"test_instance\" AllTypesMethod -p arrBool=True,False
+
+    ReturnValue=0
+    arrBool=true, false
+
 
 See :ref:`pywbemcli instance invokemethod --help` for details.
 
