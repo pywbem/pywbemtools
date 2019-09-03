@@ -1807,19 +1807,14 @@ The following defines the help output for the `pywbemcli repl --help` command
 
       Enter interactive mode (default).
 
-      Enters the interactive mode where commands can be entered interactively
-      and load the command history file.
+      Enter the interactive mode where pywbemcli commands can be entered
+      interactively. The prompt is changed to 'pywbemcli>'.
 
-      If no options are specified on the command line, the interactive mode is
-      entered. The prompt is changed to 'pywbemcli>' in the interactive mode.
+      Command history is supported. The command history is stored in a file
+      ~/.pywbemcli_history.
 
       Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q,
       :quit, :exit
-
-      Parameters:
-
-        ctx (:class:`click.Context`): The click context object. Created by the
-        ``@click.pass_context`` decorator.
 
     Options:
       -h, --help  Show this message and exit.
@@ -1958,7 +1953,7 @@ The following defines the help output for the `pywbemcli server get-centralinsts
                                       only scopig methodology
       --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports
                                       only scopig methodology. Multiples allowed
-      -r, --reference-direction [snia|dmtf]
+      --rd, --reference-direction [snia|dmtf]
                                       Navigation direction for association.
                                       [default: dmtf]
       -h, --help                      Show this message and exit.
