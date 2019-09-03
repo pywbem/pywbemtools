@@ -28,8 +28,8 @@ import click
 import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
-    CIMQualifierDeclaration, CIMProperty, CIMClassName, cimvalue, \
-    CIM_ERR_METHOD_NOT_FOUND, CIMError, CIMFloat, CIMInt
+    CIMQualifierDeclaration, CIMProperty, CIMClassName, \
+    cimvalue, CIM_ERR_METHOD_NOT_FOUND, CIMError, CIMFloat, CIMInt
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
@@ -371,33 +371,6 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
                                    (wbemuri_str, ve))
 
 
-def create_params(cim_method, kv_params):
-    """
-    Create a parameter values from the input arguments and class.
-
-    Parameters:
-
-      cim_method():
-        CIM Method that is the template for the parameters.  It is used to
-        evaluate the kv_params and generate corresponding CIM_Parameter
-        objects to be passed to the InvokeMethod
-    """
-    params = NocaseDict()
-    for p in kv_params:
-        name, value_str = parse_kv_pair(p)
-        if name not in cim_method.parameters:
-            raise click.ClickException('Parameter: %s not in method: '
-                                       ' %s' % (name, cim_method.name))
-
-        cl_param = cim_method.parameters[name]
-        is_array = cl_param.is_array
-
-        cim_value = create_cimvalue(cl_param.type, value_str, is_array)
-        params = []
-        params.append((name, cim_value))
-    return params
-
-
 def create_cimvalue(cim_type, value_str, is_array):
     """
     Build a cim value of the type in cim_type and the information in value_str
@@ -582,9 +555,10 @@ def compare_instances(inst1, inst2):
 def parse_kv_pair(pair):
     """
     Parse a single key/value pair separated by = and return the key
-    and value components.
+    and value components. Assumes that the key component does not
+    include = which is valid for CIM names.
 
-    If the value component is empty, returns None
+    If the value component is empty, returns value None
     """
     name, value = pair.partition("=")[::2]
 
@@ -677,6 +651,34 @@ def process_invokemethod(context, objectname, methodname, options):
 
     """  # pylint: enable=line-too-long
 
+    def create_params(cim_method, kv_params):
+        """
+        Create parameter values from the input arguments and class.
+
+        Parameters:
+
+          cim_method():
+            CIM Method that is the template for the parameters.  It is used to
+            evaluate the kv_params and generate corresponding CIMParameter
+            objects to be passed to the InvokeMethod
+        """
+        params = []
+        for p in kv_params:
+            name, value_str = parse_kv_pair(p)
+            if name not in cim_method.parameters:
+                raise click.ClickException('Parameter: %s not in method: '
+                                           ' %s' % (name, cim_method.name))
+
+            if name in params:
+                raise click.ClickException('Parameter "%s" duplicated' % name)
+
+            cl_param = cim_method.parameters[name]
+            is_array = cl_param.is_array
+
+            cim_value = create_cimvalue(cl_param.type, value_str, is_array)
+            params.append((name, cim_value))
+        return params
+
     classname = objectname.classname \
         if isinstance(objectname, (CIMClassName, CIMInstanceName)) \
         else objectname
@@ -697,11 +699,17 @@ def process_invokemethod(context, objectname, methodname, options):
 
     rtn = context.conn.InvokeMethod(methodname, objectname, params)
 
+    # Output results, both ReturnValue and all output parameters
     click.echo("ReturnValue=%s" % rtn[0])
+
     if rtn[1]:
-        params = rtn[1]
-        for param in params:
-            click.echo("%s=%s" % (param, params[param]))
+        cl_params = cim_method.parameters
+        rtn_params = rtn[1]
+        for pname, pvalue in rtn_params.items():
+            ptype = cl_params[pname].type if pname in cl_params else None
+            val = _value_tomof(pvalue, ptype, maxline=DEFAULT_MAX_CELL_WIDTH,
+                               avoid_splits=False)
+            click.echo("%s=%s" % (pname, val[0]))
 
 
 def sort_cimobjects(cim_objects):
