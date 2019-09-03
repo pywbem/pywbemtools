@@ -381,7 +381,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify simultaneous --mock_server and --server options fail',
+    ['Verify simultaneous --mock-server and --server options fail',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                  '--server', 'http://localhost'],
       'subcmd': 'connection',
@@ -393,7 +393,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify --mock_server invalid name',
+    ['Verify --mock-server invalid name',
      {'global': ['--mock-server', 'fred'],
       'subcmd': 'connection',
       'args': ['show']},

@@ -83,30 +83,30 @@ WBEM CIM-XML Operation             pywbemcli command group & command
 =================================  ==============================================
 **Instance Operations:**
 EnumerateInstances                 instance enumerate INSTANCENAME
-EnumerateInstanceNames             instance enumerate INSTANCENAME --name_only
+EnumerateInstanceNames             instance enumerate INSTANCENAME --names-only
 GetInstance                        instance get INSTANCENAME
 ModifyInstance                     instance modify
 CreateInstance                     instance create
 DeleteInstance                     instance delete INSTANCENAME
 Associators(instance)              instance associators INSTANCENAME
 Associators(class)                 class associators CLASSNAME
-AssociatorNames(instance)          instance associators INSTANCENAME --name_only
-AssociatorNames(class)             class associators CLASSNAME --name_only
+AssociatorNames(instance)          instance associators INSTANCENAME --names-only
+AssociatorNames(class)             class associators CLASSNAME --names-only
 References(instance)               instance references INSTANCENAME
 References(class)                  class references CLASSNAME
-ReferenceNames(instance)           instance references INSTANCENAME --name_only
-ReferenceNames(class)              class references CLASSNAME --name_only
-InvokeMethod                       instance invokemethod INSTANCENAME --name_only
-ReferenceNames                     class invokemethod CLASSNAME --name_only
+ReferenceNames(instance)           instance references INSTANCENAME --names-only
+ReferenceNames(class)              class references CLASSNAME --names-only
+InvokeMethod                       instance invokemethod INSTANCENAME --names-only
+ReferenceNames                     class invokemethod CLASSNAME --names-only
 ExecQuery                          instance query
 **Pull Operations:**               Option --use-pull ``either`` or ``yes``
 OpenEnumerateInstances             instance enumerate INSTANCENAME
-OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --name_only
+OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --names-only
 OpenAssociatorInstances            instance associators INSTANCENAME
-OpenAssociatorInstancePaths        instance associators INSTANCENAME --name_only
+OpenAssociatorInstancePaths        instance associators INSTANCENAME --names-only
 OpenReferenceInstances             instance references INSTANCENAME
-OpenReferenceInstancePaths         instance references INSTANCENAME --name_only
-OpenQueryInstances                 instance references INSTANCENAME --name_only
+OpenReferenceInstancePaths         instance references INSTANCENAME --names-only
+OpenQueryInstances                 instance references INSTANCENAME --names-only
 PullInstancesWithPath              part of pull sequence
 PullInstancePaths                  part of pull sequence
 PullInstances                      part of pull sequence
@@ -346,7 +346,7 @@ The **class** group defines commands that act on CIM classes. see
 :ref:`pywbemcli class --help`. This group includes the following commands:
 
 * **associators** to retrieve the class associators classes or classnames if the
-  (``-o``/``--names-only``) option is set for a class defined by the CLASSNAME
+  (``-o/--names-only``) option is set for a class defined by the CLASSNAME
   argument in the namespace with this command or the default
   namespace and displayed in the defined format. If successful it displays the
   classes/classnames in the :term:`CIM object output formats` (see
@@ -357,7 +357,7 @@ The **class** group defines commands that act on CIM classes. see
 
   .. code-block:: text
 
-      $ pywbemcli --name mockassoc class associators TST_Person --names_only
+      $ pywbemcli --name mockassoc class associators TST_Person --names-only
         //FakedUrl/root/cimv2:TST_Person
       $
 
@@ -398,7 +398,7 @@ The **class** group defines commands that act on CIM classes. see
   namespace or the namespace defined with this command. If the CLASSNAME
   input property the enumeration starts at the subclasses of CLASSNAME. Otherwise
   it starts at the top of the class hierarchy if the
-  ``--DeepInheritance``/``--di``  option is set it shows all the classes in the
+  ``--deep-inheritance/-di`` option is set it shows all the classes in the
   hierarchy, not just the next level of the hierarchy. Otherwise it only
   enumerates one level of the class hierarchy.  It can display the
   classes/classnames in the :term:`CIM object output formats` (see
@@ -421,7 +421,7 @@ The **class** group defines commands that act on CIM classes. see
   CIM namespaces for matching class names.  This command uses a :term:`GLOB`
   Unix style pathname pattern expansion on the classname to attempt to filter
   the names and namespaces of all of the classes in the WBEM server (or the
-  namespaces defined with the ``--namespaces``/``-n`` option):
+  namespaces defined with the ``--namespace/-n`` option):
 
   .. code-block:: text
 
@@ -447,7 +447,7 @@ The **class** group defines commands that act on CIM classes. see
   See :ref:`pywbemcli class find --help` for details.
 * **get** to get a single class defined by the required CLASSNAME argument in the
   default namespace or the namespace defined with this command displayed in
-  the format defined by the ``--output-format``/``-o`` general option. If
+  the format defined by the ``--output-format/-o`` general option. If
   successul it displays the returned class, otherwise it displays the exception
   generated.  It can display the classes/classnames in the
   :term:`CIM object output formats` (see :ref:`Output formats`).
@@ -1003,7 +1003,7 @@ options for pywbemcli. The data includes:
 
 * **name** name of the connection (required).
 * **server** the url for the defined connection (required unless
-  ``--mock-server``/``-m`` defined).
+  ``--mock-server/-m`` defined).
 * **default-namespace** the default namespace defined for the connection
   (required).
 * **user** the user name for the connection (optional).

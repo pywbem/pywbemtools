@@ -121,10 +121,10 @@ options.  The commands and subcommands are shown in **bold**:
 
   * **get** <classname> --namespace <getclass options> (corresponds to getclass)
   * **invokemethod** <classname> <methodname > [--parameter <name>=<value>]* --namespace
-  * **query** <query> --querylanguage <name> -- namespace
+  * **query** <query> --query-language <name> -- namespace
   * **enumerate**  (corresponds to enumerateclasses) <classname> --namespace --names-only &lt;enumerateclass options>
-  * **references**  <sourceclass> --namespace --names_only &lt;references options>(corresponds to class references)
-  * **associators** <sourceclass> --namespace --names_only &lt;associator options>(corresponds to class associators)
+  * **references**  <sourceclass> --namespace --names-only &lt;references options>(corresponds to class references)
+  * **associators** <sourceclass> --namespace --names-only &lt;associator options>(corresponds to class associators)
   * **method** <classname> <methodname> [<param_name=value>]*
   * **find** Find a class across namespaces (regex names allowed)
   * **hierarchy** Show a tree of the class hiearchy
@@ -135,9 +135,9 @@ options.  The commands and subcommands are shown in **bold**:
   * **delete** <instname> | <classname>   (use classname for interactive select mode)
   * **create**  <classname> --property <name>=<value>
   * **invokemethod** &lt:cinstancename> &lt:methodname > [--parameter <name>=<value>]* --namespace
-  * **enumerate** <instname>-- namespace --names-only <enumerate inst options> (corresponds to EnumerateInstances)
-  * **references** <instname>--namespace --names_only <references options>(corresponds to inst references)
-  * **associators** <instname> --namespace --names_only <associator options>(corresponds to inst associators)
+  * **enumerate** <instname> --namespace --names-only <enumerate inst options> (corresponds to EnumerateInstances)
+  * **references** <instname> --namespace --names-only <references options>(corresponds to inst references)
+  * **associators** <instname> --namespace --names-only <associator options>(corresponds to inst associators)
   * **invokemethod** <instname> <methodname> [<param_name=value>]*
 * **qualifier**             # operations on the QualifierDecl type
 
