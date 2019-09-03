@@ -475,7 +475,7 @@ def repl_help(ctx):  # pylint: disable=unused-argument
     """
     Show help message for interactive mode.
     """
-    print("""
+    click.echo("""
 The following can be entered in interactive mode:
 
   COMMAND                     Execute pywbemcli command COMMAND.
@@ -511,7 +511,7 @@ def repl(ctx):
     if history_file.startswith('~'):
         history_file = os.path.expanduser(history_file)
 
-    print("Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.")
+    click.echo("Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.")
 
     prompt_kwargs = {
         'message': PYWBEMCLI_PROMPT,
