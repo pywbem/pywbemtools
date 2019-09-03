@@ -25,21 +25,23 @@ Pywbemtools features
 --------------------
 
 Pywbemtools is a collection of command line tools that communicate with WBEM
-Servers. The tools are written in pure Python and support Python 2 and Python
+servers. The tools are written in pure Python and support Python 2 and Python
 3.
 
-Pywbemtools provides a command line tool (pywbemcli) that uses the pywbem
-package to issue operations to a WBEM server using
-the WBEM standards defined by the DMTF to perform system management tasks.
+At this point, pywbemtools includes a single command line tool named
+``pywbemcli`` that uses the `pywbem package on Pypi`_ to issue operations to a
+WBEM server using the `CIM/WBEM standards`_ defined by the `DMTF`_ to perform
+system management tasks.
 
-WBEM standards are used for a wide variety of systems management tasks
-in the industry including DMTF management standards and the SNIA Storage
-Management Initiative Specification(SMI-S).
+CIM/WBEM standards are used for a wide variety of systems management tasks
+in the industry including DMTF management standards and the `SNIA`_
+Storage Management Initiative Specification (`SMI-S`_).
 
-Pywbemtools and pywbem are packages in the GitHub pywbem project
-and are released to PyPI.
-
-Pywbemcli is a module in the pywbemtools package.
+.. _pywbem package on Pypi: https://pypi.org/project/pywbem/
+.. _DMTF: https://www.dmtf.org/
+.. _CIM/WBEM standards: https://www.dmtf.org/standards/wbem/
+.. _SNIA: https://www.snia.org/
+.. _SMI-S: https://www.snia.org/forums/smi/tech_programs/smis_home
 
 
 .. _`Pywbemcli command line interface WBEM client`:
@@ -47,30 +49,33 @@ Pywbemcli is a module in the pywbemtools package.
 Pywbemcli command line interface WBEM client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pywbemcli provides access to WBEM servers from the command line on multiple OS
-platforms. It provides functionality to:
+Pywbemcli provides access to WBEM servers from the command line.
+It provides functionality to:
 
 * Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
   components including CIM classes, CIM instances, and CIM qualifiers and
   execute CIM methods and queries on the WBEM server.
 
-* Execute specific CIM/XML operations defined in the DMTF CIM Operations Over
-  HTTP (:term:`DSP0200`). See section :ref:`pywbemcli commands to WBEM Operations`
+* Execute specific CIM-XML operations on the WBEM server as defined in `DMTF`_
+  standard :term:`DSP0200` (CIM Operations over HTTP).
 
 * Inspect and manage WBEM server functionality including:
 
-  * CIM namespaces in a WBEM server (see :term:`CIM namespace`) ,
-  * WBEM registered profiles in a WBEM server (see :term:`WBEM management profile`),
-  * WBEM server brand and version information.
+  * :term:`CIM namespaces <CIM namespace>`
+  * Advertised :term:`WBEM management profiles <WBEM management profile>`
+  * WBEM server brand and version information
 
-* Capture detailed information on  CIM-XML interactions with the WBEM server
+* Capture detailed information on CIM-XML interactions with the WBEM server
   including time statistics and details of data flow.
 
-* Maintain a file of WBEM server definitions so that pywbemcli can access
-  multiple servers by name.
+* Maintain a file with persisted WBEM connection definitions so that pywbemcli
+  can access multiple WBEM servers by name.
 
-* Provide both a command line interface and an interactive mode where multiple
+* Provide both a command line mode and an interactive mode where multiple
   pywbemcli commands can be executed within the context of a WBEM server.
+
+* Use an integrated mock WBEM server to try out commands. The mock server
+  can be loaded with CIM objects defined in MOF files or via Python scripts.
 
 
 .. _`Supported environments`:
@@ -90,6 +95,7 @@ The pywbemtools package is supported in these environments:
   these standards are also supported, but may have limitations.
   See the `pywbem WBEM servers documentation`_ for more details.
 
+
 .. _`Installation`:
 
 Installation
@@ -97,7 +103,6 @@ Installation
 
 .. _virtual Python environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 .. _PyPI: http://pypi.python.org/
-
 
 This section describes the complete installation of pywbemtools with all steps
 including prerequisite operating system packages.

@@ -28,241 +28,298 @@ pywbemtools: Python tools for communicating with WBEM servers
 .. image:: https://img.shields.io/pypi/pyversions/pywbemtools.svg?color=brightgreen
     :alt: PyPI - Python Version
 
-.. # .. contents:: **Contents:**
-.. #    :local:
 
 Overview
 --------
 
 Pywbemtools is a collection of command line tools that communicate with WBEM
-Servers. The tools are written in pure Python and support Python 2 and Python
+servers. The tools are written in pure Python and support Python 2 and Python
 3.
 
-Pywbemtools provides a command line tool (pywbemcli) that uses the pywbem
-Python WBEM client infrastructure to issue operations to a WBEM server using
-the CIM/WBEM standards defined by the DMTF to perform system management tasks.
+At this point, pywbemtools includes a single command line tool named
+``pywbemcli`` that uses the `pywbem package on Pypi`_ to issue operations to a
+WBEM server using the `CIM/WBEM standards`_ defined by the `DMTF`_ to perform
+system management tasks.
 
-CIM/WBEM infrastructure is used for a wide variety of systems management tasks
-in the industry including DMTF management standards and the SNIA Storage
-Management Initiative Specification(SMI-S).
+CIM/WBEM standards are used for a wide variety of systems management tasks
+in the industry including DMTF management standards and the `SNIA`_
+Storage Management Initiative Specification (`SMI-S`_).
 
-Pywbemcli provides the functionality to :
+Pywbemcli provides access to WBEM servers from the command line.
+It provides functionality to:
 
-* Explore the CIM data of WBEM Servers. It can manage/inspect the CIM model
-  components including CIM classes, CIM instances, and CIM qualifiers and execute
-  CIM methods and queries on the WBEM server. It implements subcommands to
-  execute the CIM-XML operations defined in the DMTF specification
-  CIM Operations Over HTTP(DSP0200_).
+* Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
+  components including CIM classes, CIM instances, and CIM qualifiers and
+  execute CIM methods and queries on the WBEM server.
 
-* Inspect/manage WBEM server functionality such as CIM namespaces, WBEM
-  registered profiles, and other server information.
+* Execute specific CIM-XML operations on the WBEM server as defined in `DMTF`_
+  standard `DSP0200 (CIM Operations over HTTP)`_.
 
-* Capture detailed information on interactions with the WBEM server including
-  time statistics.
+* Inspect and manage WBEM server functionality including:
 
-.. _DSP0200: https://www.dmtf.org/sites/default/files/standards/documents/DSP0200_1.4.0.pdf
+  * CIM namespaces
+  * Advertised WBEM management profiles
+  * WBEM server brand and version information
 
-Installation Requirements
--------------------------
+* Capture detailed information on CIM-XML interactions with the WBEM server
+  including time statistics and details of data flow.
 
-1. Python 2.7, 3.4 and higher
+* Maintain a file with persisted WBEM connection definitions so that pywbemcli
+  can access multiple WBEM servers by name.
 
-2. Operating Systems: Linux, MacOS, Windows(native) and Windows(Cygwin)
+* Provide both a command line mode and an interactive mode where multiple
+  pywbemcli commands can be executed within the context of a WBEM server.
+
+* Use an integrated mock WBEM server to try out commands. The mock server
+  can be loaded with CIM objects defined in MOF files or via Python scripts.
+
 
 Installation
 ------------
 
-The quick way:
+Requirements:
 
-.. code-block:: bash
+1. Python 2.7, 3.4 and higher
 
-    $ pip install pywbemtools
+2. Operating Systems: Linux, OS-X, native Windows, UNIX-like environments on
+   Windows (e.g. Cygwin)
 
-For more details, see the `Installation section`_ in the pywbemcools
-documentation.
+3. The following OS-level packages:
 
-.. _Installation section: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
+   * On native Windows:
 
-Documentation
--------------
+     - ``choco`` - Chocolatey package manager. The pywbemtools package installation
+       uses Chocolatey to install OS-level software. See https://chocolatey.org/
+       for the installation instructions for Chocolatey.
 
-The latest pywbemtools documentation is available on ReadTheDocs:
+   * On all platforms:
 
-* `Documentation for latest released version`_
+     - ``wget`` - Download tool.
 
-.. _Documentation for latest released version: https://pywbemtools.readthedocs.io/en/stable/
+Installation:
 
-* `Documentation for latest unreleased development version`_
+* On native Windows:
 
-.. _Documentation for latest unreleased development version: https://pywbemtools.readthedocs.io/en/latest/
+  .. code-block:: bash
 
-The detailed change history for the latest released version in the
-`Change log section`_.
+      > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+      > pywbem_os_setup.bat
+      > pip install pywbemtools
 
-.. _Change log section: https://pywbemtools.readthedocs.io/en/stable/changes.html
+  The ``pywbem_os_setup.bat`` script installs OS-level packages needed by the
+  pywbem package.
+
+* On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
+
+  .. code-block:: bash
+
+      $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
+      $ chmod 755 pywbem_os_setup.sh
+      $ ./pywbem_os_setup.sh
+      $ pip install pywbemtools
+
+  The ``pywbem_os_setup.sh`` script installs OS-level packages needed by the
+  pywbem package and uses sudo internally, so your userid needs to have sudo
+  permission.
+
+For more details, including how to install the needed OS-level packages
+manually, see `pywbemtools installation`_.
+
+
+Documentation and change history
+--------------------------------
+
+For the latest version released on Pypi:
+
+* `Pywbemtools documentation`_
+* `Pywbemtools change history`_
 
 
 Quickstart
 ----------
 
-pywbemcli
-^^^^^^^^^
-
-The following are examples of pywbemcli commands:
-
-All commands within pywbemcli include help as the --help or -h option::
-
-    pywbemcli --help
-
-Executing the EnumerateClasses CIM-XML operation:
+All commands within pywbemcli show help with the ``-help`` or ``-h`` options:
 
 .. code-block:: text
 
-    $ pywbemcli -s http://localhost class get CIM_ManagedElement
-
-       [Abstract ( true ),
-        Version ( "2.19.0" ),
-        UMLPackagePath ( "CIM::Core::CoreElements" ),
-        Description (
-           "ManagedElement is an abstract class that provides a common superclass "
-           "(or top of the inheritance tree) for the non-association classes in "
-           "the CIM Schema." )]
-    class CIM_ManagedElement {
-
-          [Description (
-              "InstanceID is an optional property that may be used to opaquely and "
+    $ pywbemcli --help
     . . .
-   string ElementName;
+    $ pywbemcli connection --help
+    . . .
+    $ pywbemcli connection add --help
+    . . .
 
-    };
+The following examples build on each other and show a typical sequence of
+exploration of a WBEM server. For simplicity, they all operate against the
+default namespace of the server, and use a persistent connection definition for
+the server:
 
-Executing the CIM-XML EnumerateInstance operation with ``-o`` option that
-returns instance names:
+* Add a persistent connection definition named ``conn1`` for the WBEM server to
+  be used, so that the subsequent commands can refer to it:
 
-.. code-block:: text
+  .. code-block:: text
 
-    $pywbemcli -s http://localhost instance enumerate PyWBEM_Person -o
+      $ pywbemcli connection add -s https://localhost -N -u user -p password -n conn1
 
-    root/cimv2:PyWBEM_Person.Name="Alice",CreationClassName="PyWBEM_Person"
-    root/cimv2:PyWBEM_Person.Name="Bob",CreationClassName="PyWBEM_Person"
-    root/cimv2:PyWBEM_Person.Name="Charlie",CreationClassName="PyWBEM_Person"
+* List the persistent connection definitions:
 
-Executing the CIM-XML GetInstance operation that requests a single instance
-from the WBEM server with the instance name shown in the example:
+  .. code-block:: text
 
-.. code-block:: text
+      $ pywbemcli connection list
+      WBEM server connections:
+      +--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------+
+      | name   | server            | namespace   | user   |   timeout | no-verify   | mock-server                            |
+      |--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------|
+      | conn1  | https://localhost | root/cimv2  | user   |        30 | True        |                                        |
+      +--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------+
 
-    $ pywbemcli -s https://localhost instance get PyWBEM_Person.CreationClassName=\"PyWBEM_Person\",Name=\"Alice\"
+* Show the class tree, using the previously added connection definition ``conn1``:
 
-    instance of PyWBEM_Person {
-       ...
-       Secretary = NULL;
-       Title = NULL;
-       CreationClassName = "PyWBEM_Person";
-       Name = "Alice";
-    };
+  .. code-block:: text
 
-or using the pywbemcli interactive option (``-i`` or ``--interactive``) where
-pywbemcli presents a list of instances on the wbem server from the class name:
+      $ pywbemcli -n conn1 class tree
+      root
+       +-- TST_Lineage
+       +-- TST_Person
+       |   +-- TST_Personsub
+       +-- TST_FamilyCollection
+       +-- TST_MemberOfFamilyCollection
 
-.. code-block:: text
+* Retrieve a single class from that class tree:
 
-    $ pywbemcli -s https://localhost instance get PyWBEM_Person -i
+  .. code-block:: text
 
-    instance of PyWBEM_Person {
-       ...
-       Secretary = NULL;
-       Title = NULL;
-       CreationClassName = "PyWBEM_Person";
-       Name = "Alice";
-    };
-                 <<< pywbemcli responds with:
-    Pick Instance name to process
-    0: //leonard/root/cimv2:PyWBEM_Person.Name="Alice",CreationClassName="PyWBEM_Person"
-    1: //leonard/root/cimv2:PyWBEM_Person.Name="Bob",CreationClassName="PyWBEM_Person"
-    2: //leonard/root/cimv2:PyWBEM_Person.Name="Charlie",CreationClassName="PyWBEM_Person"
-    Input integer between 0 and 2 or Ctrl-C to exit selection:
-                 <<< user responds with >> 0
+      $ pywbemcli -n conn1 class get TST_Person
+      class TST_Person {
 
-    instance of PyWBEM_Person {
-       ...
-       Secretary = NULL;
-       Title = NULL;
-       CreationClassName = "PyWBEM_Person";
-       Name = "Alice";
-    };
+            [Key ( true ),
+             Description ( "This is key prop" )]
+         string name;
 
-There are alternate output formats for those subcommands that output CIM objects. Thus,
-``instance enumerate <classname>`` can produce a table output where the columns are
-the properties by setting the general option ``-o table``. The following is an
-example (The instances of CIM_Foo only have two properties):
+         string extraProperty = "defaultvalue";
 
-.. code-block:: text
+      };
 
-    $ pywbemcli -N mocsvrassoc -o table -m tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
-    Instances: CIM_Foo
-    +--------------+---------------+
-    | InstanceID   | IntegerProp   |
-    |--------------+---------------|
-    | "CIM_Foo1"   | 1             |
-    | "CIM_Foo2"   | 2             |
-    | "CIM_Foo3"   |               |
-    +--------------+---------------+
+* Enumerate the instances of that class, returning only their instance names
+  by use of the ``--no`` option:
 
-Instance associators the (CIM-XML Associators operation) can be accessed as follows:
+  .. code-block:: text
 
-.. code-block:: text
+      $ pywbemcli -n conn1 instance enumerate TST_Person --no
+      root/cimv2:TST_Person.name="Gabi"
+      root/cimv2:TST_Person.name="Mike"
+      root/cimv2:TST_Person.name="Saara"
+      root/cimv2:TST_Person.name="Sofi"
+      root/cimv2:TST_PersonSub.name="Gabisub"
+      root/cimv2:TST_PersonSub.name="Mikesub"
+      root/cimv2:TST_PersonSub.name="Saarasub"
+      root/cimv2:TST_PersonSub.name="Sofisub"
 
-    $ pywbemcli> instance associators TST_Person -i
-    Pick Instance name to process
-    0: root/cimv2:TST_Person.name="Mike"
-    1: root/cimv2:TST_Person.name="Saara"
-    2: root/cimv2:TST_Person.name="Sofi"
-    3: root/cimv2:TST_Person.name="Gabi"
-    ...
-    Input integer between 0 and 7 or Ctrl-C to exit selection: 0   << user responds 0
+* Retrieve a single instance using one of these instance names:
 
-    instance of TST_Person {
-       name = "Sofi";
-    };
+  .. code-block:: text
 
-    instance of TST_Person {
-       name = "Gabi";
-    };
+      $ pywbemcli -n conn1 instance get 'root/cimv2:TST_Person.name="Sofi"'
+      instance of TST_Person {
+         name = "Sofi";
+      };
 
-    instance of TST_FamilyCollection {
-       name = "Family2";
-    };
+* The instance to be retrieved can also be selected interactively by use of
+  the ``-i`` option:
+
+  .. code-block:: text
+
+      $ pywbemcli -n conn1 instance get TST_Person -i
+      Pick Instance name to process
+      0: root/cimv2:TST_Person.name="Mike"
+      1: root/cimv2:TST_Person.name="Saara"
+      2: root/cimv2:TST_Person.name="Sofi"
+      3: root/cimv2:TST_Person.name="Gabi"
+      4: root/cimv2:TST_PersonSub.name="Mikesub"
+      5: root/cimv2:TST_PersonSub.name="Saarasub"
+      6: root/cimv2:TST_PersonSub.name="Sofisub"
+      7: root/cimv2:TST_PersonSub.name="Gabisub"
+      Input integer between 0 and 7 or Ctrl-C to exit selection: : 3
+      instance of TST_Person {
+         name = "Gabi";
+      };
+
+* There are multiple output formats supported. The enumerated instances can for
+  example be formatted as a table of properties by use of the ``-o table``
+  general option (these instances have only one property 'name'):
+
+  .. code-block:: text
+
+      $ pywbemcli -n conn1 -o table instance enumerate TST_Person
+      Instances: TST_Person
+      +------------+
+      | name       |
+      |------------|
+      | "Gabi"     |
+      | "Mike"     |
+      | "Saara"    |
+      | "Sofi"     |
+      | "Gabisub"  |
+      | "Mikesub"  |
+      | "Saarasub" |
+      | "Sofisub"  |
+      +------------+
+
+* Traverse all associations starting from a specific instance that is selected
+  interactively:
+
+  .. code-block:: text
+
+      $ pywbemcli -n conn1 -o table instance associators TST_Person -i
+      Pick Instance name to process
+      0: root/cimv2:TST_Person.name="Mike"
+      1: root/cimv2:TST_Person.name="Saara"
+      2: root/cimv2:TST_Person.name="Sofi"
+      3: root/cimv2:TST_Person.name="Gabi"
+      4: root/cimv2:TST_PersonSub.name="Mikesub"
+      5: root/cimv2:TST_PersonSub.name="Saarasub"
+      6: root/cimv2:TST_PersonSub.name="Sofisub"
+      7: root/cimv2:TST_PersonSub.name="Gabisub"
+      Input integer between 0 and 7 or Ctrl-C to exit selection: : 0
+      Instances: TST_FamilyCollection
+      +-----------+
+      | name      |
+      |-----------|
+      | "Family2" |
+      | "Gabi"    |
+      | "Sofi"    |
+      +-----------+
 
 Other operations against WBEM servers include getting information on namespaces,
-the interop namespace, and WBEM server brand informaton:
+the Interop namespace, WBEM server brand information, or the advertised
+management profiles:
 
-.. code-block:: text
+* Show the Interop namespace of the server:
 
-    $ pywbemcli -s https://localhost server interop
+  .. code-block:: text
 
-    Server Interop Namespace:
-    Namespace Name
-    ----------------
-    root/PG_InterOp
+      $ pywbemcli -n conn1 server interop
+      Server Interop Namespace:
+      Namespace Name
+      ----------------
+      root/PG_InterOp
 
-Or to view registered profiles:
+* List the advertised management profiles:
 
-.. code-block:: text
+  .. code-block:: text
 
-    $ pywbemcli -s http://localhost -u kschopmeyer -p test8play server profiles --organization DMTF
+      $ pywbemcli -n conn1 server profiles --organization DMTF
       Advertised management profiles:
-    +----------------+----------------------+-----------+
-    | Organization   | Registered Name      | Version   |
-    |----------------+----------------------+-----------|
-    | DMTF           | CPU                  | 1.0.0     |
-    | DMTF           | Computer System      | 1.0.0     |
-    | DMTF           | Ethernet Port        | 1.0.0     |
-    | DMTF           | Fan                  | 1.0.0     |
-    | DMTF           | Indications          | 1.1.0     |
-    | DMTF           | Profile Registration | 1.0.0     |
-    +----------------+----------------------+-----------+
-
+      +----------------+----------------------+-----------+
+      | Organization   | Registered Name      | Version   |
+      |----------------+----------------------+-----------|
+      | DMTF           | CPU                  | 1.0.0     |
+      | DMTF           | Computer System      | 1.0.0     |
+      | DMTF           | Ethernet Port        | 1.0.0     |
+      | DMTF           | Fan                  | 1.0.0     |
+      | DMTF           | Indications          | 1.1.0     |
+      | DMTF           | Profile Registration | 1.0.0     |
+      +----------------+----------------------+-----------+
 
 Pywbemcli can also be executed in the interactive (REPL) mode by executing it
 without entering a command or by using the command ``repl``. In this mode
@@ -272,7 +329,7 @@ executed:
 
 .. code-block:: text
 
-    $ pywbemcli -s http://localhost -u kschopmeyer -p test8play
+    $ pywbemcli -n conn1
     Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.
     pywbemcli> server brand
 
@@ -287,68 +344,13 @@ executed:
     ----------------
     root/PG_InterOp
     pywbemcli> :q
-    $
-
-There are several commands in different command groups to help locating information on the WBEM
-server including `class find`, `instance count`, and `class tree`.
-
-For example `class find` finds classes that start with `CIM_` across
-multiple namespaces.
-
-.. code-block:: text
-
-    $ pywbemcli -m tests/unit/simple_mock_model.mof class find CIM_
-
-      root/cimv2:CIM_Foo
-      root/cimv2:CIM_Foo_sub
-      root/cimv2:CIM_Foo_sub2
-      root/cimv2:CIM_Foo_sub_sub
-
-The command `class tree` produces an ASCII tree output of the hiearchy of
-classes:
-
-.. code-block:: text
-
-    $ pywbemcli -m tests/unit/simple_mock_model.mof class tree
-    root
-     +-- CIM_Foo
-         +-- CIM_Foo_sub2
-         +-- CIM_Foo_sub
-             +-- CIM_Foo_sub_sub
-
-Pywbemcli can maintain a persistent file of connections that can be accessed by
-name. The following example shows creation of a new named server definition. The
-first command creates a new connection in the connectionfile. The second
-command lists the connections in the connection file, and thethird executes
-`class enumerate -o` on the named server:
-
-.. code-block:: text
-
-    $ pywbemcli -m tests/unit/simple_mock_model.mof -N mocksvr1 connection save
-    $ pywbemcli connection list
-    WBEMServer Connections:
-    +--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------+
-    | name         | server uri       | namespace   | user        |   timeout | no-verify   | mock_server                            |
-    |--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------|
-    | mock1        |                  | root/cimv2  |             |           | False       | tests/unit/simple_mock_model.mof       |
-    | mockalltypes |                  | root/cimv2  |             |        30 | False       | tests/unit/all_types.mof               |
-    | mockassoc    |                  | root/cimv2  |             |        30 | False       | tests/unit/simple_assoc_mock_model.mof |
-    | mockext      |                  | root/cimv2  |             |        30 | False       | tests/unit/simple_mock_model_ext.mof   |
-    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False       |                                        |
-    | test3        |                  | root/cimv2  |             |           | False       | tests/unit/simple_mock_model.mof       |
-    |              |                  |             |             |           |             | tests/unit/mock_confirm_y.py           |
-    +--------------+------------------+-------------+-------------+-----------+-------------+----------------------------------------+
-    $ pywbemcli -N mocksvr1 class enumerate -o
-
-    CIM_Foo
 
 
 Project Planning
 ----------------
 
 For each upcoming release, the bugs and feature requests that are planned to
-be addressed in that release are listed in the
-`issue tracker <https://github.com/pywbem/pywbemtools/issues>`_
+be addressed in that release are listed in the `pywbemtools issue tracker`_
 with an according milestone set that identifies the target release.
 The due date on the milestone definition is the planned release date.
 There is usually also an issue that sets out the major goals for an upcoming
@@ -359,9 +361,7 @@ Contributing
 ------------
 
 For information on how to contribute to this project, see
-`Development documentation`_.
-
-.. _Development documentation: https://github.com/pywbem/pywbemtools/blob/master/DEVELOP.md
+`pywbemtools contributions`_.
 
 
 License
@@ -369,4 +369,16 @@ License
 
 The pywbemtools package is licensed under the `Apache 2.0 License`_.
 
+
+.. _pywbemtools documentation: https://pywbemtools.readthedocs.io/en/stable/
+.. _pywbemtools installation: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
+.. _pywbemtools contributions: https://pywbemtools.readthedocs.io/en/stable/development.html#contributing
+.. _pywbemtools change history: https://pywbemtools.readthedocs.io/en/stable/changes.html
+.. _pywbemtools issue tracker: https://github.com/pywbem/pywbemtools/issues
+.. _pywbem package on Pypi: https://pypi.org/project/pywbem/
+.. _DMTF: https://www.dmtf.org/
+.. _CIM/WBEM standards: https://www.dmtf.org/standards/wbem/
+.. _DSP0200 (CIM Operations over HTTP): https://www.dmtf.org/sites/default/files/standards/documents/DSP0200_1.4.0.pdf
+.. _SNIA: https://www.snia.org/
+.. _SMI-S: https://www.snia.org/forums/smi/tech_programs/smis_home
 .. _Apache 2.0 License: https://github.com/pywbem/pywbemtools/tree/master/LICENSE.txt
