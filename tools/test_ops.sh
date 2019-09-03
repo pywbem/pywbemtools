@@ -33,11 +33,11 @@ function cmd {
 #
 cmd "class get CIM_ManagedElement"
 cmd "class get CIM_ManagedElement -l"
-cmd "class get CIM_ManagedElement --localonly"
-cmd "class get CIM_ManagedElement --no_includequalifiers"
+cmd "class get CIM_ManagedElement --local-only"
+cmd "class get CIM_ManagedElement --no-qualifiers"
 cmd "class get CIM_ManagedElement -c"
-cmd "class get CIM_ManagedElement --includeclassorigin"
-cmd "class get CIM_ManagedElement --includeclassorigin"
+cmd "class get CIM_ManagedElement --include-classorigin"
+cmd "class get CIM_ManagedElement --include-classorigin"
 cmd "class get CIM_ManagedElement --namespace root/PG_Interop"
 cmd "class get CIM_ManagedElement -p InstanceID -p Caption"
 cmd "class get CIM_ManagedElement -p InstanceID"
@@ -48,14 +48,14 @@ cmd "class enumerate CIM_System"
 cmd "class enumerate CIM_System -d"
 cmd "class enumerate CIM_System -l"
 cmd "class enumerate CIM_System -s"
-cmd "class enumerate CIM_System --localonly"
-cmd "class enumerate CIM_System --names_only"
+cmd "class enumerate CIM_System --local-only"
+cmd "class enumerate CIM_System --names-only"
 cmd "class enumerate CIM_System -o"
 cmd "class enumerate CIM_System -o -s"
 
 #
 cmd "class associators CIM_System"
-cmd "class associators CIM_System -s" 
+cmd "class associators CIM_System -s"
 cmd "class associators CIM_System -o"
 cmd "class associators CIM_System -o -s"
 
@@ -123,4 +123,3 @@ if (( $ERRORS != 0 )); then
     exit 1
 fi
 exit 0
-

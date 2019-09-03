@@ -116,7 +116,7 @@ class ClassTests(TestsContainer):
         self.assert_found('CIM_ManagedElement', out)
 
     def test__get_localonly(self):
-        """Test class get --localonly"""
+        """Test class get --local-only"""
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement -l')
 
         self.assertEqual(exitcode, 0)
@@ -124,7 +124,7 @@ class ClassTests(TestsContainer):
         self.assert_found('CIM_ManagedElement', out)
 
         exitcode, out, err = self.class_cmd(
-            'get CIM_ManagedElement --localonly')
+            'get CIM_ManagedElement --local-only')
 
         self.assertEqual(exitcode, 0)
         self.assert_found('CIM_ManagedElement', out)
@@ -132,7 +132,7 @@ class ClassTests(TestsContainer):
     def test_get_no_includequalifiers(self):
         """ """
         exitcode, out, err = self.class_cmd(
-            'get CIM_ManagedElement --no_includequalifiers')
+            'get CIM_ManagedElement --no-qualifiers')
 
         self.assertEqual(exitcode, 0)
         self.assert_found('CIM_ManagedElement', out)
@@ -169,7 +169,7 @@ class ClassTests(TestsContainer):
 # TODO finish this based on the test_ops in the tools directory
 
 # cmd "class get CIM_ManagedElement -c"
-# cmd "class get CIM_ManagedElement --includeclassorigin"
+# cmd "class get CIM_ManagedElement --include-classorigin"
 # cmd "class get CIM_ManagedElement --namespace root/PG_Interop"
 # cmd "class get CIM_ManagedElement - root/PG_Interop"
 

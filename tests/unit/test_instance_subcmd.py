@@ -379,7 +379,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
-     '--pull_max_cnt=2',
+     '--pull-max-cnt=2',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
                  'all=stderr']},
@@ -391,7 +391,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
-     '--pull_max_cnt=2 and --namesonly',
+     '--pull-max-cnt=2 and --namesonly',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
                  'all=stderr']},
@@ -1277,7 +1277,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand references CIM_Foo with --use-pull yes '
-     'and --pull_max_cnt=1',
+     'and --pull-max-cnt=1',
      {'args': ['references', 'TST_Person.name="Mike"'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
@@ -1290,7 +1290,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand reference paths CIM_Foo with --use-pull '
-     'yes and --pull_max_cnt=1 and --names_only',
+     'yes and --pull-max-cnt=1 and --names-only',
      {'args': ['references', 'TST_Person.name="Mike"', '--names-only'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
@@ -1486,7 +1486,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associators CIM_Foo with --use-pull yes '
-     'and --pull_max_cnt=1',
+     'and --pull-max-cnt=1',
      {'args': ['associators', 'TST_Person.name="Mike"'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
@@ -1498,7 +1498,7 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand associator paths CIM_Foo with --use-pull '
-     'yes and --pull_max_cnt=1 and --names_only',
+     'yes and --pull-max-cnt=1 and --names-only',
      {'args': ['associators', 'TST_Person.name="Mike"', '--names-only'],
       'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
                  'all=stderr']},
