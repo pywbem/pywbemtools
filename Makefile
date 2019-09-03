@@ -562,7 +562,7 @@ endif
 # regenerate MANIFEST. Otherwise, changes in MANIFEST.in will not be used.
 # Note: Deleting build is a safeguard against picking up partial build products
 # which can lead to incorrect hashbangs in the pywbem scripts in wheel archives.
-$(bdist_file) $(sdist_file): _check_version setup.py MANIFEST.in $(dist_dependent_files) $(moftab_files)
+$(bdist_file) $(sdist_file): _check_version setup.py MANIFEST.in $(doc_utility_help_files) $(dist_dependent_files) $(moftab_files)
 	@echo "makefile: Creating the distribution archive files"
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info-INFO .eggs)
