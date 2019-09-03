@@ -480,7 +480,7 @@ clean:
 	-$(call RM_R_FUNC,*.pyc)
 	-$(call RMDIR_R_FUNC,__pycache__)
 	-$(call RM_FUNC,MANIFEST)
-	-$(call RMDIR_FUNC,build .cache $(package_name).egg-info .eggs)
+	-$(call RMDIR_FUNC,build .cache .pytest_cache $(package_name).egg-info .eggs)
 	@echo "makefile: Done removing temporary build products"
 	@echo "makefile: Target $@ done."
 
