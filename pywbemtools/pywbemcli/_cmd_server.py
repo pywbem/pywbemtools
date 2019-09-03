@@ -26,6 +26,11 @@ from pywbem import ValueMapping, Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, format_table
 
+# NOTE: A number of the options use double-dash as the short form.  In those
+# cases, a third definition of the options without the double-dash defines
+# the corresponding option name, ex. 'include_qualifiers'. It should be
+# defined with underscore and not dash
+
 
 @cli.group('server', options_metavar=CMD_OPTS_TXT)
 def server_group():
@@ -122,19 +127,19 @@ def server_profiles(context, **options):
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
               help='Filter by the profile name. (ex. -p Array')
-@click.option('-c', '--central-class', type=str, metavar='CLASSNAME',
-              required=False,
+@click.option('--cc', '--central-class', 'central_class', type=str,
+              metavar='CLASSNAME', required=False,
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-s', '--scoping-class', type=str, metavar='CLASSNAME',
-              required=False,
+@click.option('--sc', '--scoping-class', 'scoping_class', type=str,
+              metavar='CLASSNAME', required=False,
               help='Optional. Required only if profiles supports only '
               'scopig methodology')
-@click.option('-S', '--scoping-path', type=str, metavar='CLASSLIST',
-              required=False, multiple=True,
+@click.option('--sp', '--scoping-path', 'scoping_path', type=str,
+              metavar='CLASSLIST', required=False, multiple=True,
               help='Optional. Required only if profiles supports only '
               'scopig methodology. Multiples allowed')
-@click.option('-r', '--reference-direction',
+@click.option('--rd', '--reference-direction', 'reference_direction',
               type=click.Choice(['snia', 'dmtf']),
               default='dmtf',
               show_default=True,

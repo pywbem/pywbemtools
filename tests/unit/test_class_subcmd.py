@@ -85,7 +85,7 @@ CLASS_DELETE_HELP_LINES = [
 CLASS_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME',
     'List top classes or subclasses of a class in a namespace.',
-    '-d, --deep-inheritance Include the complete subclass hierarchy',
+    '--di, --deep-inheritance Include the complete subclass hierarchy',
     CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
@@ -344,8 +344,15 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo local only',
-     ['enumerate', 'CIM_Foo', '-l'],
+    ['Verify class subcommand enumerate CIM_Foo --lo',
+     ['enumerate', 'CIM_Foo', '--lo'],
+     {'stdout':
+      '   [Description ( "Subclass of CIM_Foo" )]',
+      'test': 'startswith'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate CIM_Foo --lo',
+     ['enumerate', 'CIM_Foo', '--local-only'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -370,8 +377,8 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo -d',
-     ['enumerate', 'CIM_Foo', '-d'],
+    ['Verify class subcommand enumerate CIM_Foo --di',
+     ['enumerate', 'CIM_Foo', '--di'],
      {'stdout':
       '   [Description ( "Subclass of CIM_Foo" )]',
       'test': 'startswith'},
@@ -469,8 +476,15 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand enumerate CIM_Foo names and -d --no',
-     ['enumerate', 'CIM_Foo', '-d', '--no'],
+    ['Verify class subcommand enumerate CIM_Foo names and --di --no',
+     ['enumerate', 'CIM_Foo', '--di', '--no'],
+     {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class subcommand enumerate CIM_Foo names and --deep-inheritance '
+      '--names-only',
+     ['enumerate', 'CIM_Foo', '--names-only', '--deep-inheritance'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -541,8 +555,8 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class subcommand get local-only(-l)).',
-     ['get', 'CIM_Foo_sub2', '-l'],
+    ['Verify class subcommand get local-only(--lo)).',
+     ['get', 'CIM_Foo_sub2', '--lo'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
                  '   string cimfoo_sub2;',
@@ -562,6 +576,29 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # includequalifiers. Test the flag that excludes qualifiers
+    ['Verify class subcommand get without qualifiers. Tests whole response',
+     ['get', 'CIM_Foo_sub2', '--nq'],
+     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
+                 '',
+                 '   string cimfoo_sub2;',
+                 '',
+                 '   string InstanceID;',
+                 '',
+                 '   uint32 IntegerProp;',
+                 '',
+                 '   uint32 Fuzzy(',
+                 '      string TestInOutParameter,',
+                 '      CIM_Foo REF TestRef,',
+                 '      string OutputParam,',
+                 '      uint32 OutputRtnValue);',
+                 '',
+                 '   uint32 DeleteNothing();',
+                 '',
+                 '};',
+                 '', ],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify class subcommand get without qualifiers. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--no-qualifiers'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',

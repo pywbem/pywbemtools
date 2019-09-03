@@ -350,10 +350,10 @@ The following defines the help output for the `pywbemcli class enumerate --help`
         pywbemcli -n myconn class enumerate CIM_Foo -n interop
 
     Options:
-      -d, --deep-inheritance        Include the complete subclass hierarchy of the
+      --di, --deep-inheritance      Include the complete subclass hierarchy of the
                                     requested classes in the result set. Default:
                                     Do not include subclasses.
-      -l, --local-only              Do not include superclass properties and
+      --lo, --local-only            Do not include superclass properties and
                                     methods in the returned class(es). Default:
                                     Include superclass properties and methods.
       --nq, --no-qualifiers         Do not include qualifiers in the returned
@@ -449,7 +449,7 @@ The following defines the help output for the `pywbemcli class get --help` comma
         pywbemcli -n myconn class get CIM_Foo -n interop
 
     Options:
-      -l, --local-only                Do not include superclass properties and
+      --lo, --local-only              Do not include superclass properties and
                                       methods in the returned class(es). Default:
                                       Include superclass properties and methods.
       --nq, --no-qualifiers           Do not include qualifiers in the returned
@@ -1147,12 +1147,12 @@ The following defines the help output for the `pywbemcli instance associators --
                                       must be a class name, and the instances of
                                       that class are presented.
       -s, --summary                   Show only a summary (count) of the objects.
-      -f, --filter-query QUERY-STRING
+      --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
-      --filter-query-language QUERY-LANGUAGE
+      --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
       -h, --help                      Show this message and exit.
@@ -1234,7 +1234,7 @@ The following defines the help output for the `pywbemcli instance create --help`
         pywbemcli instance create CIM_blah -P id=3 -P arr="bla bla",foo
 
     Options:
-      -P, --property PROPERTYNAME=VALUE
+      -p, --property PROPERTYNAME=VALUE
                                       Initial property value for the new instance.
                                       May be specified multiple times. Array
                                       property values are specified as a comma-
@@ -1327,13 +1327,13 @@ The following defines the help output for the `pywbemcli instance enumerate --he
       will be replaced with MOF format.
 
     Options:
-      -l, --local-only                When traditional operations are used, do not
+      --lo, --local-only              When traditional operations are used, do not
                                       include superclass properties in the
                                       returned instances. Some servers may ignore
                                       this option. By default, and when pull
                                       operations are used, superclass properties
                                       will always be included.
-      -d, --deep-inheritance          Include subclass properties in the returned
+      --di, --deep-inheritance        Include subclass properties in the returned
                                       instances. Default: Do not include subclass
                                       properties.
       --iq, --include-qualifiers      When traditional operations are used,
@@ -1360,12 +1360,12 @@ The following defines the help output for the `pywbemcli instance enumerate --he
                                       Default: Retrieve the complete objects
                                       including object paths.
       -s, --summary                   Show only a summary (count) of the objects.
-      -f, --filter-query QUERY-STRING
+      --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
-      --filter-query-language QUERY-LANGUAGE
+      --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
       -h, --help                      Show this message and exit.
@@ -1406,7 +1406,7 @@ The following defines the help output for the `pywbemcli instance get --help` co
       format general option.
 
     Options:
-      -l, --local-only                Do not include superclass properties in the
+      --lo, --local-only              Do not include superclass properties in the
                                       returned instance. Some servers may ignore
                                       this option. Default: Include superclass
                                       properties.
@@ -1544,7 +1544,7 @@ The following defines the help output for the `pywbemcli instance modify --help`
         pywbemcli instance modify CIM_blah.fred=3 -P id=3 -P arr="bla bla",foo
 
     Options:
-      -P, --property PROPERTYNAME=VALUE
+      -p, --property PROPERTYNAME=VALUE
                                       Property to be modified, with its new value.
                                       May be specified once for each property to
                                       be modified. Array property values are
@@ -1687,12 +1687,12 @@ The following defines the help output for the `pywbemcli instance references --h
                                       must be a class name, and the instances of
                                       that class are presented.
       -s, --summary                   Show only a summary (count) of the objects.
-      -f, --filter-query QUERY-STRING
+      --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
-      --filter-query-language QUERY-LANGUAGE
+      --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
       -h, --help                      Show this message and exit.
@@ -1950,11 +1950,13 @@ The following defines the help output for the `pywbemcli server get-centralinsts
       -o, --organization ORG-NAME     Filter by the defined organization. (ex. -o
                                       DMTF
       -p, --profile PROFILE-NAME      Filter by the profile name. (ex. -p Array
-      -c, --central-class CLASSNAME   Optional. Required only if profiles supports
+      --cc, --central-class CLASSNAME
+                                      Optional. Required only if profiles supports
                                       only scopig methodology
-      -s, --scoping-class CLASSNAME   Optional. Required only if profiles supports
+      --sc, --scoping-class CLASSNAME
+                                      Optional. Required only if profiles supports
                                       only scopig methodology
-      -S, --scoping-path CLASSLIST    Optional. Required only if profiles supports
+      --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports
                                       only scopig methodology. Multiples allowed
       -r, --reference-direction [snia|dmtf]
                                       Navigation direction for association.

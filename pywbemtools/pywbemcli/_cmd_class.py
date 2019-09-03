@@ -39,6 +39,11 @@ from ._displaytree import display_class_tree
 #   Common option definitions for class group
 #
 
+# NOTE: A number of the options use double-dash as the short form.  In those
+# cases, a third definition of the options without the double-dash defines
+# the corresponding option name, ex. 'include_qualifiers'. It should be
+# defined with underscore and not dash
+
 no_qualifiers_class_option = [              # pylint: disable=invalid-name
     click.option('--nq', '--no-qualifiers', 'no_qualifiers', is_flag=True,
                  default=True,
@@ -46,14 +51,14 @@ no_qualifiers_class_option = [              # pylint: disable=invalid-name
                       'Default: Include qualifiers.')]
 
 deep_inheritance_class_option = [              # pylint: disable=invalid-name
-    click.option('-d', '--deep-inheritance', is_flag=True,
+    click.option('--di', '--deep-inheritance', 'deep_inheritance', is_flag=True,
                  default=False,
                  help='Include the complete subclass hierarchy of the '
                       'requested classes in the result set. '
                       'Default: Do not include subclasses.')]
 
 local_only_class_option = [              # pylint: disable=invalid-name
-    click.option('-l', '--local-only', is_flag=True,
+    click.option('--lo', '--local-only', 'local_only', is_flag=True,
                  default=False,
                  help='Do not include superclass properties and methods in '
                       'the returned class(es). '
@@ -110,8 +115,7 @@ def class_get(context, classname, **options):
 
 @class_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
-@click.option('-f', '--force', is_flag=True,
-              default=False,
+@click.option('-f', '--force', is_flag=True, default=False,
               help='Delete any instances of the class as well. '
                    'Some servers may still reject the class deletion. '
                    'Default: Reject command if the class has any instances.')
@@ -276,8 +280,7 @@ def class_references(context, classname, **options):
               help='Filter the result set by association class name. '
                    'Subclasses of the specified class also match.')
 @click.option('--rc', '--result-class', 'result_class', type=str,
-              required=False,
-              metavar='CLASSNAME',
+              required=False, metavar='CLASSNAME',
               help='Filter the result set by result class name. '
                    'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
@@ -365,8 +368,7 @@ def class_find(context, classname_glob, **options):
 
 @class_group.command('tree', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
-@click.option('-s', '--superclasses', is_flag=True,
-              default=False,
+@click.option('-s', '--superclasses', is_flag=True, default=False,
               help='Show the superclass hierarchy. '
                    'Default: Show the subclass hierarchy.')
 @add_options(namespace_option)

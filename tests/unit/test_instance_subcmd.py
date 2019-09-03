@@ -99,7 +99,7 @@ INSTANCE_COUNT_HELP_LINES = [
 INSTANCE_CREATE_HELP_LINES = [
     'Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME',
     'Create an instance of a class in a namespace.',
-    '-P, --property PROPERTYNAME=VALUE Initial property value',
+    '-p, --property PROPERTYNAME=VALUE Initial property value',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -117,7 +117,7 @@ INSTANCE_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME',
     'List the instances of a class.',
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE,
-    '-d, --deep-inheritance Include subclass properties in the returned',
+    '--di, --deep-inheritance Include subclass properties in the returned',
     CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
@@ -154,7 +154,7 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
 INSTANCE_MODIFY_HELP_LINES = [
     'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
     'Modify properties of an instance.',
-    '-P, --property PROPERTYNAME=VALUE Property to be modified',
+    '-p, --property PROPERTYNAME=VALUE Property to be modified',
     '--pl, --propertylist PROPERTYLIST Reduce the properties to be modified',
     CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_VERIFY_HELP_LINE,
@@ -402,8 +402,8 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo -d',
-     ['enumerate', 'CIM_Foo', '-d'],
+    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo --di',
+     ['enumerate', 'CIM_Foo', '--di'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -415,15 +415,16 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate deep-inheritance CIM_Foo -d',
-     {'args': ['enumerate', 'CIM_Foo', '-d'],
+    ['Verify instance subcommand -o grid enumerate deep-inheritance CIM_Foo '
+     '--di',
+     {'args': ['enumerate', 'CIM_Foo', '--di'],
       'global': ['--output-format', 'grid']},
      {'stdout': ENUM_INSTANCE_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
-     {'args': ['enumerate', 'CIM_Foo', '-d', '--no'],
+    ['Verify instance subcommand -o grid enumerate di CIM_Foo --di -o',
+     {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
       'global': ['--output-format', 'grid']},
      {'stdout': """InstanceNames: CIM_Foo
 +--------+-------------+---------+-----------------------+
@@ -439,8 +440,8 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
-     {'args': ['enumerate', 'CIM_Foo', '-d', '--no'],
+    ['Verify instance subcommand -o grid enumerate di CIM_Foo --di --no',
+     {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
       'global': ['--output-format', 'txt']},
      {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
@@ -468,7 +469,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand -o grid enumerate di alltypes, datetime',
-     {'args': ['enumerate', 'Pywbem_Alltypes', '-d',
+     {'args': ['enumerate', 'Pywbem_Alltypes', '--di',
                '--propertylist', 'scalDateTime', '--pl', 'scalTimeDelta'],
       'global': ['--output-format', 'grid']},
      {'stdout': ["""Instances: PyWBEM_AllTypes
@@ -653,7 +654,7 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand get with instancename local_only returns data',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-l'],
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -689,7 +690,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand get with instancename --include-qualifiers '
      'and general --use-pull returns data',
-     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--iq'],
       'global': ['--use-pull', 'no']},
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
@@ -839,7 +840,7 @@ Instances: PyWBEM_AllTypes
      None, OK],
 
     ['Verify instance subcommand create, new instance of CIM_Foo one property',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah'],
+     ['create', 'CIM_Foo', '-p', 'InstanceID=blah'],
      {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
       'rc': 0,
       'test': 'lines'},
@@ -847,7 +848,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand create, new instance of CIM_Foo one '
      'property and verify yes',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  'root/cimv2:CIM_Foo.InstanceID="blah"',
@@ -858,7 +859,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand create, new instance of CIM_Foo one '
      'property and verify no',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '--verify'],
+     ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  'root/cimv2:CIM_Foo.InstanceID="blah"',
@@ -870,7 +871,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
-     ['create', 'CIM_Foo', '-P', 'InstanceID=blah', '-n', 'root/cimv2'],
+     ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '-n', 'root/cimv2'],
      {'stdout': "",
       'rc': 0,
       'test': 'regex'},
@@ -889,14 +890,14 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand create, new instance of all_types '
      'with scalar types',
      ['create', 'PyWBEM_AllTypes',
-      '-P', 'InstanceID=BunchOfValues',
-      '-P', 'scalBool=true', '-P', 'scalUint8=1',
-      '-P', 'scalUint16=9', '-P', 'scalSint16=-9',
-      '-P', 'scalUint32=999', '-P', 'scalSint32=-999',
-      '-P', 'scalSint64=-9999',
-      '-P', 'scalUint64=9999',
-      '-P', 'scalString="test\"embedded\"quote"',
-      '-P', 'scalDateTime=19991224120000.000000+360'],
+      '-p', 'InstanceID=BunchOfValues',
+      '-p', 'scalBool=true', '-p', 'scalUint8=1',
+      '-p', 'scalUint16=9', '-p', 'scalSint16=-9',
+      '-p', 'scalUint32=999', '-p', 'scalSint32=-999',
+      '-p', 'scalSint64=-9999',
+      '-p', 'scalUint64=9999',
+      '-p', 'scalString="test\"embedded\"quote"',
+      '-p', 'scalDateTime=19991224120000.000000+360'],
      {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="BunchOfValues"',
       'rc': 0,
       'test': 'lines'},
@@ -905,14 +906,14 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand create, new instance of all_types '
      "with array values",
      ['create', 'PyWBEM_AllTypes',
-      '-P', 'InstanceID=blah',
-      '-P', 'arrayBool=true,false',
-      '-P', 'arrayUint8=1,2,3',
-      '-P', 'arraySint8=-1,-2,-3',
-      '-P', 'arrayUint16=9,19',
-      '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
-      '-P', 'arrayUint64=0,999,9999', '-P', 'arraySint64=-9999,0,9999',
-      '-P', 'scalString="abc", "def", "jhijk"'],
+      '-p', 'InstanceID=blah',
+      '-p', 'arrayBool=true,false',
+      '-p', 'arrayUint8=1,2,3',
+      '-p', 'arraySint8=-1,-2,-3',
+      '-p', 'arrayUint16=9,19',
+      '-p', 'arrayUint32=0,99,999', '-p', 'arraySint32=0,-999,-999',
+      '-p', 'arrayUint64=0,999,9999', '-p', 'arraySint64=-9999,0,9999',
+      '-p', 'scalString="abc", "def", "jhijk"'],
      {'stdout': 'root/cimv2:PyWBEM_AllTypes.InstanceId="blah"',
       'rc': 0,
       'test': 'lines'},
@@ -920,14 +921,14 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand create, new instance Error in Property Type'
      " with array values",
-     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=blah',
-      '-P', 'arrayBool=8,9',
-      '-P', 'arrayUint8=1,2,3',
-      '-P', 'arraySint8=-1,-2,-3',
-      '-P', 'arrayUint16=9,19',
-      '-P', 'arrayUint32=0,99,999', '-P', 'arraySint32=0,-999,-999',
-      '-P', 'arrayUint64=0,999,9999', '-P', 'arraySint64=-9999,0,9999',
-      '-P', 'scalString="abc", "def", "jhijk"'],
+     ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=blah',
+      '-p', 'arrayBool=8,9',
+      '-p', 'arrayUint8=1,2,3',
+      '-p', 'arraySint8=-1,-2,-3',
+      '-p', 'arrayUint16=9,19',
+      '-p', 'arrayUint32=0,99,999', '-p', 'arraySint32=0,-999,-999',
+      '-p', 'arrayUint64=0,999,9999', '-p', 'arraySint64=-9999,0,9999',
+      '-p', 'scalString="abc", "def", "jhijk"'],
      {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
                 "type='boolean', array=True and input value='8,9'. "
                 'Exception: Invalid boolean value: "8"',
@@ -936,7 +937,7 @@ Instances: PyWBEM_AllTypes
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance already exists',
-     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance'],
+     ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance'],
      {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
                  'namespace "root/cimv2" in WEB server: FakedWBEMConnection'],
       'rc': 1,
@@ -944,7 +945,7 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance subcommand create, new instance invalid ns',
-     ['create', 'PyWBEM_AllTypes', '-P', 'InstanceID=test_instance', '-n',
+     ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance', '-n',
       'blah'],
      {'stderr': ["Error: Exception 3", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
@@ -953,7 +954,7 @@ Instances: PyWBEM_AllTypes
 
 
     ['Verify instance subcommand create, new instance invalid class',
-     ['create', 'CIM_blah', '-P', 'InstanceID=test_instance'],
+     ['create', 'CIM_blah', '-p', 'InstanceID=test_instance'],
      {'stderr': ["Error:", "CIMClass"],
       'rc': 1,
       'test': 'in'},
@@ -981,7 +982,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False'],
+      '-p', 'scalBool=False'],
      {'stdout': "",
       'rc': 0,
       'test': 'linesnows'},
@@ -989,7 +990,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single good change with verify yes',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False', '--verify'],
+      '-p', 'scalBool=False', '--verify'],
      {'stdout': ['instance of PyWBEM_AllTypes {',
                  'scalBool = false;',
                  '};',
@@ -1000,7 +1001,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single good change with verify no',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False', '--verify'],
+      '-p', 'scalBool=False', '--verify'],
      {'stdout': ['instance of PyWBEM_AllTypes {',
                  'scalBool = false;',
                  'Execute ModifyInstance',
@@ -1012,7 +1013,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single good change, explicit ns',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
-      'root/cimv2', '-P', 'scalBool=False'],
+      'root/cimv2', '-p', 'scalBool=False'],
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
@@ -1028,11 +1029,11 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, multiple good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False',
-      '-P', 'arrayBool=true,false,true',
-      '-P', 'arrayUint32=0,99,999, 3', '-P', 'arraySint32=0,-999,-999,9',
-      '-P', 'arrayUint64=0,999,9999,3000', '-P', 'arraySint64=-9999,0,9999,4',
-      '-P', 'scalString="abc", "def", "jhijk"'],
+      '-p', 'scalBool=False',
+      '-p', 'arrayBool=true,false,true',
+      '-p', 'arrayUint32=0,99,999, 3', '-p', 'arraySint32=0,-999,-999,9',
+      '-p', 'arrayUint64=0,999,9999,3000', '-p', 'arraySint64=-9999,0,9999,4',
+      '-p', 'scalString="abc", "def", "jhijk"'],
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
@@ -1043,7 +1044,7 @@ Instances: PyWBEM_AllTypes
     #
     ['Verify instance subcommand modify, invalid class',
      ['modify', 'PyWBEM_AllTypesxxx.InstanceID="test_instance"',
-      '-P', 'scalBool=9'],
+      '-p', 'scalBool=9'],
      {'stderr': ["CIMClass:", "PyWBEM_AllTypesxxx",
                  "does not exist in WEB server",
                  "FakedUrl"],
@@ -1053,7 +1054,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single property, Type Error bool',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=9'],
+      '-p', 'scalBool=9'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
                 "type='boolean', array=False and input value='9'. "
                 'Exception: Invalid boolean value: "9"',
@@ -1063,7 +1064,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single property, Fail modifies key',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'InstanceID=9'],
+      '-p', 'InstanceID=9'],
      {'stderr': 'Error: Server Error modifying instance. Exception: CIMError:'
                 " 4 (CIM_ERR_INVALID_PARAMETER): Property 'InstanceID' in "
                 "ModifiedInstance not in class 'PyWBEM_AllTypes'",
@@ -1074,7 +1075,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance subcommand modify, single property, Type Error uint32. '
      'Uses regex because Exception msg different between python 2 and 3',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalUint32=Fred'],
+      '-p', 'scalUint32=Fred'],
      {'stderr': ["Error: Type mismatch property 'scalUint32' between expected ",
                  "type='uint32', array=False and input value='Fred'. ",
                  "Exception: invalid literal for", "with base 10: 'Fred'"],
@@ -1084,7 +1085,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, single Property arrayness error',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'scalBool=False,True'],
+      '-p', 'scalBool=False,True'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
                 "type='boolean', array=False and input value='False,True'. "
                 'Exception: Invalid boolean value: "False,True"',
@@ -1094,7 +1095,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, Error value types mismatch with array',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'arrayBool=9,8'],
+      '-p', 'arrayBool=9,8'],
      {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
                 "type='boolean', array=True and input value='9,8'. "
                 'Exception: Invalid boolean value: "9"',
@@ -1104,7 +1105,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, Error different value types',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'arrayBool=true,8'],
+      '-p', 'arrayBool=true,8'],
      {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
                 "type='boolean', array=True and input value='true,8'. "
                 'Exception: Invalid boolean value: "8"',
@@ -1114,7 +1115,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, Error integer out of range',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'arrayUint32=99999999999999999999999'],
+      '-p', 'arrayUint32=99999999999999999999999'],
      {'stderr': "Error: Type mismatch property 'arrayUint32' between expected "
                 "type='uint32', array=True and input "
                 "value='99999999999999999999999'. "
@@ -1126,7 +1127,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance subcommand modify, Error property not in class',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-P', 'blah=9'],
+      '-p', 'blah=9'],
      {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes".',
       'rc': 1,
       'test': 'lines'},

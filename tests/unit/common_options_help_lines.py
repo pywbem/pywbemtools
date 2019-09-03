@@ -20,6 +20,11 @@ The expected help text strings are used with the 'innows' test, which is a
 whitespace-tolerant test for whether the expected text is in the actual text.
 """
 
+# NOTE: A number of the options use double-dash as the short form.  In those
+# cases, a third definition of the options without the double-dash defines
+# the corresponding option name, ex. 'include_qualifiers'. It should be
+# defined with underscore and not dash
+
 CMD_OPTION_HELP_HELP_LINE = \
     '-h, --help Show this message and exit.'
 
@@ -39,21 +44,21 @@ CMD_OPTION_SUMMARY_HELP_LINE = \
     '-s, --summary Show only a summary (count) of the objects.'
 
 CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE = \
-    '-l, --local-only Do not include superclass properties and methods in ' \
+    '--lo, --local-only Do not include superclass properties and methods in ' \
     'the returned'
 
 CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE = \
-    '-l, --local-only Do not include superclass properties in the returned'
+    '--lo, --local-only Do not include superclass properties in the returned'
 
 CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE = \
-    '-l, --local-only When traditional operations are used, do not include ' \
+    '--lo, --local-only When traditional operations are used, do not include ' \
     'superclass properties'
 
 CMD_OPTION_PROPERTYLIST_HELP_LINE = \
     '--pl, --propertylist PROPERTYLIST Filter the properties included in'
 
 CMD_OPTION_FILTER_QUERY_LINE = \
-    '-f, --filter-query QUERY-STRING When pull operations are used, filter ' \
+    '--fq, --filter-query QUERY-STRING When pull operations are used, filter ' \
     'the instances in the result'
 
 CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
