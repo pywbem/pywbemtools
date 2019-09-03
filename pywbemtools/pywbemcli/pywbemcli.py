@@ -478,19 +478,16 @@ def repl_help(ctx):  # pylint: disable=unused-argument
     print("""
 The following can be entered in interactive mode:
 
-  <pywbemcli-cmd>             Execute pywbemcli command <pywbemcli-cmd>.
-  !<shell-cmd>                Execute shell command <shell-cmd>.
-
+  COMMAND                     Execute pywbemcli command COMMAND.
+  !SHELL-CMD                  Execute shell command SHELL-CMD.
   <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
-
   <TAB>                       Tab completion (can be used anywhere).
   -h, --help                  Show pywbemcli general help message, including a
                               list of pywbemcli commands.
-  <pywbemcli-cmd> --help      Show help message for pywbemcli command
-                              <pywbemcli-cmd>.
+  COMMAND --help              Show help message for pywbemcli command COMMAND.
   help                        Show this help message.
   :?, :h, :help               Show help message about interactive mode.
-  <up-arrow, down-arrow>      View pwbemcli command history:
+  <UP>, <DOWN>                Scroll through pwbemcli command history.
 """)
 
 
@@ -500,20 +497,14 @@ def repl(ctx):
     """
     Enter interactive mode (default).
 
-    Enters the interactive mode where commands can be entered interactively
-    and load the command history file.
+    Enter the interactive mode where pywbemcli commands can be entered
+    interactively. The prompt is changed to 'pywbemcli>'.
 
-    If no options are specified on the command line, the interactive mode
-    is entered. The prompt is changed to 'pywbemcli>' in the interactive
-    mode.
+    Command history is supported. The command history is stored in a file
+    ~/.pywbemcli_history.
 
     Pywbemcli may be terminated from this mode by entering
     <CTRL-D>, :q, :quit, :exit
-
-    Parameters:
-
-      ctx (:class:`click.Context`): The click context object. Created by the
-        ``@click.pass_context`` decorator.
     """
 
     history_file = PYWBEMCLI_HISTORY_FILE
