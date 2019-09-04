@@ -118,51 +118,72 @@ development and test environment for pywbem. That has a larger set of OS-level
 prerequisites and its setup is described in the :ref:`Pywbemtools development` chapter.
 
 
-.. _`Pywbemtools installation with pip`:
-
-Pywbemtools installation with pip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
 .. _`Installation prerequisites`:
 
 Installation prerequisites
-""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pywbem installation documentation: https://pywbem.readthedocs.io/en/stable/intro.html#installation
 
-
 The Python environment into which you want to install must have the following
-packages installed:
+Python packages installed:
 
-- Python installation support packages(all platforms):
+- setuptools - http://pypi.python.org/pypi/setuptools
+- wheel
+- pip - generally installed with Python 3.x but may be a separate install
+  with Python 2.7 and with Cygwin Python releases.
 
-  - setuptools - http://pypi.python.org/pypi/setuptools
-  - wheel
-  - pip - generally installed with Python 3.x but may be a separate install
-    with Python 2.7 and with Cygwin Python releases.
+Pywbemtools installs the pywbem package which requires a number of OS-level
+packages as documented in the `pywbem installation documentation`_.
+The pywbem package provides the ``pywbem_os_setup.sh/.bat`` scripts that
+install the needed OS-level packages.
 
-Other installation support packages:
+To use these scripts, your system must have the following commands installed:
 
-- Native windows:
-    - Chocolatey package manager. The pywbemtools package installation uses
-      Chocolatey to install software required for the pywbemtools installation
-      that is are normally available with unix style OSs (ex. make). See
-      https://chocolatey.org/ for the installation instructions for Chocolatey.
-- Windows Cygwin
-    - wget - wget can be installed as part of the Cygwin installation or
-      added with Cygwin package update.
-    - python-devel - Probably named python2-devel / python3-devel
+* On native windows:
 
-Pywbemtools installs the pywbem package which has a number of
-prerequisites for installation as documented in the `pywbem installation
-documentation`_. These requirements should be covered by the list above.
+  - ``choco`` - Chocolatey package manager. The pywbemtools package installation
+    uses Chocolatey to install OS-level software. See https://chocolatey.org/
+    for the installation instructions for Chocolatey.
+
+* On all platforms:
+
+  - ``wget`` - Download tool.
 
 
 .. _`Installation with pip`:
 
 Installation with pip
-"""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^
+
+On Linux, OS-X, and UNIX-like environments under Windows, download the
+``pywbem_os_setup.sh`` script and run it to install the needed OS-level
+packages:
+
+.. code-block:: bash
+
+    $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
+    $ chmod 755 pywbem_os_setup.sh
+    $ ./pywbem_os_setup.sh
+
+The script uses ``sudo`` under the covers to invoke the OS-level package
+manager for your Linux distribution (e.g. ``yum`` on the RedHat family), so
+the current userid needs to have sudo permission.
+
+Note that for the time being, the pywbem_os_setup.sh script must be downloaded
+from the pywbemtools project. See
+`issue #329 <https://github.com/pywbem/pywbemtools/issues/329>`_.
+
+On native Windows, download the ``pywbem_os_setup.bat`` script and run it to
+install the needed OS-level packages:
+
+.. code-block:: bash
+
+    > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+    > pywbem_os_setup.bat
+
+If you want to install the needed OS-level packages manually, see
+`pywbem prerequisite OS packages <https://pywbem.readthedocs.io/en/latest/intro.html#prerequisite-operating-system-packages-for-install>`_.
 
 The following command downloads and installs the latest released version of the
 pywbemtools package from `PyPI`_ into the currently active Python environment:
@@ -183,7 +204,7 @@ branch of the Git repository of the package:
 .. _`Verification of the installation`:
 
 Verification of the installation
-""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can verify that the pywbemtools package and its dependent packages are
 installed correctly by invoking pywbemcli. Invoking with the ``--version``
@@ -193,8 +214,8 @@ shown in the following example:
 .. code-block:: bash
 
     $ pywbemcli --version
-      pywbemcli, version 0.5.0
-      pywbem, version 0.14.4
+    pywbemcli, version 0.5.0
+    pywbem, version 0.14.4
 
 
 .. _`Standards conformance`:
@@ -347,4 +368,3 @@ License
 This package is licensed under the `Apache 2.0 License`_.
 
 .. _Apache 2.0 License: https://raw.githubusercontent.com/pywbem/pywbemtools/master/LICENSE
-
