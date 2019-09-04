@@ -374,10 +374,12 @@ pywbem_os_setup.sh:
 ifneq ($(PLATFORM),Windows_native)
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
 	chmod 755 pywbem_os_setup.sh
+endif
 
 pywbem_os_setup.bat:
 ifeq ($(PLATFORM),Windows_native)
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+endif
 
 .PHONY: install_os
 install_os: install_os_$(pymn).done
