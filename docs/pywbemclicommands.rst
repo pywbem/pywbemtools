@@ -179,19 +179,25 @@ namespace of a WBEM server.
 
 The format used by pywbemcli for specifying INSTANCENAME arguments on the
 command line is an untyped WBEM URI for instance paths as defined in
-:term:`DSP0207`.
+:term:`DSP0207`, this is the *standard* format. There is also a *historical*
+format for WBEM URIs that is described in the
+:meth:`pywbem.CIMInstanceName.to_wbem_uri` method.
+
+The INSTANCENAME argument can be specified using the standard format or
+the historical format.
 
 Because pywbemcli always works with a single WBEM server at a time, the
-authority component of the WBEM URI is never specified in an INSTANCENAME.
-Because the namespace type of the WBEM URI (e.g. http or https) is not relevant
-for identifying the CIM instance, the namespace type is never specified in an
-INSTANCENAME.
+authority component of the WBEM URI does not need to be specified in an
+INSTANCENAME argument. Because the namespace type of the WBEM URI
+(e.g. "http" or "https") is not relevant for identifying the CIM instance,
+the namespace type does not need to be specified in an INSTANCENAME argument.
 
-With these simplifications, the WBEM URI compatible ABNF for INSTANCENAME is:
+With these simplifications and using the (simpler) historical format, the format
+for the INSTANCENAME argument can be described by the following ABNF:
 
 .. code-block:: text
 
-   INSTANCENAME = "/" [ NAMESPACE ] ":" CLASSNAME [ "." keybindings ]
+   INSTANCENAME = [ NAMESPACE ":" ] CLASSNAME [ "." keybindings ]
 
    keybindings = keybinding *( "," keybinding )
 
@@ -208,11 +214,14 @@ where:
 
 * integerValue, charValue, stringValue, datetimeValue and
   booleanValue are defined in ANNEX A of :term:`DSP0004`.
+
   Note that stringValue and datetimeValue when used in INSTANCENAME have exactly
   one set of surrounding double quotes (i.e. they cannot be constructed via
   string concatenation).
+
   Note that charValue when used in INSTANCENAME has exactly one set of
   surrounding single quotes.
+
   Note that DSP0004 prevents the use of real32 or real64 typed properties as
   keys.
 
@@ -224,25 +233,25 @@ backslashes:
 
 .. code-block:: text
 
-   pywbemcli instance get /root/cimv2:MY_Foo.ID=42
-   pywbemcli instance get /MY_Foo.ID=42
-   pywbemcli instance get "/MY_Foo.CharKey='x'"
-   pywbemcli instance get '/MY_Foo.InstanceID="foo1"'
-   pywbemcli instance get "/MY_Foo.InstanceID=\"$value\""
-   pywbemcli instance get '/MY_CS.CreationClassName="MY_CS",Name="MyComp"'
-   pywbemcli instance get '/MY_LogEntry.Timestamp="20190901183853.762122+120"'
+   pywbemcli instance get root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.ID=42
+   pywbemcli instance get "MY_Foo.CharKey='x'"
+   pywbemcli instance get 'MY_Foo.InstanceID="foo1"'
+   pywbemcli instance get "MY_Foo.InstanceID=\"$value\""
+   pywbemcli instance get 'MY_CS.CreationClassName="MY_CS",Name="MyComp"'
+   pywbemcli instance get 'MY_LogEntry.Timestamp="20190901183853.762122+120"'
 
 Examples for Windows command processor:
 
 .. code-block:: text
 
-   pywbemcli instance get /root/cimv2:MY_Foo.ID=42
-   pywbemcli instance get /MY_Foo.ID=42
-   pywbemcli instance get /MY_Foo.CharKey='x'
-   pywbemcli instance get /MY_Foo.InstanceID="foo1"
-   pywbemcli instance get /MY_Foo.InstanceID="%value%"
-   pywbemcli instance get /MY_CS.CreationClassName="MY_CS",Name="MyComp"
-   pywbemcli instance get /MY_LogEntry.Timestamp="20190901183853.762122+120"
+   pywbemcli instance get root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.CharKey='x'
+   pywbemcli instance get MY_Foo.InstanceID="foo1"
+   pywbemcli instance get MY_Foo.InstanceID="%value%"
+   pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
+   pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
 
 
 .. _`Specifying CIM property and parameter values`:
