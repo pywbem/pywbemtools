@@ -67,10 +67,10 @@ SERVER_GETCENTRALINSTS_HELP_LINES = [
     'List central instances of mgmt profiles on the server.',
     '-o, --organization ORG-NAME Filter by the defined organization',
     '-p, --profile PROFILE-NAME Filter by the profile name',
-    '-c, --central-class CLASSNAME Optional. Required only if profiles',
-    '-s, --scoping-class CLASSNAME Optional. Required only if profiles',
-    '-S, --scoping-path CLASSLIST Optional. Required only if profiles',
-    '-r, --reference-direction [snia|dmtf] Navigation direction',
+    '--cc, --central-class CLASSNAME Optional. Required only if profiles',
+    '--sc, --scoping-class CLASSNAME Optional. Required only if profiles',
+    '--sp, --scoping-path CLASSLIST Optional. Required only if profiles',
+    '--rd, --reference-direction [snia|dmtf] Navigation direction',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 

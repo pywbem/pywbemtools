@@ -20,6 +20,11 @@ The expected help text strings are used with the 'innows' test, which is a
 whitespace-tolerant test for whether the expected text is in the actual text.
 """
 
+# NOTE: A number of the options use double-dash as the short form.  In those
+# cases, a third definition of the options without the double-dash defines
+# the corresponding option name, ex. 'include_qualifiers'. It should be
+# defined with underscore and not dash
+
 CMD_OPTION_HELP_HELP_LINE = \
     '-h, --help Show this message and exit.'
 
@@ -33,27 +38,27 @@ CMD_OPTION_NAMESPACE_HELP_LINE = \
     '-n, --namespace NAMESPACE Namespace to use for this command'
 
 CMD_OPTION_NAMES_ONLY_HELP_LINE = \
-    '-o, --names-only Retrieve only the object paths (names).'
+    '--no, --names-only Retrieve only the object paths (names).'
 
 CMD_OPTION_SUMMARY_HELP_LINE = \
-    '-S, --summary Show only a summary (count) of the objects.'
+    '-s, --summary Show only a summary (count) of the objects.'
 
 CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE = \
-    '-l, --local-only Do not include superclass properties and methods in ' \
+    '--lo, --local-only Do not include superclass properties and methods in ' \
     'the returned'
 
 CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE = \
-    '-l, --local-only Do not include superclass properties in the returned'
+    '--lo, --local-only Do not include superclass properties in the returned'
 
 CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE = \
-    '-l, --local-only When traditional operations are used, do not include ' \
+    '--lo, --local-only When traditional operations are used, do not include ' \
     'superclass properties'
 
 CMD_OPTION_PROPERTYLIST_HELP_LINE = \
-    '-p, --propertylist PROPERTYLIST Filter the properties included in'
+    '--pl, --propertylist PROPERTYLIST Filter the properties included in'
 
 CMD_OPTION_FILTER_QUERY_LINE = \
-    '-f, --filter-query QUERY-STRING When pull operations are used, filter ' \
+    '--fq, --filter-query QUERY-STRING When pull operations are used, filter ' \
     'the instances in the result'
 
 CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
@@ -61,15 +66,15 @@ CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE = \
     'used'
 
 CMD_OPTION_NO_QUALIFIERS_HELP_LINE = \
-    '--no-qualifiers Do not include qualifiers in the returned'
+    '--nq, --no-qualifiers Do not include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE = \
-    '-q, --include-qualifiers Include qualifiers in the returned'
+    '--iq, --include-qualifiers Include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE = \
-    '-q, --include-qualifiers When traditional operations are used, ' \
+    '--iq, --include-qualifiers When traditional operations are used, ' \
     'include qualifiers in the returned'
 
 CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
-    '-c, --include-classorigin Include class origin information in the ' \
+    '--ico, --include-classorigin Include class origin information in the ' \
     'returned'

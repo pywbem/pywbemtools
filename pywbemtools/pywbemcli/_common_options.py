@@ -27,7 +27,8 @@ import click
 # multiple places in the command structure.
 #
 propertylist_option = [                      # pylint: disable=invalid-name
-    click.option('-p', '--propertylist', multiple=True, type=str,
+    click.option('--pl', '--propertylist', 'propertylist', multiple=True,
+                 type=str,
                  default=None, metavar='PROPERTYLIST',
                  help='Filter the properties included in the returned '
                       'object(s). '
@@ -39,22 +40,23 @@ propertylist_option = [                      # pylint: disable=invalid-name
                       'Default: Do not filter properties.')]
 
 names_only_option = [                      # pylint: disable=invalid-name
-    click.option('-o', '--names-only', is_flag=True, required=False,
+    click.option('--no', '--names-only', 'names_only', is_flag=True,
+                 required=False,
                  help='Retrieve only the object paths (names). '
                       'Default: Retrieve the complete objects including '
                       'object paths.')]
 
 include_classorigin_instance_option = [         # pylint: disable=invalid-name
-    click.option('-c', '--include-classorigin', is_flag=True,
-                 required=False,
+    click.option('--ico', '--include-classorigin', 'include_classorigin',
+                 is_flag=True, required=False,
                  help='Include class origin information in the returned '
                       'instance(s). '
                       'Some servers may ignore this option. '
                       'Default: Do not include class origin information.')]
 
 include_classorigin_class_option = [            # pylint: disable=invalid-name
-    click.option('-c', '--include-classorigin', is_flag=True,
-                 required=False,
+    click.option('--ico', '--include-classorigin', 'include_classorigin',
+                 is_flag=True, required=False,
                  help='Include class origin information in the returned '
                       'class(es). '
                       'Default: Do not include class origin information.')]
@@ -66,7 +68,7 @@ namespace_option = [                     # pylint: disable=invalid-name
                       'default namespace of the connection.')]
 
 summary_option = [              # pylint: disable=invalid-name
-    click.option('-S', '--summary', is_flag=True, required=False,
+    click.option('-s', '--summary', is_flag=True, required=False,
                  help='Show only a summary (count) of the objects.')]
 
 verify_option = [              # pylint: disable=invalid-name

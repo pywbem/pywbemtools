@@ -37,18 +37,18 @@ where:
 Within pywbemcli each command group name is a noun, referencing an entity (ex.
 class, instance, server).
 
+This example defines a command to get the class ``CIM_ManagedElement`` from the
+current target server and display it in the default output format (MOF).
+
 .. code-block:: text
 
     $ pywbemcli -s http://localhost class get CIM_ManagedElement
-
-defines a command to get the class ``CIM_ManagedElement`` from the current
-target server and display it in the defined output format.
 
 The pywbemcli command groups and commands are described below and the help
 output from pywbemcli for each command documented in :ref:`pywbemcli Help
 Command Details`
 
-**NOTE:** Many of the examples below use :ref:`--mock-server general option`
+**NOTE:** Many of the examples below use the :ref:`--mock-server general option`
 with mock files that are located in the pywbemtools tests/unit subdirectory
 to generate known results.
 
@@ -61,10 +61,10 @@ Pywbemcli includes several features in the command syntax that are worth
 presenting in detail to help the user understand the background, purpose and
 syntactic implementation of the features. This includes:
 
-* The ability to receive either CIM instances or CIM instance names with only
-  a change of an option on the commands that request CIM instances. The option
-  ``-o`` or ``--names-only`` defines whether only the instance name or the complete
-  object will be displayed.
+* The ability to receive either CIM instances or classes or only their names
+  with only a change of an option on the commands that request CIM instances or
+  classes. The option ``-no`` \ ``--names-only`` defines whether only the  name
+  or the complete object will be displayed.
 
 * The ability to interactively select the data from a list presented by
   pywbemcli for certain objects rather than typing in long names the full name.
@@ -126,19 +126,21 @@ DeleteQualifier                    Not Implemented
 =================================  ==============================================
 
 
-.. _`Displaying CIM instances or CIM instance names`:
+.. _`Displaying CIM instances/classes or their names`:
 
-Displaying CIM instances or CIM instance names
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Displaying CIM instances/classes or their names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The pywbem API includes different WBEM operations (ex. ``EnumerateInstances`` and
-``EnumerateInstanceNames``) to request CIM objects or just their names. To
-simplify the overall command line syntax pywbemcli combines these into a single
-command (i.e. ``enumerate``, ``references``, ``associators``) and includes
-an option (``-o,`` or ``--names-only``) that determines whether the instance
-names or instances are retrieved from the WBEM server.
+The pywbem API includes different WBEM operations (ex. ``EnumerateInstances``,
+``EnumerateInstanceNames``, ``EnumerateClasses``, and ``EnumerateClassNames``)
+to request CIM objects or just their names. To simplify the overall command
+line syntax pywbemcli combines these into a single command (i.e. ``enumerate``,
+``references``, ``associators``)  in the :ref:`class command group` and the
+:ref:`instance command group` and includes an option (``--no,`` or
+``--names-only``) that determines whether the names or the CIM objects are
+retrieved from the WBEM server.
 
-Thus, for example an ``instance enumerate`` with and without the ``-o`` option:
+Thus, for example an ``instance enumerate`` with and without the ``--no`` option:
 
 .. code-block:: text
 
@@ -158,7 +160,7 @@ Thus, for example an ``instance enumerate`` with and without the ``-o`` option:
        InstanceID = "CIM_Foo3";
     };
 
-    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo -o
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo --no
 
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
 
@@ -178,6 +180,7 @@ namespace of a WBEM server.
 The format used by pywbemcli for specifying INSTANCENAME arguments on the
 command line is an untyped WBEM URI for instance paths as defined in
 :term:`DSP0207`.
+
 Because pywbemcli always works with a single WBEM server at a time, the
 authority component of the WBEM URI is never specified in an INSTANCENAME.
 Because the namespace type of the WBEM URI (e.g. http or https) is not relevant
@@ -216,17 +219,8 @@ where:
 * escaped_INSTANCENAME is a backslash-escaped INSTANCENAME where at
   least backslash and double quote characters are backslash-escaped
 
-Note that the UNIX-like shells interpret single and double quotes in a certain
-way and remove them before passing the arguments on to the program invoked.
-Because the single and double quotes in INSTANCENAME need to be passed on to
-pywbemcli, they need to be protected from removal by the shell.
-This can be achieved by putting INSTANCENAME into single quotes if it only
-includes double quotes, or into double quotes if it only includes single quotes.
-If there is a mix of single and double quotes in INSTANCENAME, or if shell
-variables need to be expanded, this can be achieved by backslash-escaping any
-double quotes in INSTANCENAME, and putting it into double quotes.
-
-Examples for UNIX-like shells:
+Examples for UNIX-like shells. See [#fbackslash]_ for information on use of
+backslashes:
 
 .. code-block:: text
 
@@ -249,6 +243,68 @@ Examples for Windows command processor:
    pywbemcli instance get /MY_Foo.InstanceID="%value%"
    pywbemcli instance get /MY_CS.CreationClassName="MY_CS",Name="MyComp"
    pywbemcli instance get /MY_LogEntry.Timestamp="20190901183853.762122+120"
+
+
+.. _`Specifying CIM property and parameter values`:
+
+Specifying CIM property and parameter values
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO: Change to reference the commands
+TODO: Rewrite this to more completely define the value in terms of CIM types.
+
+The ``instance create``, ``instance modify``, ``class invokemethod``, and
+``instance invokemethod`` commands define the values of properties and parameters that
+are to be sent to the WBEM server.
+
+For a single property or parameter this is the `--property/-p`` or
+``parameter/-p`` option with the name and value in the form:
+
+.. code-block:: text
+
+    -p <name>=<value>
+
+where:
+
+* <name> is the name of the of the property or parameter.
+* <value> is the value of the property or parameter The values represent the
+  value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
+
+TODO: This needs to be expanded to cover all CIM types.
+
+Since the WBEM server (and pywbem) requires that each property/parameter be
+typed to be created, pywbemcli retrieves the CIM class from the WBEM Server to
+determine the CIM type and arrayness required to define a CIMProperty. The
+value of each option argument contains the value as a string or numeric value.
+For numeric values, the creation will fail if the values of the numeric exceeds
+the range of the CIM type for the property defined in the class (ex. -3 for
+Uint32).
+
+Quotes around the value are only required if the value includes whitespace. See
+[#fbackslash]_ for information on use of backslashes in formating property
+argument values.
+
+The following are examples of scalar property definitions:
+
+.. code-block:: text
+
+    -p p1=SomeText
+    -p p2=\"Text with space\"
+    -p pint=3
+    -p psint=-3
+
+  For array properties the values are defined separated by commas:
+
+  .. code-block:: text
+
+    -p <property-name>=<value>(,<value>)
+
+  For example:
+
+  .. code-block:: text
+
+    -p strarray=abc,def,ghjk
+    -p strarray2=\"ab c\",def
 
 
 .. _`Interactively selecting INSTANCENAME`:
@@ -342,7 +398,7 @@ The **class** group defines commands that act on CIM classes. see
   namespace or the namespace defined with this command. If the CLASSNAME
   input property the enumeration starts at the subclasses of CLASSNAME. Otherwise
   it starts at the top of the class hierarchy if the
-  ``--DeepInheritance``/``-d``  option is set it shows all the classes in the
+  ``--DeepInheritance``/``--di``  option is set it shows all the classes in the
   hierarchy, not just the next level of the hierarchy. Otherwise it only
   enumerates one level of the class hierarchy.  It can display the
   classes/classnames in the :term:`CIM object output formats` (see
@@ -442,11 +498,21 @@ The **class** group defines commands that act on CIM classes. see
 * **invokemethod** to invoke a method defined for the CLASSNAME argument. This
   command executes the invokemethod with a class name, not an instance name
   and any input parameters for the InvokeMethod defined with the
-  ``--parameter`` \ ``-p`` option. If successful it returns the method return
-  value and output parameters received from the server. If unsuccessful it
-  displays the exception generated. It displays the return value as an integer and
-  any returned CIM parameters in the
-  :term:`CIM object output formats` (see :ref:`Output formats`).
+  ``--parameter`` \ ``-p`` option.
+
+  The ``invokemethod`` command requires CLASSNAME and METHODNAME arguments to
+  define the class and method to be invoked and optionally a``--parameter``
+  option for each parameter that is to be attached to the request to be sent to
+  the WBEM server.
+
+  The syntax of the ``--parameter`` option is defined in :ref:`Specifying CIM
+  property and parameter values`.
+
+  If successful it returns the method return value and output parameters
+  received from the server. If unsuccessful it displays the exception
+  generated. It displays the return value as an integer and any returned CIM
+  parameters in the :term:`CIM object output formats` (see :ref:`Output
+  formats`).
   See :ref:`pywbemcli class invokemethod --help` for details.
 * **tree** to display the class hierarchy as a tree.  This command
   outputs a tree format in ASCII defining the either the subclass or superclass
@@ -535,42 +601,28 @@ The **instance** group defines commands that act on CIM instances including:
   WBEM server. The command build the CIMInstance from the class defined by
   CLASSNAME and the properties defined by the ``--property``\``-p`` option The
   properties are defined as name/value pairs, one property for each instance of
-  the ``--property`` option. Since the WBEM server (and pywbem) requires that
-  each property be typed, pywbemtools uses the CIMClass defined by CLASSNAME
-  retrieved from the WBEM server to define the type required to define the
-  CIMProperty.
+  the ``--property`` option.
 
-  For a single property in the new instance this is simply the `--property`` option
-  with the property name and value:
+  The syntax of the ``--property`` is documented in
+  :ref:`Specifying CIM property and parameter values`.
 
-  .. code-block:: text
-
-    --property <property-name>=<property-value"
-
-    where quotes are only required if the value includes whitespace.
-
-  For array properties the values are defined separated by commas:
+  The following is an example with three properties, ``InstanceId`` a scalar
+  string property, ``IntProp`` a scalar numeric property, and ``IntArr`` an
+  array integer property. Note that the ``--property/-p`` value does not
+  determine the property type.  ``IntProp`` and ``IntArr`` could be any of the
+  numeric types (Unint32, Sint32, etc.) However, generally integers and float
+  values are used for integer and float property types.
 
   .. code-block:: text
 
-    -p <property-name>=<value>(,<value>)
+    $pywbemcli instance create TST_Blah -p InstancId=blah1 -p IntProp=3 -p IntArr=3,6,9
 
-  An example with two properties, InstanceId a scalar string property and intarr
-  an array integer property. Note that the --property value does not determine
-  the property type. However, generally integers and float values are used for
-  integer and float property types.
+    $pywbemcli instance create TST_Blah -p InstancId=\"blah 2\" -p IntProp=3 -p IntArr=3,6,9
 
   If the create is successful, the server defined CIM Instance path is displayed.
   If the operation fails, the exception is displayed. If there is a descrepency
   between the defined properties and the CIMClass property characteristics
   pywbemcli generates an exception.
-
-  The following example creates an instance of the class TST_Blah with one
-  scalar and one array property.
-
-  .. code-block:: text
-
-    $pywbemcli instance create TST_Blah InstancId="blah1", intprop=3, intarr=3,6,9
 
   See :ref:`pywbemcli instance create --help` for details.
 * **delete** delete an instance defined by the :term:`INSTANCENAME` argument
@@ -581,7 +633,7 @@ The **instance** group defines commands that act on CIM instances including:
     * a string representation of a CIMInstanceName as defined by a :term:`WBEM URI`
     * A class name in which case pywbemcli will get the instance names from the
       WBEM server and present a selection list for the user to select an
-      instance name :ref:`Displaying CIM instances or CIM instance names`
+      instance name.
 
   The following example deletes the instance defined by the explicit instance
   name (Note the extra backslash required to escape the double quote on the
@@ -594,8 +646,8 @@ The **instance** group defines commands that act on CIM instances including:
 
   See :ref:`pywbemcli instance delete --help` for details.
 * **enumerate** to enumerate instances or their paths defined by the CLASSNAME
-  argument in the namespace defined by ``-o``\``--namespace`` or the general option
-  ``-o``\``--default-namespace`` in the defined format. This command displays the
+  argument in the namespace defined by ``-n``\``--namespace`` or the general option
+  ``-d``\``--default-namespace`` in the defined format. This command displays the
   returned instances or instance names in the :term:`CIM object output formats`
   or the table formats` (see :ref:`Output formats`).
 
@@ -635,6 +687,19 @@ The **instance** group defines commands that act on CIM instances including:
 
   See :ref:`pywbemcli instance get --help` for details.
 * **invokemethod** to invoke a method defined for the class argument.
+  The ``invokemethod`` command requires INSTANCENAME and METHODNAME arguments to
+  define the instance and method to be invoked and optionally a``--parameter\-p``
+  option for each   parameter that is to be attached to the request to be sent
+  to the WBEM server.
+
+  The syntax of the ``--parameter`` option is defined in :ref:`Specifying CIM
+  property and parameter values`.
+
+  If successful it returns the method return value and output parameters
+  received from the server. If unsuccessful it displays the exception
+  generated. It displays the return value as an integer and any returned CIM
+  parameters in the :term:`CIM object output formats` (see :ref:`Output
+  formats`).
   See :ref:`pywbemcli instance invokemethod --help` for details.
 * **modify** modify an existing instance of the class defined by the CLASSNAME argument
   in the WBEM server  namespace defined by either the default namespace or
@@ -1131,5 +1196,45 @@ Help command
 ------------
 
 The help command provides information on special commands and controls that can
-be executed in the :ref:`interactive mode`. This is different from the
-``--help`` option that provides information on command groups, and commands.
+be executed in the :ref:`interactive mode` including:
+
+* executing shell commands,
+* exiting pywbemcli,
+* getting help on commands,
+* viewing interactive mode command history.
+
+This is different from the ``--help`` option that provides information on
+command groups, and commands.
+
+.. code-block:: text
+
+    $ pywbemcli help
+
+    The following can be entered in interactive mode:
+
+      <pywbemcli-cmd>             Execute pywbemcli command <pywbemcli-cmd>.
+      !<shell-cmd>                Execute shell command <shell-cmd>.
+
+      <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+
+      <TAB>                       Tab completion (can be used anywhere).
+      -h, --help                  Show pywbemcli general help message, including a
+                                  list of pywbemcli commands.
+      <pywbemcli-cmd> --help      Show help message for pywbemcli command
+                                  <pywbemcli-cmd>.
+      help                        Show this help message.
+      :?, :h, :help               Show help message about interactive mode.
+      <up-arrow, down-arrow>      View pwbemcli command history:
+
+
+.. rubric:: Footnotes
+
+.. [#fbackslash] Note that the UNIX-like shells interpret single and double quotes in a certain
+    way and remove them before passing the arguments on to the program invoked.
+    Because the single and double quotes in INSTANCENAME need to be passed on to
+    pywbemcli, they need to be protected from removal by the shell.
+    This can be achieved by putting INSTANCENAME into single quotes if it only
+    includes double quotes, or into double quotes if it only includes single quotes.
+    If there is a mix of single and double quotes in INSTANCENAME, or if shell
+    variables need to be expanded, this can be achieved by backslash-escaping any
+    double quotes in INSTANCENAME, and putting it into double quotes.
