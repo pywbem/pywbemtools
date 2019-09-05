@@ -1,0 +1,309 @@
+.. Copyright 2016 IBM Corp. All Rights Reserved.
+..
+.. Licensed under the Apache License, Version 2.0 (the "License");
+.. you may not use this file except in compliance with the License.
+.. You may obtain a copy of the License at
+..
+..    http://www.apache.org/licenses/LICENSE-2.0
+..
+.. Unless required by applicable law or agreed to in writing, software
+.. distributed under the License is distributed on an "AS IS" BASIS,
+.. WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.. See the License for the specific language governing permissions and
+.. limitations under the License.
+..
+
+
+.. _`Pywbemcli special command line features`:
+
+Pywbemcli special command line features
+=======================================
+
+Pywbemcli includes several features in the command syntax that are worth
+presenting in detail to help the user understand the background, purpose and
+syntactic implementation of the features. This includes:
+
+* The ability to receive either CIM instances or classes or only their names
+  with only a change of an option on the commands that request CIM instances or
+  classes. The option ``-no`` \ ``--names-only`` defines whether only the  name
+  or the complete object will be displayed.
+
+* The ability to interactively select the data from a list presented by
+  pywbemcli for certain objects rather than typing in long names the full name.
+  see :ref:`Interactively selecting INSTANCENAME`.
+
+.. _`pywbemcli commands to WBEM Operations`:
+
+pywbemcli commands to WBEM Operations
+-------------------------------------
+
+The following table defines which pywbemcli commands are used for the
+corresponding pywbem request operations.
+
+=================================  ==============================================
+WBEM CIM-XML Operation             pywbemcli command group & command
+=================================  ==============================================
+**Instance Operations:**
+EnumerateInstances                 instance enumerate INSTANCENAME
+EnumerateInstanceNames             instance enumerate INSTANCENAME --names-only
+GetInstance                        instance get INSTANCENAME
+ModifyInstance                     instance modify
+CreateInstance                     instance create
+DeleteInstance                     instance delete INSTANCENAME
+Associators(instance)              instance associators INSTANCENAME
+Associators(class)                 class associators CLASSNAME
+AssociatorNames(instance)          instance associators INSTANCENAME --names-only
+AssociatorNames(class)             class associators CLASSNAME --names-only
+References(instance)               instance references INSTANCENAME
+References(class)                  class references CLASSNAME
+ReferenceNames(instance)           instance references INSTANCENAME --names-only
+ReferenceNames(class)              class references CLASSNAME --names-only
+InvokeMethod                       instance invokemethod INSTANCENAME --names-only
+ReferenceNames                     class invokemethod CLASSNAME --names-only
+ExecQuery                          instance query
+**Pull Operations:**               Option --use-pull ``either`` or ``yes``
+OpenEnumerateInstances             instance enumerate INSTANCENAME
+OpenEnumerateInstancePaths         instance enumerate INSTANCENAME --names-only
+OpenAssociatorInstances            instance associators INSTANCENAME
+OpenAssociatorInstancePaths        instance associators INSTANCENAME --names-only
+OpenReferenceInstances             instance references INSTANCENAME
+OpenReferenceInstancePaths         instance references INSTANCENAME --names-only
+OpenQueryInstances                 instance references INSTANCENAME --names-only
+PullInstancesWithPath              part of pull sequence
+PullInstancePaths                  part of pull sequence
+PullInstances                      part of pull sequence
+CloseEnumeration                   Not implemented
+**Class Operations:**
+EnumerateClasses                   class enumerate CLASSNAME
+EnumerateClassNames                class enumerate --names-only
+GetClass                           class get CLASSNAME
+ModifyClass                        Not implemented
+CreateClass                        Not implemented
+DeleteClass                        class delete CLASSNAME
+**QualifierDeclaration ops:**
+EnumerateQualifiers                qualifier enumerate
+GetQualifier                       qualifier get QUALIFIERNAME
+SetQualifier                       Not implemented
+DeleteQualifier                    Not Implemented
+=================================  ==============================================
+
+
+.. _`Displaying CIM instances/classes or their names`:
+
+Displaying CIM instances/classes or their names
+-----------------------------------------------
+
+The pywbem API includes different WBEM operations (ex. ``EnumerateInstances``,
+``EnumerateInstanceNames``, ``EnumerateClasses``, and ``EnumerateClassNames``)
+to request CIM objects or just their names. To simplify the overall command
+line syntax pywbemcli combines these into a single command (i.e. ``enumerate``,
+``references``, ``associators``)  in the :ref:`class command group` and the
+:ref:`instance command group` and includes an option (``--no,`` or
+``--names-only``) that determines whether the names or the CIM objects are
+retrieved from the WBEM server.
+
+Thus, for example an ``instance enumerate`` with and without the ``--no`` option:
+
+.. code-block:: text
+
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo1";
+       IntegerProp = 1;
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo2";
+       IntegerProp = 2;
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo3";
+    };
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo --no
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+
+    root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+
+.. _`Specifying the INSTANCENAME command argument`:
+
+Specifying the INSTANCENAME command argument
+--------------------------------------------
+
+The INSTANCENAME argument used by some pywbemcli commands (e.g ``instance get``)
+specifies the instance path (aka instance name) of a CIM instance in a CIM
+namespace of a WBEM server.
+
+The format used by pywbemcli for specifying INSTANCENAME arguments on the
+command line is an untyped WBEM URI for instance paths as defined in
+:term:`DSP0207`, this is the *standard* format. There is also a *historical*
+format for WBEM URIs that is described in the
+:meth:`pywbem.CIMInstanceName.to_wbem_uri` method.
+
+The INSTANCENAME argument can be specified using the standard format or
+the historical format.
+
+Because pywbemcli always works with a single WBEM server at a time, the
+authority component of the WBEM URI does not need to be specified in an
+INSTANCENAME argument. Because the namespace type of the WBEM URI
+(e.g. "http" or "https") is not relevant for identifying the CIM instance,
+the namespace type does not need to be specified in an INSTANCENAME argument.
+
+With these simplifications and using the (simpler) historical format, the format
+for the INSTANCENAME argument can be described by the following ABNF:
+
+.. code-block:: text
+
+   INSTANCENAME = [ NAMESPACE ":" ] CLASSNAME [ "." keybindings ]
+
+   keybindings = keybinding *( "," keybinding )
+
+   keybinding = PROPERTYNAME "=" value
+
+   value = integerValue / charValue / stringValue / datetimeValue / booleanValue / referenceValue
+
+   referenceValue = "\"" escaped_INSTANCENAME "\""
+
+where:
+
+* NAMESPACE, CLASSNAME and PROPERTYNAME are namespace, class and key
+  property name, respectively, as used elsewhere in pywbemcli.
+
+* integerValue, charValue, stringValue, datetimeValue and
+  booleanValue are defined in ANNEX A of :term:`DSP0004`.
+
+  Note that stringValue and datetimeValue when used in INSTANCENAME have exactly
+  one set of surrounding double quotes (i.e. they cannot be constructed via
+  string concatenation).
+
+  Note that charValue when used in INSTANCENAME has exactly one set of
+  surrounding single quotes.
+
+  Note that DSP0004 prevents the use of real32 or real64 typed properties as
+  keys.
+
+* escaped_INSTANCENAME is a :term:`backslash-escaped` INSTANCENAME where at
+  least backslash and double quote characters are backslash-escaped
+
+Examples for UNIX-like shells. See :term:`backslash-escaped` for information on
+use of backslashes:
+
+.. code-block:: text
+
+   pywbemcli instance get root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.ID=42
+   pywbemcli instance get "MY_Foo.CharKey='x'"
+   pywbemcli instance get 'MY_Foo.InstanceID="foo1"'
+   pywbemcli instance get "MY_Foo.InstanceID=\"$value\""
+   pywbemcli instance get 'MY_CS.CreationClassName="MY_CS",Name="MyComp"'
+   pywbemcli instance get 'MY_LogEntry.Timestamp="20190901183853.762122+120"'
+
+Examples for Windows command processor:
+
+.. code-block:: text
+
+   pywbemcli instance get root/cimv2:MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.ID=42
+   pywbemcli instance get MY_Foo.CharKey='x'
+   pywbemcli instance get MY_Foo.InstanceID="foo1"
+   pywbemcli instance get MY_Foo.InstanceID="%value%"
+   pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
+   pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
+
+
+.. _`Specifying CIM property and parameter values`:
+
+Specifying CIM property and parameter values
+--------------------------------------------
+
+TODO: Change to reference the commands
+
+TODO: Rewrite this to more completely define the value in terms of CIM types.
+
+The ``instance create``, ``instance modify``, ``class invokemethod``, and
+``instance invokemethod`` commands define the values of properties and parameters that
+are to be sent to the WBEM server.
+
+For a single property or parameter this is the `--property/-p`` or
+``parameter/-p`` option with the name and value in the form:
+
+.. code-block:: text
+
+    -p <name>=<value>
+
+where:
+
+* <name> is the name of the of the property or parameter.
+* <value> is the value of the property or parameter The values represent the
+  value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
+
+TODO: This needs to be expanded to cover all CIM types. SEPARATE PR
+
+Since the WBEM server (and pywbem) requires that each property/parameter be
+typed to be created, pywbemcli retrieves the CIM class from the WBEM Server to
+determine the CIM type and arrayness required to define a CIMProperty. The
+value of each option argument contains the value as a string or numeric value.
+For numeric values, the creation will fail if the values of the numeric exceeds
+the range of the CIM type for the property defined in the class (ex. -3 for
+Uint32).
+
+Quotes around the value are only required if the value includes whitespace. See
+:term:`backslash-escaped` for information on use of backslashes in formating
+property argument values.
+
+The following are examples of scalar property definitions:
+
+.. code-block:: text
+
+    -p p1=SomeText
+    -p p2=\"Text with space\"
+    -p pint=3
+    -p psint=-3
+
+  For array properties the values are defined separated by commas:
+
+  .. code-block:: text
+
+    -p <property-name>=<value>(,<value>)
+
+  For example:
+
+  .. code-block:: text
+
+    -p strarray=abc,def,ghjk
+    -p strarray2=\"ab c\",def
+
+
+.. _`Interactively selecting INSTANCENAME`:
+
+Interactively selecting INSTANCENAME
+------------------------------------
+
+The INSTANCENAME argument has a certain complexity, particularly for
+associations and for classes with multiple keys.
+
+To simplify this, pywbemcli provides an option (``-i`` or ``--interactive``) on
+commands that have an INSTANCENAME argument, that allows the user to specify
+only the class name (as the INSTANCENAME argument value), retrieves all the
+instance names of that class from the server and presents the user with a
+select list from which an instance name can be chosen.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo --interactive
+    Pick Instance name to process
+    0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+    1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+    2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 0  << user enters 0
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo1";
+       IntegerProp = 1;
+    };

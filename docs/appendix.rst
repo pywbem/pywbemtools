@@ -131,6 +131,18 @@ This documentation uses a few special terms to refer to Python types:
       named pull operations were added to improve memory and response
       efficiency.
 
+   backslash-escaped
+      The UNIX-like shells interpret single and double quotes in a certain way
+      and remove them before passing the arguments on to the program invoked.
+      Because the single and double quotes in INSTANCENAME need to be passed on
+      to pywbemcli, they need to be protected from removal by the shell. This
+      can be achieved by putting INSTANCENAME into single quotes if it only
+      includes double quotes, or into double quotes if it only includes single
+      quotes. If there is a mix of single and double quotes in INSTANCENAME, or
+      if shell variables need to be expanded, this can be achieved by
+      backslash-escaping any double quotes in INSTANCENAME, and putting it into
+      double quotes.
+
 
 .. _`Profile advertisement methodologies`:
 
