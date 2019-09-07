@@ -287,8 +287,8 @@ elif [[ "$distro_family" == "cygwin" ]]; then
       install_cygwin python2-cython
     fi
     # ================ks
-    # Added to allow successful install for pywbemtools
-    # these cygwin components required if only install used
+    # Added to allow successful install as requiements for pywbemtools
+    # on cygwin. Components required if only install used
     # which is what we expect for pip install.
     if [[ "$py_m" == "3" ]]; then
       # For typed-ast:
