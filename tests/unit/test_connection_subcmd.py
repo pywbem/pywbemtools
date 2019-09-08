@@ -51,8 +51,9 @@ CONNECTION_HELP_LINES = [
     'delete  Delete a WBEM connection definition.',
     'export  Export the current connection.',
     'list    List the WBEM connection definitions.',
-    'save    Save the current connection as a new WBEM connection definition.',
-    'select  Select a WBEM connection definition as the current connection.',
+    'save    Save a connection to a new WBEM connection definition named NAME.',
+    'select  Select a WBEM connection definition as current/default '
+    'connection.',
     'show    Show connection info of a WBEM connection definition.',
     'test    Test the current connection with a predefined WBEM request.',
 ]
@@ -98,14 +99,17 @@ CONNECTION_LIST_HELP_LINES = [
 
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME',
-    'Save the current connection as a new WBEM connection definition.',
+    'Save a connection to a new WBEM connection definition named NAME.',
+    '--input-name INPUT-NAME  If this option exists, it is the name of a',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
 ]
 
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
-    'Select a WBEM connection definition as the current connection.',
+    'Select a WBEM connection definition as current/default connection.',
+    '-d, --default  If set, the connection is set to default in the connection',
+
     CMD_OPTION_HELP_HELP_LINE
 ]
 
@@ -346,7 +350,7 @@ TEST_CASES = [
 
     ['Verify connection subcommand select test2',
      ['select', 'test2'],
-     {'stdout': ['test2', 'selected'],
+     {'stdout': ['test2', 'current'],
       'test': 'innows'},
      None, OK],
 
@@ -372,8 +376,8 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete test1',
      ['delete', 'test1'],
-     {'stdout': "",
-      'test': 'lines',
+     {'stdout': ['Deleted', 'test1'],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
@@ -385,7 +389,7 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete test2',
      ['delete', 'test2'],
-     {'stdout': 'Deleting default connection',
+     {'stdout': ['Deleted', 'test2', 'connection'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
@@ -454,8 +458,8 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete addallargs',
      ['delete', 'addallargs'],
-     {'stdout': "",
-      'test': 'lines',
+     {'stdout': "Deleted",
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
@@ -749,9 +753,9 @@ WBEM server connections: (#: default, *: current)
      None, OK],
 
     ['Verify connection select of svrtest',
-     {'args': ['select', 'svrtest'],
+     {'args': ['select', 'svrtest', '--default'],
       'global': ['--server', 'http://blah']},
-     {'stdout': '"svrtest" selected and current',
+     {'stdout': '"svrtest" default and current',
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -775,7 +779,7 @@ WBEM server connections: (#: default, *: current)
     ['Verify connection delete svrtest',
      {'args': ['delete', 'svrtest'],
       'global': []},
-     {'stdout': "Deleting default connection",
+     {'stdout': "Deleted default connection",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],

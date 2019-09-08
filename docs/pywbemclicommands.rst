@@ -63,14 +63,14 @@ The **class** command group defines commands that act on CIM classes. see
 
 This group consists of the following commands:
 
-* :ref:`Class associators command`
-* :ref:`Class references command`
-* :ref:`Class delete command`
-* :ref:`Class enumerate command`
-* :ref:`Class find command`
-* :ref:`Class get command`
-* :ref:`Class invokemethod command`
-* :ref:`Class tree command`
+* :ref:`Class associators command` - List the classes associated with a class.
+* :ref:`Class delete command` - Delete a class.
+* :ref:`Class enumerate command` - List top classes or subclasses of a class in a namespace.
+* :ref:`Class find command` - List the classes with matching class names on the server.
+* :ref:`Class get command` - Get a class.
+* :ref:`Class invokemethod command` - Invoke a method on a class.
+* :ref:`Class references command` - List the classes referencing a class.
+* :ref:`Class tree command` - Show the subclass or superclass hierarchy for a class.
 
 
 .. _`Class associators command`:
@@ -345,16 +345,16 @@ in the following subsections:
 
 This group consists of the following commands:
 
-* :ref:`Instance associators command`
-* :ref:`Instance count command`
-* :ref:`Instance create command`
-* :ref:`Instance delete command`
-* :ref:`Instance enumerate command`
-* :ref:`Instance get command`
-* :ref:`Instance invokemethod command`
-* :ref:`Instance modify command`
-* :ref:`Instance references command`
-* :ref:`Instance query command`
+* :ref:`Instance associators command` - List the instances associated with an instance.
+* :ref:`Instance count command` - Count the instances of each class with matching class name.
+* :ref:`Instance create command` - Create an instance of a class in a namespace.
+* :ref:`Instance delete command` - Delete an instance of a class.
+* :ref:`Instance enumerate command` - List the instances of a class.
+* :ref:`Instance get command` - Get an instance of a class.
+* :ref:`Instance invokemethod command` - Invoke a method on an instance.
+* :ref:`Instance modify command` - Modify properties of an instance.
+* :ref:`Instance references command` - Execute a query on instances in a namespace.
+* :ref:`Instance query command` - List the instances referencing an instance.
 
 
 .. _`Instance associators command`:
@@ -648,7 +648,13 @@ Qualifier command group
 -----------------------
 
 The **qualifier** command group defines commands that act on
-CIMQualifierDeclaration entities in the WBEM server including:
+CIMQualifierDeclaration objects in the WBEM server including:
+
+This group consists of the following commands:
+
+* :ref:`qualifier get command` - Get a qualifier declaration.
+* :ref:`qualifier enumerate command` - List the qualifier declarations in a
+  namespace.
 
 
 .. _`Qualifier get command`:
@@ -724,13 +730,13 @@ namespaces, etc. The commands are:
 
 This group consists of the following commands:
 
-* :ref:`Server brand command`
-* :ref:`Server connection command`
-* :ref:`Server info command`
-* :ref:`Server interop command`
-* :ref:`Server namespaces command`
-* :ref:`Server profiles command`
-* :ref:`Server get-centralinsts command`
+* :ref:`Server brand command` - Get the brand of the server.
+* :ref:`Server connection command` - Get connection info used by this server.
+* :ref:`Server info command` - Get information about the server.
+* :ref:`Server get-centralinsts command` - List central instances of mgmt profiles on the server.
+* :ref:`Server interop command` - Get the Interop namespace of the server.
+* :ref:`Server namespaces command` - Get the Interop namespace of the server.
+* :ref:`Server profiles command` - List management profiles advertized by the server.
 
 .. _`Server brand command`:
 
@@ -763,7 +769,7 @@ Server connection command
 
 The ``server connection command`` displays information on the connection defined for this
 server.  This is same information as was defined when the connection was
-saved with ``connection save`` or the cli general options:
+saved with :ref:`connection save command` or the cli general options:
 
 .. code-block:: text
 
@@ -953,10 +959,10 @@ rather than through the detailed parameters of the connection.
 
 Connections in the :term:`connections file` can be created by:
 
-* Using the ``connection add`` command. This allows defining the parameters
+* Using the :ref:`connection add command`. This allows defining the parameters
   of a connection as a command.
 
-* Using the ``connection save`` command with the current connection. This options
+* Using the :ref:`connection save command` with the current connection. This options
   uses the parameters current connection to define and save a connection in the
   connections file.
 
@@ -977,7 +983,7 @@ options for pywbemcli. The data includes:
 * **certfile** - optional server certificate filename. See :ref:`--certfile general option`.
 * **keyfile** - optional client private keyfile filename. See :ref:`--keyfile general option`.
 * **use-pull** - optional parameter that defines whether pull operations are
-  to be required, used if they exist or not used. See :ref:`--suse-pull general option`.
+  to be required, used if they exist or not used. See :ref:`--use-pull general option`.
 * **pull-max-cnt** - optional count of object per pull operation.  See :ref:`--pull-max-cnt general option`.
 * **timeout** - optional timeout value. See :ref:`--timeout general option`.
 * **timestats** - boolean that determines if time stats are captured.  See :ref:`--timestats general option`.
@@ -989,28 +995,32 @@ options for pywbemcli. The data includes:
   ``--server`` must not be defined.  See :ref:`--mock-server general option`.
 
 The connection information is saved in the :term:`connections file` when the
-``connection add`` or ``connection save`` command are executed. Multiple
+:ref:`connection add command` or :ref:`connection save command` command are executed. Multiple
 connection files may be maintained in separate directories.
 
 The commands in this group are:
 
-* :ref:`Connection add command`
-* :ref:`Connection delete command`
-* :ref:`Connection export command`
-* :ref:`Connection list command`
-* :ref:`Connection save command`
-* :ref:`Connection select command`
-* :ref:`Connection show command`
-* :ref:`Connection test command`
+* :ref:`Connection add command` - Add a new WBEM connection definition from
+  specified options.
+* :ref:`Connection delete command` - Delete a WBEM connection definition.
+* :ref:`Connection export command` -  Export the current connection.
+* :ref:`Connection list command` - List the WBEM connection definitions.
+* :ref:`Connection save command` - Save a connection to a new WBEM connection
+  definition named NAME.
+* :ref:`Connection select command` - Select a WBEM connection definition as
+  current/default connection.
+* :ref:`Connection show command` - Show connection info of a WBEM connection
+  definition.
+* :ref:`Connection test command` - Test the current connection with a
+  predefined WBEM request.
 
 .. _`Connection add command`:
 
 Connection add command
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection add`` command creates a new connection using the command arguments and options and sets the new
-connection as the current connection. This command saves the
-new connection to the :term:`connections file` (see ``connection save``).
+The ``connection add`` command creates a new connection using the command arguments and option. This command saves the
+new connection to the :term:`connections file` (see :ref:`connection save command` ).
 
 The following example shows creating a new connection from within the
 interactive mode of pywbemcli. The parameters for the connection are defined
@@ -1085,6 +1095,14 @@ See :ref:`pywbemcli connection delete --help` for details.
 Connection export command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The ``connection export`` command  exports the current connection information as environment variables.
+
+.. code-block:: text
+
+    $ pywbemcli -add -s http://localhost connection export
+    export PYWBEMCLI_SERVER=http://localhost
+    export PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2
+    export PYWBEMCLI_TIMEOUT=30
+
   See :ref:`pywbemcli connection export --help` for details.
 
 
