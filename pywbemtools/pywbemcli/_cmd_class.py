@@ -333,6 +333,8 @@ def class_associators(context, classname, **options):
               help='Add a namespace to the search scope. '
                    'May be specified multiple times. '
                    'Default: Search in all namespaces of the server.')
+@click.option('-s', '--sort', is_flag=True, required=False,
+              help='Sort by namespace. Default is to sort by classname')
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
@@ -360,7 +362,7 @@ def class_find(context, classname_glob, **options):
 
       pywbemcli -n myconn class find "CIM_*System*" -n interop
 
-      pywbemcli -n myconn class find CIM_Foo
+      pywbemcli -n myconn class find *Foo*
     """
     context.execute_cmd(lambda: cmd_class_find(context, classname_glob,
                                                options))
@@ -566,8 +568,8 @@ def cmd_class_find(context, classname_glob, options):
         rows = []
         for ns_name in names_dict:
             ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
-            # sort the result by classname
-            ns_rows.sort(key=lambda x: x[1])
+            row = 0 if options['sort'] else 1
+            ns_rows.sort(key=lambda x: x[row])
             rows.extend(ns_rows)
 
         context.spinner.stop()

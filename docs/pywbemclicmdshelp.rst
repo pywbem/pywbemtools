@@ -706,6 +706,10 @@ The following defines the help output for the `pywbemcli connection add --help` 
         pywbemcli --name newsrv connection add --server https://srv1
 
     Options:
+      --input-name INPUT-NAME         If this option exists, it is the name of a
+                                      persistent connection that will be put into
+                                      the connections file with the NAME argument.
+                                      All other options will be ignored.
       -m, --mock-server FILE          Use a mock WBEM server that is automatically
                                       created in pywbemcli and populated with CIM
                                       objects that are defined in the specified
