@@ -99,6 +99,7 @@ CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'List the classes with matching class names on the server.',
     '-n, --namespace NAMESPACE Add a namespace to the search scope',
+    '-s, --sort                 Sort by namespace. Default is to sort by',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
