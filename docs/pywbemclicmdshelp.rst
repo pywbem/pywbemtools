@@ -408,12 +408,14 @@ The following defines the help output for the `pywbemcli class find --help` comm
 
         pywbemcli -n myconn class find "CIM_*System*" -n interop
 
-        pywbemcli -n myconn class find CIM_Foo
+        pywbemcli -n myconn class find *Foo*
 
     Options:
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
+      -s, --sort                 Sort by namespace. Default is to sort by
+                                 classname
       -h, --help                 Show this message and exit.
 
 
