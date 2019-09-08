@@ -174,6 +174,11 @@ where:
 * NAMESPACE, CLASSNAME and PROPERTYNAME are namespace, class and key
   property name, respectively, as used elsewhere in pywbemcli.
 
+  The namespace, if specified, must be the target namespace of the operation.
+  The purpose of being able to specify a namespace in INSTANCENAME is not to
+  override the target namespace, but to use returned instance names that may
+  contain a namespace, unchanged.
+
 * integerValue, charValue, stringValue, datetimeValue and
   booleanValue are defined in ANNEX A of :term:`DSP0004`.
 
