@@ -100,7 +100,6 @@ CONNECTION_LIST_HELP_LINES = [
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME',
     'Save a connection to a new WBEM connection definition named NAME.',
-    '--input-name INPUT-NAME  If this option exists, it is the name of a',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
 ]
@@ -108,7 +107,7 @@ CONNECTION_SAVE_HELP_LINES = [
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
     'Select a WBEM connection definition as current/default connection.',
-    '-d, --default  If set, the connection is set to default in the connection',
+    '-d, --default  If set, the connection is set to be the default ',
 
     CMD_OPTION_HELP_HELP_LINE
 ]
@@ -347,8 +346,19 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-
     ['Verify connection subcommand select test2',
+     ['select', 'test2', '--default'],
+     {'stdout': ['test2', 'default'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand show test2 includes "current"',
+     ['show', 'test2'],
+     {'stdout': ['test2', 'http://blahblah', 'current'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection subcommand select test2 shows it is current',
      ['select', 'test2'],
      {'stdout': ['test2', 'current'],
       'test': 'innows'},

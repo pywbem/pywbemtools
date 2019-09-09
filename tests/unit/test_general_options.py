@@ -580,8 +580,7 @@ TEST_CASES = [
     #
 
     ['Verify Create a connection.',
-     {'args': ['add', 'test-default',
-               '--server', 'http://blah'],
+     {'args': ['add', 'test-default', '--server', 'http://blah'],
       'subcmd': 'connection', },
      {'stdout': '',
       'test': 'innows'},
@@ -590,7 +589,21 @@ TEST_CASES = [
     ['Verify select of test-default.',
      {'args': ['select', 'test-default'],
       'subcmd': 'connection', },
-     {'stdout': ['test-default', 'selected'],
+     {'stdout': ['test-default', 'current'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify shows test-default.',
+     {'args': ['show', 'test-default'],
+      'subcmd': 'connection', },
+     {'stdout': ['test-default'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify select of test-default.',
+     {'args': ['select', 'test-default', '--default'],
+      'subcmd': 'connection', },
+     {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
@@ -720,4 +733,4 @@ class TestGlobalOptions(CLITestsBase):
         subcmd = inputs['subcmd'] if inputs['subcmd'] else ''
 
         self.subcmd_test(desc, subcmd, inputs, exp_response,
-                         mock, condition, verbose=True)
+                         mock, condition, verbose=False)

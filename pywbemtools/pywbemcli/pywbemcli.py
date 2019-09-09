@@ -293,7 +293,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                     mock_server_path.append(fn)
 
             # Abort for non-existent mock files or invalid type
-            # Otherwise these issued do not get found until connection
+            # Otherwise these issues not get found until connection
             # exercised.
             # TODO: Future: Create common method with code in build_respository
             for file_path in mock_server_path:
@@ -404,7 +404,7 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                                                'WBEM server'.format(name))
             else:  # no --name option
                 # get any persistent default_connection name
-                s_name = connections.get_default_connection()
+                s_name = connections.get_default_connection_name()
 
                 if s_name and s_name not in connections:
                     click.echo('Invalid selected connection "%s". This name '
@@ -412,6 +412,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                                err=True)
                     connections.set_default_connection(None)
                     raise click.Abort()
+                if verbose:
+                    click.echo('Current connection is "%s"' % s_name)
 
             # Get the named connection from the repo
             if s_name:
@@ -448,7 +450,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                 pywbem_server = None
 
     else:  # ctx.obj exists. Processing an interactive command.
-        # Apply the option defaults from the command line options.
+        # Apply the option defaults from the command line options
+        # or from the context object.
         if pywbem_server is None:
             pywbem_server = ctx.obj.pywbem_server
         if output_format is None:
