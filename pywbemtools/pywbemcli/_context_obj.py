@@ -291,3 +291,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             # prompt.
             self._pywbem_server.get_password(self)
             self._pywbem_server.create_connection(self.verbose)
+
+    @staticmethod
+    def update_root_click_context(ctx_obj):
+        """
+        Method to update the click root context with a new context
+        object.  This makes the values in this context universal for all
+        future commands within an interactive session.
+        This is a static method and gets the current click context and
+        root context from click itself.
+        """
+        ctx = click.get_current_context()
+        root = ctx.find_root()
+        root.obj = ctx_obj

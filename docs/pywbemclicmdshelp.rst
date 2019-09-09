@@ -701,16 +701,17 @@ The following defines the help output for the `pywbemcli connection add --help` 
       properties are optional.
 
       Adding a connection does not set the new connection as the current
-      connection definition. Use `connection select` to set a particular stored
-      connection definition as the current connection.
+      connection definition. Use the connection select command to set a
+      particular connection definition as the current connection.
 
         pywbemcli connection add newsvr --server https://srv1
 
     Options:
-      --input-name INPUT-NAME         If this option exists, it is the name of a
-                                      persistent connection that will be put into
-                                      the connections file with the NAME argument.
-                                      All other options will be ignored.
+      --input-name CONNECTION-NAME    If this option exists, it is the name of an
+                                      existing persistent definition that will be
+                                      added to the connections file with the NAME
+                                      argument.  All other options will be
+                                      ignored.
       -m, --mock-server FILE          Use a mock WBEM server that is automatically
                                       created in pywbemcli and populated with CIM
                                       objects that are defined in the specified
@@ -867,7 +868,7 @@ The following defines the help output for the `pywbemcli connection list --help`
       List the WBEM connection definitions.
 
       This command displays all entries in the connections file and the current
-      connection if it is not in the connections file as a table.
+      connection if it exists and is not in the connections file as a table.
 
       An "!" before the name indicates the default connection. See connection
       select. A '*' before the name indicates that it is the current connection.
@@ -902,13 +903,10 @@ The following defines the help output for the `pywbemcli connection save --help`
         pywbemcli --server https://srv1 connection save mysrv
 
     Options:
-      --input-name INPUT-NAME  If this option exists, it is the name of a
-                               persistent connection that will be put into the
-                               connections file with the NAME argument.
-      -V, --verify             Prompt for confirmation before performing a change,
-                               to allow for verification of parameters. Default:
-                               Do not prompt for confirmation.
-      -h, --help               Show this message and exit.
+      -V, --verify  Prompt for confirmation before performing a change, to allow
+                    for verification of parameters. Default: Do not prompt for
+                    confirmation.
+      -h, --help    Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:
@@ -928,15 +926,18 @@ The following defines the help output for the `pywbemcli connection select --hel
       Select a WBEM connection definition as current/default connection.
 
       Selects a connection from the persistently stored named connections if
-      NAME exists in the store. If NAME not supplied, a list of connections from
-      the connections definition file is presented with a prompt for the user to
-      select a connection.
+      NAME exists in the store to be the current connection. If the NAME
+      argument not supplied, a list of connections from the connections
+      definition file is presented with a prompt for the user to select a
+      connection.
 
-      Selection is persistent; it creates a default connection and that used as
-      the server definition in commands in the existing an interactive session
-      and is saved in the connections file and used as the current connection if
-      there is no other server definition (--server or --name or --mock-server)
-      general option.
+      Selection is persistent if the --default option exists; the selected
+      connection will be used as the server definition in commands future
+      execution of pywbemcli if there is no other server definition (--server or
+      --name or --mock-server) general option.
+
+      Otherwise it sets the connection selected to be the current connection in
+      the current interactive session.
 
       Example:
         $ pywbemcli
@@ -947,8 +948,9 @@ The following defines the help output for the `pywbemcli connection select --hel
           server: http://localhost
 
     Options:
-      -d, --default  If set, the connection is set to default in the connections
-                     file in addition to setting it as the current connection.
+      -d, --default  If set, the connection is set to be the default connection
+                     in the connections file in addition to setting it as the
+                     current connection.
       -h, --help     Show this message and exit.
 
 

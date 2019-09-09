@@ -291,7 +291,7 @@ class ConnectionRepository(object):
             raise ValueError('Connection name "%s" does not exist in set of '
                              'connections' % connection_name)
 
-    def get_default_connection(self):
+    def get_default_connection_name(self):
         """
         Returns the name of the current connection in the connections file.
         This may be the name of a connection in the connections file or
