@@ -145,15 +145,18 @@ install the needed OS-level packages.
 
 To use these scripts, your system must have the following commands installed:
 
-* On native windows:
+* On native Windows:
 
   - ``choco`` - Chocolatey package manager. The pywbemtools package installation
     uses Chocolatey to install OS-level software. See https://chocolatey.org/
     for the installation instructions for Chocolatey.
 
-* On all platforms:
+  - ``wget`` - Download tool. Can be installed with: ``choco install wget``.
 
-  - ``wget`` - Download tool.
+* On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
+
+  - ``wget`` - Download tool. Can be installed using the OS-level package
+    manager for the platform.
 
 
 .. _`Installation with pip`:
