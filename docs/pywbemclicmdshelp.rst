@@ -671,7 +671,7 @@ The following defines the help output for the `pywbemcli connection --help` comm
       export  Export the current connection.
       list    List the WBEM connection definitions.
       save    Save a connection to a new WBEM connection definition named NAME.
-      select  Select a WBEM connection definition as current/default connection.
+      select  Select a WBEM connection definition as current or default.
       show    Show connection info of a WBEM connection definition.
       test    Test the current connection with a predefined WBEM request.
 
@@ -870,8 +870,9 @@ The following defines the help output for the `pywbemcli connection list --help`
       This command displays all entries in the connections file and the current
       connection if it exists and is not in the connections file as a table.
 
-      An "!" before the name indicates the default connection. See connection
-      select. A '*' before the name indicates that it is the current connection.
+      '#' before the name indicates the default connection.
+      '*' before the name indicates that it is the current connection.
+      See connection select.
 
     Options:
       -h, --help  Show this message and exit.
@@ -894,9 +895,8 @@ The following defines the help output for the `pywbemcli connection save --help`
       Save a connection to a new WBEM connection definition named NAME.
 
       Create a new WBEM connection definition in the connections file from the
-      current connection or the connection definition in --input-name anamed
-      NAME. A connection definition with the name NAME must not yet exist. The
-      NAME argument is required.
+      current connection A connection definition with the name NAME must not yet
+      exist. The NAME argument (the name of the new connection) is required.
 
       Examples:
 
@@ -923,25 +923,25 @@ The following defines the help output for the `pywbemcli connection select --hel
 
     Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
 
-      Select a WBEM connection definition as current/default connection.
+      Select a WBEM connection definition as current or default.
 
       Selects a connection from the persistently stored named connections if
       NAME exists in the store to be the current connection. If the NAME
-      argument not supplied, a list of connections from the connections
+      argument does not exist, a list of connections from the connections
       definition file is presented with a prompt for the user to select a
       connection.
 
-      Selection is persistent if the --default option exists; the selected
-      connection will be used as the server definition in commands future
-      execution of pywbemcli if there is no other server definition (--server or
-      --name or --mock-server) general option.
+      Default and current connction are set if the --default option exists;
+      otherwise only the connection in the current interactive session is set .
+      Once define the default connection will be used as the server definition
+      in future execution of pywbemcli if there is no server definition
+      (--server or --name or --mock-server) general option.
 
-      Otherwise it sets the connection selected to be the current connection in
-      the current interactive session.
+      Connection list shows all connections and if any are default or current.
 
-      Example:
+      Example of selecting a connection and setting the default:
         $ pywbemcli
-        pywbemcli> connection select myconn
+        pywbemcli> connection select myconn --default
         pywbemcli> :quit
         $ pywbemcli show
         name: myconn
@@ -973,20 +973,25 @@ The following defines the help output for the `pywbemcli connection show --help`
       This command displays the WBEM connection definition of a single
       connection as follows:
 
-      * A named connection from the WBEM connections file if NAME argument is
-      specified.
+      * NAME argument exists; show that WBEM connections file.
 
-      * The current connection if NAME is not provided and a current connection
-      exists (selected, or defined on the command line).
+      * NAME argument does not exist; show existing current connection or
+      presents list for selection
 
-      * User selects from list presented if NAME argument is '?' or there is no
-      NAME argument and no current connection.
+      * Name argument is '?'; presents list of connections for selection
 
-      This command displays all the variables that make up the current WBEM.
+      This command displays all the variables that make up current WBEM
+      connection.
 
-        pywbemcli connection show server1
-
+        pywbemcli connection show svr1
+          name: svr1
+          ...
         pywbemcli connection show ?
+          0: svr1
+          1: svr2
+      Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+        name: svr1
+        ...
 
     Options:
       -h, --help  Show this message and exit.

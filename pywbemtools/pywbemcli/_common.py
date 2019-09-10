@@ -1472,12 +1472,11 @@ def format_table(rows, headers, title=None, table_format='simple',
         raise click.ClickException('Invalid table format %s.' % table_format)
 
     result = tabulate.tabulate(rows, headers, tablefmt=table_format)
-
     if title:
         if table_format == 'html':
             result = '<p>%s</p>\n%s' % (title, result)
         else:
-            result = '%s\n%s' % (title, result)
+            result = '{0}\n{1}'.format(title, result)
     return result
 
 

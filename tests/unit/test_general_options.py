@@ -515,24 +515,22 @@ TEST_CASES = [
       'test': 'lines'},
      None, RUN],
 
-    ['Verify --name and other options generates warnings but works',
-     {'global': ['--name', 'generaltest1'],
-      'subcmd': 'connection',
-      'args': ['show', 'generaltest1']},
-     {'stdout': ['generaltest1'],
-      'rc': 0,
-      'test': 'innows'},
-     None, RUN],
-
-    ['Verify --name and other options generates warnings but works',
+    ['Verify --name and other options fails',
      {'global': ['--name', 'generaltest1', '--timeout', '90'],
       'subcmd': 'connection',
       'args': ['delete', 'generaltest1']},
-     {'stdout': ['WARNING:',
-                 'timeout 90" ignored when "-n/--name or default name used'],
-      'rc': 0,
+     {'stderr': ['timeout 90', 'invalid when'],
+      'rc': 1,
       'test': 'innows'},
      None, RUN],
+
+    ['Verify connection gets deleted.',
+     {'subcmd': 'connection',
+      'args': ['delete', 'generaltest1']},
+     {'stdout': '',
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
 
     ['Verify connection already deleted.',
      {'subcmd': 'connection',
@@ -542,7 +540,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection without server definition and subcommand that '
+    ['Verify connection without server definition and command that '
      ' requires connection fails.',
      {'subcmd': 'class',
       'args': ['enumerate']},
