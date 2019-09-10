@@ -141,9 +141,11 @@ Python packages installed:
 Pywbemtools installs the pywbem package which requires a number of OS-level
 packages as documented in the `pywbem installation documentation`_.
 The pywbem package provides the ``pywbem_os_setup.sh/.bat`` scripts that
-install the needed OS-level packages.
+install the needed OS-level packages. These scripts are only needed when
+using Python 2.
 
-To use these scripts, your system must have the following commands installed:
+To use these scripts, your system must have the following commands installed
+when using Python 2:
 
 * On native Windows:
 
@@ -164,31 +166,29 @@ To use these scripts, your system must have the following commands installed:
 Installation with pip
 ^^^^^^^^^^^^^^^^^^^^^
 
-On Linux, OS-X, and UNIX-like environments under Windows, download the
-``pywbem_os_setup.sh`` script and run it to install the needed OS-level
-packages:
+When using Python 2, install OS-level packages needed by the pywbem package:
 
-.. code-block:: bash
+  - On native Windows:
 
-    $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
-    $ chmod 755 pywbem_os_setup.sh
-    $ ./pywbem_os_setup.sh
+    .. code-block:: bash
 
-The script uses ``sudo`` under the covers to invoke the OS-level package
-manager for your Linux distribution (e.g. ``yum`` on the RedHat family), so
-the current userid needs to have sudo permission.
+        > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+        > pywbem_os_setup.bat
 
-Note that for the time being, the pywbem_os_setup.sh script must be downloaded
-from the pywbemtools project. See
-`issue #329 <https://github.com/pywbem/pywbemtools/issues/329>`_.
+  - On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
 
-On native Windows, download the ``pywbem_os_setup.bat`` script and run it to
-install the needed OS-level packages:
+    .. code-block:: bash
 
-.. code-block:: bash
+        $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
+        $ chmod 755 pywbem_os_setup.sh
+        $ ./pywbem_os_setup.sh
 
-    > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-    > pywbem_os_setup.bat
+    The ``pywbem_os_setup.sh`` script uses sudo internally, so your userid
+    needs to have sudo permission.
+
+    Note that for the time being, the ``pywbem_os_setup.sh`` script must be downloaded
+    from the pywbemtools project. See
+    `issue #329 <https://github.com/pywbem/pywbemtools/issues/329>`_.
 
 If you want to install the needed OS-level packages manually, see
 `pywbem prerequisite OS packages <https://pywbem.readthedocs.io/en/latest/intro.html#prerequisite-operating-system-packages-for-install>`_.
