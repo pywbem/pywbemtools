@@ -21,6 +21,7 @@ disk which is kept in sync with changes made with the add/delete commands.
 """
 from __future__ import absolute_import
 
+from copy import deepcopy
 import click
 import six
 from pywbem import Error, DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
@@ -85,21 +86,26 @@ def connection_show(context, name):
     This command displays the WBEM connection definition of a single
     connection as follows:
 
-    * A named connection from the WBEM connections file if NAME argument is
-      specified.
+    * NAME argument exists; show that WBEM connections file.
 
-    * The current connection if NAME is not provided and a current connection
-      exists (selected, or defined on the command line).
+    * NAME argument does not exist; show existing current connection or
+      presents list for selection
 
-    * User selects from list presented if NAME argument is '?' or there is no
-      NAME argument and no current connection.
+    * Name argument is '?'; presents list of connections for selection
 
-    This command displays all the variables that make up the current
-    WBEM.
+    This command displays all the variables that make up current
+    WBEM connection.
 
-      pywbemcli connection show server1
-
+    \b
+      pywbemcli connection show svr1
+        name: svr1
+        ...
       pywbemcli connection show ?
+        0: svr1
+        1: svr2
+    Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+      name: svr1
+      ...
     """
     context.execute_cmd(lambda: cmd_connection_show(context, name))
 
@@ -133,25 +139,25 @@ def connection_delete(context, name, **options):
 @click.pass_obj
 def connection_select(context, name, **options):
     """
-    Select a WBEM connection definition as current/default connection.
+    Select a WBEM connection definition as current or default.
 
     Selects a connection from the persistently stored named connections if NAME
-    exists in the store to be the current connection. If the NAME argument not
-    supplied, a list of connections from the connections definition file is
+    exists in the store to be the current connection. If the NAME argument does
+    not exist, a list of connections from the connections definition file is
     presented with a prompt for the user to select a connection.
 
-    Selection is persistent if the --default option exists; the selected
-    connection will be used as the server definition in commands future
-    execution of pywbemcli if there is no other server definition (--server or
+    Default and current connction are set if the --default option exists;
+    otherwise only the connection in the current interactive session is set .
+    Once define the default connection will be used as the server definition in
+    future execution of pywbemcli if there is no server definition (--server or
     --name or --mock-server) general option.
 
-    Otherwise it sets the connection selected to be the current connection in
-    the current interactive session.
+    Connection list shows all connections and if any are default or current.
 
     \b
-    Example:
+    Example of selecting a connection and setting the default:
       $ pywbemcli
-      pywbemcli> connection select myconn
+      pywbemcli> connection select myconn --default
       pywbemcli> :quit
       $ pywbemcli show
       name: myconn
@@ -321,9 +327,8 @@ def connection_save(context, name, **options):
     Save a connection to a new WBEM connection definition named NAME.
 
     Create a new WBEM connection definition in the connections file from the
-    current connection or the connection definition in --input-name anamed
-    NAME. A connection definition with the name NAME must not yet exist.
-    The NAME argument is required.
+    current connection A connection definition with the name NAME must not yet
+    exist. The NAME argument (the name of the new connection) is required.
 
     Examples:
 
@@ -342,9 +347,10 @@ def connection_list(context):
     current connection if it exists and is not in the connections file as
     a table.
 
-    An "!" before the name indicates the default connection. See connection
-    select.
-    A '*' before the name indicates that it is the current connection.
+    \b
+    '#' before the name indicates the default connection.
+    '*' before the name indicates that it is the current connection.
+    See connection select.
     """
     context.execute_cmd(lambda: cmd_connection_list(context))
 
@@ -665,19 +671,20 @@ def cmd_connection_add(context, name, options):
 
 def cmd_connection_save(context, name, options):
     """
-    Sets the current connection into the persistent connection repository
+    Saves the connection named name or the current connection of no name
     """
     current_connection = context.pywbem_server
     if not current_connection:
         raise click.ClickException('No current connection connection. Use '
-                                   '"connection list" to see more server '
+                                   '"connection list" to see more connection '
                                    'information')
-    current_connection._name = name  # pylint: disable=protected-access
+    save_connection = deepcopy(current_connection)
+    save_connection._name = name  # pylint: disable=protected-access
 
     connections = ConnectionRepository()
-    if current_connection.name in connections:
+    if save_connection.name in connections:
         raise click.ClickException('%s is already defined as a server' %
-                                   current_connection.name)
+                                   save_connection.name)
     context.spinner.stop()
     if options['verify']:
         click.echo('Verify save of %s' % current_connection.name)
@@ -686,7 +693,7 @@ def cmd_connection_save(context, name, options):
         if not verify_operation('Execute save', msg=True):
             return
 
-    connections.add(current_connection.name, current_connection)
+    connections.add(save_connection.name, save_connection)
 
 
 def cmd_connection_list(context):

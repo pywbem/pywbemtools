@@ -52,8 +52,7 @@ CONNECTION_HELP_LINES = [
     'export  Export the current connection.',
     'list    List the WBEM connection definitions.',
     'save    Save a connection to a new WBEM connection definition named NAME.',
-    'select  Select a WBEM connection definition as current/default '
-    'connection.',
+    'select  Select a WBEM connection definition as current or default.',
     'show    Show connection info of a WBEM connection definition.',
     'test    Test the current connection with a predefined WBEM request.',
 ]
@@ -106,7 +105,7 @@ CONNECTION_SAVE_HELP_LINES = [
 
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
-    'Select a WBEM connection definition as current/default connection.',
+    'Select a WBEM connection definition as current or default.',
     '-d, --default  If set, the connection is set to be the default ',
 
     CMD_OPTION_HELP_HELP_LINE
@@ -140,7 +139,7 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify connection subcommand --help response',
+    ['Verify connection command --help response',
      '--help',
      {'stdout': CONNECTION_HELP_LINES,
       'test': 'innows'},
@@ -799,7 +798,7 @@ WBEM server connections: (#: default, *: current)
 
 class TestSubcmdClass(CLITestsBase):
     """
-    Test all of the class subcommand variations.
+    Test all of the class command variations.
     """
     subcmd = 'connection'
 

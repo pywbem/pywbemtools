@@ -33,7 +33,7 @@ from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
 
 from ._context_obj import ContextObj
 from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
-    CIM_OBJECT_OUTPUT_FORMATS, warning_msg
+    CIM_OBJECT_OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
@@ -253,6 +253,19 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
+    # list of options that are not allowed in some cases:
+    # When -name is used and when in interactive mode.
+    conditional_options = ((default_namespace, 'default_namespace'),
+                           (use_pull, 'use_pull'),
+                           (pull_max_cnt, ''),
+                           (timeout, 'timeout'),
+                           (no_verify, 'no_verify'),
+                           (user, 'user'),
+                           (certfile, 'certfile'),
+                           (keyfile, 'keyfile'),
+                           (ca_certs, 'ca_certs'),
+                           (server, 'server'),
+                           (mock_server, 'mock-server'))
     # In interactive mode, general options specified in cmd line are used as
     # defaults for interactive commands.
     # This requires being able to determine for each option whether it has been
@@ -418,26 +431,16 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
             # Get the named connection from the repo
             if s_name:
                 pywbem_server = connections[s_name]
-                # Test for invalid other options with the --name option
+                # Test for invalid options with the --name option
                 # The following options are part of each PywbemServer object
                 # TODO: FUTURE should really put this into pywbemserver itself.
-                other_options = ((default_namespace, 'default_namespace'),
-                                 (use_pull, 'use_pull'),
-                                 (pull_max_cnt, ''),
-                                 (timeout, 'timeout'),
-                                 (no_verify, 'no_verify'),
-                                 (user, 'user'),
-                                 (certfile, 'certfile'),
-                                 (keyfile, 'keyfile'),
-                                 (ca_certs, 'ca_certs'),
-                                 (server, 'server'),
-                                 (mock_server, 'mock-server'))
 
-                for option in other_options:
+                for option in conditional_options:
                     if option[0]:
-                        warning_msg('"%s %s" ignored when "-n/--name  or '
-                                    'default name used' %
-                                    (option[1], option[0]))
+                        raise click.ClickException(
+                            '"--%s %s" option invalid when --name exists or '
+                            'default name set.' % (option[1], option[0]))
+
                 # NOTE: The log definition is only for this session.
                 if log:
                     # pylint: disable=protected-access
@@ -452,6 +455,12 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options
         # or from the context object.
+        for option in conditional_options:
+            if option[0]:
+                raise click.ClickException('"--%s %s" option invalid in '
+                                           'interactive mode' %
+                                           (option[1], option[0]))
+
         if pywbem_server is None:
             pywbem_server = ctx.obj.pywbem_server
         if output_format is None:
