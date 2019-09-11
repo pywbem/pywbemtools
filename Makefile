@@ -430,12 +430,20 @@ develop_os: develop_os_$(pymn).done
 
 # The following target is supposed to install any prerequisite OS-level packages
 # needed for development of pywbemtools. Pywbemtools has no such prerequisite
-# packages on its own. Pywbem has such prerequisite packages, but only for
-# development of pywbem itself. Therefore, this target does not need to do
-# anything. We still have it in the Makefile, for clarity.
+# packages on its own. However, on Python 3, the 'astroid' package used by
+# 'pylint' needs 'typed-ast' which depends on the OS-level packages
+# 'libcrypt-devel' and 'python3-devel'. These packages happen to also be used
+# by pywbem for development.
 develop_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done $(pywbem_os_setup_file)
-	@echo "No OS-level development requirements needed for pywbemtools"
+	@echo "makefile: Installing OS-level development requirements"
+	-$(call RM_FUNC,$@)
+ifeq ($(PLATFORM),Windows_native)
+	pywbem_os_setup.bat develop
+else
+	./pywbem_os_setup.sh develop
+endif
 	echo "done" >$@
+	@echo "makefile: Done installing OS-level development requirements"
 
 .PHONY: develop
 develop: develop_$(pymn).done

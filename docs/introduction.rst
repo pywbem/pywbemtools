@@ -179,16 +179,12 @@ When using Python 2, install OS-level packages needed by the pywbem package:
 
     .. code-block:: bash
 
-        $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
+        $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
         $ chmod 755 pywbem_os_setup.sh
         $ ./pywbem_os_setup.sh
 
     The ``pywbem_os_setup.sh`` script uses sudo internally, so your userid
     needs to have sudo permission.
-
-    Note that for the time being, the ``pywbem_os_setup.sh`` script must be downloaded
-    from the pywbemtools project. See
-    `issue #329 <https://github.com/pywbem/pywbemtools/issues/329>`_.
 
 If you want to install the needed OS-level packages manually, see
 `pywbem prerequisite OS packages <https://pywbem.readthedocs.io/en/latest/intro.html#prerequisite-operating-system-packages-for-install>`_.

@@ -115,7 +115,7 @@ Installation:
 
     .. code-block:: bash
 
-        $ wget -q https://raw.githubusercontent.com/pywbem/pywbemtools/master/pywbem_os_setup.sh
+        $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
         $ chmod 755 pywbem_os_setup.sh
         $ ./pywbem_os_setup.sh
 
