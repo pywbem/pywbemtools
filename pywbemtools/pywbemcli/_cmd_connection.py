@@ -324,10 +324,10 @@ def connection_test(context):
 @click.pass_obj
 def connection_save(context, name, **options):
     """
-    Save a connection to a new WBEM connection definition named NAME.
+    Save the current connection to a new WBEM connection definition.
 
     Create a new WBEM connection definition in the connections file from the
-    current connection A connection definition with the name NAME must not yet
+    current connection. A connection definition with the name NAME must not yet
     exist. The NAME argument (the name of the new connection) is required.
 
     Examples:
@@ -379,7 +379,10 @@ def if_export_statement(name, value):
 
 
 def is_default_connection(connection):
-    """Returns True if connection is the default connection"""
+    """
+    Returns True if connection is the default connection. Where
+    default connection is defined in repository.
+    """
 
     default_connection = ConnectionRepository().get_default_connection_name()
     if default_connection and default_connection == connection.name:
