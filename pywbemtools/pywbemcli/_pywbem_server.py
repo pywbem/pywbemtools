@@ -21,13 +21,13 @@ Common Functions applicable across multiple components of pywbemcli
 from __future__ import absolute_import, unicode_literals
 
 import re
-import click
 from collections import OrderedDict
+import click
 
 from pywbem import WBEMServer, configure_loggers_from_string
 
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
-    DEFAULT_MAXPULLCNT, DEFAULT_NAMESPACE, MAX_TIMEOUT
+    DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
 WBEM_SERVER_OBJ = None
@@ -95,7 +95,7 @@ class PywbemServer(object):
     timeout_envvar = 'PYWBEMCLI_TIMEOUT'
     keyfile_envvar = 'PYWBEMCLI_KEYFILE'
     certfile_envvar = 'PYWBEMCLI_CERTFILE'
-    no_verify_envvar = 'PYWBEMCLI_NO_VERIFY'
+    verify_envvar = 'PYWBEMCLI_VERIFY'
     ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
     timestats_envvar = 'PYWBEMCLI_TIMESTATS'
     use_pull_envvar = 'PYWBEMCLI_USE_PULL'
@@ -104,14 +104,11 @@ class PywbemServer(object):
     log_envvar = 'PYWBEMCLI_LOG'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
-                 name='default',
-                 user=None, password=None, timeout=DEFAULT_CONNECTION_TIMEOUT,
-                 no_verify=True, certfile=None, keyfile=None, ca_certs=None,
-                 use_pull=None, pull_max_cnt=DEFAULT_MAXPULLCNT,
-                 stats_enabled=False, verbose=False, mock_server=None,
-                 log=None):
+                 name='default', user=None, password=None,
+                 timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None,
+                 certfile=None, keyfile=None, ca_certs=None, mock_server=None):
         """
-            Create a PywbemServer object. This contains the configuration
+            Create  a PywbemServer object. This contains the configuration
             and operation information to create a connection to the server
             and execute cim_operations on the server.
         """
@@ -120,42 +117,31 @@ class PywbemServer(object):
             raise ValueError('Simultaneous "--server" and '
                              '"--mock-server" not allowed. Server: %s, '
                              'mock_server %s' % (server, mock_server))
-        self._server = server
-        self._mock_server = mock_server
-
-        self._name = name
-        self._default_namespace = default_namespace
-        self._user = user
-        self._password = password
-        self._timeout = timeout
-        self._no_verify = no_verify
-        self._certfile = certfile
-        self._keyfile = keyfile
-        self._ca_certs = ca_certs
-        self._stats_enabled = stats_enabled
-        self._verbose = verbose
-        self._wbem_server = None
-        self._validate_timeout()
-        self._use_pull = use_pull
-        self._pull_max_cnt = pull_max_cnt
+        self.server = server
+        self.mock_server = mock_server
+        self.name = name
+        self.default_namespace = default_namespace
+        self.user = user
+        self.password = password
+        self.timeout = timeout
+        self.verify = verify
+        self.certfile = certfile
+        self.keyfile = keyfile
+        self.ca_certs = ca_certs
 
         self._wbem_server = None
-        self._verbose = verbose
-        self._log = log
 
     def __str__(self):
         return 'PywbemServer(url=%s name=%s)' % (self.server, self.name)
 
     def __repr__(self):
         return 'PywbemServer(server=%s name=%s ns=%s user=%s ' \
-               'password=%s timeout=%s no_verify=%s certfile=%s ' \
-               'keyfile=%s ca_certs=%s use_pull=%s, pull_max_cnt=%s, ' \
-               'stats_enabled=%s mock_server=%r, log=%r)' % \
+               'password=%s timeout=%s verify=%s certfile=%s ' \
+               'keyfile=%s ca_certs=%s  ' \
+               'mock_server=%r)' % \
                (self.server, self.name, self.default_namespace,
-                self.user, self.password, self.timeout, self.no_verify,
-                self.certfile, self.keyfile, self.ca_certs, self.use_pull,
-                self.pull_max_cnt, self.stats_enabled, self.mock_server,
-                self._log)
+                self.user, self.password, self.timeout, self.verify,
+                self.certfile, self.keyfile, self.ca_certs, self.mock_server)
 
     @property
     def server(self):
@@ -164,12 +150,43 @@ class PywbemServer(object):
         """
         return self._server
 
+    @server.setter
+    def server(self, server):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        if server:
+            self._server = _validate_server(server)
+        else:
+            self._server = server
+
+    @property
+    def mock_server(self):
+        """
+        :term: `list of strings`: list of file paths for mock server setup.
+        """
+        return self._mock_server
+
+    @mock_server.setter
+    def mock_server(self, mock_server):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._mock_server = mock_server
+
     @property
     def name(self):
         """
         :term:`string`: Defines a name for this connection object.
         """
         return self._name
+
+    @name.setter
+    def name(self, name):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._name = name
 
     @property
     def user(self):
@@ -178,28 +195,12 @@ class PywbemServer(object):
         """
         return self._user
 
-    @property
-    def use_pull(self):
-        """
-        :term:`bool`: Flag to define if pull operations are to be used.
-        True if pull operations are to be use. False if traditional operations
-        and None if the system will decide.
-        """
-        return self._use_pull
+    @user.setter
+    def user(self, user):
+        """Setter method; for a description see the getter method."""
 
-    @property
-    def pull_max_cnt(self):
-        """
-        :term:`string`: max object count for pull operations.
-        """
-        return self._pull_max_cnt
-
-    @property
-    def stats_enabled(self):
-        """
-        :term:`bool`: if set, statistics are enabled for this connection
-        """
-        return self._stats_enabled
+        # pylint: disable=attribute-defined-outside-init
+        self._user = user
 
     @property
     def password(self):
@@ -208,12 +209,26 @@ class PywbemServer(object):
         """
         return self._password
 
+    @password.setter
+    def password(self, password):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._password = password
+
     @property
     def default_namespace(self):
         """
         :term:`string`: Namespace to be used as default  for requests.
         """
         return self._default_namespace
+
+    @default_namespace.setter
+    def default_namespace(self, default_namespace):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._default_namespace = default_namespace
 
     @property
     def timeout(self):
@@ -222,13 +237,32 @@ class PywbemServer(object):
         """
         return self._timeout
 
+    @timeout.setter
+    def timeout(self, timeout):
+        """Setter method; for a description see the getter method."""
+
+        if timeout is None:   # disallow None
+            ValueError('Timout of None not allowed')
+        if timeout < 0 or timeout > MAX_TIMEOUT:
+            ValueError('Timeout option(%s) out of range %s to %s sec' %
+                       (timeout, 0, MAX_TIMEOUT))
+        # pylint: disable=attribute-defined-outside-init
+        self._timeout = timeout
+
     @property
-    def no_verify(self):
+    def verify(self):
         """
         :term: `bool`: Connection server verfication flag. If True
-        server cert not verified during connection.
+        server cert verified during connection.
         """
-        return self._no_verify
+        return self._verify
+
+    @verify.setter
+    def verify(self, verify):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._verify = verify
 
     @property
     def certfile(self):
@@ -238,6 +272,13 @@ class PywbemServer(object):
         """
         return self._certfile
 
+    @certfile.setter
+    def certfile(self, certfile):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._certfile = certfile
+
     @property
     def keyfile(self):
         """
@@ -245,12 +286,12 @@ class PywbemServer(object):
         """
         return self._keyfile
 
-    @property
-    def log(self):
-        """
-        :term: `string`: log config or None if no log parameter input
-        """
-        return self._log
+    @keyfile.setter
+    def keyfile(self, keyfile):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._keyfile = keyfile
 
     @property
     def ca_certs(self):
@@ -258,6 +299,13 @@ class PywbemServer(object):
         :term: `list of strings`: List of ca_certs if provided on cmd line
         """
         return self._ca_certs
+
+    @ca_certs.setter
+    def ca_certs(self, ca_certs):
+        """Setter method; for a description see the getter method."""
+
+        # pylint: disable=attribute-defined-outside-init
+        self._ca_certs = ca_certs
 
     @property
     def conn(self):
@@ -275,13 +323,6 @@ class PywbemServer(object):
         """
         return self._wbem_server
 
-    @property
-    def mock_server(self):
-        """
-        :term: `list of strings`: list of file paths for mock server setup.
-        """
-        return self._mock_server
-
     def _validate_timeout(self):
         """
         Validate that timeout parameter is in proper range.
@@ -295,7 +336,6 @@ class PywbemServer(object):
             ValueError('Timeout option(%s) out of range %s to %s sec' %
                        (self.timeout, 0, MAX_TIMEOUT))
 
-    # TODO ks Can this function can be merged into get_password below?
     def password_prompt(self, ctx):
         """
         Request password from console.
@@ -307,6 +347,7 @@ class PywbemServer(object):
                 hide_input=True,
                 confirmation_prompt=False, type=str, err=True)
             ctx.spinner.start()
+            # pylint: disable=attribute-defined-outside-init
             self._password = password
         else:
             raise click.ClickException("{cmd} requires user/password, but "
@@ -334,30 +375,31 @@ class PywbemServer(object):
                             "password": self.password,
                             "default-namespace": self.default_namespace,
                             "timeout": self.timeout,
-                            "no-verify": self.no_verify,
+                            "verify": self.verify,
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,
                             "ca-certs": self.ca_certs,
-                            "use-pull": self.use_pull,
-                            "pull-max-cnt": self.pull_max_cnt,
-                            "mock-server": self.mock_server,
-                            "log": self.log})
+                            "mock-server": self.mock_server})
 
     @staticmethod
     def create(replace_underscores=False, **kwargs):
         """Create PywbemServer object from kwargs. If replace_underscore is
         True, replace any -  in names with _
         """
+        kwargsout = {}
         if replace_underscores:
-            for name, value in kwargs.items():
-                if '-' in name:
-                    del kwargs[name]
-                    name = name.replace('-', '_')
-                    kwargs[name] = value
+            kwargsout = {k.replace('-', '_'): v for k, v in kwargs.items()}
+        return PywbemServer(**kwargsout)
 
-        return PywbemServer(**kwargs)
+    def reset(self):
+        """ Reset the connection attributes of this pywbem server so that the
+        connection must be restablished
+        """
+        self._conn = None
+        self._wbemserver = None
 
-    def create_connection(self, verbose):
+    def create_connection(self, log=None, use_pull=None, pull_max_cnt=None,
+                          verbose=None, timestats=None):
         """
         Initiate a WBEB connection, via PyWBEM api. Arguments for
         the request are the parameters required by the pywbem
@@ -378,8 +420,8 @@ class PywbemServer(object):
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(
                 default_namespace=self.default_namespace,
-                use_pull_operations=self.use_pull,
-                stats_enabled=self.stats_enabled)
+                use_pull_operations=use_pull,
+                stats_enabled=timestats)
             try:
                 self._wbem_server = WBEMServer(conn)
                 conn.build_repository(conn,
@@ -394,7 +436,6 @@ class PywbemServer(object):
             if not self.server:
                 raise click.ClickException('No server found. Cannot '
                                            'connect.')
-            self._server = _validate_server(self._server)
             if self.keyfile is not None and self.certfile is None:
                 ValueError('keyfile option requires certfile option')
 
@@ -412,22 +453,28 @@ class PywbemServer(object):
 
             # Create the WBEMConnection object and the _wbem_server object
 
+            # Negate verify to no_verification
+            if self.verify is None:
+                no_verification = self.verify
+            else:
+                no_verification = not self.verify
+
             conn = PYWBEMCLIConnection(
                 self.server, creds,
                 default_namespace=self.default_namespace,
-                no_verification=self.no_verify,
+                no_verification=no_verification,
                 x509=x509_dict, ca_certs=self.ca_certs,
                 timeout=self.timeout,
-                use_pull_operations=self.use_pull,
-                stats_enabled=self.stats_enabled)
+                use_pull_operations=use_pull,
+                stats_enabled=timestats)
             # Create a WBEMServer object
             self._wbem_server = WBEMServer(conn)
 
-        if self.log:
+        if log:
             try:
-                configure_loggers_from_string(self.log,
+                configure_loggers_from_string(log,
                                               log_filename=PYWBEMCLI_LOG,
                                               connection=conn, propagate=True)
             except ValueError as ve:
                 raise click.ClickException('Logger configuration error. input: '
-                                           '%s. Exception: %s' % (self.log, ve))
+                                           '%s. Exception: %s' % (log, ve))

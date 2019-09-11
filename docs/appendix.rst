@@ -143,6 +143,22 @@ This documentation uses a few special terms to refer to Python types:
       backslash-escaping any double quotes in INSTANCENAME, and putting it into
       double quotes.
 
+   default connection
+      A connection definition in the :ref:`--server general option` that is used
+      by pywbemcli as the :term:`current connection` if pywbemcli is started without
+      any connection definition (no :ref:`--server general option`,
+      :ref:`--mock-server general option`, or :ref:`--name general option`).
+      A connection definition in the :term:`connections file` becomes the
+      current connection on pywbemcli startup if it is defined using the
+      :ref:`connection select command`.
+
+   current connection
+      The connection definition in pywbemcli that is currently active; the
+      target WBEM server for pywbemcli commands.  The current server is defined
+      either upon startup (:ref:`--server general option`,
+      :ref:`--mock-server general option`, or :ref:`--name general option` or
+      :term:`default connection`) or with the :ref:`connection select command`.
+
 
 .. _`Profile advertisement methodologies`:
 

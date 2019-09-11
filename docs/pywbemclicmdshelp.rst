@@ -75,10 +75,11 @@ The following defines the help output for the `pywbemcli  --help` command
       -p, --password TEXT             Password for the WBEM server. Default:
                                       EnvVar PYWBEMCLI_PASSWORD, or prompted for
                                       if --user specified.
-      -N, --no-verify                 If true, client does not verify the X.509
+      --verify / --no-verify          If --verify, client verifies the X.509
                                       server certificate presented by the WBEM
-                                      server during TLS/SSL handshake. Default:
-                                      EnvVar PYWBEMCLI_NO_VERIFY, or false.
+                                      server during TLS/SSL handshake. If --no-
+                                      verify client bypasses verificationDefault:
+                                      EnvVar PYWBEMCLI_VERIFY, or --verify.
       --ca-certs FILE                 Path name of a file or directory containing
                                       certificates that will be matched against
                                       the server certificate presented by the WBEM
@@ -779,9 +780,14 @@ The following defines the help output for the `pywbemcli connection save --help`
 
       Save the current connection to a new WBEM connection definition.
 
-      Create a new WBEM connection definition in the connections file from the
-      current connection. A connection definition with the name NAME must not
-      yet exist. The NAME argument (the name of the new connection) is required.
+      Save WBEM connection definition in the connections file from the current
+      connection. The NAME argument (the name of the new connection) is
+      required. If the connection exists, it will be overwritten with the
+      current connection definition.
+
+      In the interactive mode, general options preceeding the connection command
+      that change the connection definition will be applied before the
+      connection is saved.
 
       Examples:
 
@@ -810,15 +816,15 @@ The following defines the help output for the `pywbemcli connection select --hel
 
       Select a WBEM connection definition as current or default.
 
-      Selects a connection from the persistently stored named connections if
-      NAME exists in the store to be the current connection. If the NAME
-      argument does not exist, a list of connections from the connections
-      definition file is presented with a prompt for the user to select a
-      connection.
+      Selects the connection named NAME from the persistently stored named
+      connectionsto be the current connection if NAME exists in the store . If
+      the NAME argument does not exist, a list of connections from the
+      connections definition file is presented with a prompt for the user to
+      select a connection.
 
-      Default and current connction are set if the --default option exists;
-      otherwise only the connection in the current interactive session is set .
-      Once define the default connection will be used as the server definition
+      Default and current connection are set if the --default option exists;
+      otherwise only the current connection the interactive session is set .
+      Once defined the default connection will be used as the server definition
       in future execution of pywbemcli if there is no server definition
       (--server or --name or --mock-server) general option.
 

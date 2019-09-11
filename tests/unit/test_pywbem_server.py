@@ -55,20 +55,19 @@ class PywbemServerTests(unittest.TestCase):
         user = 'Fred'
         pw = 'blah'
         timeout = 10
-        no_verify = False
+        verify = True
         certfile = 'mycertfile.blah'
         keyfile = 'mykeys.blah'
-        verbose = True
 
         svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
-                           no_verify=no_verify, certfile=certfile,
-                           keyfile=keyfile, verbose=verbose)
+                           verify=verify, certfile=certfile,
+                           keyfile=keyfile)
 
         self.assertEqual(svr.server, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
-        self.assertEqual(svr.no_verify, no_verify)
+        self.assertEqual(svr.verify, verify)
         self.assertEqual(svr.certfile, certfile)
         self.assertEqual(svr.keyfile, keyfile)
 
@@ -79,20 +78,19 @@ class PywbemServerTests(unittest.TestCase):
         user = 'Fred'
         pw = 'blah'
         timeout = 10
-        no_verify = False
+        verify = True
         certfile = 'mycertfile.blah'
         keyfile = 'mykeys.blah'
-        verbose = True
 
         svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
-                           no_verify=no_verify, certfile=certfile,
-                           keyfile=keyfile, verbose=verbose)
+                           verify=verify, certfile=certfile,
+                           keyfile=keyfile)
 
         self.assertEqual(svr.server, server)
         self.assertEqual(svr.default_namespace, ns)
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
-        self.assertEqual(svr.no_verify, no_verify)
+        self.assertEqual(svr.verify, verify)
         self.assertEqual(svr.certfile, certfile)
         self.assertEqual(svr.keyfile, keyfile)
 

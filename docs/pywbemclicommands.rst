@@ -937,17 +937,10 @@ options for pywbemcli. The data includes:
 * **no-verify** - a boolean flag option that, if set causes the pywbem client not
   to verify any certificate received from the WBEM server certificate. Otherwise
   the ssh client software verifies the validity of the server certificate
-  received from the WBEM server during connection setup. See :ref:`--no-verify general option`.
+  received from the WBEM server during connection setup. See :ref:`--verify general option`.
 * **certfile** - optional server certificate filename. See :ref:`--certfile general option`.
 * **keyfile** - optional client private keyfile filename. See :ref:`--keyfile general option`.
-* **use-pull** - optional parameter that defines whether pull operations are
-  to be required, used if they exist or not used. See :ref:`--use-pull general option`.
-* **pull-max-cnt** - optional count of object per pull operation.  See :ref:`--pull-max-cnt general option`.
 * **timeout** - optional timeout value. See :ref:`--timeout general option`.
-* **timestats** - boolean that determines if time stats are captured.  See :ref:`--timestats general option`.
-* **log** - optional log configuration. See :ref:`--log general option`.
-* **verbose** - optional boolean that enables the verbose mode.
-* **output-format** - optional output format.
 * **mock-server** - optional definition  a mock server
   environment using the pywbem mock module. This parameter is used, the
   ``--server`` must not be defined.  See :ref:`--mock-server general option`.
@@ -1070,13 +1063,19 @@ Connection select command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection select`` command selects a connection from the connections
-file and marks that connection as the default connection. The default
-connection will be used if it is defined and pywbemcli is started with no
-:ref:`--server general option` or :ref:`--mock-server general option` general options. A connection may be
-selected to be default either by using the NAMEargument or if no argument is
-provided by selecting from a list presented on the console. The following
-example shows changing connection from within the interactive mode of
-pywbemcli:
+file sets that connection as the :term:`current connection` and optionally the
+:term:`default connection` with the (``--default option``).
+
+A connection may be selected
+to be the current connection by using the NAME argument or by selecting from a
+list presented on the console if there is no NAME argument.
+
+In the interactive mode, the selected connection remains the current connection
+for the remainder of the interactive session unless another connection is selected.
+
+
+The following example shows changing connection from within the interactive
+mode of pywbemcli:
 
 .. code-block:: text
 
@@ -1120,9 +1119,27 @@ See :ref:`pywbemcli connection select --help` for details.
 .. _`Connection show command`:
 
 Connection show command
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection show`` command shows information in the current connection.  See the the ``select``
-above for an example of this command.
+^^^^^^^^^^^^^^^^^^^^^^^
+The ``connection show`` command shows information about the current connection, the
+connection with name NAME, or any connection in the :ref:`connections file` by using
+"?" as the NAME argument.  The connection to be displayed will be
+the :term:`current connection` if the NAME argument is omitted, the connection named
+with the NAME argument, or selected from a selection list the NAME argument "?"
+
+.. code-block:: text
+
+    pywbemcli -s http://blah connection show
+    name: not-saved (current)
+      server: http://blah
+      default-namespace: root/cimv2
+      user: None
+      password: None
+      timeout: 30
+      verify: True
+      certfile: None
+      keyfile: None
+      mock-server:
+      ca-certs: None
 
 See :ref:`pywbemcli connection show --help` for details.
 

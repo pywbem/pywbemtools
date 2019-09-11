@@ -91,6 +91,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return self._pull_max_cnt
 
     @property
+    def log(self):
+        """
+        :term:`string`: log definition from cmd line
+        """
+        return self._log
+
+    @property
     def conn(self):
         """
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
@@ -108,13 +115,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             return self._conn
 
     @property
-    def log(self):
-        """
-        :term:`string`: log definition from cmd line
-        """
-        return self._log
-
-    @property
     def wbem_server(self):
         """
         :class:`~pywbem.WBEMServer` WBEMServer instance to be used for
@@ -130,8 +130,15 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             if self._pywbem_server.wbem_server is None:
                 # get the password if it is required.  This may involve a
                 # prompt.
+                # TODO there are two creates and also, since all the inputs
+                # are self, why do that here
                 self._pywbem_server.get_password(self)
-                self._pywbem_server.create_connection(self.verbose)
+                self._pywbem_server.create_connection(
+                    log=self.log,
+                    use_pull=self.use_pull,
+                    pull_max_cnt=self.pull_max_cnt,
+                    timestats=self.timestats,
+                    verbose=self.verbose)
                 if self._conn and self.timestats:  # Enable stats gathering
                     self.conn.statistics.enable()
             return self._pywbem_server.wbem_server
@@ -290,7 +297,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             # get the password if it is required.  This may involve a
             # prompt.
             self._pywbem_server.get_password(self)
-            self._pywbem_server.create_connection(self.verbose)
+            self._pywbem_server.create_connection(
+                log=self.log,
+                use_pull=self.use_pull,
+                pull_max_cnt=self.pull_max_cnt,
+                timestats=self.timestats,
+                verbose=self.verbose)
 
     @staticmethod
     def update_root_click_context(ctx_obj):
@@ -304,3 +316,34 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         ctx = click.get_current_context()
         root = ctx.find_root()
         root.obj = ctx_obj
+
+
+#
+#   Debug tools to help understandingthe click context.
+#
+def display_click_context(ctx, msg=None, display_only_obj=True):
+    """
+    Debug function displays attributes of click context
+    """
+
+    attrs = vars(ctx)
+    if not msg:
+        msg = "CLICK_CONTEXT"
+    if display_only_obj:
+        click.echo(ctx.obj)
+    else:
+        click.echo('%s %s, attrs: %s' % (
+            msg, ctx,
+            '. '.join("%s: %s" % item for item in attrs.items())))
+
+
+def display_click_context_parents(ctx):
+    """
+    Display the current click context and its all of its parents
+    """
+
+    display_click_context(ctx)
+    parent_ctx = ctx.parent
+    while parent_ctx is not None:
+        display_click_context(parent_ctx)
+        parent_ctx = parent_ctx.parent

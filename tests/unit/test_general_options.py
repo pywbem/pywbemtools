@@ -96,10 +96,11 @@ Options:
   -p, --password TEXT             Password for the WBEM server. Default:
                                   EnvVar PYWBEMCLI_PASSWORD, or prompted for
                                   if --user specified.
-  -N, --no-verify                 If true, client does not verify the X.509
+  --verify / --no-verify          If --verify, client verifies the X.509
                                   server certificate presented by the WBEM
-                                  server during TLS/SSL handshake. Default:
-                                  EnvVar PYWBEMCLI_NO_VERIFY, or false.
+                                  server during TLS/SSL handshake. If --no-
+                                  verify client bypasses verificationDefault:
+                                  EnvVar PYWBEMCLI_VERIFY, or --verify.
   --ca-certs FILE                 Path name of a file or directory containing
                                   certificates that will be matched against
                                   the server certificate presented by the WBEM
@@ -179,6 +180,7 @@ Commands:
 OK = True
 RUN = True
 FAIL = False
+SKIP = False
 
 TEST_CASES = [
     # desc - Description of test
@@ -227,7 +229,7 @@ TEST_CASES = [
      {'stdout': ['use-pull: True'],
       'rc': 0,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify valid --use-pull option parameter no.',
      {'global': ['-s', 'http://blah', '--use-pull', 'no'],
@@ -236,7 +238,7 @@ TEST_CASES = [
      {'stdout': ['use-pull: False'],
       'rc': 0,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify valid --use-pull option parameter.',
      {'global': ['-s', 'http://blah', '--use-pull', 'either'],
@@ -245,7 +247,7 @@ TEST_CASES = [
      {'stdout': ['use-pull: None'],
       'rc': 0,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify invalid --use-pull option parameter fails.',
      {'global': ['-s', 'http://blah', '--use-pull', 'blah'],
@@ -255,7 +257,7 @@ TEST_CASES = [
                  'blah. (choose from yes, no, either)'],
       'rc': 2,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify valid --pull-max-cnt option parameter.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
@@ -264,7 +266,7 @@ TEST_CASES = [
      {'stdout': ['pull-max-cnt: 2000'],
       'rc': 0,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify invalid --pull-max-cnt option parameter fails.',
      {'global': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
@@ -274,7 +276,7 @@ TEST_CASES = [
                  'valid integer'],
       'rc': 2,
       'test': 'in'},
-     None, OK],
+     None, SKIP],
 
     ['Verify --version global option.',
      {'global': ['-s', 'http://blah', '--version'],
@@ -284,6 +286,36 @@ TEST_CASES = [
                  r'^pywbem, version [0-9]+\.[0-9]+\.[0-9]+'],
       'rc': 0,
       'test': 'regex'},
+     None, OK],
+
+    #
+    #  Test --verify and --no-verify general option using the connection show
+    #
+    ['Verify --verify general option.',
+     {'global': ['--server', 'http://blah', '--verify'],
+      'args': ['show'],
+      'subcmd': 'connection'},
+     {'stdout': "verify: True",
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'None'}},
+     None, OK],
+
+    ['Verify --no-verify general option.',
+     {'global': ['--server', 'http://blah', '--no-verify'],
+      'args': ['show'],
+      'subcmd': 'connection'},
+     {'stdout': "verify: False",
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'None'}},
+     None, OK],
+
+    ['Verify --verify general options  Default value.',
+     {'global': ['--server', 'http://blah'],
+      'args': ['show'],
+      'subcmd': 'connection'},
+     {'stdout': "verify: True",
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'None'}},
      None, OK],
 
     ['Verify --mock option one file',
@@ -427,7 +459,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-
     ['Verify --timestats -T',
      {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-T'],
       'subcmd': 'class',
@@ -511,7 +542,8 @@ TEST_CASES = [
       'subcmd': 'connection', },
      {'stdout': "",
       'test': 'innows'},
-     None, RUN],
+     None, OK],
+
 
     ['Verify --name and other options fails',
      {'global': ['--name', 'generaltest1', '--timeout', '90'],
@@ -520,7 +552,7 @@ TEST_CASES = [
      {'stderr': ['timeout 90', 'invalid when'],
       'rc': 1,
       'test': 'innows'},
-     None, RUN],
+     None, OK],
 
     ['Verify connection gets deleted.',
      {'subcmd': 'connection',
@@ -580,21 +612,21 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify shows test-default.',
+    ['Verify shows test-default connection.',
      {'args': ['show', 'test-default'],
       'subcmd': 'connection', },
      {'stdout': ['test-default'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify select of test-default.',
+    ['Verify select of test-default connection.',
      {'args': ['select', 'test-default', '--default'],
       'subcmd': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify shows test-default.',
+    ['Verify show current which is test-default',
      {'args': ['show'],
       'subcmd': 'connection', },
      {'stdout': ['test-default'],
@@ -619,9 +651,9 @@ TEST_CASES = [
 
 
     #
-    # Test environment variables
+    # Test using environment variables as input
     #
-    ['Verify setting one env vars for input.',
+    ['Verify setting one env var for input.',
      {'env': {'PYWBEMCLI_SERVER': 'http://blah'},
       'subcmd': 'connection',
       'args': 'show'},
@@ -631,13 +663,10 @@ TEST_CASES = [
                  'user', 'None',
                  'password', 'None',
                  'timeout', '30',
-                 'no-verify', 'False',
+                 'verify', 'True',
                  'certfile', 'None',
                  'keyfile', 'None',
-                 'use-pull', 'either',
-                 'pull-max-cnt', '1000',
-                 'mock-server',
-                 'log', 'None'],
+                 'mock-server'],
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -648,7 +677,7 @@ TEST_CASES = [
               'PYWBEMCLI_USER': 'RonaldMcDonald',
               'PYWBEMCLI_PASSWORD': 'abcxdfG',
               'PYWBEMCLI_TIMEOUT': '99',
-              'PYWBEMCLI_NO_VERIFY': 'True',
+              'PYWBEMCLI_VERIFY': 'True',
               'PYWBEMCLI_CERTFILE': 'certfile.pem',
               'PYWBEMCLI_KEYFILE': 'keyfile.pem',
               'PYWBEMCLI_USE_PULL': 'no',
@@ -662,17 +691,14 @@ TEST_CASES = [
                  'user', 'RonaldMcDonald',
                  'password', 'abcxdfG',
                  'timeout', '99',
-                 'no-verify', 'True',
+                 'verify', 'True',
                  'certfile', 'certfile.pem',
-                 'keyfile', 'keyfile.pem',
-                 'use-pull', 'no',
-                 'pull-max-cnt', '10',
-                 'log', 'api=all'],
+                 'keyfile', 'keyfile.pem'],
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['erify mixed env var and input options.',
+    ['Verify mixed env var and input options.',
      {'env': {'PYWBEMCLI_DEFAULT_NAMESPACE': 'fred/fred',
               'PYWBEMCLI_USER': 'RonaldMcDonald',
               'PYWBEMCLI_PASSWORD': 'abcxdfG',
@@ -691,15 +717,157 @@ TEST_CASES = [
                  'user', 'RonaldMcDonald',
                  'password', 'abcxdfG',
                  'timeout', '99',
-                 'no-verify', 'True',
+                 'verify', 'True',
                  'certfile', 'certfile.pem',
-                 'keyfile', 'keyfile.pem',
-                 'use-pull', 'False',
-                 'pull-max-cnt', '10',
-                 'log', 'api=all'],
+                 'keyfile', 'keyfile.pem'],
       'rc': 0,
       'test': 'innows'},
      None, OK],
+
+    #
+    #  Test setting general options in interactive mode
+    #
+
+    ['Verify multiple commands in interacive mode.',
+     {'global': ['--server', 'http://blah', ],
+      # args not allowed in interactive mode
+      'stdin': ['--certfile cert1.pem --keyfile keys1.pem connection show',
+                'connection show',
+                '--certfile cert2.pem --keyfile keys2.pem connection show',
+                'connection show'],             # should show None
+      'subcmd': 'connection', },
+     {'stdout': ['certfile: None',              # at startup and other times
+                 'certfile: cert1.pem',         # after first change
+                 'certfile: cert2.pem',         # after second change
+                 'keyfile: None',               # at startup and other times
+                 'keyfile: keys1.pem',
+                 'keyfile: keys2.pem'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify Change --mock-server to --server in interactive mode.',
+     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, ],
+      # args not allowed in interactive mode
+      'stdin': ['connection show',
+                '--server  http://blah connection show',
+                '--mock-server tests/unit/simple_mock_model.mof '
+                'connection show',
+                'connection show'],
+      'subcmd': None,
+      },
+     {'stdout': ['server : None',
+                 'server: http://blah',
+                 'mock-server:',
+                 'simple_mock_model.mof'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    #
+    #   The following is a sequence
+    #
+    ['Verify Create a connection for test of mods through general opts.',
+     {'global': ['--server', 'http://blah',
+                 '--timeout', '45',
+                 '--default-namespace', 'root/fred',
+                 '--user', 'RonaldMcDonald',
+                 '--password', 'pw',
+                 '--no-verify',
+                 '--certfile', 'certfile.pem',
+                 '--keyfile', 'keyfile.pem'],
+      'args': ['save', 'testGeneralOpsMods'],
+      'subcmd': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify show current which is testGeneralOpsMods',
+     {'args': ['show', 'testGeneralOpsMods'],
+      'subcmd': 'connection', },
+     {'stdout': ['testGeneralOpsMods',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/fred',
+                 'user', 'RonaldMcDonald',
+                 'password', 'pw',
+                 'timeout', '45',
+                 'verify', 'False',
+                 'certfile', 'certfile.pem',
+                 'keyfile', 'keyfile.pem'],
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify Change all server parameters and show.',
+     {'global': ['--name', 'testGeneralOpsMods'],
+      # args not allowed in interactive mode
+      'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
+                '--default-namespace root/john --password  abcd '
+                ' --verify --certfile c1.pem --keyfile k1.pem connection show'],
+      'subcmd': None,
+      },
+     {'stdout': ['testGeneralOpsMods',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem'
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Change all parameters and save as t1.',
+     {'global': ['--name', 'testGeneralOpsMods'],
+      # args not allowed in interactive mode
+      'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
+                '--default-namespace root/john --password  abcd '
+                ' --verify --certfile c1.pem --keyfile k1.pem connection '
+                'save t1',
+                'connection list'],
+      'subcmd': None,
+      },
+     {'stdout': [''],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify  load t1 and changed parameters are correct',
+     {'global': ['--name', 't1'],
+      'args': 'show',
+      'subcmd': 'connection'},
+     {'stdout': ['t1',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem'
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Delete testGeneralOpsMods.',
+     {'args': ['delete', 'testGeneralOpsMods'],
+      'subcmd': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
+    ['Delete testGeneralOpsMods.',
+     {'args': ['delete', 't1'],
+      'subcmd': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
 ]
 
 # TODO add test for pull operations with pull ops max size variations

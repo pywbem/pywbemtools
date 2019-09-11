@@ -74,6 +74,13 @@ interactive mode and as a table:
 command, general the options redefinition's are not retained between command
 executions.
 
+The general options may be used in the interactive mode to override
+the default general options or specific general options for the current command.
+
+Thus, behavior of pywbemcli (ex. :ref:`--output-format`) or the parameters of the
+current connection (:ref:`--server general option`) can be changed for the
+execution of a single command in the interactive mode.
+
 
 .. _`Defining the WBEM Server`:
 
@@ -94,7 +101,7 @@ the following arguments :
      * The :ref:`--user general option`,  defines the WBEM server user name
      * The :ref:`--password general option`, defining the password for the WBEM
        server user
-     * The :ref:`--no-verify general option` that defines whether the client verifies
+     * The :ref:`--verify general option` that defines whether the client verifies
        certificates received from the WBEM server,
      * The :ref:`--certfile general option`, client certificate file,
      * The :ref:`--keyfile general option`,  client key file,
@@ -368,14 +375,19 @@ server in the time defined by this value. Pywbemcli defaults to a
 predefined timeout (normally 30 seconds) if this option is not defined.
 
 
-.. _`--no-verify general option`:
+.. _`--verify general option`:
 
---no-verify general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--verify general option
+^^^^^^^^^^^^^^^^^^^^^^^
 
-If the ``--no-verify/-n`` boolean general option is set, the client does not
-verify any certificates received from the WBEM server. Any certificate returned
-by the WBEM server is accepted.
+If the ``--verify\--no-verify`` general option is set ``--no-verify``, the client does not
+verify any certificates received from the WBEM server. If --verify is defined, certificates
+returned from the server are verified. Any certificate returned
+by the WBEM server is accepted. The default is to verify certificates returned.
+
+This general option uses this approach with two long option names to allow the
+user to specifically enable or disable certificate verification when this
+general option is used in interactive mode.
 
 
 .. _`--certfile general option`:
@@ -420,7 +432,7 @@ received from the WBEM server. The default is OS dependent and is a set of
 system directories where certificates are expected to be stored for the client
 OS.
 
-Setting the :ref:`--no-verify general option` bypasses client verification of
+Setting the :ref:`--verify general option`  to ``--no-verify`` bypasses client verification of
 the WBEM server certificate.
 
 
@@ -1091,7 +1103,7 @@ new connection in the CLI command mode:
       user: usr1
       password: blah
       timeout: None
-      no-verify: False
+      verify: True
       certfile: None
       keyfile: None
       use-pull: None

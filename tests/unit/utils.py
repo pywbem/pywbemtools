@@ -108,6 +108,9 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     if stdin and six.PY3:
         stdin = stdin.encode('utf-8')
 
+    if verbose and stdin:
+        print('stdin %s' % stdin)
+
     # The click package on Windows writes NL at the Python level
     # as '\r\r\n' at the level of the shell under some cases. This is
     # documented in Click issue #1271 for Click 7.0 The Popen universal_newlines
