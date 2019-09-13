@@ -499,20 +499,18 @@ TEST_CASES = [
     #
 
     ['Verify Create a connection for test.',
-     {'args': ['add',
-               'generaltest1',
-               '--server', 'http://blah',
-               '--timeout', '45',
-               '--use-pull', 'no',
-               '--default-namespace', 'root/blah',
-               '--user', 'john',
-               '--password', 'pw',
-               '--no-verify',
-               '--certfile', 'mycertfile.pem',
-               '--keyfile', 'mykeyfile.pem'],
+     {'global': ['--server', 'http://blah',
+                 '--timeout', '45',
+                 '--default-namespace', 'root/blah',
+                 '--user', 'john',
+                 '--password', 'pw',
+                 '--no-verify',
+                 '--certfile', 'mycertfile.pem',
+                 '--keyfile', 'mykeyfile.pem'],
+      'args': ['save', 'generaltest1'],
       'subcmd': 'connection', },
      {'stdout': "",
-      'test': 'lines'},
+      'test': 'innows'},
      None, RUN],
 
     ['Verify --name and other options fails',
@@ -553,16 +551,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify Create a connection fails if no name.',
-     {'args': ['add',
-               '--server', 'http://blah'],
-      'subcmd': 'connection', },
-     {'stderr': 'Missing argument "NAME"',
-      'rc': 2,
-      'test': 'innows'},
-     None, RUN],
-
-
     ['Verify --keyfile allowed only if --certfile exists.',
      {'subcmd': 'class',
       'args': ['enumerate'],
@@ -577,8 +565,9 @@ TEST_CASES = [
     #  Test use of default connection
     #
 
-    ['Verify Create a connection.',
-     {'args': ['add', 'test-default', '--server', 'http://blah'],
+    ['Verify Create a connection to test default connection.',
+     {'global': ['--server', 'http://blah'],
+      'args': ['save', 'test-default'],
       'subcmd': 'connection', },
      {'stdout': '',
       'test': 'innows'},

@@ -24,19 +24,14 @@ from __future__ import absolute_import
 from copy import deepcopy
 import click
 import six
-from pywbem import Error, DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
-    LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
-    DEFAULT_LOG_DETAIL_LEVEL
+from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
     verify_operation, hide_empty_columns
 from ._common_options import add_options, verify_option
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_NAMESPACE, DEFAULT_CONNECTION_TIMEOUT, \
-    DEFAULT_MAXPULLCNT
 from ._connection_repository import ConnectionRepository
-from .config import MAX_TIMEOUT
 from ._context_obj import ContextObj
 
 
@@ -165,140 +160,6 @@ def connection_select(context, name, **options):
     """
 
     context.execute_cmd(lambda: cmd_connection_select(context, name, options))
-
-
-@connection_group.command('add', options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=True)
-@click.option('--input-name', type=str, metavar='CONNECTION-NAME',
-              required=False,
-              help='If this option exists, it is the name of an existing '
-                   'persistent definition that will be added to the '
-                   'connections file with the NAME argument.  All other '
-                   'options will be ignored.')
-@click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
-              default=None,
-              help='Use a mock WBEM server that is automatically created in '
-                   'pywbemcli and populated with CIM objects that are defined '
-                   'in the specified MOF file or Python script file. '
-                   'See the pywbemcli documentation for more information. '
-                   'This option may be specified multiple times, and is '
-                   'mutually exclusive with the --server option, '
-                   'since each defines a WBEM server. '
-                   'Default: None.')
-@click.option('-s', '--server', type=str, metavar='URL',
-              default=None,
-              help='Use the WBEM server at the specified URL with format: '
-                   '[SCHEME://]HOST[:PORT]. '
-                   'SCHEME must be "https" (default) or "http". '
-                   'HOST is a short or long hostname or literal IPV4/v6 '
-                   'address. '
-                   'PORT defaults to 5989 for https and 5988 for http. '
-                   'This option is mutually exclusive with the --mock-server '
-                   'option, since each defines a WBEM server. '
-                   'Default: None.'.
-              format(ev=PywbemServer.server_envvar))
-@click.option('-u', '--user', type=str, metavar="TEXT",
-              default=None,
-              help='User name for the WBEM server. '
-                   'Default: None.')
-@click.option('-p', '--password', type=str, metavar="TEXT",
-              default=None,
-              help='Password for the WBEM server. '
-                   'Default: Prompted for if --user specified.')
-@click.option('-N', '--no-verify', is_flag=True,
-              default=False,
-              help='If true, client does not verify the X.509 server '
-                   'certificate presented by the WBEM server during TLS/SSL '
-                   'handshake. '
-                   'Default: False.')
-@click.option('--ca-certs', type=str, metavar="FILE",
-              default=None,
-              help='Path name of a file or directory containing certificates '
-                   'that will be matched against the server certificate '
-                   'presented by the WBEM server during TLS/SSL handshake. '
-                   'Default: [{dirs}].'.
-              format(dirs=', '.join(DEFAULT_CA_CERT_PATHS)))
-@click.option('-c', '--certfile', type=str, metavar="FILE",
-              default=None,
-              help='Path name of a PEM file containing a X.509 client '
-                   'certificate that is used to enable TLS/SSL 2-way '
-                   'authentication by presenting the certificate to the '
-                   'WBEM server during TLS/SSL handshake. '
-                   'Default: None.')
-@click.option('-k', '--keyfile', type=str, metavar="FILE",
-              default=None,
-              help='Path name of a PEM file containing a X.509 private key '
-                   'that belongs to the certificate in the --certfile file. '
-                   'Not required if the private key is part of the '
-                   '--certfile file.'
-                   'Default: None.')
-@click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
-              metavar='INT',
-              default=DEFAULT_CONNECTION_TIMEOUT,
-              help='Client-side timeout in seconds for operations with the '
-                   'WBEM server. '
-                   'Default: {default}.'.
-              format(default=DEFAULT_CONNECTION_TIMEOUT))
-@click.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
-              default='either',
-              help='Determines whether pull operations are used for '
-                   'operations with the WBEM server that return lists of '
-                   'instances, as follows: '
-                   '"yes" uses pull operations and fails if not supported by '
-                   'the server; '
-                   '"no" uses traditional operations; '
-                   '"either" (default) uses pull operations if supported by '
-                   'the server, and otherwise traditional operations. '
-                   'Default: "either".')
-@click.option('--pull-max-cnt', type=int, metavar='INT',
-              default=DEFAULT_MAXPULLCNT,
-              help='Maximum number of instances to be returned by the WBEM '
-                   'server in each response, if pull operations are used. '
-                   'This is a tuning parameter that does not affect the '
-                   'external behavior of the commands. '
-                   'Default: {default}'.
-              format(default=DEFAULT_MAXPULLCNT))
-@click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
-              default=DEFAULT_NAMESPACE,
-              help='Default namespace, to be used when commands do not '
-                   'specify the --namespace command option. '
-                   'Default: {default}.'.
-              format(default=DEFAULT_NAMESPACE))
-@click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
-              default=None,
-              help='Enable logging of the WBEM operations, defined by a list '
-                   'of log configuration strings with: '
-                   'COMP: [{comp_choices}]; '
-                   'DEST: [{dest_choices}], default: {dest_default}; '
-                   'DETAIL: [{detail_choices}], default: {detail_default}. '
-                   'Default: {default}.'.
-              format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
-                     dest_choices='|'.join(LOG_DESTINATIONS),
-                     dest_default=DEFAULT_LOG_DESTINATION,
-                     detail_choices='|'.join(LOG_DETAIL_LEVELS),
-                     detail_default=DEFAULT_LOG_DETAIL_LEVEL,
-                     default='all'))
-@add_options(verify_option)
-@click.pass_obj
-def connection_add(context, name, **options):
-    """
-    Add a new WBEM connection definition from specified options.
-
-    Create a new WBEM connection definition named NAME in the connections file
-    from the specified options. A connection definition with that name must not
-    yet exist.
-
-    The NAME argument is required. One of --server,  --mock-server, or --name
-    option  is required to define the server for the new connection. All other
-    properties are optional.
-
-    Adding a connection does not set the new connection as the current
-    connection definition. Use the connection select command to set a
-    particular connection definition as the current connection.
-
-      pywbemcli connection add newsvr --server https://srv1
-    """
-    context.execute_cmd(lambda: cmd_connection_add(context, name, options))
 
 
 @connection_group.command('test', options_metavar=CMD_OPTS_TXT)
@@ -610,66 +471,6 @@ def cmd_connection_delete(context, name, options):
 
     default = 'default ' if cname and cname == name else ''
     click.echo('Deleted %sconnection "%s".' % (default, name))
-
-
-# pylint: disable=unused-argument
-def cmd_connection_add(context, name, options):
-    """
-    Create a new connection object from the input arguments and options and
-    put it into the PYWBEMCLI_SERVERS dictionary.
-    """
-    server = options['server']
-    mock_server = options['mock_server']
-    connections = ConnectionRepository()
-    if name in connections:
-        raise click.ClickException('Connection name "%s" already defined'
-                                   % name)
-
-    if options['input_name']:
-        input_name = options['input_name']
-        if input_name not in connections:
-            raise click.ClickException('Connection "%s" not in repository' %
-                                       input_name)
-        new_connection = connections[input_name]
-        new_connection._name = name  # pylint: disable=protected-access
-
-    else:
-        if not mock_server and not server:
-            raise click.ClickException('Add failed; missing server definition. '
-                                       'A server using either "--server" or '
-                                       '"--mock-server" required.')
-
-        if mock_server and server:
-            raise click.ClickException('Add failed; "--server" and '
-                                       '"--mock-server" are mutuallly '
-                                       'exclusive.')
-        try:
-            new_connection = PywbemServer(
-                server=server,
-                default_namespace=options['default_namespace'],
-                name=name,
-                user=options['user'],
-                password=options['password'],
-                timeout=options['timeout'],
-                no_verify=options['no_verify'],
-                certfile=options['certfile'],
-                keyfile=options['keyfile'],
-                ca_certs=options['ca_certs'],
-                mock_server=mock_server,
-                log=options['log'])
-
-        except ValueError as ve:
-            raise click.ClickException('Add failed. %s' % ve)
-
-    context.spinner.stop()
-    if options['verify']:
-        click.echo('Verify add of %s' % new_connection.name)
-        show_connection_information(context, new_connection,
-                                    separate_line=False)
-        if not verify_operation("Execute add connection", msg=True):
-            return
-
-    connections.add(name, new_connection)
 
 
 def cmd_connection_save(context, name, options):
