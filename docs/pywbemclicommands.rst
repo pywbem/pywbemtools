@@ -959,9 +959,6 @@ rather than through the detailed parameters of the connection.
 
 Connections in the :term:`connections file` can be created by:
 
-* Using the :ref:`connection add command`. This allows defining the parameters
-  of a connection as a command.
-
 * Using the :ref:`connection save command` with the current connection. This options
   uses the parameters current connection to define and save a connection in the
   connections file.
@@ -995,13 +992,11 @@ options for pywbemcli. The data includes:
   ``--server`` must not be defined.  See :ref:`--mock-server general option`.
 
 The connection information is saved in the :term:`connections file` when the
-:ref:`connection add command` or :ref:`connection save command` command are executed. Multiple
+:ref:`connection save command` command are executed. Multiple
 connection files may be maintained in separate directories.
 
 The commands in this group are:
 
-* :ref:`Connection add command` - Add a new WBEM connection definition from
-  specified options.
 * :ref:`Connection delete command` - Delete a WBEM connection definition.
 * :ref:`Connection export command` -  Export the current connection.
 * :ref:`Connection list command` - List the WBEM connection definitions.
@@ -1013,49 +1008,6 @@ The commands in this group are:
   definition.
 * :ref:`Connection test command` - Test the current connection with a
   predefined WBEM request.
-
-.. _`Connection add command`:
-
-Connection add command
-^^^^^^^^^^^^^^^^^^^^^^
-
-The ``connection add`` command creates a new connection using the command arguments and option. This command saves the
-new connection to the :term:`connections file` (see :ref:`connection save command` ).
-
-The following example shows creating a new connection from within the
-interactive mode of pywbemcli. The parameters for the connection are defined
-through the input options for the command. These use the same option names
-as the corresponding general options to define the WBEM server:
-
-.. code-block:: text
-
-    pywbemcli> connection add me --server http://localhost --user me --password mypw --no-verify
-    pywbemcli> connection list
-    WBEM server connections:  (#: default, *: current)
-    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
-    | name         | server           | namespace   | user        |   timeout | no-verify  | mock-server                            |
-    |--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------|
-    | blahblah     | http://blah      | root/cimv2  |             |        45 | False      |                                        |
-    | mock1        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
-    | mockalltypes |                  | root/cimv2  |             |        30 | False      | tests/unit/all_types.mof               |
-    | mockassoc    |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_assoc_mock_model.mof |
-    | mockext      |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model_ext.mof   |
-    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False      |                                        |
-    | *#test3      |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
-    |              |                  |             |             |           |            | tests/unit/mock_confirm_y.py           |
-    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
-    pywbemcli>
-
-NOTE: The ``*`` on the name indicates the current connection, the one that
-will be used for any subsequent commands within the current interactive session.
-The ``#`` indicates the default connection, the connection that is defined in
-the :term:`connections file` as default and that will be uses if there is no
-connection definition general option when pywbemcli is started.
-
-This can be changed using the :ref:`connection select command`.
-
-See :ref:`pywbemcli connection add --help` for details.
-
 
 .. _`Connection delete command`:
 
@@ -1123,7 +1075,7 @@ command` ).
 
 .. code-block:: text
 
-    pywbemcli> connection add me --server http://localhost --user me --password mypw --no-verify
+    pywbemcli> --server http://localhost --user me --password mypw --no-verify connection save me
     pywbemcli> --server http://blahblah connection list
     WBEM server connections:  (#: default, *: current)
     +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
