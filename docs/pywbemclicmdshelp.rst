@@ -670,7 +670,7 @@ The following defines the help output for the `pywbemcli connection --help` comm
       delete  Delete a WBEM connection definition.
       export  Export the current connection.
       list    List the WBEM connection definitions.
-      save    Save a connection to a new WBEM connection definition named NAME.
+      save    Save the current connection to a new WBEM connection definition.
       select  Select a WBEM connection definition as current or default.
       show    Show connection info of a WBEM connection definition.
       test    Test the current connection with a predefined WBEM request.
@@ -892,11 +892,11 @@ The following defines the help output for the `pywbemcli connection save --help`
 
     Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME
 
-      Save a connection to a new WBEM connection definition named NAME.
+      Save the current connection to a new WBEM connection definition.
 
       Create a new WBEM connection definition in the connections file from the
-      current connection A connection definition with the name NAME must not yet
-      exist. The NAME argument (the name of the new connection) is required.
+      current connection. A connection definition with the name NAME must not
+      yet exist. The NAME argument (the name of the new connection) is required.
 
       Examples:
 
