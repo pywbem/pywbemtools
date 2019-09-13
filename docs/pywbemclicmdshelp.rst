@@ -666,7 +666,6 @@ The following defines the help output for the `pywbemcli connection --help` comm
       -h, --help  Show this message and exit.
 
     Commands:
-      add     Add a new WBEM connection definition from specified options.
       delete  Delete a WBEM connection definition.
       export  Export the current connection.
       list    List the WBEM connection definitions.
@@ -674,120 +673,6 @@ The following defines the help output for the `pywbemcli connection --help` comm
       select  Select a WBEM connection definition as current or default.
       show    Show connection info of a WBEM connection definition.
       test    Test the current connection with a predefined WBEM request.
-
-
-.. _`pywbemcli connection add --help`:
-
-pywbemcli connection add --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli connection add --help` command
-
-
-::
-
-    Usage: pywbemcli connection add [COMMAND-OPTIONS] NAME
-
-      Add a new WBEM connection definition from specified options.
-
-      Create a new WBEM connection definition named NAME in the connections file
-      from the specified options. A connection definition with that name must
-      not yet exist.
-
-      The NAME argument is required. One of --server,  --mock-server, or --name
-      option  is required to define the server for the new connection. All other
-      properties are optional.
-
-      Adding a connection does not set the new connection as the current
-      connection definition. Use the connection select command to set a
-      particular connection definition as the current connection.
-
-        pywbemcli connection add newsvr --server https://srv1
-
-    Options:
-      --input-name CONNECTION-NAME    If this option exists, it is the name of an
-                                      existing persistent definition that will be
-                                      added to the connections file with the NAME
-                                      argument.  All other options will be
-                                      ignored.
-      -m, --mock-server FILE          Use a mock WBEM server that is automatically
-                                      created in pywbemcli and populated with CIM
-                                      objects that are defined in the specified
-                                      MOF file or Python script file. See the
-                                      pywbemcli documentation for more
-                                      information. This option may be specified
-                                      multiple times, and is mutually exclusive
-                                      with the --server option, since each defines
-                                      a WBEM server. Default: None.
-      -s, --server URL                Use the WBEM server at the specified URL
-                                      with format: [SCHEME://]HOST[:PORT]. SCHEME
-                                      must be "https" (default) or "http". HOST is
-                                      a short or long hostname or literal IPV4/v6
-                                      address. PORT defaults to 5989 for https and
-                                      5988 for http. This option is mutually
-                                      exclusive with the --mock-server option,
-                                      since each defines a WBEM server. Default:
-                                      None.
-      -u, --user TEXT                 User name for the WBEM server. Default:
-                                      None.
-      -p, --password TEXT             Password for the WBEM server. Default:
-                                      Prompted for if --user specified.
-      -N, --no-verify                 If true, client does not verify the X.509
-                                      server certificate presented by the WBEM
-                                      server during TLS/SSL handshake. Default:
-                                      False.
-      --ca-certs FILE                 Path name of a file or directory containing
-                                      certificates that will be matched against
-                                      the server certificate presented by the WBEM
-                                      server during TLS/SSL handshake. Default:
-                                      [/etc/pki/ca-trust/extracted/openssl/ca-
-                                      bundle.trust.crt, /etc/ssl/certs,
-                                      /etc/ssl/certificates].
-      -c, --certfile FILE             Path name of a PEM file containing a X.509
-                                      client certificate that is used to enable
-                                      TLS/SSL 2-way authentication by presenting
-                                      the certificate to the WBEM server during
-                                      TLS/SSL handshake. Default: None.
-      -k, --keyfile FILE              Path name of a PEM file containing a X.509
-                                      private key that belongs to the certificate
-                                      in the --certfile file. Not required if the
-                                      private key is part of the --certfile
-                                      file.Default: None.
-      -t, --timeout INT               Client-side timeout in seconds for
-                                      operations with the WBEM server. Default:
-                                      30.
-      -U, --use-pull [yes|no|either]  Determines whether pull operations are used
-                                      for operations with the WBEM server that
-                                      return lists of instances, as follows: "yes"
-                                      uses pull operations and fails if not
-                                      supported by the server; "no" uses
-                                      traditional operations; "either" (default)
-                                      uses pull operations if supported by the
-                                      server, and otherwise traditional
-                                      operations. Default: "either".
-      --pull-max-cnt INT              Maximum number of instances to be returned
-                                      by the WBEM server in each response, if pull
-                                      operations are used. This is a tuning
-                                      parameter that does not affect the external
-                                      behavior of the commands. Default: 1000
-      -d, --default-namespace NAMESPACE
-                                      Default namespace, to be used when commands
-                                      do not specify the --namespace command
-                                      option. Default: root/cimv2.
-      -l, --log COMP[=DEST[:DETAIL]],...
-                                      Enable logging of the WBEM operations,
-                                      defined by a list of log configuration
-                                      strings with: COMP: [api|http|all]; DEST:
-                                      [file|stderr], default: file; DETAIL:
-                                      [all|paths|summary], default: all. Default:
-                                      all.
-      -V, --verify                    Prompt for confirmation before performing a
-                                      change, to allow for verification of
-                                      parameters. Default: Do not prompt for
-                                      confirmation.
-      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli connection delete --help`:
