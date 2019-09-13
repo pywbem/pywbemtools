@@ -168,23 +168,23 @@ Installation with pip
 
 When using Python 2, install OS-level packages needed by the pywbem package:
 
-  - On native Windows:
+* On native Windows:
 
-    .. code-block:: bash
+  .. code-block:: bash
 
-        > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-        > pywbem_os_setup.bat
+      > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+      > pywbem_os_setup.bat
 
-  - On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
+* On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
 
-    .. code-block:: bash
+  .. code-block:: bash
 
-        $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
-        $ chmod 755 pywbem_os_setup.sh
-        $ ./pywbem_os_setup.sh
+      $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
+      $ chmod 755 pywbem_os_setup.sh
+      $ ./pywbem_os_setup.sh
 
-    The ``pywbem_os_setup.sh`` script uses sudo internally, so your userid
-    needs to have sudo permission.
+  The ``pywbem_os_setup.sh`` script uses sudo internally, so your userid
+  needs to have sudo permission.
 
 If you want to install the needed OS-level packages manually, see
 `pywbem prerequisite OS packages <https://pywbem.readthedocs.io/en/latest/intro.html#prerequisite-operating-system-packages-for-install>`_.

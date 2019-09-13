@@ -1121,7 +1121,7 @@ See :ref:`pywbemcli connection select --help` for details.
 Connection show command
 ^^^^^^^^^^^^^^^^^^^^^^^
 The ``connection show`` command shows information about the current connection, the
-connection with name NAME, or any connection in the :ref:`connections file` by using
+connection with name NAME, or any connection in the :term:`connections file` by using
 "?" as the NAME argument.  The connection to be displayed will be
 the :term:`current connection` if the NAME argument is omitted, the connection named
 with the NAME argument, or selected from a selection list the NAME argument "?"
