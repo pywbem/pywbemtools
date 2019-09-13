@@ -25,20 +25,21 @@ syntactic implementation of the features. This includes:
 
 * The ability to receive either CIM instances or classes or only their names
   with only a change of an option on the commands that request CIM instances or
-  classes. The option ``-no`` \ ``--names-only`` defines whether only the  name
-  or the complete object will be displayed.
+  classes. The ``--names-only``/``-no`` command option defines whether only the
+  name or the complete object will be displayed.
 
 * The ability to interactively select the data from a list presented by
   pywbemcli for certain objects rather than typing in long names the full name.
   see :ref:`Interactively selecting INSTANCENAME`.
 
-.. _`pywbemcli commands to WBEM Operations`:
 
-pywbemcli commands to WBEM Operations
+.. _`pywbemcli commands to WBEM operations`:
+
+pywbemcli commands to WBEM operations
 -------------------------------------
 
 The following table defines which pywbemcli commands are used for the
-corresponding pywbem request operations.
+corresponding WBEM operations.
 
 =================================  ==============================================
 WBEM CIM-XML Operation             pywbemcli command group & command
@@ -102,12 +103,12 @@ line syntax pywbemcli combines these into a single command (i.e. ``enumerate``,
 ``--names-only``) that determines whether the names or the CIM objects are
 retrieved from the WBEM server.
 
-Thus, for example an ``instance enumerate`` with and without the ``--no`` option:
+Thus, for example an ``instance enumerate`` with and without the ``--names-only`` option:
 
 .. code-block:: text
 
-
     $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo
+
     instance of CIM_Foo {
        InstanceID = "CIM_Foo1";
        IntegerProp = 1;
@@ -122,13 +123,12 @@ Thus, for example an ``instance enumerate`` with and without the ``--no`` option
        InstanceID = "CIM_Foo3";
     };
 
-    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo --no
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance enumerate CIM_Foo --names-only
 
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
-
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
-
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+
 
 .. _`Specifying the INSTANCENAME command argument`:
 
@@ -159,15 +159,15 @@ for the INSTANCENAME argument can be described by the following ABNF:
 
 .. code-block:: text
 
-   INSTANCENAME = [ NAMESPACE ":" ] CLASSNAME [ "." keybindings ]
+    INSTANCENAME = [ NAMESPACE ":" ] CLASSNAME [ "." keybindings ]
 
-   keybindings = keybinding *( "," keybinding )
+    keybindings = keybinding *( "," keybinding )
 
-   keybinding = PROPERTYNAME "=" value
+    keybinding = PROPERTYNAME "=" value
 
-   value = integerValue / charValue / stringValue / datetimeValue / booleanValue / referenceValue
+    value = integerValue / charValue / stringValue / datetimeValue / booleanValue / referenceValue
 
-   referenceValue = "\"" escaped_INSTANCENAME "\""
+    referenceValue = "\"" escaped_INSTANCENAME "\""
 
 where:
 
@@ -200,25 +200,25 @@ use of backslashes:
 
 .. code-block:: text
 
-   pywbemcli instance get root/cimv2:MY_Foo.ID=42
-   pywbemcli instance get MY_Foo.ID=42
-   pywbemcli instance get "MY_Foo.CharKey='x'"
-   pywbemcli instance get 'MY_Foo.InstanceID="foo1"'
-   pywbemcli instance get "MY_Foo.InstanceID=\"$value\""
-   pywbemcli instance get 'MY_CS.CreationClassName="MY_CS",Name="MyComp"'
-   pywbemcli instance get 'MY_LogEntry.Timestamp="20190901183853.762122+120"'
+    pywbemcli instance get root/cimv2:MY_Foo.ID=42
+    pywbemcli instance get MY_Foo.ID=42
+    pywbemcli instance get "MY_Foo.CharKey='x'"
+    pywbemcli instance get 'MY_Foo.InstanceID="foo1"'
+    pywbemcli instance get "MY_Foo.InstanceID=\"$value\""
+    pywbemcli instance get 'MY_CS.CreationClassName="MY_CS",Name="MyComp"'
+    pywbemcli instance get 'MY_LogEntry.Timestamp="20190901183853.762122+120"'
 
 Examples for Windows command processor:
 
 .. code-block:: text
 
-   pywbemcli instance get root/cimv2:MY_Foo.ID=42
-   pywbemcli instance get MY_Foo.ID=42
-   pywbemcli instance get MY_Foo.CharKey='x'
-   pywbemcli instance get MY_Foo.InstanceID="foo1"
-   pywbemcli instance get MY_Foo.InstanceID="%value%"
-   pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
-   pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
+    pywbemcli instance get root/cimv2:MY_Foo.ID=42
+    pywbemcli instance get MY_Foo.ID=42
+    pywbemcli instance get MY_Foo.CharKey='x'
+    pywbemcli instance get MY_Foo.InstanceID="foo1"
+    pywbemcli instance get MY_Foo.InstanceID="%value%"
+    pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
+    pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
 
 
 .. _`Specifying CIM property and parameter values`:
@@ -234,14 +234,14 @@ The ``instance create``, ``instance modify``, ``class invokemethod``, and
 ``instance invokemethod`` commands define the values of properties and parameters that
 are to be sent to the WBEM server.
 
-For a single property or parameter this is the `--property/-p`` or
-``parameter/-p`` option with the name and value in the form:
+For a single property or parameter this is the ``--property``/``-p`` or
+``--parameter``/``-p`` option with the name and value in the form:
 
 .. code-block:: text
 
     -p <name>=<value>
 
-where:
+Where:
 
 * <name> is the name of the of the property or parameter.
 * <value> is the value of the property or parameter The values represent the
