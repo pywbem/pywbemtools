@@ -275,6 +275,14 @@ dist_dependent_files := \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(pywbemcli_module_path)/*.py) \
 
+# Scripts are required to install the OS-level components of pywbem.
+ifeq ($(PLATFORM),Windows_native)
+  pywbem_os_setup_file := pywbem_os_setup.bat
+else
+  pywbem_os_setup_file := pywbem_os_setup.sh
+endif
+
+
 .PHONY: help
 help:
 	@echo "Makefile for $(package_name) package"
@@ -368,24 +376,20 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 	echo "done" >$@
 	@echo "makefile: Done installing/upgrading basic Python packages"
 
-# Scripts may be required to install the os components of pywbem.
-# Makefile gets the required scripts from github.pywbem (see pywbem doc)
+# Scripts are required to install the OS-level components of pywbem.
+# Makefile gets the required scripts from the pywbem project on GitHub.
 pywbem_os_setup.sh:
-ifneq ($(PLATFORM),Windows_native)
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
 	chmod 755 pywbem_os_setup.sh
-endif
 
 pywbem_os_setup.bat:
-ifeq ($(PLATFORM),Windows_native)
 	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-endif
 
 .PHONY: install_os
 install_os: install_os_$(pymn).done
 	@echo "makefile: Target $@ done."
 
-install_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done pywbem_os_setup.sh pywbem_os_setup.bat
+install_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done $(pywbem_os_setup_file)
 	@echo "makefile: Installing OS-level installation and runtime requirements"
 	-$(call RM_FUNC,$@)
 ifeq ($(PLATFORM),Windows_native)
@@ -429,7 +433,7 @@ develop_os: develop_os_$(pymn).done
 # packages on its own. Pywbem has such prerequisite packages, but only for
 # development of pywbem itself. Therefore, this target does not need to do
 # anything. We still have it in the Makefile, for clarity.
-develop_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done pywbem_os_setup.sh pywbem_os_setup.bat
+develop_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done $(pywbem_os_setup_file)
 	@echo "No OS-level development requirements needed for pywbemtools"
 	echo "done" >$@
 
@@ -496,10 +500,10 @@ upload: _check_version $(dist_files)
 	@echo "makefile: Target $@ done."
 
 .PHONY: html
-html: develop_$(pymn).done $(doc_build_dir)/html/docs/index.html
+html: develop_$(pymn).done $(doc_build_dir)/html/index.html
 	@echo "makefile: Target $@ done."
 
-$(doc_build_dir)/html/docs/index.html: Makefile $(doc_utility_help_files) $(doc_dependent_files)
+$(doc_build_dir)/html/index.html: Makefile $(doc_utility_help_files) $(doc_dependent_files)
 	@echo "makefile: Creating the documentation as HTML pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b html $(doc_opts) $(doc_build_dir)/html
