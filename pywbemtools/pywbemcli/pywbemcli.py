@@ -111,8 +111,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.verify_envvar,
               help='If --verify, client verifies the X.509 server '
                    'certificate presented by the WBEM server during TLS/SSL '
-                   'handshake. If --no-verify client bypasses verification'
-                   'Default: EnvVar {ev}, or --verify.'.
+                   'handshake. If --no-verify client bypasses verification. '
+                   'Default: EnvVar {ev}, or "--verify".'.
                    format(ev=PywbemServer.verify_envvar))
 @click.option('--ca-certs', type=str, metavar="FILE",
               default=None,  # defaulted in code

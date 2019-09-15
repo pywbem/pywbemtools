@@ -500,7 +500,7 @@ TEST_CASES = [
      ['select'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
-      'test': 'regex',
+      'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 

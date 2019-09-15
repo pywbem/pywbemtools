@@ -1064,7 +1064,7 @@ Connection select command
 
 The ``connection select`` command selects a connection from the connections
 file sets that connection as the :term:`current connection` and optionally the
-:term:`default connection` with the (``--default option``).
+:term:`default connection` by using the ``--default option``.
 
 A connection may be selected
 to be the current connection by using the NAME argument or by selecting from a

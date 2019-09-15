@@ -99,8 +99,9 @@ Options:
   --verify / --no-verify          If --verify, client verifies the X.509
                                   server certificate presented by the WBEM
                                   server during TLS/SSL handshake. If --no-
-                                  verify client bypasses verificationDefault:
-                                  EnvVar PYWBEMCLI_VERIFY, or --verify.
+                                  verify client bypasses verification.
+                                  Default: EnvVar PYWBEMCLI_VERIFY, or "--
+                                  verify".
   --ca-certs FILE                 Path name of a file or directory containing
                                   certificates that will be matched against
                                   the server certificate presented by the WBEM
@@ -174,6 +175,7 @@ Commands:
   qualifier   Command group for CIM qualifier declarations.
   repl        Enter interactive mode (default).
   server      Command group for WBEM servers.
+
 """
 
 

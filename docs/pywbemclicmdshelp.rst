@@ -78,8 +78,9 @@ The following defines the help output for the `pywbemcli  --help` command
       --verify / --no-verify          If --verify, client verifies the X.509
                                       server certificate presented by the WBEM
                                       server during TLS/SSL handshake. If --no-
-                                      verify client bypasses verificationDefault:
-                                      EnvVar PYWBEMCLI_VERIFY, or --verify.
+                                      verify client bypasses verification.
+                                      Default: EnvVar PYWBEMCLI_VERIFY, or "--
+                                      verify".
       --ca-certs FILE                 Path name of a file or directory containing
                                       certificates that will be matched against
                                       the server certificate presented by the WBEM
@@ -780,9 +781,9 @@ The following defines the help output for the `pywbemcli connection save --help`
 
       Save the current connection to a new WBEM connection definition.
 
-      Save WBEM connection definition in the connections file from the current
-      connection. The NAME argument (the name of the new connection) is
-      required. If the connection exists, it will be overwritten with the
+      Saves the current connection as a connection definition in the connections
+      file. The NAME argument (the name of the connection) is required. If a
+      connection with that name already exists, it will be overwritten with the
       current connection definition.
 
       In the interactive mode, general options preceeding the connection command
@@ -864,10 +865,10 @@ The following defines the help output for the `pywbemcli connection show --help`
       This command displays the WBEM connection definition of a single
       connection as follows:
 
-      * NAME argument exists; show that WBEM connections file.
+      * NAME argument exists; show that WBEM connections definition from the
+      connections file.
 
-      * NAME argument does not exist; show existing current connection or
-      presents list for selection
+      * NAME argument does not exist; show existing current connection.
 
       * Name argument is '?'; presents list of connections for selection
 

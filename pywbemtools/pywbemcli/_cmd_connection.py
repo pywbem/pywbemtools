@@ -81,10 +81,10 @@ def connection_show(context, name):
     This command displays the WBEM connection definition of a single
     connection as follows:
 
-    * NAME argument exists; show that WBEM connections file.
+    * NAME argument exists; show that WBEM connections definition from the
+      connections file.
 
-    * NAME argument does not exist; show existing current connection or
-      presents list for selection
+    * NAME argument does not exist; show existing current connection.
 
     * Name argument is '?'; presents list of connections for selection
 
@@ -188,10 +188,10 @@ def connection_save(context, name, **options):
     """
     Save the current connection to a new WBEM connection definition.
 
-    Save WBEM connection definition in the connections file from the current
-    connection. The NAME argument (the name of the new connection) is required.
-    If the connection exists, it will be overwritten with the current
-    connection definition.
+    Saves the current connection as a connection definition in the connections
+    file. The NAME argument (the name of the connection) is required. If a
+    connection with that name already exists, it will be overwritten with the
+    current connection definition.
 
     In the interactive mode, general options preceeding the connection
     command that change the connection definition will be
@@ -317,6 +317,33 @@ def get_current_connection_name(context):
     return context.pywbem_server.name if context.pywbem_server else None
 
 
+def select_connection(name, context, connections):
+    """
+    Use the interactive mode to select the connection from the list of
+    connections in the connections file. If the name is provided, it is tested
+    against the names in the connections file.  If it is not provided,
+    """
+    context.spinner.stop()
+    # get all names from dictionary
+
+    if name:
+        if name in connections:
+            return name
+        else:
+            raise click.ClickException(
+                'Connection name "%s" does not exist' % name)
+
+    conn_names = sorted(list(six.iterkeys(connections)))
+
+    if conn_names:
+        name = pick_one_from_list(context, conn_names,
+                                  "Select a connection or Ctrl_C to abort.")
+        return name
+    else:
+        raise click.ClickException(
+            'Connection repository %s empty' % connections.connections_file)
+
+
 def get_connection_name(name, context, connections, include_current=False):
     """
     If a name is provided, test to see if it is a valid connection name.
@@ -395,8 +422,6 @@ def cmd_connection_show(context, name):
     """
     connections = ConnectionRepository()
 
-    # BUG here we really want current if the name field is blank. but we get
-    # the name from the current connection I bet.
     name = get_connection_name(name, context, connections,
                                include_current=True)
     current_name = context.pywbem_server.name if context.pywbem_server else None
@@ -433,7 +458,7 @@ def cmd_connection_select(context, name, options):
     """
     connections = ConnectionRepository()
 
-    name = get_connection_name(name, context, connections)
+    name = select_connection(name, context, connections)
 
     new_ctx = ContextObj(connections[name],
                          context.output_format,
@@ -464,7 +489,7 @@ def cmd_connection_delete(context, name, options):
     """
     connections = ConnectionRepository()
 
-    name = get_connection_name(name, context, connections)
+    name = select_connection(name, context, connections)
 
     context.spinner.stop()
     if options['verify']:
