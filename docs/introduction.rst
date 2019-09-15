@@ -264,9 +264,8 @@ Python warnings of type ``DeprecationWarning`` (see the Python
 :mod:`py:warnings` module).
 
 Since Python 2.7, ``DeprecationWarning`` messages are suppressed by default.
-They can be shown for example in any of these ways:
-
-* By invoking Python with the environment variable: ``PYTHONWARNINGS=default``
+They can be shown for example by invoking pywbemcli with the environment
+variable: ``PYTHONWARNINGS=default``
 
 It is recommended that users of the pywbemtools package run their test code with
 ``DeprecationWarning`` messages being shown, so they become aware of any use of
@@ -328,32 +327,6 @@ The output formats are currently not the subject of compatibility assurances.
 
 Violations of these compatibility rules are described in section
 :ref:`Change log`.
-
-
-.. _`Deprecation and compatibility policy`:
-
-Deprecation and compatibility policy
-------------------------------------
-
-Deprecated functionality is marked accordingly in this documentation and in the
-:ref:`Change log`, and is made visible at runtime by issuing Python warnings of
-type :exc:`~py:exceptions.DeprecationWarning` (see :mod:`py:warnings` for
-details).
-
-Since Python 2.7, :exc:`~py:exceptions.DeprecationWarning` warnings are
-suppressed by default. They can be shown for example in any of these ways:
-
-
-* by invoking pywbemcli with the environment variable:
-
-  ``PYTHONWARNINGS=default``
-
-It is recommended that users of this package run their tests with
-:exc:`~py:exceptions.DeprecationWarning` warnings being shown, so they become
-aware of any use of deprecated functionality.
-
-It is even possible to cause pywbemcli to fail by setting the action to ``'error'``
-instead of ``'default'``.
 
 
 .. _`Reporting issues`:
