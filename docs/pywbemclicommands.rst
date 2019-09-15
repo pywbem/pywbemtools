@@ -22,35 +22,11 @@ Pywbemcli command groups and commands
 This section defines the characteristics of each of the pywbemcli command
 groups and commands including examples.
 
-The command syntax of pywbemcli is:
-
-.. code-block:: text
-
-    $ pywbemcli <general-options> <cmd-group>|<command> <args>
-
-where:
-
-.. code-block:: text
-
-        cmd-group := <command group name> <command>
-
-Within pywbemcli each command group name is a noun, referencing an entity (ex.
-class, instance, server).
-
-This example defines a command to get the class ``CIM_ManagedElement`` from the
-current target server and display it in the default output format (MOF).
-
-.. code-block:: text
-
-    $ pywbemcli -s http://localhost class get CIM_ManagedElement
-
-The pywbemcli command groups and commands are described below and the help
-output from pywbemcli for each command documented in :ref:`pywbemcli Help
-Command Details`
+For the command line syntax of pywbemcli using these command groups and
+commands, see :ref:`Pywbemcli command line interface`.
 
 **NOTE:** Many of the examples below use the :ref:`--mock-server general option`
-with mock files that are located in the pywbemtools tests/unit subdirectory
-to generate known results.
+with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 
 
 .. _`Class command group`:
