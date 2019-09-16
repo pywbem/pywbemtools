@@ -235,7 +235,7 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete, empty repo fails.',
      ['delete', 'blah'],
-     {'stderr': 'Connection name "blah" does not exist',
+     {'stderr': ["Connection repository", "empty"],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -480,18 +480,20 @@ TEST_CASES = [
      None, OK],
 
     #
-    #  Test command line parameter errors
+    #  Test command line parameter errors, select, show, and delete with
+    #  no repository
     #
-    ['Verify connection subcommand select with name not in repo',
+    ['Verify connection subcommand show with name not in empty repo',
      ['show', 'Blah'],
-     {'stderr': ['Connection name "Blah" does not exist'],
+     {'stderr': ['Name "Blah" not current and no connections file'],
       'rc': 1,
-      'test': 'innows'},
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand select with no name empty repo',
-     ['show', 'Blah'],
-     {'stderr': ['Connection name "Blah" does not exist'],
+    ['Verify connection subcommand show with no name empty repo',
+     ['show'],
+     {'stderr': ['No current connection and no connections file'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -504,11 +506,28 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
+    ['Verify connection subcommand select blah, empty repo fails',
+     ['select', 'blah'],
+     {'stderr': ["Connection repository", "empty"],
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
     ['Verify connection subcommand delete, empty repo fails',
      ['delete'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
-      'test': 'regex',
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+
+    ['Verify connection subcommand delete, empty repo fails',
+     ['delete', 'blah'],
+     {'stderr': ["Connection repository", "empty"],
+      'rc': 1,
+      'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
@@ -551,6 +570,14 @@ TEST_CASES = [
      ['select'],
      {'stdout': "",
       'test': 'in',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     MOCK_PROMPT0_FILE, OK],
+
+
+    ['Verify connection subcommand show with prompt',
+     ['show', '?'],
+     {'stdout': ['name: mocktest'],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      MOCK_PROMPT0_FILE, OK],
 
@@ -745,6 +772,10 @@ WBEM server connections: (#: default, *: current)
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
+
+    #
+    #   Test use of interactive connection choice
+    #
 
 ]
 

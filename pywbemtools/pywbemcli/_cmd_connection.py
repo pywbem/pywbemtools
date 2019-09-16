@@ -137,10 +137,10 @@ def connection_select(context, name, **options):
     Select a WBEM connection definition as current or default.
 
     Selects the connection named NAME from the persistently stored named
-    connectionsto be the current connection if NAME exists in the store . If
-    the NAME argument does not exist, a list of connections from the
-    connections definition file is presented with a prompt for the user to
-    select a connection.
+    connections to be the current connection.The connection definition must
+    exist in the connections file. If the NAME argument is not specified, a
+    list of connections from the connections file is presented with a prompt
+    for the user to select a connection definition.
 
     Default and current connection are set if the --default option exists;
     otherwise only the current connection the interactive session is set .
@@ -326,64 +326,25 @@ def select_connection(name, context, connections):
     context.spinner.stop()
     # get all names from dictionary
 
+    if not connections:
+        raise click.ClickException(
+            'Connection repository %s empty' % connections.connections_file)
     if name:
         if name in connections:
             return name
-        else:
-            raise click.ClickException(
-                'Connection name "%s" does not exist' % name)
+        raise click.ClickException(
+            'Connection name "%s" does not exist in connections file: %s' %
+            (name, connections.connections_file))
 
     conn_names = sorted(list(six.iterkeys(connections)))
 
+    # TODO: Really do not need the if on conn_names. already tested above
     if conn_names:
-        name = pick_one_from_list(context, conn_names,
+        return pick_one_from_list(context, conn_names,
                                   "Select a connection or Ctrl_C to abort.")
-        return name
-    else:
-        raise click.ClickException(
-            'Connection repository %s empty' % connections.connections_file)
+    raise click.ClickException(
+        'Connection repository %s empty' % connections.connections_file)
 
-
-def get_connection_name(name, context, connections, include_current=False):
-    """
-    If a name is provided, test to see if it is a valid connection name.
-    If no name is provided, get list of names for and present selection
-    list to the user.
-    If include_current, the current connection is included in the list to
-    select
-    """
-    # If no name and context exists with name, use it. Otherwise
-    #
-    cname = get_current_connection_name(context)
-    # alternative to include the current connection name in the list
-    if not name:
-        if include_current:
-            name = cname or '?'
-        else:
-            name = '?'
-
-    if name == "?":
-        context.spinner.stop()
-        # get all names from dictionary
-
-        conn_names = sorted(list(six.iterkeys(connections)))
-
-        if conn_names:
-            name = pick_one_from_list(context, conn_names,
-                                      "Select a connection or Ctrl_C to abort.")
-        else:
-            raise click.ClickException(
-                'Connection repository %s empty' % connections.connections_file)
-
-    if include_current and cname:
-        if cname == name:
-            return name
-
-    if name not in connections:
-        raise click.ClickException(
-            'Connection name "%s" does not exist' % name)
-
-    return name
 
 ################################################################
 #
@@ -422,11 +383,42 @@ def cmd_connection_show(context, name):
     """
     connections = ConnectionRepository()
 
-    name = get_connection_name(name, context, connections,
-                               include_current=True)
-    current_name = context.pywbem_server.name if context.pywbem_server else None
-    connection = connections[name] if name in connections and \
-        current_name != name else context.pywbem_server
+    cname = get_current_connection_name(context)
+    # If no name arg, fallback to selection unless there is no connections file
+    if not name:
+        name = cname or '?'
+        if not cname and not connections:
+            raise click.ClickException('No current connection and no '
+                                       'connections file %s.' %
+                                       connections.connections_file)
+
+    # ? means to ask for connections file. However fallback to current
+    # if there is no connections file and fail if no current.
+    if name == '?':
+        # No connections exit in connections file.
+        if not connections:
+            if context.pywbem_server:
+                show_connection_information(context,
+                                            context.pywbem_server,
+                                            show_state=True)
+                return
+
+        name = select_connection(None, context, connections)
+
+    # Have a name. If there are connections and this name is in connections
+    # and that name is not current, use it. If current name is same as
+    # name, use the current version.
+    if connections:
+        # If name in connections same as currrent connection. use current
+        connection = connections[name] if name in connections and \
+            cname != name else context.pywbem_server
+    else:   # nothing in connections file
+        if cname != name:
+            raise click.ClickException('Name "%s" not current and no '
+                                       'connections file %s' %
+                                       (name, connections.connections_file))
+        connection = context.pywbem_server
+
     if connection is None:
         raise click.ClickException("No connection definition exists.")
     show_connection_information(context, connection, show_state=True)
@@ -517,7 +509,7 @@ def cmd_connection_save(context, name, options):
                                    '"connection list" to see more connection '
                                    'information')
     save_connection = deepcopy(current_connection)
-    save_connection._name = name  # pylint: disable=protected-access
+    save_connection.name = name
 
     connections = ConnectionRepository()
 

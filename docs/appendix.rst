@@ -150,16 +150,16 @@ This documentation uses a few special terms to refer to Python types:
       :ref:`--mock-server general option`, or :ref:`--name general option`) and
       the default connection is defined.
       A connection definition in the :term:`connections file` becomes the
-      default connection on pywbemcli startup if it is defined using the
+      default connection on pywbemcli startup if it is specified using the
       :ref:`connection select command` and the ``--default option`` is used.
 
    current connection
       The connection definition in pywbemcli that is currently active; it is the
       target connection for pywbemcli commands.  The current
-      server is created on pywbemcli startup with the following options
+      connection is created on pywbemcli startup with the following options
       :ref:`--server general option`,
       :ref:`--mock-server general option`, or :ref:`--name general option` or
-      if a :term:`default connection`) has been defined. The current sconnection can be
+      if a :term:`default connection`) has been defined. The current connection can be
       changed in the interactive mode with the :ref:`connection select command`.
 
 

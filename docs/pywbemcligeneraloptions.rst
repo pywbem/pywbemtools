@@ -77,7 +77,7 @@ executions.
 The general options may be used in the interactive mode to override
 the default general options or specific general options for the current command.
 
-Thus, behavior of pywbemcli (ex. :ref:`--output-format`) or the parameters of the
+Thus, behavior of pywbemcli (ex. :ref:`--output-format general option`) or the parameters of the
 current connection (:ref:`--server general option`) can be changed for the
 execution of a single command in the interactive mode.
 

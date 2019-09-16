@@ -403,7 +403,8 @@ class PywbemServer(object):
         """
         Initiate a WBEB connection, via PyWBEM api. Arguments for
         the request are the parameters required by the pywbem
-        WBEMConnection constructor.
+        WBEMConnection constructor that are not available within this
+        class.
 
         If self.mock_server is set, a mock connection is created instead
         of a genuine connection to a server.

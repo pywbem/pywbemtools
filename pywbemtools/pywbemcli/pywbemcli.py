@@ -444,10 +444,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                             '"--%s %s" option invalid when --name exists or '
                             'default name set.' % (option[1], option[0]))
 
-                if log:
-                    # pylint: disable=protected-access
-                    pywbem_server._log = log
-
             else:
                 # If no server defined, set None. This allows subcmds that
                 # donot require a server executed without the server

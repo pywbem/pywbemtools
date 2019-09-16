@@ -818,10 +818,10 @@ The following defines the help output for the `pywbemcli connection select --hel
       Select a WBEM connection definition as current or default.
 
       Selects the connection named NAME from the persistently stored named
-      connectionsto be the current connection if NAME exists in the store . If
-      the NAME argument does not exist, a list of connections from the
-      connections definition file is presented with a prompt for the user to
-      select a connection.
+      connections to be the current connection.The connection definition must
+      exist in the connections file. If the NAME argument is not specified, a
+      list of connections from the connections file is presented with a prompt
+      for the user to select a connection definition.
 
       Default and current connection are set if the --default option exists;
       otherwise only the current connection the interactive session is set .
