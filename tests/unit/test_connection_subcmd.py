@@ -235,7 +235,7 @@ TEST_CASES = [
 
     ['Verify connection subcommand delete, empty repo fails.',
      ['delete', 'blah'],
-     {'stderr': 'Connection name "blah" does not exist',
+     {'stderr': ["Connection repository", "empty"],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -265,17 +265,18 @@ TEST_CASES = [
      ['show', 'test1'],
      {'stdout': [
          "name: test1", "  server: http://blah",
-         "  default-namespace: root/cimv2", "  user: None", "  password: None",
-         "  timeout: 30", "  no-verify: False", "  certfile: None",
-         "  keyfile: None", "  use-pull: either", "  mock-server:",
-         "  log: None"],
+         "default-namespace: root/cimv2", "  user: None", "  password: None",
+         "timeout: 30",
+         "verify: True",
+         "certfile: None",
+         "keyfile: None", "  mock-server:"],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
     ['Verify connection subcommand save with complex general options short',
      {'global': ['--server', 'http://blahblah', '-u', 'fred', '-p',
-      'argh', '-t', '18', '-N', '-l', 'api=file,all'],
+                 'argh', '-t', '18', '--no-verify', '-l', 'api=file,all'],
       'args': ['save', 'test2']},
      {'stdout': "",
       'test': 'innows',
@@ -286,32 +287,36 @@ TEST_CASES = [
      ['show', 'test1'],
      {'stdout': [
          "name: test1", "  server: http://blah",
-         "  default-namespace: root/cimv2", "  user: None", "  password: None",
-         "  timeout: 30", "  no-verify: False", "  certfile: None",
-         "  keyfile: None", "  use-pull: either", "  mock-server:",
-         "  log: None"],
+         "default-namespace: root/cimv2", "user: None", "password: None",
+         "timeout: 30",
+         "verify: True",
+         "certfile: None",
+         "keyfile: None", "mock-server:"],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand show  name connection test2',
+    ['Verify connection subcommand show  test2',
      ['show', 'test2'],
-     {'stdout': [
-         "name: test2", "  server: http://blahblah",
-         "  default-namespace: root/cimv2", "  user: fred", "  password: argh",
-         "  timeout: 18", "  no-verify: True", "  certfile: None",
-         "  keyfile: None", "  use-pull: either", "  mock-server:",
-         "  log: api=file,all"],
-      'test': 'in'},
+     {'stdout': ['name: test2',
+                 'server: http://blahblah',
+                 'default-namespace: root/cimv2',
+                 'user: fred',
+                 'password: argh',
+                 'timeout: 18',
+                 'verify: False',
+                 'certfile: None',
+                 'keyfile: None',
+                 'mock-server:'],
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand list with 2 servers defined',
      {'global': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
-                 'name    server namespace user timeout no-verify    log',
-                 "test1   http://blah      root/cimv2         30  False",
-                 "test2   http://blahblah  root/cimv2   fred  18  True "
-                 "api=file,all"],
+                 'name server namespace user timeout verify',
+                 "test1 http://blah root/cimv2 30  True",
+                 "test2 http://blahblah  root/cimv2 fred 18  False"],
       'test': 'innows'},
      None, OK],
 
@@ -346,9 +351,9 @@ TEST_CASES = [
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  '(#: default, *: current)',
-                 'name    server namespace user timeout no-verify    log',
-                 'test1   http://blah      root/cimv2        30  False',
-                 '*#test2   http://blahblah  root/cimv2   fred 18  True '
+                 'name    server namespace user timeout verify log',
+                 'test1   http://blah      root/cimv2        30  True',
+                 '*#test2   http://blahblah  root/cimv2   fred 18  False'
                  'api=file,all'],
       'test': 'insnows'},
      None, OK],
@@ -388,8 +393,8 @@ TEST_CASES = [
     #   It creates, shows and deletes a single server definition.
     #
     ['Verify connection subcommand add with all arguments.',
-     {'global': ['--server', 'http://blah',
-                 '--default-namespace', 'root/blah',
+     {'global': ['--server', 'http://blahblah',
+                 '--default-namespace', 'root/blahblah',
                  '--user', 'john',
                  '--password', 'pw',
                  '--timeout', '30',
@@ -402,7 +407,21 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand with duplicate name fails.',
+    ['Verify connection subcommand show addallargs initial version',
+     ['show', 'addallargs'],
+     {'stdout': [
+         'name: addallargs',
+         '  server: http://blahblah',
+         '  default-namespace: root/blahblah',
+         '  user: john',
+         '  password: pw',
+         '  certfile: mycertfile.pem',
+         '  keyfile: mykeyfile.pem',
+         '  mock-server: '],
+      'test': 'in'},
+     None, OK],
+
+    ['Verify connection subcommand with that overwrites existing name works.',
      {'global': ['--server', 'http://blah',
                  '--default-namespace', 'root/blah',
                  '--user', 'john',
@@ -412,13 +431,13 @@ TEST_CASES = [
                  '--certfile', 'mycertfile.pem',
                  '--keyfile', 'mykeyfile.pem', ],
       'args': ['save', 'addallargs']},
-     {'stderr': 'addallargs is already defined as a server',
-      'rc': 1,
-      'test': 'in',
+     {'stderr': '',
+      'rc': 0,
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand show with all params',
+    ['Verify connection subcommand show of name addallargs, overwrite changed',
      ['show', 'addallargs'],
      {'stdout': [
          'name: addallargs',
@@ -428,10 +447,7 @@ TEST_CASES = [
          '  password: pw',
          '  certfile: mycertfile.pem',
          '  keyfile: mykeyfile.pem',
-         '  use-pull: either',
-         '  pull-max-cnt: 1000',
-         '  mock-server: ',
-         '  log: None'],
+         '  mock-server: '],
       'test': 'in'},
      None, OK],
 
@@ -446,14 +462,15 @@ TEST_CASES = [
     # No file verification required. Does not use file
     ['Verify connection subcommand export current connection',
      {'args': ['export'],
-      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh', '-N',
+      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh',
+                 '--no-verify',
                  '-c', 'certfile.txt', '-k', 'keyfile.txt', '-t', '12']},
      {'stdout': ['PYWBEMCLI_SERVER=http://blah$',
                  'PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2$',
                  'PYWBEMCLI_USER=fred$',
-                 'PYWBEMCLI_PASSWORD=argh',
+                 'PYWBEMCLI_PASSWORD=arghh$',
                  'PYWBEMCLI_TIMEOUT=12$',
-                 'PYWBEMCLI_NO_VERIFY=True$',
+                 #   TODO 'PYWBEMCLI_NO_VERIFY=True$',
                  'PYWBEMCLI_CERTFILE=certfile.txt$',
                  'PYWBEMCLI_KEYFILE=keyfile.txt$',
                  # account for windows and non_windows platforms
@@ -463,18 +480,20 @@ TEST_CASES = [
      None, OK],
 
     #
-    #  Test command line parameter errors
+    #  Test command line parameter errors, select, show, and delete with
+    #  no repository
     #
-    ['Verify connection subcommand select with name not in repo',
+    ['Verify connection subcommand show with name not in empty repo',
      ['show', 'Blah'],
-     {'stderr': ['Connection name "Blah" does not exist'],
+     {'stderr': ['Name "Blah" not current and no connections file'],
       'rc': 1,
-      'test': 'innows'},
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand select with no name empty repo',
-     ['show', 'Blah'],
-     {'stderr': ['Connection name "Blah" does not exist'],
+    ['Verify connection subcommand show with no name empty repo',
+     ['show'],
+     {'stderr': ['No current connection and no connections file'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -483,7 +502,15 @@ TEST_CASES = [
      ['select'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
-      'test': 'regex',
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+    ['Verify connection subcommand select blah, empty repo fails',
+     ['select', 'blah'],
+     {'stderr': ["Connection repository", "empty"],
+      'rc': 1,
+      'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
@@ -491,7 +518,16 @@ TEST_CASES = [
      ['delete'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
-      'test': 'regex',
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+
+    ['Verify connection subcommand delete, empty repo fails',
+     ['delete', 'blah'],
+     {'stderr': ["Connection repository", "empty"],
+      'rc': 1,
+      'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
@@ -513,14 +549,14 @@ TEST_CASES = [
      ['show', 'mocktest'],
      {'stdout': [
          "name: mocktest",
-         "  default-namespace: root/cimv2",
-         "  user: None", "  password: None",
-         "  timeout: 30",
-         "  no-verify: False", "  certfile: None",
-         "  keyfile: None", "  use-pull: either",
-         r"  mock-server:", r"simple_mock_model.mof",
-         "  log: None"],
-      'test': 'regex'},
+         "default-namespace: root/cimv2",
+         "user: None", "  password: None",
+         "timeout: 30",
+         "verify: True",
+         "certfile: None",
+         "keyfile: None",
+         "mock-server:", r"simple_mock_model.mof"],
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection subcommand test against existing mock def',
@@ -534,6 +570,14 @@ TEST_CASES = [
      ['select'],
      {'stdout': "",
       'test': 'in',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     MOCK_PROMPT0_FILE, OK],
+
+
+    ['Verify connection subcommand show with prompt',
+     ['show', '?'],
+     {'stdout': ['name: mocktest'],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      MOCK_PROMPT0_FILE, OK],
 
@@ -577,7 +621,7 @@ TEST_CASES = [
                  '--default-namespace', 'root/blah',
                  '--user', 'john',
                  '--password', 'pw',
-                 '--no-verify',
+                 '--verify',
                  '--certfile', 'mycertfile.pem',
                  '--keyfile', 'mykeyfile.pem']},
      {'stdout': "",
@@ -605,12 +649,15 @@ TEST_CASES = [
      ['show', 'mocktest2'],
      {'stdout': [
          "name: mocktest2",
-         "  default-namespace: root/blah", "  user: john", "  password: pw",
-         "  timeout: 45", "  no-verify: True", "  certfile: mycertfile.pem",
-         "  keyfile: mykeyfile.pem", "  use-pull: False",
-         r"  mock-server:", "simple_mock_model.mof",
-         "  log: None"],
-      'test': 'regex',
+         "default-namespace: root/blah",
+         "user: john",
+         "password: pw",
+         "timeout: 45",
+         "verify: False",
+         "certfile: mycertfile.pem",
+         "keyfile: mykeyfile.pem",
+         "mock-server:", "simple_mock_model.mof"],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
@@ -618,11 +665,12 @@ TEST_CASES = [
      ['show', 'svrtest2'],
      {'stdout': [
          "name: svrtest2",
-         "  server: http://blah",
-         "  default-namespace: root/blah", "  user: john", "  password: pw",
-         "  timeout: 45", "  no-verify: True", "  certfile: mycertfile.pem",
-         "  keyfile: mykeyfile.pem", "  use-pull: False",
-         "  log: None"],
+         "server: http://blah",
+         "default-namespace: root/blah", "user: john", "password: pw",
+         "timeout: 45",
+         "verify: True",
+         "certfile: mycertfile.pem",
+         "keyfile: mykeyfile.pem"],
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -654,17 +702,11 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection list with current server from general options',
+    ['Verify connection list with current server from general options, plain',
      {'args': ['list'],
-      'global': ['--server', 'http://blah']},
-     {'stdout': """
-WBEM server connections: (#: default, *: current)
-+------------+-------------+-------------+-----------+-------------+
-| name       | server      | namespace   |   timeout | no-verify   |
-|------------+-------------+-------------+-----------+-------------|
-| *not-saved | http://blah | root/cimv2  |        30 | False       |
-+------------+-------------+-------------+-----------+-------------+
-""",
+      'global': ['--server', 'http://blah', '--output-format', 'plain']},
+     {'stdout': ['WBEM server connections: (#: default, *: current)',
+                 '*not-saved http://blah root/cimv2  30 True'],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
@@ -682,17 +724,18 @@ WBEM server connections: (#: default, *: current)
      None, OK],
 
 
-    ['Verify connection list with current server from general options',
+    ['Verify connection list with current server from general options, grid',
      {'args': ['list'],
       'global': ['--server', 'http://blah']},
-     {'stdout':
-      ['WBEM server connections: (#: default, *: current)',
-       '+------------+-------------+-------------+-----------+-------------+',
-       '| name       | server      | namespace   |   timeout | no-verify   |',
-       '|------------+-------------+-------------+-----------+-------------|',
-       '| *not-saved | http://blah | root/cimv2  |        30 | False       |',
-       '| svrtest    | http://blah | root/cimv2  |        30 | False       |',
-       '+------------+-------------+-------------+-----------+-------------+'],
+     {'stdout': """
+WBEM server connections: (#: default, *: current)
++------------+-------------+-------------+-----------+----------+
+| name       | server      | namespace   |   timeout | verify   |
+|------------+-------------+-------------+-----------+----------|
+| *not-saved | http://blah | root/cimv2  |        30 | True     |
+| svrtest    | http://blah | root/cimv2  |        30 | True     |
++------------+-------------+-------------+-----------+----------+
+""",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -705,17 +748,18 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection select of mocktest',
-     {'args': ['list'],
-      'global': ['--server', 'http://blah']},
-     {'stdout':
-      ['WBEM server connections: (#: default, *: current)',
-       '+------------+-------------+-------------+-----------+-------------+',
-       '| name       | server      | namespace   |   timeout | no-verify   |',
-       '|------------+-------------+-------------+-----------+-------------|',
-       '| *not-saved | http://blah | root/cimv2  |        30 | False       |',
-       '| #svrtest   | http://blah | root/cimv2  |        30 | False       |',
-       '+------------+-------------+-------------+-----------+-------------+'],
+    ['Verify connection select of svrtest as default',
+     {'args': ['show'],
+      'global': []},
+     {'stdout': ['svrtest'],
+      'test': 'innows',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     None, OK],
+
+    ['Verify current connection set with general opts overrides default',
+     {'args': ['show'],
+      'global': ['--server', 'https://blahblahblah']},
+     {'stdout': ['not-saved', 'https://blahblahblah'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -728,6 +772,10 @@ WBEM server connections: (#: default, *: current)
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
+
+    #
+    #   Test use of interactive connection choice
+    #
 
 ]
 

@@ -25,6 +25,7 @@ import traceback
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
+from copy import deepcopy
 
 import pywbem
 from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
@@ -46,6 +47,7 @@ __all__ = ['cli']
 PYWBEM_VERSION = "pywbem, version {}".format(pywbem.__version__)
 
 # Defaults for some options
+DEFAULT_VERIFY = True  # The default is to verify
 DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
@@ -104,16 +106,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               help='Password for the WBEM server. '
                    'Default: EnvVar {ev}, or prompted for if --user specified.'.
                    format(ev=PywbemServer.password_envvar))
-@click.option('-N', '--no-verify', is_flag=True,
+@click.option('--verify/--no-verify', 'verify', default=None,
               # defaulted in code
-              envvar=PywbemServer.no_verify_envvar,
-              help='If true, client does not verify the X.509 server '
+              envvar=PywbemServer.verify_envvar,
+              help='If --verify, client verifies the X.509 server '
                    'certificate presented by the WBEM server during TLS/SSL '
-                   'handshake. '
-                   'Default: EnvVar {ev}, or false.'.
-                   format(ev=PywbemServer.no_verify_envvar))
+                   'handshake. If --no-verify client bypasses verification. '
+                   'Default: EnvVar {ev}, or "--verify".'.
+                   format(ev=PywbemServer.verify_envvar))
 @click.option('--ca-certs', type=str, metavar="FILE",
-              # defaulted in code
+              default=None,  # defaulted in code
               envvar=PywbemServer.ca_certs_envvar,
               help='Path name of a file or directory containing certificates '
                    'that will be matched against the server certificate '
@@ -176,7 +178,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               # defaulted in code
               help='Show time statistics of WBEM server operations.')
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
-              # defaulted in code
+              default=None,
               envvar=PywbemServer.defaultnamespace_envvar,
               help='Default namespace, to be used when commands do not '
                    'specify the --namespace command option. '
@@ -217,9 +219,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout,
-        no_verify, certfile, keyfile, ca_certs, output_format, use_pull,
-        pull_max_cnt, verbose, mock_server, pywbem_server=None, timestats=None,
-        log=None):
+        verify, certfile, keyfile, ca_certs, output_format, use_pull,
+        pull_max_cnt, verbose, mock_server, timestats=None, log=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -256,10 +257,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     # list of options that are not allowed in some cases:
     # When -name is used and when in interactive mode.
     conditional_options = ((default_namespace, 'default_namespace'),
-                           (use_pull, 'use_pull'),
-                           (pull_max_cnt, ''),
                            (timeout, 'timeout'),
-                           (no_verify, 'no_verify'),
+                           (verify, 'verify'),
                            (user, 'user'),
                            (certfile, 'certfile'),
                            (keyfile, 'keyfile'),
@@ -271,110 +270,120 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     # This requires being able to determine for each option whether it has been
     # specified and is why general options don't define defaults in the
     # decorators that define them.
-    if ctx.obj is None:
-        # In command mode or processing the command line options in
-        # interactive mode. Apply the documented option defaults.
-        # Default for output_format is applied in processing since it depends
-        # on request (ex. mof for get class vs table for many)
+    pywbem_server = None
+    # In command mode or processing the command line options in
+    # interactive mode. Apply the documented option defaults.
+    # Default for output_format is applied in processing since it depends
+    # on request (ex. mof for get class vs table for many)
 
-        resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
+    resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
 
-        resolved_timestats = timestats or DEFAULT_TIMESTATS
+    resolved_timestats = timestats or DEFAULT_TIMESTATS
 
-        if server and name:
-            click.echo('The --name option "%s" and --server option "%s" '
-                       'are mutually exclusive and may not be used '
-                       'simultaneously' % (name, server), err=True)
-            raise click.Abort()
+    resolved_verify = verify if verify is not None else DEFAULT_VERIFY
 
-        if keyfile and not certfile:
-            click.echo('The --keyfile option "%s" is allowed only if the '
-                       '--certfile option is also used' % keyfile, err=True)
-            raise click.Abort()
+    if ca_certs is None:
+        resolved_ca_certs = DEFAULT_CA_CERT_PATHS
+    else:
+        resolved_ca_certs = ca_certs
 
-        # process mock_server option
+    if server and name:
+        click.echo('The --name option "%s" and --server option "%s" '
+                   'are mutually exclusive and may not be used '
+                   'simultaneously' % (name, server), err=True)
+        raise click.Abort()
+
+    if keyfile and not certfile:
+        click.echo('The --keyfile option "%s" is allowed only if the '
+                   '--certfile option is also used' % keyfile, err=True)
+        raise click.Abort()
+
+    # process mock_server option
+    resolved_mock_server = []
+    if mock_server:
+        assert isinstance(mock_server, tuple)
         resolved_mock_server = []
-        if mock_server:
-            assert isinstance(mock_server, tuple)
-            resolved_mock_server = []
-            # resolve relative and absolute paths
-            mock_server_path = []
-            for fn in mock_server:
-                if fn == os.path.basename(fn):
-                    mock_server_path.append(os.path.join(os.getcwd(), fn))
-                else:
-                    mock_server_path.append(fn)
+        # resolve relative and absolute paths
+        mock_server_path = []
+        for fn in mock_server:
+            if fn == os.path.basename(fn):
+                mock_server_path.append(os.path.join(os.getcwd(), fn))
+            else:
+                mock_server_path.append(fn)
 
-            # Abort for non-existent mock files or invalid type
-            # Otherwise these issues not get found until connection
-            # exercised.
-            # TODO: Future: Create common method with code in build_respository
-            for file_path in mock_server_path:
-                ext = os.path.splitext(file_path)[1]
-                if ext not in ['.py', '.mof']:
-                    click.echo('Error: --mock-server: File: "%s" '
-                               'extension: "%s" not valid. "py" or "mof" '
-                               'required' % (file_path, ext), err=True)
-                    raise click.Abort()
-                if not os.path.isfile(file_path):
-                    click.echo('Error: --mock-server: File: "%s" does '
-                               'not exist' % file_path, err=True)
-                    raise click.Abort()
-                if ext != '.py':
+        # Abort for non-existent mock files or invalid type
+        # Otherwise these issues not get found until connection
+        # exercised.
+        # TODO: Future: Create common method with code in build_respository
+        for file_path in mock_server_path:
+            ext = os.path.splitext(file_path)[1]
+            if ext not in ['.py', '.mof']:
+                click.echo('Error: --mock-server: File: "%s" '
+                           'extension: "%s" not valid. "py" or "mof" '
+                           'required' % (file_path, ext), err=True)
+                raise click.Abort()
+            if not os.path.isfile(file_path):
+                click.echo('Error: --mock-server: File: "%s" does '
+                           'not exist' % file_path, err=True)
+                raise click.Abort()
+            if ext != '.py':
+                resolved_mock_server.append(file_path)
+                continue
+
+            # The following allows executing selected python scripts at
+            # startup but with only VERBOSE as a known global.  Inserted
+            # primarily to support testing.
+            with open(file_path) as fp:
+                if '!PROCESS!AT!STARTUP!' in fp.readline():
+                    try:
+                        # Only verbose is allowed here
+                        globalparams = {'VERBOSE': verbose}
+                        # pylint: disable=exec-used
+                        exec(fp.read(), globalparams, None)
+                    except Exception as ex:
+                        exc_type, exc_value, exc_traceback = \
+                            sys.exc_info()
+                        tb = repr(traceback.format_exception(
+                            exc_type,
+                            exc_value,
+                            exc_traceback))
+                        raise click.ClickException('Exception failure of '
+                                                   '"--mock-server" python '
+                                                   'script %r. '
+                                                   'Exception: %r\n'
+                                                   'Traceback\n%s' %
+                                                   (file_path, ex, tb))
+                else:  # not processed during startup
                     resolved_mock_server.append(file_path)
-                    continue
+    # The mock-server that leaves something in resolved server
+    # and name simultaneously fail.
+    if server and resolved_mock_server:
+        click.echo('Error: Conflicting server definitions. Do not use '
+                   '--server and --mock-server simultaneously. '
+                   '--server: %s, --mock-server: %s' %
+                   (server, resolved_mock_server), err=True)
+        raise click.Abort()
 
-                with open(file_path) as fp:
-                    if '!PROCESS!AT!STARTUP!' in fp.readline():
-                        try:
-                            # Only verbose is allowed here
-                            globalparams = {'VERBOSE': verbose}
-                            # pylint: disable=exec-used
-                            exec(fp.read(), globalparams, None)
-                        except Exception as ex:
-                            exc_type, exc_value, exc_traceback = \
-                                sys.exc_info()
-                            tb = repr(traceback.format_exception(
-                                exc_type,
-                                exc_value,
-                                exc_traceback))
-                            raise click.ClickException('Exception failure of '
-                                                       '"--mock-server" python '
-                                                       'script %r. '
-                                                       'Exception: %r\n'
-                                                       'Traceback\n%s' %
-                                                       (file_path, ex, tb))
-                    else:  # not processed during startup
-                        resolved_mock_server.append(file_path)
+    if resolved_mock_server and name:
+        click.echo('The --name "%s" option and --server "%s" option '
+                   'are mutually exclusive and may not be used '
+                   'simultaneously' % (name, mock_server), err=True)
+        raise click.Abort()
 
-        # The mock-server that leaves something in resolved server
-        # and name simultaneously fail.
-        if server and resolved_mock_server:
-            click.echo('Error: Conflicting server definitions. Do not use '
-                       '--server and --mock-server simultaneously. '
-                       '--server: %s, --mock-server: %s' %
-                       (server, resolved_mock_server), err=True)
-            raise click.Abort()
+    if use_pull:
+        try:
+            resolved_use_pull = USE_PULL_CHOICE[use_pull]
+        except KeyError:
+            raise click.ClickException(
+                'Invalid choice for --use-pull %s' % use_pull)
+    else:
+        resolved_use_pull = DEFAULT_PULL_CHOICE
 
-        if resolved_mock_server and name:
-            click.echo('The --name "%s" option and --server "%s" option '
-                       'are mutually exclusive and may not be used '
-                       'simultaneously' % (name, mock_server), err=True)
-            raise click.Abort()
+    resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 
-        if use_pull:
-            try:
-                resolved_use_pull = USE_PULL_CHOICE[use_pull]
-            except KeyError:
-                raise click.ClickException(
-                    'Invalid choice for --use-pull %s' % use_pull)
-        else:
-            resolved_use_pull = DEFAULT_PULL_CHOICE
+    resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
-        resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
-
-        resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
-
+    if ctx.obj is None:
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
         if server or mock_server:
@@ -390,16 +399,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                                          user=user,
                                          password=password,
                                          timeout=resolved_timeout,
-                                         no_verify=no_verify,
+                                         verify=resolved_verify,
                                          certfile=certfile,
                                          keyfile=keyfile,
-                                         ca_certs=ca_certs,
-                                         use_pull=resolved_use_pull,
-                                         pull_max_cnt=resolved_pull_max_cnt,
-                                         stats_enabled=resolved_timestats,
-                                         verbose=verbose,
-                                         mock_server=resolved_mock_server,
-                                         log=log)
+                                         ca_certs=resolved_ca_certs,
+                                         mock_server=resolved_mock_server)
         else:  # Server and mock_server are None
             # if name cmd line option, get connection repo and
             # get name from the repo.
@@ -434,17 +438,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                 # Test for invalid options with the --name option
                 # The following options are part of each PywbemServer object
                 # TODO: FUTURE should really put this into pywbemserver itself.
-
                 for option in conditional_options:
                     if option[0]:
                         raise click.ClickException(
                             '"--%s %s" option invalid when --name exists or '
                             'default name set.' % (option[1], option[0]))
-
-                # NOTE: The log definition is only for this session.
-                if log:
-                    # pylint: disable=protected-access
-                    pywbem_server._log = log
 
             else:
                 # If no server defined, set None. This allows subcmds that
@@ -455,14 +453,66 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options
         # or from the context object.
-        for option in conditional_options:
-            if option[0]:
-                raise click.ClickException('"--%s %s" option invalid in '
-                                           'interactive mode' %
-                                           (option[1], option[0]))
 
-        if pywbem_server is None:
-            pywbem_server = ctx.obj.pywbem_server
+        # If --name option, get server from connection
+        if name:
+            connections = ConnectionRepository()
+            try:
+                pywbem_server = connections[name]
+            except KeyError:
+                raise click.ClickException('Named connection  "%s" '
+                                           'does not exist' % name)
+
+        # If other parameters, modify the existing connection and reset
+        # it
+        else:
+            if pywbem_server is None:
+                pywbem_server = deepcopy(ctx.obj.pywbem_server)
+            if pywbem_server:
+                modified_server = False
+                if server:
+                    if pywbem_server.mock_server:
+                        pywbem_server.mock_server = None
+                    pywbem_server.server = server
+                    modified_server = True
+                if mock_server:
+                    if pywbem_server.server:
+                        pywbem_server.server = None
+                    pywbem_server.mock_server = resolved_mock_server
+                    modified_server = True
+                if user:
+                    pywbem_server.user = user
+                    modified_server = True
+                if password:
+                    pywbem_server.password = password
+                    modified_server = True
+                if verify is not None:
+                    pywbem_server.verify = resolved_verify
+                    modified_server = True
+                if ca_certs:
+                    pywbem_server.ca_certs = ca_certs
+                    modified_server = True
+                if certfile:
+                    pywbem_server.certfile = certfile
+                    modified_server = True
+                if keyfile:
+                    pywbem_server.keyfile = keyfile
+                    modified_server = True
+                if timeout:
+                    pywbem_server.timeout = resolved_timeout
+                if server:
+                    pywbem_server.server = server
+                    modified_server = True
+                if default_namespace:
+                    pywbem_server.default_namespace = resolved_default_namespace
+                    modified_server = True
+                if modified_server:
+                    pywbem_server.reset()
+
+        # The following variables are maintained only in the context_obj and
+        # not attached to any particular connection. If the cli argument is
+        # None, this argument was not defined as part of this interactive
+        # command
         if output_format is None:
             output_format = ctx.obj.output_format
         if use_pull is None:
@@ -475,17 +525,16 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
             log = ctx.obj.log
         if verbose is None:
             verbose = ctx.obj.verbose
+
     # Create a command context for each command: An interactive command has
     # its own command context different from the command context for the
     # command line.
-
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose)
-
-    # Invoke default command
+    # Invoke command if one exists.
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)
 

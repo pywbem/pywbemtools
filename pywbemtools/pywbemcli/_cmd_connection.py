@@ -81,10 +81,10 @@ def connection_show(context, name):
     This command displays the WBEM connection definition of a single
     connection as follows:
 
-    * NAME argument exists; show that WBEM connections file.
+    * NAME argument exists; show that WBEM connections definition from the
+      connections file.
 
-    * NAME argument does not exist; show existing current connection or
-      presents list for selection
+    * NAME argument does not exist; show existing current connection.
 
     * Name argument is '?'; presents list of connections for selection
 
@@ -136,14 +136,15 @@ def connection_select(context, name, **options):
     """
     Select a WBEM connection definition as current or default.
 
-    Selects a connection from the persistently stored named connections if NAME
-    exists in the store to be the current connection. If the NAME argument does
-    not exist, a list of connections from the connections definition file is
-    presented with a prompt for the user to select a connection.
+    Selects the connection named NAME from the persistently stored named
+    connections to be the current connection.The connection definition must
+    exist in the connections file. If the NAME argument is not specified, a
+    list of connections from the connections file is presented with a prompt
+    for the user to select a connection definition.
 
-    Default and current connction are set if the --default option exists;
-    otherwise only the connection in the current interactive session is set .
-    Once define the default connection will be used as the server definition in
+    Default and current connection are set if the --default option exists;
+    otherwise only the current connection the interactive session is set .
+    Once defined the default connection will be used as the server definition in
     future execution of pywbemcli if there is no server definition (--server or
     --name or --mock-server) general option.
 
@@ -187,9 +188,15 @@ def connection_save(context, name, **options):
     """
     Save the current connection to a new WBEM connection definition.
 
-    Create a new WBEM connection definition in the connections file from the
-    current connection. A connection definition with the name NAME must not yet
-    exist. The NAME argument (the name of the new connection) is required.
+    Saves the current connection as a connection definition in the connections
+    file. The NAME argument (the name of the connection) is required. If a
+    connection with that name already exists, it will be overwritten with the
+    current connection definition.
+
+    In the interactive mode, general options preceeding the connection
+    command that change the connection definition will be
+    applied before the connection is saved.
+
 
     Examples:
 
@@ -235,7 +242,7 @@ def export_statement(name, value):
 
 def if_export_statement(name, value):
     """Export the statement if the value is not None"""
-    if value:
+    if value is not None:
         export_statement(name, value)
 
 
@@ -280,23 +287,26 @@ def show_connection_information(context, connection, separate_line=True,
     sep = '\n  ' if separate_line else ', '
     context.spinner.stop()
 
+    if isinstance(connection.mock_server, (list, tuple)):
+        mock_server = ', '.join(connection.mock_server)
+    else:
+        mock_server = connection.mock_server
+
     click.echo('\nname: %s%s%sserver: %s%sdefault-namespace: %s'
-               '%suser: %s%spassword: %s%stimeout: %s%sno-verify: %s%s'
-               'certfile: %s%skeyfile: %s%suse-pull: %s%spull-max-cnt: %s%s'
-               'mock-server: %s%slog: %s'
+               '%suser: %s%spassword: %s%stimeout: %s%sverify: %s%s'
+               'certfile: %s%skeyfile: %s%s'
+               'mock-server: %s%sca-certs: %s%s'
                % (connection.name, state_str, sep,
                   connection.server, sep,
                   connection.default_namespace, sep,
                   connection.user, sep,
                   connection.password, sep,
                   connection.timeout, sep,
-                  connection.no_verify, sep,
+                  connection.verify, sep,
                   connection.certfile, sep,
                   connection.keyfile, sep,
-                  connection.use_pull, sep,
-                  connection.pull_max_cnt, sep,
-                  ", ".join(connection.mock_server), sep,
-                  connection.log))
+                  mock_server, sep,
+                  connection.ca_certs, sep))
 
 
 def get_current_connection_name(context):
@@ -307,47 +317,34 @@ def get_current_connection_name(context):
     return context.pywbem_server.name if context.pywbem_server else None
 
 
-def get_connection_name(name, context, connections, include_current=False):
+def select_connection(name, context, connections):
     """
-    If a name is provided, test to see if it is a valid connection name.
-    If no name is provided, get list of names for and present selection
-    list to the user.
-    If include_current, the current connection is included in the list to
-    select
+    Use the interactive mode to select the connection from the list of
+    connections in the connections file. If the name is provided, it is tested
+    against the names in the connections file.  If it is not provided,
     """
-    # If no name and context exists with name, use it. Otherwise
-    #
-    cname = get_current_connection_name(context)
-    # alternative to include the current connection name in the list
-    if not name:
-        if include_current:
-            name = cname or '?'
-        else:
-            name = '?'
+    context.spinner.stop()
+    # get all names from dictionary
 
-    if name == "?":
-        context.spinner.stop()
-        # get all names from dictionary
-
-        conn_names = sorted(list(six.iterkeys(connections)))
-        if include_current and cname:
-            conn_names.append(cname)
-        if conn_names:
-            name = pick_one_from_list(context, conn_names,
-                                      "Select a connection or Ctrl_C to abort.")
-        else:
-            raise click.ClickException(
-                'Connection repository %s empty' % connections.connections_file)
-
-    if include_current and cname:
-        if cname == name:
-            return name
-
-    if name not in connections:
+    if not connections:
         raise click.ClickException(
-            'Connection name "%s" does not exist' % name)
+            'Connection repository %s empty' % connections.connections_file)
+    if name:
+        if name in connections:
+            return name
+        raise click.ClickException(
+            'Connection name "%s" does not exist in connections file: %s' %
+            (name, connections.connections_file))
 
-    return name
+    conn_names = sorted(list(six.iterkeys(connections)))
+
+    # TODO: Really do not need the if on conn_names. already tested above
+    if conn_names:
+        return pick_one_from_list(context, conn_names,
+                                  "Select a connection or Ctrl_C to abort.")
+    raise click.ClickException(
+        'Connection repository %s empty' % connections.connections_file)
+
 
 ################################################################
 #
@@ -373,7 +370,7 @@ def cmd_connection_export(context):
     if_export_statement(PywbemServer.user_envvar, svr.user)
     if_export_statement(PywbemServer.password_envvar, svr.password)
     if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
-    if_export_statement(PywbemServer.no_verify_envvar, svr.no_verify)
+    if_export_statement(PywbemServer.verify_envvar, svr.verify)
     if_export_statement(PywbemServer.certfile_envvar, svr.certfile)
     if_export_statement(PywbemServer.keyfile_envvar, svr.keyfile)
     if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
@@ -381,19 +378,49 @@ def cmd_connection_export(context):
 
 def cmd_connection_show(context, name):
     """
-    Show the parameters that make up the current connection information
+    Show the parameters that make up the current connection information if
+    name is None. If Name exists, shows connections in connections file.
     """
     connections = ConnectionRepository()
-    name = get_connection_name(name, context, connections, include_current=True)
 
-    if name in connections:
-        connection = connections[name]
-    else:
-        if context.pywbem_server:
-            connection = context.pywbem_server
-        else:
-            raise click.ClickException("No server set as current.")
+    cname = get_current_connection_name(context)
+    # If no name arg, fallback to selection unless there is no connections file
+    if not name:
+        name = cname or '?'
+        if not cname and not connections:
+            raise click.ClickException('No current connection and no '
+                                       'connections file %s.' %
+                                       connections.connections_file)
 
+    # ? means to ask for connections file. However fallback to current
+    # if there is no connections file and fail if no current.
+    if name == '?':
+        # No connections exit in connections file.
+        if not connections:
+            if context.pywbem_server:
+                show_connection_information(context,
+                                            context.pywbem_server,
+                                            show_state=True)
+                return
+
+        name = select_connection(None, context, connections)
+
+    # Have a name. If there are connections and this name is in connections
+    # and that name is not current, use it. If current name is same as
+    # name, use the current version.
+    if connections:
+        # If name in connections same as currrent connection. use current
+        connection = connections[name] if name in connections and \
+            cname != name else context.pywbem_server
+    else:   # nothing in connections file
+        if cname != name:
+            raise click.ClickException('Name "%s" not current and no '
+                                       'connections file %s' %
+                                       (name, connections.connections_file))
+        connection = context.pywbem_server
+
+    if connection is None:
+        raise click.ClickException("No connection definition exists.")
     show_connection_information(context, connection, show_state=True)
 
 
@@ -423,18 +450,17 @@ def cmd_connection_select(context, name, options):
     """
     connections = ConnectionRepository()
 
-    name = get_connection_name(name, context, connections)
+    name = select_connection(name, context, connections)
 
-    connection = connections[name]
     new_ctx = ContextObj(connections[name],
                          context.output_format,
-                         connection.use_pull,
-                         connection.pull_max_cnt,
+                         context.use_pull,
+                         context.pull_max_cnt,
                          context.timestats,
                          context.log,
                          context.verbose)
 
-    # update the root context making this context the basis for future
+    # Update the root context making this context the basis for future
     # commands in the current interactive session
     ContextObj.update_root_click_context(new_ctx)
     context.spinner.stop()
@@ -455,7 +481,7 @@ def cmd_connection_delete(context, name, options):
     """
     connections = ConnectionRepository()
 
-    name = get_connection_name(name, context, connections)
+    name = select_connection(name, context, connections)
 
     context.spinner.stop()
     if options['verify']:
@@ -483,12 +509,10 @@ def cmd_connection_save(context, name, options):
                                    '"connection list" to see more connection '
                                    'information')
     save_connection = deepcopy(current_connection)
-    save_connection._name = name  # pylint: disable=protected-access
+    save_connection.name = name
 
     connections = ConnectionRepository()
-    if save_connection.name in connections:
-        raise click.ClickException('%s is already defined as a server' %
-                                   save_connection.name)
+
     context.spinner.stop()
     if options['verify']:
         click.echo('Verify save of %s' % current_connection.name)
@@ -517,8 +541,8 @@ def cmd_connection_list(context):
         dc = dflt_sym if is_default_connection(svr) else ''
         name = '%s%s%s' % (cc, dc, name)
         row = [name, svr.server, svr.default_namespace, svr.user,
-               svr.timeout, svr.no_verify, svr.certfile,
-               svr.keyfile, svr.log, "\n".join(svr.mock_server)]
+               svr.timeout, svr.verify, svr.certfile,
+               svr.keyfile, "\n".join(svr.mock_server)]
         rows.append(row)
 
     # add current connection if not in persistent connections
@@ -529,11 +553,13 @@ def cmd_connection_list(context):
             cname = '%s%s' % ('*', cname)
             svr = current_connection
             rows.append([cname, svr.server, svr.default_namespace, svr.user,
-                         svr.timeout, svr.no_verify, svr.certfile,
-                         svr.keyfile, svr.log, "\n".join(svr.mock_server)])
+                         svr.timeout, svr.verify, svr.certfile,
+                         svr.keyfile, "\n".join(svr.mock_server)])
 
+    # NOTE: Does not show ca_certs because that creates a very big table
+    # in particular if you use the default.
     headers = ['name', 'server', 'namespace', 'user',
-               'timeout', 'no-verify', 'certfile', 'keyfile', 'log',
+               'timeout', 'verify', 'certfile', 'keyfile',
                'mock-server']
 
     headers, rows = hide_empty_columns(headers, rows)

@@ -75,10 +75,12 @@ The following defines the help output for the `pywbemcli  --help` command
       -p, --password TEXT             Password for the WBEM server. Default:
                                       EnvVar PYWBEMCLI_PASSWORD, or prompted for
                                       if --user specified.
-      -N, --no-verify                 If true, client does not verify the X.509
+      --verify / --no-verify          If --verify, client verifies the X.509
                                       server certificate presented by the WBEM
-                                      server during TLS/SSL handshake. Default:
-                                      EnvVar PYWBEMCLI_NO_VERIFY, or false.
+                                      server during TLS/SSL handshake. If --no-
+                                      verify client bypasses verification.
+                                      Default: EnvVar PYWBEMCLI_VERIFY, or "--
+                                      verify".
       --ca-certs FILE                 Path name of a file or directory containing
                                       certificates that will be matched against
                                       the server certificate presented by the WBEM
@@ -779,9 +781,14 @@ The following defines the help output for the `pywbemcli connection save --help`
 
       Save the current connection to a new WBEM connection definition.
 
-      Create a new WBEM connection definition in the connections file from the
-      current connection. A connection definition with the name NAME must not
-      yet exist. The NAME argument (the name of the new connection) is required.
+      Saves the current connection as a connection definition in the connections
+      file. The NAME argument (the name of the connection) is required. If a
+      connection with that name already exists, it will be overwritten with the
+      current connection definition.
+
+      In the interactive mode, general options preceeding the connection command
+      that change the connection definition will be applied before the
+      connection is saved.
 
       Examples:
 
@@ -810,15 +817,15 @@ The following defines the help output for the `pywbemcli connection select --hel
 
       Select a WBEM connection definition as current or default.
 
-      Selects a connection from the persistently stored named connections if
-      NAME exists in the store to be the current connection. If the NAME
-      argument does not exist, a list of connections from the connections
-      definition file is presented with a prompt for the user to select a
-      connection.
+      Selects the connection named NAME from the persistently stored named
+      connections to be the current connection.The connection definition must
+      exist in the connections file. If the NAME argument is not specified, a
+      list of connections from the connections file is presented with a prompt
+      for the user to select a connection definition.
 
-      Default and current connction are set if the --default option exists;
-      otherwise only the connection in the current interactive session is set .
-      Once define the default connection will be used as the server definition
+      Default and current connection are set if the --default option exists;
+      otherwise only the current connection the interactive session is set .
+      Once defined the default connection will be used as the server definition
       in future execution of pywbemcli if there is no server definition
       (--server or --name or --mock-server) general option.
 
@@ -858,10 +865,10 @@ The following defines the help output for the `pywbemcli connection show --help`
       This command displays the WBEM connection definition of a single
       connection as follows:
 
-      * NAME argument exists; show that WBEM connections file.
+      * NAME argument exists; show that WBEM connections definition from the
+      connections file.
 
-      * NAME argument does not exist; show existing current connection or
-      presents list for selection
+      * NAME argument does not exist; show existing current connection.
 
       * Name argument is '?'; presents list of connections for selection
 
