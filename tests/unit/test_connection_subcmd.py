@@ -23,8 +23,7 @@ import os
 import pytest
 
 from .cli_test_extensions import CLITestsBase
-from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
-    CMD_OPTION_VERIFY_HELP_LINE
+from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -59,7 +58,6 @@ CONNECTION_HELP_LINES = [
 CONNECTION_DELETE_HELP_LINES = [
     'Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME',
     'Delete a WBEM connection definition.',
-    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -78,7 +76,6 @@ CONNECTION_LIST_HELP_LINES = [
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME',
     'Save the current connection to a new WBEM connection definition.',
-    CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE
 ]
 
@@ -598,11 +595,11 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand delete with prompt that selects y for '
+    ['Verify connection subcommand delete'
      'verify',
-     ['delete', 'mocktest', '--verify'],
+     ['delete', 'mocktest'],
      {'stdout': ['name: mocktest', 'Execute delete'],
-      'test': 'regex',
+      'test': 'onnows',
       'file': {'before': 'exists', 'after': 'none'}},
      MOCK_CONFIRMY_FILE, OK],
 
@@ -612,9 +609,8 @@ TEST_CASES = [
     #  The following test is artifical in that the first create actually
     #  uses the mock but not to really create a server
     #
-    ['Verify save server with cmd line params to empty connections file. Using '
-     '--verify',
-     {'args': ['save', '--verify', 'svrtest2'],
+    ['Verify save server with cmd line params to empty connections file.',
+     {'args': ['save', 'svrtest2'],
       'global': ['--server', 'http://blah',
                  '--timeout', '45',
                  '--use-pull', 'no',
