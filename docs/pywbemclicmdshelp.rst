@@ -702,10 +702,7 @@ The following defines the help output for the `pywbemcli connection delete --hel
         pywbemcli connection delete blah
 
     Options:
-      -V, --verify  Prompt for confirmation before performing a change, to allow
-                    for verification of parameters. Default: Do not prompt for
-                    confirmation.
-      -h, --help    Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection export --help`:
@@ -795,10 +792,7 @@ The following defines the help output for the `pywbemcli connection save --help`
         pywbemcli --server https://srv1 connection save mysrv
 
     Options:
-      -V, --verify  Prompt for confirmation before performing a change, to allow
-                    for verification of parameters. Default: Do not prompt for
-                    confirmation.
-      -h, --help    Show this message and exit.
+      -h, --help  Show this message and exit.
 
 
 .. _`pywbemcli connection select --help`:

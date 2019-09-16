@@ -28,8 +28,7 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
-    verify_operation, hide_empty_columns
-from ._common_options import add_options, verify_option
+    hide_empty_columns
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
@@ -107,7 +106,6 @@ def connection_show(context, name):
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
-@add_options(verify_option)
 @click.pass_obj
 def connection_delete(context, name, **options):
     """
@@ -182,7 +180,6 @@ def connection_test(context):
 
 @connection_group.command('save', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True)
-@add_options(verify_option)
 @click.pass_obj
 def connection_save(context, name, **options):
     """
@@ -481,22 +478,15 @@ def cmd_connection_delete(context, name, options):
     """
     connections = ConnectionRepository()
 
+    # Select the connection with prompt if name is None.
+    # This also stops the spinner
     name = select_connection(name, context, connections)
-
-    context.spinner.stop()
-    if options['verify']:
-        click.echo('Verify delete of %s' % name)
-        show_connection_information(context,
-                                    connections[name],
-                                    separate_line=False)
-        if not verify_operation('Execute delete', msg=True):
-            return
 
     cname = get_current_connection_name(context)
     connections.delete(name)
 
     default = 'default ' if cname and cname == name else ''
-    click.echo('Deleted %sconnection "%s".' % (default, name))
+    click.echo('Deleted %s connection "%s".' % (default, name))
 
 
 def cmd_connection_save(context, name, options):
@@ -514,12 +504,6 @@ def cmd_connection_save(context, name, options):
     connections = ConnectionRepository()
 
     context.spinner.stop()
-    if options['verify']:
-        click.echo('Verify save of %s' % current_connection.name)
-        click.echo(show_connection_information(context, current_connection,
-                                               separate_line=False))
-        if not verify_operation('Execute save', msg=True):
-            return
 
     connections.add(save_connection.name, save_connection)
 
