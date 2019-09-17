@@ -1102,76 +1102,58 @@ See :ref:`pywbemcli server get-centralinsts --help` for details.
 Connection command group
 ------------------------
 
-The **connection** command group defines commands that provide for a
-persistent file (:term:`connections file`) of WBEM server connection
-parameters and allow selecting entries in this file as well as adding entries
-to the file, deleting entries from the file and viewing WBEM servers defined in the
-the file. This allows multiple connections to be defined and then used by name
-rather than through the detailed parameters of the connection.
+The ``connection`` command group has commands that manage named connection
+definitions that are persisted in a :term:`connections file`.
+This allows maintaining multiple connection definitions and then using any
+one via the :ref:`--name general option`.
 
-Connections in the :term:`connections file` can be created by:
+The attributes of each connection definition in the connections file are:
 
-* Using the :ref:`connection save command` with the current connection. This options
-  uses the parameters current connection to define and save a connection in the
-  connections file.
-
-The connection information for each connection is based on the information
-used to create a connection and is largely the same information as is in the
-options for pywbemcli. The data includes:
-
-* **name** - name of the connection (required) and defined with an argument.
-* **server** - the url for the defined connection. See :ref:`--server general option`.
-* **default-namespace** - the default namespace defined for the connection
-  (required). See :ref:`--default-namespace general option`.
-* **user** - the user name for the connection (optional). See :ref:`--user general option`.
-* **password** - the password for the connection (optional). See :ref:`--password general option`.
-* **no-verify** - a boolean flag option that, if set causes the pywbem client not
-  to verify any certificate received from the WBEM server certificate. Otherwise
-  the ssh client software verifies the validity of the server certificate
-  received from the WBEM server during connection setup. See :ref:`--verify general option`.
-* **certfile** - optional server certificate filename. See :ref:`--certfile general option`.
-* **keyfile** - optional client private keyfile filename. See :ref:`--keyfile general option`.
-* **timeout** - optional timeout value. See :ref:`--timeout general option`.
-* **mock-server** - optional definition  a mock server
-  environment using the pywbem mock module. This parameter is used, the
-  ``--server`` must not be defined.  See :ref:`--mock-server general option`.
-
-The connection information is saved in the :term:`connections file` when the
-:ref:`connection save command` command are executed. Multiple
-connection files may be maintained in separate directories.
+* **name** - name of the connection definition. See :ref:`--name general option`.
+* **server** - URL of the WBEM server, or None if the connection definition is
+  for a mock WBEM server. See :ref:`--server general option`.
+* **default-namespace** - default namespace for the WBEM server. See :ref:`--default-namespace general option`.
+* **user** - user name for the WBEM server. See :ref:`--user general option`.
+* **password** - password for the WBEM server. See :ref:`--password general option`.
+* **verify** - a boolean flag controlling whether the pywbem client verifies
+  any certificate received from the WBEM server. See :ref:`--verify general option`.
+* **certfile** - path name of the server certificate file. See :ref:`--certfile general option`.
+* **keyfile** - path name of the client private key file. See :ref:`--keyfile general option`.
+* **timeout** - client-side timeout for operations against the WBEM server. See :ref:`--timeout general option`.
+* **mock-server** - list of files defining the setup of the mock WBEM server,
+  or None if the connection definition is for a real WBEM server.
+  See :ref:`--mock-server general option`.
 
 The commands in this group are:
 
 * :ref:`Connection delete command` - Delete a WBEM connection definition.
-* :ref:`Connection export command` -  Export the current connection.
+* :ref:`Connection export command` - Export the current connection.
 * :ref:`Connection list command` - List the WBEM connection definitions.
-* :ref:`Connection save command` - Save a connection to a new WBEM connection
-  definition named NAME.
-* :ref:`Connection select command` - Select a WBEM connection definition as
-  current/default connection.
-* :ref:`Connection show command` - Show connection info of a WBEM connection
-  definition.
-* :ref:`Connection test command` - Test the current connection with a
-  predefined WBEM request.
+* :ref:`Connection save command` - Save the current connection to a new WBEM connection definition.
+* :ref:`Connection select command` - Select a WBEM connection definition as current or default.
+* :ref:`Connection show command` - Show connection info of a WBEM connection definition.
+* :ref:`Connection test command` - Test the current connection with a predefined WBEM request.
 
 
 .. _`Connection delete command`:
 
 Connection delete command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection delete`` command deletes a specific connection by name or selection.
-If the NAME argument exists, it attemts to delete the connection with that name;
-otherwise it presents a selection list for the user to pick a connection to
-delete.
 
-The following
-example deletes the connection defined in the add command above:
+The ``connection delete`` command deletes a connection definition from the
+:term:`connections file`.
+
+If the ``NAME`` argument is specified, the connection definition with that name
+is deleted. Otherwise, the command displays the list of connection definitions
+and prompts the user for picking the one to be deleted.
+
+Example that deletes a connection definition by the specified name:
 
 .. code-block:: text
 
     $ pywbemcli connection delete me
 
-To delete by selection:
+Example that deletes a connection definition by selecting it:
 
 .. code-block:: text
 
@@ -1189,7 +1171,11 @@ See :ref:`pywbemcli connection delete --help` for details.
 
 Connection export command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection export`` command  exports the current connection information as environment variables.
+
+The ``connection export`` command exports the current connection as a set of
+environment variables.
+
+This is done by displaying the commands to set the environment variables.
 
 .. code-block:: text
 
@@ -1197,8 +1183,22 @@ The ``connection export`` command  exports the current connection information as
     export PYWBEMCLI_SERVER=http://localhost
     export PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2
     export PYWBEMCLI_TIMEOUT=30
+    . . .
 
-  See :ref:`pywbemcli connection export --help` for details.
+This can be used for example on Linux and OS-X to set the environment variables
+as follows:
+
+.. code-block:: text
+
+    $ eval $(pywbemcli --server http://localhost connection export)
+
+    $ env |grep PYWBEMCLI
+    PYWBEMCLI_SERVER=http://localhost
+    PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2
+    PYWBEMCLI_TIMEOUT=30
+    . . .
+
+See :ref:`pywbemcli connection export --help` for details.
 
 
 .. _`Connection list command`:
@@ -1206,15 +1206,18 @@ The ``connection export`` command  exports the current connection information as
 Connection list command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection list`` command lists the connections in the :term:`connections
-file` as a table. This produces a table output showing the connections defined
-in the connections file.  It displays all of the persistent connections and
-also the current connection if it has not been saved (i.e. defined with the
-:ref:`--server general option` or :ref:`--mock-server general option` general
-options and not saved).  This shows if a connection is the current connection
+The ``connection list`` command lists the connection definitions in the
+:term:`connections file` and also the current connection if it has not been
+saved to the connections file.
+
+Valid output formats are :term:`Table output formats`.
+
+This shows if a connection is the current connection
 and if any connection is set as the default connection (:ref:`Connection select
 command` ).
 
+The current connection is marked with `*` in the Name column.
+The default connection, if defined, is marked with `#` in the Name column.
 
 .. code-block:: text
 
@@ -1222,18 +1225,18 @@ command` ).
 
     pywbemcli> --server http://blahblah connection list
     WBEM server connections:  (#: default, *: current)
-    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
-    | name         | server           | namespace   | user        |   timeout | no-verify  | mock-server                            |
-    |--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------|
-    | *blahblah    | http://blah      | root/cimv2  |             |        45 | False      |                                        |
-    | mock1        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
-    | mockalltypes |                  | root/cimv2  |             |        30 | False      | tests/unit/all_types.mof               |
-    | mockassoc    |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_assoc_mock_model.mof |
-    | mockext      |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model_ext.mof   |
-    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False      |                                        |
-    | test3        |                  | root/cimv2  |             |           | False      | tests/unit/simple_mock_model.mof       |
-    |              |                  |             |             |           |            | tests/unit/mock_confirm_y.py           |
-    +--------------+------------------+-------------+-------------+-----------+------------+----------------------------------------+
+    +--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------+
+    | name         | server           | namespace   | user        |   timeout | verify   | mock-server                            |
+    |--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------|
+    | *blahblah    | http://blah      | root/cimv2  |             |        45 | False    |                                        |
+    | mock1        |                  | root/cimv2  |             |           | False    | tests/unit/simple_mock_model.mof       |
+    | mockalltypes |                  | root/cimv2  |             |        30 | False    | tests/unit/all_types.mof               |
+    | mockassoc    |                  | root/cimv2  |             |        30 | False    | tests/unit/simple_assoc_mock_model.mof |
+    | mockext      |                  | root/cimv2  |             |        30 | False    | tests/unit/simple_mock_model_ext.mof   |
+    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False    |                                        |
+    | test3        |                  | root/cimv2  |             |           | False    | tests/unit/simple_mock_model.mof       |
+    |              |                  |             |             |           |          | tests/unit/mock_confirm_y.py           |
+    +--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------+
 
 See :ref:`pywbemcli connection list --help` for details.
 
@@ -1242,9 +1245,14 @@ See :ref:`pywbemcli connection list --help` for details.
 
 Connection save command
 ^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection save`` command saves the current connection information
-to the :term:`connections file`.  If the current connection does not have a name
-a console request asks for a name for the connection.
+
+The ``connection save`` command saves the current connection in the
+:term:`connections file` as a connection definition with the name specified
+in the ``NAME`` argument.
+
+If a connection definition with that name already exists, it will be overwritten
+without notice.
+
 See :ref:`pywbemcli connection save --help` for details.
 
 
@@ -1253,17 +1261,16 @@ See :ref:`pywbemcli connection save --help` for details.
 Connection select command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection select`` command selects a connection from the connections
-file sets that connection as the :term:`current connection` and optionally the
-:term:`default connection` by using the ``--default option``.
+The ``connection select`` command selects a connection definition from the
+:term:`connections file` to become the current connection.
 
-A connection may be selected
-to be the current connection by using the NAME argument or by selecting from a
-list presented on the console if there is no NAME argument.
+If the ``NAME`` argument is specified, the connection definition with that name
+is selected. Otherwise, the command displays the list of connection definitions
+and prompts the user for picking the one to be selected.
 
-In the interactive mode, the selected connection remains the current connection
-for the remainder of the interactive session unless another connection is selected.
-
+If the ``--default`` command option is set, the connection definition in
+addition becomes the default connection, by marking it accordingly in the
+:term:`connections file`.
 
 The following example shows changing connection from within the interactive
 mode of pywbemcli:
@@ -1281,13 +1288,13 @@ mode of pywbemcli:
 
     pywbemcli> connection list
     WBEMServer Connections:   (#: default, *: current)
-    +------------+------------------+-------------+-------------+------------+-----------+------------+
-    | name       | server uri       | namespace   | user        | password   |   timeout | no-verify  |
-    |------------+------------------+-------------+-------------+------------+-----------+------------+
-    | mock1      |                  | root/cimv2  |             |            |        30 | False      |
-    | mockassoc* |                  | root/cimv2  |             |            |        30 | False      |
-    | op         | http://localhost | root/cimv2  | xxxxxxxxxxx | edfddfedd  |        30 | True       |
-    +------------+------------------+-------------+-------------+------------+-----------+------------+
+    +------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------+
+    | name       | server           | namespace   | user        |   timeout | verify     | mock-server                             |
+    |------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------|
+    | mock1      |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model.mof        |
+    | *mockassoc |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_assoc_mock_model.mof  |
+    | op         | http://localhost | root/cimv2  | me          |        30 | True       |                                         |
+    +------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------+
 
     pywbemcli> connection show
     name: mockassoc
@@ -1311,11 +1318,13 @@ See :ref:`pywbemcli connection select --help` for details.
 
 Connection show command
 ^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection show`` command shows information about the current connection, the
-connection with name NAME, or any connection in the :term:`connections file` by using
-"?" as the NAME argument.  The connection to be displayed will be
-the :term:`current connection` if the NAME argument is omitted, the connection named
-with the NAME argument, or selected from a selection list the NAME argument "?"
+
+The ``connection show`` command shows information about a connection definition:
+
+* If ``NAME`` is ``?``, pywbemcli prompts the user for picking one and shows
+  the existing current connection.
+* If ``NAME`` is specified, show the connection definition with that name.
+* If ``NAME`` is not specified, show the existing current connection.
 
 .. code-block:: text
 
@@ -1339,12 +1348,14 @@ See :ref:`pywbemcli connection show --help` for details.
 
 Connection test command
 ^^^^^^^^^^^^^^^^^^^^^^^
-The ``connection test`` command executes a single predefined operation on the current connection
-to determine if it is a WBEM server. It executes a single ``EnumerateClasses``
-WBEM operation in the default namespace. If the server accepts the request
-a simple text ``Connection successful`` will be returned.
 
-See :ref:`pywbemcli connection test --help` for details.
+The ``connection test`` command executes a single predefined operation on
+the current connection to verify that accessing the WBEM server works.
+
+The predefined operation is ``EnumerateClasses``.
+
+If the server accepts the request, a simple text ``Connection successful``
+will be returned.
 
 The following example defines the connection with ``--server``, ``--user``,
 and ``--password`` and executes the test with successful result:
@@ -1354,13 +1365,7 @@ and ``--password`` and executes the test with successful result:
     $ pywbemcli --server http://localhost --user me --password mypw connection test
     Connection successful
 
-An unsuccessful test will normally result in an exception that defines the
-issue as follows for the server http://blah in the example below:
-
-.. code-block:: text
-
-    $ pywbemcli --server http://blah connection test
-    Error: ConnectionError: Socket error: [Errno -2] Name or service not known
+See :ref:`pywbemcli connection test --help` for details.
 
 
 .. _`Repl command`:
@@ -1368,8 +1373,8 @@ issue as follows for the server http://blah in the example below:
 Repl command
 ------------
 
-This command sets pywbemcli into the :ref:`interactive mode`.  Pywbemcli can be
-started in the :ref:`interactive mode` either by entering:
+The ``repl`` command sets pywbemcli into the :ref:`interactive mode`. Pywbemcli
+can be started in the :ref:`interactive mode` either by entering:
 
 .. code-block:: text
 
@@ -1393,8 +1398,8 @@ The repl mode is recognized by the prompt ``pywbemcli>``.
 Help command
 ------------
 
-The help command provides information on special commands and controls that can
-be executed in the :ref:`interactive mode` including:
+The ``help`` command provides information on special commands and controls
+that can be executed in the :ref:`interactive mode` including:
 
 * executing shell commands,
 * exiting pywbemcli,
