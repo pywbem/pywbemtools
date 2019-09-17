@@ -34,9 +34,7 @@ with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 Class command group
 -------------------
 
-The **class** command group has commands that act on CIM classes.
-
-This group has the following commands:
+The ``class`` command group has commands that act on CIM classes:
 
 * :ref:`Class associators command` - List the classes associated with a class.
 * :ref:`Class delete command` - Delete a class.
@@ -63,10 +61,9 @@ namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
 If the ``--names-only``/``--no`` command option is set, only the class path is
-displayed,
-using a :term:`CIM object output formats` or a :term:`Table output formats`.
-Otherwise, the class definition is displayed,
-using a :term:`CIM object output formats`.
+displayed, using :term:`CIM object output formats` or
+:term:`Table output formats`. Otherwise, the class definition is displayed,
+using :term:`CIM object output formats`.
 
 Note: This command returns the class associators, not the instance associators.
 The :ref:`Instance associators command` returns the instance associators.
@@ -132,10 +129,9 @@ classes of the class hierarchy in the namespace specified with the
 the connection.
 
 If the ``--names-only``/``--no`` command option is set, only the class path is
-displayed,
-using a :term:`CIM object output formats` or a :term:`Table output formats`.
-Otherwise, the class definition is displayed,
-using a :term:`CIM object output formats`.
+displayed, using :term:`CIM object output formats` or
+:term:`Table output formats`. Otherwise, the class definition is displayed,
+using :term:`CIM object output formats`.
 
 If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
@@ -167,7 +163,7 @@ namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
 
 The command displays the namespaces and class names of the result using the
-``txt`` output format (default), or in a :term:`Table output formats`.
+``txt`` output format (default), or using :term:`Table output formats`.
 
 .. code-block:: text
 
@@ -226,7 +222,7 @@ The class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
-The class definition is displayed using a :term:`CIM object output formats`.
+The class definition is displayed using :term:`CIM object output formats`.
 This command does not support :term:`Table output formats`.
 
 The following example shows getting the MOF representation of the class
@@ -286,8 +282,9 @@ in the default namespace of the connection.
 
 Input parameters for the method can be specified with the ``--parameter``/``-p``
 command option, which can be specified multiple times.
+For details, see :ref:`Specifying CIM property and parameter values`.
 
-The return value and output parameters are displayed in the
+The return value and output parameters are displayed using
 :term:`CIM object output formats`.
 
 This command invokes a method on a class, not on an instance. To invoke a
@@ -309,10 +306,9 @@ namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
 If the ``--names-only``/``--no`` command option is set, only the class path is
-displayed,
-using a :term:`CIM object output formats` or a :term:`Table output formats`.
-Otherwise, the class definition is displayed,
-using a :term:`CIM object output formats`.
+displayed, using :term:`CIM object output formats` or
+:term:`Table output formats`. Otherwise, the class definition is displayed,
+using :term:`CIM object output formats`.
 
 Note: This command returns the class references, not the instance references.
 The :ref:`Instance references command` returns the instance references.
@@ -367,10 +363,7 @@ See :ref:`pywbemcli class tree --help` for details.
 Instance command group
 ----------------------
 
-The **instance** command group defines commands that act on CIM instances as defined
-in the following subsections:
-
-This group consists of the following commands:
+The ``instance`` command group has commands that act on CIM instances:
 
 * :ref:`Instance associators command` - List the instances associated with an instance.
 * :ref:`Instance count command` - Count the instances of each class with matching class name.
@@ -383,19 +376,41 @@ This group consists of the following commands:
 * :ref:`Instance references command` - Execute a query on instances in a namespace.
 * :ref:`Instance query command` - List the instances referencing an instance.
 
+See :ref:`pywbemcli instance --help`.
+
 
 .. _`Instance associators command`:
 
 Instance associators command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance associators`` command gets the associator instances for the argument
-as the :term:`INSTANCENAME` argument in the namespace defined with this
-command or the default namespace and displays it in the defined format. If successful it returns the
-instances or instance names associated with :term:`INSTANCENAME` otherwise it returns an
-exception generated by the response This command displays the returned instances
-or instance in the :term:`CIM object output formats` or :term:`Table output formats` (see
-:ref:`Output formats`).:
+The ``instance associators`` command lists the CIM instances that are associated
+with the specified source instance.
+
+The source instance can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+If the ``--names-only``/``--no`` command option is set, only the instance paths
+are displayed. Otherwise, the instances are displayed.
+
+Valid output formats in both cases are :term:`CIM object output formats` or
+:term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -423,12 +438,20 @@ See :ref:`pywbemcli instance associators --help` for details.
 Instance count command
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance count`` command returns acount of the number of CIM instances in the
-namespace defined by ``--namespace`` or the default namespace. The list of
-classes processed is filtered by the ``CLASSNAME-GLOB`` optional argument using
-using a :term:`Unix-style path name pattern`.
+The ``instance count`` command counts the CIM instances of some or all classes
+in the namespace specified with the ``-namespace``/``-n`` command option, or
+otherwise in the default namespace of the connection.
 
-For example:
+The count of instances is displayed for each class name.
+**TBD: Does it include instances of subclasses?**
+
+If the ``CLASSNAME-GLOB`` argument is specified, only the classes are counted
+that match the specified :term:`Unix-style path name pattern`.
+Otherwise, all classes are counted.
+
+Valid output formats are :term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -443,13 +466,9 @@ For example:
     | TST_Person                   |       4 |
     +------------------------------+---------+
 
-This counts the number of instances specific to the class shown where the
-``instance enumerate`` would show the instances for that class and its
-subclasses.
-
 Count is useful to determine which classes in the environment are actually
 implemented. However this command can take a long time to execute because
-it must a) enumerate all the classes in the namespaces, b) enumerate the
+it must a) enumerate all classes in the namespace, b) enumerate the
 instances for each class.
 
 See :ref:`pywbemcli instance count --help` for details.
@@ -460,41 +479,30 @@ See :ref:`pywbemcli instance count --help` for details.
 Instance create command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance create`` command creates a new CIMInstance in the WBEM server namespace
-defined with ``--namespace`` or the default namespace. The command builds the CIMInstance from the class defined by
-CLASSNAME and the properties defined by the ``--property``/``-p`` option. The
-properties are defined as name/value pairs, one property for each instance of
-the ``--property`` option. Since the WBEM server (and pywbem) requires that
-each property be typed, pywbemtools uses the CIMClass defined by CLASSNAME
-retrieved from the WBEM server to define the type required to define the
-CIMProperty.
+The ``instance create`` command creates a CIM instance in the namespace
+specified with the ``-namespace``/``-n`` command option, or otherwise in the
+default namespace of the connection.
 
-For a single property in the new instance this is simply the ``--property`` option
-with the property name and value:
+The new CIM instance has the creation class specified in the ``CLASSNAME``
+argument and initial property values as specified by zero or more
+``--property``/``-p`` command options.
+For details, see :ref:`Specifying CIM property and parameter values`.
 
-.. code-block:: text
+The command displays the instance path of the new instance that is returned by
+the WBEM server, using ``txt`` output format.
 
-    --property PROPERTY-NAME=PROPERTY-VALUE
-
-    --property PROPERTY-NAME="PROPERTY-VALUE"
-
-where quotes are only required if the value includes whitespace.
-
-For array properties the values are defined separated by commas.
+Since the WBEM server (and pywbem) requires that each property be typed,
+pywbemcli retrieves the creation class from the WBEM server to determine
+the data types for the properties.
 
 The following examples create an instance of the class TST_Blah with two
-scalar and one array property.
+scalar and one array property:
 
 .. code-block:: text
 
     $ pywbemcli instance create TST_Blah --property InstancId=blah1 --property IntProp=3 --property IntArr=3,6,9
 
     $ pywbemcli instance create TST_Blah --property InstancId=\"blah 2\" --property IntProp=3 --property IntArr=3,6,9
-
-If the create is successful, the server defined CIM Instance path is displayed.
-If the operation fails, the exception is displayed. If there is a discrepancy
-between the defined properties and the CIMClass property parameters
-pywbemcli generates an exception.
 
 See :ref:`pywbemcli instance create --help` for details.
 
@@ -504,19 +512,28 @@ See :ref:`pywbemcli instance create --help` for details.
 Instance delete command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance delete`` command deletes an instance defined by the
-:term:`INSTANCENAME` argument in a namespace defined by either the
-``--namespace`` option or the general ``--default-namespace``. The form of
-INSTANCENAME is determined by the ``--interactive`` options and must be either:
+The ``instance delete`` command deletes a CIM instance.
 
-* a string representation of a CIMInstanceName as defined by a :term:`WBEM URI`
-* A class name in which case pywbemcli will get the instance names from the
-  WBEM server and present a selection list for the user to select an
-  instance name :ref:`Displaying CIM instances/classes or their names`
+The instance can be specified in two ways:
 
-The following example deletes the instance defined by the explicit instance
-name (Note the extra backslash (see :term:`backslash-escaped` required to
-escape the double quote on the terminal):
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+The following example deletes an instance by specifying its instance name.
+Note the extra backslash (see :term:`backslash-escaped`) that is required to
+escape the double quote on the terminal:
 
 .. code-block:: text
 
@@ -530,14 +547,20 @@ See :ref:`pywbemcli instance delete --help` for details.
 Instance enumerate command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance enumerate`` command enumerates instances or their paths defined by the CLASSNAME
-argument in the namespace defined by ``--namespace``/``-n`` or the general option
-``--default-namespace``/``-d`` in the defined format. This command displays the
-returned instances or instance names in the :term:`CIM object output formats`
-or :term:`Table output formats` (see :ref:`Output formats`).
+The ``instance enumerate`` command lists the CIM instances of the specified
+class (including subclasses) in a namespace.
 
-The following example returns a two instanced to an ``instance enumerate``
-command as MOF:
+The class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If the ``--names-only``/``--no`` command option is set, only the instance paths
+are displayed. Otherwise, the instances are displayed.
+
+Valid output formats in both cases are :term:`CIM object output formats` or
+:term:`Table output formats`.
+
+The following example returns two instances as MOF:
 
 .. code-block:: text
 
@@ -559,15 +582,29 @@ See :ref:`pywbemcli instance enumerate --help` for details.
 Instance get command
 ^^^^^^^^^^^^^^^^^^^^
 
-The ``instance get`` command gets a single CIM instance defined by the :term:`INSTANCENAME`
-argument from the default namespace or the namespace defined with the
-command displayed in the defined format. The form of :term:`INSTANCENAME` is
-determined by the ``--interactive`` option. It can display the returned
-instance in the :term:`CIM object output formats` or :term:`Table output formats`
-(see :ref:`Output formats`). Otherwise it returns the received exception.
+The ``instance get`` command gets a CIM instance.
 
-This example successfully retrieves the instance defined by the INSTANCENAME
-``root/cimv2:TST_Person.name=\"Saara\"``:
+The instance can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+The command displays the instance using :term:`CIM object output formats`
+or :term:`Table output formats`.
+
+This example gets an instance by instance name:
 
 .. code-block:: text
 
@@ -584,18 +621,40 @@ See :ref:`pywbemcli instance get --help` for details.
 Instance invokemethod command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The invokemethod command invokes a method defined for the INSTANCENAME  and
-METHOD arguments using any CIM parameters defined with the ``-parameter`` option.
-If successful, it returns a return value and and CIM output parameters included in
-the response. This command only formats in a simple text format.
+The ``instance invokemethod`` command invokes a CIM method on the specified
+instance and displays the return value and any output parameters.
 
-As as example:
+The instance can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+Input parameters for the method can be specified with the ``--parameter``/``-p``
+command option, which can be specified multiple times.
+For details, see :ref:`Specifying CIM property and parameter values`.
+
+The return value and output parameters are displayed using
+:term:`CIM object output formats`.
+
+Example:
 
 .. code-block:: text
 
-    $ pywbemcli --mock-server tests/unit/all_types.mof --mock-server tests/unit/all_types_method.py
+    $ pywbemcli --mock-server tests/unit/all_types.mof --mock-server tests/unit/all_types_method_mock.py.py
 
-    pywbemcli> instance invokemethod PyWBEM_AllTypes.InstanceId=\"test_instance\" AllTypesMethod -parameter arrBool=True,False
+    pywbemcli> instance invokemethod PyWBEM_AllTypes.InstanceId=\"test_instance\" AllTypesMethod --parameter arrBool=True,False
     ReturnValue=0
     arrBool=true, false
 
@@ -607,16 +666,33 @@ See :ref:`pywbemcli instance invokemethod --help` for details.
 Instance modify command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance modify`` command modifies an existing instance of the class
-defined by the CLASSNAME argument in the WBEM server  namespace defined by
-either the default namespace or namespace option. The user provides the
-definition of an instance in the same form as the ``add`` command but the
-instance must already exist in the WBEM server and the instance created from
-the command line must include all of the key properties so that it can be
-identified in the server.
+The ``instance modify`` command modifies the properties of an existing CIM
+instance.
 
-If successful, this command displays nothing, otherwise it displays the
-received exception.
+The instance can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+The new property values are specified by possibly multiple ``--property``/``-p``
+command options.
+For details, see :ref:`Specifying CIM property and parameter values`.
+
+Since the WBEM server (and pywbem) requires that each property be typed,
+pywbemcli retrieves the creation class from the WBEM server to determine
+the data types for the properties.
 
 See :ref:`pywbemcli instance modify --help` for details.
 
@@ -626,12 +702,33 @@ See :ref:`pywbemcli instance modify --help` for details.
 Instance references command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance references`` command gets the reference instances or paths for a
-instance defined as the :term:`INSTANCENAME` input argument in the default
-namespace or the namespace defined with this command displayed in the
-defined format. It can display any returned instances in the
-:term:`CIM object output formats` or :term:`Table output formats`
-(see :ref:`Output formats`). Otherwise it returns the received exception.:
+The ``instance references`` command lists the CIM instances that reference
+the specified source instance.
+
+The source instance can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+If the ``--names-only``/``--no`` command option is set, only the instance paths
+are displayed. Otherwise, the instances are displayed.
+
+Valid output formats in both cases are :term:`CIM object output formats` or
+:term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -650,16 +747,18 @@ See :ref:`pywbemcli instance references --help` for details.
 Instance query command
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance query`` command executes an ExecQuery CIM-XML operation with query string defined as an argument.
-The QUERY argument must be a valid query defined for the ``--query-language``
-option and available in the WBEM server being queried.  The default for
-the ``--query-language`` option is DMTF:CQL but any query language and query
-will be passed to the server.
+The ``instance query`` command executes a query for CIM instances in a
+namespace.
 
-It displays any instances returned in the defined formats or any exception
-returned.  It can display any returned instances in the
-:term:`CIM object output formats` or :term:`Table output formats`
-(see :ref:`Output formats`).
+The query is specified with the ``QUERY`` argument and must be a valid query
+in the query language specified with the ``--query-language`` command option.
+The default for the query language is ``DMTF:CQL``.
+
+The namespace is specified with the ``-namespace``/``-n`` command option, or
+otherwise is the default namespace of the connection.
+
+Valid output formats are :term:`CIM object output formats` or
+:term:`Table output formats`.
 
 See :ref:`pywbemcli instance query --help` for details.
 
@@ -669,10 +768,8 @@ See :ref:`pywbemcli instance query --help` for details.
 Qualifier command group
 -----------------------
 
-The **qualifier** command group defines commands that act on
-CIMQualifierDeclaration objects in the WBEM server including:
-
-This group consists of the following commands:
+The ``qualifier`` command group has commands that act on CIM qualifier
+declarations:
 
 * :ref:`qualifier get command` - Get a qualifier declaration.
 * :ref:`qualifier enumerate command` - List the qualifier declarations in a
@@ -684,11 +781,14 @@ This group consists of the following commands:
 Qualifier get command
 ^^^^^^^^^^^^^^^^^^^^^
 
-The ``qualifier get`` command gets a single qualifier declaration defined by the ``QUALIFIERNAME``
-argument from the namespace in the target WBEM server defined with this
-command  or the default namespace and display in the defined output format.
-The output formats can be either one of the :term:`CIM object output formats`
-or :term:`Table output formats` (see :ref:`Output formats`).
+The ``qualifier get`` command gets the specified qualifier declaration.
+
+The qualifier declaration is named with the ``QUALIFIERNAME`` argument and is
+in the namespace specified with the ``-namespace``/``-n`` command option, or
+otherwise in the default namespace of the connection.
+
+The qualifier declaration is displayed using :term:`CIM object output formats`
+or :term:`Table output formats`.
 
 The following example gets the ``Key`` qualifier declaration from the
 default namespace:
@@ -708,14 +808,17 @@ See :ref:`pywbemcli qualifier get --help` for details.
 Qualifier enumerate command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``qualifier enumerate`` command  enumerates all qualifier declarations within the namespace
-defined with this command or the default namespace in the target WBEM
-server . The output formats can be either one  of the
-:term:`CIM object output formats` or :term:`Table output formats`
-(see :ref:`Output formats`).
+The ``qualifier enumerate`` command enumerates the qualifier declarations in
+a namespace.
+
+The namespace is specified with the ``-namespace``/``-n`` command option, or
+otherwise is the default namespace of the connection.
+
+The qualifier declaration is displayed using :term:`CIM object output formats`
+or :term:`Table output formats`.
 
 This example displays all of the qualifier declarations in the default
-namespace as a simple table.
+namespace as a table:
 
 .. code-block:: text
 
