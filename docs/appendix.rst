@@ -21,10 +21,23 @@ This documentation uses a few special terms to refer to Python types:
       The name of the protocol used in :term:`DSP0200` that pywbemcli uses to
       communicate with WBEM servers.
 
-   CIM object output formats
-      Pywbemcli output formats (specified with the ``-o\--output-format`` general
-      option) that represent CIM objects in MOF, CIM-XML or pywbem repr/str
-      formats.
+   CIM object output format
+      A pywbemcli output format (specified with the
+      :ref:`--output-format general option`) that formats the resulting CIM
+      objects or CIM object paths as MOF, CIM-XML, or using the pywbem repr or
+      str formatting.
+      See :ref:`CIM object formats` for details.
+
+   Table output format
+      A pywbemcli output format (specified with the
+      :ref:`--output-format general option`) that formats the result as a table.
+      See :ref:`Table formats` for details.
+
+   Tree output format
+      A pywbemcli output format (specified with the
+      :ref:`--output-format general option`) that formats the result as a tree
+      using ASCII characters.
+      See :ref:`ASCII tree format` for details.
 
    INSTANCENAME
       A CIM instance path in a format that is suitable as a command line
@@ -102,11 +115,13 @@ This documentation uses a few special terms to refer to Python types:
       commands may be executed within the context of a connection defined
       by a set of general options.
 
-   GLOB
-      A pathname pattern expansion used in Unix environments. It is
-      used by pywbemcli to expand classnames in the ``class find`` command.
+   Unix-style path name pattern
+      A pattern used in Unix environments for path names (file names and
+      directory names). It is used by pywbemcli for example to expand class
+      names in the ``class find`` command.
       No tilde expansion is done, but ``*``, ``?``, and character ranges
-      expressed with ``[]`` will be correctly matched.
+      expressed with ``[]`` are supported.
+      Example: ``CIM_*Device*``.
 
    source end role
       The reference in an association class that is on the source side when

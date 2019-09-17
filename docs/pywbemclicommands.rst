@@ -34,10 +34,9 @@ with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 Class command group
 -------------------
 
-The **class** command group defines commands that act on CIM classes. see
-:ref:`pywbemcli class --help`. This group includes the following commands:
+The **class** command group has commands that act on CIM classes.
 
-This group consists of the following commands:
+This group has the following commands:
 
 * :ref:`Class associators command` - List the classes associated with a class.
 * :ref:`Class delete command` - Delete a class.
@@ -48,21 +47,31 @@ This group consists of the following commands:
 * :ref:`Class references command` - List the classes referencing a class.
 * :ref:`Class tree command` - Show the subclass or superclass hierarchy for a class.
 
+See :ref:`pywbemcli class --help`.
+
 
 .. _`Class associators command`:
 
 Class associators command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``class associators`` command retrieves associated classes or class names if the
-(``--names-only``/``--no``) option is set for a class defined by the CLASSNAME
-argument in the namespace with this command or the default
-namespace and displayed in the defined format. If successful it displays the
-classes/classnames in the :term:`CIM object output formats` (see
-:ref:`Output formats`). If unsuccesful it an exception. This command
-returns the class associators, not the instance associators. The
-:ref:`Instance command group` includes the corresponding associators
-operation for instances:
+The ``class associators`` command lists the CIM classes that are associated
+with the specified source class.
+
+The source class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If the ``--names-only``/``--no`` command option is set, only the class path is
+displayed,
+using a :term:`CIM object output format` or a :term:`Table output format`.
+Otherwise, the class definition is displayed,
+using a :term:`CIM object output format`.
+
+Note: This command returns the class associators, not the instance associators.
+The :ref:`Instance associators command` returns the instance associators.
+
+Example:
 
 .. code-block:: text
 
@@ -72,47 +81,34 @@ operation for instances:
 See :ref:`pywbemcli class associators --help` for details.
 
 
-.. _`Class references command`:
-
-Class references command
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``class references`` command retrieves association classes or class names for a
-class defined by the CLASSNAME argument in the default namespace or the
-namespace defined with this command displayed in the defined format. If
-successful it displays the classes/classnames in the
-:term:`CIM object output formats` (see :ref:`Output formats`).
-If unsuccesful it returns an  exception. This command
-returns the class level references,not the instance references. The
-:ref:`Instance command group` includes a corresponding instance references
-operation:
-
-.. code-block:: text
-
-    $ pywbemcli --name mymock class references TST_Person --names-only
-    //FakedUrl/root/cimv2:TST_Lineage
-    //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
-
-See :ref:`pywbemcli class associators --help` for details.
-
-
 .. _`Class delete command`:
 
 Class delete command
 ^^^^^^^^^^^^^^^^^^^^
-The ``class delete`` command deletes the class defined by the ``CLASSNAME``
-argument from the WBEM server. Note that many WBEM servers may not allow this
-operation or may severely limit the conditions under which a class can be
-deleted from the server.  If successful it returns nothing, otherwise it
-displays an exception.
 
-To delete the class ``CIM_Blah``:
+The ``class delete`` command deletes the specified class on the server.
+
+The class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If the class has subclasses, the command is rejected.
+
+If the class has instances, the command is rejected, unless the ``--force``
+command option was specified, in which case the instances are also deleted.
+
+WARNING: Deleting classes can cause damage to the server: It can impact
+instance providers and other components in the server. Use this command with
+caution.
+
+Many WBEM servers may not allow this operation or may severely limit
+the conditions under which a class can be deleted from the server.
+
+Example:
 
 .. code-block:: text
 
-    $ pywbemcli class delete CIM_blah
-
-Pywbemcli will not delete a class that has subclasses.
+    $ pywbemcli class delete CIM_Blah
 
 See :ref:`pywbemcli class delete --help` for details.
 
@@ -122,16 +118,31 @@ See :ref:`pywbemcli class delete --help` for details.
 Class enumerate command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``class enumerate`` command lists the classes or their class names in the
-default namespace or the namespace defined with this command. If the CLASSNAME
-input property exists, the enumeration starts at the subclasses of CLASSNAME. Otherwise
-it starts at the top of the class hierarchy if the ``--deep-inheritance``/``--di``
-option is set it shows all the classes in the hierarchy, not just the next
-level of the hierarchy. Otherwise it only enumerates one level of the class
-hierarchy.  This command can display the classes/classnames in the :term:`CIM object
-output formats` (see :ref:`Output formats`). The following example enumerates
-the class names starting at the root of the class hiearchy for a simple mocked
-CIM schema definition:
+The ``class enumerate`` command enumerates the subclasses of the specified
+class, or the root classes of the class hierarchy.
+
+If the ``CLASSNAME`` argument is specified, the command enumerates the
+subclasses of the class named with the ``CLASSNAME`` argument in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If the ``CLASSNAME`` argument is omitted, the command enumerates the top
+classes of the class hierarchy in the namespace specified with the
+``-namespace``/``-n`` command option, or otherwise in the default namespace of
+the connection.
+
+If the ``--names-only``/``--no`` command option is set, only the class path is
+displayed,
+using a :term:`CIM object output format` or a :term:`Table output format`.
+Otherwise, the class definition is displayed,
+using a :term:`CIM object output format`.
+
+If the ``--deep-inheritance``/``--di`` command option is set, all direct and
+indirect subclasses are included in the result. Otherwise, only one level of
+the class hierarchy is in the result.
+
+The following example enumerates the class names of the root classes in the
+default namespace:
 
 .. code-block:: text
 
@@ -149,17 +160,14 @@ See :ref:`pywbemcli class enumerate --help` for details.
 Class find command
 ^^^^^^^^^^^^^^^^^^
 
-The ``class find`` command gets classes filtered by the CLASSNAME-GLOB argument (a
-Unix style pathname pattern expansion) in the target WBEM server across
-multiple namespaces. It displays the results as a simple list or a table
-of the namespaces and class names in each namespace.
+The ``class find`` command lists classes with a class name that matches the
+:term:`Unix-style path name pattern` specified in the ``CLASSNAME-GLOB``
+argument in all namespaces of the connection, or otherwise in the specified
+namespaces if the ``-namespace``/``-n`` command option is specified one or more
+times.
 
-If successful it displays a list of the namespaces and classnames. If the
-WBEM server returns unsupported or other errors, the command fails with an
-exception.
-
-It searches all of the namespaces in the WBEM server or the namespaces defined
-with the ``--namespace``/``-n`` option):
+The command displays the namespaces and class names of the result using the
+``txt`` output format (default), or in a :term:`Table output format`.
 
 .. code-block:: text
 
@@ -212,16 +220,17 @@ See :ref:`pywbemcli class find --help` for details.
 Class get command
 ^^^^^^^^^^^^^^^^^
 
-The ``class get`` command gets a single class defined by the required CLASSNAME
-argument in the default namespace or the namespace defined with this command
-and displays the returned object. If successul it displays the returned class,
-otherwise it displays the exception generated.  It can display the class using
-the :term:`CIM object output formats` (see :ref:`Output formats`). This command
-does not have a table based format.
+The ``class get`` command gets the specified class.
+
+The class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+The class definition is displayed using a :term:`CIM object output format`.
+This command does not support :term:`Table output format`.
 
 The following example shows getting the MOF representation of the class
-``CIM_Foo`` from a mock repository that is named mock1 in the
-:term:`connections file`:
+``CIM_Foo``:
 
 .. code-block:: text
 
@@ -268,16 +277,53 @@ See :ref:`pywbemcli class get --help` for details.
 Class invokemethod command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``class invokemethod`` command invokes a CIM method defined for the CLASSNAME argument. This
-command executes the invokemethod with a class name, not an instance name
-and any input parameters for the InvokeMethod defined with the
-``--parameter``/``-p`` option. If successful it returns the method return
-value and output parameters received from the server. If unsuccessful it
-displays the exception generated. It displays the return value as an integer and
-any returned CIM parameters in the
-:term:`CIM object output formats` (see :ref:`Output formats`).
+The ``class invokemethod`` command invokes a CIM method on the specified class
+and displays the return value and any output parameters.
+
+The class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+Input parameters for the method can be specified with the ``--parameter``/``-p``
+command option, which can be specified multiple times.
+
+The return value and output parameters are displayed in the
+:term:`CIM object output format`.
+
+This command invokes a method on a class, not on an instance. To invoke a
+method on an instance, use the :ref:`instance invokemethod command`.
 
 See :ref:`pywbemcli class invokemethod --help` for details.
+
+
+.. _`Class references command`:
+
+Class references command
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``class references`` command lists the CIM classes that reference
+the specified source class.
+
+The source class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If the ``--names-only``/``--no`` command option is set, only the class path is
+displayed,
+using a :term:`CIM object output format` or a :term:`Table output format`.
+Otherwise, the class definition is displayed,
+using a :term:`CIM object output format`.
+
+Note: This command returns the class references, not the instance references.
+The :ref:`Instance references command` returns the instance references.
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock class references TST_Person --names-only
+    //FakedUrl/root/cimv2:TST_Lineage
+    //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
+
+See :ref:`pywbemcli class references --help` for details.
 
 
 .. _`Class tree command`:
@@ -285,10 +331,25 @@ See :ref:`pywbemcli class invokemethod --help` for details.
 Class tree command
 ^^^^^^^^^^^^^^^^^^
 
-The ``class tree`` command display the class hierarchy as a tree for the namespace
-defined by ``-n / --namespace`` or the default namespace.  This command
-always outputs a tree format in ASCII defining the either the subclass or superclass
-hierarchy (``--superclasses`` option) of the class name input parameter as a tree:
+The ``class tree`` command displays the subclass or superclass hierarchy of the
+specified class.
+
+The class is named with the ``CLASSNAME`` argument and is in the
+namespace specified with the ``-namespace``/``-n`` command option, or otherwise
+in the default namespace of the connection.
+
+If ``CLASSNAME`` is omitted, the complete class hierarchy of the namespace is
+displayed.
+
+If the ``-superclasses`` command option is set, the specified class and its
+superclass ancestry up to the top-level class are displayed. Otherwise,
+the specified class and its subclass hierarchy are displayed.
+
+The class hierarchy (or ancestry) is always formatted in the
+:term:`Tree output format`; the ``--output-format``/``-o`` general option is
+ignored.
+
+Example:
 
 .. code-block:: text
 
@@ -297,9 +358,6 @@ hierarchy (``--superclasses`` option) of the class name input parameter as a tre
      +-- CIM_Foo_sub
      |   +-- CIM_Foo_sub_sub
      +-- CIM_Foo_sub2
-
-This command ignores the ``--output-format``/``-o`` general option and
-always outputs the tree format.
 
 See :ref:`pywbemcli class tree --help` for details.
 
@@ -336,7 +394,7 @@ as the :term:`INSTANCENAME` argument in the namespace defined with this
 command or the default namespace and displays it in the defined format. If successful it returns the
 instances or instance names associated with :term:`INSTANCENAME` otherwise it returns an
 exception generated by the response This command displays the returned instances
-or instance in the :term:`CIM object output formats` or the table formats` (see
+or instance in the :term:`CIM object output format` or :term:`Table output format` (see
 :ref:`Output formats`).:
 
 .. code-block:: text
@@ -368,7 +426,7 @@ Instance count command
 The ``instance count`` command returns acount of the number of CIM instances in the
 namespace defined by ``--namespace`` or the default namespace. The list of
 classes processed is filtered by the ``CLASSNAME-GLOB`` optional argument using
-using :term:`GLOB` .
+using a :term:`Unix-style path name pattern`.
 
 For example:
 
@@ -475,8 +533,8 @@ Instance enumerate command
 The ``instance enumerate`` command enumerates instances or their paths defined by the CLASSNAME
 argument in the namespace defined by ``--namespace``/``-n`` or the general option
 ``--default-namespace``/``-d`` in the defined format. This command displays the
-returned instances or instance names in the :term:`CIM object output formats`
-or the table formats` (see :ref:`Output formats`).
+returned instances or instance names in the :term:`CIM object output format`
+or :term:`Table output format` (see :ref:`Output formats`).
 
 The following example returns a two instanced to an ``instance enumerate``
 command as MOF:
@@ -505,7 +563,7 @@ The ``instance get`` command gets a single CIM instance defined by the :term:`IN
 argument from the default namespace or the namespace defined with the
 command displayed in the defined format. The form of :term:`INSTANCENAME` is
 determined by the ``--interactive`` option. It can display the returned
-instance in the :term:`CIM object output formats` or the table formats`
+instance in the :term:`CIM object output format` or :term:`Table output format`
 (see :ref:`Output formats`). Otherwise it returns the received exception.
 
 This example successfully retrieves the instance defined by the INSTANCENAME
@@ -572,7 +630,7 @@ The ``instance references`` command gets the reference instances or paths for a
 instance defined as the :term:`INSTANCENAME` input argument in the default
 namespace or the namespace defined with this command displayed in the
 defined format. It can display any returned instances in the
-:term:`CIM object output formats` or the table formats`
+:term:`CIM object output format` or :term:`Table output format`
 (see :ref:`Output formats`). Otherwise it returns the received exception.:
 
 .. code-block:: text
@@ -600,7 +658,7 @@ will be passed to the server.
 
 It displays any instances returned in the defined formats or any exception
 returned.  It can display any returned instances in the
-:term:`CIM object output formats` or the table formats
+:term:`CIM object output format` or :term:`Table output format`
 (see :ref:`Output formats`).
 
 See :ref:`pywbemcli instance query --help` for details.
@@ -629,8 +687,8 @@ Qualifier get command
 The ``qualifier get`` command gets a single qualifier declaration defined by the ``QUALIFIERNAME``
 argument from the namespace in the target WBEM server defined with this
 command  or the default namespace and display in the defined output format.
-The output formats can be either one of the :term:`CIM object output formats`
-or the table formats` (see :ref:`Output formats`).
+The output formats can be either one of the :term:`CIM object output format`
+or :term:`Table output format` (see :ref:`Output formats`).
 
 The following example gets the ``Key`` qualifier declaration from the
 default namespace:
@@ -653,7 +711,7 @@ Qualifier enumerate command
 The ``qualifier enumerate`` command  enumerates all qualifier declarations within the namespace
 defined with this command or the default namespace in the target WBEM
 server . The output formats can be either one  of the
-:term:`CIM object output formats` or the table formats`
+:term:`CIM object output format` or :term:`Table output format`
 (see :ref:`Output formats`).
 
 This example displays all of the qualifier declarations in the default
