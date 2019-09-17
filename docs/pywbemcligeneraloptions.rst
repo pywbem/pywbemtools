@@ -288,8 +288,8 @@ If this option is not specified, the default namespace will be ``root/cimv2``.
 The default namespace will be used if the ``--namespace``/``-n`` command
 option is not used on a command.
 
-Note that the ``class find`` command searches in all namespaces, if its
-``--namespace``/``-n`` command option is not used.
+Some commands execute against multiple or all namespaces, for example the
+the ``class find`` command.
 
 
 .. _`--user general option`:
@@ -392,9 +392,8 @@ predefined timeout (normally 30 seconds) if this option is not defined.
 --verify general option
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The pair of ``--verify`` and ``--no-verify`` general options are a boolean
-option that controls whether or not the client verifies any certificates
-received from the WBEM server.
+The pair of ``--verify`` and ``--no-verify`` general options control whether or
+not the client verifies any certificates received from the WBEM server.
 
 By default or if ``--verify`` is specified, any certificates returned by the
 server are verified. If ``--no-verify`` is specified, any certificates returned
@@ -614,11 +613,9 @@ PYWBEMCLI_LOG                   ``--log``
 
 If these environment variables are set, the corresponding general options
 default to the value of the environment variables.
-
 If both an environment variable and its corresponding general option are
 set, the command line option overrides the environment variable with no
 warning.
-
 Environment variables are not provided for command options or command arguments.
 
 In the following example, the pywbemcli command uses server
@@ -1041,6 +1038,9 @@ responses to stderr:
 .. code-block:: text
 
     $ pywbemcli --log api=file:summary,http=stderr
+
+The simplest log configuration string to enable logging is ``all=stderr`` or
+``all=file``.
 
 The ``COMPONENT`` field defines the component for which logging is enabled:
 
