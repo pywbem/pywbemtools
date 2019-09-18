@@ -745,19 +745,16 @@ See :ref:`pywbemcli qualifier enumerate --help` for details.
 Server command group
 --------------------
 
-The **server** command group defines commands that interact with a WBEM
-server to access information about the WBEM server itself. These commands
-are generally not namespace specific but access information about the server,
-namespaces, etc. The commands are:
-
-This group consists of the following commands:
+The ``server`` command group has commands that interact with the WBEM
+server of the :term:`current connection` to access information about the
+WBEM server itself:
 
 * :ref:`Server brand command` - Get the brand of the server.
 * :ref:`Server connection command` - Get connection info used by this server.
-* :ref:`Server info command` - Get information about the server.
 * :ref:`Server get-centralinsts command` - List central instances of mgmt profiles on the server.
+* :ref:`Server info command` - Get information about the server.
 * :ref:`Server interop command` - Get the Interop namespace of the server.
-* :ref:`Server namespaces command` - Get the Interop namespace of the server.
+* :ref:`Server namespaces command` - List the namespaces of the server.
 * :ref:`Server profiles command` - List management profiles advertized by the server.
 
 
@@ -766,11 +763,17 @@ This group consists of the following commands:
 Server brand command
 ^^^^^^^^^^^^^^^^^^^^
 
-The ``server brand`` command gets general information on the server.  Brand information is an
-attempt by pywbem and pywbemtools to determine the product that represents
-the WBEM server infrastructure.  Since that was not clearly defined in the DMTF
-specifications, this command may return strange results but it returns
-legitimate results for most servers:
+The ``server brand`` command gets the brand of the WBEM server of the
+:term:`current connection`.
+
+The brand is intended to identify the product that represents the WBEM server
+infrastructure. Since that was not clearly defined in the DMTF
+specifications, this command may return strange results for some servers, but
+it returns legitimate results for the most commonly used servers.
+
+The brand is displayed using :term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -790,9 +793,12 @@ See :ref:`pywbemcli server brand --help` for details.
 Server connection command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server connection command`` displays information on the connection defined for this
-server.  This is same information as was defined when the connection was
-saved with :ref:`connection save command` or the cli general options:
+The ``server connection`` command displays information on the
+:term:`current connection`.
+
+Note that the :ref:`connection show command` also displays such information.
+
+Example:
 
 .. code-block:: text
 
@@ -812,9 +818,15 @@ See :ref:`pywbemcli server connection --help` for details.
 Server info command
 ^^^^^^^^^^^^^^^^^^^
 
-The server info command gets general information on the server.  This command returns
-information on the brand, namespaces, and other reasonable information on the
-WBEM server:
+The ``server info`` command gets general information on the WBEM server of the
+:term:`current connection`.
+
+This includes the brand, version, namespaces, and other reasonable information
+on the WBEM server.
+
+The result is displayed using :term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -851,7 +863,12 @@ See :ref:`pywbemcli server info --help` for details.
 Server interop command
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server interop`` command get a the name of the interop namespace target WBEM server:
+The ``server interop`` command gets the name of the Interop namespace of the
+WBEM server of the :term:`current connection`.
+
+The result is displayed using :term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -871,7 +888,12 @@ See :ref:`pywbemcli server interop --help` for details.
 Server namespaces command
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server namespaces`` command gets a list of the namespaces defined in the target server:
+The ``server namespaces`` command lists the namespaces of the WBEM server of
+the :term:`current connection`.
+
+The result is displayed using :term:`Table output formats`.
+
+Example:
 
 .. code-block:: text
 
@@ -898,19 +920,18 @@ See :ref:`pywbemcli server namespaces --help` for details.
 Server profiles command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server profiles`` command gets information on the WBEM management profiles
-(see :term:`WBEM management profile`)
-defined in the target WBEM server. WBEM management profiles are the mechanism WBEM
-uses to provide the user a programmatic connection to defined management
-functionality with the implementation of that functionality in a WBEM server
-(see :term:`DSP1001` and :term:`DSP1033`).
+The ``server profiles`` command lists the
+:term:`management profiles <management profile>` advertised by the
+WBEM server of the :term:`current connection`.
 
-This request returns the organization, registered name, and version of each
-profile definition returned from the server and the options can be used to
-filter the returned profiles by Organization and registered name.
+The returned management profiles are displayed with organization, name, and
+version using the :term:`Table output formats`.
 
-The following example shows the CIM profiles in
-an example WBEM server:
+The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
+used to filter the returned management profiles by organization and name,
+respectively.
+
+Example:
 
 .. code-block:: text
 
@@ -947,13 +968,22 @@ See :ref:`pywbemcli server profiles --help` for details.
 Server get-centralinsts command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server get-centralinsts`` command gets the instance names of the central/scoping
-instances of one or more :term:`WBEM management profile` s defined in the
-target WBEM server:
+The ``server get-centralinsts`` command gets the :term:`central instances`
+of the :term:`management profiles <management profile>` advertised by the
+WBEM server of the :term:`current connection`.
+
+The command displays the instance paths of the central instances by profile,
+using the :term:`Table output formats`.
+
+The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
+used to filter the result by organization and name of the management profiles,
+respectively.
+
+Example:
 
 .. code-block:: text
 
-    $ pywbemcli server centralinsts --org DMTF --profile "Computer System"
+    $ pywbemcli server get-centralinsts --organization DMTF --profile "Computer System"
     Advertised Central Instances:
     +---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
     | Profile                         | Central Instances                                                                                                                                                                                                                       |
