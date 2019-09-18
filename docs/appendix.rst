@@ -21,16 +21,16 @@ This documentation uses a few special terms to refer to Python types:
       The name of the protocol used in :term:`DSP0200` that pywbemcli uses to
       communicate with WBEM servers.
 
-   CIM object output format
-      A pywbemcli output format (specified with the
-      :ref:`--output-format general option`) that formats the resulting CIM
+   CIM object output formats
+      Pywbemcli output formats (specified with the
+      :ref:`--output-format general option`) that format the resulting CIM
       objects or CIM object paths as MOF, CIM-XML, or using the pywbem repr or
       str formatting.
       See :ref:`CIM object formats` for details.
 
-   Table output format
-      A pywbemcli output format (specified with the
-      :ref:`--output-format general option`) that formats the result as a table.
+   Table output formats
+      Pywbemcli output formats (specified with the
+      :ref:`--output-format general option`) that format the result as a table.
       See :ref:`Table formats` for details.
 
    Tree output format
@@ -95,14 +95,26 @@ This documentation uses a few special terms to refer to Python types:
       information on the MOF format.
 
    WBEM management profile
-      The DMTF and SNIA define specific profiles of manageability that are
-      published as specifications in the DMTF and within the SMI-S specification
-      in SNIA. A management profile defines the manageability characteristics
-      of a specific set of services in terms of the CIM model and WBEM operations.
-      These profiles are documented by name and version and are incorporated into
-      compliant WBEM servers so that they can be discovered by WBEM clients to
-      determine the management capabilities of the WBEM server.
-      See :ref:`Profile advertisement methodologies`
+   management profile
+      WBEM management profiles define specific management functionality
+      in terms of the CIM model and WBEM operations. The DMTF publishes
+      management profiles in several areas and the SNIA within the SMI-S
+      specification.
+
+      Management profiles are identified by organization, name and version.
+      WBEM servers advertise the management profiles that are implemented by
+      the server so that they can be discovered by WBEM clients to determine
+      the management capabilities of the WBEM server. This includes providing
+      the clients a programmatic access to the :term:`central instances` of the
+      management profile.
+      For details, see :ref:`Profile advertisement methodologies`.
+
+   central instances
+      The CIM instances that act as an algorithmic focal point for accessing
+      the management functionality provided by the implementation of a
+      :term:`management profile` on a WBEM server.
+      The central instances typically represent the central managed resource
+      in the management domain that is addressed by the management profile.
 
    WBEM URI
       WBEM URI is a standardized text form for CIM object paths and is
@@ -187,8 +199,8 @@ This section briefly explains the profile advertisement methodologies defined
 by DMTF. A full description can be found in :term:`DSP1033`.
 
 These methodologies describe how a client can discover the central instances
-of a management profile. Discovering the central instances through a management
-profile is the recommended approach for clients, over simply enumerating a CIM
+of a management profile. Discovering the :term:`central instances` through a
+:term:`management profile` is the recommended approach for clients, over simply enumerating a CIM
 class of choice. The reason is that this approach enables clients to work
 seamlessly with different server implementations, even when they have
 implemented a different set of management profiles.
