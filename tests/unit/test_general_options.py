@@ -34,7 +34,7 @@ BAD_MOF_FILE_PATH = os.path.join(SCRIPT_DIR, 'mof_with_error.mof')
 BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
 
 
-GLOBAL_HELP = """
+GENERAL_HELP = """
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
   Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML
@@ -186,7 +186,7 @@ SKIP = False
 
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation. This test processor includes an
     #          additional key, `subcmd`
@@ -196,18 +196,27 @@ TEST_CASES = [
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify -help.',
-     {'global': ['--help'],
-      'subcmd': 'class',
+    ['Verify -help response.',
+     {'general': ['--help'],
+      'cmdgrp': 'class',
       'args': ['get', 'blah']},
-     {'stdout': GLOBAL_HELP,
+     {'stdout': GENERAL_HELP,
+      'rc': 0,
+      'test': 'linesnows'},
+     None, OK],
+
+    ['Verify -h response.',
+     {'general': ['--help'],
+      'cmdgrp': 'class',
+      'args': ['get', 'blah']},
+     {'stdout': GENERAL_HELP,
       'rc': 0,
       'test': 'linesnows'},
      None, OK],
 
     ['Verify invalid server definition.',
-     {'global': ['-s', 'httpx://blah'],
-      'subcmd': 'class',
+     {'general': ['-s', 'httpx://blah'],
+      'cmdgrp': 'class',
       'args': ['get', 'blah']},
      {'stderr': ['Error: Invalid scheme on server argument. httpx://blah Use '
                  '"http" or "https"'],
@@ -216,8 +225,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify invalid server port definition fails.',
-     {'global': ['-s', 'http://blah:abcd'],
-      'subcmd': 'class',
+     {'general': ['-s', 'http://blah:abcd'],
+      'cmdgrp': 'class',
       'args': ['get', 'blah']},
      {'stderr': ['Error:', 'ConnectionError', 'Socket error'],
       'rc': 1,
@@ -225,8 +234,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify valid --use-pull option parameter yes.',
-     {'global': ['-s', 'http://blah', '--use-pull', 'yes'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--use-pull', 'yes'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['use-pull: True'],
       'rc': 0,
@@ -234,8 +243,8 @@ TEST_CASES = [
      None, SKIP],
 
     ['Verify valid --use-pull option parameter no.',
-     {'global': ['-s', 'http://blah', '--use-pull', 'no'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--use-pull', 'no'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['use-pull: False'],
       'rc': 0,
@@ -243,8 +252,8 @@ TEST_CASES = [
      None, SKIP],
 
     ['Verify valid --use-pull option parameter.',
-     {'global': ['-s', 'http://blah', '--use-pull', 'either'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--use-pull', 'either'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['use-pull: None'],
       'rc': 0,
@@ -252,8 +261,8 @@ TEST_CASES = [
      None, SKIP],
 
     ['Verify invalid --use-pull option parameter fails.',
-     {'global': ['-s', 'http://blah', '--use-pull', 'blah'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--use-pull', 'blah'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Invalid value for "-U" / "--use-pull": invalid choice: '
                  'blah. (choose from yes, no, either)'],
@@ -262,8 +271,8 @@ TEST_CASES = [
      None, SKIP],
 
     ['Verify valid --pull-max-cnt option parameter.',
-     {'global': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['pull-max-cnt: 2000'],
       'rc': 0,
@@ -271,8 +280,8 @@ TEST_CASES = [
      None, SKIP],
 
     ['Verify invalid --pull-max-cnt option parameter fails.',
-     {'global': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
-      'subcmd': 'connection',
+     {'general': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Error: Invalid value for "--pull-max-cnt": blah is not a '
                  'valid integer'],
@@ -280,9 +289,9 @@ TEST_CASES = [
       'test': 'in'},
      None, SKIP],
 
-    ['Verify --version global option.',
-     {'global': ['-s', 'http://blah', '--version'],
-      'subcmd': 'connection',
+    ['Verify --version general option.',
+     {'general': ['-s', 'http://blah', '--version'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': [r'^pywbemcli, version [0-9]+\.[0-9]+\.[0-9]+',
                  r'^pywbem, version [0-9]+\.[0-9]+\.[0-9]+'],
@@ -294,35 +303,35 @@ TEST_CASES = [
     #  Test --verify and --no-verify general option using the connection show
     #
     ['Verify --verify general option.',
-     {'global': ['--server', 'http://blah', '--verify'],
+     {'general': ['--server', 'http://blah', '--verify'],
       'args': ['show'],
-      'subcmd': 'connection'},
+      'cmdgrp': 'connection'},
      {'stdout': "verify: True",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'None'}},
      None, OK],
 
     ['Verify --no-verify general option.',
-     {'global': ['--server', 'http://blah', '--no-verify'],
+     {'general': ['--server', 'http://blah', '--no-verify'],
       'args': ['show'],
-      'subcmd': 'connection'},
+      'cmdgrp': 'connection'},
      {'stdout': "verify: False",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'None'}},
      None, OK],
 
     ['Verify --verify general options  Default value.',
-     {'global': ['--server', 'http://blah'],
+     {'general': ['--server', 'http://blah'],
       'args': ['show'],
-      'subcmd': 'connection'},
+      'cmdgrp': 'connection'},
      {'stdout': "verify: True",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'None'}},
      None, OK],
 
     ['Verify --mock option one file',
-     {'global': ['-m', SIMPLE_MOCK_FILE_PATH],
-      'subcmd': 'connection',
+     {'general': ['-m', SIMPLE_MOCK_FILE_PATH],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['name: not-saved',
                  'server: None',
@@ -334,9 +343,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, multiple files',
-     {'global': ['-m', SIMPLE_MOCK_FILE_PATH,
-                 '-m', PYTHON_MOCK_FILE_PATH],
-      'subcmd': 'connection',
+     {'general': ['-m', SIMPLE_MOCK_FILE_PATH,
+                  '-m', PYTHON_MOCK_FILE_PATH],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': ['name', 'default',
                  'server', 'None',
@@ -349,8 +358,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file does not exist',
-     {'global': ['--mock-server', 'invalidfilename.mof'],
-      'subcmd': 'connection',
+     {'general': ['--mock-server', 'invalidfilename.mof'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File:',
                  r'invalidfilename\.mof',
@@ -361,8 +370,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file with bad extension',
-     {'global': ['--mock-server', 'invalidfilename.mofx'],
-      'subcmd': 'connection',
+     {'general': ['--mock-server', 'invalidfilename.mofx'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': [r'Error: --mock-server: File: ',
                  r'invalidfilename\.mofx',
@@ -374,8 +383,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file with mof containing syntax error',
-     {'global': ['-m', BAD_MOF_FILE_PATH],
-      'subcmd': 'class',
+     {'general': ['-m', BAD_MOF_FILE_PATH],
+      'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stderr': ['badtypedef InstanceID;',
                  'Repository build exception MOFParseError',
@@ -385,8 +394,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option, file with python containing syntax error',
-     {'global': ['-m', BAD_PY_FILE_PATH],
-      'subcmd': 'class',
+     {'general': ['-m', BAD_PY_FILE_PATH],
+      'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stderr': [r'Traceback \(most recent call last\)',
                  r'pywbemtools', r'_pywbemcli_operations\.py',
@@ -398,8 +407,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --name option with new name but not in repo fails',
-     {'global': ['-n', 'fred'],
-      'subcmd': 'connection',
+     {'general': ['-n', 'fred'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': 'Error: Named connection "fred" does not exist',
       'rc': 1,
@@ -407,8 +416,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --name option with new name but not in repo fails',
-     {'global': ['--name', 'fred'],
-      'subcmd': 'connection',
+     {'general': ['--name', 'fred'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': 'Error: Named connection "fred" does not exist',
       'rc': 1,
@@ -416,9 +425,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify simultaneous --mock-server and --server options fail',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                 '--server', 'http://localhost'],
-      'subcmd': 'connection',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--server', 'http://localhost'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Conflicting server definitions. Do not use --server '
                  'and --mock-server simultaneously',
@@ -428,8 +437,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server invalid name',
-     {'global': ['--mock-server', 'fred'],
-      'subcmd': 'connection',
+     {'general': ['--mock-server', 'fred'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['--mock-server: File:',
                  'fred',
@@ -440,8 +449,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock option one file and name fails',
-     {'global': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
-      'subcmd': 'connection',
+     {'general': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
+      'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['The --name "MyConnName" option',
                  'server', 'option',
@@ -451,8 +460,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --timestats',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
-      'subcmd': 'class',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
+      'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stdout': ['class CIM_Foo {',
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -462,8 +471,8 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --timestats -T',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-T'],
-      'subcmd': 'class',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-T'],
+      'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stdout': ['class CIM_Foo {',
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -472,12 +481,11 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-
     ['Verify uses pull Operation  with option either',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                 '--timestats',
-                 '--use-pull', 'either'],
-      'subcmd': 'instance',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--timestats',
+                  '--use-pull', 'either'],
+      'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -487,10 +495,10 @@ TEST_CASES = [
      None, OK],
 
     ['Verify uses pull Operation with option yes',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                 '--timestats',
-                 '--use-pull', 'yes'],
-      'subcmd': 'instance',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--timestats',
+                  '--use-pull', 'yes'],
+      'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -500,10 +508,10 @@ TEST_CASES = [
      None, OK],
 
     ['Verify uses pull Operation with option no',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                 '--timestats',
-                 '--use-pull', 'no'],
-      'subcmd': 'instance',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--timestats',
+                  '--use-pull', 'no'],
+      'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stdout': ['instance of CIM_Foo {',
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -512,18 +520,15 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
     ['Verify --mock-server and -server not allowed',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                 '--server', 'http://blah'],
-      'subcmd': 'instance',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--server', 'http://blah'],
+      'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
      {'stderr': ['Conflicting server definitions. '],
       'rc': 1,
       'test': 'regex'},
      None, OK],
-
-
 
     #
     #   The following is a new sequence but depends on the repo being empty
@@ -532,24 +537,23 @@ TEST_CASES = [
     #
 
     ['Verify Create a connection for test.',
-     {'global': ['--server', 'http://blah',
-                 '--timeout', '45',
-                 '--default-namespace', 'root/blah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--no-verify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem'],
+     {'general': ['--server', 'http://blah',
+                  '--timeout', '45',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'john',
+                  '--password', 'pw',
+                  '--no-verify',
+                  '--certfile', 'mycertfile.pem',
+                  '--keyfile', 'mykeyfile.pem'],
       'args': ['save', 'generaltest1'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
 
-
     ['Verify --name and other options fails',
-     {'global': ['--name', 'generaltest1', '--timeout', '90'],
-      'subcmd': 'connection',
+     {'general': ['--name', 'generaltest1', '--timeout', '90'],
+      'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
      {'stderr': ['timeout 90', 'invalid when'],
       'rc': 1,
@@ -557,7 +561,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection gets deleted.',
-     {'subcmd': 'connection',
+     {'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
      {'stdout': '',
       'rc': 0,
@@ -565,7 +569,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection already deleted.',
-     {'subcmd': 'connection',
+     {'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
      {'stderr': ['Connection repository', 'empty'],
       'rc': 1,
@@ -574,7 +578,7 @@ TEST_CASES = [
 
     ['Verify connection without server definition and command that '
      ' requires connection fails.',
-     {'subcmd': 'class',
+     {'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stderr': ['No server defined for command that requires server. ',
                  'Define a server with "--server", "--mock-server", or ',
@@ -586,9 +590,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --keyfile allowed only if --certfile exists.',
-     {'subcmd': 'class',
+     {'cmdgrp': 'class',
       'args': ['enumerate'],
-      'global': ['--keyfile', 'mykey.pem']},
+      'general': ['--keyfile', 'mykey.pem']},
      {'stderr': ['The --keyfile option',
                  'is allowed only if the --certfile option is also used'],
       'rc': 1,
@@ -600,64 +604,62 @@ TEST_CASES = [
     #
 
     ['Verify Create a connection to test default connection.',
-     {'global': ['--server', 'http://blah'],
+     {'general': ['--server', 'http://blah'],
       'args': ['save', 'test-default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': '',
       'test': 'innows'},
      None, OK],
 
     ['Verify select of test-default.',
      {'args': ['select', 'test-default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
     ['Verify shows test-default connection.',
      {'args': ['show', 'test-default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['test-default'],
       'test': 'innows'},
      None, OK],
 
     ['Verify select of test-default connection.',
      {'args': ['select', 'test-default', '--default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
     ['Verify show current which is test-default',
      {'args': ['show'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['test-default'],
       'test': 'innows'},
      None, OK],
 
-
     ['Delete test-default.',
      {'args': ['delete', 'test-default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
 
     ['Verify delete worked by requesting again expecting failure.',
      {'args': ['delete', 'test-default'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stderr': ['Connection repository', 'empty'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
-
 
     #
     # Test using environment variables as input
     #
     ['Verify setting one env var for input.',
      {'env': {'PYWBEMCLI_SERVER': 'http://blah'},
-      'subcmd': 'connection',
+      'cmdgrp': 'connection',
       'args': 'show'},
      {'stdout': ['name', 'default',
                  'server', 'http://blah',
@@ -685,7 +687,7 @@ TEST_CASES = [
               'PYWBEMCLI_USE_PULL': 'no',
               'PYWBEMCLI_PULL_MAX_CNT': '10',
               'PYWBEMCLI_LOG': 'api=all', },
-      'subcmd': 'connection',
+      'cmdgrp': 'connection',
       'args': 'show'},
      {'stdout': ['name', 'default',
                  'server', 'http://blah',
@@ -711,8 +713,8 @@ TEST_CASES = [
               'PYWBEMCLI_USE_PULL': 'no',
               'PYWBEMCLI_PULL_MAX_CNT': '10',
               'PYWBEMCLI_LOG': 'api=all', },
-      'subcmd': 'connection',
-      'global': ['--server', 'http://blah'],
+      'cmdgrp': 'connection',
+      'general': ['--server', 'http://blah'],
       'args': 'show'},
      {'stdout': ['server', 'http://blah',
                  'default-namespace', 'fred/fred',
@@ -731,13 +733,13 @@ TEST_CASES = [
     #
 
     ['Verify multiple commands in interacive mode.',
-     {'global': ['--server', 'http://blah', ],
+     {'general': ['--server', 'http://blah', ],
       # args not allowed in interactive mode
       'stdin': ['--certfile cert1.pem --keyfile keys1.pem connection show',
                 'connection show',
                 '--certfile cert2.pem --keyfile keys2.pem connection show',
                 'connection show'],             # should show None
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['certfile: None',              # at startup and other times
                  'certfile: cert1.pem',         # after first change
                  'certfile: cert2.pem',         # after second change
@@ -748,14 +750,14 @@ TEST_CASES = [
      None, OK],
 
     ['Verify Change --mock-server to --server in interactive mode.',
-     {'global': ['--mock-server', SIMPLE_MOCK_FILE_PATH, ],
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, ],
       # args not allowed in interactive mode
       'stdin': ['connection show',
                 '--server  http://blah connection show',
                 '--mock-server tests/unit/simple_mock_model.mof '
                 'connection show',
                 'connection show'],
-      'subcmd': None,
+      'cmdgrp': None,
       },
      {'stdout': ['server : None',
                  'server: http://blah',
@@ -769,24 +771,23 @@ TEST_CASES = [
     #   The following is a sequence
     #
     ['Verify Create a connection for test of mods through general opts.',
-     {'global': ['--server', 'http://blah',
-                 '--timeout', '45',
-                 '--default-namespace', 'root/fred',
-                 '--user', 'RonaldMcDonald',
-                 '--password', 'pw',
-                 '--no-verify',
-                 '--certfile', 'certfile.pem',
-                 '--keyfile', 'keyfile.pem'],
+     {'general': ['--server', 'http://blah',
+                  '--timeout', '45',
+                  '--default-namespace', 'root/fred',
+                  '--user', 'RonaldMcDonald',
+                  '--password', 'pw',
+                  '--no-verify',
+                  '--certfile', 'certfile.pem',
+                  '--keyfile', 'keyfile.pem'],
       'args': ['save', 'testGeneralOpsMods'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
 
-
     ['Verify show current which is testGeneralOpsMods',
      {'args': ['show', 'testGeneralOpsMods'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': ['testGeneralOpsMods',
                  'server', 'http://blah',
                  'default-namespace', 'root/fred',
@@ -799,14 +800,13 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-
     ['Verify Change all server parameters and show.',
-     {'global': ['--name', 'testGeneralOpsMods'],
+     {'general': ['--name', 'testGeneralOpsMods'],
       # args not allowed in interactive mode
       'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
                 '--default-namespace root/john --password  abcd '
                 ' --verify --certfile c1.pem --keyfile k1.pem connection show'],
-      'subcmd': None,
+      'cmdgrp': None,
       },
      {'stdout': ['testGeneralOpsMods',
                  'server : http://blahblah',
@@ -823,14 +823,14 @@ TEST_CASES = [
      None, OK],
 
     ['Change all parameters and save as t1.',
-     {'global': ['--name', 'testGeneralOpsMods'],
+     {'general': ['--name', 'testGeneralOpsMods'],
       # args not allowed in interactive mode
       'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
                 '--default-namespace root/john --password  abcd '
                 ' --verify --certfile c1.pem --keyfile k1.pem connection '
                 'save t1',
                 'connection list'],
-      'subcmd': None,
+      'cmdgrp': None,
       },
      {'stdout': [''],
       'rc': 0,
@@ -838,9 +838,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify  load t1 and changed parameters are correct',
-     {'global': ['--name', 't1'],
+     {'general': ['--name', 't1'],
       'args': 'show',
-      'subcmd': 'connection'},
+      'cmdgrp': 'connection'},
      {'stdout': ['t1',
                  'server : http://blahblah',
                  'default-namespace', 'root/john',
@@ -855,17 +855,16 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-
     ['Delete testGeneralOpsMods.',
      {'args': ['delete', 'testGeneralOpsMods'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
 
     ['Delete testGeneralOpsMods.',
      {'args': ['delete', 't1'],
-      'subcmd': 'connection', },
+      'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
@@ -875,9 +874,9 @@ TEST_CASES = [
 # TODO add test for pull operations with pull ops max size variations
 
 
-class TestGlobalOptions(CLITestsBase):
+class TestGeneralOptions(CLITestsBase):
     """
-    Test the global options including statistics,  --server,
+    Test the general options including statistics,  --server,
     --timeout, --use-pull, --pull-max-cnt, --output-format
     """
     @pytest.mark.parametrize(
@@ -887,7 +886,7 @@ class TestGlobalOptions(CLITestsBase):
         """
         Execute pybemcli with the defined input and test output.
         """
-        subcmd = inputs['subcmd'] if inputs['subcmd'] else ''
+        cmd_grp = inputs['cmdgrp'] or ''
 
-        self.subcmd_test(desc, subcmd, inputs, exp_response,
-                         mock, condition, verbose=False)
+        self.command_test(desc, cmd_grp, inputs, exp_response,
+                          mock, condition, verbose=False)

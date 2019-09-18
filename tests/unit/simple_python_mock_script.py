@@ -1,5 +1,5 @@
 """
-    Test script to be loaded with pywbemcli --mock-server global option to test
+    Test script to be loaded with pywbemcli --mock-server general option to test
     capability to execute python code as part of startup.
     This script loads a single class into the repository.
     This script includes  asserts to confirm that the class is loaded into

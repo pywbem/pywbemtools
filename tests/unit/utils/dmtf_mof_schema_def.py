@@ -19,7 +19,7 @@ To change the schema used:
 2. Delete the TESTSUITE_SCHEMA_DIR directory.
    This eliminates the old schema.
 
-3. Execute the test tests/unit/test_server_subcmd.py. This should cause the
+3. Execute the test tests/unit/test_server_cmd.py. This should cause the
    new schema to be downloaded and expanded as part of the test.
 
 5. Add the new DMTF CIM schema zip file to git so that it is persisted for

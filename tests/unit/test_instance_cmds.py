@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests the class subcommand
+Tests the commands in the server command group.
 """
 from __future__ import absolute_import, print_function
 
@@ -298,52 +298,52 @@ FAIL = False  # Any test currently FAILING or not tested yet
 
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
-    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
+    #          and 'stdin'. See See CLITestsBase.command_test()  for
     #          detailed documentation
     # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
     #                test definition (test: <testname>).
-    #                See CLITestsBase.subcmd_test() for detailed documentation.
+    #                See CLITestsBase.command_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
     #
     #   instance --help
     #
-    ['Verify instance subcommand --help response',
+    ['Verify instance command --help response',
      '--help',
      {'stdout': INSTANCE_HELP_LINES,
       'test': 'insnows'},
      None, OK],
 
-    ['Verify instance subcommand -h response',
+    ['Verify instance command -h response',
      '-h',
      {'stdout': INSTANCE_HELP_LINES,
       'test': 'insnows'},
      None, OK],
 
     #
-    #  Instance Enumerate subcommand good responses
+    #  Instance Enumerate command good responses
     #
-    ['Verify instance subcommand enumerate --help response',
+    ['Verify instance command enumerate --help response',
      ['enumerate', '--help'],
      {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand enumerate -h response',
+    ['Verify instance command enumerate -h response',
      ['enumerate', '-h'],
      {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo',
+    ['Verify instance command enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo --no',
+    ['Verify instance command enumerate names CIM_Foo --no',
      ['enumerate', 'CIM_Foo', '--no'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
@@ -351,13 +351,13 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo --no -s',
+    ['Verify instance command enumerate names CIM_Foo --no -s',
      ['enumerate', 'CIM_Foo', '--no', '--summary'],
      {'stdout': ['3 CIMInstanceName(s) returned'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate names CIM_Foo --no --namespace',
+    ['Verify instance command enumerate names CIM_Foo --no --namespace',
      ['enumerate', 'CIM_Foo', '--no', '--namespace', 'root/cimv2'],
      {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
@@ -365,25 +365,25 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo --include-qualifiers',
+    ['Verify instance command enumerate CIM_Foo --include-qualifiers',
      ['enumerate', 'CIM_Foo', '--include-qualifiers'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo include-qualifiers and '
+    ['Verify instance command enumerate CIM_Foo include-qualifiers and '
      ' --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
+    ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
      '--pull-max-cnt=2',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(pull_inst_result_tuple\(context='
                  'None, eos=True,',
                  r'PullInstancesWithPath\(MaxObjectCount=2',
@@ -391,11 +391,11 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate CIM_Foo with --use-pull yes and '
+    ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
      '--pull-max-cnt=2 and --namesonly',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(pull_path_result_tuple\(context='
                  'None, eos=True,',
                  r'PullInstancePaths\(MaxObjectCount=2',
@@ -403,30 +403,30 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo --di',
+    ['Verify instance command enumerate deep-inheritance CIM_Foo --di',
      ['enumerate', 'CIM_Foo', '--di'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate deep-inheritance CIM_Foo '
+    ['Verify instance command enumerate deep-inheritance CIM_Foo '
      '--deep-inheritance',
      ['enumerate', 'CIM_Foo', '--deep-inheritance'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate deep-inheritance CIM_Foo '
+    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo '
      '--di',
      {'args': ['enumerate', 'CIM_Foo', '--di'],
-      'global': ['--output-format', 'grid']},
+      'general': ['--output-format', 'grid']},
      {'stdout': ENUM_INSTANCE_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate di CIM_Foo --di -o',
+    ['Verify instance command -o grid enumerate di CIM_Foo --di -o',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
-      'global': ['--output-format', 'grid']},
+      'general': ['--output-format', 'grid']},
      {'stdout': """InstanceNames: CIM_Foo
 +--------+-------------+---------+-----------------------+
 | host   | namespace   | class   | keysbindings          |
@@ -441,9 +441,9 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate di CIM_Foo --di --no',
+    ['Verify instance command -o grid enumerate di CIM_Foo --di --no',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
-      'global': ['--output-format', 'txt']},
+      'general': ['--output-format', 'txt']},
      {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
                  'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"'],
@@ -451,9 +451,9 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand -o grid enumerate di CIM_Foo -d -o',
+    ['Verify instance command -o grid enumerate di CIM_Foo -d -o',
      {'args': ['enumerate', 'CIM_Foo'],
-      'global': ['--output-format', 'txt']},
+      'general': ['--output-format', 'txt']},
      {'stdout': ["CIMInstance(classname='CIM_Foo', "
                  "path=CIMInstanceName(classname='CIM_Foo', "
                  "keybindings=NocaseDict({'InstanceID': 'CIM_Foo1'}), "
@@ -469,10 +469,10 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid enumerate di alltypes, datetime',
+    ['Verify instance command -o grid enumerate di alltypes, datetime',
      {'args': ['enumerate', 'Pywbem_Alltypes', '--di',
                '--propertylist', 'scalDateTime', '--pl', 'scalTimeDelta'],
-      'global': ['--output-format', 'grid']},
+      'general': ['--output-format', 'grid']},
      {'stdout': ["""Instances: PyWBEM_AllTypes
 +-----------------------------+
 | scalDateTime                |
@@ -485,15 +485,15 @@ TEST_CASES = [
 
     # TODO: modify this to output log and test for info in return and log
 
-    ['Verify instance subcommand enumerate with query.',
+    ['Verify instance command enumerate with query.',
      ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate with query, traditional ops fails',
+    ['Verify instance command enumerate with query, traditional ops fails',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stderr': ["ValueError",
                  "EnumerateInstances does not support FilterQuery"],
       'rc': 1,
@@ -501,9 +501,9 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify subcommand enumerate with CIM_Foo inst name table output',
+    ['Verify command enumerate with CIM_Foo inst name table output',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
-      'global': ['--output-format', 'table']},
+      'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
 +--------+-------------+---------+-----------------------+
 | host   | namespace   | class   | keysbindings          |
@@ -518,9 +518,9 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify subcommand enumerate with CIM_Foo summary table output',
+    ['Verify command enumerate with CIM_Foo summary table output',
      {'args': ['enumerate', 'CIM_Foo', '--summary'],
-      'global': ['--output-format', 'table']},
+      'general': ['--output-format', 'table']},
      {'stdout': """Summary of CIMInstance returned
 +---------+-------------+
 |   Count | CIM Type    |
@@ -533,12 +533,12 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # TODO the following uses deep-inheritance because of issue in pywbem_mock
-    ['Verify subcommand enumerate with PyWBEM_AllTypes table with scalar '
+    ['Verify command enumerate with PyWBEM_AllTypes table with scalar '
      'properties returns instance with all property types',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,scalbool,scaluint32,scalsint32'],
-      'global': ['--output-format', 'grid']},
+      'general': ['--output-format', 'grid']},
      {'stdout': """
 Instances: PyWBEM_AllTypes
 +-----------------+------------+--------------+--------------+
@@ -551,12 +551,12 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify subcommand enumerate with PyWBEM_AllTypes with array properties '
+    ['Verify command enumerate with PyWBEM_AllTypes with array properties '
      'returns instance with all property types',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,arraybool,arrayuint32,arraysint32'],
-      'global': ['--output-format', 'grid']},
+      'general': ['--output-format', 'grid']},
      {'stdout': """
 Instances: PyWBEM_AllTypes
 +-----------------+-------------+---------------+---------------+
@@ -573,14 +573,14 @@ Instances: PyWBEM_AllTypes
     #
     # instance enumerate error returns
     #
-    ['Verify instance subcommand enumerate error, invalid classname fails',
+    ['Verify instance command enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
      {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate error, no classname fails',
+    ['Verify instance command enumerate error, no classname fails',
      ['enumerate'],
      {'stderr':
       ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
@@ -588,7 +588,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate error, invalid namespace',
+    ['Verify instance command enumerate error, invalid namespace',
      ['enumerate', 'CIM_Foo', '--namespace', 'root/blah'],
      {'stderr':
       ["CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not exist in "
@@ -597,7 +597,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate fails invalid query language',
+    ['Verify instance command enumerate fails invalid query language',
      ['enumerate', 'CIM_Foo', '--filter-query-language', 'blah',
       '--filter-query', 'InstanceID = 3'],
      {'stderr': ['CIMError', '14', 'CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED'],
@@ -605,9 +605,9 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand enumerate fails using traditional op',
+    ['Verify instance command enumerate fails using traditional op',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stderr':
       ['ValueError', 'EnumerateInstances does not support FilterQuery'],
       'rc': 1,
@@ -615,24 +615,24 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     #
-    #  instance get subcommand
+    #  instance get command
     #
 
-    ['Verify instance subcommand get --help response',
+    ['Verify instance command get --help response',
      ['get', '--help'],
      {'stdout': INSTANCE_GET_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand get -h response',
+    ['Verify instance command get -h response',
      ['get', '-h'],
      {'stdout': INSTANCE_GET_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand get with instancename returns data',
+    ['Verify instance command get with instancename returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
@@ -643,7 +643,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename, namespace returns data',
+    ['Verify instance command get with instancename, namespace returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
@@ -654,7 +654,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename local_only returns data',
+    ['Verify instance command get with instancename local_only returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
@@ -665,7 +665,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --local-only returns '
+    ['Verify instance command get with instancename --local-only returns '
      ' data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--local-only'],
      {'stdout': ['instance of CIM_Foo {',
@@ -677,7 +677,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --include-qualifiers '
+    ['Verify instance command get with instancename --include-qualifiers '
      'returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
      {'stdout': ['instance of CIM_Foo {',
@@ -689,10 +689,10 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename --include-qualifiers '
+    ['Verify instance command get with instancename --include-qualifiers '
      'and general --use-pull returns data',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--iq'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stdout': ['instance of CIM_Foo {',
                  '   InstanceID = "CIM_Foo1";',
                  '   IntegerProp = 1;',
@@ -702,7 +702,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename prop list -p returns '
+    ['Verify instance command get with instancename prop list -p returns '
      ' one property',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID'],
      {'stdout': ['instance of CIM_Foo {',
@@ -713,7 +713,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename prop list '
+    ['Verify instance command get with instancename prop list '
      '--propertylist returns property',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--propertylist', 'InstanceID'],
      {'stdout': ['instance of CIM_Foo {',
@@ -724,7 +724,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename prop list -p  '
+    ['Verify instance command get with instancename prop list -p  '
      ' InstanceID,IntegerProp returns 2 properties',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID,IntegerProp'],
      {'stdout': ['instance of CIM_Foo {',
@@ -736,7 +736,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename prop list -p '
+    ['Verify instance command get with instancename prop list -p '
      ' multiple instances of option returns 2 properties',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID',
       '--pl', 'IntegerProp'],
@@ -749,7 +749,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename empty  prop list '
+    ['Verify instance command get with instancename empty  prop list '
      'returns  empty instance',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', '""'],
      {'stdout': ['instance of CIM_Foo {',
@@ -759,7 +759,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with instancename PyWBEM_AllTypes'
+    ['Verify instance command get with instancename PyWBEM_AllTypes'
      ' returns instance with all property types',
      ['get', 'PyWBEM_AllTypes.InstanceID="test_instance"'],
      {'stdout': GET_INSTANCE_ALL_TYPES,
@@ -767,14 +767,14 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand -o grid get CIM_Foo',
+    ['Verify instance command -o grid get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
-      'global': ['-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ENUM_INSTANCE_GET_TABLE_RESP,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with interactive option',
+    ['Verify instance command get with interactive option',
      ['get', 'TST_Person', '-i'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
@@ -783,7 +783,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand get with interactive option',
+    ['Verify instance command get with interactive option',
      ['get', 'TST_Person', '--interactive'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
@@ -793,9 +793,9 @@ Instances: PyWBEM_AllTypes
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     #
-    #  get subcommand errors
+    #  get command errors
     #
-    ['instance subcommand get error. no classname',
+    ['instance command get error. no classname',
      ['get'],
      {'stderr':
       ['Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME', ],
@@ -803,7 +803,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['instance subcommand get error. invalid namespace',
+    ['instance command get error. invalid namespace',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/invalidnamespace'],
      {'stderr':
@@ -813,7 +813,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand get with none existentinstancename',
+    ['Verify instance command get with none existentinstancename',
      ['get', 'CIM_Foo.InstanceID="CIM_NOTEXIST"'],
      {'stderr': ["Error: CIMError: 6 (CIM_ERR_NOT_FOUND): Instance not found "
                  "in repository namespace 'root/cimv2'. Path=CIMInstanceName("
@@ -824,30 +824,30 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     #
-    #  instance create subcommand
+    #  instance create command
     #
-    ['Verify instance subcommand create --help response',
+    ['Verify instance command create --help response',
      ['create', '--help'],
      {'stdout': INSTANCE_CREATE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand create -h response',
+    ['Verify instance command create -h response',
      ['create', '-h'],
      {'stdout': INSTANCE_CREATE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo one property',
+    ['Verify instance command create, new instance of CIM_Foo one property',
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah'],
      {'stdout': 'root/cimv2:CIM_Foo.InstanceID="blah"',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo one '
+    ['Verify instance command create, new instance of CIM_Foo one '
      'property and verify yes',
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
@@ -858,7 +858,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in '},
      [SIMPLE_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo one '
+    ['Verify instance command create, new instance of CIM_Foo one '
      'property and verify no',
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
@@ -870,7 +870,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in '},
      [SIMPLE_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
 
-    ['Verify instance subcommand create, new instance of CIM_Foo, '
+    ['Verify instance command create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '-n', 'root/cimv2'],
      {'stdout': "",
@@ -888,7 +888,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      None, FAIL],
 
-    ['Verify instance subcommand create, new instance of all_types '
+    ['Verify instance command create, new instance of all_types '
      'with scalar types',
      ['create', 'PyWBEM_AllTypes',
       '-p', 'InstanceID=BunchOfValues',
@@ -904,7 +904,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance of all_types '
+    ['Verify instance command create, new instance of all_types '
      "with array values",
      ['create', 'PyWBEM_AllTypes',
       '-p', 'InstanceID=blah',
@@ -920,7 +920,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance Error in Property Type'
+    ['Verify instance command create, new instance Error in Property Type'
      " with array values",
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=blah',
       '-p', 'arrayBool=8,9',
@@ -937,7 +937,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance already exists',
+    ['Verify instance command create, new instance already exists',
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance'],
      {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
                  'namespace "root/cimv2" in WEB server: FakedWBEMConnection'],
@@ -945,7 +945,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand create, new instance invalid ns',
+    ['Verify instance command create, new instance invalid ns',
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance', '-n',
       'blah'],
      {'stderr': ["Error: Exception 3", "CIM_ERR_INVALID_NAMESPACE"],
@@ -954,7 +954,7 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand create, new instance invalid class',
+    ['Verify instance command create, new instance invalid class',
      ['create', 'CIM_blah', '-p', 'InstanceID=test_instance'],
      {'stderr': ["Error:", "CIMClass"],
       'rc': 1,
@@ -965,23 +965,23 @@ Instances: PyWBEM_AllTypes
     # We have not repeated a bunch of those in for the CreateInstance
 
     #
-    #  instance modify subcommand
+    #  instance modify command
     #
-    ['Verify instance subcommand modify --help response',
+    ['Verify instance command modify --help response',
      ['modify', '--help'],
      {'stdout': INSTANCE_MODIFY_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand modify -h response',
+    ['Verify instance command modify -h response',
      ['modify', '-h'],
      {'stdout': INSTANCE_MODIFY_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand modify, single good change',
+    ['Verify instance command modify, single good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False'],
      {'stdout': "",
@@ -989,7 +989,7 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single good change with verify yes',
+    ['Verify instance command modify, single good change with verify yes',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False', '--verify'],
      {'stdout': ['instance of PyWBEM_AllTypes {',
@@ -1000,7 +1000,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
 
-    ['Verify instance subcommand modify, single good change with verify no',
+    ['Verify instance command modify, single good change with verify no',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False', '--verify'],
      {'stdout': ['instance of PyWBEM_AllTypes {',
@@ -1012,7 +1012,7 @@ Instances: PyWBEM_AllTypes
      [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
 
 
-    ['Verify instance subcommand modify, single good change, explicit ns',
+    ['Verify instance command modify, single good change, explicit ns',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
       'root/cimv2', '-p', 'scalBool=False'],
      {'stdout': "",
@@ -1020,7 +1020,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single good change, explicit ns',
+    ['Verify instance command modify, single good change, explicit ns',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '--namespace',
       'root/cimv2', '--property', 'scalBool=False'],
      {'stdout': "",
@@ -1028,7 +1028,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, multiple good change',
+    ['Verify instance command modify, multiple good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False',
       '-p', 'arrayBool=true,false,true',
@@ -1043,7 +1043,7 @@ Instances: PyWBEM_AllTypes
     #
     # Instance modify errors
     #
-    ['Verify instance subcommand modify, invalid class',
+    ['Verify instance command modify, invalid class',
      ['modify', 'PyWBEM_AllTypesxxx.InstanceID="test_instance"',
       '-p', 'scalBool=9'],
      {'stderr': ["CIMClass:", "PyWBEM_AllTypesxxx",
@@ -1053,7 +1053,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single property, Type Error bool',
+    ['Verify instance command modify, single property, Type Error bool',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=9'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
@@ -1063,7 +1063,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single property, Fail modifies key',
+    ['Verify instance command modify, single property, Fail modifies key',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'InstanceID=9'],
      {'stderr': 'Error: Server Error modifying instance. Exception: CIMError:'
@@ -1073,7 +1073,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single property, Type Error uint32. '
+    ['Verify instance command modify, single property, Type Error uint32. '
      'Uses regex because Exception msg different between python 2 and 3',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalUint32=Fred'],
@@ -1084,7 +1084,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, single Property arrayness error',
+    ['Verify instance command modify, single Property arrayness error',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False,True'],
      {'stderr': "Error: Type mismatch property 'scalBool' between expected "
@@ -1094,7 +1094,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, Error value types mismatch with array',
+    ['Verify instance command modify, Error value types mismatch with array',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'arrayBool=9,8'],
      {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
@@ -1104,7 +1104,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, Error different value types',
+    ['Verify instance command modify, Error different value types',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'arrayBool=true,8'],
      {'stderr': "Error: Type mismatch property 'arrayBool' between expected "
@@ -1114,7 +1114,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, Error integer out of range',
+    ['Verify instance command modify, Error integer out of range',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'arrayUint32=99999999999999999999999'],
      {'stderr': "Error: Type mismatch property 'arrayUint32' between expected "
@@ -1126,7 +1126,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance subcommand modify, Error property not in class',
+    ['Verify instance command modify, Error property not in class',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'blah=9'],
      {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes".',
@@ -1137,44 +1137,44 @@ Instances: PyWBEM_AllTypes
     # TODO additional modify error tests required
 
     #
-    #  instance delete subcommand
+    #  instance delete command
     #
-    ['Verify instance subcommand delete --help response',
+    ['Verify instance command delete --help response',
      ['delete', '--help'],
      {'stdout': INSTANCE_DELETE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand delete -h response',
+    ['Verify instance command delete -h response',
      ['delete', '-h'],
      {'stdout': INSTANCE_DELETE_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand delete, valid delete',
+    ['Verify instance command delete, valid delete',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"'],
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete, valid delete, explicit ns',
+    ['Verify instance command delete, valid delete, explicit ns',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '-n', 'root/cimv2'],
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete, valid delete, explicit ns',
+    ['Verify instance command delete, valid delete, explicit ns',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete with interactive option',
+    ['Verify instance command delete with interactive option',
      ['delete', 'TST_Person', '-i'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
@@ -1182,7 +1182,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand delete with interactive option',
+    ['Verify instance command delete with interactive option',
      ['delete', 'TST_Person', '--interactive'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
@@ -1191,9 +1191,9 @@ Instances: PyWBEM_AllTypes
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     #
-    # Delete subcommand error tests
+    # Delete command error tests
     #
-    ['Verify instance subcommand delete, missing instance name',
+    ['Verify instance command delete, missing instance name',
      ['delete'],
      {'stderr':
       ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME', ],
@@ -1201,7 +1201,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete, instance name invalid',
+    ['Verify instance command delete, instance name invalid',
      ['delete', "blah"],
      {'stderr':
       ['Invalid wbem uri', ],
@@ -1209,7 +1209,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete, instance name not in repo',
+    ['Verify instance command delete, instance name not in repo',
      ['delete', 'CIM_Foo.InstanceID="xxxxx"', '--namespace', 'root/cimv2'],
      {'stderr':
       ["CIMError", "6", "CIM_ERR_NOT_FOUND"],
@@ -1217,7 +1217,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand delete, namespace not in repo',
+    ['Verify instance command delete, namespace not in repo',
      ['delete', 'CIM_Foo.InstanceID=1', '--namespace', 'Argh'],
      {'stderr':
       ["CIMError", "3", "CIM_ERR_INVALID_NAMESPACE"],
@@ -1226,37 +1226,37 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     #
-    #  instance references subcommand
+    #  instance references command
     #
-    ['Verify instance subcommand references --help response',
+    ['Verify instance command references --help response',
      ['references', '--help'],
      {'stdout': INSTANCE_REFERENCES_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand references -h response',
+    ['Verify instance command references -h response',
      ['references', '-h'],
      {'stdout': INSTANCE_REFERENCES_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand references, returns instances',
+    ['Verify instance command references, returns instances',
      ['references', 'TST_Person.name="Mike"'],
      {'stdout': REF_INSTS,
       'rc': 0,
       'test': 'lineswons'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references, returns instances, explicit ns',
+    ['Verify instance command references, returns instances, explicit ns',
      ['references', 'TST_Person.name="Mike"', '-n', 'root/cimv2'],
      {'stdout': REF_INSTS,
       'rc': 0,
       'test': 'lineswons'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references --no, returns paths',
+    ['Verify instance command references --no, returns paths',
      ['references', 'TST_Person.name="Mike"', '--no'],
      {'stdout': ['"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
                  '=\"root/cimv2:TST_Person.name=\\"Mike\\""',
@@ -1267,7 +1267,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references --no, returns paths with result '
+    ['Verify instance command references --no, returns paths with result '
      'class valid returns paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
@@ -1277,11 +1277,11 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references CIM_Foo with --use-pull yes '
+    ['Verify instance command references CIM_Foo with --use-pull yes '
      'and --pull-max-cnt=1',
      {'args': ['references', 'TST_Person.name="Mike"'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
                  r'OpenReferenceInstances\(pull_inst_result_tuple\('
                  'context=',
@@ -1290,11 +1290,11 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand reference paths CIM_Foo with --use-pull '
+    ['Verify instance command reference paths CIM_Foo with --use-pull '
      'yes and --pull-max-cnt=1 and --names-only',
      {'args': ['references', 'TST_Person.name="Mike"', '--names-only'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
                  r'OpenReferenceInstancePaths\(pull_path_result_tuple\('
                  'context=',
@@ -1303,7 +1303,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance command references -o, returns paths with result '
      'class valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
@@ -1313,7 +1313,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance command references -o, returns paths with result '
      'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--rc', 'TST_Lineage'],
@@ -1323,7 +1323,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references --no, returns paths with result '
+    ['Verify instance command references --no, returns paths with result '
      'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '--no', '--summary',
       '--rc', 'TST_Lineage'],
@@ -1333,11 +1333,11 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand references --no, returns paths with result '
+    ['Verify instance command references --no, returns paths with result '
      'class short form valid returns paths',
      {'args': ['references', 'TST_Person.name="Mike"', '--no', '--summary',
                '--rc', 'TST_Lineage'],
-      'global': ['--output-format', 'table']},
+      'general': ['--output-format', 'table']},
      {'stdout': ["""Summary of CIMInstanceName returned
 +---------+-----------------+
 |   Count | CIM Type        |
@@ -1349,7 +1349,7 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references -s, returns paths with result '
+    ['Verify instance command references -s, returns paths with result '
      'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '-s',
       '--rc', 'TST_Lineage'],
@@ -1358,22 +1358,22 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references --include-qualifiers',
+    ['Verify instance command references --include-qualifiers',
      ['references', 'TST_Person.name="Mike"', '--include-qualifiers'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references include-qualifiers and '
+    ['Verify instance command references include-qualifiers and '
      ' --use-pull no',
      {'args': ['references', 'TST_Person.name="Mike"', '--include-qualifiers'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
 
-    ['Verify instance subcommand references -o, returns paths with result '
+    ['Verify instance command references -o, returns paths with result '
      'class not a real ref returns no paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineagex'],
@@ -1382,7 +1382,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references, no instance name',
+    ['Verify instance command references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
                  'INSTANCENAME', ],
@@ -1390,14 +1390,14 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references, invalid instance name',
+    ['Verify instance command references, invalid instance name',
      ['references', 'TST_Blah.blah="abc"'],
      {'stdout': "",
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references with interactive option -i',
+    ['Verify instance command references with interactive option -i',
      ['references', 'TST_Person', '-i'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
@@ -1407,7 +1407,7 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand references with interactive option '
+    ['Verify instance command references with interactive option '
      '--interactive',
      ['references', 'TST_Person', '--interactive'],
      {'stdout':
@@ -1418,17 +1418,17 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand references with query.',
+    ['Verify instance command references with query.',
      ['references', 'TST_Person.name="Mike"', '--filter-query',
       'InstanceID = 3'],
      {'stdout': REF_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand references with query, traditional ops fails',
+    ['Verify instance command references with query, traditional ops fails',
      {'args': ['references', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stderr': ["ValueError:",
                  "References does not support FilterQuery"],
       'rc': 1,
@@ -1438,38 +1438,38 @@ Instances: PyWBEM_AllTypes
     # TODO add more invalid references tests
 
     #
-    #  instance associators subcommand
+    #  instance associators command
     #
-    ['Verify instance subcommand associators --help response',
+    ['Verify instance command associators --help response',
      ['associators', '--help'],
      {'stdout': INSTANCE_ASSOCIATORS_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand associators -h response',
+    ['Verify instance command associators -h response',
      ['associators', '-h'],
      {'stdout': INSTANCE_ASSOCIATORS_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand associators, returns instances',
+    ['Verify instance command associators, returns instances',
      ['associators', 'TST_Person.name="Mike"'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators, --include-qualifiers',
+    ['Verify instance command associators, --include-qualifiers',
      ['associators', 'TST_Person.name="Mike"', '--include-qualifiers'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators, --include-qualifiers wo pull',
-     {'global': ['--use-pull', 'no'],
+    ['Verify instance command associators, --include-qualifiers wo pull',
+     {'general': ['--use-pull', 'no'],
       'args': ['associators', 'TST_Person.name="Mike"',
                '--include-qualifiers']},
      {'stdout': ASSOC_INSTS,
@@ -1477,7 +1477,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators -o, returns data',
+    ['Verify instance command associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '--no'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'
                  '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
@@ -1486,11 +1486,11 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators CIM_Foo with --use-pull yes '
+    ['Verify instance command associators CIM_Foo with --use-pull yes '
      'and --pull-max-cnt=1',
      {'args': ['associators', 'TST_Person.name="Mike"'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancesWithPath\(MaxObjectCount=1',
                  r'OpenAssociatorInstances\(pull_inst_result_tuple\('
                  'context=',
@@ -1498,11 +1498,11 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associator paths CIM_Foo with --use-pull '
+    ['Verify instance command associator paths CIM_Foo with --use-pull '
      'yes and --pull-max-cnt=1 and --names-only',
      {'args': ['associators', 'TST_Person.name="Mike"', '--names-only'],
-      'global': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
-                 'all=stderr']},
+      'general': ['--use-pull', 'yes', '--pull-max-cnt', '1', '--log',
+                  'all=stderr']},
      {'stderr': [r'PullInstancePaths\(MaxObjectCount=1',
                  r'OpenAssociatorInstancePaths\(pull_path_result_tuple\('
                  'context=',
@@ -1512,7 +1512,7 @@ Instances: PyWBEM_AllTypes
 
     # Invalid associators tests
 
-    ['Verify instance subcommand associators, no instance name',
+    ['Verify instance command associators, no instance name',
      ['associators'],
      {'stderr': ['Usage: pywbemcli instance associators [COMMAND-OPTIONS] '
                  'INSTANCENAME', ],
@@ -1520,14 +1520,14 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators, invalid instance name',
+    ['Verify instance command associators, invalid instance name',
      ['associators', 'TST_Blah.blah="abc"'],
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators with interactive option -i',
+    ['Verify instance command associators with interactive option -i',
      ['associators', 'TST_Person', '-i'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
@@ -1537,17 +1537,17 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance subcommand associators with query.',
+    ['Verify instance command associators with query.',
      ['associators', 'TST_Person.name="Mike"', '--filter-query',
       'InstanceID = 3'],
      {'stdout': ASSOC_INSTS,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance subcommand associators with query, traditional ops',
+    ['Verify instance command associators with query, traditional ops',
      {'args': ['associators', 'TST_Person.name="Mike"', '--filter-query',
                'InstanceID = 3'],
-      'global': ['--use-pull', 'no']},
+      'general': ['--use-pull', 'no']},
      {'stderr': ["ValueError:",
                  "Associators does not support FilterQuery"],
       'rc': 1,
@@ -1557,23 +1557,23 @@ Instances: PyWBEM_AllTypes
     # TODO add more associators error tests
 
     #
-    #  instance count subcommand
+    #  instance count command
     #
-    ['Verify instance subcommand count --help response',
+    ['Verify instance command count --help response',
      ['count', '--help'],
      {'stdout': INSTANCE_COUNT_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand count -h response',
+    ['Verify instance command count -h response',
      ['count', '-h'],
      {'stdout': INSTANCE_COUNT_HELP_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand count, Return table of instances',
+    ['Verify instance command count, Return table of instances',
      ['count', 'CIM_*'],
      {'stdout': ['Count of instances per class',
                  '+---------+---------+',
@@ -1585,7 +1585,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance subcommand count sorted, Return table of instances',
+    ['Verify instance command count sorted, Return table of instances',
      ['count', 'CIM_*', '--sort'],
      {'stdout': ['Count of instances per class',
                  '+-----------------+---------+',
@@ -1599,7 +1599,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE_EXT, OK],
 
-    ['Verify instance subcommand count. Return table of instances',
+    ['Verify instance command count. Return table of instances',
      ['count', 'CIM_*'],
      {'stdout': ['Count of instances per class',
                  '+-----------------+---------+',
@@ -1619,26 +1619,26 @@ Instances: PyWBEM_AllTypes
     #  instance invokemethod tests
     #
 
-    ['class subcommand invokemethod --help',
+    ['class command invokemethod --help',
      ['invokemethod', '--help'],
      {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['class subcommand invokemethod -h',
+    ['class command invokemethod -h',
      ['invokemethod', '-h'],
      {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance subcommand invokemethod, returnvalue = 0',
+    ['Verify instance command invokemethod, returnvalue = 0',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy'],
      {'stdout': ['ReturnValue=0'],
       'rc': 0,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-    ['Verify instance subcommand invokemethod with multiple scalar params',
+    ['Verify instance command invokemethod with multiple scalar params',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy',
       '-p', 'TestInOutParameter="blah"',
       '-p', 'TestRef=CIM_Foo.InstanceID="CIM_Foo1"'],
@@ -1650,7 +1650,7 @@ Instances: PyWBEM_AllTypes
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
 
-    ['Verify instance subcommand invokemethod with all_types method',
+    ['Verify instance command invokemethod with all_types method',
      ['invokemethod', 'Pywbem_alltypes.InstanceID="test_instance"',
       'AllTypesMethod',
       '-p', 'scalBool=true',
@@ -1672,7 +1672,7 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
 
-    ['Verify instance subcommand invokemethod fails Invalid Class',
+    ['Verify instance command invokemethod fails Invalid Class',
      ['invokemethod', ':CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter="blah"'],
      {'stderr': ["Error: CIMError: 6"],
@@ -1680,7 +1680,7 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-    ['Verify instance subcommand invokemethod fails Method not registered',
+    ['Verify instance command invokemethod fails Method not registered',
      ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter=blah'],
      {'stderr': ["Error: CIMError: 17"],
@@ -1694,23 +1694,23 @@ Instances: PyWBEM_AllTypes
 
 
     #
-    #  instance query subcommand. We have not implemented this command
+    #  instance query command. We have not implemented this command
     #
-    ['Verify instance subcommand query --help response',
+    ['Verify instance command query --help response',
      ['query', '--help'],
      {'stdout': INSTANCE_QUERY_HELP_LINES,
       'rc': 0,
       'test': 'linnows'},
      None, OK],
 
-    ['Verify instance subcommand query -h response',
+    ['Verify instance command query -h response',
      ['query', '-h'],
      {'stdout': INSTANCE_QUERY_HELP_LINES,
       'rc': 0,
       'test': 'linnows'},
      None, OK],
 
-    ['Verify instance subcommand query execution. Returns error becasue '
+    ['Verify instance command query execution. Returns error becasue '
      'mock does not support query',
      ['query', 'Select blah from blah'],
      {'stderr': ['Error: CIMError: 14 (CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): ',
@@ -1723,9 +1723,9 @@ Instances: PyWBEM_AllTypes
 
 class TestSubcmd(CLITestsBase):
     """
-    Test all of the class subcommand variations.
+    Test all of the class command variations.
     """
-    subcmd = 'instance'
+    command_group = 'instance'
     # mock_mof_file = 'simple_mock_model.mof'
 
     @pytest.mark.parametrize(
@@ -1735,5 +1735,5 @@ class TestSubcmd(CLITestsBase):
         """
         Execute pybemcli with the defined input and test output.
         """
-        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition, verbose=False)
+        self.command_test(desc, self.command_group, inputs, exp_response,
+                          mock, condition, verbose=False)

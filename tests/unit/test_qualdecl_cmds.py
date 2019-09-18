@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests the qualifier grop of  subcommands
+Tests the commands in thequalifier command group
 """
 import os
 import pytest
@@ -156,73 +156,73 @@ FAIL = False   # flag any tests that fail
 
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
-    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
+    #          and 'stdin'. See See CLITestsBase.command_test()  for
     #          detailed documentation
     # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
     #                test definition (test: <testname>).
-    #                See CLITestsBase.subcmd_test() for detailed documentation.
+    #                See CLITestsBase.command_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify qualifier subcommand --help response',
+    ['Verify qualifier command --help response',
      '--help',
      {'stdout': QD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand -h response',
+    ['Verify qualifier command -h response',
      '-h',
      {'stdout': QD_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand enumerate --help response',
+    ['Verify qualifier command enumerate --help response',
      ['enumerate', '--help'],
      {'stdout': QD_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand enumerate -h response.',
+    ['Verify qualifier command enumerate -h response.',
      ['enumerate', '-h'],
      {'stdout': QD_ENUMERATE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand get --help response.',
+    ['Verify qualifier command get --help response.',
      ['get', '--help'],
      {'stdout': QD_GET_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand get -h response.',
+    ['Verify qualifier command get -h response.',
      ['get', '-h'],
      {'stdout': QD_GET_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify qualifier subcommand enumerate returns qual decls.',
+    ['Verify qualifier command enumerate returns qual decls.',
      ['enumerate'],
      {'stdout': QD_ENUM_MOCK,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand enumerate with namespace returns qual decls.',
+    ['Verify qualifier command enumerate with namespace returns qual decls.',
      ['enumerate', '--namespace', 'root/cimv2'],
      {'stdout': QD_ENUM_MOCK,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand enumerate summary returns qual decls.',
+    ['Verify qualifier command enumerate summary returns qual decls.',
      ['enumerate', '--summary'],
      {'stdout': ['9', 'CIMQualifierDeclaration'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify qualifier subcommand enumerate summary returns qual decls table',
+    ['Verify qualifier command enumerate summary returns qual decls table',
      {'args': ['enumerate', '--summary'],
-      'global': ['--output-format', 'table']},
+      'general': ['--output-format', 'table']},
      {'stdout': ["""Summary of CIMQualifierDeclaration returned
 +---------+-------------------------+
 |   Count | CIM Type                |
@@ -233,54 +233,54 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand get  Description',
+    ['Verify qualifier command get  Description',
      ['get', 'Description'],
      {'stdout': QD_GET_MOCK,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand get invalid qual decl name .',
+    ['Verify qualifier command get invalid qual decl name .',
      ['get', 'NoSuchQualDecl'],
      {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand get  Description outputformat xml',
+    ['Verify qualifier command get  Description outputformat xml',
      {'args': ['get', 'Description'],
-      'global': ['--output-format', 'xml']},
+      'general': ['--output-format', 'xml']},
      {'stdout': QD_GET_MOCK_XML,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand -o grid enumerate produces table out',
+    ['Verify qualifier command -o grid enumerate produces table out',
      {'args': ['enumerate'],
-      'global': ['-o', 'grid']},
+      'general': ['-o', 'grid']},
      {'stdout': QD_TBL_OUT,
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify qualifier subcommand -o grid get Abstract table out',
+    ['Verify qualifier command -o grid get Abstract table out',
      {'args': ['get', 'abstract'],
-      'global': ['-o', 'grid']},
+      'general': ['-o', 'grid']},
      {'stdout': QD_TBL_GET_OUT,
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand enumerate invalid namespace Fails',
+    ['Verify qualifier command enumerate invalid namespace Fails',
      ['enumerate', '--namespace', 'root/blah'],
      {'stderr': ["Error: CIMError: 3", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand --timestats gets stats output. Cannot test'
+    ['Verify qualifier command --timestats gets stats output. Cannot test'
      'with lines because execution time is variable.',
      {'args': ['get', 'IN'],
-      'global': ['--timestats']},
+      'general': ['--timestats']},
      {'stdout': ['Qualifier In : boolean = true,',
                  'Scope(parameter),',
                  'Count    Exc    Time    ReqLen    ReplyLen  Operation',
@@ -290,9 +290,9 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier subcommand -o repr get Description produces repr out',
+    ['Verify qualifier command -o repr get Description produces repr out',
      {'args': ['get', 'Description'],
-      'global': ['-o', 'repr']},
+      'general': ['-o', 'repr']},
      {'stdout': "CIMQualifierDeclaration(name='Description', value=None, "
                 "type='string', is_array=False, array_size=None, "
                 "scopes=NocaseDict({'CLASS': False, 'ASSOCIATION': False, "
@@ -306,23 +306,23 @@ TEST_CASES = [
 ]
 
 
-class TestSubcmdQualifiers(CLITestsBase):
+class TestcmdQualifiers(CLITestsBase):
     """
-    Test all of the qualifiers subcommand variations.
+    Test all of the qualifiers command variations.
     """
-    subcmd = 'qualifier'
+    command_group = 'qualifier'
 
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition", TEST_CASES)
     def test_qualdecl(self, desc, inputs, exp_response, mock, condition):
         """
-        Common test method for those subcommands and options in the
-        class subcmd that can be tested.  This includes:
+        Common test method for those commands and options in the
+        qualifier command group that can be tested.  This includes:
 
           * Subcommands like help that do not require access to a server
 
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+        self.command_test(desc, self.command_group, inputs, exp_response,
+                          mock, condition)
