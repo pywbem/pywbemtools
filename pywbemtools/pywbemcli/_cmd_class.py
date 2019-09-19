@@ -135,10 +135,11 @@ def class_delete(context, classname, **options):
     option was specified, in which case the instances are also deleted.
 
     WARNING: Deleting classes can cause damage to the server: It can impact
-    instance providers and other components in the server. Use this with
+    instance providers and other components in the server. Use this
     command with caution.
 
-    Some servers may reject the command altogether.
+    Many WBEM servers may not allow this operation or may severely limit the
+    conditions under which a class can be deleted from the server.
 
     Example:
 
@@ -249,7 +250,7 @@ def class_references(context, classname, **options):
     List the classes referencing a class.
 
     List the CIM (association) classes that reference the specified class
-    (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+    (CLASSNAME argument) in the specified CIM namespace
     (--namespace option). If no namespace was specified, the default namespace
     of the connection is used.
 
@@ -301,7 +302,7 @@ def class_associators(context, classname, **options):
     List the classes associated with a class.
 
     List the CIM classes that are associated with the specified class
-    (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
+    (CLASSNAME argument) in the specified CIM namespace
     (--namespace option). If no namespace was specified, the default namespace
     of the connection is used.
 
