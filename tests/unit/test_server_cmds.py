@@ -332,17 +332,18 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify server command get-centralinsts, ',
+    ['Verify server command get-centralinsts based on wbem server mock.',
      {'args': ['get-centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
       'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',
-                 r'Profile +Central Instances',
+                 'Profile',
+                 'Central Instance paths',
                  'SNIA:Server:1.1.0',
                  'SNIA:Server:1.2.0',
-                 'interop:XXX_StorageComputerSystem'],
+                 'interop:MCK_StorageComputerSystem'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
 

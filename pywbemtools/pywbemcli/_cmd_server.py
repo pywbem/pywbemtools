@@ -375,7 +375,7 @@ def cmd_server_centralinsts(context, options):
                     scoping_class=options['scoping_class'],
                     scoping_path=options['scoping_path'],
                     reference_direction=options['reference_direction'])
-                row.append(":".join([str(p) for p in ci]))
+                row.append("\n".join([str(p) for p in ci]))
             # mark current inst as failed and continue
             except Exception as ex:  # pylint: disable=broad-except
                 click.echo('Exception: %s %s' % (row, ex))
@@ -384,7 +384,7 @@ def cmd_server_centralinsts(context, options):
 
         # sort by org
         rows.sort(key=lambda x: (x[0]))
-        headers = ['Profile', 'Central Instances']
+        headers = ['Profile', 'Central Instance paths']
 
         click.echo(format_table(rows,
                                 headers,

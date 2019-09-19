@@ -9,12 +9,19 @@ from __future__ import print_function, absolute_import
 
 import os
 
-from pywbem import ValueMapping, CIMInstance, CIMInstanceName
+from pywbem import ValueMapping, CIMInstance, CIMInstanceName, Error, \
+    CIM_ERR_ALREADY_EXISTS
 from pywbem_mock import FakedWBEMConnection
 
 # from .dmtf_mof_schema_def import DMTF_TEST_SCHEMA_VER
 
 DMTF_TEST_SCHEMA_VER = (2, 49, 0)
+
+# test that GLOBALS exist. They should be provided by pywbemcli
+assert "CONN" in globals()
+assert 'SERVER' in globals()
+assert 'VERBOSE'in globals()
+
 
 # Location of DMTF schema directory used by all tests.
 # This directory is permanent and should not be removed.
@@ -59,9 +66,9 @@ DEFAULT_WBEM_SERVER_MOCK_DICT = {
                     'CIM_ElementConformsToProfile',
                     'CIM_ReferencedProfile',
                     'CIM_ComputerSystem'],
-    'class-mof': ["class XXX_StorageComputerSystem : CIM_ComputerSystem{};", ],
-    'system_name': 'Mock_Test_WBEMServerTest',
-    'object_manager': {'Name': 'MyFakeObjectManager',
+    'class-mof': ["class MCK_StorageComputerSystem : CIM_ComputerSystem{};", ],
+    'system_name': 'Mock_WBEMServerTest',
+    'object_manager': {'Name': 'FakeObjectManager',
                        'ElementName': 'Pegasus',
                        'Description': 'Pegasus CIM Server Version 2.15.0'
                                       ' Released', },
@@ -88,19 +95,19 @@ DEFAULT_WBEM_SERVER_MOCK_DICT = {
     # CIMInstanceName
     'element_conforms_to_profile': [
         (('SNIA', 'Server', '1.2.0'),
-         ("XXX_StorageComputerSystem", {'Name': "10.1.2.3",
+         ("MCK_StorageComputerSystem", {'Name': "10.1.2.3",
                                         'CreationClassName':
-                                            "XXX_StorageComputerSystem"})), ],
+                                            "MCK_StorageComputerSystem"})), ],
     # List of CIMInstances. Each entry is a CIM instance with classname,
     # and properties. All properties required to build the path must be
     # defined. No other properties are required for this test.
     # TODO: We may expand this for more scoping tests.
     'central-instances': [
         CIMInstance(
-            'XXX_StorageComputerSystem',
+            'MCK_StorageComputerSystem',
             properties={
                 'Name': "10.1.2.3",
-                'CreationClassName': "XXX_StorageComputerSystem",
+                'CreationClassName': "MCK_StorageComputerSystem",
                 'NameFormat': "IP"}),
     ],
     'scoping-instances': []
@@ -124,7 +131,7 @@ class WbemServerMock(object):
     tests
     """
 
-    def __init__(self, interop_ns=None, server_mock_data=None):
+    def __init__(self, interop_ns=None, server_mock_data=None, verbose=None):
         """
         Build the class repository for with the classes defined for
         the WBEMSERVER.  This is built either from a dictionary of data
@@ -132,6 +139,7 @@ class WbemServerMock(object):
         DEFAULT_WBEM_SERVER_MOCK_DICT or if server_mock_data is None from
         the DEFAULT_WBEM_SERVER_MOCK_DICT dictionary.
         """
+        self.verbose = verbose
         if server_mock_data is None:
             self.server_mock_data = DEFAULT_WBEM_SERVER_MOCK_DICT
         else:
@@ -159,6 +167,7 @@ class WbemServerMock(object):
         self.conn = CONN  # pylint: disable=undefined-variable
         global SERVER  # pylint: disable=global-variable-not-assigned
         self.wbem_server = SERVER  # pylint: disable=undefined-variable
+
         self.build_mock()
 
     def __str__(self):
@@ -184,10 +193,10 @@ class WbemServerMock(object):
              getattr(self, 'wbem_server', None), self.registered_profiles)
         return ret_str
 
-    def build_class_repo(self, default_namespace):
+    def build_classes(self, namespace):
         """
-        Build the schema qualifier and class objects in the repository
-        from a DMTF schema.
+        Build the schema qualifier declarations, and the class objects in the
+        repository from a DMTF schema.
         This requires only that the leaf objects be defined in a mof
         include file since the compiler finds the files for qualifiers
         and dependent classes.
@@ -199,22 +208,30 @@ class WbemServerMock(object):
 
         FakedWBEMConnection._reset_logging_config()
 
-        # self.conn.add_namespace(self.interop_ns)
+        # Note: During tests, not needed.  When you run direct from
+        # pywbemcli it fails
+        try:
+            self.conn.add_namespace(namespace)
+        except Error as er:
+            if er.status_code != CIM_ERR_ALREADY_EXISTS:
+                raise
 
         self.conn.compile_dmtf_schema(
             self.dmtf_schema_ver, self.schema_dir,
-            class_names=self.server_mock_data['class_names'], verbose=False)
+            class_names=self.server_mock_data['class_names'],
+            namespace=namespace,
+            verbose=self.verbose)
 
         for filename in self.pg_schema_files:
             filepath = os.path.join(self.pg_schema_dir, filename)
-            self.conn.compile_mof_file(filepath, namespace=default_namespace,
+            self.conn.compile_mof_file(filepath, namespace=namespace,
                                        search_paths=[self.pg_schema_dir],
-                                       verbose=False)
+                                       verbose=self.verbose)
 
         # compile the mof defined in the 'class-mof definitions
         for mof in self.server_mock_data['class-mof']:
-            self.conn.compile_mof_string(mof, namespace=default_namespace,
-                                         verbose=False)
+            self.conn.compile_mof_string(mof, namespace=namespace,
+                                         verbose=self.verbose)
 
     def inst_from_classname(self, class_name, namespace=None,
                             property_list=None,
@@ -245,7 +262,7 @@ class WbemServerMock(object):
         """
         Build a CIMObjectManager instance for the mock wbem server using
         fixed data defined in this method and data from the init parameter
-        mock data.
+        mock data. Build into interop namespace always
         """
         omdict = {"SystemCreationClassName": "CIM_ComputerSystem",
                   "CreationClassName": "CIM_ObjectManager",
@@ -271,8 +288,9 @@ class WbemServerMock(object):
 
     def build_cimnamespace_insts(self, namespaces=None):
         """
-        Build instances of CIM_Namespace defined by test_namespaces list. These
-        instances are built into the interop namespace
+        Build instances of CIM_Namespace defined by namespaces list parameter.
+        These instances are built into the interop namespace. They allow the
+        standard WBEM tools for getting and creating namespaces to work.
         """
         for namespace in namespaces:
             nsdict = {"SystemName": self.system_name,
@@ -296,7 +314,7 @@ class WbemServerMock(object):
 
     def build_reg_profile_insts(self, profiles):
         """
-        Build and install in repository the registered profiles define by
+        Build and install in repository the registered profiles defined by
         the profiles parameter. A dictionary of tuples where each tuple
         contains RegisteredOrganization, RegisteredName, RegisteredVersion
 
@@ -403,7 +421,7 @@ class WbemServerMock(object):
         """
         Build the central_instances from the definitions provided in the list
         central_instance where each definition is a python CIMInstance object
-        and add them to the repositoryu. This method adds the path to each
+        and add them to the repository. This method adds the path to each
         """
         for inst in central_instances:
             cls = self.conn.GetClass(inst.classname, namespace=self.interop_ns,
@@ -422,7 +440,13 @@ class WbemServerMock(object):
               the namespaces
               the profiles
         """
-        self.build_class_repo(self.interop_ns)
+
+        self.build_classes(self.interop_ns)
+
+        if self.verbose:
+            print("Built classes")
+            self.conn.display_repository()
+
         # NOTE: The wbemserver is not complete until the instances for at
         # least object manager and namespaces have been inserted. Any attempt
         # to display the instance object before that will fail because the
@@ -436,21 +460,33 @@ class WbemServerMock(object):
             self.server_mock_data['object_manager']['ElementName'],
             self.server_mock_data['object_manager']['Description'])
 
+        if self.verbose:
+            print("Built object manager object")
+            self.conn.display_repository()
+
         # build CIM_Namespace instances based on the init parameters
         namespaces = [self.interop_ns]
         if self.server_mock_data['other_namespaces']:
             namespaces.extend(self.server_mock_data['other_namespaces'])
-
         self.build_cimnamespace_insts(namespaces)
+
+        if self.verbose:
+            print("Built namespace instances")
+            self.conn.display_repository()
 
         self.build_reg_profile_insts(self.registered_profiles)
 
         self.build_referenced_profile_insts(
             self.server_mock_data['referenced_profiles'])
 
+        if self.verbose:
+            print("Built profile instances")
+            self.conn.display_repository()
+
         self.build_central_instances(self.server_mock_data['central-instances'])
 
-        # Element conforms for SNIA server to object manager
+        # Get element conforms for SNIA server to object manager
+        # TODO this should be driven by the input dictionary
         prof_inst = self.wbem_server.get_selected_profiles(
             registered_org='SNIA',
             registered_name='Server',
@@ -461,9 +497,11 @@ class WbemServerMock(object):
 
         self.build_elementconformstoprofile_inst(prof_inst[0].path,
                                                  om_inst.path)
+
+        # build element_conforms_to_profile insts from dictionary
         for item in self.server_mock_data['element_conforms_to_profile']:
             profile_name = item[0]
-            # TODO we are fixing the host name here.  Not good
+            # TODO we are fixing the host name here.  should get from conn
             central_inst_path = CIMInstanceName(
                 item[1][0],
                 keybindings=item[1][1],
@@ -478,7 +516,14 @@ class WbemServerMock(object):
             self.build_elementconformstoprofile_inst(prof_insts[0].path,
                                                      central_inst_path)
 
+        if self.verbose:
+            print("Built central instances and element_conforms_to_Profile")
+            self.conn.display_repository()
+
 
 # Execute the WBEM Server configuration build
-MOCK_WBEMSERVER = WbemServerMock(interop_ns="interop")
+global VERBOSE  # pylint: disable=global-variable-not-assigned
+
+MOCK_WBEMSERVER = WbemServerMock(interop_ns="interop",
+                                 verbose=False)  # noqa: F821
 # server = MOCK_WBEMSERVER.wbem_server
