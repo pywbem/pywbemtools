@@ -437,7 +437,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                 pywbem_server = connections[s_name]
                 # Test for invalid options with the --name option
                 # The following options are part of each PywbemServer object
-                # TODO: FUTURE should really put this into pywbemserver itself.
                 for option in conditional_options:
                     if option[0]:
                         raise click.ClickException(
@@ -445,8 +444,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                             'default name set.' % (option[1], option[0]))
 
             else:
-                # If no server defined, set None. This allows subcmds that
-                # donot require a server executed without the server
+                # If no server defined, set None. This allows commands that
+                # do not require a server to be executed with no server
                 # defined.
                 pywbem_server = None
 

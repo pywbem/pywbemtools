@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests the cglobal log option
+Tests the general log option
 """
 import os
 import pytest
@@ -29,7 +29,7 @@ FAIL = False
 
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
     #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
     #          detailed documentation
     # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
@@ -39,8 +39,8 @@ TEST_CASES = [
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
     ['Verify log of class get blah. class get that fails',
-     {'global': ['-l', 'all=stderr'],
-      'subcmd': 'class',
+     {'general': ['-l', 'all=stderr'],
+      'cmdgrp': 'class',
       'args': ['get', 'blah']},
      {'stderr': ['-pywbem.api',
                  'FakedWBEMConnection',
@@ -50,9 +50,9 @@ TEST_CASES = [
       'rc': 1},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log of class subcommand get local-only. Test stdoit',
-     {'global': ['-l', 'all=stderr:summary'],
-      'subcmd': 'class',
+    ['Verify log of class  get command get local-only. Test stdoit',
+     {'general': ['-l', 'all=stderr:summary'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
                  '',
@@ -63,10 +63,10 @@ TEST_CASES = [
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify Log of class subcommand get local-only. test stderr'
+    ['Verify Log of class get command local-only. test stderr'
      'Cannot test stderr and stdout in same test.',
-     {'global': ['-l', 'all=stderr:summary'],
-      'subcmd': 'class',
+     {'general': ['-l', 'all=stderr:summary'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [r'-pywbem.api.',
                  r'FakedWBEMConnection',
@@ -76,10 +76,10 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log of class subcommand get local-only. Test stderr'
+    ['Verify log of class get command local-only. Test stderr'
      'Cannot test stderr and stdout in same test.',
-     {'global': ['-l', 'api=stderr:summary'],
-      'subcmd': 'class',
+     {'general': ['-l', 'api=stderr:summary'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [r'-pywbem.api.',
                  r'FakedWBEMConnection',
@@ -89,11 +89,11 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify log http class subcommand get local-only. Should be no log '
+    ['Verify log http class get command local-only. Should be no log '
      'because mock does not use http'
      'Cannot test stderr and stdout in same test.',
-     {'global': ['-l', 'http=stderr:summary'],
-      'subcmd': 'class',
+     {'general': ['-l', 'http=stderr:summary'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [],
       'test': 'in'},
@@ -101,8 +101,8 @@ TEST_CASES = [
 
     ['Verify log with error in definition. Cannot test stderr and stdout in '
      'same test.',
-     {'global': ['-l', 'httpx=stderr'],
-      'subcmd': 'class',
+     {'general': ['-l', 'httpx=stderr'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Error: Logger configuration error. input: "],
       'rc': 1,
@@ -110,8 +110,8 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify log with error in definition. invalid type',
-     {'global': ['-l', 'allx=stderr'],
-      'subcmd': 'class',
+     {'general': ['-l', 'allx=stderr'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Error: Logger configuration error. input: allx=stderr. "
                  "Exception: Invalid simple logger name:"],
@@ -120,10 +120,9 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify invalid log parameter fails (no value) '
-     'same test.',
-     {'global': ['-l'],
-      'subcmd': 'class',
+    ['Verify invalid log parameter fails (no value) same test.',
+     {'general': ['-l'],
+      'cmdgrp': 'class',
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': ["Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]"],
       'rc': 2,
@@ -135,8 +134,8 @@ TEST_CASES = [
 
 class TestLogOption(CLITestsBase):
     """
-    Test use of the global log option. This was be tested in the
-    test_global_opts.py file because it requires execution of a subcommand
+    Test use of the general log option. This was be tested in the
+    test_general_opts.py file because it requires execution of a command
     to actually use the log and create logs.
     """
 
@@ -152,7 +151,7 @@ class TestLogOption(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        subcmd = inputs['subcmd'] if inputs['subcmd'] else ''
+        cmd_grp = inputs['cmdgrp'] if inputs['cmdgrp'] else ''
 
-        self.subcmd_test(desc, subcmd, inputs, exp_response,
-                         mock, condition)
+        self.command_test(desc, cmd_grp, inputs, exp_response,
+                          mock, condition)

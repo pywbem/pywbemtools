@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests the class subcommand
+Tests the server command group
 """
 import os
 import pytest
@@ -106,115 +106,115 @@ FAIL = False  # Any test currently FAILING or not tested yet
 # pylint: enable=line-too-long
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
-    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
+    #          and 'stdin'. See See CLITestsBase.command_test()  for
     #          detailed documentation
     # exp_response - Dictionary of expected responses,
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
-    ['Verify server subcommand --help response',
+    ['Verify server command --help response',
      '--help',
      {'stdout': SERVER_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand -h response',
+    ['Verify server command -h response',
      '-h',
      {'stdout': SERVER_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand brand  --help response',
+    ['Verify server command brand  --help response',
      ['brand', '--help'],
      {'stdout': SERVER_BRAND_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand brand  -h response',
+    ['Verify server command brand  -h response',
      ['brand', '-h'],
      {'stdout': SERVER_BRAND_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand connection --help response',
+    ['Verify server command connection --help response',
      ['connection', '--help'],
      {'stdout': SERVER_CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand connection -h response',
+    ['Verify server command connection -h response',
      ['connection', '-h'],
      {'stdout': SERVER_CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand get-centralinsts  --help response',
+    ['Verify server command get-centralinsts  --help response',
      ['get-centralinsts', '--help'],
      {'stdout': SERVER_GETCENTRALINSTS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand get-centralinsts  -h response',
+    ['Verify server command get-centralinsts  -h response',
      ['get-centralinsts', '-h'],
      {'stdout': SERVER_GETCENTRALINSTS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand info --help response',
+    ['Verify server command info --help response',
      ['info', '--help'],
      {'stdout': SERVER_INFO_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand info -h response',
+    ['Verify server command info -h response',
      ['info', '-h'],
      {'stdout': SERVER_INFO_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand interop --help response',
+    ['Verify server command interop --help response',
      ['interop', '--help'],
      {'stdout': SERVER_INTEROP_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand interop -h response',
+    ['Verify server command interop -h response',
      ['interop', '-h'],
      {'stdout': SERVER_INTEROP_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand namespaces --help response',
+    ['Verify server command namespaces --help response',
      ['namespaces', '--help'],
      {'stdout': SERVER_NAMESPACES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand namespaces -h response',
+    ['Verify server command namespaces -h response',
      ['namespaces', '-h'],
      {'stdout': SERVER_NAMESPACES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand profiles --help response',
+    ['Verify server command profiles --help response',
      ['profiles', '--help'],
      {'stdout': SERVER_PROFILES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server subcommand profiles -h response',
+    ['Verify server command profiles -h response',
      ['profiles', '-h'],
      {'stdout': SERVER_PROFILES_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
     #
-    #   Verify the individual subcommands returning data
+    #   Verify the individual commands returning data
     #
-    ['Verify server subcommand interop',
+    ['Verify server command interop',
      {'args': ['interop'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Interop Namespace:',
                  'Namespace Name',
                  '----------------',
@@ -223,9 +223,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand namespaces',
+    ['Verify server command namespaces',
      {'args': ['namespaces'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
                  '----------------',
@@ -235,9 +235,9 @@ TEST_CASES = [
      MOCK_SERVER_MODEL, OK],
 
     # TODO: Remove this test once removal of --sort option is agreed.
-    ['Verify server subcommand namespaces with sort option',
+    ['Verify server command namespaces with sort option',
      {'args': ['namespaces', '-s'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
                  '----------------',
@@ -246,9 +246,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, FAIL],
 
-    ['Verify server subcommand brand',
+    ['Verify server command brand',
      {'args': ['brand'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Server brand:',
                  'WBEM server brand',
                  '-------------------',
@@ -257,9 +257,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand profiles',
+    ['Verify server command profiles',
      {'args': ['profiles'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -275,9 +275,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand profiles, filtered by org',
+    ['Verify server command profiles, filtered by org',
      {'args': ['profiles', '-o', 'DMTF'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -288,9 +288,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand profiles, filtered by org, long',
+    ['Verify server command profiles, filtered by org, long',
      {'args': ['profiles', '--organization', 'DMTF'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -301,9 +301,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand profiles, filtered by name',
+    ['Verify server command profiles, filtered by name',
      {'args': ['profiles', '-p', 'Profile Registration'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -312,9 +312,9 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand profiles, filtered by org, long',
+    ['Verify server command profiles, filtered by org, long',
      {'args': ['profiles', '--profile', 'Profile Registration'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -323,7 +323,7 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server subcommand connection with mock server',
+    ['Verify server command connection with mock server',
      ['connection'],
      {'stdout': ["", 'url: http://FakedUrl', 'creds: None', '.x509: None',
                  'default_namespace: root/cimv2', 'timeout: None sec.',
@@ -332,10 +332,10 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify server subcommand get-centralinsts, ',
+    ['Verify server command get-centralinsts, ',
      {'args': ['get-centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',
                  r'Profile +Central Instances',
                  'SNIA:Server:1.1.0',
@@ -346,9 +346,9 @@ TEST_CASES = [
      MOCK_SERVER_MODEL, OK],
 
 
-    ['Verify server subcommand info with mock server',
+    ['Verify server command info with mock server',
      {'args': ['info'],
-      'global': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout':
       ['Server General Information',
        'Brand        Version    Interop Namespace    Namespaces',
@@ -368,16 +368,16 @@ TEST_CASES = [
 
 class TestSubcmdServer(CLITestsBase):
     """
-    Execute the testcases for server subcommand variations.
+    Execute the testcases for server command variations.
     """
-    subcmd = 'server'
+    command_group = 'server'
 
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition",
         TEST_CASES)
     def test_class(self, desc, inputs, exp_response, mock, condition):
         """
-        Common test method for those subcommands and options in the
+        Common test method for those commands and options in the
         class subcmd that can be tested.  This includes:
 
           * Subcommands like help that do not require access to a server
@@ -385,5 +385,5 @@ class TestSubcmdServer(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
-        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition)
+        self.command_test(desc, self.command_group, inputs, exp_response,
+                          mock, condition)

@@ -21,12 +21,12 @@ class CLITestsBase(object):
         Defines methods to execute tests on pywbemcli.
 
     """
-    def subcmd_test(self, desc, subcmd, inputs, exp_response, mock_files,
-                    condition, verbose=None):
+    def command_test(self, desc, command_grp, inputs, exp_response, mock_files,
+                     condition, verbose=None):
         # pylint: disable=line-too-long, no-self-use
         """
         Test method to execute test on pywbemcli by calling the executable
-        pywbemcli for the command defined by subcmd with arguments defined
+        pywbemcli for the command defined by command with arguments defined
         by args. This can execute pywbemcli either with a mock environment
         by using the mock_files variable or without mock if the mock_files
         parameter is None. The method tests the results of the execution
@@ -36,9 +36,9 @@ class CLITestsBase(object):
           desc (:term:`string`):
             Description of the test
 
-          subcmd (:term:`string`):
-            pywbemcli subcommand inserted for this test.  This is the first
-            level subcommand (ex. class).
+          command_grp (:term:`string`):
+            pywbemcli command_grp definedfor this test.  This is the first
+            level of the command(the command group) (ex. class).
 
           inputs (:class:`py:dict` or :class:`py:list` of :term:`string` or :term:`string`):
 
@@ -53,11 +53,11 @@ class CLITestsBase(object):
             If inputs is a dict it can contain the following possible keys:
 
               * 'args': defines local arguments to append to the command after
-                  the subcommand name. Each single argument must be its own
+                  the command name. Each single argument must be its own
                   item in the iterable.
 
-              * 'globals': defines global arguments that will be inserted
-                  into the command line before the subcommand name. Each
+              * 'general': defines general arguments that will be inserted
+                  into the command line before the command name. Each
                   single argument must be its own item in the iterable.
 
               * 'env': Dictionary of environment variables where  key is the
@@ -74,8 +74,8 @@ class CLITestsBase(object):
                 as a separate repl line by the pybemcli executable.
                 If `stdin` is a single string it is passed  to the stdin
                 parameter for the call to pywbemcli. If `stdin` is defined, the
-                `subcmd` parameter is ignored and the full subcommand must be in
-                the `stdin` iterable.
+                parameters defining a command to be executed are ignored and
+                the full command must be in the `stdin` iterable.
 
                 If None, no stdin input is defined for the test.
 
@@ -148,7 +148,7 @@ class CLITestsBase(object):
             If it is a list, the same rules apply to each entry in the list.
 
             If None, test is executed without the --mock-server input parameter
-            and defines an artificial server name  Used to test subcommands
+            and defines an artificial server name  Used to test commands
             and options that do not communicate with a server.  It is faster
             than installing the mock repository
 
@@ -166,7 +166,7 @@ class CLITestsBase(object):
         env = None
         stdin = None
         if isinstance(inputs, dict):
-            global_args = inputs.get("global", None)
+            general_args = inputs.get("general", None)
             local_args = inputs.get("args", None)
             env = inputs.get("env", None)
             stdin = inputs.get('stdin', None)
@@ -175,10 +175,10 @@ class CLITestsBase(object):
                     stdin = '\n'.join(stdin)
         elif isinstance(inputs, six.string_types):
             local_args = inputs.split(" ")
-            global_args = None
+            general_args = None
         elif isinstance(inputs, (list, tuple)):
             local_args = inputs
-            global_args = None
+            general_args = None
         else:
             assert 'Invalid inputs param to test %r . Allowed types are ' \
                    'dict, string, list, tuple.' % inputs
@@ -186,12 +186,12 @@ class CLITestsBase(object):
         if isinstance(local_args, six.string_types):
             local_args = local_args.split(" ")
 
-        if isinstance(global_args, six.string_types):
-            global_args = global_args.split(" ")
+        if isinstance(general_args, six.string_types):
+            general_args = general_args.split(" ")
 
         cmd_line = []
-        if global_args:
-            cmd_line.extend(global_args)
+        if general_args:
+            cmd_line.extend(general_args)
 
         if mock_files:
             if isinstance(mock_files, (list, tuple)):
@@ -205,7 +205,7 @@ class CLITestsBase(object):
                 assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_files)
 
         if not stdin:
-            cmd_line.append(subcmd)
+            cmd_line.append(command_grp)
 
         if local_args:
             cmd_line.extend(local_args)

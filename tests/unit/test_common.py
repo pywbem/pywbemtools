@@ -1049,7 +1049,7 @@ class SorterTest(unittest.TestCase):
     def test_sort_class_ref_rtn(self):
         """
         Test the return from the class references and class associators
-        subcommands which is a tuple of CIMCLassName and CIMClass
+        commands which is a tuple of CIMCLassName and CIMClass
         """
 
         cl1 = (CIMClass(

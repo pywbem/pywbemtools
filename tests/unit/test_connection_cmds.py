@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """
-Test the connection command group and its subcommands. This test depends on
-a pywbemcliservers.json file in the test directory.  It assumes that the
+Test the connection command group and its commands. This test manipulates
+a connections file in the test directory.  It assumes that the
 test directory is the same as the current working directory where pywbemcli
-was called.
+was called.  If there is a connections file at the start of the test it is
+renamed for the test and restored at the end of the test.
 """
 
 import os
@@ -106,12 +107,12 @@ FAIL = False  # Any test currently FAILING or not tested yet
 
 TEST_CASES = [
     # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'globals',
-    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
+    # inputs - String, or list of args or dict of 'env', 'args', 'general',
+    #          and 'stdin'. See See CLITestsBase.command_test()  for
     #          detailed documentation
     # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
     #                test definition (test: <testname>).
-    #                See CLITestsBase.subcmd_test() for detailed documentation.
+    #                See CLITestsBase.command_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
     # condition - If True, the test is executed,  Otherwise it is skipped.
 
@@ -121,116 +122,105 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand -h response',
+    ['Verify connection command -h response',
      '-h',
      {'stdout': CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand delete --help response',
+    ['Verify connection command delete --help response',
      ['delete', '--help'],
      {'stdout': CONNECTION_DELETE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand delete -h response',
+    ['Verify connection command delete -h response',
      ['delete', '-h'],
      {'stdout': CONNECTION_DELETE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand export --help response',
+    ['Verify connection command export --help response',
      ['export', '--help'],
      {'stdout': CONNECTION_EXPORT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand export -h response',
+    ['Verify connection command export -h response',
      ['export', '-h'],
      {'stdout': CONNECTION_EXPORT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand list --help response',
+    ['Verify connection command list --help response',
      ['list', '--help'],
      {'stdout': CONNECTION_LIST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand list -h response',
+    ['Verify connection command list -h response',
      ['list', '-h'],
      {'stdout': CONNECTION_LIST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand save --help response',
+    ['Verify connection command save --help response',
      ['save', '--help'],
      {'stdout': CONNECTION_SAVE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand save -h response',
+    ['Verify connection command save -h response',
      ['save', '-h'],
      {'stdout': CONNECTION_SAVE_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select  --help response',
+    ['Verify connection command select  --help response',
      ['select', '--help'],
      {'stdout': CONNECTION_SELECT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select  -h response',
+    ['Verify connection command select  -h response',
      ['select', '-h'],
      {'stdout': CONNECTION_SELECT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand show --help response',
+    ['Verify connection command show --help response',
      ['show', '--help'],
      {'stdout': CONNECTION_SHOW_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand show -h response',
+    ['Verify connection command show -h response',
      ['show', '-h'],
      {'stdout': CONNECTION_SHOW_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand test --help response',
+    ['Verify connection command test --help response',
      ['test', '--help'],
      {'stdout': CONNECTION_TEST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand test -h response',
+    ['Verify connection command test -h response',
      ['test', '-h'],
      {'stdout': CONNECTION_TEST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    # ['Verify connection subcommand new. test with show and delete  ',
-    # # {'stdin': ['connection new test1 http://blah', 'connection show test1',
-    #            # 'connection delete test1']},
-    # # {'stdout': ["name: test1", "  WBEM Server uri: http://blah",
-    #  # "  default-namespace: root/cimv2", "  user: None", "  password: None",
-    #  # "  timeout: None", "  Noverify: False", "  certfile: None",
-    #  # "  keyfile: None", "  use-pull: None", "  mock-server:",
-    #  # "  log: None"],
-    #  # 'test': 'in'},
-    # # None, OK],
-
-    ['Verify connection subcommand list empty repository.',
-     {'global': ['-o', 'simple'],
+    ['Verify connection command list empty repository.',
+     {'general': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
          "WBEM server connections:", ""],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand delete, empty repo fails.',
+    ['Verify connection command delete, empty repo fails.',
      ['delete', 'blah'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
@@ -238,7 +228,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify --mock-server and --server together fail.',
-     {'global': ['--mock-server', MOCK_FILE_PATH, '--server', 'http://blah'],
+     {'general': ['--mock-server', MOCK_FILE_PATH, '--server', 'http://blah'],
       'args': ['list']},
      {'stderr': ['Conflicting server definitions. Do not use --server and '
                  '--mock-server simultaneously'],
@@ -250,15 +240,15 @@ TEST_CASES = [
     # The following tests are a sequence. Each depends on the previous
     # and what was in the repository when each test is executed.
     #
-    ['Verify connection subcommand save creates file.',
-     {'global': ['--server', 'http://blah'],
+    ['Verify connection command save creates file.',
+     {'general': ['--server', 'http://blah'],
       'args': ['save', 'test1']},
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand show of just created test1',
+    ['Verify connection command show of just created test1',
      ['show', 'test1'],
      {'stdout': [
          "name: test1", "  server: http://blah",
@@ -271,16 +261,16 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand save with complex general options short',
-     {'global': ['--server', 'http://blahblah', '-u', 'fred', '-p',
-                 'argh', '-t', '18', '--no-verify', '-l', 'api=file,all'],
+    ['Verify connection command save with complex general options short',
+     {'general': ['--server', 'http://blahblah', '-u', 'fred', '-p',
+                  'argh', '-t', '18', '--no-verify', '-l', 'api=file,all'],
       'args': ['save', 'test2']},
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand show named connnection test1',
+    ['Verify connection command show named connnection test1',
      ['show', 'test1'],
      {'stdout': [
          "name: test1", "  server: http://blah",
@@ -292,7 +282,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand show  test2',
+    ['Verify connection command show  test2',
      ['show', 'test2'],
      {'stdout': ['name: test2',
                  'server: http://blahblah',
@@ -307,8 +297,8 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand list with 2 servers defined',
-     {'global': ['--output-format', 'plain'],
+    ['Verify connection command list with 2 servers defined',
+     {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  'name server namespace user timeout verify',
@@ -317,34 +307,34 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select test2',
+    ['Verify connection command select test2',
      ['select', 'test2', '--default'],
      {'stdout': ['test2', 'default'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand show test2 includes "current"',
+    ['Verify connection command show test2 includes "current"',
      ['show', 'test2'],
      {'stdout': ['test2', 'http://blahblah', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select test2 shows it is current',
+    ['Verify connection command select test2 shows it is current',
      ['select', 'test2'],
      {'stdout': ['test2', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select test3 fails',
+    ['Verify connection command select test3 fails',
      ['select', 'test9'],
      {'stderr': ['Connection name "test9" does not exist'],
       'rc': 1,
       'test': 'regex'},
      None, OK],
 
-    ['Verify connection subcommand list with 2 servers defined, not sel after '
+    ['Verify connection command list with 2 servers defined, not sel after '
      ' next pywbemcli call',
-     {'global': ['--output-format', 'plain'],
+     {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  '(#: default, *: current)',
@@ -355,28 +345,28 @@ TEST_CASES = [
       'test': 'insnows'},
      None, OK],
 
-    ['Verify connection subcommand delete test1',
+    ['Verify connection command delete test1',
      ['delete', 'test1'],
      {'stdout': ['Deleted', 'test1'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand test',
+    ['Verify connection command test',
      ['test'],
      {'stdout': "Connection successful",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify connection subcommand delete test2',
+    ['Verify connection command delete test2',
      ['delete', 'test2'],
      {'stdout': ['Deleted', 'test2', 'connection'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand list empty repository.',
-     {'global': ['-o', 'simple'],
+    ['Verify connection command list empty repository.',
+     {'general': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
          "WBEM server connections:", ""],
@@ -389,22 +379,22 @@ TEST_CASES = [
     #   The following is a new sequence but depends on the repo being empty
     #   It creates, shows and deletes a single server definition.
     #
-    ['Verify connection subcommand add with all arguments.',
-     {'global': ['--server', 'http://blahblah',
-                 '--default-namespace', 'root/blahblah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--timeout', '30',
-                 '--no-verify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem', ],
+    ['Verify connection command add with all arguments.',
+     {'general': ['--server', 'http://blahblah',
+                  '--default-namespace', 'root/blahblah',
+                  '--user', 'john',
+                  '--password', 'pw',
+                  '--timeout', '30',
+                  '--no-verify',
+                  '--certfile', 'mycertfile.pem',
+                  '--keyfile', 'mykeyfile.pem', ],
       'args': ['save', 'addallargs']},
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand show addallargs initial version',
+    ['Verify connection command show addallargs initial version',
      ['show', 'addallargs'],
      {'stdout': [
          'name: addallargs',
@@ -418,15 +408,15 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify connection subcommand with that overwrites existing name works.',
-     {'global': ['--server', 'http://blah',
-                 '--default-namespace', 'root/blah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--timeout', '30',
-                 '--no-verify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem', ],
+    ['Verify connection command with that overwrites existing name works.',
+     {'general': ['--server', 'http://blah',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'john',
+                  '--password', 'pw',
+                  '--timeout', '30',
+                  '--no-verify',
+                  '--certfile', 'mycertfile.pem',
+                  '--keyfile', 'mykeyfile.pem', ],
       'args': ['save', 'addallargs']},
      {'stderr': '',
       'rc': 0,
@@ -434,7 +424,7 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand show of name addallargs, overwrite changed',
+    ['Verify connection command show of name addallargs, overwrite changed',
      ['show', 'addallargs'],
      {'stdout': [
          'name: addallargs',
@@ -448,7 +438,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify connection subcommand delete addallargs',
+    ['Verify connection command delete addallargs',
      ['delete', 'addallargs'],
      {'stdout': "Deleted",
       'test': 'innows',
@@ -457,11 +447,11 @@ TEST_CASES = [
 
     # uses regex because windows generates set and linux export in statements
     # No file verification required. Does not use file
-    ['Verify connection subcommand export current connection',
+    ['Verify connection command export current connection',
      {'args': ['export'],
-      'global': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh',
-                 '--no-verify',
-                 '-c', 'certfile.txt', '-k', 'keyfile.txt', '-t', '12']},
+      'general': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh',
+                  '--no-verify',
+                  '-c', 'certfile.txt', '-k', 'keyfile.txt', '-t', '12']},
      {'stdout': ['PYWBEMCLI_SERVER=http://blah$',
                  'PYWBEMCLI_DEFAULT_NAMESPACE=root/cimv2$',
                  'PYWBEMCLI_USER=fred$',
@@ -480,7 +470,7 @@ TEST_CASES = [
     #  Test command line parameter errors, select, show, and delete with
     #  no repository
     #
-    ['Verify connection subcommand show with name not in empty repo',
+    ['Verify connection command show with name not in empty repo',
      ['show', 'Blah'],
      {'stderr': ['Name "Blah" not current and no connections file'],
       'rc': 1,
@@ -488,14 +478,14 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand show with no name empty repo',
+    ['Verify connection command show with no name empty repo',
      ['show'],
      {'stderr': ['No current connection and no connections file'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand select, empty repo fails',
+    ['Verify connection command select, empty repo fails',
      ['select'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
@@ -503,7 +493,7 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand select blah, empty repo fails',
+    ['Verify connection command select blah, empty repo fails',
      ['select', 'blah'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
@@ -511,7 +501,7 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection subcommand delete, empty repo fails',
+    ['Verify connection command delete, empty repo fails',
      ['delete'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
@@ -520,7 +510,7 @@ TEST_CASES = [
      None, OK],
 
 
-    ['Verify connection subcommand delete, empty repo fails',
+    ['Verify connection command delete, empty repo fails',
      ['delete', 'blah'],
      {'stderr': ["Connection repository", "empty"],
       'rc': 1,
@@ -535,14 +525,14 @@ TEST_CASES = [
     #
 
     ['Verify mock connection exists.',
-     {'global': ['--mock-server', MOCK_FILE_PATH],
+     {'general': ['--mock-server', MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand shows mock file ',
+    ['Verify connection command shows mock file ',
      ['show', 'mocktest'],
      {'stdout': [
          "name: mocktest",
@@ -556,14 +546,14 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection subcommand test against existing mock def',
+    ['Verify connection command test against existing mock def',
      {'args': ['test'],
-      'global': ['--name', 'mocktest']},
+      'general': ['--name', 'mocktest']},
      {'stdout': "Connection successful",
       'test': 'lines'},
      None, OK],
 
-    ['Verify connection subcommand select mocktest with prompt',
+    ['Verify connection command select mocktest with prompt',
      ['select'],
      {'stdout': "",
       'test': 'in',
@@ -571,14 +561,14 @@ TEST_CASES = [
      MOCK_PROMPT0_FILE, OK],
 
 
-    ['Verify connection subcommand show with prompt',
+    ['Verify connection command show with prompt',
      ['show', '?'],
      {'stdout': ['name: mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      MOCK_PROMPT0_FILE, OK],
 
-    ['Verify connection subcommand delete with prompt that selects 0',
+    ['Verify connection command delete with prompt that selects 0',
      ['delete', ],
      {'stdout': ['Select a connection or Ctrl_C to abort',
                  '0: mocktest',
@@ -588,14 +578,14 @@ TEST_CASES = [
      MOCK_PROMPT0_FILE, OK],
 
     ['Verify Add mock server to empty connections file.',
-     {'global': ['--mock-server', MOCK_FILE_PATH],
+     {'general': ['--mock-server', MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand delete'
+    ['Verify connection command delete'
      'verify',
      ['delete', 'mocktest'],
      {'stdout': ['name: mocktest', 'Execute delete'],
@@ -611,15 +601,15 @@ TEST_CASES = [
     #
     ['Verify save server with cmd line params to empty connections file.',
      {'args': ['save', 'svrtest2'],
-      'global': ['--server', 'http://blah',
-                 '--timeout', '45',
-                 '--use-pull', 'no',
-                 '--default-namespace', 'root/blah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--verify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem']},
+      'general': ['--server', 'http://blah',
+                  '--timeout', '45',
+                  '--use-pull', 'no',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'john',
+                  '--password', 'pw',
+                  '--verify',
+                  '--certfile', 'mycertfile.pem',
+                  '--keyfile', 'mykeyfile.pem']},
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
@@ -627,21 +617,21 @@ TEST_CASES = [
 
     ['Verify save mock server with cmd line params to empty connections file.',
      {'args': ['save', 'mocktest2'],
-      'global': ['--mock-server', MOCK_FILE_PATH,
-                 '--timeout', '45',
-                 '--use-pull', 'no',
-                 '--default-namespace', 'root/blah',
-                 '--user', 'john',
-                 '--password', 'pw',
-                 '--no-verify',
-                 '--certfile', 'mycertfile.pem',
-                 '--keyfile', 'mykeyfile.pem']},
+      'general': ['--mock-server', MOCK_FILE_PATH,
+                  '--timeout', '45',
+                  '--use-pull', 'no',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'john',
+                  '--password', 'pw',
+                  '--no-verify',
+                  '--certfile', 'mycertfile.pem',
+                  '--keyfile', 'mykeyfile.pem']},
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand shows mock file ',
+    ['Verify connection command shows mock file ',
      ['show', 'mocktest2'],
      {'stdout': [
          "name: mocktest2",
@@ -657,7 +647,7 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand shows svrtest2 ',
+    ['Verify connection command shows svrtest2 ',
      ['show', 'svrtest2'],
      {'stdout': [
          "name: svrtest2",
@@ -671,14 +661,14 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand delete works',
+    ['Verify connection command delete works',
      ['delete', 'mocktest2'],
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection subcommand delete works and file empty',
+    ['Verify connection command delete works and file empty',
      ['delete', 'svrtest2'],
      {'stderr': "",
       'rc': 0,
@@ -692,7 +682,7 @@ TEST_CASES = [
 
     ['Verify connection show with just current server defined by --server',
      {'args': ['show'],
-      'global': ['--server', 'http://blah']},
+      'general': ['--server', 'http://blah']},
      {'stdout': ['name', 'not-saved'],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
@@ -700,7 +690,7 @@ TEST_CASES = [
 
     ['Verify connection list with current server from general options, plain',
      {'args': ['list'],
-      'global': ['--server', 'http://blah', '--output-format', 'plain']},
+      'general': ['--server', 'http://blah', '--output-format', 'plain']},
      {'stdout': ['WBEM server connections: (#: default, *: current)',
                  '*not-saved http://blah root/cimv2  30 True'],
       'test': 'innows',
@@ -712,7 +702,7 @@ TEST_CASES = [
     #
 
     ['Verify mock connection exists.',
-     {'global': ['--server', 'http://blah'],
+     {'general': ['--server', 'http://blah'],
       'args': ['save', 'svrtest']},
      {'stdout': "",
       'test': 'lines',
@@ -722,7 +712,7 @@ TEST_CASES = [
 
     ['Verify connection list with current server from general options, grid',
      {'args': ['list'],
-      'global': ['--server', 'http://blah']},
+      'general': ['--server', 'http://blah']},
      {'stdout': """
 WBEM server connections: (#: default, *: current)
 +------------+-------------+-------------+-----------+----------+
@@ -738,7 +728,7 @@ WBEM server connections: (#: default, *: current)
 
     ['Verify connection select of svrtest',
      {'args': ['select', 'svrtest', '--default'],
-      'global': ['--server', 'http://blah']},
+      'general': ['--server', 'http://blah']},
      {'stdout': '"svrtest" default and current',
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -746,7 +736,7 @@ WBEM server connections: (#: default, *: current)
 
     ['Verify connection select of svrtest as default',
      {'args': ['show'],
-      'global': []},
+      'general': []},
      {'stdout': ['svrtest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -754,7 +744,7 @@ WBEM server connections: (#: default, *: current)
 
     ['Verify current connection set with general opts overrides default',
      {'args': ['show'],
-      'global': ['--server', 'https://blahblahblah']},
+      'general': ['--server', 'https://blahblahblah']},
      {'stdout': ['not-saved', 'https://blahblahblah'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -763,7 +753,7 @@ WBEM server connections: (#: default, *: current)
 
     ['Verify connection delete svrtest',
      {'args': ['delete', 'svrtest'],
-      'global': []},
+      'general': []},
      {'stdout': "Deleted default connection",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
@@ -780,7 +770,7 @@ class TestSubcmdClass(CLITestsBase):
     """
     Test all of the class command variations.
     """
-    subcmd = 'connection'
+    command_group = 'connection'
 
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition",
@@ -788,8 +778,8 @@ class TestSubcmdClass(CLITestsBase):
     def test_connection(self, desc, inputs, exp_response, mock, condition,
                         repo_file_path):
         """
-        Common test method for those subcommands and options in the
-        class subcmd that can be tested.  Note the
+        Common test method for those commands and options in the
+        connection command group that can be tested.  Note the
         fixture remove_connection_file which is session, autouse so should
         hide any existing connection file at beginning of this test and
         restore it after the test.
@@ -828,8 +818,8 @@ class TestSubcmdClass(CLITestsBase):
             if 'before' in exp_response['file']:
                 test_file(exp_response['file']['before'])
 
-        self.subcmd_test(desc, self.subcmd, inputs, exp_response,
-                         mock, condition, verbose=False)
+        self.command_test(desc, self.command_group, inputs, exp_response,
+                          mock, condition, verbose=False)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:
