@@ -269,3 +269,67 @@ following examples, an underscore ``_`` is shown as the cursor:
 The pywbemcli shell supports history across multiple invocations of the shell
 using <UP-ARROW>, <DOWN-ARROW>.
 The pywbemcli history is stored in ``~/.pywbemcli_history``.
+
+
+.. _`Error handling`:
+
+Error handling
+--------------
+
+Pywbemcli terminates with one of the following program exit codes:
+
+* **0 - Success**: The pywbemcli command has succeeded.
+
+* **1 - Error**: In such cases, pywbemcli aborts the requested operation and
+  displays one or more human readable error messages on standard error.
+
+  If this happens for a command entered in interactive mode, the pywbemcli shell
+  is not terminated; only the command that failed is terminated.
+
+  Examples for errors reported that way:
+
+  * Local system issues, e.g. pywbemcli history file or connections file cannot
+    be written to.
+
+  * WBEM server access issues, e.g. pywbemcli cannot connect to or authenticate
+    with the WBEM server. This includes CIM errors about failed authentication
+    returned by the server.
+
+  * WBEM server operation issues, e.g. pywbemcli attempts to retrieve an
+    instance that does not exist, or the WBEM server encountered an internal
+    error. This will mostly be caused by CIM errors returned by the server,
+    but can also be caused by the pywbemcli code itself.
+
+  * Programming errors in mock Python scripts (see `Mock support overview`_);
+    the error message includes a Python traceback of the error.
+
+* **1 - Python traceback**: In such cases, pywbemcli terminates during its
+  processing, and displays the Python stack traceback on standard error.
+
+  If this happens for a command entered in interactive mode, the pywbemcli shell
+  also terminates with a program exit code of 1.
+
+  These Python tracebacks should never happen and are always considered a
+  reason to open a bug in the
+  `pywbemtools issue tracker <https://github.com/pywbem/pywbemtools/issues>`_`.
+
+  Note that an error message with a traceback from a mock Python script does
+  not fall into this category and is an issue in that Python script and not
+  in pywbemcli.
+
+* **2 - User error**: In such cases, pywbemcli terminates without even
+  attempting to perform the requested operation, and displays one or more human
+  readable error messages on standard error.
+
+  If this happens for a command entered in interactive mode, the pywbemcli shell
+  is not terminated; only the command that failed is terminated.
+
+  Examples for user errors are a missing required command argument, the use of
+  an invalid option, or an invalid option argument.
+
+* **2 - Help**: When help is requested (``--help``/``-h`` option or
+  ``help command``), pywbemcli displays the requested help text on standard
+  output and terminates.
+
+  If this happens for a command entered in interactive mode, the pywbemcli shell
+  is not terminated; only the command that displayed the help is terminated.
