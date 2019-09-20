@@ -120,7 +120,7 @@ def server_profiles(context, **options):
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
 
-@server_group.command('get-centralinsts', options_metavar=CMD_OPTS_TXT)
+@server_group.command('central-insts', options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
               help='Filter by the defined organization. (ex. -o DMTF')
@@ -145,7 +145,7 @@ def server_profiles(context, **options):
               show_default=True,
               help='Navigation direction for association.')
 @click.pass_obj
-def server_centralinsts(context, **options):
+def central_insts(context, **options):
     """
     List central instances of mgmt profiles on the server.
 
@@ -168,7 +168,7 @@ def server_centralinsts(context, **options):
     The --output-format general option is ignored unless it specifies a table
     format.
     """
-    context.execute_cmd(lambda: cmd_server_centralinsts(context, options))
+    context.execute_cmd(lambda: cmd_server_central_insts(context, options))
 
 
 # TODO: reactivate and implement this in version 0.6.0
@@ -324,7 +324,7 @@ def cmd_server_profiles(context, options):
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 
 
-def cmd_server_centralinsts(context, options):
+def cmd_server_central_insts(context, options):
     """
     Display general overview of info from current WBEM server
     """
