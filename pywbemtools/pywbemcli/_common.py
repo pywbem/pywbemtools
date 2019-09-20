@@ -270,7 +270,7 @@ def filter_namelist(pattern, name_list, ignore_case=True):
     Filter out names in name_list that do not match glob pattern compiled
     as regex.
 
-    The regex is defines as IGNORECASE and anchored.
+    The regex is defined as IGNORECASE and anchored.
 
     Note that the regex may define a subset of the name string.  Thus,  regex:
         - CIM* matches any name that starts with CIM
@@ -294,6 +294,7 @@ def filter_namelist(pattern, name_list, ignore_case=True):
 
     flags = re.IGNORECASE if ignore_case else None
     # compile the regex since it used multiple times
+    regex = None
     try:
         # Convert the glob input to regex.
         regex = fnmatch.translate(pattern)

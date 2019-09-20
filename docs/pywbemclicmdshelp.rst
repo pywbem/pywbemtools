@@ -212,9 +212,9 @@ The following defines the help output for the `pywbemcli class associators --hel
       List the classes associated with a class.
 
       List the CIM classes that are associated with the specified class
-      (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
-      (--namespace option). If no namespace was specified, the default namespace
-      of the connection is used.
+      (CLASSNAME argument) in the specified CIM namespace (--namespace option).
+      If no namespace was specified, the default namespace of the connection is
+      used.
 
       The classes to be retrieved can be filtered by the --role, --result-role,
       --assoc-class, and --result-class options.
@@ -292,10 +292,11 @@ The following defines the help output for the `pywbemcli class delete --help` co
       option was specified, in which case the instances are also deleted.
 
       WARNING: Deleting classes can cause damage to the server: It can impact
-      instance providers and other components in the server. Use this with
-      command with caution.
+      instance providers and other components in the server. Use this command
+      with caution.
 
-      Some servers may reject the command altogether.
+      Many WBEM servers may not allow this operation or may severely limit the
+      conditions under which a class can be deleted from the server.
 
       Example:
 
@@ -413,6 +414,9 @@ The following defines the help output for the `pywbemcli class find --help` comm
         pywbemcli -n myconn class find *Foo*
 
     Options:
+      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
+                                 specified multiple times. Default: Search in all
+                                 namespaces of the server.
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
@@ -538,9 +542,9 @@ The following defines the help output for the `pywbemcli class references --help
       List the classes referencing a class.
 
       List the CIM (association) classes that reference the specified class
-      (CLASSNAME argument) or subclasses thereof in the specified CIM namespace
-      (--namespace option). If no namespace was specified, the default namespace
-      of the connection is used.
+      (CLASSNAME argument) in the specified CIM namespace (--namespace option).
+      If no namespace was specified, the default namespace of the connection is
+      used.
 
       The classes to be retrieved can be filtered by the --role and --result-
       class options.
@@ -1085,29 +1089,35 @@ The following defines the help output for the `pywbemcli instance count --help` 
 
       Count the instances of each class with matching class name.
 
-      Display the count of the instances of each CIM class whose class name
-      matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
-      namespaces of the WBEM server, or in the specified namespace (--namespace
-      option).
+      Displays the count of instances of each CIM class whose class name matches
+      the specified wildcard expression (CLASSNAME-GLOB) in all CIM namespaces
+      of the WBEM server, or in the specified namespaces (--namespace option).
+      This differs from instance enumerate, etc. in that it counts the instances
+      specifically for the classname of each instance returned, not including
+      subclasses.
 
       The CLASSNAME-GLOB argument is a wildcard expression that is matched on
       the class names case insensitively. The special characters known from file
-      nme wildcarding are supported: `*` to match zero or more characters, and
+      name wildcarding are supported: `*` to match zero or more characters, and
       `?` to match a single character. In order to not have the shell expand the
       wildcards, the CLASSNAME-GLOB argument should be put in quotes.
 
-      For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
-      `pywbem_`, etc. '*system*' returns classes whose names include the case
-      insensitive string `system`.
+      If CLASSNAME-GLOB is not specified, the all classes in the specified
+      namespaces are counted (GLOB "*").
+
+      For example, `pywbem_*` returns instances of classes whose name begins
+      with `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names
+      include the case insensitive string `system`.
 
       This command can take a long time to execute since it potentially
-      enumerates all instance names in all namespaces.
+      enumerates all instance names for all classes in all namespaces.
 
     Options:
       -s, --sort                 Sort by instance count. Otherwise sorted by class
                                  name
-      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
-                                 default namespace of the connection.
+      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
+                                 specified multiple times. Default: Search in all
+                                 namespaces of the server.
       -h, --help                 Show this message and exit.
 
 
@@ -1760,7 +1770,6 @@ The following defines the help output for the `pywbemcli server --help` command
 
     Commands:
       brand             Get the brand of the server.
-      connection        Get connection info used by this server.
       get-centralinsts  List central instances of mgmt profiles on the server.
       info              Get information about the server.
       interop           Get the Interop namespace of the server.
@@ -1787,31 +1796,6 @@ The following defines the help output for the `pywbemcli server brand --help` co
       Brand information is defined by the server implementor and may or may not
       be available. Pywbem attempts to collect the brand information from
       multiple sources.
-
-    Options:
-      -h, --help  Show this message and exit.
-
-
-.. _`pywbemcli server connection --help`:
-
-pywbemcli server connection --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The following defines the help output for the `pywbemcli server connection --help` command
-
-
-::
-
-    Usage: pywbemcli server connection [COMMAND-OPTIONS]
-
-      Get connection info used by this server.
-
-      Display the information about the connection used to connect to the WBEM
-      server.
-
-      This is equivalent to the 'connection show' command.
 
     Options:
       -h, --help  Show this message and exit.

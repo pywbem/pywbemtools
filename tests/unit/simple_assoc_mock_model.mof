@@ -24,6 +24,8 @@ class TST_Person{
     string extraProperty = "defaultvalue";
 };
 
+// NOTE: classname uses lower case s in sub.  Instance names use upper case
+// This is good test of case insensitivity for class names.
 class TST_Personsub : TST_Person{
     string secondProperty = "empty";
     uint32 counter;

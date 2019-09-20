@@ -28,7 +28,7 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
     process_invokemethod
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
-    summary_option, verify_option
+    summary_option, verify_option, multiple_namespaces_option
 from .config import DEFAULT_QUERY_LANGUAGE
 
 
@@ -542,29 +542,34 @@ def instance_query(context, query, **options):
                 required=False)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by class name')
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
     Count the instances of each class with matching class name.
 
-    Display the count of the instances of each CIM class whose class name
+    Displays the count of instances of each CIM class whose class name
     matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
-    namespaces of the WBEM server, or in the specified namespace
-    (--namespace option).
+    namespaces of the WBEM server, or in the specified namespaces
+    (--namespace option).  This differs from instance enumerate, etc. in that
+    it counts the instances specifically for the classname of each instance
+    returned, not including subclasses.
 
-    The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-    the class names case insensitively. The special characters known from file
-    nme wildcarding are supported: `*` to match zero or more characters, and
-    `?` to match a single character. In order to not have the shell expand
-    the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
+    The CLASSNAME-GLOB argument is a wildcard expression that is matched on the
+    class names case insensitively. The special characters known from file name
+    wildcarding are supported: `*` to match zero or more characters, and `?` to
+    match a single character. To avoid shell expansion of wildcards, the
+    CLASSNAME-GLOB argument should be put in quotes.
 
-    For example, `pywbem_*` returns classes whose name begins with `PyWBEM_`,
-    `pywbem_`, etc. '*system*' returns classes whose names include the case
-    insensitive string `system`.
+    If CLASSNAME-GLOB is not specified, the all classes in the specified
+    namespaces are counted (GLOB "*").
+
+    For example, `pywbem_*` returns instances of classes whose name begins with
+    `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names include
+    the case insensitive string `system`.
 
     This command can take a long time to execute since it potentially
-    enumerates all instance names in all namespaces.
+    enumerates all instance names for all classes in all namespaces.
     """
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
@@ -917,65 +922,75 @@ def cmd_instance_count(context, classname, options):
     """
     Get the number of instances of each class in the namespace
     """
-    def maxlen(str_list):
-        """ get the maximum length of the elements in a list of strings"""
-        maxlen = 0
-        for item in str_list:
-            if len(item) > maxlen:
-                maxlen = len(item)
-        return maxlen
-
-    namespace = options['namespace']
-
-    # Get all classes in Namespace
-    try:
-        classlist = context.conn.EnumerateClassNames(
-            DeepInheritance=True,
-            namespace=namespace)
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-    if classname:
-        classlist = filter_namelist(classname, classlist, ignore_case=True)
-
-    # sort  since normal output for this command is by class alphabetic order.
-    classlist.sort()
-
-    maxlen = maxlen(classlist)    # get max classname size for display
-
-    display_data = []
-    for classname_ in classlist:
-
-        # Try block allows issues where enumerate does not properly execute
-        # in some cases. The totals may be wrong but at least it gets what
-        # it can.  This accounts for issues with some servers where there
-        # are providers that return errors from the enumerate.
+    if classname is None:
+        classname = '*'
+    # Create list of namespaces from the option or from all namespaces
+    if options['namespace']:
+        ns_names = options['namespace']
+    else:
         try:
-            inst_names = context.conn.EnumerateInstanceNames(
-                classname_,
+            ns_names = context.wbem_server.namespaces
+            ns_names.sort()
+        except CIMError as ce:
+            # allow processing to continue if no interop namespace
+            if ce.status_code == CIM_ERR_NOT_FOUND:
+                click.echo('WARNING: %s' % ce)
+                ns_names = [context.conn.default_namespace]
+
+    ns_cln_tuples = []  # a list of tuples of namespace, classname
+    for namespace in ns_names:
+        # Get all classes in Namespace
+        try:
+            classnames = context.conn.EnumerateClassNames(
+                DeepInheritance=True,
                 namespace=namespace)
         except Error as er:
+            raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+
+        if classnames:
+            classlist = filter_namelist(classname, classnames, ignore_case=True)
+            cl_tup = [(namespace, cln) for cln in classlist]
+            ns_cln_tuples.extend(cl_tup)
+
+    # sort since normal output for this command is  namespace, classname
+    # alphabetic order.
+    ns_cln_tuples.sort(key=lambda tup: (tup[0], tup[1]))
+
+    display_data = []
+    for tup in ns_cln_tuples:
+        ns = tup[0]
+        cln = tup[1]
+        # Try block allows issues where enumerate does not properly execute
+        # The totals may be wrong but at least it gets what it can.
+        # This accounts for issues with some servers where there
+        # are providers that return errors from the enumerate.
+        try:
+            inst_names = context.conn.EnumerateInstanceNames(cln, namespace=ns)
+        except Error as er:
             click.echo('Server Error %s with %s:%s. Continuing' %
-                       (er, namespace, classname))
+                       (er, ns, cln), err=True)
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
         # subclasses
-        count = sum(1 for inst in inst_names if (inst.classname == classname_))
+        clnl = cln.lower()
+        count = sum(1 for inst_name in inst_names
+                    if (inst_name.classname.lower() == clnl))
 
         if count != 0:
-            display_tuple = (classname_, count)
+            display_tuple = (ns, cln, count)
             display_data.append(display_tuple)
 
     # If sort set, resort by count size
     if options['sort']:
-        display_data.sort(key=lambda x: x[1])
+        display_data.sort(key=lambda x: x[2])
 
-    headers = ['Class', 'count']
+    headers = ['Namespace', 'Class', 'count']
     rows = []
     if display_data:
         for item in display_data:
-            rows.append([item[0], item[1]])
+            rows.append([item[0], item[1], item[2]])
+
     context.spinner.stop()
     click.echo(format_table(rows, headers,
                             title='Count of instances per class',

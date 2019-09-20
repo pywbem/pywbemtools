@@ -78,3 +78,6 @@ CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE = \
 CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
     '--ico, --include-classorigin Include class origin information in the ' \
     'returned'
+
+CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE = \
+    '-n, --namespace NAMESPACE  Add a namespace to the search scope. May be'

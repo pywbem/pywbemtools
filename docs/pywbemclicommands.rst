@@ -439,15 +439,25 @@ Instance count command
 ^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance count`` command counts the CIM instances of some or all classes
-in the namespace specified with the ``-namespace``/``-n`` command option, or
-otherwise in the default namespace of the connection.
+in the namespaces specified with the ``-namespace``/``-n`` command option, or
+all namespaces in the server.
 
-The count of instances is displayed for each class name.
-**TBD: Does it include instances of subclasses?**
+This command displays the count of instances of each CIM class whose class name
+matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
+namespaces of the WBEM server, or in the specified namespaces (--namespace
+option).  This differs from instance enumerate, etc. in that it counts the
+instances specifically for the classname of each instance returned (the
+creation classname), not including subclasses.
 
-If the ``CLASSNAME-GLOB`` argument is specified, only the classes are counted
-that match the specified :term:`Unix-style path name pattern`.
-Otherwise, all classes are counted.
+If the ``CLASSNAME-GLOB`` argument is specified, only instances of classes that
+match the specified :term:`Unix-style path name pattern` are counted. If the
+``CLASSNAME-GLOB`` argument is not specified all instances of all classes in
+the target namespaces are counted.
+
+Results for class that have no instances are not displayed.
+
+This command can take a long time to execute since it potentially enumerates
+all instance names for all classes in all namespaces.
 
 Valid output formats are :term:`Table output formats`.
 
@@ -457,14 +467,16 @@ Example:
 
     $ pywbemcli --name mymock instance count
     Count of instances per class
-    +------------------------------+---------+
-    | Class                        |   count |
-    |------------------------------+---------|
-    | TST_FamilyCollection         |       2 |
-    | TST_Lineage                  |       3 |
-    | TST_MemberOfFamilyCollection |       3 |
-    | TST_Person                   |       4 |
-    +------------------------------+---------+
+    +-------------+------------------------------+---------+
+    | Namespace   | Class                        |   count |
+    |-------------+------------------------------+---------|
+    | root/cimv2  | TST_FamilyCollection         |       2 |
+    | root/cimv2  | TST_Lineage                  |       3 |
+    | root/cimv2  | TST_MemberOfFamilyCollection |       3 |
+    | root/cimv2  | TST_Person                   |       4 |
+    | root/cimv2  | TST_Personsub                |       4 |
+    +-------------+------------------------------+---------+
+
 
 Count is useful to determine which classes in the environment are actually
 implemented. However this command can take a long time to execute because

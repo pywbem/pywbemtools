@@ -22,7 +22,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
-    CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE
+    CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE
 
 from .utils import execute_pywbemcli, assert_rc
 
@@ -98,8 +99,8 @@ CLASS_ENUMERATE_HELP_LINES = [
 CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'List the classes with matching class names on the server.',
-    '-n, --namespace NAMESPACE Add a namespace to the search scope',
     '-s, --sort                 Sort by namespace. Default is to sort by',
+    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 

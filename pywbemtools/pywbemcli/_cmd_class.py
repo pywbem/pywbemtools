@@ -30,7 +30,7 @@ from ._common import display_cim_objects, filter_namelist, \
     format_table, process_invokemethod
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
-    summary_option
+    summary_option, multiple_namespaces_option
 
 from ._displaytree import display_class_tree
 
@@ -334,6 +334,7 @@ def class_associators(context, classname, **options):
               help='Add a namespace to the search scope. '
                    'May be specified multiple times. '
                    'Default: Search in all namespaces of the server.')
+@add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by namespace. Default is to sort by classname')
 @click.pass_obj
@@ -546,6 +547,7 @@ def cmd_class_find(context, classname_glob, options):
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
     """
+
     if options['namespace']:
         ns_names = options['namespace']
     else:

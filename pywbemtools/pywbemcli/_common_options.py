@@ -77,6 +77,13 @@ verify_option = [              # pylint: disable=invalid-name
                       'to allow for verification of parameters. '
                       'Default: Do not prompt for confirmation.')]
 
+multiple_namespaces_option = [              # pylint: disable=invalid-name
+    click.option('-n', '--namespace', type=str, multiple=True,
+                 required=False, metavar='NAMESPACE',
+                 help='Add a namespace to the search scope. '
+                      'May be specified multiple times. '
+                      'Default: Search in all namespaces of the server.')]
+
 
 def add_options(options):
     """
