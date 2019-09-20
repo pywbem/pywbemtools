@@ -42,7 +42,6 @@ SERVER_HELP_LINES = [
     'Command group for WBEM servers.',
     CMD_OPTION_HELP_HELP_LINE,
     'brand             Get the brand of the server.',
-    'connection        Get connection info used by this server.',
     'get-centralinsts  List central instances of mgmt profiles on the server.',
     'info              Get information about the server.',
     'interop           Get the Interop namespace of the server.',
@@ -56,11 +55,6 @@ SERVER_BRAND_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_CONNECTION_HELP_LINES = [
-    'Usage: pywbemcli server connection [COMMAND-OPTIONS]',
-    'Get connection info used by this server.',
-    CMD_OPTION_HELP_HELP_LINE,
-]
 
 SERVER_GETCENTRALINSTS_HELP_LINES = [
     'Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]',
@@ -134,18 +128,6 @@ TEST_CASES = [
     ['Verify server command brand  -h response',
      ['brand', '-h'],
      {'stdout': SERVER_BRAND_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify server command connection --help response',
-     ['connection', '--help'],
-     {'stdout': SERVER_CONNECTION_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify server command connection -h response',
-     ['connection', '-h'],
-     {'stdout': SERVER_CONNECTION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -322,15 +304,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
-
-    ['Verify server command connection with mock server',
-     ['connection'],
-     {'stdout': ["", 'url: http://FakedUrl', 'creds: None', '.x509: None',
-                 'default_namespace: root/cimv2', 'timeout: None sec.',
-                 'ca_certs: None'],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
 
     ['Verify server command get-centralinsts based on wbem server mock.',
      {'args': ['get-centralinsts', '-o', 'SNIA',
