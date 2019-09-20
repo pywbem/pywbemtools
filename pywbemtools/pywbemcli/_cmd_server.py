@@ -171,20 +171,6 @@ def server_centralinsts(context, **options):
     context.execute_cmd(lambda: cmd_server_centralinsts(context, options))
 
 
-@server_group.command('connection', options_metavar=CMD_OPTS_TXT)
-@click.pass_obj
-def server_connection(context):
-    """
-    Get connection info used by this server.
-
-    Display the information about the connection used to connect to the
-    WBEM server.
-
-    This is equivalent to the 'connection show' command.
-    """
-    context.execute_cmd(lambda: cmd_server_connection(context))
-
-
 # TODO: reactivate and implement this in version 0.6.0
 # @server_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
 # @click.pass_obj
@@ -334,18 +320,6 @@ def cmd_server_profiles(context, options):
                                 title='Advertised management profiles:',
                                 table_format=context.output_format))
 
-    except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
-
-
-def cmd_server_connection(context):
-    """Display information on the current WBEM Connection"""
-    try:
-        conn = context.conn
-        click.echo('\nurl: %s\ncreds: %s\n.x509: %s\ndefault_namespace: %s\n'
-                   'timeout: %s sec.\nca_certs: %s' %
-                   (conn.url, conn.creds, conn.x509, conn.default_namespace,
-                    conn.timeout, conn.ca_certs))
     except Error as er:
         raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
 

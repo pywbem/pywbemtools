@@ -853,7 +853,6 @@ server of the :term:`current connection` to access information about the
 WBEM server itself:
 
 * :ref:`Server brand command` - Get the brand of the server.
-* :ref:`Server connection command` - Get connection info used by this server.
 * :ref:`Server get-centralinsts command` - List central instances of mgmt profiles on the server.
 * :ref:`Server info command` - Get information about the server.
 * :ref:`Server interop command` - Get the Interop namespace of the server.
@@ -889,31 +888,6 @@ Example:
     +---------------------+
 
 See :ref:`pywbemcli server brand --help` for details.
-
-
-.. _`Server connection command`:
-
-Server connection command
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``server connection`` command displays information on the
-:term:`current connection`.
-
-Note that the :ref:`connection show command` also displays such information.
-
-Example:
-
-.. code-block:: text
-
-    $ pywbemcli --name myserver server connection
-    url: http://localhost
-    creds: ('kschopmeyer', 'test8play')
-    .x509: None
-    default_namespace: root/cimv2
-    timeout: 30 sec.
-    ca_certs: None
-
-See :ref:`pywbemcli server connection --help` for details.
 
 
 .. _`Server info command`:
