@@ -300,7 +300,7 @@ Pywbemcli terminates with one of the following program exit codes:
     error. This will mostly be caused by CIM errors returned by the server,
     but can also be caused by the pywbemcli code itself.
 
-  * Programming errors in mock Python scripts (see `Mock support overview`_);
+  * Programming errors in mock Python scripts (see: :ref:`Mock support overview`);
     the error message includes a Python traceback of the error.
 
 * **1 - Python traceback**: In such cases, pywbemcli terminates during its

@@ -289,20 +289,44 @@ The following are examples of scalar property definitions:
 Interactively selecting INSTANCENAME
 ------------------------------------
 
-The INSTANCENAME argument has a certain complexity, particularly for
-associations and for classes with multiple keys.
+The INSTANCENAME argument can be complex, particularly for associations and
+classes with multiple keys.
 
-To simplify this, pywbemcli provides an option (``-i`` or ``--interactive``) on
-commands that have an INSTANCENAME argument, that allows the user to specify
-only the class name (as the INSTANCENAME argument value), retrieves all the
-instance names of that class from the server and presents the user with a
-select list from which an instance name can be chosen.
+To simplify using INSTANCENAME on the command line, pywbemcli provides a wild
+card character "?" that can be used with commands in place of the INSTANCENAME
+keys on commands that have an INSTANCENAME argument. This allows the user to
+specify only the class name (as the INSTANCENAME argument value) with the wild
+card for the keys. Pywbemcli retrieves all instance names of that class from
+the server and presents the user with a select list from which an instance name
+can be chosen.
+
+Thus an INSTANCENAME argument on the command line can be specified in two ways:
+
+* By specifying an untyped WBEM URI of an instance path in the
+  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
+  specified in the WBEM URI, or otherwise the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection. Any host name in the WBEM URI will be ignored.
+  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+
+* By specifying the ``--interactive`` command option and a class name in the
+  ``INSTANCENAME`` argument. The instances of the specified class are displayed
+  and the user is prompted for an index number to select an instance. The
+  namespace of the instance is the namespace specified with the
+  ``-namespace``/``-n`` command option, or otherwise the default namespace
+  of the connection.
+  For details, see :ref:`Interactively selecting INSTANCENAME`.
+
+Thus, in place of the full instance name (ex.
+``CIM_Foo.InstanceID="CIM_Foo1"``) the users uses ``CIM_Foo.?`` to initiate
+pywbemcli instance name selection
+
 
 Example:
 
 .. code-block:: text
 
-    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo --interactive
+    $ pywbemcli --mock-server tests/unit/simple_mock_model.mof instance get CIM_Foo.?
     Pick Instance name to process
     0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
     1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"

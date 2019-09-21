@@ -26,7 +26,7 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, CMD_OPTION_VERIFY_HELP_LINE, \
     CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE, \
     CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE, \
-    CMD_OPTION_INTERACTIVE_HELP_LINE, CMD_OPTION_FILTER_QUERY_LINE, \
+    CMD_OPTION_FILTER_QUERY_LINE, \
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE, \
@@ -83,7 +83,6 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
@@ -110,7 +109,6 @@ INSTANCE_CREATE_HELP_LINES = [
 INSTANCE_DELETE_HELP_LINES = [
     'Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
     'Delete an instance of a class.',
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -139,7 +137,6 @@ INSTANCE_GET_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -148,7 +145,6 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
     'METHODNAME',
     'Invoke a method on an instance.',
     '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -158,7 +154,6 @@ INSTANCE_MODIFY_HELP_LINES = [
     'Modify properties of an instance.',
     '-p, --property PROPERTYNAME=VALUE Property to be modified',
     '--pl, --propertylist PROPERTYLIST Reduce the properties to be modified',
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -183,7 +178,6 @@ INSTANCE_REFERENCES_HELP_LINES = [
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_INTERACTIVE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
@@ -775,8 +769,8 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command get with interactive option',
-     ['get', 'TST_Person', '-i'],
+    ['Verify instance command get with interactive wild card on classname',
+     ['get', 'TST_Person.?'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
@@ -784,8 +778,8 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
-    ['Verify instance command get with interactive option',
-     ['get', 'TST_Person', '--interactive'],
+    ['Verify instance command get with  wild card for keys',
+     ['get', 'TST_Person.?'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {'],
@@ -1175,16 +1169,8 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command delete with interactive option',
-     ['delete', 'TST_Person', '-i'],
-     {'stdout':
-      ['root/cimv2:TST_Person.name="Mike"'],
-      'rc': 0,
-      'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
-
-    ['Verify instance command delete with interactive option',
-     ['delete', 'TST_Person', '--interactive'],
+    ['Verify instance command delete with interactive wild card on classname',
+     ['delete', 'TST_Person.?'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
@@ -1398,19 +1384,8 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command references with interactive option -i',
-     ['references', 'TST_Person', '-i'],
-     {'stdout':
-      ['root/cimv2:TST_Person.name="Mike"',
-       'instance of TST_Lineage {',
-       'instance of TST_MemberOfFamilyCollection {'],
-      'rc': 0,
-      'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
-
-    ['Verify instance command references with interactive option '
-     '--interactive',
-     ['references', 'TST_Person', '--interactive'],
+    ['Verify instance command references with selection suffix keys wild card ',
+     ['references', 'TST_Person.?'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
@@ -1528,8 +1503,9 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command associators with interactive option -i',
-     ['associators', 'TST_Person', '-i'],
+    ['Verify instance command associators with interactive wild card on '
+     'classname',
+     ['associators', 'TST_Person.?'],
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Person {',

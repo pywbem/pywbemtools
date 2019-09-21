@@ -1005,7 +1005,7 @@ The following defines the help output for the `pywbemcli instance associators --
       specified in the --namespace option, or otherwise the default namespace of
       the connection. Any host name in the WBEM URI will be ignored.
 
-      2. By specifying the --interactive option and a CIM class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
       and the user is prompted for an index number to select an instance. The
       CIM namespace in which the instances are looked up is the namespace
@@ -1058,10 +1058,6 @@ The following defines the help output for the `pywbemcli instance associators --
                                       including object paths.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
-      -i, --interactive               Prompt for selecting an instance from a
-                                      list. If used, the INSTANCENAME argument
-                                      must be a class name, and the instances of
-                                      that class are presented.
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
@@ -1197,7 +1193,7 @@ The following defines the help output for the `pywbemcli instance delete --help`
       specified in the --namespace option, or otherwise the default namespace of
       the connection. Any host name in the WBEM URI will be ignored.
 
-      2. By specifying the --interactive option and a CIM class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
       and the user is prompted for an index number to select an instance. The
       CIM namespace in which the instances are looked up is the namespace
@@ -1205,10 +1201,6 @@ The following defines the help output for the `pywbemcli instance delete --help`
       the connection.
 
     Options:
-      -i, --interactive          Prompt for selecting an instance from a list. If
-                                 used, the INSTANCENAME argument must be a class
-                                 name, and the instances of that class are
-                                 presented.
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
       -h, --help                 Show this message and exit.
@@ -1312,18 +1304,18 @@ The following defines the help output for the `pywbemcli instance get --help` co
 
       The instance can be specified in two ways:
 
-      * By specifying an untyped WBEM URI of an instance path in the
-      INSTANCENAME   argument. The namespace in which the instance is looked up
-      is the   namespace specified in the WBEM URI, or otherwise the namespace
-      specified   in the --namespace option, or otherwise the default namespace
-      of the   connection. Any host name in the WBEM URI will be ignored.
+      1. By specifying an untyped WBEM URI of an instance path in the
+      INSTANCENAME argument. The namespace in which the instance is looked up is
+      the namespace specified in the WBEM URI, or otherwise the namespace
+      specified in the --namespace option, or otherwise the default namespace of
+      the connection. Any host name in the WBEM URI will be ignored.
 
-      * By specifying the --interactive option and a class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
-      and the user is prompted for an index number to select an instance.   The
-      namespace in which the instances are looked up is the namespace
-      specified in the --namespace option, or otherwise the default namespace
-      of the connection.
+      and the user is prompted for an index number to select an instance. The
+      namespace in which the instances are looked up is the namespace specified
+      in the --namespace option, or otherwise the default namespace of the
+      connection.
 
       In the output, the instance will formatted as defined by the --output-
       format general option.
@@ -1352,10 +1344,6 @@ The following defines the help output for the `pywbemcli instance get --help` co
                                       Default: Do not filter properties.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
-      -i, --interactive               Prompt for selecting an instance from a
-                                      list. If used, the INSTANCENAME argument
-                                      must be a class name, and the instances of
-                                      that class are presented.
       -h, --help                      Show this message and exit.
 
 
@@ -1388,7 +1376,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       specified in the --namespace option, or otherwise the default namespace of
       the connection. Any host name in the WBEM URI will be ignored.
 
-      2. By specifying the --interactive option and a CIM class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
       and the user is prompted for an index number to select an instance. The
       CIM namespace in which the instances are looked up is the namespace
@@ -1416,10 +1404,6 @@ The following defines the help output for the `pywbemcli instance invokemethod -
                                       Array property values are specified as a
                                       comma-separated list; embedded instances are
                                       not supported. Default: No input parameters.
-      -i, --interactive               Prompt for selecting an instance from a
-                                      list. If used, the INSTANCENAME argument
-                                      must be a class name, and the instances of
-                                      that class are presented.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -h, --help                      Show this message and exit.
@@ -1449,7 +1433,7 @@ The following defines the help output for the `pywbemcli instance modify --help`
       specified in the --namespace option, or otherwise the default namespace of
       the connection. Any host name in the WBEM URI will be ignored.
 
-      2. By specifying the --interactive option and a CIM class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
       and the user is prompted for an index number to select an instance. The
       CIM namespace in which the instances are looked up is the namespace
@@ -1483,10 +1467,6 @@ The following defines the help output for the `pywbemcli instance modify --help`
                                       will cause no properties to be modified.
                                       Default: Do not reduce the properties to be
                                       modified.
-      -i, --interactive               Prompt for selecting an instance from a
-                                      list. If used, the INSTANCENAME argument
-                                      must be a class name, and the instances of
-                                      that class are presented.
       -V, --verify                    Prompt for confirmation before performing a
                                       change, to allow for verification of
                                       parameters. Default: Do not prompt for
@@ -1557,7 +1537,7 @@ The following defines the help output for the `pywbemcli instance references --h
       specified in the --namespace option, or otherwise the default namespace of
       the connection. Any host name in the WBEM URI will be ignored.
 
-      2. By specifying the --interactive option and a CIM class name in the
+      2. By specifying a class name with the characters ".?" as the keys in the
       INSTANCENAME argument. The instances of the specified class are displayed
       and the user is prompted for an index number to select an instance. The
       CIM namespace in which the instances are looked up is the namespace
@@ -1605,10 +1585,6 @@ The following defines the help output for the `pywbemcli instance references --h
                                       including object paths.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
-      -i, --interactive               Prompt for selecting an instance from a
-                                      list. If used, the INSTANCENAME argument
-                                      must be a class name, and the instances of
-                                      that class are presented.
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the

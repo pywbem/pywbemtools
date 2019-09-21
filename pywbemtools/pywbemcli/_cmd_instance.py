@@ -86,12 +86,6 @@ local_only_list_option = [              # pylint: disable=invalid-name
                       'By default, and when pull operations are used, '
                       'superclass properties will always be included.')]
 
-interactive_option = [              # pylint: disable=invalid-name
-    click.option('-i', '--interactive', is_flag=True, required=False,
-                 help='Prompt for selecting an instance from a list. '
-                      'If used, the INSTANCENAME argument must be a class '
-                      'name, and the instances of that class are presented.')]
-
 property_create_option = [              # pylint: disable=invalid-name
     click.option('-p', '--property', type=str, metavar='PROPERTYNAME=VALUE',
                  required=False, multiple=True,
@@ -160,7 +154,6 @@ def instance_group():
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
-@add_options(interactive_option)
 @click.pass_obj
 def instance_get(context, instancename, **options):
     """
@@ -168,18 +161,18 @@ def instance_get(context, instancename, **options):
 
     The instance can be specified in two ways:
 
-    * By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-      argument. The namespace in which the instance is looked up is the
-      namespace specified in the WBEM URI, or otherwise the namespace specified
-      in the --namespace option, or otherwise the default namespace of the
-      connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
+    argument. The namespace in which the instance is looked up is the
+    namespace specified in the WBEM URI, or otherwise the namespace specified
+    in the --namespace option, or otherwise the default namespace of the
+    connection. Any host name in the WBEM URI will be ignored.
 
-    * By specifying the --interactive option and a class name in the
-      INSTANCENAME argument. The instances of the specified class are displayed
-      and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace
-      specified in the --namespace option, or otherwise the default namespace
-      of the connection.
+    2. By specifying a class name with the characters ".?" as the keys in the
+    INSTANCENAME argument. The instances of the specified class are displayed
+    and the user is prompted for an index number to select an instance.
+    The namespace in which the instances are looked up is the namespace
+    specified in the --namespace option, or otherwise the default namespace
+    of the connection.
 
     In the output, the instance will formatted as defined by the
     --output-format general option.
@@ -190,7 +183,6 @@ def instance_get(context, instancename, **options):
 
 @instance_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_delete(context, instancename, **options):
@@ -205,7 +197,7 @@ def instance_delete(context, instancename, **options):
     in the --namespace option, or otherwise the default namespace of the
     connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying the --interactive option and a CIM class name in the
+    2. By specifying a class name with the characters ".?" as the keys in the
     INSTANCENAME argument. The instances of the specified class are displayed
     and the user is prompted for an index number to select an instance.
     The CIM namespace in which the instances are looked up is the namespace
@@ -259,7 +251,6 @@ def instance_create(context, classname, **options):
               'times. The empty string will cause no properties to '
               'be modified. '
               'Default: Do not reduce the properties to be modified.')
-@add_options(interactive_option)
 @add_options(verify_option)
 @add_options(namespace_option)
 @click.pass_obj
@@ -275,7 +266,7 @@ def instance_modify(context, instancename, **options):
     in the --namespace option, or otherwise the default namespace of the
     connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying the --interactive option and a CIM class name in the
+    2. By specifying a class name with the characters ".?" as the keys in the
     INSTANCENAME argument. The instances of the specified class are displayed
     and the user is prompted for an index number to select an instance.
     The CIM namespace in which the instances are looked up is the namespace
@@ -306,7 +297,6 @@ def instance_modify(context, instancename, **options):
                    'Array property values are specified as a comma-separated '
                    'list; embedded instances are not supported. '
                    'Default: No input parameters.')
-@add_options(interactive_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
@@ -325,7 +315,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
     in the --namespace option, or otherwise the default namespace of the
     connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying the --interactive option and a CIM class name in the
+    2. By specifying a class name with the characters ".?" as the keys in the
     INSTANCENAME argument. The instances of the specified class are displayed
     and the user is prompted for an index number to select an instance.
     The CIM namespace in which the instances are looked up is the namespace
@@ -404,7 +394,6 @@ def instance_enumerate(context, classname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(interactive_option)
 @add_options(summary_option)
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
@@ -425,7 +414,7 @@ def instance_references(context, instancename, **options):
     in the --namespace option, or otherwise the default namespace of the
     connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying the --interactive option and a CIM class name in the
+    2. By specifying a class name with the characters ".?" as the keys in the
     INSTANCENAME argument. The instances of the specified class are displayed
     and the user is prompted for an index number to select an instance.
     The CIM namespace in which the instances are looked up is the namespace
@@ -469,7 +458,6 @@ def instance_references(context, instancename, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(namespace_option)
-@add_options(interactive_option)
 @add_options(summary_option)
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
@@ -490,7 +478,7 @@ def instance_associators(context, instancename, **options):
     in the --namespace option, or otherwise the default namespace of the
     connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying the --interactive option and a CIM class name in the
+    2. By specifying a class name with the characters ".?" as the keys in the
     INSTANCENAME argument. The instances of the specified class are displayed
     and the user is prompted for an index number to select an instance.
     The CIM namespace in which the instances are looked up is the namespace
@@ -584,13 +572,17 @@ def instance_count(context, classname, **options):
 def get_instancename(context, instancename, options):
     """
     Common function to get the instancename from either the input or the user.
+    If the instance name replaces the keys with ".?" execute the console
+    prompt to select the instance name.
 
     Returns:
      CIMInstanceName with namespace retrieved either from the namespace option
      in options dictionary or the connection default_namespace.
     """
     try:
-        if options['interactive']:
+        # if the keys component is the character ? execute select
+        if instancename.endswith(".?"):
+            instancename = instancename[:-2]
             ns = options.get('namespace', context.conn.default_namespace)
 
             try:
@@ -603,7 +595,8 @@ def get_instancename(context, instancename, options):
                 return None
 
         else:
-            instancepath = parse_wbemuri_str(instancename, options['namespace'])
+            instancepath = parse_wbemuri_str(instancename,
+                                             options['namespace'])
         return instancepath
 
     except ValueError as ve:

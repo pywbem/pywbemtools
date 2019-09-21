@@ -387,22 +387,13 @@ Instance associators command
 The ``instance associators`` command lists the CIM instances that are associated
 with the specified source instance.
 
-The source instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed.
@@ -414,7 +405,7 @@ Example:
 
 .. code-block:: text
 
-    $ pywbemcli --name mymock instance references TST_Person --names-only --interactive
+    $ pywbemcli --name mymock instance references TST_Person.? --names-only
     Pick Instance name to process: 0
     0: root/cimv2:TST_Person.name="Mike"
     1: root/cimv2:TST_Person.name="Saara"
@@ -526,22 +517,13 @@ Instance delete command
 
 The ``instance delete`` command deletes a CIM instance.
 
-The instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 The following example deletes an instance by specifying its instance name.
 Note the extra backslash (see :term:`backslash-escaped`) that is required to
@@ -596,22 +578,13 @@ Instance get command
 
 The ``instance get`` command gets a CIM instance.
 
-The instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 The command displays the instance using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -625,6 +598,21 @@ This example gets an instance by instance name:
        name = "Saara";
     };
 
+or using the keys wild card:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock instance get root/cimv2:TST_Person.?
+    Pick Instance name to process
+    0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+    1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+    2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+    Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+    instance of TST_Person {
+       name = "Saara";
+    };
+
+
 See :ref:`pywbemcli instance get --help` for details.
 
 
@@ -636,22 +624,13 @@ Instance invokemethod command
 The ``instance invokemethod`` command invokes a CIM method on the specified
 instance and displays the return value and any output parameters.
 
-The instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 Input parameters for the method can be specified with the ``--parameter``/``-p``
 command option, which can be specified multiple times.
@@ -670,6 +649,21 @@ Example:
     ReturnValue=0
     arrBool=true, false
 
+Or using the wild card to create a selection list for the instance names
+
+.. code-block:: text
+
+    $ pywbemcli --mock-server tests/unit/all_types.mof --mock-server tests/unit/all_types_method_mock.py.py
+
+    pywbemcli> instance invokemethod PyWBEM_AllTypes.? --parameter arrBool=True,False
+    Pick Instance name to process
+    0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
+    1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
+    2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
+    Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+    ReturnValue=0
+    arrBool=true, false
+
 See :ref:`pywbemcli instance invokemethod --help` for details.
 
 
@@ -681,22 +675,13 @@ Instance modify command
 The ``instance modify`` command modifies the properties of an existing CIM
 instance.
 
-The instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 The new property values are specified by possibly multiple ``--property``/``-p``
 command options.
@@ -717,22 +702,13 @@ Instance references command
 The ``instance references`` command lists the CIM instances that reference
 the specified source instance.
 
-The source instance can be specified in two ways:
+The instance name (INSTANCENAME argument) can be specified in two ways as
+defined in :ref:`Interactively selecting INSTANCENAME`:
 
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
+* By specifying an untyped WBEM_URI.
 
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
+* By specifying the WBEM_URI with the wild card "?" in place of the keys
+  component of the WBEM_URI, (i.e. <classname>.?).
 
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed.
