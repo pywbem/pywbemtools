@@ -42,7 +42,7 @@ SERVER_HELP_LINES = [
     'Command group for WBEM servers.',
     CMD_OPTION_HELP_HELP_LINE,
     'brand             Get the brand of the server.',
-    'central-insts     List central instances of mgmt profiles on the server.',
+    'centralinsts      List central instances of mgmt profiles on the server.',
     'info              Get information about the server.',
     'interop           Get the Interop namespace of the server.',
     'namespaces        List the namespaces of the server.',
@@ -57,7 +57,7 @@ SERVER_BRAND_HELP_LINES = [
 
 
 SERVER_CENTRAL_INSTS_HELP_LINES = [
-    'Usage: pywbemcli server central-insts [COMMAND-OPTIONS]',
+    'Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]',
     'List central instances of mgmt profiles on the server.',
     '-o, --organization ORG-NAME Filter by the defined organization',
     '-p, --profile PROFILE-NAME Filter by the profile name',
@@ -132,13 +132,13 @@ TEST_CASES = [
      None, OK],
 
     ['Verify server command get-centralinsts  --help response',
-     ['central-insts', '--help'],
+     ['centralinsts', '--help'],
      {'stdout': SERVER_CENTRAL_INSTS_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify server command central-insts  -h response',
-     ['central-insts', '-h'],
+    ['Verify server command centralinsts  -h response',
+     ['centralinsts', '-h'],
      {'stdout': SERVER_CENTRAL_INSTS_HELP_LINES,
       'test': 'innows'},
      None, OK],
@@ -305,8 +305,8 @@ TEST_CASES = [
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify server command central-insts based on wbem server mock.',
-     {'args': ['central-insts', '-o', 'SNIA',
+    ['Verify server command centralinsts based on wbem server mock.',
+     {'args': ['centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
       'general': ['-d', 'interop', '-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',
