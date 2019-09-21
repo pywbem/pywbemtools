@@ -80,6 +80,7 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       string OutputParam2);
 };
 
+// 5 instances of CIM_Foo class
 
 class CIM_Foo_sub2 : CIM_Foo {
     string cimfoo_sub2;
@@ -101,7 +102,8 @@ instance of CIM_Foo as $foo3 { InstanceID = "CIM_Foo30"; };
 
 instance of CIM_Foo as $foo3 { InstanceID = "CIM_Foo31"; };
 
-// Additional instances behond simple_mof_model.mof
+
+// 4 instances of CIM_Foo_sub class
 
 instance of CIM_Foo_sub as $foosub1{
     InstanceID = "CIM_Foo_sub1";
@@ -122,6 +124,8 @@ instance of CIM_Foo_sub as $foosub1{
     InstanceID = "CIM_Foo_sub3";
     IntegerProp = 7;
     };
+
+// 3 instances of CIM_Foo_sub_sub
 
 instance of CIM_Foo_sub_sub as $foosubsub1{
     InstanceID = "CIM_Foo_sub_sub1";

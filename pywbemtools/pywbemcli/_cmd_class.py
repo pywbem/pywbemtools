@@ -30,7 +30,7 @@ from ._common import display_cim_objects, filter_namelist, \
     format_table, process_invokemethod
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
-    summary_option
+    summary_option, multiple_namespaces_option
 
 from ._displaytree import display_class_tree
 
@@ -334,6 +334,7 @@ def class_associators(context, classname, **options):
               help='Add a namespace to the search scope. '
                    'May be specified multiple times. '
                    'Default: Search in all namespaces of the server.')
+@add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by namespace. Default is to sort by classname')
 @click.pass_obj
@@ -346,10 +347,11 @@ def class_find(context, classname_glob, **options):
     WBEM server, or in the specified namespace (--namespace option).
 
     The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-    the class names case insensitively. The special characters known from file
-    name wildcarding are supported: "*" to match zero or more characters, and
-    "?" to match a single character. In order to not have the shell expand
-    the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
+    class names case insensitively. The special characters from file name
+    wildcarding are supported (`*` to match zero or more characters, and `?` to
+    match a single character) and character ranges expressed with []. To avoid
+    shell expansion of wildcards, the CLASSNAME-GLOB argument should be put in
+    quotes.
 
     For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
     "pywbem_", etc. "*system*" returns classes whose names include the case
@@ -546,6 +548,7 @@ def cmd_class_find(context, classname_glob, options):
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
     """
+
     if options['namespace']:
         ns_names = options['namespace']
     else:

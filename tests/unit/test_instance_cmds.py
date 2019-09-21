@@ -29,7 +29,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INTERACTIVE_HELP_LINE, CMD_OPTION_FILTER_QUERY_LINE, \
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
-    CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE
+    CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -93,7 +94,7 @@ INSTANCE_COUNT_HELP_LINES = [
     'Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -1573,47 +1574,80 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance command count, Return table of instances',
-     ['count', 'CIM_*'],
-     {'stdout': ['Count of instances per class',
-                 '+---------+---------+',
-                 '| Class   |   count |',
-                 '|---------+---------|',
-                 '| CIM_Foo |       3 |',
-                 '+---------+---------+', ],
+    # The following use interop ns to avoid warning about namespaces.
+    ['Verify instance command count CIM_* simple model, Rtn tbl of instances',
+     {'args': ['count', 'CIM_*'],
+      'general': ['--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
++-------------+---------+---------+
+| Namespace   | Class   |   count |
+|-------------+---------+---------|
+| interop     | CIM_Foo |       3 |
++-------------+---------+---------+
+""",
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count sorted, Return table of instances',
-     ['count', 'CIM_*', '--sort'],
-     {'stdout': ['Count of instances per class',
-                 '+-----------------+---------+',
-                 '| Class           |   count |',
-                 '|-----------------+---------|',
-                 '| CIM_Foo_sub_sub |       3 |',
-                 '| CIM_Foo_sub     |       4 |',
-                 '| CIM_Foo         |       5 |',
-                 '+-----------------+---------+'],
+    ['Verify instance command count CIM_*  sorted, Rtn table of inst counts',
+     {'args': ['count', 'CIM_*', '--sort'],
+      'general': ['--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
++-------------+-----------------+---------+
+| Namespace   | Class           |   count |
+|-------------+-----------------+---------|
+| interop     | CIM_Foo_sub_sub |       3 |
+| interop     | CIM_Foo_sub     |       4 |
+| interop     | CIM_Foo         |       5 |
++-------------+-----------------+---------+
+""",
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE_EXT, OK],
 
-    ['Verify instance command count. Return table of instances',
-     ['count', 'CIM_*'],
-     {'stdout': ['Count of instances per class',
-                 '+-----------------+---------+',
-                 '| Class           |   count |',
-                 '|-----------------+---------|',
-                 '| CIM_Foo         |       5 |',
-                 '| CIM_Foo_sub     |       4 |',
-                 '| CIM_Foo_sub_sub |       3 |',
-                 '+-----------------+---------+'],
+    ['Verify instance command count CIM_*. Rtn table of inst counts',
+     {'args': ['count', 'CIM_*'],
+      'general': ['--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
++-------------+-----------------+---------+
+| Namespace   | Class           |   count |
+|-------------+-----------------+---------|
+| interop     | CIM_Foo         |       5 |
+| interop     | CIM_Foo_sub     |       4 |
+| interop     | CIM_Foo_sub_sub |       3 |
++-------------+-----------------+---------+
+""",
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE_EXT, OK],
 
-    # TODO add subclass instances to the count test.
+    ['Verify instance command count mock assoc. Return table of instances',
+     {'args': ['count', '*'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': [
+         'Count of instances per class',
+         'Namespace    Class                           count',
+         'interop      TST_FamilyCollection                2',
+         'interop      TST_Lineage                         3',
+         'interop      TST_MemberOfFamilyCollection        3',
+         'interop      TST_Person                          4',
+         'interop      TST_Personsub                       4', ],
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command count *Person* . Return table of instances',
+     {'args': ['count', '*Person*'],
+      'general': ['--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
+Namespace    Class            count
+interop      TST_Person           4
+interop      TST_Personsub        4
+""",
+      'rc': 0,
+      'test': 'lonnows'},
+     ASSOC_MOCK_FILE, OK],
 
     #
     #  instance invokemethod tests
