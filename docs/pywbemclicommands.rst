@@ -454,7 +454,7 @@ match the specified :term:`Unix-style path name pattern` are counted. If the
 ``CLASSNAME-GLOB`` argument is not specified all instances of all classes in
 the target namespaces are counted.
 
-Results for class that have no instances are not displayed.
+Results for classes that have no instances are not displayed.
 
 This command can take a long time to execute since it potentially enumerates
 all instance names for all classes in all namespaces.

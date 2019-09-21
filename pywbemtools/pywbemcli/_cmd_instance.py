@@ -555,14 +555,15 @@ def instance_count(context, classname, **options):
     it counts the instances specifically for the classname of each instance
     returned, not including subclasses.
 
-    The CLASSNAME-GLOB argument is a wildcard expression that is matched on the
-    class names case insensitively. The special characters known from file name
-    wildcarding are supported: `*` to match zero or more characters, and `?` to
-    match a single character. To avoid shell expansion of wildcards, the
-    CLASSNAME-GLOB argument should be put in quotes.
+    The CLASSNAME-GLOB argument is a wildcard expression that is matched on
+    class names case insensitively. The special characters from file name
+    wildcarding are supported (`*` to match zero or more characters, and `?` to
+    match a single character) and character ranges expressed with []. To avoid
+    shell expansion of wildcards, the CLASSNAME-GLOB argument should be put in
+    quotes.
 
-    If CLASSNAME-GLOB is not specified, the all classes in the specified
-    namespaces are counted (GLOB "*").
+    If CLASSNAME-GLOB is not specified, then all classes in the specified
+    namespaces are counted (same as when specifying CLASSNAME-GLOB as "*").
 
     For example, `pywbem_*` returns instances of classes whose name begins with
     `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names include

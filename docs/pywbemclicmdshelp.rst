@@ -1097,12 +1097,13 @@ The following defines the help output for the `pywbemcli instance count --help` 
       subclasses.
 
       The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-      the class names case insensitively. The special characters known from file
-      name wildcarding are supported: `*` to match zero or more characters, and
-      `?` to match a single character. In order to not have the shell expand the
-      wildcards, the CLASSNAME-GLOB argument should be put in quotes.
+      class names case insensitively. The special characters from file name
+      wildcarding are supported (`*` to match zero or more characters, and `?`
+      to match a single character) and character ranges expressed with []. To
+      avoid shell expansion of wildcards, the CLASSNAME-GLOB argument should be
+      put in quotes.
 
-      If CLASSNAME-GLOB is not specified, the all classes in the specified
+      If CLASSNAME-GLOB is not specified, then all classes in the specified
       namespaces are counted (GLOB "*").
 
       For example, `pywbem_*` returns instances of classes whose name begins

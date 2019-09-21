@@ -347,10 +347,11 @@ def class_find(context, classname_glob, **options):
     WBEM server, or in the specified namespace (--namespace option).
 
     The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-    the class names case insensitively. The special characters known from file
-    name wildcarding are supported: "*" to match zero or more characters, and
-    "?" to match a single character. In order to not have the shell expand
-    the wildcards, the CLASSNAME-GLOB argument should be put in quotes.
+    class names case insensitively. The special characters from file name
+    wildcarding are supported (`*` to match zero or more characters, and `?` to
+    match a single character) and character ranges expressed with []. To avoid
+    shell expansion of wildcards, the CLASSNAME-GLOB argument should be put in
+    quotes.
 
     For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
     "pywbem_", etc. "*system*" returns classes whose names include the case
