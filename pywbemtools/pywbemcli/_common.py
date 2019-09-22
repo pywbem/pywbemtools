@@ -31,7 +31,6 @@ from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
     cimvalue, CIMFloat, CIMInt
 from pywbem.cim_obj import mofstr
-from pywbem.cim_obj import NocaseDict
 
 from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
 
@@ -581,7 +580,7 @@ def create_ciminstancename(cim_class, kv_keys):
     """
     # TODO make usable if no class can be acquired because GetClass not
     # implemented in server.
-    keys = NocaseDict()
+    keys = []
     for kv_property in kv_keys:
         name, value_str = parse_kv_pair(kv_property)
         try:
@@ -593,8 +592,8 @@ def create_ciminstancename(cim_class, kv_keys):
         if value_str.startswith('"') and value_str.endswith('"'):
             value_str = value_str[1:-1]
         try:
-
-            keys[name] = create_cimvalue(cl_prop.type, value_str, False)
+            value = create_cimvalue(cl_prop.type, value_str, False)
+            keys.append((name, value))
         except ValueError as ex:
             raise click.ClickException("Type mismatch property '{}' between "
                                        "expected type='{}', array={} and input "
@@ -628,7 +627,7 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
         click.ClickException if Property name not found in class or if mismatch
           of property type in class vs value component of kv pair
     """
-    properties = NocaseDict()
+    properties = []
     for kv_property in kv_properties:
         name, value_str = parse_kv_pair(kv_property)
         try:
@@ -638,10 +637,11 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
                                        .format(name, cim_class.classname))
 
         try:
-            properties[name] = create_cimproperty(cl_prop.type,
-                                                  cl_prop.is_array,
-                                                  name,
-                                                  value_str)
+            property = create_cimproperty(cl_prop.type,
+                                          cl_prop.is_array,
+                                          name,
+                                          value_str)
+            properties.append((name, property))
         except ValueError as ex:
             raise click.ClickException("Type mismatch property '{}' between "
                                        "expected type='{}', array={} and input "
@@ -1074,6 +1074,16 @@ def format_keys(obj, max_width):
     """
     Format the keys of a dictionary of keybindings as text for display. Formats
     multiple keybindings on each line within the max_width
+
+    Parameters:
+
+        obj(:Class:`pwbem.CIMInstanceName`):
+            Instance name from which keybindings are to be extracted for
+            formatting.
+
+    Returns:
+        :term:`string` containing the keys from the input obj formatted for
+        display at within the defined width.
     """
     def get_wbemurikeys(obj):
         """

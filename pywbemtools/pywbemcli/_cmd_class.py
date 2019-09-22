@@ -482,13 +482,13 @@ def _filter_classes_for_qualifiers(qualifier_filters, results, names_only, iq):
             # If returning instances, honor the names_only option
             if not names_only:
                 if not iq:
-                    cls.qualifiers = NocaseDict()
+                    cls.qualifiers = []
                     for p in cls.properties.values():
-                        p.qualifiers = NocaseDict()
+                        p.qualifiers = []
                     for m in cls.methods.values():
-                        m.qualifiers = NocaseDict()
+                        m.qualifiers = []
                         for p in m.parameters.values():
-                            p.qualifiers = NocaseDict()
+                            p.qualifiers = []
             filtered_results.append(cls)
     if names_only:
         filtered_results = [cls.classname for cls in filtered_results]
