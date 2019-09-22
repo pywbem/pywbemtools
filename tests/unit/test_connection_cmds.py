@@ -742,7 +742,7 @@ TEST_CASES = [
 
     ['Verify connection list with current server from general options, grid',
      {'args': ['list'],
-      'general': ['--server', 'http://blah']},
+      'general': ['--output-format', 'table', '--server', 'http://blah']},
      {'stdout': """
 WBEM server connections: (#: default, *: current)
 +------------+-------------+-------------+-----------+----------+
@@ -870,6 +870,15 @@ WBEM server connections: (#: default, *: current)
      {'stdout': ['Deleted connection "mocktest3"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'None'}},
+     None, OK],
+
+    ['Verify connection list with mof output format mof fails',
+     {'args': ['list'],
+      'general': ['--output-format', 'mof', '--server', 'http://blah']},
+     {'stderr': ['not allowed'],
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'None', 'after': 'None'}},
      None, OK],
 
 ]

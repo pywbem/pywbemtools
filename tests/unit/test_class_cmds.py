@@ -467,16 +467,16 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate CIM_Foo summary',
+    ['Verify class command enumerate CIM_Foo summary table',
      ['enumerate', 'CIM_Foo', '-s'],
      {'stdout': ['2 CIMClass(s) returned'],
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate CIM_Foo summary',
+    ['Verify class command enumerate CIM_Foo summary, table',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': ['2 CIMClass(s) returned'],
-      'test': 'linesnows'},
+      'test': 'insnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate CIM_Foo summary table output',
@@ -657,6 +657,14 @@ TEST_CASES = [
      {'stderr': ['CIMError', 'CIM_ERR_INVALID_CLASS'],
       'rc': 1,
       'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate table output fails).',
+     {'args': ['enumerate'],
+      'general': ['--output-format', 'table']},
+     {'stderr': ['CIM Object formats ', 'not allowed'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -884,6 +892,15 @@ TEST_CASES = [
      {'stderr': ['CIMError', 'CIM_ERR_INVALID_NAMESPACE', '3'],
       'rc': 1,
       'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify class command enumerate table output fails).',
+     {'args': ['get', 'CIM_Foo'],
+      'general': ['--output-format', 'table']},
+     {'stderr': ['CIM Object formats ', 'not allowed'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -1321,6 +1338,7 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+
     #
     # references command tests
     #
@@ -1365,6 +1383,14 @@ TEST_CASES = [
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command refereces table output fails).',
+     {'args': ['associators', 'TST_Person'],
+      'general': ['--output-format', 'table']},
+     {'stderr': ['CIM Object formats ', 'not allowed'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
 
     # Reference errors
 

@@ -32,7 +32,7 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
-    hide_empty_columns, raise_pywbem_error_exception
+    hide_empty_columns, raise_pywbem_error_exception, validate_output_format
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
@@ -563,6 +563,8 @@ def cmd_connection_list(context):
     """
     connections = ConnectionRepository()
 
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     # build the table structure
     rows = []
     cur_sym = '*'  # single char representing current connection
@@ -601,4 +603,4 @@ def cmd_connection_list(context):
         headers,
         title='WBEM server connections: ({}: default, {}: current)'.format(
             dflt_sym, cur_sym),
-        table_format=context.output_format))
+        table_format=output_format))

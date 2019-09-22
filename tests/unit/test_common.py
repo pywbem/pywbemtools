@@ -37,19 +37,18 @@ from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, Uint32, Uint64, Sint32, \
     CIMDateTime, CIMClassName
 from pywbem._nocasedict import NocaseDict
+
+from tests.unit.pytest_extensions import simplified_test_function
+
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
     verify_operation, split_str_w_esc, format_keys, create_ciminstancename, \
-    shorten_path_str, NoCaseList
-
-# pylint: disable=unused-import
+    shorten_path_str, NoCaseList, validate_output_format
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
-
-from tests.unit.pytest_extensions import simplified_test_function
 # from tests.unit.utils import assert_lines
 
 DATETIME1_DT = datetime(2014, 9, 22, 10, 49, 20, 524789)
@@ -74,11 +73,11 @@ TESTCASES_ISCLASSNAME = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('verify is a classname',
+    ('Verify is a classname',
      dict(name=u"CIM_Blah", exp_rtn=True),
      None, None, True),
 
-    ('verify is instance name',
+    ('Verify is instance name',
      dict(name=u"CIM_Blah.px=3", exp_rtn=True),
      None, None, True),
 ]
@@ -93,6 +92,145 @@ def test_is_classname(testcase, name, exp_rtn):
     # The code to be tested
 
     act_rtn = is_classname(name)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_VALID_OUTPUT_FORMAT = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * fmt: output_format defined for this command execution or None
+    #   * default: string containing default format or None
+    #   * groups: list of groups allowed for this command
+    #   * exp_rtn: output_format return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify cmd input, None, default None returns mof',
+     dict(fmt=None,
+          default=None,
+          groups=['CIM'],
+          exp_rtn='mof'),
+     None, None, True),
+
+    ('Verify cmd input, None, default mof returns mof',
+     dict(fmt=None,
+          default='mof',
+          groups=['CIM'],
+          exp_rtn='mof'),
+     None, None, True),
+
+
+    ('Verify cmd input, None, default mof groups TABLE returns mof',
+     dict(fmt=None,
+          default=None,
+          groups=['TABLE'],
+          exp_rtn='simple'),
+     None, None, True),
+
+    ('Verify cmd input, None, default mof returns mof',
+     dict(fmt=None,
+          default='table',
+          groups=['TABLE'],
+          exp_rtn='table'),
+     None, None, True),
+
+    ('Verify cmd input, mof, default mof returns mof',
+     dict(fmt='mof',
+          default='mof',
+          groups=['CIM'],
+          exp_rtn='mof'),
+     None, None, True),
+
+    ('Verify cmd input, mof, default xml returns mof',
+     dict(fmt='mof',
+          default='mof',
+          groups=['CIM'],
+          exp_rtn='mof'),
+     None, None, True),
+
+    ('Verify cmd input xml returns xml',
+     dict(fmt='xml',
+          default='mof',
+          groups=['CIM'],
+          exp_rtn='xml'),
+     None, None, True),
+
+    ('Verify cmd input None default xml returns xml',
+     dict(fmt=None,
+          default='xml',
+          groups=['CIM'],
+          exp_rtn='xml'),
+     None, None, True),
+
+    ('Verify cmd input None default xml group table fails, AssertionError',
+     dict(fmt=None,
+          default='xml',
+          groups=['Table'],
+          exp_rtn='xml'),
+     AssertionError, None, True),
+
+    ('Verify cmd input blah default xml group table fails, AssertionError',
+     dict(fmt='Blah',
+          default='xml',
+          groups=['Table'],
+          exp_rtn='xml'),
+     AssertionError, None, True),
+
+    ('Verify cmd input None default xml group blah fails, AssertionError',
+     dict(fmt='simple',
+          default='xml',
+          groups=['Blah'],
+          exp_rtn='xml'),
+     AssertionError, None, True),
+
+    ('Verify cmd input None default xml group blah fails, AssertionError',
+     dict(fmt='simple',
+          default='blah',
+          groups=['Table'],
+          exp_rtn='xml'),
+     AssertionError, None, True),
+
+    ('Verify cmd input table group CIM fails',
+     dict(fmt='table',
+          default='xml',
+          groups=['CIM'],
+          exp_rtn='xml'),
+     click.ClickException, None, True),
+
+    ('Verify cmd input mof group TABLE fails',
+     dict(fmt='mof',
+          default='xml',
+          groups=['TABLE'],
+          exp_rtn=''),
+     click.ClickException, None, True),
+
+    ('Verify cmd input None, default xml group empty OK',
+     dict(fmt=None,
+          default='xml',
+          groups=[],
+          exp_rtn='xml'),
+     None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_VALID_OUTPUT_FORMAT)
+@simplified_test_function
+def test_valid_output_format(testcase, fmt, default, groups, exp_rtn):
+    """Test common.valid_output_format function"""
+    # The code to be tested
+
+    act_rtn = validate_output_format(fmt, groups, default_format=default)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -706,17 +844,17 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
     # NOTE: choises must end with '' element to close the
     #       pick_multiple_from_list function.
 
-    ('verify good choice ZERO made',
+    ('Verify good choice ZERO made',
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0', ''],
           exp_rtn=[u'ZERO']),
      None, None, OK),
 
-    ('verify good choice ONE made',
+    ('Verify good choice ONE made',
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1', ''],
           exp_rtn=[u'ONE']),
      None, None, OK),
 
-    ('verify good choice TWO after bad choices',
+    ('Verify good choice TWO after bad choices',
      dict(options=[u'ZERO', u'ONE', u'TWO'],
           choices=['-1', '9', '3', 'a', '2', ''],
           exp_rtn=[u'TWO']),
@@ -759,30 +897,30 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('verify simple property list with 2 entries',
+    ('Verify simple property list with 2 entries',
      dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
      None, None, True),
 
-    ('verify propertylist with single property entry',
+    ('Verify propertylist with single property entry',
      dict(pl_str=("abc",), exp_pl=['abc']),
      None, None, True),
 
-    ('verify multiple properties',
+    ('Verify multiple properties',
      dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
      None, None, True),
 
-    ('verify multiple properties and both multiple in on option and multiple '
+    ('Verify multiple properties and both multiple in on option and multiple '
      'options.',
      dict(pl_str=None, exp_pl=None),
      None, None, True),
 
-    ('verify multiple properties and both multiple in on option and multiple '
+    ('Verify multiple properties and both multiple in on option and multiple '
      'options.',
      dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
      None, None, True),
 
 
-    ('verify empty propertylist',
+    ('Verify empty propertylist',
      dict(pl_str=("",), exp_pl=[]),
      None, None, False),
 ]
@@ -821,7 +959,7 @@ TESTCASES_COMPARE_INSTANCES = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('verify instances match',
+    ('Verify instances match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -833,7 +971,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=True),
      None, None, True),
 
-    ('verify classnames do not match',
+    ('Verify classnames do not match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -845,7 +983,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=False),
      None, None, True),
 
-    ('verify property values do not match',
+    ('Verify property values do not match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -857,7 +995,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=False),
      None, None, True),
 
-    ('verify property names do not match',
+    ('Verify property names do not match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -869,7 +1007,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=False),
      None, None, True),
 
-    ('verify classnames qualifiers do not match',
+    ('Verify classnames qualifiers do not match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -881,7 +1019,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=False),
      None, None, True),
 
-    ('verify instances do not match diff  in number of properties',
+    ('Verify instances do not match diff  in number of properties',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -893,7 +1031,7 @@ TESTCASES_COMPARE_INSTANCES = [
           result=False),
      None, None, True),
 
-    ('verify instances values do not match',
+    ('Verify instances values do not match',
      dict(inst1=CIMInstance('CIM_Foo',
                             properties={'Name': 'Foo', 'Chicken': 'Ham'},
                             qualifiers={'Key': CIMQualifier('Key', True)},
@@ -2233,30 +2371,30 @@ TESTCASES_ASSOC_SHRUB = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-    ('verify simple property list with 2 entries',
+    ('Verify simple property list with 2 entries',
      dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
      None, None, True),
 
-    ('verify propertylist with single property entry',
+    ('Verify propertylist with single property entry',
      dict(pl_str=("abc",), exp_pl=['abc']),
      None, None, True),
 
-    ('verify multiple properties',
+    ('Verify multiple properties',
      dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
      None, None, True),
 
-    ('verify multiple properties and both multiple in on option and multiple '
+    ('Verify multiple properties and both multiple in on option and multiple '
      'options.',
      dict(pl_str=None, exp_pl=None),
      None, None, True),
 
-    ('verify multiple properties and both multiple in on option and multiple '
+    ('Verify multiple properties and both multiple in on option and multiple '
      'options.',
      dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
      None, None, True),
 
 
-    ('verify empty propertylist',
+    ('Verify empty propertylist',
      dict(pl_str=("",), exp_pl=[]),
      None, None, False),
 ]
