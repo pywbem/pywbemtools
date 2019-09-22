@@ -5,11 +5,11 @@ pywbemcli Help Command Details
 ==============================
 
 
-This section defines the help output for each pywbemcli command group and command.
+This section shows the help text for each pywbemcli command group and command.
 
 
 
-The following defines the help output for the `pywbemcli  --help` command
+Help text for ``pywbemcli``:
 
 
 ::
@@ -163,7 +163,7 @@ pywbemcli class --help
 
 
 
-The following defines the help output for the `pywbemcli class --help` command
+Help text for ``pywbemcli class`` (see :ref:`class command group`):
 
 
 ::
@@ -202,7 +202,7 @@ pywbemcli class associators --help
 
 
 
-The following defines the help output for the `pywbemcli class associators --help` command
+Help text for ``pywbemcli class associators`` (see :ref:`class associators command`):
 
 
 ::
@@ -273,7 +273,7 @@ pywbemcli class delete --help
 
 
 
-The following defines the help output for the `pywbemcli class delete --help` command
+Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
 
 
 ::
@@ -319,7 +319,7 @@ pywbemcli class enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli class enumerate --help` command
+Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`):
 
 
 ::
@@ -380,7 +380,7 @@ pywbemcli class find --help
 
 
 
-The following defines the help output for the `pywbemcli class find --help` command
+Help text for ``pywbemcli class find`` (see :ref:`class find command`):
 
 
 ::
@@ -394,17 +394,17 @@ The following defines the help output for the `pywbemcli class find --help` comm
       server, or in the specified namespace (--namespace option).
 
       The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-      class names case insensitively. The special characters from file name
-      wildcarding are supported (`*` to match zero or more characters, and `?`
-      to match a single character) and character ranges expressed with []. To
-      avoid shell expansion of wildcards, the CLASSNAME-GLOB argument should be
-      put in quotes.
+      class names case insensitively. The special characters from Unix file name
+      wildcarding are supported ('*' to match zero or more characters, '?' to
+      match a single character, and '[]' to match character ranges). To avoid
+      shell expansion of wildcard characters, the CLASSNAME-GLOB argument should
+      be put in quotes.
 
       For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
       "pywbem_", etc. "*system*" returns classes whose names include the case
       insensitive string "system".
 
-      In the output, the classes will formatted as defined by the --output-
+      In the output, the classes will be formatted as defined by the --output-
       format general option if it specifies table output. Otherwise the classes
       will be in the form "NAMESPACE:CLASSNAME".
 
@@ -433,7 +433,7 @@ pywbemcli class get --help
 
 
 
-The following defines the help output for the `pywbemcli class get --help` command
+Help text for ``pywbemcli class get`` (see :ref:`class get command`):
 
 
 ::
@@ -487,7 +487,7 @@ pywbemcli class invokemethod --help
 
 
 
-The following defines the help output for the `pywbemcli class invokemethod --help` command
+Help text for ``pywbemcli class invokemethod`` (see :ref:`class invokemethod command`):
 
 
 ::
@@ -533,7 +533,7 @@ pywbemcli class references --help
 
 
 
-The following defines the help output for the `pywbemcli class references --help` command
+Help text for ``pywbemcli class references`` (see :ref:`class references command`):
 
 
 ::
@@ -599,7 +599,7 @@ pywbemcli class tree --help
 
 
 
-The following defines the help output for the `pywbemcli class tree --help` command
+Help text for ``pywbemcli class tree`` (see :ref:`class tree command`):
 
 
 ::
@@ -650,7 +650,7 @@ pywbemcli connection --help
 
 
 
-The following defines the help output for the `pywbemcli connection --help` command
+Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
 
 
 ::
@@ -678,7 +678,7 @@ The following defines the help output for the `pywbemcli connection --help` comm
       list    List the WBEM connection definitions.
       save    Save the current connection to a new WBEM connection definition.
       select  Select a WBEM connection definition as current or default.
-      show    Show connection info of a WBEM connection definition.
+      show    Show a WBEM connection definition or the current connection.
       test    Test the current connection with a predefined WBEM request.
 
 
@@ -689,7 +689,7 @@ pywbemcli connection delete --help
 
 
 
-The following defines the help output for the `pywbemcli connection delete --help` command
+Help text for ``pywbemcli connection delete`` (see :ref:`connection delete command`):
 
 
 ::
@@ -717,7 +717,7 @@ pywbemcli connection export --help
 
 
 
-The following defines the help output for the `pywbemcli connection export --help` command
+Help text for ``pywbemcli connection export`` (see :ref:`connection export command`):
 
 
 ::
@@ -747,7 +747,7 @@ pywbemcli connection list --help
 
 
 
-The following defines the help output for the `pywbemcli connection list --help` command
+Help text for ``pywbemcli connection list`` (see :ref:`connection list command`):
 
 
 ::
@@ -761,7 +761,8 @@ The following defines the help output for the `pywbemcli connection list --help`
 
       '#' before the name indicates the default connection.
       '*' before the name indicates that it is the current connection.
-      See connection select.
+
+      See also the 'connection select' command.
 
     Options:
       -h, --help  Show this message and exit.
@@ -774,7 +775,7 @@ pywbemcli connection save --help
 
 
 
-The following defines the help output for the `pywbemcli connection save --help` command
+Help text for ``pywbemcli connection save`` (see :ref:`connection save command`):
 
 
 ::
@@ -783,14 +784,13 @@ The following defines the help output for the `pywbemcli connection save --help`
 
       Save the current connection to a new WBEM connection definition.
 
-      Saves the current connection as a connection definition in the connections
-      file. The NAME argument (the name of the connection) is required. If a
-      connection with that name already exists, it will be overwritten with the
-      current connection definition.
+      Save the current connection to the connections file as a connection
+      definition named NAME. The NAME argument is required. If a connection
+      definition with that name already exists, it is overwritten without
+      warning.
 
-      In the interactive mode, general options preceeding the connection command
-      that change the connection definition will be applied before the
-      connection is saved.
+      In the interactive mode, general options that are connection related are
+      applied to the current connection before it is saved.
 
       Examples:
 
@@ -807,7 +807,7 @@ pywbemcli connection select --help
 
 
 
-The following defines the help output for the `pywbemcli connection select --help` command
+Help text for ``pywbemcli connection select`` (see :ref:`connection select command`):
 
 
 ::
@@ -816,27 +816,35 @@ The following defines the help output for the `pywbemcli connection select --hel
 
       Select a WBEM connection definition as current or default.
 
-      Selects the connection named NAME from the persistently stored named
-      connections to be the current connection.The connection definition must
-      exist in the connections file. If the NAME argument is not specified, a
-      list of connections from the connections file is presented with a prompt
-      for the user to select a connection definition.
+      Select the connection definition named NAME from the connections file to
+      be the current connection. The connection definition in the connections
+      file must exist. If the NAME argument is omitted, a list of connection
+      definitions from the connections file is presented with a prompt for the
+      user to select a connection definition.
 
-      Default and current connection are set if the --default option exists;
-      otherwise only the current connection the interactive session is set .
-      Once defined the default connection will be used as the server definition
-      in future execution of pywbemcli if there is no server definition
-      (--server or --name or --mock-server) general option.
+      If the --default option is set, the default connection is set to the
+      selected connection definition, in addition. Once defined, the default
+      connection will be used as a default in future executions of pywbemcli if
+      none of the server-defining general options (i.e. --server, --mock-server,
+      or --name) was used.
 
-      Connection list shows all connections and if any are default or current.
+      The 'connection list' command marks the current connection with '*' and
+      the default connection with '#'.
 
-      Example of selecting a connection and setting the default:
-        $ pywbemcli
-        pywbemcli> connection select myconn --default
-        pywbemcli> :quit
-        $ pywbemcli show
+      Example of selecting a default connection in command mode:
+
+        pywbemcli connection select myconn --default
+        pywbemcli connection show
         name: myconn
-          server: http://localhost
+          . . .
+
+      Example of selecting just the current connection in interactive mode:
+
+        pywbemcli
+        pywbemcli> connection select myconn
+        pywbemcli> connection show
+        name: myconn
+          . . .
 
     Options:
       -d, --default  If set, the connection is set to be the default connection
@@ -852,37 +860,41 @@ pywbemcli connection show --help
 
 
 
-The following defines the help output for the `pywbemcli connection show --help` command
+Help text for ``pywbemcli connection show`` (see :ref:`connection show command`):
 
 
 ::
 
     Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
 
-      Show connection info of a WBEM connection definition.
+      Show a WBEM connection definition or the current connection.
 
-      This command displays the WBEM connection definition of a single
-      connection as follows:
+      Show the name and attributes of a WBEM connection definition or the
+      current connection, as follows:
 
-      * NAME argument exists; show that WBEM connections definition from the
-      connections file.
+      * If the NAME argument is specified, the connection definition with that
+      name from the connections file.
 
-      * NAME argument does not exist; show existing current connection.
+      * If the NAME argument is '?', the command presents a list of connection
+      definitions from the connections file and prompts the user for   selecting
+      one.
 
-      * Name argument is '?'; presents list of connections for selection
+      * If the NAME argument is omitted, the current connection is shown.
 
-      This command displays all the variables that make up current WBEM
-      connection.
+      Example showing a named connection definition:
 
         pywbemcli connection show svr1
           name: svr1
           ...
+
+      Example for prompting for a connection definition:
+
         pywbemcli connection show ?
           0: svr1
           1: svr2
-      Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
-        name: svr1
-        ...
+        Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+          name: svr1
+            ...
 
     Options:
       -h, --help  Show this message and exit.
@@ -895,7 +907,7 @@ pywbemcli connection test --help
 
 
 
-The following defines the help output for the `pywbemcli connection test --help` command
+Help text for ``pywbemcli connection test`` (see :ref:`connection test command`):
 
 
 ::
@@ -923,7 +935,7 @@ pywbemcli help --help
 
 
 
-The following defines the help output for the `pywbemcli help --help` command
+Help text for ``pywbemcli help`` (see :ref:`help command`):
 
 
 ::
@@ -943,7 +955,7 @@ pywbemcli instance --help
 
 
 
-The following defines the help output for the `pywbemcli instance --help` command
+Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
 
 
 ::
@@ -984,7 +996,7 @@ pywbemcli instance associators --help
 
 
 
-The following defines the help output for the `pywbemcli instance associators --help` command
+Help text for ``pywbemcli instance associators`` (see :ref:`instance associators command`):
 
 
 ::
@@ -1006,7 +1018,7 @@ The following defines the help output for the `pywbemcli instance associators --
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1077,7 +1089,7 @@ pywbemcli instance count --help
 
 
 
-The following defines the help output for the `pywbemcli instance count --help` command
+Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
 
 
 ::
@@ -1086,7 +1098,7 @@ The following defines the help output for the `pywbemcli instance count --help` 
 
       Count the instances of each class with matching class name.
 
-      Displays the count of instances of each CIM class whose class name matches
+      Display the count of instances of each CIM class whose class name matches
       the specified wildcard expression (CLASSNAME-GLOB) in all CIM namespaces
       of the WBEM server, or in the specified namespaces (--namespace option).
       This differs from instance enumerate, etc. in that it counts the instances
@@ -1094,25 +1106,25 @@ The following defines the help output for the `pywbemcli instance count --help` 
       subclasses.
 
       The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-      class names case insensitively. The special characters from file name
-      wildcarding are supported (`*` to match zero or more characters, and `?`
-      to match a single character) and character ranges expressed with []. To
-      avoid shell expansion of wildcards, the CLASSNAME-GLOB argument should be
-      put in quotes.
+      class names case insensitively. The special characters from Unix file name
+      wildcarding are supported ('*' to match zero or more characters, '?' to
+      match a single character, and '[]' to match character ranges). To avoid
+      shell expansion of wildcard characters, the CLASSNAME-GLOB argument should
+      be put in quotes.
 
       If CLASSNAME-GLOB is not specified, then all classes in the specified
       namespaces are counted (same as when specifying CLASSNAME-GLOB as "*").
 
-      For example, `pywbem_*` returns instances of classes whose name begins
-      with `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names
-      include the case insensitive string `system`.
+      For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
+      "pywbem_", etc. "*system*" returns classes whose names include the case
+      insensitive string "system".
 
       This command can take a long time to execute since it potentially
       enumerates all instance names for all classes in all namespaces.
 
     Options:
       -s, --sort                 Sort by instance count. Otherwise sorted by class
-                                 name
+                                 name.
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
@@ -1126,7 +1138,7 @@ pywbemcli instance create --help
 
 
 
-The following defines the help output for the `pywbemcli instance create --help` command
+Help text for ``pywbemcli instance create`` (see :ref:`instance create command`):
 
 
 ::
@@ -1176,7 +1188,7 @@ pywbemcli instance delete --help
 
 
 
-The following defines the help output for the `pywbemcli instance delete --help` command
+Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`):
 
 
 ::
@@ -1194,7 +1206,7 @@ The following defines the help output for the `pywbemcli instance delete --help`
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1213,7 +1225,7 @@ pywbemcli instance enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli instance enumerate --help` command
+Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate command`):
 
 
 ::
@@ -1293,7 +1305,7 @@ pywbemcli instance get --help
 
 
 
-The following defines the help output for the `pywbemcli instance get --help` command
+Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
 
 
 ::
@@ -1311,7 +1323,7 @@ The following defines the help output for the `pywbemcli instance get --help` co
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1354,7 +1366,7 @@ pywbemcli instance invokemethod --help
 
 
 
-The following defines the help output for the `pywbemcli instance invokemethod --help` command
+Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemethod command`):
 
 
 ::
@@ -1377,7 +1389,7 @@ The following defines the help output for the `pywbemcli instance invokemethod -
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1416,7 +1428,7 @@ pywbemcli instance modify --help
 
 
 
-The following defines the help output for the `pywbemcli instance modify --help` command
+Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`):
 
 
 ::
@@ -1434,7 +1446,7 @@ The following defines the help output for the `pywbemcli instance modify --help`
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1483,7 +1495,7 @@ pywbemcli instance query --help
 
 
 
-The following defines the help output for the `pywbemcli instance query --help` command
+Help text for ``pywbemcli instance query`` (see :ref:`instance query command`):
 
 
 ::
@@ -1516,7 +1528,7 @@ pywbemcli instance references --help
 
 
 
-The following defines the help output for the `pywbemcli instance references --help` command
+Help text for ``pywbemcli instance references`` (see :ref:`instance references command`):
 
 
 ::
@@ -1538,7 +1550,7 @@ The following defines the help output for the `pywbemcli instance references --h
       the connection. Any host name in the WBEM URI will be ignored.
 
       2. By specifying a class name with wildcard for the keys in the
-      INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+      INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
       class are displayed and the user is prompted for an index number to select
       an instance. The namespace in which the instances are looked up is the
       namespace specified in the --namespace option, or otherwise the default
@@ -1604,7 +1616,7 @@ pywbemcli qualifier --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier --help` command
+Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
 
 
 ::
@@ -1638,7 +1650,7 @@ pywbemcli qualifier enumerate --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier enumerate --help` command
+Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate command`):
 
 
 ::
@@ -1668,7 +1680,7 @@ pywbemcli qualifier get --help
 
 
 
-The following defines the help output for the `pywbemcli qualifier get --help` command
+Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
 
 
 ::
@@ -1697,7 +1709,7 @@ pywbemcli repl --help
 
 
 
-The following defines the help output for the `pywbemcli repl --help` command
+Help text for ``pywbemcli repl`` (see :ref:`repl command`):
 
 
 ::
@@ -1726,7 +1738,7 @@ pywbemcli server --help
 
 
 
-The following defines the help output for the `pywbemcli server --help` command
+Help text for ``pywbemcli server`` (see :ref:`server command group`):
 
 
 ::
@@ -1762,7 +1774,7 @@ pywbemcli server brand --help
 
 
 
-The following defines the help output for the `pywbemcli server brand --help` command
+Help text for ``pywbemcli server brand`` (see :ref:`server brand command`):
 
 
 ::
@@ -1786,7 +1798,7 @@ pywbemcli server centralinsts --help
 
 
 
-The following defines the help output for the `pywbemcli server centralinsts --help` command
+Help text for ``pywbemcli server centralinsts`` (see :ref:`server centralinsts command`):
 
 
 ::
@@ -1839,7 +1851,7 @@ pywbemcli server info --help
 
 
 
-The following defines the help output for the `pywbemcli server info --help` command
+Help text for ``pywbemcli server info`` (see :ref:`server info command`):
 
 
 ::
@@ -1861,7 +1873,7 @@ pywbemcli server interop --help
 
 
 
-The following defines the help output for the `pywbemcli server interop --help` command
+Help text for ``pywbemcli server interop`` (see :ref:`server interop command`):
 
 
 ::
@@ -1881,7 +1893,7 @@ pywbemcli server namespaces --help
 
 
 
-The following defines the help output for the `pywbemcli server namespaces --help` command
+Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces command`):
 
 
 ::
@@ -1901,7 +1913,7 @@ pywbemcli server profiles --help
 
 
 
-The following defines the help output for the `pywbemcli server profiles --help` command
+Help text for ``pywbemcli server profiles`` (see :ref:`server profiles command`):
 
 
 ::

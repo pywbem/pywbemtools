@@ -52,7 +52,7 @@ CONNECTION_HELP_LINES = [
     'list    List the WBEM connection definitions.',
     'save    Save the current connection to a new WBEM connection definition.',
     'select  Select a WBEM connection definition as current or default.',
-    'show    Show connection info of a WBEM connection definition.',
+    'show    Show a WBEM connection definition or the current connection.',
     'test    Test the current connection with a predefined WBEM request.',
 ]
 
@@ -90,7 +90,7 @@ CONNECTION_SELECT_HELP_LINES = [
 
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
-    'Show connection info of a WBEM connection definition.',
+    'Show a WBEM connection definition or the current connection.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
