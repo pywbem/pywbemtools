@@ -394,10 +394,11 @@ The following defines the help output for the `pywbemcli class find --help` comm
       server, or in the specified namespace (--namespace option).
 
       The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-      the class names case insensitively. The special characters known from file
-      name wildcarding are supported: "*" to match zero or more characters, and
-      "?" to match a single character. In order to not have the shell expand the
-      wildcards, the CLASSNAME-GLOB argument should be put in quotes.
+      class names case insensitively. The special characters from file name
+      wildcarding are supported (`*` to match zero or more characters, and `?`
+      to match a single character) and character ranges expressed with []. To
+      avoid shell expansion of wildcards, the CLASSNAME-GLOB argument should be
+      put in quotes.
 
       For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
       "pywbem_", etc. "*system*" returns classes whose names include the case
@@ -1104,7 +1105,7 @@ The following defines the help output for the `pywbemcli instance count --help` 
       put in quotes.
 
       If CLASSNAME-GLOB is not specified, then all classes in the specified
-      namespaces are counted (GLOB "*").
+      namespaces are counted (same as when specifying CLASSNAME-GLOB as "*").
 
       For example, `pywbem_*` returns instances of classes whose name begins
       with `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names
@@ -1770,12 +1771,12 @@ The following defines the help output for the `pywbemcli server --help` command
       -h, --help  Show this message and exit.
 
     Commands:
-      brand             Get the brand of the server.
-      get-centralinsts  List central instances of mgmt profiles on the server.
-      info              Get information about the server.
-      interop           Get the Interop namespace of the server.
-      namespaces        List the namespaces of the server.
-      profiles          List management profiles advertized by the server.
+      brand         Get the brand of the server.
+      centralinsts  List central instances of mgmt profiles on the server.
+      info          Get information about the server.
+      interop       Get the Interop namespace of the server.
+      namespaces    List the namespaces of the server.
+      profiles      List management profiles advertized by the server.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1802,19 +1803,19 @@ The following defines the help output for the `pywbemcli server brand --help` co
       -h, --help  Show this message and exit.
 
 
-.. _`pywbemcli server get-centralinsts --help`:
+.. _`pywbemcli server centralinsts --help`:
 
-pywbemcli server get-centralinsts --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pywbemcli server centralinsts --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
-The following defines the help output for the `pywbemcli server get-centralinsts --help` command
+The following defines the help output for the `pywbemcli server centralinsts --help` command
 
 
 ::
 
-    Usage: pywbemcli server get-centralinsts [COMMAND-OPTIONS]
+    Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
 
       List central instances of mgmt profiles on the server.
 

@@ -865,7 +865,7 @@ server of the :term:`current connection` to access information about the
 WBEM server itself:
 
 * :ref:`Server brand command` - Get the brand of the server.
-* :ref:`Server get-centralinsts command` - List central instances of mgmt profiles on the server.
+* :ref:`Server centralinsts command` - List central instances of mgmt profiles on the server.
 * :ref:`Server info command` - Get information about the server.
 * :ref:`Server interop command` - Get the Interop namespace of the server.
 * :ref:`Server namespaces command` - List the namespaces of the server.
@@ -1052,12 +1052,12 @@ Example:
 See :ref:`pywbemcli server profiles --help` for details.
 
 
-.. _`Server get-centralinsts command`:
+.. _`Server centralinsts command`:
 
-Server get-centralinsts command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Server centralinsts command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server get-centralinsts`` command gets the :term:`central instances`
+The ``server centralinsts`` command gets the :term:`central instances`
 of the :term:`management profiles <management profile>` advertised by the
 WBEM server of the :term:`current connection`.
 
@@ -1072,15 +1072,16 @@ Example:
 
 .. code-block:: text
 
-    $ pywbemcli server get-centralinsts --organization DMTF --profile "Computer System"
+    $ pywbemcli server centralinsts --organization DMTF --profile "Computer System"
     Advertised Central Instances:
-    +---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-    | Profile                         | Central Instances                                                                                                                                                                                                                       |
-    |---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | DMTF:Computer System:1.0.0      | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance1",CreationClassName="Test_StorageSystem"://leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem" |
-    +---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
+    | Profile                         | Central Instances                                                                                                    |
+    |---------------------------------+----------------------------------------------------------------------------------------------------------------------|
+    | DMTF:Computer System:1.0.0      | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance1",CreationClassName="Test_StorageSystem"  |
+    |                                 | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem"  |
+    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
 
-See :ref:`pywbemcli server get-centralinsts --help` for details.
+See :ref:`pywbemcli server centralinsts --help` for details.
 
 
 .. _`Connection command group`:

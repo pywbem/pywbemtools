@@ -120,7 +120,7 @@ def server_profiles(context, **options):
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
 
-@server_group.command('get-centralinsts', options_metavar=CMD_OPTS_TXT)
+@server_group.command('centralinsts', options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
               help='Filter by the defined organization. (ex. -o DMTF')
@@ -145,7 +145,7 @@ def server_profiles(context, **options):
               show_default=True,
               help='Navigation direction for association.')
 @click.pass_obj
-def server_centralinsts(context, **options):
+def centralinsts(context, **options):
     """
     List central instances of mgmt profiles on the server.
 
@@ -326,7 +326,8 @@ def cmd_server_profiles(context, options):
 
 def cmd_server_centralinsts(context, options):
     """
-    Display general overview of info from current WBEM server
+    Display general information on the central instances of one or more
+    profiles.
     """
     server = context.wbem_server
     try:
