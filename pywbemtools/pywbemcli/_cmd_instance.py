@@ -168,7 +168,7 @@ def instance_get(context, instancename, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -198,7 +198,7 @@ def instance_delete(context, instancename, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -267,7 +267,7 @@ def instance_modify(context, instancename, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -316,7 +316,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -415,7 +415,7 @@ def instance_references(context, instancename, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -479,7 +479,7 @@ def instance_associators(context, instancename, **options):
     the connection. Any host name in the WBEM URI will be ignored.
 
     2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
     class are displayed and the user is prompted for an index number to select
     an instance. The namespace in which the instances are looked up is the
     namespace specified in the --namespace option, or otherwise the default
@@ -529,14 +529,14 @@ def instance_query(context, query, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help='Sort by instance count. Otherwise sorted by class name')
+              help='Sort by instance count. Otherwise sorted by class name.')
 @add_options(multiple_namespaces_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
     Count the instances of each class with matching class name.
 
-    Displays the count of instances of each CIM class whose class name
+    Display the count of instances of each CIM class whose class name
     matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
     namespaces of the WBEM server, or in the specified namespaces
     (--namespace option).  This differs from instance enumerate, etc. in that
@@ -544,18 +544,18 @@ def instance_count(context, classname, **options):
     returned, not including subclasses.
 
     The CLASSNAME-GLOB argument is a wildcard expression that is matched on
-    class names case insensitively. The special characters from file name
-    wildcarding are supported (`*` to match zero or more characters, and `?` to
-    match a single character) and character ranges expressed with []. To avoid
-    shell expansion of wildcards, the CLASSNAME-GLOB argument should be put in
-    quotes.
+    class names case insensitively.
+    The special characters from Unix file name wildcarding are supported
+    ('*' to match zero or more characters, '?' to match a single character,
+    and '[]' to match character ranges). To avoid shell expansion of wildcard
+    characters, the CLASSNAME-GLOB argument should be put in quotes.
 
     If CLASSNAME-GLOB is not specified, then all classes in the specified
     namespaces are counted (same as when specifying CLASSNAME-GLOB as "*").
 
-    For example, `pywbem_*` returns instances of classes whose name begins with
-    `PyWBEM_`, `pywbem_`, etc. '*system*' returns classes whose names include
-    the case insensitive string `system`.
+    For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
+    "pywbem_", etc. "*system*" returns classes whose names include the case
+    insensitive string "system".
 
     This command can take a long time to execute since it potentially
     enumerates all instance names for all classes in all namespaces.

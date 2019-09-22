@@ -221,23 +221,31 @@ def create_help_cmd_list(script_cmd, script_name):
     help_groups_result.sort()
     if USE_RST:
         print(rst_headline("%s Help Command Details" % script_name, 2))
-        print('\nThis section defines the help output for each %s '
+        print('\nThis section shows the help text for each %s '
               'command group and command.\n' % script_name)
 
     for name in help_groups_result:
-        command_name = '%s %s --help' % (script_name, name)
+        command = '%s %s' % (script_name, name)
+        command_help = '%s %s --help' % (script_name, name)
         out = HELP_DICT[name]
         if USE_RST:
-            level = len(command_name.split())
-            # Don't put the top level in a separate section
-            if name:
-                print(rst_headline(command_name, level))
-            print('\n%s\n' % '\nThe following defines the help output for the '
-                  '`%s` command\n' % command_name)
+            level = len(name.split())  # 0: top, 1: group, 2: command
+            if level == 0:
+                line = 'Help text for ``%s``:' % script_name
+            elif level == 1 and name not in ('repl', 'help'):
+                line = 'Help text for ``%s`` (see :ref:`%s command group`):' % \
+                    (command, name)
+            else:
+                line = 'Help text for ``%s`` (see :ref:`%s command`):' % \
+                    (command, name)
+            if level > 0:
+                # Don't generate section header for top level
+                print(rst_headline(command_help, 2 + level))
+            print('\n\n%s\n\n' % line)
             print_rst_verbatum_text(out.decode())
         else:
-            print('%s\n%s COMMAND: %s' %
-                  (('=' * 50), script_name, command_name))
+            print('%s\n%s command: %s' %
+                  (('=' * 50), script_name, command_help))
             print(out.decode())
 
     return help_groups_result
