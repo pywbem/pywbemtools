@@ -254,6 +254,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
+
+    #
+    # Process cli options to produce resolved options, i.e. the
+    # options with any defaults applied for non None options.
+    #
     # list of options that are not allowed in some cases:
     # When -name is used and when in interactive mode.
     conditional_options = ((default_namespace, 'default_namespace'),
@@ -265,16 +270,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                            (ca_certs, 'ca_certs'),
                            (server, 'server'),
                            (mock_server, 'mock-server'))
-    # In interactive mode, general options specified in cmd line are used as
-    # defaults for interactive commands.
-    # This requires being able to determine for each option whether it has been
-    # specified and is why general options don't define defaults in the
-    # decorators that define them.
+
     pywbem_server = None
-    # In command mode or processing the command line options in
-    # interactive mode. Apply the documented option defaults.
-    # Default for output_format is applied in processing since it depends
-    # on request (ex. mof for get class vs table for many)
 
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
 
@@ -383,6 +380,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
 
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
+    # Command mode (ctx is None). Processes command on comand line and quits
+    # Apply the documented option defaults to create a pywbem_server instance
+    # and a ContextObj instance
+    #
     if ctx.obj is None:
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
@@ -449,6 +450,13 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                 # defined.
                 pywbem_server = None
 
+    # Interactive mode cmd line processing
+    # In interactive mode, general options specified in cmd line are used as
+    # to modify the pywbem_server object and to modify the general options
+    # for a single command execution.
+    # This requires being able to determine for each option whether it has been
+    # specified and is why general options don't define defaults in the
+    # decorators that define them.
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options
         # or from the context object.
@@ -462,10 +470,11 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                 raise click.ClickException('Named connection  "%s" '
                                            'does not exist' % name)
 
-        # If other parameters, modify the existing connection and reset
-        # it
+        # If other parameters, modify the existing connection and reset it.
+        # TODO: refactor this code to avoid deepcopy when not needed.
         else:
             if pywbem_server is None:
+                # Copy to keep the original clean from any changes
                 pywbem_server = deepcopy(ctx.obj.pywbem_server)
             if pywbem_server:
                 modified_server = False
@@ -507,6 +516,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                     modified_server = True
                 if modified_server:
                     pywbem_server.reset()
+                else:
+                    pywbem_server = ctx.obj.pywbem_server
 
         # The following variables are maintained only in the context_obj and
         # not attached to any particular connection. If the cli argument is
@@ -526,13 +537,14 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
             verbose = ctx.obj.verbose
 
     # Create a command context for each command: An interactive command has
-    # its own command context different from the command context for the
+    # its own command context as a child of the command context for the
     # command line.
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose)
+
     # Invoke command if one exists.
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)

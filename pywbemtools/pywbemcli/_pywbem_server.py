@@ -129,6 +129,7 @@ class PywbemServer(object):
         self.keyfile = keyfile
         self.ca_certs = ca_certs
 
+        # dynamically created in create_connection
         self._wbem_server = None
 
     def __str__(self):
@@ -138,10 +139,11 @@ class PywbemServer(object):
         return 'PywbemServer(server=%s name=%s ns=%s user=%s ' \
                'password=%s timeout=%s verify=%s certfile=%s ' \
                'keyfile=%s ca_certs=%s  ' \
-               'mock_server=%r)' % \
+               'mock_server=%r wbem_server %r)' % \
                (self.server, self.name, self.default_namespace,
                 self.user, self.password, self.timeout, self.verify,
-                self.certfile, self.keyfile, self.ca_certs, self.mock_server)
+                self.certfile, self.keyfile, self.ca_certs, self.mock_server,
+                self.wbem_server)
 
     @property
     def server(self):
@@ -313,7 +315,7 @@ class PywbemServer(object):
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
         """
         # This is created in wbemserver and retained there.
-        return self._wbem_server.conn
+        return self.wbem_server.conn if self.wbem_server else None
 
     @property
     def wbem_server(self):
@@ -419,21 +421,24 @@ class PywbemServer(object):
                the input values
         """
         if self._mock_server:
-            conn = PYWBEMCLIFakedConnection(
-                default_namespace=self.default_namespace,
-                use_pull_operations=use_pull,
-                stats_enabled=timestats)
-            try:
-                self._wbem_server = WBEMServer(conn)
-                conn.build_repository(conn,
-                                      self._wbem_server,
-                                      self._mock_server,
-                                      verbose)
-            except Exception as ex:
-                click.echo('Repository build exception %s.: %s' % (
-                    ex.__class__.__name__, ex), err=True)
-                raise click.Abort()
-        else:
+            if self.conn is None:
+                conn = PYWBEMCLIFakedConnection(
+                    default_namespace=self.default_namespace,
+                    use_pull_operations=use_pull,
+                    stats_enabled=timestats)
+                try:
+                    self._wbem_server = WBEMServer(conn)
+                    if verbose:
+                        print('CREATE_CONNECTION:BUILD_REPO %s' % self)
+                    conn.build_repository(conn,
+                                          self._wbem_server,
+                                          self._mock_server,
+                                          verbose)
+                except Exception as ex:
+                    click.echo('Repository build exception %s.: %s' % (
+                        ex.__class__.__name__, ex), err=True)
+                    raise click.Abort()
+        else:  # mock_server does not exist
             if not self.server:
                 raise click.ClickException('No server found. Cannot '
                                            'connect.')

@@ -50,9 +50,10 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._spinner = click_spinner.Spinner()
         self._log = log
         self._conn = None
+        self._wbem_server = None
 
     def __repr__(self):
-        return 'ContextObj(at 0x%08x, pywbem_server=%s, outputformat=%s, ' \
+        return 'ContextObj(at 0x%08x, pywbem_server=%r, outputformat=%s, ' \
                'use_pull=%s, pull_max_cnt=%s, timestats=%s, verbose=%s' % \
                (id(self), self.pywbem_server, self.output_format,
                 self.use_pull, self.pull_max_cnt, self.timestats,
@@ -102,7 +103,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
         This property uses the wbem_server property to activate the
-        conn and wbem_server. Thus, the connection is not activated unless
+        conn and wbem_server. The connection is not activated unless
         a command requiring the webem server is executed.  This allows other
         commands like connection to execute without testing whether or not the
         WBEM server exists.
@@ -121,12 +122,14 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         requests This is maintained in the pywbem_server object as
         _pywbem_server. This and/or the conn property are executed before
         any operation that is to contact the server.  This property enables any
-        server characteristics.
+        server characteristics. This is a passthrough for the wbem_server
+        property maintained in self._pywbem_server
         """
         # If no server defined, do not try to connect. This allows
         # commands like help, connection new, list to execute without
         # a target server defined.
         if self._pywbem_server:
+            # If wbem_server not initialized, initialize it.
             if self._pywbem_server.wbem_server is None:
                 # get the password if it is required.  This may involve a
                 # prompt.
@@ -141,6 +144,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                     verbose=self.verbose)
                 if self._conn and self.timestats:  # Enable stats gathering
                     self.conn.statistics.enable()
+                self._wbem_server = self._pywbem_server.wbem_server
             return self._pywbem_server.wbem_server
         else:
             raise click.ClickException('No server defined for command '
@@ -325,7 +329,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
 
 #
-#   Debug tools to help understandingthe click context.
+#   Debug tools to help understandingthe click context.  These are only
+#   to help analyzing the click_context (ctx) and primarily in the
+#   interactive mode whene several levels of click context can exist
 #
 def display_click_context(ctx, msg=None, display_attrs=True):
     """
