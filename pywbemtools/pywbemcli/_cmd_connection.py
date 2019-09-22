@@ -33,7 +33,8 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
-    raise_pywbem_error_exception, validate_output_format
+    raise_pywbem_error_exception, validate_output_format, \
+    fold_strings, output_format_is_table
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
@@ -315,6 +316,7 @@ def show_connection_information(context, connection, separate_line=True,
     could also have been part of the context object since this is just the
     info from that object.
     """
+    # Build state string, mock_server obj, password
     state_str = ''
     if show_state:
         state = []
@@ -335,27 +337,64 @@ def show_connection_information(context, connection, separate_line=True,
     else:
         disp_password = connection.password
 
-    context.spinner_stop()
+    if output_format_is_table(context.output_format):
+        headers = ["name", 'value  (state)']
+        if isinstance(connection.mock_server, (list, tuple)):
+            mock_server = ', '.join(connection.mock_server)
+        else:
+            mock_server = connection.mock_server
 
-    click.echo('\nname: {cn}{st}{sep}server: {sv}{sep}'
-               'default-namespace: {dns}{sep}'
-               'user: {usr}{sep}password: {pw}{sep}timeout: {to}{sep}'
-               'use_pull: {up}{sep}'
-               'verify: {ve}{sep}certfile: {cf}{sep}keyfile: {kf}{sep}'
-               'mock-server: {ms}{sep}ca-certs: {crts}{sep}'
-               .format(cn=connection.name, st=state_str,
-                       sv=connection.server,
-                       dns=connection.default_namespace,
-                       usr=connection.user,
-                       pw=disp_password,
-                       to=connection.timeout,
-                       up=connection.use_pull,
-                       ve=connection.verify,
-                       cf=connection.certfile,
-                       kf=connection.keyfile,
-                       ms=mock_server,
-                       crts=connection.ca_certs,
-                       sep='\n  ' if separate_line else ', '))
+        if connection.ca_certs:
+            ca_certs = fold_strings(connection.ca_certs, 20,
+                                    fold_list_items=True,
+                                    break_long_words=False)
+        else:
+            ca_certs = None
+        mock_server = fold_strings(mock_server, 20,
+                                   fold_list_items=True,
+                                   break_long_words=False,
+                                   break_on_hyphens=False)
+
+        rows = [['name', "{}{}".format(connection.name, state_str)],
+                ['server', connection.server],
+                ['default-namespace', connection.default_namespace],
+                ['user', connection.user],
+                ['password', disp_password],
+                ['timeout', connection.timeout],
+                ['use-pull', connection.use_pull],
+                ['verify', connection.verify],
+                ['certfile', connection.certfile],
+                ['keyfile', connection.keyfile],
+                ['pmock-server', mock_server],
+                ['ca_certs', ca_certs]]
+
+        context.spinner_stop()
+
+        click.echo(format_table(rows, headers, title='Connection status:',
+                   table_format=context.output_format))
+    else:
+        context.spinner_stop()
+
+        click.echo('\nname: {cn}{st}{sep}server: {sv}{sep}'
+                   'default-namespace: {dns}{sep}'
+                   'user: {usr}{sep}password: {pw}{sep}timeout: {to}{sep}'
+                   'use-pull: {up}{sep}'
+                   'verify: {ve}{sep}certfile: {cf}{sep}keyfile: {kf}{sep}'
+                   'mock-server: {ms}{sep}ca-certs: {crts}{sep}'
+                   .format(cn=connection.name,
+                           st=state_str,
+                           sv=connection.server,
+                           dns=connection.default_namespace,
+                           usr=connection.user,
+                           pw=disp_password,
+                           to=connection.timeout,
+                           up=connection.use_pull,
+                           ve=connection.verify,
+                           cf=connection.certfile,
+                           kf=connection.keyfile,
+                           ms=mock_server,
+                           crts=connection.ca_certs,
+                           sep='\n  ' if separate_line else ', '))
 
 
 def get_current_connection_name(context):

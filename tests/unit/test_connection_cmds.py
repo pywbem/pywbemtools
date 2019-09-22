@@ -247,7 +247,10 @@ TEST_CASES = [
      None, OK],
 
     #
-    #  Sequence for simple connection save, show, list, select, delete
+    # The following tests are a sequence. Each depends on the previous
+    # and what was in the repository when each test is executed.
+    # This sequence creates a simple server named test1 and tests the
+    # display, etc. of that persisted server name
     #
 
     # Begin of sequence - repository is empty.
@@ -261,15 +264,42 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection command show of just created test1',
-     ['show', 'test1'],
+     {'general': [],
+      'args': ['show', 'test1']},
      {'stdout': [
-         "name: test1", "  server: http://blah",
-         "default-namespace: root/cimv2", "  user: None",
+         "name: test1",
+         "server: http://blah",
+         "default-namespace: root/cimv2",
+         "user: None",
          "password: None",
          "timeout: 30",
+         "use-pull:",
          "verify: True",
          "certfile: None",
          "keyfile: None", "  mock-server:"],
+      'test': 'innows',
+      'file': {'before': 'exists', 'after': 'exists'}},
+     None, OK],
+
+    ['Verify connection command show of just created test1 as table',
+     {'general': ['--output-format', 'plain'],
+      'args': ['show', 'test1']},
+     {'stdout': """Connection status:
+name                value  (state)
+name                test1
+server              http://blah
+default-namespace   root/cimv2
+user
+password
+timeout             30
+use-pull
+verify              True
+certfile
+keyfile
+pmock-server
+ca_certs
+
+""",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],

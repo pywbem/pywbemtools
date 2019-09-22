@@ -175,7 +175,7 @@ file ``pywbemcli.log``:
 .. _`Controlling output formats`:
 
 Controlling output formats
-""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""
 
 Pywbemcli supports multiple output formats for command results by using the
 :ref:`--output-format general option`.

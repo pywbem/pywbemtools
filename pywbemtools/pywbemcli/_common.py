@@ -1454,7 +1454,7 @@ def _print_instances_as_table(insts, table_width, table_format,
     new_header_line = []
     for header in header_line:
         if len(header) > max_cell_width:
-            new_header_line.append(fold_string(header, max_cell_width))
+            new_header_line.append(fold_strings(header, max_cell_width))
         else:
             new_header_line.append(header)
 
@@ -1600,28 +1600,113 @@ def format_table(rows, headers, title=None, table_format='simple',
     return result
 
 
-def fold_string(input_string, max_width):
+def fold_strings(input_strings, max_width, break_long_words=False,
+                 break_on_hyphens=False, fold_list_items=False, separator=', ',
+                 initial_indent='', subsequent_indent=''):
     """
-    Fold a string within a maximum width.
+    Fold a string or a list/tuple of strings within a maximum width and return
+    a folded string that fits within the width defined by max_width. If input
+    is a list of strings, the fold_list_itmes defines whether they create
+    separate lines in the output or are concatenated into a single string
+    before folding the string. This implementation refolds strings that already
+    contain EOL characters and removes any existing folds that do not match the
+    max_width criteria.  Lists of strings may be folded with one string per
+    line or concatenated and then folded.
 
       Parameters:
 
-        input_string:
-          The string of data to go into the cell
-        max_width:
-          Maximum width of cell.  Data is folded into multiple lines to
-          fit into this width.
+        input_strings (:term:`string` or list of :term:`string`):
+          The string that will be contents of into the cell. This string may
+          already include multiple lines.
 
-      Return:
-          String representing the folded string
+        max_width (:term:`integer`):
+          Maximum width of cell containing the resulting string.  Data is
+          folded into multiple lines to fit into this width.
+
+        break_long_words(:class:`py:bool`)
+          Boolean that forces long words to be broken if True
+          If False, long words will not break at the max width
+
+        break_on_hyphens:(:class:`py:bool`):
+          If True use hypens as word separator.
+
+        fold_list_items(:class:`py:bool`):
+          If True, force fold for each item in list/tupe of input strings if
+          single line concatenation is longer than max_width. Otherwise list is
+          contatenated and the result folded.
+
+        separator(:term:`string`):
+          String that is separator between list items when folded into
+          string.
+
+        initial_indent(:term:`integer` or :term:`string`):
+          Integer  or string defining the number of characters of indent for
+          the first line if single string or the first line of each string in
+          the list if input_strings is a list and fold_list_items is True.
+
+        subsequent_indent(:term:`integer`):
+          Integer or string, defining the number of characters of indent for
+          the all but the first lineif single string or the first line of
+          each string in the list if input_strings is a list and
+          fold_list_items is True.
+
+
+      Returns:
+          String representing the folded input_strings
     """
-    new_string = input_string
-    if isinstance(input_string, six.string_types):
-        if max_width < len(input_string):
-            # use textwrap to fold the string
-            new_string = fill(input_string, max_width)
+    def indent_str(indent):
+        """
+        Maps indent to string of indent characters if necessary.
+        If None, return None
+        If integer, map to indent characters
+        """
+        if indent is None:
+            return ""
+        if isinstance(indent, six.string_types):
+            return indent
+        return ' ' * indent
 
-    return new_string
+    initial_indent = indent_str(initial_indent)
+    subsequent_indent = indent_str(subsequent_indent)
+
+    if isinstance(input_strings, (list, tuple)):
+        if separator is None:
+            separator = ', '
+        build_str = separator.join(input_strings)
+        # Return contatentated list if within cell width
+        if len(build_str) <= max_width:
+            return build_str
+
+        for fold_items in input_strings:
+            if fold_list_items:
+                folded_strings = []
+                for str_item in input_strings:
+                    folded_strings.append(
+                        fold_strings(str_item, max_width,
+                                     break_long_words=break_long_words,
+                                     break_on_hyphens=break_on_hyphens,
+                                     initial_indent=initial_indent,
+                                     subsequent_indent=subsequent_indent))
+                return "\n".join(folded_strings)
+
+            else:
+                input_strings = build_str
+
+    # process single string
+    input_string = input_strings
+    assert isinstance(input_string, six.string_types)
+
+    if len(input_string) <= max_width:
+        return input_string
+
+    # use textwrap fill to fold the string
+    folded_string = fill(input_string, max_width,
+                         break_long_words=break_long_words,
+                         break_on_hyphens=break_on_hyphens,
+                         initial_indent=initial_indent,
+                         subsequent_indent=subsequent_indent)
+
+    return folded_string
 
 
 def raise_pywbem_error_exception(er):
