@@ -18,8 +18,8 @@ This documentation uses a few special terms to refer to Python types:
 .. glossary::
 
    CIM-XML
-      The name of the protocol used in :term:`DSP0200` that pywbemcli uses to
-      communicate with WBEM servers.
+      The name of the protocol that pywbemcli uses to communicate with WBEM
+      servers. CIM-XML is defined in :term:`DSP0200`.
 
    CIM object output formats
       Pywbemcli output formats (specified with the
@@ -43,18 +43,17 @@ This documentation uses a few special terms to refer to Python types:
       A CIM instance path in a format that is suitable as a command line
       argument or option value of pywbemcli. Several commands of the instance
       command group use INSTANCENAME as a command line argument.
-      The only supported format for INSTANCENAME is a :term:`WBEM URI`.
-      See also :ref:`Specifying the INSTANCENAME command argument` for the
-      definition of how to define both a complete WBEM URL as INSTANCENAME
-      and to use a wildcard where pywbemcli presents a selection list of
-      instance names.
+
+      The supported formats for INSTANCENAME are an untyped :term:`WBEM URI`
+      and the use of wildcard keys i.e. ``CLASSNAME.?``.
+      See :ref:`Specifying the INSTANCENAME command argument` and
+      :ref:`Interactively selecting INSTANCENAME`.
 
       Examples::
 
         CIM_RegisteredProfile.InstanceID="acme:1"
         CIM_System.CreationClassName="ACME_System",Name="MySystem"
-
-        CIM_System.?   # Interactive specification of instance name
+        CIM_System.?
 
    connection id
       A string that uniquely identifies each :class:`pywbem.WBEMConnection`
@@ -82,21 +81,17 @@ This documentation uses a few special terms to refer to Python types:
       The connections file defines a list of named WBEM connection definitions,
       each of which is either the set of parameters for connecting to a real
       WBEM server, or the set of files for creating a mock WBEM server. The
-      file name of the connections file is
-      :term:`WBEM connection definitions filename`; it is created by pywbemcli
+      file name of the connections file is ``pywbemcli_connection_definitions.yaml``
       in the current directory. Multiple connections files may exist in
       different directories. This allows connection definitions to be
       predefined and pywbemcli commands executed against them using only the
       connection definition name (via the ``--name`` general option).
 
-   WBEM connection definitions filename
-      ``pywbemcli_connection_definitions.yaml``
-
    MOF
       MOF (Managed Object Format) is the language used by the DMTF to
       describe in textual form CIM objects including CIM classes,
       CIM instances, etc.  It is one of the output formats provided for
-      the display of CIM objects in pywbemcli. See DMTF term:`DSP0004` for more
+      the display of CIM objects in pywbemcli. See DMTF :term:`DSP0004` for more
       information on the MOF format.
 
    WBEM management profile
