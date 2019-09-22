@@ -49,11 +49,22 @@ else:
     # pylint: disable=invalid-name
     _Longint = int
 
+##############################################################
+#
+#     general option output format definitions and support for
+#     validating output formats
+#
+##############################################################
 
 TABLE_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html')
 CIM_OBJECT_OUTPUT_FORMATS = ('mof', 'xml', 'repr', 'txt')
 
-OUTPUT_FORMATS = [TABLE_FORMATS, CIM_OBJECT_OUTPUT_FORMATS]
+OUTPUT_FORMATS = TABLE_FORMATS + CIM_OBJECT_OUTPUT_FORMATS
+
+DEFAULT_CIM_OUTPUT_FORMAT = 'mof'
+DEFAULT_TABLE_OUTPUT_FORMAT = 'simple'
+FORMAT_GROUPS = ('CIM', 'TABLE')
+
 
 GENERAL_OPTIONS_METAVAR = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
@@ -64,6 +75,89 @@ DEFAULT_MAX_CELL_WIDTH = 100
 def output_format_is_table(output_format):
     """ Return True if output format is a table form"""
     return output_format in TABLE_FORMATS
+
+
+def validate_output_format(output_format, valid_format_groups,
+                           default_format=None,):
+    """
+    Tests for valid format groups and provides a default format if the
+    context.output_format is None.
+
+    Parameters:
+      output_format(:term:`string` or None):
+        The output format string provided by input (i.e. ContextObj) or
+        None if there is no defined format for this command execution.
+
+      valid_format_groups(list of :term:`string` or :term:`string`):
+        One or more strings in a list where the allowed strings are:
+        'CIM', 'TABLE'. An empty list implies any output group if valid.
+        A single string may be used to designate a single group
+
+      default_format(:term:`string` or None):
+        One of the valid format definitions or None.  The format must be in the
+        OUTPUT_FORMAT list. If None, the default format for the first group is
+        returned
+
+    Returns:
+       :term:`string` containing output format to be used.
+
+    Raises:
+        click.ClickException if format invalid for command
+    """
+    # These are asserts because they are coding errors in the input parameters
+    # for this function
+    if isinstance(valid_format_groups, six.string_types):
+        valid_format_groups = [valid_format_groups]
+    assert all(element in FORMAT_GROUPS for element in valid_format_groups)
+    if default_format:
+        assert default_format in OUTPUT_FORMATS
+
+    # If valid = 1 assure that default in that group.
+    # confirm default matches group.
+
+    # CIM object type has priority over Table
+    if output_format:
+        # Do invalid message here but really should be assert???
+        if 'CIM' in valid_format_groups:
+            if output_format in CIM_OBJECT_OUTPUT_FORMATS:
+                return output_format
+        if 'TABLE' in valid_format_groups:
+            if output_format in TABLE_FORMATS:
+                return output_format
+        if not valid_format_groups:
+            return output_format
+    else:
+        if default_format:
+            return default_format
+        elif valid_format_groups:
+            if valid_format_groups[0] == 'CIM':
+                return DEFAULT_CIM_OUTPUT_FORMAT
+            if valid_format_groups[0] == 'TABLE':
+                return DEFAULT_TABLE_OUTPUT_FORMAT
+            else:
+                return DEFAULT_CIM_OUTPUT_FORMAT
+        else:
+            return DEFAULT_CIM_OUTPUT_FORMAT
+
+    valid_formats = ""
+    err_msg = "not allowed for this command"
+
+    valid_formats = ""
+    if 'TABLE' in valid_format_groups:
+        valid_formats += 'TABLE formats ({})'.format(','.join(TABLE_FORMATS))
+    if 'CIM' in valid_format_groups:
+        valid_formats += 'CIM Object formats ({})'.format(
+            ','.join(CIM_OBJECT_OUTPUT_FORMATS))
+
+    raise click.ClickException('Output format "{}" {}. Only {} allowed.'.
+                               format(output_format, err_msg, valid_formats))
+
+
+######################################################################
+#
+#  General common functions
+#
+######################################################################
 
 
 def resolve_propertylist(propertylist):
@@ -109,6 +203,13 @@ def resolve_propertylist(propertylist):
 def warning_msg(msg):
     """Issue the msg param as warning prefixed by WARNING: to stderr"""
     click.echo('WARNING: {}'.format(msg), err=True)
+
+
+######################################################################
+#
+#  Functions to select from console
+#
+######################################################################
 
 
 def pick_one_from_list(context, options, title):
@@ -773,6 +874,13 @@ def process_invokemethod(context, objectname, methodname, options):
             click.echo('{}={}'.format(pname, val[0]))
 
 
+####################################################################
+#
+#  Display of CIM objects.
+#
+####################################################################
+
+
 def sort_cimobjects(cim_objects):
     """
     Sort lists of CIMClass, CIMCLassName, CIMQualifierDecl, CIMInstance or
@@ -813,15 +921,12 @@ def sort_cimobjects(cim_objects):
     return [sort_dict[key] for key in sorted(sort_dict.keys())]
 
 
-def display_cim_objects_summary(context, objects):
+def display_cim_objects_summary(context, objects, output_format):
     """
-    Display a summary of the objects received. This only displays the
-    count.
+    Display a summary of the objects received. This displays the
+    count of objects.
     """
     context.spinner_stop()
-
-    # default when displaying cim objects is mof
-    output_format = context.output_format or 'mof'
 
     if objects:
         cim_type = get_cimtype(objects)
@@ -834,11 +939,12 @@ def display_cim_objects_summary(context, objects):
                                     table_format=output_format))
             return
         click.echo('{} {}(s) returned'.format(len(objects), cim_type))
+
     else:
         click.echo('0 objects returned')
 
 
-def display_cim_objects(context, cim_objects, output_format=None, summary=False,
+def display_cim_objects(context, cim_objects, output_format, summary=False,
                         sort=False):
     """
     Display CIM objects in form determined by input parameters.
@@ -867,14 +973,20 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
       context (:class:`ContextObj`):
         Click context contained in ContextObj object.
 
-      TODO This is not correct form for this doc.
-      objects(iterable of CIMInstance, CIMInstanceName, CIMClass, CIMClassName,
-      or CIMQualifierDeclaration):
-        Iterable of CIM objects to be displayed or a single object.
+      TODO: Future:This line was way too long. Since we are not putting it
+            into docmentation today, we folded it.
+      objects(iterable of :class:`~pywbem.CIMInstance`,
+        :class:`~pywbem.CIMInstanceName`, :class:`~pywbem.CIMClass`,
+        :class:`~pywbem.CIMClassName`,
+        or :class:`~pywbem.CIMQualifierDeclaration`):
+        Iterable of zero or more CIM objects to be displayed.
 
       output_format(:term:`strng`):
-        String defining the preferred output format. This may be overridden
-        if the output format cannot be used for the object type
+        String defining the preferred output format. Must not be None since
+        the correct output_format must have been selected before this call.
+        Note that the output formats allowed may depend on a) whether
+        summary is True, b)the specific type because we do not have a table
+        output format for CIMClass.
 
       summary(:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
@@ -883,11 +995,10 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
     context.spinner_stop()
 
     if summary:
-        display_cim_objects_summary(context, cim_objects)
+        display_cim_objects_summary(context, cim_objects, output_format)
         return
 
     if not cim_objects and context.verbose:
-        context.spinner_stop()
         click.echo("No objects returned")
         return
 
@@ -895,24 +1006,24 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
         cim_objects = sort_cimobjects(cim_objects)
 
     # default when displaying cim objects is mof
-    output_format = context.output_format or 'mof'
+    assert output_format
 
     if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
         if output_format in TABLE_FORMATS:
-            _print_objects_as_table(context, cim_objects)
+            _print_objects_as_table(context, cim_objects, output_format)
         else:
-            # Recursively call to display each object
+            # Call to display each object
             for obj in cim_objects:
                 display_cim_objects(context, obj,
-                                    output_format=context.output_format)
+                                    output_format=output_format)
         return
 
     # Display a single item.
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format in TABLE_FORMATS:
-        _print_objects_as_table(context, [object_])
+        _print_objects_as_table(context, [object_], output_format)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -955,11 +1066,6 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
                                    .format(output_format))
 
 
-#######################################################################
-#
-#  The following code formats and outputs CIM Objects in table format
-#
-#######################################################################
 def _print_classes_as_table(classes, table_width, table_format):
     """
     TODO: Future extend to display classes as a table, showing the
@@ -1329,7 +1435,7 @@ def _print_instances_as_table(insts, table_width, table_format,
                             table_format=table_format))
 
 
-def _print_objects_as_table(context, objects):
+def _print_objects_as_table(context, objects, output_format):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -1341,7 +1447,6 @@ def _print_objects_as_table(context, objects):
     else:
         table_width = DEFAULT_TABLE_WIDTH
 
-    output_format = context.output_format
     if objects:
         if isinstance(objects[0], CIMInstance):
             _print_instances_as_table(objects, table_width, output_format)

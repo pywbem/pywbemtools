@@ -157,12 +157,13 @@ Options:
                                   option. Default: EnvVar
                                   PYWBEMCLI_DEFAULT_NAMESPACE, or root/cimv2.
   -o, --output-format FORMAT      Output format for the command result. The
-                                  specified format may be overriden since not
-                                  all formats apply to all result data types.
-                                  FORMAT is a table format
+                                  default and allowed output formats are
+                                  command specific. The default output_format
+                                  is None so that each command selects its own
+                                  default format. FORMAT is either a table
+                                  format:
                                   [table|plain|simple|grid|psql|rst|html] or
-                                  object format [mof|xml|repr|txt]. Default:
-                                  simple.
+                                  CIM object format: [mof|xml|repr|txt].
   -l, --log COMP[=DEST[:DETAIL]],...
                                   Enable logging of the WBEM operations,
                                   defined by a list of log configuration

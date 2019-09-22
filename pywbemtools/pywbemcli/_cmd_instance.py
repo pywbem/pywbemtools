@@ -32,7 +32,7 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
     process_invokemethod, raise_pywbem_error_exception, \
-    create_ciminstancename, warning_msg
+    create_ciminstancename, warning_msg, validate_output_format
 
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
@@ -810,6 +810,9 @@ def cmd_instance_get(context, instancename, options):
     instances to the console from which one can be picked to get from the
     server and display.
     """
+
+    output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
+
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
         return
@@ -822,7 +825,7 @@ def cmd_instance_get(context, instancename, options):
             IncludeClassOrigin=options['include_classorigin'],
             PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, instance, context.output_format)
+        display_cim_objects(context, instance, output_fmt)
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -986,6 +989,8 @@ def cmd_instance_enumerate(context, classname, options):
     Enumerate CIM instances or CIM instance names
 
     """
+    output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
+
     try:
         if options['names_only']:
             results = context.conn.PyWbemcliEnumerateInstancePaths(
@@ -1007,7 +1012,7 @@ def cmd_instance_enumerate(context, classname, options):
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -1029,6 +1034,8 @@ def cmd_instance_references(context, instancename, options):
        If the interactive option is selected, the instancename MUST BE
        a classname.
     """
+    output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
+
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
         return
@@ -1054,7 +1061,7 @@ def cmd_instance_references(context, instancename, options):
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -1073,6 +1080,8 @@ def cmd_instance_associators(context, instancename, options):
     Execute the references request operation to get references for
     the classname defined
     """
+    output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
+
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
         return
@@ -1102,7 +1111,7 @@ def cmd_instance_associators(context, instancename, options):
                 MaxObjectCount=context.pull_max_cnt,
                 PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -1121,6 +1130,7 @@ def cmd_instance_count(context, classname, options):
     """
     Get the number of instances of each class in the namespace
     """
+    output_fmt = validate_output_format(context.output_format, 'TABLE')
 
     # Differs from class find because it classname is optional.
     # If None, select all
@@ -1192,11 +1202,12 @@ def cmd_instance_count(context, classname, options):
     context.spinner_stop()
     click.echo(format_table(rows, headers,
                             title='Count of instances per class',
-                            table_format=context.output_format))
+                            table_format=output_fmt))
 
 
 def cmd_instance_query(context, query, options):
     """Execute the query defined by the inputs"""
+    output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     try:
         results = context.conn.PyWbemcliQueryInstances(
@@ -1205,7 +1216,7 @@ def cmd_instance_query(context, query, options):
             namespace=options['namespace'],
             MaxObjectCount=context.pull_max_cnt)
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True)
 
     except Error as er:

@@ -38,7 +38,7 @@ from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
     CIM_OBJECT_OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
+from .config import DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository
@@ -195,15 +195,15 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    format(ev=PywbemServer.defaultnamespace_envvar,
                           default=DEFAULT_NAMESPACE))
 @click.option('-o', '--output-format', metavar='FORMAT',
-              # defaulted in code
               help='Output format for the command result. '
-                   'The specified format may be overriden since not all '
-                   'formats apply to all result data types. '
-                   'FORMAT is a table format [{tb}] or object format [{ob}]. '
-                   'Default: {default}.'.
+                   'The default and allowed output formats are command '
+                   'specific. '
+                   'The default output_format is None so that each command '
+                   'selects its own default format. '
+                   'FORMAT is either a table format: [{tb}] or CIM object '
+                   'format: [{ob}].'.
                    format(tb='|'.join(TABLE_FORMATS),
-                          ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS),
-                          default=DEFAULT_OUTPUT_FORMAT))
+                          ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)))
 @click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
               # defaulted in code
               envvar=PywbemServer.log_envvar,

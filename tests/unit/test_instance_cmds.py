@@ -1998,7 +1998,8 @@ Instances: PyWBEM_AllTypes
     # The following use interop ns to avoid warning about namespaces.
     ['Verify instance command count CIM_* simple model, Rtn tbl of instances',
      {'args': ['count', 'CIM_*'],
-      'general': ['--default-namespace', 'interop']},
+      'general': ['--output-format', 'table',
+                  '--default-namespace', 'interop']},
      {'stdout': ['Count of instances per class',
                  '+-------------+-----------------+---------+',
                  '| Namespace   | Class           |   count |',
@@ -2013,7 +2014,8 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command count CIM_*  sorted, Rtn table of inst counts',
      {'args': ['count', 'CIM_*', '--sort'],
-      'general': ['--default-namespace', 'interop']},
+      'general': ['--output-format', 'table',
+                  '--default-namespace', 'interop']},
      {'stdout': """Count of instances per class
 +-------------+-----------------+---------+
 | Namespace   | Class           |   count |
@@ -2029,7 +2031,8 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command count CIM_*. Rtn table of inst counts',
      {'args': ['count', 'CIM_*'],
-      'general': ['--default-namespace', 'interop']},
+      'general': ['--output-format', 'table',
+                  '--default-namespace', 'interop']},
      {'stdout': """Count of instances per class
 +-------------+-----------------+---------+
 | Namespace   | Class           |   count |

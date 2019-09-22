@@ -29,7 +29,8 @@ import click
 from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception
+from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception, \
+    validate_output_format
 from ._click_extensions import PywbemcliGroup
 
 # NOTE: A number of the options use double-dash as the short form.  In those
@@ -210,6 +211,8 @@ def cmd_server_namespaces(context, options):
     """
     Display namespaces in the current WBEM server
     """
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     try:
         namespaces = context.wbem_server.namespaces
         namespaces.sort()
@@ -220,7 +223,7 @@ def cmd_server_namespaces(context, options):
 
         click.echo(format_table(rows, ['Namespace Name'],
                                 title='Server Namespaces:',
-                                table_format=context.output_format))
+                                table_format=output_format))
 
     except Error as er:
         raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
@@ -230,6 +233,8 @@ def cmd_server_interop(context):
     """
     Display interop namespace in the current WBEM server
     """
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     try:
         interop_ns = context.wbem_server.interop_ns
         context.spinner_stop()
@@ -238,7 +243,7 @@ def cmd_server_interop(context):
 
         click.echo(format_table(rows, ['Namespace Name'],
                                 title='Server Interop Namespace:',
-                                table_format=context.output_format))
+                                table_format=output_format))
     except Error as er:
         raise_pywbem_error_exception(er)
 
@@ -247,6 +252,8 @@ def cmd_server_brand(context):
     """
     Display product and version info of the current WBEM server
     """
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     try:
         brand = context.wbem_server.brand
         context.spinner_stop()
@@ -254,7 +261,7 @@ def cmd_server_brand(context):
         rows = [[brand]]
         click.echo(format_table(rows, ['WBEM server brand'],
                                 title='Server brand:',
-                                table_format=context.output_format))
+                                table_format=output_format))
     except Error as er:
         raise_pywbem_error_exception(er)
 
@@ -263,6 +270,8 @@ def cmd_server_info(context):
     """
     Display general overview of info from current WBEM server
     """
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     try:
         # execute the namespaces to force contact with server before
         # turning off the spinner.
@@ -283,7 +292,7 @@ def cmd_server_info(context):
                      namespaces])
         click.echo(format_table(rows, headers,
                                 title='Server General Information',
-                                table_format=context.output_format))
+                                table_format=output_format))
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -322,6 +331,8 @@ def cmd_server_profiles(context, options):
     """
     Display general overview of info from current WBEM server
     """
+    output_format = validate_output_format(context.output_format, 'TABLE')
+
     server = context.wbem_server
     try:
         found_server_profiles = server.get_selected_profiles(
@@ -341,7 +352,7 @@ def cmd_server_profiles(context, options):
 
         click.echo(format_table(rows, headers,
                                 title='Advertised management profiles:',
-                                table_format=context.output_format))
+                                table_format=output_format))
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -352,6 +363,9 @@ def cmd_server_centralinsts(context, options):
     Display general information on the central instances of one or more
     profiles.
     """
+    output_format = validate_output_format(context.output_format, ['CIM',
+                                                                   'TABLE'])
+
     server = context.wbem_server
     try:
         found_server_profiles = server.get_selected_profiles(
@@ -387,6 +401,6 @@ def cmd_server_centralinsts(context, options):
         click.echo(format_table(rows,
                                 headers,
                                 title='Advertised Central Instances:',
-                                table_format=context.output_format))
+                                table_format=output_format))
     except Error as er:
         raise_pywbem_error_exception(er)

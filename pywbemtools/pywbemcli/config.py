@@ -39,7 +39,7 @@ However, they should be used from the ``pywbemcli`` namespace.
 # This module is meant to be safe for 'import *'.
 
 
-__all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
+__all__ = ['DEFAULT_CONNECTION_TIMEOUT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
            'DEFAULT_MAXPULLCNT', 'MAX_TIMEOUT', 'DEFAULT_URL_SCHEME',
            'USE_TERMINAL_WIDTH', 'DEFAULT_TABLE_WIDTH']
@@ -48,10 +48,6 @@ __all__ = ['DEFAULT_CONNECTION_TIMEOUT', 'DEFAULT_OUTPUT_FORMAT',
 #: is not set by an input parameter.
 #: Positive integer.
 DEFAULT_CONNECTION_TIMEOUT = 30
-
-#: Specifies the default output format selected if no output format is
-#: defined on the cmd line, environment variable, or a config file.
-DEFAULT_OUTPUT_FORMAT = 'simple'
 
 #: Specifies the default namespace uses if no default namespace is defined
 #: on the cmd line, environment variable, or a config file.

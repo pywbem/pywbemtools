@@ -32,7 +32,7 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
     format_table, process_invokemethod, raise_pywbem_error_exception, \
-    warning_msg
+    warning_msg, validate_output_format
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option, association_filter_option, \
@@ -559,6 +559,32 @@ def enumerate_classes_filtered(context, classname, options):
     return results
 
 
+def get_format_group(context, options):
+    """
+    Define the format groups allowed based on the options. This is particular
+    to the class commands, largely because we do not have a table format
+    for enumerate, get, associators, or references unless options such as
+    summary, or names_only are set.
+    """
+    # Summary always output as TABLE
+    if 'summary' in options and options['summary']:
+        # This accounts for the fact that the results of a summary can be
+        # either table or simply a string output
+        if context.output_format and context.output_format in TABLE_FORMATS:
+            return ['TABLE']
+        else:
+            # Temporary hack. We need another format group, i.e. txt or str
+            # That displays in non-structured manner. Or drop this output
+            # completely.
+            return ['CIM']
+    # Names_only may be output as Table or as CIM Object.
+    elif 'names_only' in options and options['names_only']:
+        return ['CIM', 'TABLE']
+    # otherwise only CIM allowed today.
+    else:
+        return ['CIM']
+
+
 #####################################################################
 #
 #  Command functions for each of the commands in the class group
@@ -573,8 +599,10 @@ def cmd_class_get(context, classname, options):
     Gets the class defined by CLASSNAME from the WBEM server and displays
     the class. If the class cannot be found, the server returns a CIMError
     exception.
-
     """
+    format_group = get_format_group(context, options)
+    output_format = validate_output_format(context.output_format, format_group)
+
     try:
         result_class = context.conn.GetClass(
             classname,
@@ -585,7 +613,7 @@ def cmd_class_get(context, classname, options):
             PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, result_class,
-                            output_format=context.output_format)
+                            output_format=output_format)
     except Error as er:
         raise_pywbem_error_exception(er)
 
@@ -605,11 +633,13 @@ def cmd_class_enumerate(context, classname, options):
         Enumerate the classes returning a list of classes from the WBEM server.
         That match the qualifier filter options
     """
+    format_group = get_format_group(context, options)
+    output_format = validate_output_format(context.output_format, format_group)
 
     try:
         results = enumerate_classes_filtered(context, classname, options)
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_format,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -623,6 +653,9 @@ def cmd_class_references(context, classname, options):
     """
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
+
+    format_group = get_format_group(context, options)
+    output_format = validate_output_format(context.output_format, format_group)
 
     try:
         if options['names_only']:
@@ -639,7 +672,7 @@ def cmd_class_references(context, classname, options):
                 IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_format,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -653,6 +686,9 @@ def cmd_class_associators(context, classname, options):
     """
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
+
+    format_group = get_format_group(context, options)
+    output_format = validate_output_format(context.output_format, format_group)
 
     try:
         if options['names_only']:
@@ -673,7 +709,7 @@ def cmd_class_associators(context, classname, options):
                 IncludeClassOrigin=options['include_classorigin'],
                 PropertyList=resolve_propertylist(options['propertylist']))
 
-        display_cim_objects(context, results, context.output_format,
+        display_cim_objects(context, results, output_format,
                             summary=options['summary'], sort=True)
 
     except Error as er:
@@ -717,8 +753,9 @@ def cmd_class_find(context, classname_glob, options):
     option and display the result. The result is a list of classes/namespaces
     """
 
-    context.spinner_stop()
+    output_format = validate_output_format(context.output_format, 'TABLE')
 
+    context.spinner_stop()
     namespaces = get_namespaces(context, options['namespace'])
 
     try:
@@ -753,7 +790,7 @@ def cmd_class_find(context, classname_glob, options):
             click.echo(
                 format_table(rows, headers,
                              title='Find class {}'.format(classname_glob),
-                             table_format=context.output_format))
+                             table_format=output_format))
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
@@ -773,6 +810,8 @@ def cmd_class_tree(context, classname, options):
     The --superclasses option determines if the superclass tree or the
     subclass tree is displayed.
     """
+
+    # TODO: Sort out how we handle output format with tree output.
     try:
         if options['superclasses']:
             if classname is None:

@@ -27,8 +27,8 @@ import click
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, CMD_OPTS_TXT, \
-    output_format_is_table, sort_cimobjects, raise_pywbem_error_exception
+from ._common import display_cim_objects, CMD_OPTS_TXT, sort_cimobjects, \
+    raise_pywbem_error_exception, validate_output_format
 from ._common_options import add_options, namespace_option, summary_option
 from ._click_extensions import PywbemcliGroup
 
@@ -94,22 +94,18 @@ def qualifier_enumerate(context, **options):
 #####################################################################
 
 
-def qual_outputformat(output_format):
-    """ If output format is table type, force to mof"""
-
-    return 'mof' if output_format_is_table(output_format) else output_format
-
-
 def cmd_qualifier_get(context, qualifiername, options):
     """
     Execute the command for get qualifier and display result
     """
+    output_format = validate_output_format(context.output_format, ['CIM',
+                                                                   'TABLE'])
+
     try:
         qual_decl = context.conn.GetQualifier(qualifiername,
                                               namespace=options['namespace'])
 
-        display_cim_objects(context, qual_decl,
-                            qual_outputformat(context.output_format))
+        display_cim_objects(context, qual_decl, output_format)
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -119,11 +115,14 @@ def cmd_qualifier_enumerate(context, options):
     """
     Execute the command for enumerate qualifiers and desplay the result.
     """
+    output_format = validate_output_format(context.output_format, ['CIM',
+                                                                   'TABLE'])
+
     try:
         qual_decls = sort_cimobjects(context.conn.EnumerateQualifiers(
             namespace=options['namespace']))
 
-        display_cim_objects(context, qual_decls, context.output_format,
+        display_cim_objects(context, qual_decls, output_format,
                             summary=options['summary'])
 
     except Error as er:

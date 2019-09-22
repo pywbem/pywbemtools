@@ -803,8 +803,9 @@ pull operations are not supported in the WBEM server:
 Output formats
 ^^^^^^^^^^^^^^
 
-Pywbemcli supports various output formats for the command result. The output
-format can be selected with the ``--output-format``/``-o`` option.
+Pywbemcli supports multiple output formats to present command results. The output
+format can be selected with the ``--output-format``/``-o`` option. The allowed
+output formats are different for the various command groups and commands.
 
 The output formats fall into three groups:
 
@@ -828,13 +829,103 @@ The output formats fall into three groups:
 * **ASCII tree format** - The :ref:`ASCII tree format` formats the result
   as a tree, using ASCII characters to represent the tree. The only command
   supporting the ASCII tree format is ``class tree``, and it supports only
-  that one output format.
+  that one output format.  The tree format is not supported by any other
+  command today.
 
 When an unsupported output format is specified for a command response, it is
-ignored and a default output format is used instead.  For example, the command
-``class enumerate`` only supports the CIM object formats and always outputs
-in those formats.
+rejected with an exception.  For example, the command
+``class enumerate`` only supports the CIM object formats and will generate an
+exception if the command ``pywbemcli -o table class enumerate`` is entered.
 
+
+.. _`Output formats for groups and commands`:
+
+Output formats for groups and commands
+""""""""""""""""""""""""""""""""""""""
+
+Each of the commands may allow only a subset of the possible ouput formats. Thus,
+the `server brand` only outputs data in a table format so there is no defined
+default format for the `--output-format` general option.
+
+The following shows the default format for each command the the alternate
+format groups where the groups are:
+
+objects = xml|repr|txt
+
+table = table|plain|simple|grid|psql|rst|html
+
++----------+---------------+----------+----------------+--------------------------------------------+
+|Group     |Command        | Default  | Alternates     | Comments                                   |
++==========+===============+==========+================+============================================+
+| class    | associators   | 'mof'    | objects        | See Note 1 below.                          |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | delete        | None     | None           | Nothing returned                           |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | enumerate     | 'mof'    | objects        |  See Note 1 below.                         |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | find          | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | get           | 'mof'    | objects        |  See Note 1 below.                         |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | invokemethod  | 'mof'    | objects        |  See Note 1 below.                         |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | references    | 'mof'    | objects        |  See Note 1 below.                         |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | tree          | None     | None           | Only outputs as ascii tree                 |
++----------+---------------+----------+----------------+--------------------------------------------+
+|instance  | associators   | 'mof'    | objects, table | output as cim object or table of properties|
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | count         | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | create        | None     |                | Nothing returned                           |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | delete        | None     |                | Nothing returned                           |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  enumerate    | 'mof'    | objects, table |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  get          | 'mof'    | objects, table |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          | invokemethod  | 'mof'    | objexts, table |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  modify       | None     | None           |  Nothing returned                          |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  references   | 'mof'    | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|qualifier |  enumerate    | 'mof'    | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  get          | 'mof'    | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|server    |  brand        | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |centralinsts   | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  info         | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  interop      | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  namespaces   | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  profiles     | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|connection|  delete       | None     | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  export       | None     | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  list         | 'simple' | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  save         |  None    | table          |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  select       |  None    | None           |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  show         |  None    |                | Currently ignores output format            |
++----------+---------------+----------+----------------+--------------------------------------------+
+|          |  test         |  None    | None           |                                            |
++----------+---------------+----------+----------------+--------------------------------------------+
+
+NOTES:
+
+1. While the display of classes allows only CIM object display format (`mof`, etc.) the display with
+   the --names-only or --summary formats allows table output also.
 
 .. _`Table formats`:
 
