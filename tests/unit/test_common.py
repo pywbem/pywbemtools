@@ -44,7 +44,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
     verify_operation, split_str_w_esc, format_keys, create_ciminstancename, \
-    shorten_path_str, NoCaseList, validate_output_format
+    shorten_path_str, NoCaseList, validate_output_format, fold_strings
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
 # from tests.unit.utils import assert_lines
@@ -60,7 +60,7 @@ SKIP = False  # mark tests that are to be skipped.
 
 
 TESTCASES_ISCLASSNAME = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for is_classname
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -86,7 +86,7 @@ TESTCASES_ISCLASSNAME = [
     TESTCASES_ISCLASSNAME)
 @simplified_test_function
 def test_is_classname(testcase, name, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for is_classname function"""
     # The code to be tested
 
     act_rtn = is_classname(name)
@@ -99,7 +99,7 @@ def test_is_classname(testcase, name, exp_rtn):
 
 
 TESTCASES_VALID_OUTPUT_FORMAT = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for valid_output_format
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -238,7 +238,7 @@ def test_valid_output_format(testcase, fmt, default, groups, exp_rtn):
 
 
 TESTCASES_FORMAT_KEYBINDINGS = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for format_keybindings
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -442,7 +442,7 @@ TESTCASES_SHORT_PATH = [
     TESTCASES_SHORT_PATH)
 @simplified_test_function
 def test_short_path(testcase, kb, rpl, fp, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for shorten_path_str function"""
     # The code to be tested
 
     inst_name = CIMInstanceName('cln', keybindings=kb)
@@ -563,7 +563,7 @@ TESTCASES_HIDE_EMPTY_COLUMNS = [
     TESTCASES_HIDE_EMPTY_COLUMNS)
 @simplified_test_function
 def test_hide_empty_columns(testcase, rows, headers, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for hide_empty_columns function"""
     # The code to be tested
 
     act_rtn_headrs, act_rtn_rows = hide_empty_columns(headers, rows)
@@ -650,7 +650,7 @@ TESTCASES_SPLIT_STR = [
     TESTCASES_SPLIT_STR)
 @simplified_test_function
 def test_split_str(testcase, input_str, delimiter, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for split_str function"""
 
     # The code to be tested
     act_result = [item for item in split_str_w_esc(input_str, delimiter)]
@@ -739,7 +739,7 @@ TESTCASES_NOCASE_LIST = [
     TESTCASES_NOCASE_LIST)
 @simplified_test_function
 def test_nocase_list(testcase, input_list, test_str, add_strs, exp_rtn):
-    """Test for resolve_propertylist function"""
+    """Test for nocase_list function"""
 
     # The code to be tested
     test_list = NoCaseList(input_list)
@@ -757,7 +757,7 @@ def test_nocase_list(testcase, input_list, test_str, add_strs, exp_rtn):
 
 
 TESTCASES_PICK_ONE_FROM_LIST = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for pick_one_from_list
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -834,13 +834,14 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
 
 
 TESTCASES_PICK_MULTIPLE_FROM_LIST = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for pick_multiple_from_list
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function and response:
     #   * options: tuple of strings defining properties
-    #   * choices: item index from options that is to be chosen
+    #   * choices: list of item indexes from options to be chosen rtnd from
+    #     prompt. Allows chosing multiple items.
     #   * exp_rtn: expected function return, a list of selected items.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
@@ -874,8 +875,8 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
 def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     """Test for pick_one_from_list function"""
     # setup mock for this test
-    mock_function = 'pywbemtools.pywbemcli.click.prompt'
-    with patch(mock_function, side_effect=choices) as mock_prompt:
+    mock_clickprompt = 'pywbemtools.pywbemcli.click.prompt'
+    with patch(mock_clickprompt, side_effect=choices) as mock_prompt:
         # mock the echo to hide output
         mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
         with patch(mock_echo_func):
@@ -889,6 +890,8 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     # are not mistaken as expected exceptions
     assert testcase.exp_exc_types is None
 
+    if act_rtn != exp_rtn:
+        print('act %s\nexp %s' % (act_rtn, exp_rtn))
     assert act_rtn == exp_rtn
 
 
@@ -926,7 +929,6 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
      dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
      None, None, True),
 
-
     ('Verify empty propertylist',
      dict(pl_str=("",), exp_pl=[]),
      None, None, False),
@@ -941,9 +943,6 @@ def test_propertylist(testcase, pl_str, exp_pl):
     """Test for resolve_propertylist function"""
     # The code to be tested
 
-    # wraps the test string in a tuple because that is the way the
-    # propertylist option returns the list since it is a multiple type
-    # option
     plist = resolve_propertylist(pl_str)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -954,7 +953,7 @@ def test_propertylist(testcase, pl_str, exp_pl):
 
 
 TESTCASES_COMPARE_INSTANCES = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for compare_instances
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -1074,7 +1073,7 @@ def test_compare_instances(testcase, inst1, inst2, result):
 # TODO: The mock for the following test is broken. Not sure yet how to
 # fix it
 TESTCASES_VERIFY_OPERATION = [
-    # TESTCASES for resolve_propertylist
+    # TESTCASES for verify_operation
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -2147,6 +2146,287 @@ def test_create_instancename(testcase, cls_kwargs, kv_args, exp_iname,
                                   keybindings=exp_keybindings,
                                   host=exp_host,
                                   namespace=exp_namespace)
+
+
+TESTCASES_FOLD_STRINGS = [
+    # TESTCASES for fold_strings
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #      input_str:  The input string or list of strings to be folded
+    #      max_wdth:  Max width of line in result
+    #      brk_long_words: Boolean flag to request long words be folded
+    #      brk-hyphen: Boolean flag to request that fold occur on hyphens
+    #      fold_list: Sets the fold_list_items argument boolean value
+    #      separator:
+    #      init_indent:
+    #      sub_indent:
+    #   * fmt: output_format defined for this command execution or None
+    #   * default: string containing default format or None
+    #   * groups: list of groups allowed for this command
+    #   * exp_rtn: String defining expected result
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify String does not change with max_len > string length',
+     dict(input_str='The red fox jumped over the fence',
+          max_width=100,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped over the fence'),
+     None, None, OK),
+
+    ('Verify String folds with small len',
+     dict(input_str='The red fox jumped over the fence',
+          max_width=5,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The\nred\nfox\njumped\nover\nthe\nfence'),
+     None, None, OK),
+
+    ('Verify String folds once',
+     dict(input_str='The red fox jumped over the fence',
+          max_width=18,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped\nover the fence'),
+     None, None, OK),
+
+    ('Verify String with fold already in string',
+     dict(input_str='The red fox jumped\nover the fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped\nover the fence'),
+     None, None, OK),
+
+    ('Verify String with existing fold refolds',
+     dict(input_str='The red\nfox jumped over\nthe fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped\nover the fence'),
+     None, None, OK),
+
+    ('Verify String with existing fold refolds with initial indent string',
+     dict(input_str='The red\nfox jumped over\nthe fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent='    ',
+          sub_indent=None,
+          exp_rtn='    The red fox\njumped over the\nfence'),
+     None, None, OK),
+
+    ('Verify String with existing fold refolds with initial indent integer',
+     dict(input_str='The red\nfox jumped over\nthe fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=4,
+          sub_indent=None,
+          exp_rtn='    The red fox\njumped over the\nfence'),
+     None, None, OK),
+
+    ('Verify String with existing fold refolds with subsequent indent string',
+     dict(input_str='The red\nfox jumped over\nthe fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent='    ',
+          exp_rtn='The red fox jumped\n    over the fence'),
+     None, None, OK),
+
+    ('Verify String with existing fold refolds with subsequent indent integer',
+     dict(input_str='The red\nfox jumped over\nthe fence',
+          max_width=19,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=4,
+          exp_rtn='The red fox jumped\n    over the fence'),
+     None, None, OK),
+
+    ('Verify String folds with longword',
+     dict(input_str='Theredfoxjumped over the fence',
+          max_width=10,
+          brk_long_wds=True,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='Theredfoxj\numped over\nthe fence'),
+     None, None, OK),
+
+    ('Verify String folds with hyphen in words but brk_hyphen=False',
+     dict(input_str='The red-green-blue fox jumped over the '
+                    'pink-orange-white fence',
+          max_width=10,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The\nred-green-blue\nfox jumped\nover the\n'
+                  'pink-orange-white\nfence'),
+     None, None, OK),
+
+    ('Verify String folds with hyphen in words but brk_hyphen=True',
+     dict(input_str='The red-green-blue fox jumped over the '
+                    'pink-orange-white fence',
+          max_width=10,
+          brk_long_wds=False,
+          brk_hyphen=True,
+          fold_list=None,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red-\ngreen-blue\nfox jumped\nover the\n'
+                  'pink-\norange-\nwhite\nfence'),
+     None, None, OK),
+
+    ('Verify String list folds each item into single string separator=" "',
+     dict(input_str=['The red fox jumped over the fence.',
+                     'The red fox jumped over the fence.'],
+          max_width=27,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=None,
+          separator=" ",
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped over the\nfence. The red fox jumped\n'
+                  'over the fence.'),
+     None, None, OK),
+
+    ('Verify String list folds each item into separate line separator=" "',
+     dict(input_str=['The red fox jumped over the fence.',
+                     'The red fox jumped over the fence.'],
+          max_width=27,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=True,
+          separator=None,
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped over the\nfence.\nThe red fox jumped '
+                  'over the\nfence.'),
+     None, None, OK),
+
+    ('Verify String list folds each item into separate line separator=" "  with'
+     'with subsequent indent',
+     dict(input_str=['The red fox jumped over the fence.',
+                     'The red fox jumped over the fence.'],
+          max_width=27,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=True,
+          separator=None,
+          init_indent=0,
+          sub_indent=4,
+          exp_rtn='The red fox jumped over the\n    fence.\nThe red fox '
+                  'jumped over the\n    fence.'),
+     None, None, OK),
+
+    ('Verify String list of words folds properly',
+     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
+          max_width=10,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=False,
+          separator=" ",
+          init_indent=0,
+          sub_indent=0,
+          exp_rtn='The red\nfox jumped\nover the\nfence.'),
+     None, None, OK),
+
+    ('Verify String list of words folds properly',
+     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
+          max_width=3,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=False,
+          separator=" ",
+          init_indent=0,
+          sub_indent=0,
+          exp_rtn='The\nred\nfox\njumped\nover\nthe\nfence.'),
+     None, None, OK),
+
+    ('Verify String list of words folds properly',
+     dict(input_str=['The', 'red', 'fox', 'jumped', 'over', 'the', 'fence.'],
+          max_width=90,
+          brk_long_wds=False,
+          brk_hyphen=False,
+          fold_list=False,
+          separator=" ",
+          init_indent=None,
+          sub_indent=None,
+          exp_rtn='The red fox jumped over the fence.'),
+     None, None, RUN),
+
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_FOLD_STRINGS)
+@simplified_test_function
+def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
+                      fold_list, separator, init_indent, sub_indent, exp_rtn):
+    """Test common.valid_output_format function"""
+    # The code to be tested
+    initial_indent = init_indent or 0
+    subsequent_indent = sub_indent or 0
+
+    act_rtn = fold_strings(input_str, max_width,
+                           break_long_words=brk_long_wds,
+                           break_on_hyphens=brk_hyphen,
+                           fold_list_items=fold_list,
+                           separator=separator,
+                           initial_indent=initial_indent,
+                           subsequent_indent=subsequent_indent)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    if act_rtn != exp_rtn:
+        print('IN\n%s\nEXP\n%s\nACT\n%s\n' % (input_str, exp_rtn, act_rtn))
+    assert act_rtn == exp_rtn
 
 
 # TODO this is a pytest. param

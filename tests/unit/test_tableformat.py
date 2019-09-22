@@ -30,7 +30,7 @@ try:
 except ImportError:
     from io import StringIO
 
-from pywbemtools.pywbemcli._common import format_table, fold_string
+from pywbemtools.pywbemcli._common import format_table, fold_strings
 
 VERBOSE = False
 
@@ -74,7 +74,7 @@ class BaseTableTests(unittest.TestCase):
     def create_folded_table(table_format, title=True):
         """Create a table with folded cells"""
         headers = ['col1', 'col2', 'col3']
-        folded = fold_string('this is a folded cell', 10)
+        folded = fold_strings('this is a folded cell', 10)
         rows = [['row1col1', 'row2col2', folded],
                 [folded, 'row2col2', 'row2col3']]
         title_txt = 'test folded table' if title else None

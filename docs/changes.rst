@@ -230,6 +230,8 @@ Released: not yet
   `--use-pull` can now be set for a particular server permanently.(See issues
   #529 and #534).
 
+* Added table formatted output for connection show. (See issue #572)
+
 **Known issues:**
 
 * See `list of open issues`_.
