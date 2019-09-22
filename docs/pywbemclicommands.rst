@@ -387,13 +387,8 @@ Instance associators command
 The ``instance associators`` command lists the CIM instances that are associated
 with the specified source instance.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed.
@@ -517,13 +512,8 @@ Instance delete command
 
 The ``instance delete`` command deletes a CIM instance.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 The following example deletes an instance by specifying its instance name.
 Note the extra backslash (see :term:`backslash-escaped`) that is required to
@@ -578,13 +568,8 @@ Instance get command
 
 The ``instance get`` command gets a CIM instance.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 The command displays the instance using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -598,7 +583,7 @@ This example gets an instance by instance name:
        name = "Saara";
     };
 
-or using the keys wild card:
+or using the keys wildcard:
 
 .. code-block:: text
 
@@ -624,13 +609,8 @@ Instance invokemethod command
 The ``instance invokemethod`` command invokes a CIM method on the specified
 instance and displays the return value and any output parameters.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 Input parameters for the method can be specified with the ``--parameter``/``-p``
 command option, which can be specified multiple times.
@@ -649,7 +629,7 @@ Example:
     ReturnValue=0
     arrBool=true, false
 
-Or using the wild card to create a selection list for the instance names
+Or using the wildcard to create a selection list for the instance names
 
 .. code-block:: text
 
@@ -675,13 +655,8 @@ Instance modify command
 The ``instance modify`` command modifies the properties of an existing CIM
 instance.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 The new property values are specified by possibly multiple ``--property``/``-p``
 command options.
@@ -702,13 +677,8 @@ Instance references command
 The ``instance references`` command lists the CIM instances that reference
 the specified source instance.
 
-The instance name (INSTANCENAME argument) can be specified in two ways as
-defined in :ref:`Interactively selecting INSTANCENAME`:
-
-* By specifying an untyped WBEM_URI.
-
-* By specifying the WBEM_URI with the wild card "?" in place of the keys
-  component of the WBEM_URI, (i.e. <classname>.?).
+The specification of the instance name (INSTANCENAME argument) is documented
+in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed.

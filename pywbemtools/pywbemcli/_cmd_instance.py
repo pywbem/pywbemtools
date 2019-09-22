@@ -161,18 +161,18 @@ def instance_get(context, instancename, **options):
 
     The instance can be specified in two ways:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
 
     In the output, the instance will formatted as defined by the
     --output-format general option.
@@ -191,18 +191,18 @@ def instance_delete(context, instancename, **options):
 
     The CIM instance to be deleted can be specified as follows:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The CIM namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The CIM namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
     """
     context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
                                                     options))
@@ -260,18 +260,18 @@ def instance_modify(context, instancename, **options):
 
     The CIM instance to be modified can be specified in two ways:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The CIM namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The CIM namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
 
     The properties to be modified and their new values are specified using the
     --property option, which may be specified multiple times.
@@ -309,18 +309,18 @@ def instance_invokemethod(context, instancename, methodname, **options):
 
     The CIM instance can be specified in two ways:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The CIM namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The CIM namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
 
     The method input parameters are specified using the --parameter option,
     which may be specified multiple times.
@@ -408,18 +408,18 @@ def instance_references(context, instancename, **options):
 
     The CIM instance can be specified in two ways:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The CIM namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The CIM namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
 
     The instances to be retrieved can be filtered by the --filter-query, --role
     and --result-class options.
@@ -472,18 +472,18 @@ def instance_associators(context, instancename, **options):
 
     The CIM instance can be specified in two ways:
 
-    1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME
-    argument. The CIM namespace in which the instance is looked up is the
-    namespace specified in the WBEM URI, or otherwise the namespace specified
-    in the --namespace option, or otherwise the default namespace of the
-    connection. Any host name in the WBEM URI will be ignored.
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
 
-    2. By specifying a class name with the characters ".?" as the keys in the
-    INSTANCENAME argument. The instances of the specified class are displayed
-    and the user is prompted for an index number to select an instance.
-    The CIM namespace in which the instances are looked up is the namespace
-    specified in the --namespace option, or otherwise the default namespace
-    of the connection.
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?. The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
 
     The instances to be retrieved can be filtered by the --filter-query,
     --role, --result-role, --assoc-class, and --result-class options.

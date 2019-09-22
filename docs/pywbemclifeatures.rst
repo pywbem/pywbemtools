@@ -28,9 +28,10 @@ syntactic implementation of the features. This includes:
   classes. The ``--names-only``/``-no`` command option defines whether only the
   name or the complete object will be displayed.
 
-* The ability to interactively select the data from a list presented by
+* The ability to define complete INSTANCE name command arguments or
+  interactively select the instance namesfrom a list presented by
   pywbemcli for certain objects rather than typing in long names the full name.
-  see :ref:`Interactively selecting INSTANCENAME`.
+  see :ref:`Specifying the INSTANCENAME command argument`.
 
 
 .. _`pywbemcli commands to WBEM operations`:
@@ -89,6 +90,70 @@ DeleteQualifier                    Not Implemented
 =================================  ==============================================
 
 
+.. _`Specifying CIM property and parameter values`:
+
+Specifying CIM property and parameter values
+--------------------------------------------
+
+TODO: Change to reference the commands
+
+TODO: Rewrite this to more completely define the value in terms of CIM types.
+
+The ``instance create``, ``instance modify``, ``class invokemethod``, and
+``instance invokemethod`` commands define the values of properties and parameters that
+are to be sent to the WBEM server.
+
+For a single property or parameter this is the ``--property``/``-p`` or
+``--parameter``/``-p`` option with the name and value in the form:
+
+.. code-block:: text
+
+    -p <name>=<value>
+
+Where:
+
+* <name> is the name of the of the property or parameter.
+* <value> is the value of the property or parameter The values represent the
+  value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
+
+TODO: This needs to be expanded to cover all CIM types. SEPARATE PR
+
+Since the WBEM server (and pywbem) requires that each property/parameter be
+typed to be created, pywbemcli retrieves the CIM class from the WBEM Server to
+determine the CIM type and arrayness required to define a CIMProperty. The
+value of each option argument contains the value as a string or numeric value.
+For numeric values, the creation will fail if the values of the numeric exceeds
+the range of the CIM type for the property defined in the class (ex. -3 for
+Uint32).
+
+Quotes around the value are only required if the value includes whitespace. See
+:term:`backslash-escaped` for information on use of backslashes in formating
+property argument values.
+
+The following are examples of scalar property definitions:
+
+.. code-block:: text
+
+    -p p1=SomeText
+    -p p2=\"Text with space\"
+    -p pint=3
+    -p psint=-3
+
+  For array properties the values are defined separated by commas:
+
+  .. code-block:: text
+
+    -p <property-name>=<value>(,<value>)
+
+  For example:
+
+  .. code-block:: text
+
+    -p strarray=abc,def,ghjk
+    -p strarray2=\"ab c\",def
+
+
+
 .. _`Displaying CIM instances/classes or their names`:
 
 Displaying CIM instances/classes or their names
@@ -103,7 +168,8 @@ line syntax pywbemcli combines these into a single command (i.e. ``enumerate``,
 ``--names-only``) that determines whether the names or the CIM objects are
 retrieved from the WBEM server.
 
-Thus, for example an ``instance enumerate`` with and without the ``--names-only`` option:
+Thus, for example an ``instance enumerate`` with and without the
+``--names-only`` option:
 
 .. code-block:: text
 
@@ -139,8 +205,30 @@ The INSTANCENAME argument used by some pywbemcli commands (e.g ``instance get``)
 specifies the instance path (aka instance name) of a CIM instance in a CIM
 namespace of a WBEM server.
 
-The format used by pywbemcli for specifying INSTANCENAME arguments on the
-command line is an untyped WBEM URI for instance paths as defined in
+The instance name (INSTANCENAME argument) can be specified in two ways:
+
+* By specifying a complete untyped WBEM URI as defined in section
+  :ref:`The INSTANCENAME command argument as a WBEM URI`. The
+  namespace of the instance is the namespace specified in the WBEM URI, or the
+  namespace specified with the ``-namespace``/``-n`` command option, or the
+  default namespace of the connection. Any host name in the WBEM URI will be
+  ignored.
+
+* By specifying the WBEM URI with the wildcard "?" in place of the keys
+  component of the WBEM URI,  as defined in section
+  :ref:`Interactively selecting INSTANCENAME command argument` (i.e.
+  CLASSNAME.?). The namespace of the instance is the namespace specified with
+  the ``-namespace``/``-n`` command option, or the default namespace of the
+  connection.
+
+
+.. _`The INSTANCENAME command argument as a WBEM URI`:
+
+The INSTANCENAME command argument as a WBEM URI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The format used by pywbemcli for specifying complete INSTANCENAME arguments on
+the command line is an untyped WBEM URI for instance paths as defined in
 :term:`DSP0207`, this is the *standard* format. There is also a *historical*
 format for WBEM URIs that is described in the
 :meth:`pywbem.CIMInstanceName.to_wbem_uri` method.
@@ -220,106 +308,32 @@ Examples for Windows command processor:
     pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
     pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
 
+.. _`Interactively selecting INSTANCENAME command argument`:
 
-.. _`Specifying CIM property and parameter values`:
+Interactively selecting INSTANCENAME command argument
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Specifying CIM property and parameter values
---------------------------------------------
+To simplify creating the INSTANCENAME argument on the command line, pywbemcli
+provides a wildcard character "?" that can be used in  the
+INSTANCENAME argument in place of the keybindings component of the WBEM URI.
+Pywbemcli retrieves all instance names of that class from the server and
+presents the user with a select list from which an instance name can be chosen.
 
-TODO: Change to reference the commands
-
-TODO: Rewrite this to more completely define the value in terms of CIM types.
-
-The ``instance create``, ``instance modify``, ``class invokemethod``, and
-``instance invokemethod`` commands define the values of properties and parameters that
-are to be sent to the WBEM server.
-
-For a single property or parameter this is the ``--property``/``-p`` or
-``--parameter``/``-p`` option with the name and value in the form:
+The ABNF for the INSTANCENAME argument with wildcard is:
 
 .. code-block:: text
 
-    -p <name>=<value>
+    INSTANCENAME = CLASSNAME "." wildcard
 
-Where:
+    wildcard = "?"
 
-* <name> is the name of the of the property or parameter.
-* <value> is the value of the property or parameter The values represent the
-  value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
+where:
 
-TODO: This needs to be expanded to cover all CIM types. SEPARATE PR
+* CLASSNAME isas used elsewhere in pywbemcli
 
-Since the WBEM server (and pywbem) requires that each property/parameter be
-typed to be created, pywbemcli retrieves the CIM class from the WBEM Server to
-determine the CIM type and arrayness required to define a CIMProperty. The
-value of each option argument contains the value as a string or numeric value.
-For numeric values, the creation will fail if the values of the numeric exceeds
-the range of the CIM type for the property defined in the class (ex. -3 for
-Uint32).
-
-Quotes around the value are only required if the value includes whitespace. See
-:term:`backslash-escaped` for information on use of backslashes in formating
-property argument values.
-
-The following are examples of scalar property definitions:
-
-.. code-block:: text
-
-    -p p1=SomeText
-    -p p2=\"Text with space\"
-    -p pint=3
-    -p psint=-3
-
-  For array properties the values are defined separated by commas:
-
-  .. code-block:: text
-
-    -p <property-name>=<value>(,<value>)
-
-  For example:
-
-  .. code-block:: text
-
-    -p strarray=abc,def,ghjk
-    -p strarray2=\"ab c\",def
-
-
-.. _`Interactively selecting INSTANCENAME`:
-
-Interactively selecting INSTANCENAME
-------------------------------------
-
-The INSTANCENAME argument can be complex, particularly for associations and
-classes with multiple keys.
-
-To simplify using INSTANCENAME on the command line, pywbemcli provides a wild
-card character "?" that can be used with commands in place of the INSTANCENAME
-keys on commands that have an INSTANCENAME argument. This allows the user to
-specify only the class name (as the INSTANCENAME argument value) with the wild
-card for the keys. Pywbemcli retrieves all instance names of that class from
-the server and presents the user with a select list from which an instance name
-can be chosen.
-
-Thus an INSTANCENAME argument on the command line can be specified in two ways:
-
-* By specifying an untyped WBEM URI of an instance path in the
-  ``INSTANCENAME`` argument. The namespace of the instance is the namespace
-  specified in the WBEM URI, or otherwise the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection. Any host name in the WBEM URI will be ignored.
-  For details, see :ref:`Specifying the INSTANCENAME command argument`.
-
-* By specifying the ``--interactive`` command option and a class name in the
-  ``INSTANCENAME`` argument. The instances of the specified class are displayed
-  and the user is prompted for an index number to select an instance. The
-  namespace of the instance is the namespace specified with the
-  ``-namespace``/``-n`` command option, or otherwise the default namespace
-  of the connection.
-  For details, see :ref:`Interactively selecting INSTANCENAME`.
-
-Thus, in place of the full instance name (ex.
-``CIM_Foo.InstanceID="CIM_Foo1"``) the users uses ``CIM_Foo.?`` to initiate
-pywbemcli instance name selection
+Thus, in place of the full instance name WBEM URI (ex.
+``CIM_Foo.InstanceID="CIM_Foo1"``) the users inputs ``CIM_Foo.?`` to initiate
+pywbemcli instance name selection.
 
 
 Example:

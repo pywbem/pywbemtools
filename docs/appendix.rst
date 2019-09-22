@@ -44,12 +44,17 @@ This documentation uses a few special terms to refer to Python types:
       argument or option value of pywbemcli. Several commands of the instance
       command group use INSTANCENAME as a command line argument.
       The only supported format for INSTANCENAME is a :term:`WBEM URI`.
-      See also :ref:`Interactively selecting INSTANCENAME`.
+      See also :ref:`Specifying the INSTANCENAME command argument` for the
+      definition of how to define both a complete WBEM URL as INSTANCENAME
+      and to use a wildcard where pywbemcli presents a selection list of
+      instance names.
 
       Examples::
 
         CIM_RegisteredProfile.InstanceID="acme:1"
         CIM_System.CreationClassName="ACME_System",Name="MySystem"
+
+        CIM_System.?   # Interactive specification of instance name
 
    connection id
       A string that uniquely identifies each :class:`pywbem.WBEMConnection`
