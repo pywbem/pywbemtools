@@ -211,8 +211,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                           detail_default=DEFAULT_LOG_DETAIL_LEVEL,
                           ev=PywbemServer.log_envvar,
                           default='all'))
-@click.option('-v', '--verbose', is_flag=True,
-              default=False,
+@click.option('-v', '--verbose/--no-verbose',
+              default=None,
               help='Display extra information about the processing.')
 @click.version_option(
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
@@ -220,7 +220,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def cli(ctx, server, name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
-        pull_max_cnt, verbose, mock_server, timestats=None, log=None):
+        pull_max_cnt, mock_server, verbose=None, timestats=None, log=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:

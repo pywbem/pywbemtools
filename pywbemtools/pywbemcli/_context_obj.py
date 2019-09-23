@@ -191,6 +191,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
+        # Verbose displays the click interpetation of the command and
+        # parameters from click context
+        if self.verbose:
+            ctx = click.get_current_context()
+            click.echo('COMMAND="%s", params=%r' % (ctx.info_name, ctx.params))
+
         self.spinner.start()
         try:
             cmd()
@@ -321,7 +327,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 #
 #   Debug tools to help understandingthe click context.
 #
-def display_click_context(ctx, msg=None, display_only_obj=True):
+def display_click_context(ctx, msg=None, display_attrs=True):
     """
     Debug function displays attributes of click context
     """
@@ -329,21 +335,24 @@ def display_click_context(ctx, msg=None, display_only_obj=True):
     attrs = vars(ctx)
     if not msg:
         msg = "CLICK_CONTEXT"
-    if display_only_obj:
+    if not display_attrs:
         click.echo(ctx.obj)
     else:
         click.echo('%s %s, attrs: %s' % (
             msg, ctx,
-            '. '.join("%s: %s" % item for item in attrs.items())))
+            '\n    '.join("%s: %s" % item for item in attrs.items())))
 
 
-def display_click_context_parents(ctx):
+def display_click_context_parents(ctx, display_attrs=False):
     """
     Display the current click context and its all of its parents
     """
 
     display_click_context(ctx)
     parent_ctx = ctx.parent
+    level = 0
     while parent_ctx is not None:
-        display_click_context(parent_ctx)
+        display_click_context(parent_ctx, msg='level %s' % level,
+                              display_attrs=display_attrs)
+        level += -1
         parent_ctx = parent_ctx.parent

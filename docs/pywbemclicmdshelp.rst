@@ -140,7 +140,7 @@ The following defines the help output for the `pywbemcli  --help` command
                                       [file|stderr], default: file; DETAIL:
                                       [all|paths|summary], default: all. Default:
                                       EnvVar PYWBEMCLI_LOG, or all.
-      -v, --verbose                   Display extra information about the
+      -v, --verbose / --no-verbose    Display extra information about the
                                       processing.
       --version                       Show the version of this command and the
                                       pywbem package and exit.

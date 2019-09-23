@@ -52,7 +52,7 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         Passed to the executable as stdin.
 
       verbose: (bool)
-        If True, display args before calling cli
+        If True, display args, env, and stdin before executing the command
 
     Returns:
 
