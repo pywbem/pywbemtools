@@ -161,7 +161,7 @@ Options:
                                   [file|stderr], default: file; DETAIL:
                                   [all|paths|summary], default: all. Default:
                                   EnvVar PYWBEMCLI_LOG, or all.
-  -v, --verbose                   Display extra information about the
+  -v, --verbose / --no-verbose    Display extra information about the
                                   processing.
   --version                       Show the version of this command and the
                                   pywbem package and exit.
@@ -862,6 +862,76 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    #
+    #  Test verbose option
+    #
+    ['Verify --verbose on by doing a create with --verbose',
+     {'general': ['--name', 't1', '--verbose'],
+      'args': 'show',
+      'cmdgrp': 'connection'},
+     {'stdout': ['t1',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem',
+                 'COMMAND', 'show',
+                 "params={'name': None}"
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --no-verbose',
+     {'general': ['--name', 't1', '--no-verbose'],
+      'args': 'show',
+      'cmdgrp': 'connection'},
+     {'stdout': ['t1',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem'
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    # Cannot really test without a test not_innows
+    ['Verify -verbose but turned off on interactive cmd',
+     {'general': ['--name', 't1', '-v'],
+      'stdin': ['--no-verbose connection show'],
+      'cmdgrp': None},
+     {'stdout': ['t1',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem'
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify -verbose but turned off on interactive cmd',
+     {'general': ['--name', 't1', '-v'],
+      'stdin': ['--no-verbose connection show'],
+      'cmdgrp': None},
+     {'stdout': ['COMMAND', 'params='],
+      'rc': 0,
+      'test': 'not-innows'},
+     None, OK],
+
+
     ['Delete testGeneralOpsMods.',
      {'args': ['delete', 't1'],
       'cmdgrp': 'connection', },
@@ -886,7 +956,7 @@ class TestGeneralOptions(CLITestsBase):
         """
         Execute pybemcli with the defined input and test output.
         """
-        cmd_grp = inputs['cmdgrp'] or ''
+        cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
                           mock, condition, verbose=False)

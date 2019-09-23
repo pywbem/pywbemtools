@@ -308,6 +308,14 @@ class CLITestsBase(object):
                         assert remove_ws(test_str) in remove_ws(rtn_value), \
                             "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
                             "{!r}".format(desc, test_str, rtn_value)
+                elif test_definition == 'not-innows':
+                    if isinstance(test_value, six.string_types):
+                        test_value = [test_value]
+                    for test_str in test_value:
+                        assert remove_ws(test_str) not in \
+                            remove_ws(rtn_value), \
+                            "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
+                            "{!r}".format(desc, test_str, rtn_value)
                 else:
                     assert 'test %s is invalid. Skipped' % test_definition
 
