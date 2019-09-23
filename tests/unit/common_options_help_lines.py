@@ -28,9 +28,6 @@ whitespace-tolerant test for whether the expected text is in the actual text.
 CMD_OPTION_HELP_HELP_LINE = \
     '-h, --help Show this message and exit.'
 
-CMD_OPTION_INTERACTIVE_HELP_LINE = \
-    "-i, --interactive Prompt for selecting an instance from a list."
-
 CMD_OPTION_VERIFY_HELP_LINE = \
     '-V, --verify Prompt for confirmation before performing a change'
 

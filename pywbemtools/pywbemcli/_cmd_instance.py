@@ -610,10 +610,9 @@ def cmd_instance_get(context, instancename, options):
     Gets the instance defined by instancename argument and displays in output
     format defined.
 
-    If the interactive flag (-i) is set, only a classname is provided as
-    the instancename argument and pywbemcli presents a list of instances
-    to the console from which one can be picked to get from the server and
-    display.
+    If the wildcard key is used (CLASSNAME.?), pywbemcli presents a list of
+    instances to the console from which one can be picked to get from the
+    server and display.
     """
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
