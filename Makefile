@@ -628,7 +628,7 @@ test: develop_$(pymn).done
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
 	@echo 'makefile: Creating $@ for documentation'
-	$(PYTHON_CMD) tools/click_help_capture.py >$@.tmp
+	$(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp
 	-$(call RM_FUNC,$@)
 	-$(call CP_FUNC,$@.tmp,$@)
 	-$(call RM_FUNC,$@.tmp)
