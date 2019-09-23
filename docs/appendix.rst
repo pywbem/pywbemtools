@@ -45,9 +45,8 @@ This documentation uses a few special terms to refer to Python types:
       command group use INSTANCENAME as a command line argument.
 
       The supported formats for INSTANCENAME are an untyped :term:`WBEM URI`
-      and the use of wildcard keys i.e. ``CLASSNAME.?``.
-      See :ref:`Specifying the INSTANCENAME command argument` and
-      :ref:`Interactively selecting INSTANCENAME`.
+      and the use of wildcard keys i.e. ``CLASSNAME.?``, as detailed in
+      :ref:`Specifying the INSTANCENAME command argument`.
 
       Examples::
 

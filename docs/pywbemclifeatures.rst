@@ -308,18 +308,23 @@ Examples for Windows command processor:
     pywbemcli instance get MY_CS.CreationClassName="MY_CS",Name="MyComp"
     pywbemcli instance get MY_LogEntry.Timestamp="20190901183853.762122+120"
 
+
 .. _`Interactively selecting INSTANCENAME command argument`:
 
 Interactively selecting INSTANCENAME command argument
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To simplify creating the INSTANCENAME argument on the command line, pywbemcli
-provides a wildcard character "?" that can be used in  the
+provides a wildcard character "?" that can be used in the
 INSTANCENAME argument in place of the keybindings component of the WBEM URI.
-Pywbemcli retrieves all instance names of that class from the server and
-presents the user with a select list from which an instance name can be chosen.
 
-The ABNF for the INSTANCENAME argument with wildcard is:
+If an INSTANCENAME argument specifies the wildcard key, pywbemcli performs
+an interactive selection of the instance name by enumerating the instance names
+of the specified class, displaying the list of instance names along with index
+numbers, and prompting the user for the index number of the instance name to be
+used.
+
+The ABNF for the INSTANCENAME argument with a wildcard key is:
 
 .. code-block:: text
 
@@ -329,14 +334,11 @@ The ABNF for the INSTANCENAME argument with wildcard is:
 
 where:
 
-* CLASSNAME isas used elsewhere in pywbemcli
+* CLASSNAME is a class name as used elsewhere in pywbemcli.
 
-Thus, in place of the full instance name WBEM URI (ex.
-``CIM_Foo.InstanceID="CIM_Foo1"``) the users inputs ``CIM_Foo.?`` to initiate
-pywbemcli instance name selection.
-
-
-Example:
+Thus, in place of the full WBEM URI (ex. ``CIM_Foo.InstanceID="CIM_Foo1"``),
+the user specifies ``CIM_Foo.?`` for the INSTANCENAME argument to trigger the
+interactive selection, as shown in the following example:
 
 .. code-block:: text
 
