@@ -231,11 +231,11 @@ the server:
       };
 
 * The instance to be retrieved can also be selected interactively by use of
-  the ``-i`` option:
+  the wildcard instance key ("CLASSNAME.?"):
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 instance get TST_Person -i
+      $ pywbemcli -n conn1 instance get TST_Person.?
       Pick Instance name to process
       0: root/cimv2:TST_Person.name="Mike"
       1: root/cimv2:TST_Person.name="Saara"
@@ -276,7 +276,7 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 -o table instance associators TST_Person -i
+      $ pywbemcli -n conn1 -o table instance associators TST_Person.?
       Pick Instance name to process
       0: root/cimv2:TST_Person.name="Mike"
       1: root/cimv2:TST_Person.name="Saara"

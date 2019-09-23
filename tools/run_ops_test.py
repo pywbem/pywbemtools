@@ -168,8 +168,9 @@ execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -o")
 execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -p name -p CreationClassName",
                       general_options='--output-format table')
 
-# TODO find way to do interactive in batch. THis disabled for now
-# execute_pywbemcli_cmd("instance get PyWBEM_Person -i")
+# TODO: Find way to do interactive in batch. This disabled for now
+# execute_pywbemcli_cmd("instance get PyWBEM_Person.?")
+
 execute_pywbemcli_cmd(
     "instance get PyWBEM_Person.CreationClassName=PyWBEM_Person,name=Bob")
 
