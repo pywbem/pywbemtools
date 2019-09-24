@@ -308,6 +308,7 @@ class BuildRepositoryMixin(object):
 
             ext = os.path.splitext(file_path)[1]
             if ext == '.mof':
+                # Returns pywbem Error exceptions
                 conn.compile_mof_file(file_path)
             elif ext == '.py':
                 try:
@@ -321,17 +322,16 @@ class BuildRepositoryMixin(object):
                 except (IOError, Error):
                     raise
 
-        # Other errors, display complete traceback
+                # Other errors, display complete traceback
                 except Exception as ex:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
-                    tb = repr(traceback.format_exception(exc_type, exc_value,
-                                                         exc_traceback))
-                    # TODO this is not correct exception at this point.
+                    tb = traceback.format_exception(exc_type, exc_value,
+                                                    exc_traceback)
                     raise CIMError(
                         CIM_ERR_FAILED,
-                        'Exception failure of "--mock-server" python script %r '
-                        'with conn %r Exception: %r\nTraceback\n%s' %
-                        (file_path, conn, ex, tb))
+                        'Exception: "--mock-server" python script '
+                        '"%s"\n\n%s\nconn %s,\nException %s' %
+                        (file_path, "".join(tb), conn, ex))
 
             else:
                 raise IOError('Invalid suffix %s on "--mock-server" '
