@@ -24,7 +24,8 @@ import re
 from collections import OrderedDict
 import click
 
-from pywbem import WBEMServer, configure_loggers_from_string
+from pywbem import WBEMServer, configure_loggers_from_string,  \
+    MOFParseError
 
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_NAMESPACE, MAX_TIMEOUT
@@ -428,16 +429,22 @@ class PywbemServer(object):
                     stats_enabled=timestats)
                 try:
                     self._wbem_server = WBEMServer(conn)
-                    if verbose:
-                        print('CREATE_CONNECTION:BUILD_REPO %s' % self)
                     conn.build_repository(conn,
                                           self._wbem_server,
                                           self._mock_server,
                                           verbose)
+        # All errors in building mock repository cause abort
+        # Errors where information display handled by build_repository
+                except MOFParseError as pe:
+                    click.echo('Mock repository build exception:\n'
+                               '{0}'.format(pe), err=True)
+                    raise click.Abort()
+
                 except Exception as ex:
-                    click.echo('Repository build exception %s.: %s' % (
+                    click.echo('Mock repository build exception. %s.: %s' % (
                         ex.__class__.__name__, ex), err=True)
                     raise click.Abort()
+
         else:  # mock_server does not exist
             if not self.server:
                 raise click.ClickException('No server found. Cannot '
