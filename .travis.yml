@@ -32,26 +32,26 @@ sudo: required
 # to install Python.
 matrix:
   include:
-    - os: linux
-      language: python
-      python: "2.7"
-      env:
-        - PACKAGE_LEVEL=minimum
-    - os: linux
-      language: python
-      python: "2.7"
-      env:
-        - PACKAGE_LEVEL=latest
+#x    - os: linux
+#x      language: python
+#x      python: "2.7"
+#x      env:
+#x        - PACKAGE_LEVEL=minimum
+#x    - os: linux
+#x      language: python
+#x      python: "2.7"
+#x      env:
+#x        - PACKAGE_LEVEL=latest
 #    - os: linux
 #      language: python
 #      python: "3.4"
 #      env:
 #        - PACKAGE_LEVEL=minimum
-    - os: linux
-      language: python
-      python: "3.4"
-      env:
-        - PACKAGE_LEVEL=latest
+#x    - os: linux
+#x      language: python
+#x      python: "3.4"
+#x      env:
+#x        - PACKAGE_LEVEL=latest
 #    - os: linux
 #      language: python
 #      python: "3.5"
@@ -72,11 +72,11 @@ matrix:
 #      python: "3.6"
 #      env:
 #        - PACKAGE_LEVEL=latest
-    - os: linux
-      language: python
-      python: "3.7"
-      env:
-        - PACKAGE_LEVEL=minimum
+#x    - os: linux
+#x      language: python
+#x      python: "3.7"
+#x      env:
+#x        - PACKAGE_LEVEL=minimum
 #    - os: linux
 #      language: python
 #      python: "3.7"
@@ -93,30 +93,30 @@ matrix:
 #      python: "pypy-5.3.1"  # Python 2.7.10
 #      env:
 #        - PACKAGE_LEVEL=latest
-#    - os: osx
-#      language: generic
-#      python:
-#      env:
-#        - PYTHON=2
-#        - PACKAGE_LEVEL=minimum
-#    - os: osx
-#      language: generic
-#      python:
-#      env:
-#        - PYTHON=2
-#        - PACKAGE_LEVEL=latest
-#    - os: osx
-#      language: generic
-#      python:
-#      env:
-#        - PYTHON=3
-#        - PACKAGE_LEVEL=minimum
-#    - os: osx
-#      language: generic
-#      python:
-#      env:
-#        - PYTHON=3
-#        - PACKAGE_LEVEL=latest
+    - os: osx
+      language: generic
+      python:
+      env:
+        - PYTHON=2
+        - PACKAGE_LEVEL=minimum
+    - os: osx
+      language: generic
+      python:
+      env:
+        - PYTHON=2
+        - PACKAGE_LEVEL=latest
+    - os: osx
+      language: generic
+      python:
+      env:
+        - PYTHON=3
+        - PACKAGE_LEVEL=minimum
+    - os: osx
+      language: generic
+      python:
+      env:
+        - PYTHON=3
+        - PACKAGE_LEVEL=latest
 
 before_install:
   - if [[ "$TRAVIS_BRANCH" == "manual-ci-run" ]]; then
