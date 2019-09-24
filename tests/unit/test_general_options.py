@@ -865,7 +865,27 @@ TEST_CASES = [
     #
     #  Test verbose option
     #
-    ['Verify --verbose on by doing a create with --verbose',
+    ['Verify --verbose on by doing a connection show with --verbose',
+     {'general': ['--name', 't1', '--verbose'],
+      'args': 'show',
+      'cmdgrp': 'connection'},
+     {'stdout': ['t1',
+                 'server : http://blahblah',
+                 'default-namespace', 'root/john',
+                 'user', 'Fred',
+                 'password', 'abcd',
+                 'timeout', '90',
+                 'verify', 'True',
+                 'certfile', 'c1.pem',
+                 'keyfile', 'k1.pem',
+                 'COMMAND', 'show',
+                 "params={'name': None}"
+                 ],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --verbose on by doing a connection show with -v',
      {'general': ['--name', 't1', '--verbose'],
       'args': 'show',
       'cmdgrp': 'connection'},

@@ -40,6 +40,7 @@ SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
+MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock.py'
@@ -873,15 +874,51 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    # This test skipped because click stdin broken
-    ['Verify create, get, delete works with stdin',
-     {'stdin': ['instance create CIM_foo -P InstancID=blah',
-                'instance get CIM_Foo=/"blah/"',
-                'instance delete CIM_Foo/"blah/"']},
-     {'stdout': [''],
+    ['Verify create, get, delete work with stdin',
+     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
+                'instance get CIM_Foo.?',
+                'instance delete CIM_Foo.?']},
+     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp= NULL'],
       'rc': 0,
-      'test': 'regex'},
-     None, FAIL],
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_3_FILE], OK],
+
+    ['Verify multiple creates verify with enum summary with stdin',
+     {'stdin': ['instance create CIM_Foo -p InstanceID=blah1',
+                'instance enumerate CIM_Foo -s',
+                'instance create CIM_Foo -p InstanceID=blah2',
+                'instance enumerate CIM_Foo -s']},
+     {'stdout': ['4 CIMInstance', '5 CIMInstance'],
+      'rc': 0,
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE], OK],
+
+
+    # TODO: For some reason the required quote marks on the instance IDs in
+    # INSTANCENAME do not make it through stdin. What click presents is the
+    # option as CIM_Foo.InstanceID=blah no matter how you define the
+    # blah: quotes, quotes with escape.
+    # TEST MARKED FAIL
+    ['Verify create, get, delete works with stdin',
+     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
+                'instance get CIM_Foo.InstanceID=blah',
+                'instance delete CIM_Foo.InstanceID=blah']},
+     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp= NULL'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, FAIL],
+
+    # TODO This sequence locks up pywbemcli
+    ['Verify create, get, delete works with stdin, scnd delete fails',
+     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
+                'instance get CIM_Foo.?',
+                'instance delete CIM_Foo.?',
+                'instance delete CIM_Foo.?']},
+     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp= NULL'
+                 'CIM_ERR_NOT_FOUND'],
+      'rc': 1,
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_3_FILE], FAIL],
 
     ['Verify instance command create, new instance of all_types '
      'with scalar types',
