@@ -873,11 +873,11 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
       current connection, as follows:
 
       * If the NAME argument is specified, the connection definition with that
-      name from the connections file.
+      name from the connections file is shown.
 
       * If the NAME argument is '?', the command presents a list of connection
       definitions from the connections file and prompts the user for   selecting
-      one.
+      one, which is then shown.
 
       * If the NAME argument is omitted, the current connection is shown.
 
