@@ -95,13 +95,9 @@ DeleteQualifier                    Not Implemented
 Specifying CIM property and parameter values
 --------------------------------------------
 
-TODO: Change to reference the commands
-
-TODO: Rewrite this to more completely define the value in terms of CIM types.
-
-The ``instance create``, ``instance modify``, ``class invokemethod``, and
-``instance invokemethod`` commands define the values of properties and parameters that
-are to be sent to the WBEM server.
+The :ref:`instance create command`, :ref:`instance modify command`, :ref:`class invokemethod command`, and
+:ref:`instance invokemethod command` define the values of properties and parameters that
+are to be applied to CIM instances and methods to be sent to the WBEM server.
 
 For a single property or parameter this is the ``--property``/``-p`` or
 ``--parameter``/``-p`` option with the name and value in the form:
@@ -116,19 +112,32 @@ Where:
 * <value> is the value of the property or parameter The values represent the
   value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
 
-TODO: This needs to be expanded to cover all CIM types. SEPARATE PR
+.. code-block:: text
 
-Since the WBEM server (and pywbem) requires that each property/parameter be
-typed to be created, pywbemcli retrieves the CIM class from the WBEM Server to
-determine the CIM type and arrayness required to define a CIMProperty. The
-value of each option argument contains the value as a string or numeric value.
-For numeric values, the creation will fail if the values of the numeric exceeds
-the range of the CIM type for the property defined in the class (ex. -3 for
-Uint32).
+    value := scalarValue | or arrayValues
+    arrayValues := scalarValue [ "," scalarValue]
+    scalarValue := integerValue, realValue, charValue, stringValue,
+                   datetimeValue, booleanValue, nullValue, objectPath of
+                   ANNEX A :term:`DSP0004`
+
+These values define the syntax of the values to build  CIM properties and CIM
+parameters to be sent to the CIM Server. Since the WBEM server requires that
+each property/parameter be typed to be created, pywbemcli retrieves the target
+CIM class from the WBEM Server to determine the CIM type and arrayness required
+to define a CIMProperty.
+
+The scalarValues limitations with respect to the definitions in :term:`DSP0004`
+include:
+
+* Only decimal integers are allowed (octal, hex, and binary are not supported).
+* Integers must be in the value range of the corresponding CIM type
+  (ex. Uint32) defined in the class to which the property is being applied.
+* The format for objectPath is the WBEM URI as defined in
+  :ref:`Specifying the INSTANCENAME command argument`
 
 Quotes around the value are only required if the value includes whitespace. See
 :term:`backslash-escaped` for information on use of backslashes in formating
-property argument values.
+property and parameter argument values.
 
 The following are examples of scalar property definitions:
 
