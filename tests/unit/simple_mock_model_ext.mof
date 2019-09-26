@@ -121,7 +121,7 @@ instance of CIM_Foo_sub as $foosub1{
     };
 
 instance of CIM_Foo_sub as $foosub1{
-    InstanceID = "CIM_Foo_sub3";
+    InstanceID = "CIM_Foo_sub4";
     IntegerProp = 7;
     };
 
