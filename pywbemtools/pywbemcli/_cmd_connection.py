@@ -72,8 +72,12 @@ def connection_export(context):
 
 @connection_group.command('show', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
+@click.option('--show-password', is_flag=True,
+              default=False,
+              help='If set, show existing password in results. Otherwise, '
+                   'password is masked')
 @click.pass_obj
-def connection_show(context, name):
+def connection_show(context, name, **options):
     """
     Show a WBEM connection definition or the current connection.
 
@@ -106,13 +110,13 @@ def connection_show(context, name):
         name: svr1
           ...
     """
-    context.execute_cmd(lambda: cmd_connection_show(context, name))
+    context.execute_cmd(lambda: cmd_connection_show(context, name, options))
 
 
 @connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.pass_obj
-def connection_delete(context, name, **options):
+def connection_delete(context, name):
     """
     Delete a WBEM connection definition.
 
@@ -124,7 +128,7 @@ def connection_delete(context, name, **options):
 
       pywbemcli connection delete blah
     """
-    context.execute_cmd(lambda: cmd_connection_delete(context, name, options))
+    context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
 
 @connection_group.command('select', options_metavar=CMD_OPTS_TXT)
@@ -278,7 +282,7 @@ def is_current_connection(connection, context):
 
 
 def show_connection_information(context, connection, separate_line=True,
-                                show_state=False):
+                                show_state=False, show_password=False):
     """
     Common function to display the connection information.  Note that this
     could also have been part of the context object since this is just the
@@ -302,6 +306,11 @@ def show_connection_information(context, connection, separate_line=True,
     else:
         mock_server = connection.mock_server
 
+    if connection.password:
+        disp_password = connection.password if show_password else '******'
+    else:
+        disp_password = connection.password
+
     click.echo('\nname: %s%s%sserver: %s%sdefault-namespace: %s'
                '%suser: %s%spassword: %s%stimeout: %s%sverify: %s%s'
                'certfile: %s%skeyfile: %s%s'
@@ -310,7 +319,7 @@ def show_connection_information(context, connection, separate_line=True,
                   connection.server, sep,
                   connection.default_namespace, sep,
                   connection.user, sep,
-                  connection.password, sep,
+                  disp_password, sep,
                   connection.timeout, sep,
                   connection.verify, sep,
                   connection.certfile, sep,
@@ -386,7 +395,7 @@ def cmd_connection_export(context):
     if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
 
 
-def cmd_connection_show(context, name):
+def cmd_connection_show(context, name, options):
     """
     Show the parameters that make up the current connection information if
     name is None. If Name exists, shows connections in connections file.
@@ -408,9 +417,11 @@ def cmd_connection_show(context, name):
         # No connections exit in connections file.
         if not connections:
             if context.pywbem_server:
-                show_connection_information(context,
-                                            context.pywbem_server,
-                                            show_state=True)
+                show_connection_information(
+                    context,
+                    context.pywbem_server,
+                    show_state=True,
+                    show_password=options['show_password'])
                 return
 
         name = select_connection(None, context, connections)
@@ -431,7 +442,11 @@ def cmd_connection_show(context, name):
 
     if connection is None:
         raise click.ClickException("No connection definition exists.")
-    show_connection_information(context, connection, show_state=True)
+
+    show_connection_information(context,
+                                connection,
+                                show_state=True,
+                                show_password=options['show_password'])
 
 
 def cmd_connection_test(context):
@@ -481,7 +496,7 @@ def cmd_connection_select(context, name, options):
         click.echo('"%s" current' % name)
 
 
-def cmd_connection_delete(context, name, options):
+def cmd_connection_delete(context, name):
     """
     Delete a connection definition from the set of connections defined.
 
