@@ -38,7 +38,8 @@ The command line can contain the following components:
 * **ARGS** - Arguments for a command.
 
 Options are prefixed with the characters ``-`` for the short form or ``--`` for
-the long form (ex. ``-n`` or ``--namespace``).
+the long form (ex. ``-n`` or ``--namespace``). The other components do not
+begin with ``-``.
 
 Command groups are named after the objects the commands operate on
 (ex. ``class``, ``instance``, ``qualifier``, ``server``).
@@ -129,8 +130,8 @@ for additional features of the Bash tab completion of pywbemcli.
 Interactive mode
 ----------------
 
-In interactive mode also known as :term:`REPL` mode, an interactive shell
-environment is within pywbemcli that allows typing pywbemcli commands, internal
+In interactive mode (also known as :term:`REPL` mode), pywbem provides an
+interactive shell environment that allows typing pywbemcli commands, internal
 commands (for operating the pywbemcli shell), and external commands (that are
 executed in the standard shell of the user).
 
@@ -153,10 +154,11 @@ command:
 The pywbemcli shell uses the prompt ``pywbemcli>``. The cursor is shown in
 the examples above as an underscore (``_``).
 
-The commands that can be typed in the pywbemcli shell are the rest of the
-command line that would follow the ``pywbemcli`` command in `command mode`_,
-as well as internal commands (for operating the pywbemcli shell), and external
-commands (that are executed in the standard shell of the user):
+The commands and options that can be typed in the pywbemcli shell are the rest
+of the command line that would follow the ``pywbemcli`` command in
+`command mode`_, as well as internal commands (for operating the pywbemcli
+shell), and external commands (that are executed in the standard shell of the
+user):
 
 .. code-block:: text
 

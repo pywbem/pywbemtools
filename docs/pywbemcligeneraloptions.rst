@@ -509,8 +509,12 @@ This allows pywbemcli to be used without access to a real WBEM server.
 
 This option may be specified multiple times.
 
-When this option is used to define a WBEM server the security options (ex.
-``--user``) are irrelevant; they may be included but are not used.
+This option may be specified multiple times to define multiple MOF and Python
+files that make up the definition of a mock server. The files must have the
+suffix ".mof" for MOF files and ".py" for Python scripts.
+
+When this option is used, the security options (ex. ``--user``) are irrelevant;
+they may be specified but are not used.
 
 The following example creates a mock server with two files defining the mock
 data, shows what parameters are defined for the connection, and then saves that
@@ -521,11 +525,10 @@ connection named ``mymockserver``:
     $ pywbemcli --mock-server classdefs.mof --mock-server insts.py --default-namespace root/myhome
 
     pywbemcli> connection show
-    Name: default
-      WBEMServer uri: None
-      Default-namespace: root/myhome
+    name: not-saved (current)
+      server:
+      mock-server: classdefs.mof, insts.py
       . . .
-      mock: classdefs.mof, insts.py
 
     pywbemcli> connection save mymockserver
 
@@ -607,9 +610,15 @@ PYWBEMCLI_CACERTS               ``--ca-certs``
 PYWBEMCLI_USE_PULL              ``--use-pull``
 PYWBEMCLI_PULL_MAX_CNT          ``--pull-max-cnt``
 PYWBEMCLI_STATS_ENABLED         ``--timestats``
-PYWBEMCLI_MOCK_SERVER           ``--mock-server``
+PYWBEMCLI_MOCK_SERVER (1)       ``--mock-server``
 PYWBEMCLI_LOG                   ``--log``
 ==============================  ============================
+
+Notes:
+
+(1) The ``--mock-server`` general option can be specified multiple times. To
+    do that with the PYWBEMCLI_MOCK_SERVER environment variable, separate
+    the multiple path names with space.
 
 If these environment variables are set, the corresponding general options
 default to the value of the environment variables.
@@ -1106,83 +1115,82 @@ Pywbemcli persisted connection definitions
 Pywbemcli can manage persisted connection definitions via the
 :ref:`Connection command group`. These connection definitions are persisted in
 a :term:`connections file` named ``pywbemcli_connection_definitions.yaml`` in
-the current directory. A connection has a name
+the current directory. A connection definition has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined
-these connections can be accessed with the general option ``--name`` or in the
-interactive mode with the ``connection select`` command.
+these connection definitions can be used with the :ref:`--name general option`
+or in the interactive mode by defining a current connection with the
+:ref:`connection select command`.
 
 A new persistent connection definition can be created with the
 :ref:`connection save command`.
 
-At any point in time, pywbemcli can communicate with only a single WBEM server. That
-is the current connection.
+At any point in time, pywbemcli can communicate with only a single WBEM server.
+That is the *current connection*.
 In the command mode, this is the WBEM server defined by the general options
 ``--server`` or ``--mock-server`` or ``--name``.  In the interactive mode, the
-connection that is active (the current connection) can be changed within an
-interactive session using the :ref:`connection select command` so that within a single
-session, the user can work with multiple WBEM servers. The server that was defined
-when pywbemcli was started or the server selected by ``connection select`` is the
-current server.
+current connection can be changed within an interactive session using the
+:ref:`connection select command` so that within a single session, the user can
+work with multiple WBEM servers (at different points in time).
 
-For example the following example of a pywbemcli interactive session creates a
-new connection in the CLI command mode:
+The following example creates a persisted connection definition, using
+interactive mode:
 
 .. code-block:: text
 
     $ pywbemcli
 
-    pywbemcli> --server http://localhost --user usr1 -password blah connection save testconn
-
-    pywbemcli> connection show
-    name: testconn
-      server: http://localhost
-      default-namespace: root/cimv2
-      user: usr1
-      password: blah
-      timeout: None
-      verify: True
-      certfile: None
-      keyfile: None
-      mock-server:
+    pywbemcli> --server http://localhost --user usr1 --password blah connection save testconn
 
     pywbemcli> connection list
-    name       server uri        namespace    user         timeout  noverify
-    ---------  ----------------  -----------  -----------  -------  ----------
-    testconn*  http://localhost  root/blah    me                30  False
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
 
-Note: The * indicates that this is the current connection.
-
-Other connections can be added from either the command mode or interactive mode
-using the add command:
+Since the connection definition is persisted, it is available in command mode
+as well as in new interactive sessions:
 
 .. code-block:: text
 
-    pywbemcli> --server http://blah2 --user you --password xxx connection save Ronald
+    $ pywbemcli connection list
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+
+    $ pywbemcli
+
     pywbemcli> connection list
-    WBEMServer Connections:
-    name      server uri        namespace    user         password      timeout  noverify
-    --------  ----------------  -----------  -----------  ----------  ---------  ----------
-    Ronald    http://blah2      root/cimv2   you          xxx                    False
-    testconn  http://localhost  root/blah    kschopmeyer  test8play          30  False
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
 
-These persisted connections can now be used either in the command mode or interactive mode.
-
-For example, in the command mode the following executes a command with a WBEM
-server definition from the :term:`connections file`.
+Other connection definitions can be added, this time using command mode:
 
 .. code-block:: text
 
-    $ pywbemcli --name Ronald server brand
-    Server brand:
-    +---------------------+
-    | WBEM server brand   |
-    |---------------------|
-    | OpenPegasus         |
-    +---------------------+
+    $ pywbemcli --server http://blah2 --user you --password xxx connection save Ronald
 
-In the interactive mode the current WBEM server can be defined with the
-``connection select`` command which selects a connection definition from the
-:term:`connections file` and makes that the current connection.
+    $ pywbemcli connection list
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | Ronald    | http://blah2     | root/cimv2  | you    |        30 | True     |                                        |
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+
+The following example shows how to select current connections in interactive
+mode. Note the marker ``*`` in front of the name, which indicates the current
+connection. The :ref:`connection show command` when used without a connection
+name shows the current connection:
 
 .. code-block:: text
 
@@ -1191,36 +1199,82 @@ In the interactive mode the current WBEM server can be defined with the
     pywbemcli> connection select Ronald
 
     pywbemcli> connection list
-    WBEMServer Connections:
-    name      server uri        namespace    user         timeout  noverify
-    --------  ----------------  -----------  -----------  ---------  ----------
-    Ronald*   http://blah2      root/cimv2   you                     False
-    testconn  http://localhost  root/blah    kschopmeyer         30  False
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | *Ronald   | http://blah2     | root/cimv2  | you    |        30 | True     |                                        |
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
 
-    pywbemcli> server interop
-    Server Interop Namespace:
-    +------------------+
-    | Namespace Name   |
-    |------------------|
-    | root/PG_InterOp  |
-    +------------------+
+    pywbemcli> connection show
+    name: Ronald (current)
+      server: http://blah2
+      mock-server:
+      . . .
 
     pywbemcli> connection select testconn
 
     pywbemcli> connection list
-    WBEMServer Connections:
-    name      server uri        namespace    user         timeout  noverify
-    --------  ----------------  -----------  -----------  ---------  ----------
-    Ronald    http://blah2      root/cimv2   you                     False
-    testconn* http://localhost  root/blah    kschopmeyer         30  False
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | Ronald    | http://blah2     | root/cimv2  | you    |        30 | True     |                                        |
+    | *testconn | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+
+    pywbemcli> connection show
+    name: testconn (current)
+      server: http://localhost
+      mock-server:
+      . . .
+
+    pywbemcli> connection show Ronald
+    name: Ronald
+      server: http://blah2
+      mock-server:
+      . . .
+
+The concept of a current connection that can be selected is useful mostly for
+the interactive mode. In command mode, the connection specified with one of the
+``-server``, ``--mock-server``, or ``--name`` general options automatically is
+considered the current connection, and there is no concept of selecting a
+current connection other than using these options.
+Therefore, pywbemcli additionally supports the concept of a persisted default
+connection.
+
+The following example defines a persisted default connection and then uses it in
+command mode:
+
+.. code-block:: text
+
+    $ pywbemcli connection select Ronald --default
+    "Ronald" default and current
+
+    $ pywbemcli connection list
+    WBEM server connections: (#: default, *: current)
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+    | name      | server           | namespace   | user   |   timeout | verify   | mock-server                            |
+    |-----------+------------------+-------------+--------+-----------+----------+----------------------------------------|
+    | #Ronald   | http://blah2     | root/cimv2  | you    |        30 | True     |                                        |
+    | testconn  | http://localhost | root/cimv2  | usr1   |        30 | True     |                                        |
+    +-----------+------------------+-------------+--------+-----------+----------+----------------------------------------+
+
+    $ pywbemcli connection show
+    name: Ronald (default, current)
+      server: http://blah2
+      mock-server:
+      . . .
 
 Connections can be deleted with the ``connection delete`` command either with
 the command argument containing the connection name or with no name provided so
-pywbemcli presents a list of connections:
+pywbemcli presents a list of connections to choose from:
 
 .. code-block:: text
 
     $ pywbemcli connection delete Ronald
+    Deleted default connection "Ronald".
 
 or:
 
@@ -1231,9 +1285,4 @@ or:
     0: Ronald
     1: testconn
     Input integer between 0 and 1 or Ctrl-C to exit selection: 0
-
-    $ pywbemcli connection list
-    WBEMServer Connections:
-    name      server uri        namespace    user         timeout  noverify
-    --------  ----------------  -----------  -----------  ---------  ----------
-    testconn  http://localhost  root/blah    kschopmeyer         30  False
+    Deleted default connection "Ronald".

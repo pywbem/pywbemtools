@@ -75,7 +75,7 @@ Example:
     $ pywbemcli --name mymock class associators TST_Person --names-only
     //FakedUrl/root/cimv2:TST_Person
 
-See :ref:`pywbemcli class associators --help` for details.
+See :ref:`pywbemcli class associators --help` for the exact help output of the command.
 
 
 .. _`Class delete command`:
@@ -107,7 +107,7 @@ Example:
 
     $ pywbemcli class delete CIM_Blah
 
-See :ref:`pywbemcli class delete --help` for details.
+See :ref:`pywbemcli class delete --help` for the exact help output of the command.
 
 
 .. _`Class enumerate command`:
@@ -148,7 +148,7 @@ default namespace:
     TST_MemberOfFamilyCollection
     TST_FamilyCollection
 
-See :ref:`pywbemcli class enumerate --help` for details.
+See :ref:`pywbemcli class enumerate --help` for the exact help output of the command.
 
 
 .. _`Class find command`:
@@ -208,7 +208,7 @@ The command displays the namespaces and class names of the result using the
     | root/benchmark                | CIM_SystemComponent |
     +-------------------------------+---------------------+
 
-See :ref:`pywbemcli class find --help` for details.
+See :ref:`pywbemcli class find --help` for the exact help output of the command.
 
 
 .. _`Class get command`:
@@ -265,7 +265,7 @@ The following example shows getting the MOF representation of the class
 
       };
 
-See :ref:`pywbemcli class get --help` for details.
+See :ref:`pywbemcli class get --help` for the exact help output of the command.
 
 
 .. _`Class invokemethod command`:
@@ -290,7 +290,17 @@ The return value and output parameters are displayed using
 This command invokes a method on a class, not on an instance. To invoke a
 method on an instance, use the :ref:`instance invokemethod command`.
 
-See :ref:`pywbemcli class invokemethod --help` for details.
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --mock-server tests/unit/all_types.mof --mock-server tests/unit/all_types_method_mock.py.py
+
+    pywbemcli> class invokemethod PyWBEM_AllTypes AllTypesMethod --parameter arrBool=True,False
+    ReturnValue=0
+    arrBool=true, false
+
+See :ref:`pywbemcli class invokemethod --help` for the exact help output of the command.
 
 
 .. _`Class references command`:
@@ -319,7 +329,7 @@ The :ref:`Instance references command` returns the instance references.
     //FakedUrl/root/cimv2:TST_Lineage
     //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
 
-See :ref:`pywbemcli class references --help` for details.
+See :ref:`pywbemcli class references --help` for the exact help output of the command.
 
 
 .. _`Class tree command`:
@@ -355,7 +365,7 @@ Example:
      |   +-- CIM_Foo_sub_sub
      +-- CIM_Foo_sub2
 
-See :ref:`pywbemcli class tree --help` for details.
+See :ref:`pywbemcli class tree --help` for the exact help output of the command.
 
 
 .. _`Instance command group`:
@@ -396,6 +406,9 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+Note: This command returns the instance associators, not the class associators.
+The :ref:`Class associators command` returns the class associators.
+
 Example:
 
 .. code-block:: text
@@ -410,13 +423,13 @@ Example:
     5: root/cimv2:TST_PersonSub.name="Saarasub"
     6: root/cimv2:TST_PersonSub.name="Sofisub"
     7: root/cimv2:TST_PersonSub.name="Gabisub"
-    Input integer between 0 and 7 or Ctrl-C to exit selection: 0   << user responds 0
+    Input integer between 0 and 7 or Ctrl-C to exit selection: 0   << entered by user
 
     //FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"
     //FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"
     //FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family="root/cimv2:TST_FamilyCollection.name=\"Family2\"",member="root/cimv2:TST_Person.name=\"Mike\""
 
-See :ref:`pywbemcli instance associators --help` for details.
+See :ref:`pywbemcli instance associators --help` for the exact help output of the command.
 
 
 .. _`Instance count command`:
@@ -469,7 +482,7 @@ implemented. However this command can take a long time to execute because
 it must a) enumerate all classes in the namespace, b) enumerate the
 instances for each class.
 
-See :ref:`pywbemcli instance count --help` for details.
+See :ref:`pywbemcli instance count --help` for the exact help output of the command.
 
 
 .. _`Instance create command`:
@@ -502,7 +515,7 @@ scalar and one array property:
 
     $ pywbemcli instance create TST_Blah --property InstancId=\"blah 2\" --property IntProp=3 --property IntArr=3,6,9
 
-See :ref:`pywbemcli instance create --help` for details.
+See :ref:`pywbemcli instance create --help` for the exact help output of the command.
 
 
 .. _`Instance delete command`:
@@ -523,7 +536,7 @@ escape the double quote on the terminal:
 
     $ pywbemcli --name mymock instance delete root/cimv2:TST_Person.name=\"Saara\"
 
-See :ref:`pywbemcli instance delete --help` for details.
+See :ref:`pywbemcli instance delete --help` for the exact help output of the command.
 
 
 .. _`Instance enumerate command`:
@@ -558,7 +571,7 @@ The following example returns two instances as MOF:
        name = "Family2";
     };
 
-See :ref:`pywbemcli instance enumerate --help` for details.
+See :ref:`pywbemcli instance enumerate --help` for the exact help output of the command.
 
 
 .. _`Instance get command`:
@@ -592,13 +605,13 @@ or using the keys wildcard:
     0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
     1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
     2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
-    Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 0   << entered by user
     instance of TST_Person {
        name = "Saara";
     };
 
 
-See :ref:`pywbemcli instance get --help` for details.
+See :ref:`pywbemcli instance get --help` for the exact help output of the command.
 
 
 .. _`Instance invokemethod command`:
@@ -640,11 +653,11 @@ Or using the wildcard to create a selection list for the instance names
     0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
     1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
     2: root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
-    Input integer between 0 and 2 or Ctrl-C to exit selection: : 0
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 0   << entered by user
     ReturnValue=0
     arrBool=true, false
 
-See :ref:`pywbemcli instance invokemethod --help` for details.
+See :ref:`pywbemcli instance invokemethod --help` for the exact help output of the command.
 
 
 .. _`Instance modify command`:
@@ -662,11 +675,22 @@ The new property values are specified by possibly multiple ``--property``/``-p``
 command options.
 For details, see :ref:`Specifying CIM property and parameter values`.
 
+Note that key properties cannot be modified, as per :term:`DSP0004`.
+
 Since the WBEM server (and pywbem) requires that each property be typed,
 pywbemcli retrieves the creation class from the WBEM server to determine
 the data types for the properties.
 
-See :ref:`pywbemcli instance modify --help` for details.
+The following examples modifies an instance of the class TST_Blah with two
+scalar and one array property:
+
+.. code-block:: text
+
+    $ pywbemcli instance modify TST_Blah --property InstancId=blah1 --property IntProp=3 --property IntArr=3,6,9
+
+    $ pywbemcli instance modify TST_Blah --property InstancId=\"blah 2\" --property IntProp=3 --property IntArr=3,6,9
+
+See :ref:`pywbemcli instance modify --help` for the exact help output of the command.
 
 
 .. _`Instance references command`:
@@ -686,6 +710,9 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+Note: This command returns the instance references, not the class references.
+The :ref:`Class references command` returns the class references.
+
 Example:
 
 .. code-block:: text
@@ -697,7 +724,7 @@ Example:
        child = "/root/cimv2:TST_Person.name=\"Sofi\"";
     };
 
-See :ref:`pywbemcli instance references --help` for details.
+See :ref:`pywbemcli instance references --help` for the exact help output of the command.
 
 
 .. _`Instance query command`:
@@ -710,7 +737,7 @@ namespace.
 
 The query is specified with the ``QUERY`` argument and must be a valid query
 in the query language specified with the ``--query-language`` command option.
-The default for the query language is ``DMTF:CQL``.
+The default for that option is ``DMTF:CQL`` (see :term:`CQL`).
 
 The namespace is specified with the ``-namespace``/``-n`` command option, or
 otherwise is the default namespace of the connection.
@@ -718,7 +745,7 @@ otherwise is the default namespace of the connection.
 Valid output formats are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
-See :ref:`pywbemcli instance query --help` for details.
+See :ref:`pywbemcli instance query --help` for the exact help output of the command.
 
 
 .. _`qualifier command group`:
@@ -758,7 +785,7 @@ default namespace:
         Scope(property, reference),
         Flavor(DisableOverride, ToSubclass);
 
-See :ref:`pywbemcli qualifier get --help` for details.
+See :ref:`pywbemcli qualifier get --help` for the exact help output of the command.
 
 
 .. _`Qualifier enumerate command`:
@@ -798,7 +825,7 @@ namespace as a table:
     |             |         |         |         |             | ToSubclass      |
     +-------------+---------+---------+---------+-------------+-----------------+
 
-See :ref:`pywbemcli qualifier enumerate --help` for details.
+See :ref:`pywbemcli qualifier enumerate --help` for the exact help output of the command.
 
 
 .. _`Server command group`:
@@ -845,7 +872,7 @@ Example:
     | OpenPegasus         |
     +---------------------+
 
-See :ref:`pywbemcli server brand --help` for details.
+See :ref:`pywbemcli server brand --help` for the exact help output of the command.
 
 
 .. _`Server info command`:
@@ -890,7 +917,7 @@ Example:
     |             |           |                     | test/static                   |
     +-------------+-----------+---------------------+-------------------------------+
 
-See :ref:`pywbemcli server info --help` for details.
+See :ref:`pywbemcli server info --help` for the exact help output of the command.
 
 
 .. _`Server interop command`:
@@ -915,7 +942,7 @@ Example:
     | root/PG_InterOp  |
     +------------------+
 
-See :ref:`pywbemcli server interop --help` for details.
+See :ref:`pywbemcli server interop --help` for the exact help output of the command.
 
 
 .. _`Server namespaces command`:
@@ -947,7 +974,7 @@ Example:
     test/cimv2
     test/static
 
-See :ref:`pywbemcli server namespaces --help` for details.
+See :ref:`pywbemcli server namespaces --help` for the exact help output of the command.
 
 
 .. _`Server profiles command`:
@@ -995,7 +1022,7 @@ Example:
     SNIA            Software                  1.1.0
     SNIA            Software                  1.2.0
 
-See :ref:`pywbemcli server profiles --help` for details.
+See :ref:`pywbemcli server profiles --help` for the exact help output of the command.
 
 
 .. _`Server centralinsts command`:
@@ -1027,7 +1054,7 @@ Example:
     |                                 | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem"  |
     +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
 
-See :ref:`pywbemcli server centralinsts --help` for details.
+See :ref:`pywbemcli server centralinsts --help` for the exact help output of the command.
 
 
 .. _`Connection command group`:
@@ -1095,9 +1122,10 @@ Example that deletes a connection definition by selecting it:
     0: mock1
     1: mockassoc
     2: op
-    Input integer between 0 and 2 or Ctrl-C to exit selection: 1  << users enters
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 1   << entered by user
+    Deleted connection "mockassoc".
 
-See :ref:`pywbemcli connection delete --help` for details.
+See :ref:`pywbemcli connection delete --help` for the exact help output of the command.
 
 
 .. _`Connection export command`:
@@ -1131,7 +1159,7 @@ as follows:
     PYWBEMCLI_TIMEOUT=30
     . . .
 
-See :ref:`pywbemcli connection export --help` for details.
+See :ref:`pywbemcli connection export --help` for the exact help output of the command.
 
 
 .. _`Connection list command`:
@@ -1171,7 +1199,7 @@ The default connection, if defined, is marked with `#` in the Name column.
     |              |                  |             |             |           |          | tests/unit/mock_confirm_y.py           |
     +--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------+
 
-See :ref:`pywbemcli connection list --help` for details.
+See :ref:`pywbemcli connection list --help` for the exact help output of the command.
 
 
 .. _`Connection save command`:
@@ -1186,7 +1214,7 @@ in the ``NAME`` argument.
 If a connection definition with that name already exists, it will be overwritten
 without notice.
 
-See :ref:`pywbemcli connection save --help` for details.
+See :ref:`pywbemcli connection save --help` for the exact help output of the command.
 
 
 .. _`Connection select command`:
@@ -1217,7 +1245,7 @@ mode of pywbemcli:
     0: mock1
     1: mockassoc
     2: op
-    Input integer between 0 and 2 or Ctrl-C to exit selection: 1
+    Input integer between 0 and 2 or Ctrl-C to exit selection: 1   << entered by user
 
     pywbemcli> connection list
     WBEMServer Connections:   (#: default, *: current)
@@ -1244,7 +1272,7 @@ mode of pywbemcli:
       mock-server: tests/unit/simple_assoc_mock_model.mof
       log: None
 
-See :ref:`pywbemcli connection select --help` for details.
+See :ref:`pywbemcli connection select --help` for the exact help output of the command.
 
 
 .. _`Connection show command`:
@@ -1274,7 +1302,7 @@ The ``connection show`` command shows information about a connection definition:
       mock-server:
       ca-certs: None
 
-See :ref:`pywbemcli connection show --help` for details.
+See :ref:`pywbemcli connection show --help` for the exact help output of the command.
 
 
 .. _`Connection test command`:
@@ -1298,7 +1326,7 @@ and ``--password`` and executes the test with successful result:
     $ pywbemcli --server http://localhost --user me --password mypw connection test
     Connection successful
 
-See :ref:`pywbemcli connection test --help` for details.
+See :ref:`pywbemcli connection test --help` for the exact help output of the command.
 
 
 .. _`Repl command`:

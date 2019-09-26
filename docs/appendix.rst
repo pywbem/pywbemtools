@@ -188,6 +188,11 @@ This documentation uses a few special terms to refer to Python types:
       if a :term:`default connection`) has been defined. The current connection can be
       changed in the interactive mode with the :ref:`connection select command`.
 
+   CQL
+      CQL (CIM Query Language) is a query language defined by DMTF for use
+      by query operations against WBEM servers. In operation parameters that
+      define the use of a query language, it is specified with the string
+      ``DMTF:QCL``. CQL is described in DMTF standard :term:`DSP0202`.
 
 .. _`Profile advertisement methodologies`:
 
@@ -317,11 +322,14 @@ References
    DSP0201
       `DMTF DSP0201, Representation of CIM in XML, Version 2.4 <https://www.dmtf.org/standards/published_documents/DSP0201_2.4.pdf>`_
 
+   DSP0202
+      `DMTF DSP0202, CIM Query Language Specification, Version 1.0 <https://www.dmtf.org/standards/published_documents/DSP0202_1.0.0.pdf>`_
+
    DSP0207
       `DMTF DSP0207, WBEM URI Mapping, Version 1.0 <https://www.dmtf.org/standards/published_documents/DSP0207_1.0.pdf>`_
 
    DSP0212
-      `DMTF DSP0212, Filter Query Language, Version 1.0.1 <https://www.dmtf.org/standards/published_documents/DSP0212_1.0.1.pdf>`_
+      `DMTF DSP0212, Filter Query Language, Version 1.0 <https://www.dmtf.org/standards/published_documents/DSP0212_1.0.pdf>`_
 
    DSP1001
       `DMTF DSP1001, Management Profile Specification Usage Guide, Version 1.1 <https://www.dmtf.org/standards/published_documents/DSP1001_1.1.pdf>`_
