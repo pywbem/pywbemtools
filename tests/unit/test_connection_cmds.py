@@ -91,6 +91,7 @@ CONNECTION_SELECT_HELP_LINES = [
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
     'Show a WBEM connection definition or the current connection.',
+    '--show-password  If set, show existing password in results.',
     CMD_OPTION_HELP_HELP_LINE
 ]
 
@@ -252,7 +253,8 @@ TEST_CASES = [
      ['show', 'test1'],
      {'stdout': [
          "name: test1", "  server: http://blah",
-         "default-namespace: root/cimv2", "  user: None", "  password: None",
+         "default-namespace: root/cimv2", "  user: None",
+         "password: None",
          "timeout: 30",
          "verify: True",
          "certfile: None",
@@ -282,13 +284,28 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show  test2',
-     ['show', 'test2'],
+    ['Verify connection command show  test2 with --show-password',
+     ['show', 'test2', '--show-password'],
      {'stdout': ['name: test2',
                  'server: http://blahblah',
                  'default-namespace: root/cimv2',
                  'user: fred',
                  'password: argh',
+                 'timeout: 18',
+                 'verify: False',
+                 'certfile: None',
+                 'keyfile: None',
+                 'mock-server:'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command show  test2, masked password',
+     ['show', 'test2'],
+     {'stdout': ['name: test2',
+                 'server: http://blahblah',
+                 'default-namespace: root/cimv2',
+                 'user: fred',
+                 'password: ****',
                  'timeout: 18',
                  'verify: False',
                  'certfile: None',
@@ -401,7 +418,7 @@ TEST_CASES = [
          '  server: http://blahblah',
          '  default-namespace: root/blahblah',
          '  user: john',
-         '  password: pw',
+         '  password: ******',
          '  certfile: mycertfile.pem',
          '  keyfile: mykeyfile.pem',
          '  mock-server: '],
@@ -425,7 +442,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection command show of name addallargs, overwrite changed',
-     ['show', 'addallargs'],
+     ['show', 'addallargs', '--show-password'],
      {'stdout': [
          'name: addallargs',
          '  server: http://blah',
@@ -537,7 +554,8 @@ TEST_CASES = [
      {'stdout': [
          "name: mocktest",
          "default-namespace: root/cimv2",
-         "user: None", "  password: None",
+         "user: None",
+         "password: None",
          "timeout: 30",
          "verify: True",
          "certfile: None",
@@ -637,7 +655,7 @@ TEST_CASES = [
          "name: mocktest2",
          "default-namespace: root/blah",
          "user: john",
-         "password: pw",
+         "password: **",
          "timeout: 45",
          "verify: False",
          "certfile: mycertfile.pem",
@@ -652,7 +670,8 @@ TEST_CASES = [
      {'stdout': [
          "name: svrtest2",
          "server: http://blah",
-         "default-namespace: root/blah", "user: john", "password: pw",
+         "default-namespace: root/blah", "user: john",
+         "password: **",
          "timeout: 45",
          "verify: True",
          "certfile: mycertfile.pem",
