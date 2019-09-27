@@ -24,8 +24,8 @@ import sys
 import traceback
 import click
 import click_repl
-from prompt_toolkit.history import FileHistory
 from copy import deepcopy
+from prompt_toolkit.history import FileHistory
 
 import pywbem
 from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
@@ -60,7 +60,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(invoke_without_command=True,
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTIONS_METAVAR)
-@click.option('-n', '--name', type=str, metavar='NAME',
+@click.option('-n', '--name', 'svr_name', type=str, metavar='NAME',
               # defaulted in code
               envvar=PywbemServer.name_envvar,
               help='Use the WBEM server defined by the WBEM connection '
@@ -218,7 +218,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
     help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
-def cli(ctx, server, name, default_namespace, user, password, timeout,
+def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
         pull_max_cnt, mock_server, verbose=None, timestats=None, log=None):
     """
@@ -254,13 +254,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
-
-    #
-    # Process cli options to produce resolved options, i.e. the
-    # options with any defaults applied for non None options.
-    #
     # list of options that are not allowed in some cases:
-    # When -name is used and when in interactive mode.
+    # i.e. When -name is used and when in interactive mode.
     conditional_options = ((default_namespace, 'default_namespace'),
                            (timeout, 'timeout'),
                            (verify, 'verify'),
@@ -270,6 +265,85 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                            (ca_certs, 'ca_certs'),
                            (server, 'server'),
                            (mock_server, 'mock-server'))
+
+    def create_server_instance(svr_name):
+        """
+        Create a PywbemServer instance from the cli arguments and return
+        that object.  This method depends on using variables from the
+        enclosing function. If the arguments to create a server do not exist
+        no server is created.
+        NOTE: svr_name passed to this function because the ClickException
+        treats it as a reference before assignment if using the svr_name
+        from the enclosing scopt
+        """
+        # test for conflicting server definitions.
+        if server or mock_server:
+            if svr_name:
+                click.ClickException('Option conflict: --name "%s" '
+                                     'conflicts with existence of --server and '
+                                     '--mock-server' % svr_name)
+            svr_name = 'not-saved'
+            pywbem_server = PywbemServer(server,
+                                         resolved_default_namespace,
+                                         name=svr_name,
+                                         user=user,
+                                         password=password,
+                                         timeout=resolved_timeout,
+                                         verify=resolved_verify,
+                                         certfile=certfile,
+                                         keyfile=keyfile,
+                                         ca_certs=resolved_ca_certs,
+                                         mock_server=resolved_mock_server)
+        else:  # Server and mock_server are None
+            # if name cmd line option, get connection repo and
+            # get name from the repo.
+            connections = ConnectionRepository()
+            local_svr_name = None
+            if svr_name:
+                if svr_name in connections:
+                    local_svr_name = svr_name
+                # exception when defined name does not exist
+                else:
+                    raise click.ClickException('Named connection "{}" does '
+                                               'not exist and no --server or '
+                                               '--mock-server options to '
+                                               'define a '
+                                               'WBEM server'.format(svr_name))
+            else:  # no --name option
+                # get any persistent default_connection name
+                local_svr_name = connections.get_default_connection_name()
+
+                if svr_name and local_svr_name not in connections:
+                    click.echo('Invalid selected connection "%s". This name '
+                               'not in connections repository. Deleting',
+                               err=True)
+                    connections.set_default_connection(None)
+                    raise click.Abort()
+                if verbose:
+                    click.echo('Current connection is "%s"' % svr_name)
+
+            # Get the named connection from the repo
+            if local_svr_name:
+                pywbem_server = connections[local_svr_name]
+                # Test for invalid options with the --name option
+                # The following options are part of each PywbemServer object
+                for option in conditional_options:
+                    if option[0]:
+                        raise click.ClickException(
+                            '"--%s %s" option invalid when --name exists or '
+                            'default name set.' % (option[1], option[0]))
+
+            else:
+                # If no server defined, set None. This allows commands that
+                # do not require a server to be executed with no server
+                # defined.
+                pywbem_server = None
+        return pywbem_server
+
+    #
+    # Process cli options to produce resolved options, i.e. the
+    # options with any defaults applied for non None options.
+    #
 
     pywbem_server = None
 
@@ -284,10 +358,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     else:
         resolved_ca_certs = ca_certs
 
-    if server and name:
+    if server and svr_name:
         click.echo('The --name option "%s" and --server option "%s" '
                    'are mutually exclusive and may not be used '
-                   'simultaneously' % (name, server), err=True)
+                   'simultaneously' % (svr_name, server), err=True)
         raise click.Abort()
 
     if keyfile and not certfile:
@@ -311,7 +385,6 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         # Abort for non-existent mock files or invalid type
         # Otherwise these issues not get found until connection
         # exercised.
-        # TODO: Future: Create common method with code in build_respository
         for file_path in mock_server_path:
             ext = os.path.splitext(file_path)[1]
             if ext not in ['.py', '.mof']:
@@ -361,10 +434,10 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                    (server, resolved_mock_server), err=True)
         raise click.Abort()
 
-    if resolved_mock_server and name:
+    if resolved_mock_server and svr_name:
         click.echo('The --name "%s" option and --server "%s" option '
                    'are mutually exclusive and may not be used '
-                   'simultaneously' % (name, mock_server), err=True)
+                   'simultaneously' % (svr_name, mock_server), err=True)
         raise click.Abort()
 
     if use_pull:
@@ -383,76 +456,14 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
     # Command mode (ctx is None). Processes command on comand line and quits
     # Apply the documented option defaults to create a pywbem_server instance
     # and a ContextObj instance
-    #
-    if ctx.obj is None:
+    if ctx.obj is None:  # No context. This is cmd line mode
         # Create the PywbemServer object (this contains all of the info
         # for the connection defined by the cmd line input)
-        if server or mock_server:
-            if name:
-                click.echo('Option conflict: --name "%s" conflicts with '
-                           'existence of --server and --mock-server' %
-                           name, err=True)
-                raise click.Abort()
-            name = 'not-saved'
-            pywbem_server = PywbemServer(server,
-                                         resolved_default_namespace,
-                                         name=name,
-                                         user=user,
-                                         password=password,
-                                         timeout=resolved_timeout,
-                                         verify=resolved_verify,
-                                         certfile=certfile,
-                                         keyfile=keyfile,
-                                         ca_certs=resolved_ca_certs,
-                                         mock_server=resolved_mock_server)
-        else:  # Server and mock_server are None
-            # if name cmd line option, get connection repo and
-            # get name from the repo.
-            connections = ConnectionRepository()
-            s_name = None
-            if name:
-                if name in connections:
-                    s_name = name
-                # exception when defined name does not exist
-                else:
-                    raise click.ClickException('Named connection "{}" does '
-                                               'not exist and no --server or '
-                                               '--mock-server options to '
-                                               'define a '
-                                               'WBEM server'.format(name))
-            else:  # no --name option
-                # get any persistent default_connection name
-                s_name = connections.get_default_connection_name()
-
-                if s_name and s_name not in connections:
-                    click.echo('Invalid selected connection "%s". This name '
-                               'not in connections repository. Deleting',
-                               err=True)
-                    connections.set_default_connection(None)
-                    raise click.Abort()
-                if verbose:
-                    click.echo('Current connection is "%s"' % s_name)
-
-            # Get the named connection from the repo
-            if s_name:
-                pywbem_server = connections[s_name]
-                # Test for invalid options with the --name option
-                # The following options are part of each PywbemServer object
-                for option in conditional_options:
-                    if option[0]:
-                        raise click.ClickException(
-                            '"--%s %s" option invalid when --name exists or '
-                            'default name set.' % (option[1], option[0]))
-
-            else:
-                # If no server defined, set None. This allows commands that
-                # do not require a server to be executed with no server
-                # defined.
-                pywbem_server = None
+        pywbem_server = create_server_instance(svr_name)
 
     # Interactive mode cmd line processing
-    # In interactive mode, general options specified in cmd line are used as
-    # to modify the pywbem_server object and to modify the general options
+    # In interactive mode, general options specified in cmd line are used
+    # to modify the pywbem_server object and the general options
     # for a single command execution.
     # This requires being able to determine for each option whether it has been
     # specified and is why general options don't define defaults in the
@@ -462,13 +473,13 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
         # or from the context object.
 
         # If --name option, get server from connection
-        if name:
+        if svr_name:
             connections = ConnectionRepository()
             try:
-                pywbem_server = connections[name]
+                pywbem_server = connections[svr_name]
             except KeyError:
                 raise click.ClickException('Named connection  "%s" '
-                                           'does not exist' % name)
+                                           'does not exist' % svr_name)
 
         # If other parameters, modify the existing connection and reset it.
         # TODO: refactor this code to avoid deepcopy when not needed.
@@ -518,6 +529,8 @@ def cli(ctx, server, name, default_namespace, user, password, timeout,
                     pywbem_server.reset()
                 else:
                     pywbem_server = ctx.obj.pywbem_server
+            else:
+                pywbem_server = create_server_instance(svr_name)
 
         # The following variables are maintained only in the context_obj and
         # not attached to any particular connection. If the cli argument is
