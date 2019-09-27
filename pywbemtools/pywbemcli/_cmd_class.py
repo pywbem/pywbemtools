@@ -206,9 +206,8 @@ def class_enumerate(context, classname, **options):
     class (CLASSNAME argument) in the specified namespace. If no namespace was
     specified, the default namespace of the connection is used.
 
-    The --local-only, --include-classorigin, --no-qualifiers, and
-    --propertylist options determine which parts are included in each retrieved
-    class.
+    The --local-only, --include-classorigin, and --no-qualifiers options
+    determine which parts are included in each retrieved class.
 
     The --deep-inheritance option defines whether or not the complete subclass
     hierarchy of the classes is retrieved.

@@ -174,6 +174,10 @@ def instance_get(context, instancename, **options):
     namespace specified in the --namespace option, or otherwise the default
     namespace of the connection.
 
+    The --local-only, --include-qualifiers, --include-classorigin, and
+    --propertylist options determine which parts are included in the retrieved
+    instance.
+
     In the output, the instance will formatted as defined by the
     --output-format general option.
     """
@@ -276,8 +280,10 @@ def instance_modify(context, instancename, **options):
     The properties to be modified and their new values are specified using the
     --property option, which may be specified multiple times.
 
-    The --propertylist option can be used to reduce the modifications to only
-    a specific list of properties.
+    The --propertylist option allows restricting the set of properties to be
+    modified. Given that the set of properties to be modified is already
+    determined by the specified --property options, it does not need to be
+    specified.
 
     Example:
 

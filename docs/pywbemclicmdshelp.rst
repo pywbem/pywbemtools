@@ -333,9 +333,8 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
       class (CLASSNAME argument) in the specified namespace. If no namespace was
       specified, the default namespace of the connection is used.
 
-      The --local-only, --include-classorigin, --no-qualifiers, and
-      --propertylist options determine which parts are included in each
-      retrieved class.
+      The --local-only, --include-classorigin, and --no-qualifiers options
+      determine which parts are included in each retrieved class.
 
       The --deep-inheritance option defines whether or not the complete subclass
       hierarchy of the classes is retrieved.
@@ -897,7 +896,9 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
             ...
 
     Options:
-      -h, --help  Show this message and exit.
+      --show-password  If set, show existing password in results. Otherwise,
+                       password is masked
+      -h, --help       Show this message and exit.
 
 
 .. _`pywbemcli connection test --help`:
@@ -1329,6 +1330,10 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
       namespace specified in the --namespace option, or otherwise the default
       namespace of the connection.
 
+      The --local-only, --include-qualifiers, --include-classorigin, and
+      --propertylist options determine which parts are included in the retrieved
+      instance.
+
       In the output, the instance will formatted as defined by the --output-
       format general option.
 
@@ -1455,8 +1460,10 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
       The properties to be modified and their new values are specified using the
       --property option, which may be specified multiple times.
 
-      The --propertylist option can be used to reduce the modifications to only
-      a specific list of properties.
+      The --propertylist option allows restricting the set of properties to be
+      modified. Given that the set of properties to be modified is already
+      determined by the specified --property options, it does not need to be
+      specified.
 
       Example:
 

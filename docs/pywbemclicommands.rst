@@ -554,6 +554,9 @@ in the default namespace of the connection.
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed.
 
+The ``--propertylist``/``--pl`` command option allows restricting the set of
+properties to be retrieved and displayed on the instances.
+
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
@@ -583,6 +586,9 @@ The ``instance get`` command gets a CIM instance.
 
 The specification of the instance name (INSTANCENAME argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
+
+The ``--propertylist``/``--pl`` command option allows restricting the set of
+properties to be retrieved and displayed on the instance.
 
 The command displays the instance using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -676,6 +682,13 @@ command options.
 For details, see :ref:`Specifying CIM property and parameter values`.
 
 Note that key properties cannot be modified, as per :term:`DSP0004`.
+
+The ``--propertylist``/``--pl`` command option allows restricting the set of
+properties to be modified. It is supported for consistency with the
+corresponding parameter at the CIM-XML protocol level, but given that the set
+of properties to be modified is already determined by the specified
+``--property``/``-p`` command options, the ``--propertylist``/``--pl`` command
+option does not need to be specified.
 
 Since the WBEM server (and pywbem) requires that each property be typed,
 pywbemcli retrieves the creation class from the WBEM server to determine
