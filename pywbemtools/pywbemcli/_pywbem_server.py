@@ -174,6 +174,9 @@ class PywbemServer(object):
     def mock_server(self, mock_server):
         """Setter method; for a description see the getter method."""
 
+        # assure this is list type in yaml output
+        if mock_server is None:
+            mock_server = []
         # pylint: disable=attribute-defined-outside-init
         self._mock_server = mock_server
 

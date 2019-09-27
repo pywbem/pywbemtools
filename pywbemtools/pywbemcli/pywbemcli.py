@@ -491,7 +491,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                 modified_server = False
                 if server:
                     if pywbem_server.mock_server:
-                        pywbem_server.mock_server = None
+                        pywbem_server.mock_server = []
                     pywbem_server.server = server
                     modified_server = True
                 if mock_server:
@@ -557,7 +557,11 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose)
-
+    if verbose:
+        print('CONTEXT_obj FROM generals loc 547 %r' % ctx.obj)
+        print('CLICK CTX %s' % ctx)
+        display_click_context(ctx, msg="After adding Context",
+                              display_attrs=True)
     # Invoke command if one exists.
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)

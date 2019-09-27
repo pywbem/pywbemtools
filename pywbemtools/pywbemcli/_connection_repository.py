@@ -188,6 +188,7 @@ class ConnectionRepository(object):
         existing connection.  Users of this method should check before add if
         they do not want to replace an existing entry.
         """
+        assert svr_definition.mock_server is not None  # must be empty list
         ConnectionRepository._pywbemcli_servers[name] = svr_definition
         self._write_file()
 
