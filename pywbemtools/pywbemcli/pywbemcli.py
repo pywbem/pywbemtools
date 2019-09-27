@@ -32,7 +32,7 @@ from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
     DEFAULT_LOG_DETAIL_LEVEL
 
-from ._context_obj import ContextObj
+from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
     CIM_OBJECT_OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
