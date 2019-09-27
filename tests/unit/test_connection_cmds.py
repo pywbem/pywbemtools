@@ -393,8 +393,8 @@ TEST_CASES = [
      None, OK],
 
     #
-    #   The following is a new sequence but depends on the repo being empty
-    #   It creates, shows and deletes a single server definition.
+    # The following tests are a new sequence and depends on empty repo.
+    # It creates, shows and deletes a single server definition.
     #
     ['Verify connection command add with all arguments.',
      {'general': ['--server', 'http://blahblah',
@@ -535,7 +535,7 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    #
+    #  The following is a sequence that starts with an empty repo
     #  Verify create and save mock connection sequence. Starts with empty
     #  server adds a mock server, shows it, tests if valid, and deletes
     #  the connection
@@ -568,7 +568,8 @@ TEST_CASES = [
      {'args': ['test'],
       'general': ['--name', 'mocktest']},
      {'stdout': "Connection successful",
-      'test': 'lines'},
+      'test': 'linnows',
+      'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
     ['Verify connection command select mocktest with prompt',
@@ -720,14 +721,13 @@ TEST_CASES = [
     #  Sequence to test
     #
 
-    ['Verify mock connection exists.',
+    ['Verify Create new connection names svrtest works.',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'svrtest']},
      {'stdout': "",
       'test': 'lines',
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
-
 
     ['Verify connection list with current server from general options, grid',
      {'args': ['list'],
@@ -769,7 +769,6 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-
     ['Verify connection delete svrtest',
      {'args': ['delete', 'svrtest'],
       'general': []},
@@ -777,6 +776,69 @@ WBEM server connections: (#: default, *: current)
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
+
+    #
+    #   Test creating a server and saving it from stdin all in single
+    #   interactive sequence
+    #
+    ['Verify Create new connection in interactive mode and delete.',
+     {'general': [],
+      'stdin': ['--server http://blah --user fred --password fred '
+                '--certfile cert1.pem --keyfile keys1.pem',
+                'connection save fred',
+                'connection show',
+                'connection delete fred']},
+     {'stdout': ['name', 'not-saved',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/cimv2',
+                 'user',
+                 'fred',
+                 'password',
+                 'timeout', '30',
+                 'verify', 'True',
+                 'certfile', 'cert1.pem',
+                 'keyfile', 'keys1.pem',
+                 'Deleted', 'connection', '"fred"'],
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+    #
+    # The following is a sequence to assure that the interactive creation
+    # of a server actually puts the server in the repository
+    #
+    ['Verify Create new connection in interactive mode and delete.',
+     {'general': [],
+      'stdin': ['--server http://blah --user fred --password fred '
+                '--certfile cert1.pem --keyfile keys1.pem',
+                'connection save fred',
+                'connection show']},
+     {'stdout': ['name', 'not-saved',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/cimv2',
+                 'user',
+                 'fred',
+                 'password',
+                 'timeout', '30',
+                 'verify', 'True',
+                 'certfile', 'cert1.pem',
+                 'keyfile', 'keys1.pem'],
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'exists'}},
+     None, OK],
+
+    ['Verify connection delete fred',
+     {'args': ['delete', 'fred'],
+      'general': []},
+     {'stdout': 'Deleted connection "fred"',
+      'test': 'innows',
+      'file': {'before': 'exists', 'after': 'none'}},
+     None, OK],
+
+
+    # add to this sequence where we create save, load, delete
+    # add to this sequence where we create, save and then load delete in next
+    # pywbemcli
 
     #
     #   Test use of interactive connection choice
@@ -806,7 +868,7 @@ class TestSubcmdClass(CLITestsBase):
         # Where is this file to be located for tests.
         pywbemserversfile = repo_file_path
 
-        def test_file(file_test):
+        def test_file_existence(file_test):
             """
             Local function to execute tests on existence of connections file.
             """
@@ -814,7 +876,7 @@ class TestSubcmdClass(CLITestsBase):
                 assert os.path.isfile(pywbemserversfile) and \
                     os.path.getsize(pywbemserversfile) > 0, \
                     "Fail. File  %s should exist" % pywbemserversfile
-            elif file_test == 'none':
+            elif file_test.lower() == 'none':
                 if os.path.isfile(pywbemserversfile):
                     print('FILE THAT SHOULD NOT EXIST')
                     with open(pywbemserversfile, 'r') as fin:
@@ -835,11 +897,11 @@ class TestSubcmdClass(CLITestsBase):
 
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
-                test_file(exp_response['file']['before'])
+                test_file_existence(exp_response['file']['before'])
 
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition, verbose=False)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:
-                test_file(exp_response['file']['after'])
+                test_file_existence(exp_response['file']['after'])

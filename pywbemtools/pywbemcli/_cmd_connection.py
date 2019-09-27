@@ -400,6 +400,7 @@ def cmd_connection_show(context, name, options):
     Show the parameters that make up the current connection information if
     name is None. If Name exists, shows connections in connections file.
     """
+
     connections = ConnectionRepository()
 
     cname = get_current_connection_name(context)
@@ -521,6 +522,7 @@ def cmd_connection_save(context, name, options):
     """
     Saves the connection named name or the current connection of no name
     """
+
     current_connection = context.pywbem_server
     if not current_connection:
         raise click.ClickException('No current connection connection. Use '

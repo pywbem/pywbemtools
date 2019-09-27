@@ -201,6 +201,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             ctx = click.get_current_context()
             click.echo('COMMAND="%s", params=%r' % (ctx.info_name, ctx.params))
 
+        if self.verbose:
+            display_click_context_parents(display_attrs=True)
+
         self.spinner.start()
         try:
             cmd()
@@ -349,16 +352,15 @@ def display_click_context(ctx, msg=None, display_attrs=True):
             '\n    '.join("%s: %s" % item for item in attrs.items())))
 
 
-def display_click_context_parents(ctx, display_attrs=False):
+def display_click_context_parents(display_attrs=False):
     """
     Display the current click context and its all of its parents
     """
-
-    display_click_context(ctx)
-    parent_ctx = ctx.parent
     level = 0
-    while parent_ctx is not None:
-        display_click_context(parent_ctx, msg='level %s' % level,
+    ctx = click.get_current_context()
+    disp_ctx = ctx.parent
+    while disp_ctx is not None:
+        display_click_context(disp_ctx, msg='level %s' % level,
                               display_attrs=display_attrs)
         level += -1
-        parent_ctx = parent_ctx.parent
+        disp_ctx = disp_ctx.parent
