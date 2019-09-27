@@ -835,14 +835,31 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
-
-    # add to this sequence where we create save, load, delete
-    # add to this sequence where we create, save and then load delete in next
-    # pywbemcli
-
     #
-    #   Test use of interactive connection choice
+    #   The following is a sequence. Confirm fix to issue #396
     #
+    ['Create mock server defintion.',
+     {'args': ['save', 'mocktest3'],
+      'general': ['--mock-server', MOCK_FILE_PATH]},
+     {'stdout': "",
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'exists'}},
+     None, OK],
+
+    ['Verify sequence select, list, create new and save, list works.',
+     {'general': [],
+      'stdin': ['connection select mocktest3',
+                'connection list',
+                '--server http://blah --user fred --password fred '
+                '--certfile cert1.pem connection save testconn',
+                'connection connection list',
+                'connection select testconn',
+                'connection delete testconn',
+                'connection delete mocktest3']},
+     {'stdout': ['Deleted connection "mocktest3"'],
+      'test': 'innows',
+      'file': {'before': 'exists', 'after': 'None'}},
+     None, OK],
 
 ]
 
@@ -892,7 +909,7 @@ class TestSubcmdClass(CLITestsBase):
             pytest.skip("Condition for test case not met")
 
         if condition == 'pdb':
-            import pdb
+            import pdb  # pylint: disable=import-outside-toplevel
             pdb.set_trace()
 
         if 'file' in exp_response:
@@ -900,7 +917,7 @@ class TestSubcmdClass(CLITestsBase):
                 test_file_existence(exp_response['file']['before'])
 
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition, verbose=True)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:
