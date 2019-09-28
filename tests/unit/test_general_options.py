@@ -70,9 +70,9 @@ Options:
   -n, --name NAME                 Use the WBEM server defined by the WBEM
                                   connection definition NAME. This option is
                                   mutually exclusive with the --server and
-                                  --name options, since each defines a WBEM
-                                  server. Default: EnvVar PYWBEMCLI_NAME, or
-                                  none.
+                                  --mock-server options, since each defines a
+                                  WBEM server. Default: EnvVar PYWBEMCLI_NAME,
+                                  or none.
   -m, --mock-server FILE          Use a mock WBEM server that is automatically
                                   created in pywbemcli and populated with CIM
                                   objects that are defined in the specified
