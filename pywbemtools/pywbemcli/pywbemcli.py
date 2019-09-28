@@ -65,8 +65,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               envvar=PywbemServer.name_envvar,
               help='Use the WBEM server defined by the WBEM connection '
                    'definition NAME. '
-                   'This option is mutually exclusive with the --server '
-                   'and --name options, since each defines a WBEM server. '
+                   'This option is mutually exclusive with the --server and '
+                   '--mock-server options, since each defines a WBEM server. '
                    'Default: EnvVar {ev}, or none.'.
                    format(ev=PywbemServer.name_envvar))
 @click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
