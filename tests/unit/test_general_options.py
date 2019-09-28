@@ -996,12 +996,12 @@ TEST_CASES = [
       'test': 'not-innows'},
      None, OK],
 
-    ['Delete fred.',
+    ['Delete fred. This one will fail if previous does not abort',
      {'args': ['delete', 'fred'],
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
-     None, OK],
+     None, FAIL],
 
 ]
 
@@ -1030,4 +1030,4 @@ class TestGeneralOptions(CLITestsBase):
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition, verbose=True)
