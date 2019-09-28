@@ -28,9 +28,9 @@ from __future__ import absolute_import
 import os
 import sys
 import traceback
+import click
 
-from pywbem import WBEMConnection, CIMError, CIM_ERR_FAILED, \
-    Error
+from pywbem import WBEMConnection, MOFParseError
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
@@ -308,35 +308,46 @@ class BuildRepositoryMixin(object):
 
             ext = os.path.splitext(file_path)[1]
             if ext == '.mof':
-                # Returns pywbem Error exceptions
-                conn.compile_mof_file(file_path)
-            elif ext == '.py':
                 try:
-                    with open(file_path) as fp:
-                        # the exec includes CONN and VERBOSE
-                        globalparams = {'CONN': conn,
-                                        'SERVER': server,
-                                        'VERBOSE': verbose}
-                        # pylint: disable=exec-used
-                        exec(fp.read(), globalparams, None)
-                except (IOError, Error):
-                    raise
-
-                # Other errors, display complete traceback
-                except Exception as ex:
-                    exc_type, exc_value, exc_traceback = sys.exc_info()
-                    tb = traceback.format_exception(exc_type, exc_value,
-                                                    exc_traceback)
-                    raise CIMError(
-                        CIM_ERR_FAILED,
-                        'Exception: "--mock-server" python script '
-                        '"%s"\n\n%s\nconn %s,\nException %s' %
-                        (file_path, "".join(tb), conn, ex))
-
+                    # Displays any MOFParseError already
+                    conn.compile_mof_file(file_path)
+                except MOFParseError:
+                    # Abort the entire pywbemcli command because the
+                    # MOF compilation might have caused inconsistencies in the
+                    # mock repository.
+                    click.echo(
+                        "Mock MOF file '{}' failed compiling (see above)".
+                        format(file_path),
+                        err=True)
+                    raise click.Abort()
             else:
-                raise IOError('Invalid suffix %s on "--mock-server" '
-                              'global parameter %s. Must be "py" or "mof".'
-                              % (ext, file_path))
+                assert ext == '.py'  # already checked
+                with open(file_path) as fp:
+                    # May raise IOError
+                    file_source = fp.read()
+                    # the exec includes CONN and VERBOSE
+                    globalparams = {'CONN': conn,
+                                    'SERVER': server,
+                                    'VERBOSE': verbose}
+                    try:
+                        # Using compile+exec instead of just exec allows
+                        # specifying the file name, causing it to appear in
+                        # any tracebacks.
+                        file_code = compile(file_source, file_path, 'exec')
+                        # pylint: disable=exec-used
+                        exec(file_code, globalparams, None)
+                    except Exception:
+                        exc_type, exc_value, exc_traceback = sys.exc_info()
+                        tb = traceback.format_exception(exc_type, exc_value,
+                                                        exc_traceback)
+                        # Abort the entire pywbemcli command because the
+                        # script might have caused inconsistencies in the
+                        # Python namespace and in the mock repository.
+                        click.echo(
+                            "Mock Python script '{}' failed:\n{}".
+                            format(file_path, "\n".join(tb)),
+                            err=True)
+                        raise click.Abort()
 
 
 class PYWBEMCLIConnection(WBEMConnection, PYWBEMCLIConnectionMixin):

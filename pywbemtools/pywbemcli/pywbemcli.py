@@ -294,33 +294,32 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                                          keyfile=keyfile,
                                          ca_certs=resolved_ca_certs,
                                          mock_server=resolved_mock_server)
-        else:  # Server and mock_server are None
+        else:  # Server and mock_server were not specified
             # if name cmd line option, get connection repo and
             # get name from the repo.
             connections = ConnectionRepository()
             local_svr_name = None
             if svr_name:
-                if svr_name in connections:
-                    local_svr_name = svr_name
-                # exception when defined name does not exist
-                else:
-                    raise click.ClickException('Named connection "{}" does '
-                                               'not exist and no --server or '
-                                               '--mock-server options to '
-                                               'define a '
-                                               'WBEM server'.format(svr_name))
-            else:  # no --name option
-                # get any persistent default_connection name
+                if svr_name not in connections:
+                    raise click.ClickException(
+                        "Connection definition '{}' not found in "
+                        "connections file '{}'".
+                        format(svr_name, connections.connections_file))
+                local_svr_name = svr_name
+            else:  # no connection name specified
+                # get the default_connection definition
                 local_svr_name = connections.get_default_connection_name()
-
-                if svr_name and local_svr_name not in connections:
-                    click.echo('Invalid selected connection "%s". This name '
-                               'not in connections repository. Deleting',
-                               err=True)
+                if local_svr_name and local_svr_name not in connections:
                     connections.set_default_connection(None)
+                    click.echo(
+                        "Default connection definition '{}' not found in "
+                        "connections file '{}'; deleted default connection "
+                        "in connections file".
+                        format(local_svr_name, connections.connections_file),
+                        err=True)
                     raise click.Abort()
                 if verbose:
-                    click.echo('Current connection is "%s"' % svr_name)
+                    click.echo('Current connection is "%s"' % local_svr_name)
 
             # Get the named connection from the repo
             if local_svr_name:
@@ -352,15 +351,13 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
 
     if server and svr_name:
         raise click.ClickException(
-            'The --name option "{0}" and --server option "{1}" are mutually '
-            'exclusive and may not be used simultaneously'.format(svr_name,
-                                                                  server))
+            'Conflicting server definitions: name: {}, server: {}'.
+            format(svr_name, server))
 
     if keyfile and not certfile:
         raise click.ClickException(
-            'The --keyfile option "{0}" is allowed only if the --certfile '
+            'The --keyfile option "{}" is allowed only if the --certfile '
             'option is also used'.format(keyfile))
-
     # process mock_server option
     resolved_mock_server = []
     if mock_server:
@@ -379,12 +376,11 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             ext = os.path.splitext(file_path)[1]
             if ext not in ['.py', '.mof']:
                 raise click.ClickException(
-                    '--mock-server: File: "{0}" extension: "{1}" not valid. '
-                    '"py" or "mof" required'.format(file_path, ext))
+                    "Mock file '{}' has invalid suffix '{}' "
+                    "- must be '.py' or '.mof'".format(file_path, ext))
             if not os.path.isfile(file_path):
                 raise click.ClickException(
-                    '--mock-server: File: "{0}" does not '
-                    'exist'.format(file_path))
+                    "Mock file '{}' does not exist".format(file_path))
             if ext != '.py':
                 resolved_mock_server.append(file_path)
                 continue
@@ -394,38 +390,38 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             # primarily to support testing.
             with open(file_path) as fp:
                 if '!PROCESS!AT!STARTUP!' in fp.readline():
+                    file_source = fp.read()
+                    # Only verbose is allowed here
+                    globalparams = {'VERBOSE': verbose}
                     try:
-                        # Only verbose is allowed here
-                        globalparams = {'VERBOSE': verbose}
+                        # Using compile+exec instead of just exec allows
+                        # specifying the file name, causing it to appear in
+                        # any tracebacks.
+                        file_code = compile(file_source, file_path, 'exec')
                         # pylint: disable=exec-used
-                        exec(fp.read(), globalparams, None)
-                    except Exception as ex:
-                        exc_type, exc_value, exc_traceback = \
-                            sys.exc_info()
-                        tb = traceback.format_exception(
-                            exc_type,
-                            exc_value,
-                            exc_traceback)
+                        exec(file_code, globalparams, None)
+                    except Exception:
+                        exc_type, exc_value, exc_traceback = sys.exc_info()
+                        tb = traceback.format_exception(exc_type, exc_value,
+                                                        exc_traceback)
                         raise click.ClickException(
-                            'Exception failure of "--mock-server" python '
-                            'script {0!r}. Exception: %r\n'
-                            'Traceback\n{1}'.format(file_path, ex, tb))
+                            "Mock Python process-at-startup script '{}' "
+                            "failed:\n{}" %
+                            (file_path, "\n".join(tb)))
                 else:  # not processed during startup
                     resolved_mock_server.append(file_path)
 
     # Simultaneous mock_server and server fails
     if server and resolved_mock_server:
         raise click.ClickException(
-            'Conflicting server definitions. Do not use --server and '
-            '--mock-server simultaneously. --server: {0}, '
-            '--mock-server: {1}'.format(server, resolved_mock_server))
+            'Conflicting server definitions: server: {}, mock-server: {}'.
+            format(server, ', '.join(resolved_mock_server)))
 
     # simultaneous mock_server and svr_name fails
     if resolved_mock_server and svr_name:
         raise click.ClickException(
-            'The --name "{0}" option and --server "{1}" option are mutually '
-            'exclusive and may not be used simultaneously'.format(svr_name,
-                                                                  mock_server))
+            'Conflicting server definitions: mock-server: {}, name: {}'.
+            format(', '.join(resolved_mock_server), svr_name))
 
     if use_pull:
         try:
@@ -465,8 +461,10 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             try:
                 pywbem_server = connections[svr_name]
             except KeyError:
-                raise click.ClickException('Named connection  "%s" '
-                                           'does not exist' % svr_name)
+                raise click.ClickException(
+                    "Connection definition '{}' not found in "
+                    "connections file '{}'".
+                    format(svr_name, connections.connections_file))
 
         # If other parameters, modify the existing connection and reset it.
         # TODO: refactor this code to avoid deepcopy when not needed.
