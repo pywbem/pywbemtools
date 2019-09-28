@@ -433,8 +433,8 @@ class PywbemServer(object):
                                           self._wbem_server,
                                           self._mock_server,
                                           verbose)
-        # All errors in building mock repository cause abort
-        # Errors where information display handled by build_repository
+                # All errors in building mock repository cause abort
+                # Errors where information display handled by build_repository
                 except MOFParseError as pe:
                     click.echo('Mock repository build exception:\n'
                                '{0}'.format(pe), err=True)

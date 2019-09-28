@@ -22,6 +22,7 @@ NOTE: The --log options are tested in a separate file.
 from __future__ import absolute_import, print_function
 
 import os
+import sys
 import pytest
 
 from .cli_test_extensions import CLITestsBase
@@ -361,10 +362,9 @@ TEST_CASES = [
      {'general': ['--mock-server', 'invalidfilename.mof'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': [r'Error: --mock-server: File:',
-                 r'invalidfilename.mof',
-                 r'does not exist',
-                 r'Aborted!'],
+     {'stderr': ['Error: --mock-server: File:',
+                 'invalidfilename.mof',
+                 'does not exist'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -376,8 +376,7 @@ TEST_CASES = [
      {'stderr': ['Error: --mock-server: File: ',
                  'invalidfilename.mofx',
                  'extension', 'not valid',
-                 '"py" or "mof" required',
-                 'Aborted!'],
+                 '"py" or "mof" required'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -430,8 +429,7 @@ TEST_CASES = [
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Conflicting server definitions. Do not use --server '
-                 'and --mock-server simultaneously',
-                 'Aborted!'],
+                 'and --mock-server simultaneously'],
       'rc': 1,
       'test': 'regex'},
      None, OK],
@@ -442,8 +440,7 @@ TEST_CASES = [
       'args': ['show']},
      {'stderr': ['--mock-server: File:',
                  'fred',
-                 'extension: "" not valid.',
-                 'Aborted!'],
+                 'extension: "" not valid.'],
       'rc': 1,
       'test': 'regex'},
      None, OK],
@@ -948,9 +945,59 @@ TEST_CASES = [
       'test': 'not-innows'},
      None, OK],
 
-
     ['Delete testGeneralOpsMods.',
      {'args': ['delete', 't1'],
+      'cmdgrp': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
+    #
+    #  Test that bad mock_error file names do not cause Abort but bad MOF
+    #  or python script do cause Abort
+    #
+
+    ['Verify interactive create mock with bad file name does not fail.',
+     {'general': [],
+      'stdin': ['--server http://blah --user fred --password fred',
+                'connection save connectiontoprovestdincontinues',
+                '--mock-server DoesNotExist.mof class enumerate',
+                '-m DoesNotExist.py class enumerate',
+                'connection select connectiontoprovestdincontinues',
+                'connection show',
+                'connection delete connectiontoprovestdincontinues']},
+     {'stdout': ['name', 'fred',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/cimv2',
+                 'user',
+                 'fred',
+                 'Deleted connection "connectiontoprovestdincontinues"'],
+      'stderr': ['DoesNotExist.mof',
+                 'DoesNotExist.py',
+                 'does not exist'],
+      'test': 'innows'},
+     None, OK],
+
+    # TODO this test fails on windows because the statement that builds the
+    # --mock-server ... class enumerate inserts the filepath without
+    # the backslashes. This is a windows issue, and problem occurs for both
+    # python 2 and 3
+    ['Verify interactive MOF or PY failures causes Abort.',
+     {'general': [],
+      'stdin': ['--server http://blah --user fred --password fred ',
+                'connection save fred',
+                '--mock-server %s class enumerate' % BAD_MOF_FILE_PATH,
+                'connection select fred',
+                'connection show',
+                'connection delete fred'],
+      'platform': 'win32'},  # ignore this platform.  See comments above
+     {'stdout': ['Deleted connection "fred"'],
+      'rc': 1,
+      'test': 'not-innows'},
+     None, OK],
+
+    ['Delete fred.',
+     {'args': ['delete', 'fred'],
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
@@ -971,8 +1018,15 @@ class TestGeneralOptions(CLITestsBase):
     def test_execute_pywbemcli(self, desc, inputs, exp_response, mock,
                                condition):
         """
+
+
         Execute pybemcli with the defined input and test output.
         """
+        # Temp bypass of windows platform because of issue with one test
+        if 'platform' in inputs:
+            if sys.platform == inputs['platform']:
+                return
+
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
