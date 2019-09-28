@@ -1269,9 +1269,9 @@ TEST_CASES = [
 
     ['Verify class command invokemethod fails Invalid Method',
      ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
-     {'stderr': ["CIMError: 17"],
+     {'stderr': ["Error: ClickException: .* CIM_Foo .* Fuzzyx"],
       'rc': 1,
-      'test': 'innows'},
+      'test': 'regex'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
 

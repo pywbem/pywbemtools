@@ -231,8 +231,9 @@ TEST_CASES = [
     ['Verify --mock-server and --server together fail.',
      {'general': ['--mock-server', MOCK_FILE_PATH, '--server', 'http://blah'],
       'args': ['list']},
-     {'stderr': ['Conflicting server definitions. Do not use --server and '
-                 '--mock-server simultaneously'],
+     {'stderr': ['Conflicting server definitions:',
+                 'server:', 'http://blah',
+                 'mock-server:', MOCK_FILE_PATH],
       'rc': 1,
       'test': 'innows'},
      None, OK],

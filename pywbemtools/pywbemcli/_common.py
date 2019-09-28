@@ -29,7 +29,7 @@ import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue, CIM_ERR_METHOD_NOT_FOUND, CIMError, CIMFloat, CIMInt
+    cimvalue, CIMFloat, CIMInt
 from pywbem.cim_obj import mofstr
 from pywbem.cim_obj import NocaseDict
 
@@ -652,7 +652,7 @@ def process_invokemethod(context, objectname, methodname, options):
 
     """  # pylint: enable=line-too-long
 
-    def create_params(cim_method, kv_params):
+    def create_params(classname, cim_method, kv_params):
         """
         Create parameter values from the input arguments and class.
 
@@ -667,11 +667,14 @@ def process_invokemethod(context, objectname, methodname, options):
         for p in kv_params:
             name, value_str = parse_kv_pair(p)
             if name not in cim_method.parameters:
-                raise click.ClickException('Parameter: %s not in method: '
-                                           ' %s' % (name, cim_method.name))
+                raise click.ClickException(
+                    "Method {} of class {} does not have a parameter {}".
+                    format(cim_method.name, classname, name))
 
             if name in params:
-                raise click.ClickException('Parameter "%s" duplicated' % name)
+                raise click.ClickException(
+                    "Method parameter {} specified multiple times".
+                    format(name))
 
             cl_param = cim_method.parameters[name]
             is_array = cl_param.is_array
@@ -690,13 +693,12 @@ def process_invokemethod(context, objectname, methodname, options):
 
     cim_methods = cim_class.methods
     if methodname not in cim_methods:
-        # TODO: This really is a client error and probably should not use
-        # CIMError
-        raise CIMError(CIM_ERR_METHOD_NOT_FOUND, 'Method %s not in class %s '
-                       'in server' % (methodname, classname))
+        raise click.ClickException(
+            "Class {} does not have a method {}".
+            format(classname, methodname))
     cim_method = cim_methods[methodname]
 
-    params = create_params(cim_method, options['parameter'])
+    params = create_params(classname, cim_method, options['parameter'])
 
     rtn = context.conn.InvokeMethod(methodname, objectname, params)
 
