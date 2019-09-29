@@ -577,11 +577,11 @@ TEST_CASES = [
      ' requires connection fails.',
      {'cmdgrp': 'class',
       'args': ['enumerate']},
-     {'stderr': ['No server defined for command that requires server. ',
-                 'Define a server with "--server", "--mock-server", or ',
-                 '"--name" general options; or in interactive mode, use ',
-                 '"connection select" or "connection add" to define a '
-                 'connection'],
+     {'stderr': ['No server specified for a command that requires a WBEM '
+                 'server. To specify a server, use the "--server", '
+                 '"--mock-server", or "--name" general options, or set the '
+                 'corresponding environment variables, or in interactive mode '
+                 'use "connection select"'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
