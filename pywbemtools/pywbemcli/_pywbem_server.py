@@ -328,19 +328,6 @@ class PywbemServer(object):
         """
         return self._wbem_server
 
-    def _validate_timeout(self):
-        """
-        Validate that timeout parameter is in proper range.
-
-        Exception: ValueError in Invalid
-        """
-        if not self.timeout:   # disallow None
-            ValueError('Timout of None not allowed')
-        if self.timeout is not None and (self.timeout < 0 or  # noqa: W504
-                                         self.timeout > MAX_TIMEOUT):
-            ValueError('Timeout option(%s) out of range %s to %s sec' %
-                       (self.timeout, 0, MAX_TIMEOUT))
-
     def password_prompt(self, ctx):
         """
         Request password from console.

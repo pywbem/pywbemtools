@@ -484,6 +484,15 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
+    ['Verify connection command export no current conection',
+     {'args': ['export'],
+      'general': []},
+     {'stderr': ['No server currently defined as current'],
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
     #
     #  Test command line parameter errors, select, show, and delete with
     #  no repository

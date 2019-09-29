@@ -256,6 +256,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
     """
     # list of options that are not allowed in some cases:
     # i.e. When -name is used and when in interactive mode.
+    resolved_mock_server = []
     conditional_options = ((default_namespace, 'default_namespace'),
                            (timeout, 'timeout'),
                            (verify, 'verify'),
@@ -264,7 +265,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                            (keyfile, 'keyfile'),
                            (ca_certs, 'ca_certs'),
                            (server, 'server'),
-                           (mock_server, 'mock-server'))
+                           # Special because we remove some items from the
+                           # list of mocks that define the mock repository
+                           (resolved_mock_server, 'mock-server'))
 
     def create_server_instance(svr_name):
         """
@@ -277,7 +280,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         from the enclosing scopt
         """
         # test for conflicting server definitions.
-        if server or mock_server:
+        if server or resolved_mock_server:
             if svr_name:
                 click.ClickException('Option conflict: --name "%s" '
                                      'conflicts with existence of --server and '
@@ -309,6 +312,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             else:  # no connection name specified
                 # get the default_connection definition
                 local_svr_name = connections.get_default_connection_name()
+                # Abort here because we have modified the file to clear
+                # the bad default. First this should never happen and
+                # second, if it does, Abort seems logical.
                 if local_svr_name and local_svr_name not in connections:
                     connections.set_default_connection(None)
                     click.echo(
@@ -359,7 +365,6 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             'The --keyfile option "{}" is allowed only if the --certfile '
             'option is also used'.format(keyfile))
     # process mock_server option
-    resolved_mock_server = []
     if mock_server:
         assert isinstance(mock_server, tuple)
         # resolve relative and absolute paths
@@ -387,7 +392,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
 
             # The following allows executing selected python scripts at
             # startup but with only VERBOSE as a known global.  Inserted
-            # primarily to support testing.
+            # primarily to support testing. If the flag exists in the
+            # file, it executes immediatly but does not put into mock_server
+            # variable
             with open(file_path) as fp:
                 if '!PROCESS!AT!STARTUP!' in fp.readline():
                     file_source = fp.read()
@@ -404,9 +411,11 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                         exc_type, exc_value, exc_traceback = sys.exc_info()
                         tb = traceback.format_exception(exc_type, exc_value,
                                                         exc_traceback)
-                        raise click.ClickException(
+                        click.echo(
                             "Mock Python process-at-startup script '{}' "
-                            "failed:\n{}".format(file_path, "\n".join(tb)))
+                            "failed:\n{}".format(file_path, "\n".join(tb)),
+                            err=True)
+                        raise click.Abort()
                 else:  # not processed during startup
                     resolved_mock_server.append(file_path)
 
@@ -416,20 +425,15 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             'Conflicting server definitions: server: {}, mock-server: {}'.
             format(server, ', '.join(resolved_mock_server)))
 
-    # simultaneous mock_server and svr_name fails
+    # simultaneous mock_server and svr_name fails. Note: resolve mock_server
+    # does not include any mocks processedatstartup
     if resolved_mock_server and svr_name:
         raise click.ClickException(
             'Conflicting server definitions: mock-server: {}, name: {}'.
             format(', '.join(resolved_mock_server), svr_name))
 
-    if use_pull:
-        try:
-            resolved_use_pull = USE_PULL_CHOICE[use_pull]
-        except KeyError:
-            raise click.ClickException(
-                'Invalid choice for --use-pull %s' % use_pull)
-    else:
-        resolved_use_pull = DEFAULT_PULL_CHOICE
+    resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
+        else DEFAULT_PULL_CHOICE
 
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 
