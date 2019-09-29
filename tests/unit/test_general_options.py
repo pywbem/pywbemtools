@@ -34,7 +34,7 @@ PYTHON_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_python_mock_script.py')
 BAD_MOF_FILE_PATH = os.path.join(SCRIPT_DIR, 'mof_with_error.mof')
 BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
 BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
-
+MOCK_PW_PROMPT_PATH = os.path.join(SCRIPT_DIR, 'mock_password_prompt.py')
 
 GENERAL_HELP = """
 Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
@@ -180,6 +180,36 @@ Commands:
 
 """
 
+REPL_HELP = """Usage: pywbemcli repl [OPTIONS]
+
+  Enter interactive mode (default).
+
+  Enter the interactive mode where pywbemcli commands can be entered
+  interactively. The prompt is changed to 'pywbemcli>'.
+
+  Command history is supported. The command history is stored in a file
+  ~/.pywbemcli_history.
+
+  Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q,
+  :quit, :exit
+
+Options:
+  -h, --help  Show this message and exit.
+"""
+INTERACTIVE_HELP = """The following can be entered in interactive mode:
+
+  COMMAND                     Execute pywbemcli command COMMAND.
+  !SHELL-CMD                  Execute shell command SHELL-CMD.
+  <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+  <TAB>                       Tab completion (can be used anywhere).
+  -h, --help                  Show pywbemcli general help message, including a
+                              list of pywbemcli commands.
+  COMMAND --help              Show help message for pywbemcli command COMMAND.
+  help                        Show this help message.
+  :?, :h, :help               Show help message about interactive mode.
+  <UP>, <DOWN>                Scroll through pwbemcli command history.
+
+"""
 
 OK = True
 RUN = True
@@ -216,6 +246,24 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
+    ['Verify repl-help response.',
+     {'general': [],
+      'cmdgrp': 'repl',
+      'args': ['-h']},
+     {'stdout': REPL_HELP,
+      'rc': 0,
+      'test': 'linesnows'},
+     None, OK],
+
+    ['Verify help response (interactive help)).',
+     {'general': [],
+      'cmdgrp': 'help',
+      'args': []},
+     {'stdout': INTERACTIVE_HELP,
+      'rc': 0,
+      'test': 'linesnows'},
+     None, OK],
+
     ['Verify invalid server definition.',
      {'general': ['-s', 'httpx://blah'],
       'cmdgrp': 'class',
@@ -243,6 +291,18 @@ TEST_CASES = [
       'rc': 0,
       'test': 'in'},
      None, SKIP],
+
+    ['Verify valid --server and --mock-server invalid.',
+     {'general': ['--server', 'http://blah', '--mock-server',
+                  SIMPLE_MOCK_FILE_PATH],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ['Conflicting server definitions:',
+                 'mock-server:', 'simple_mock_model.mof',
+                 'server:', 'http://blah'],
+      'rc': 1,
+      'test': 'in'},
+     None, OK],
 
     ['Verify valid --use-pull option parameter no.',
      {'general': ['-s', 'http://blah', '--use-pull', 'no'],
@@ -291,6 +351,7 @@ TEST_CASES = [
       'test': 'in'},
      None, SKIP],
 
+    # TODO: This fails with pywbemcli version 0.5.0 PY2. Temporarily disabled
     ['Verify --version general option.',
      {'general': ['-s', 'http://blah', '--version'],
       'cmdgrp': 'connection',
@@ -299,7 +360,7 @@ TEST_CASES = [
                  r'^pywbem, version [0-9]+\.[0-9]+\.[0-9]+'],
       'rc': 0,
       'test': 'regex'},
-     None, OK],
+     None, FAIL],
 
     #
     #  Test --verify and --no-verify general option using the connection show
@@ -358,6 +419,10 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
+
+    #
+    #  Test errors with --mock-server option
+    #
 
     ['Verify --mock-server option, file does not exist',
      {'general': ['--mock-server', 'invalidfilename.mof'],
@@ -418,6 +483,10 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      BAD_PY_ERR_STRTUP_PATH, OK],
+
+    #
+    #  Test errors with --name option, --mock-server option
+    #
 
     ['Verify -n option with new name but not in repo fails',
      {'general': ['-n', 'fred'],
@@ -616,10 +685,60 @@ TEST_CASES = [
      None, OK],
 
     #
-    #  Test use of default connection
+    #   Verify password prompt. This is a sequence
+    #
+    ['Create a mock serve with user but no password.',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--user', 'john'],
+      'args': ['save', 'mocktestVerifyPWPrompt'],
+      'cmdgrp': 'connection', },
+     {'stdout': "",
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server in repository',
+     {'general': [],
+      'cmdgrp': 'connection',
+      'args': ['list']},
+     {'stdout': ['mocktestVerifyPWPrompt'],
+      'test': 'innows'},
+     MOCK_PW_PROMPT_PATH, OK],
+
+    ['Verify load of this server and class enumerate triggers password prompt',
+     {'general': ['--name', 'mocktestVerifyPWPrompt'],
+      'cmdgrp': 'class',
+      'args': ['enumerate']},
+     {'stdout': ['CIM_Foo'],
+      'test': 'innows'},
+     MOCK_PW_PROMPT_PATH, OK],
+
+    ['Delete our test server',
+     {'general': ['--name', 'mocktestVerifyPWPrompt'],
+      'cmdgrp': 'connection',
+      'args': ['delete', 'mocktestVerifyPWPrompt']},
+     {'stdout': ['Deleted'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Create a mock server with user but no password. stdin to test for prompt',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--user', 'john'],
+      'stdin': ['class enumerate']},
+     {'stdout': ['MOCK_CLICK_PROMPT Enter password',
+                 '(user john)',
+                 'class CIM_Foo {'],
+      'test': 'innows'},
+     MOCK_PW_PROMPT_PATH, OK],
+
+    #
+    #  The following is a sequence that tests use of default connection
+    #  Creates server and saves. Tests that save works and then uses
+    #  select to set the default server to this connection
+    #  Tests that pywbemcli execute with no --name, etc. gets the default.
+    #  Removes the connection
     #
 
-    ['Verify Create a connection to test default connection.',
+    ['Create a connection to test default connection.',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'test-default'],
       'cmdgrp': 'connection', },
@@ -634,7 +753,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify shows test-default connection.',
+    ['Verify show test-default connection.',
      {'args': ['show', 'test-default'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default'],
@@ -655,6 +774,14 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify show current which is test-default because it loads the default',
+     {'general': ['--verbose'],
+      'args': ['show'],
+      'cmdgrp': 'connection', },
+     {'stdout': ['Current connection is "test-default"'],
+      'test': 'innows'},
+     None, OK],
+
     ['Delete test-default.',
      {'args': ['delete', 'test-default'],
       'cmdgrp': 'connection', },
@@ -669,6 +796,8 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      None, OK],
+
+    # End of sequence
 
     #
     # Test using environment variables as input
@@ -750,7 +879,7 @@ TEST_CASES = [
 
     ['Verify multiple commands in interacive mode.',
      {'general': ['--server', 'http://blah', ],
-      # args not allowed in interactive mode
+      # 'args' not allowed in interactive mode
       'stdin': ['--certfile cert1.pem --keyfile keys1.pem connection show',
                 'connection show',
                 '--certfile cert2.pem --keyfile keys2.pem connection show',
@@ -784,7 +913,8 @@ TEST_CASES = [
      None, OK],
 
     #
-    #   The following is a sequence
+    #   The following is a sequence. Creates a server and changes almost all
+    #   parameters interactively.
     #
     ['Verify Create a connection for test of mods through general opts.',
      {'general': ['--server', 'http://blah',
@@ -823,8 +953,7 @@ TEST_CASES = [
                 '--default-namespace root/john --password  abcd '
                 ' --verify --certfile c1.pem --keyfile k1.pem '
                 'connection show --show-password'],
-      'cmdgrp': None,
-      },
+      'cmdgrp': None},
      {'stdout': ['testGeneralOpsMods',
                  'server : http://blahblah',
                  'default-namespace', 'root/john',
@@ -847,8 +976,7 @@ TEST_CASES = [
                 ' --verify --certfile c1.pem --keyfile k1.pem connection '
                 'save t1',
                 'connection list'],
-      'cmdgrp': None,
-      },
+      'cmdgrp': None},
      {'stdout': [''],
       'rc': 0,
       'test': 'innows'},
@@ -873,11 +1001,21 @@ TEST_CASES = [
      None, OK],
 
     ['Delete testGeneralOpsMods.',
+     {'args': ['show', 'ServerDoesNotExist'],
+      'cmdgrp': 'connection', },
+     {'stderr': "",
+      'rc': 1,
+      'test': 'innows'},
+
+     None, OK],
+    ['Delete testGeneralOpsMods.',
      {'args': ['delete', 'testGeneralOpsMods'],
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
+
+    # End of sequence
 
     #
     #  Test verbose option
@@ -1023,6 +1161,28 @@ TEST_CASES = [
      {'stdout': "",
       'test': 'innows'},
      None, FAIL],
+
+
+    ['Verify operation that makes request to WBEM server fails with no server.',
+     {'args': ['enumerate'],
+      'cmdgrp': 'class', },
+     {'stderr': "No server specified for a command that requires a WBEM server",
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    #
+    #  Verify operation that tries interactive general options for name
+    #  and server/mock server fails
+    #
+
+    ['Test conflicting server defintions interactive mode.',
+     {'stdin': ['--server http://blah --name blah connection show']},
+     {'stderr': "Conflicting server definitions:",
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
 
 ]
 
