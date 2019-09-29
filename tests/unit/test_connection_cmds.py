@@ -918,7 +918,7 @@ class TestSubcmdClass(CLITestsBase):
                 test_file_existence(exp_response['file']['before'])
 
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition, verbose=False)
 
         if 'file' in exp_response:
             if 'after' in exp_response['file']:
