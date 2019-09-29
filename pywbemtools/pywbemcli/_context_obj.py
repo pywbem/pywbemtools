@@ -147,13 +147,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 self._wbem_server = self._pywbem_server.wbem_server
             return self._pywbem_server.wbem_server
         else:
-            raise click.ClickException('No server defined for command '
-                                       'that requires server. Define a server '
-                                       'with "--server", "--mock-server", or '
-                                       '"--name" general options; or in '
-                                       'interactive mode, use "connection '
-                                       'select" or "connection add" to define '
-                                       'a connection.')
+            raise click.ClickException(
+                'No server specified for a command that requires a WBEM '
+                'server. To specify a server, use the "--server", '
+                '"--mock-server", or "--name" general options, or set the '
+                'corresponding environment variables, or in interactive mode '
+                'use "connection select"')
 
     @property
     def pywbem_server(self):
