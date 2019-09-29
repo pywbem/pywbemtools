@@ -432,7 +432,7 @@ TEST_CASES = [
                  'mock-server:', SIMPLE_MOCK_FILE_PATH,
                  'server:', 'http://localhost'],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify --mock-server invalid name',
@@ -527,7 +527,7 @@ TEST_CASES = [
                  'mock-server:', SIMPLE_MOCK_FILE_PATH,
                  'server:', 'http://blah'],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     #
