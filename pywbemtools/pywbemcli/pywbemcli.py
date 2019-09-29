@@ -326,7 +326,6 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             if local_svr_name:
                 pywbem_server = connections[local_svr_name]
                 # Test for invalid options with the --name option
-                # The following options are part of each PywbemServer object
                 for option in conditional_options:
                     if option[0]:
                         raise click.ClickException(
@@ -334,7 +333,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                             'default name set.' % (option[1], option[0]))
 
             else:
-                # If no server defined, set None. This allows commands that
+                # If no server defined, set None to allow commands that
                 # do not require a server to be executed with no server
                 # defined.
                 pywbem_server = None
@@ -343,37 +342,29 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
     #
     # Process cli options to produce resolved options, i.e. the
     # options with any defaults applied for non None options.
-    #
-
+    # Produces new variables resolved... so that later tests can confirm that
+    # original variables were None or not None
     pywbem_server = None
-
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
-
     resolved_timestats = timestats or DEFAULT_TIMESTATS
-
-    resolved_verify = verify if verify is not None else DEFAULT_VERIFY
-
-    if ca_certs is None:
-        resolved_ca_certs = DEFAULT_CA_CERT_PATHS
-    else:
-        resolved_ca_certs = ca_certs
+    resolved_verify = DEFAULT_VERIFY if verify is None else verify
+    resolved_ca_certs = DEFAULT_CA_CERT_PATHS if ca_certs is None else ca_certs
 
     if server and svr_name:
-        click.echo('The --name option "%s" and --server option "%s" '
-                   'are mutually exclusive and may not be used '
-                   'simultaneously' % (svr_name, server), err=True)
-        raise click.Abort()
+        raise click.ClickException(
+            'The --name option "{0}" and --server option "{1}" are mutually '
+            'exclusive and may not be used simultaneously'.format(svr_name,
+                                                                  server))
 
     if keyfile and not certfile:
-        click.echo('The --keyfile option "%s" is allowed only if the '
-                   '--certfile option is also used' % keyfile, err=True)
-        raise click.Abort()
+        raise click.ClickException(
+            'The --keyfile option "{0}" is allowed only if the --certfile '
+            'option is also used'.format(keyfile))
 
     # process mock_server option
     resolved_mock_server = []
     if mock_server:
         assert isinstance(mock_server, tuple)
-        resolved_mock_server = []
         # resolve relative and absolute paths
         mock_server_path = []
         for fn in mock_server:
@@ -382,20 +373,18 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             else:
                 mock_server_path.append(fn)
 
-        # Abort for non-existent mock files or invalid type
-        # Otherwise these issues not get found until connection
-        # exercised.
+        # Test for non-existent files
+        # TODO: Future: Create common method with code in build_respository
         for file_path in mock_server_path:
             ext = os.path.splitext(file_path)[1]
             if ext not in ['.py', '.mof']:
-                click.echo('Error: --mock-server: File: "%s" '
-                           'extension: "%s" not valid. "py" or "mof" '
-                           'required' % (file_path, ext), err=True)
-                raise click.Abort()
+                raise click.ClickException(
+                    '--mock-server: File: "{0}" extension: "{1}" not valid. '
+                    '"py" or "mof" required'.format(file_path, ext))
             if not os.path.isfile(file_path):
-                click.echo('Error: --mock-server: File: "%s" does '
-                           'not exist' % file_path, err=True)
-                raise click.Abort()
+                raise click.ClickException(
+                    '--mock-server: File: "{0}" does not '
+                    'exist'.format(file_path))
             if ext != '.py':
                 resolved_mock_server.append(file_path)
                 continue
@@ -413,32 +402,30 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                     except Exception as ex:
                         exc_type, exc_value, exc_traceback = \
                             sys.exc_info()
-                        tb = repr(traceback.format_exception(
+                        tb = traceback.format_exception(
                             exc_type,
                             exc_value,
-                            exc_traceback))
-                        raise click.ClickException('Exception failure of '
-                                                   '"--mock-server" python '
-                                                   'script %r. '
-                                                   'Exception: %r\n'
-                                                   'Traceback\n%s' %
-                                                   (file_path, ex, tb))
+                            exc_traceback)
+                        raise click.ClickException(
+                            'Exception failure of "--mock-server" python '
+                            'script {0!r}. Exception: %r\n'
+                            'Traceback\n{1}'.format(file_path, ex, tb))
                 else:  # not processed during startup
                     resolved_mock_server.append(file_path)
-    # The mock-server that leaves something in resolved server
-    # and name simultaneously fail.
-    if server and resolved_mock_server:
-        click.echo('Error: Conflicting server definitions. Do not use '
-                   '--server and --mock-server simultaneously. '
-                   '--server: %s, --mock-server: %s' %
-                   (server, resolved_mock_server), err=True)
-        raise click.Abort()
 
+    # Simultaneous mock_server and server fails
+    if server and resolved_mock_server:
+        raise click.ClickException(
+            'Conflicting server definitions. Do not use --server and '
+            '--mock-server simultaneously. --server: {0}, '
+            '--mock-server: {1}'.format(server, resolved_mock_server))
+
+    # simultaneous mock_server and svr_name fails
     if resolved_mock_server and svr_name:
-        click.echo('The --name "%s" option and --server "%s" option '
-                   'are mutually exclusive and may not be used '
-                   'simultaneously' % (svr_name, mock_server), err=True)
-        raise click.Abort()
+        raise click.ClickException(
+            'The --name "{0}" option and --server "{1}" option are mutually '
+            'exclusive and may not be used simultaneously'.format(svr_name,
+                                                                  mock_server))
 
     if use_pull:
         try:
@@ -461,7 +448,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         # for the connection defined by the cmd line input)
         pywbem_server = create_server_instance(svr_name)
 
-    # Interactive mode cmd line processing
+    # Interactive mode cmd line processing (ctx not Nome)
     # In interactive mode, general options specified in cmd line are used
     # to modify the pywbem_server object and the general options
     # for a single command execution.
