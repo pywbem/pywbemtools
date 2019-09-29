@@ -4,6 +4,11 @@
 Change log
 ==========
 
-This is the initial release of pywbemtools and therefore there is no change log.
 
-The change log will be enabled for future releases.
+pywbemtools 0.5.0
+-----------------
+
+Released: 2019-09-29
+
+This is the initial release of pywbemtools.
+
