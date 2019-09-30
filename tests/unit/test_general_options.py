@@ -33,6 +33,7 @@ SIMPLE_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_mock_model.mof')
 PYTHON_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_python_mock_script.py')
 BAD_MOF_FILE_PATH = os.path.join(SCRIPT_DIR, 'mof_with_error.mof')
 BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
+BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
 
 
 GENERAL_HELP = """
@@ -402,6 +403,21 @@ TEST_CASES = [
       'rc': 1,
       'test': 'regex'},
      None, OK],
+
+    ['Verify -m option, file with python startup file containing syntax error',
+     {'general': ['-m', SIMPLE_MOCK_FILE_PATH],
+      'cmdgrp': 'class',
+      'args': ['enumerate']},
+     {'stderr': ['Mock Python process-at-startup',
+                 'Traceback (most recent call last)',
+                 'pywbemtools', 'pywbemcli.py',
+                 'line ', 'in cli',
+                 'py_err_processatstartup.py',
+                 'def mock?prompt(msg):',
+                 'SyntaxError: invalid syntax'],
+      'rc': 1,
+      'test': 'innows'},
+     BAD_PY_ERR_STRTUP_PATH, OK],
 
     ['Verify -n option with new name but not in repo fails',
      {'general': ['-n', 'fred'],

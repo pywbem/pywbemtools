@@ -22,9 +22,9 @@ from __future__ import absolute_import
 import os
 import sys
 import traceback
+from copy import deepcopy
 import click
 import click_repl
-from copy import deepcopy
 from prompt_toolkit.history import FileHistory
 
 import pywbem
@@ -406,8 +406,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                                                         exc_traceback)
                         raise click.ClickException(
                             "Mock Python process-at-startup script '{}' "
-                            "failed:\n{}" %
-                            (file_path, "\n".join(tb)))
+                            "failed:\n{}".format(file_path, "\n".join(tb)))
                 else:  # not processed during startup
                     resolved_mock_server.append(file_path)
 
