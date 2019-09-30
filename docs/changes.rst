@@ -18,6 +18,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fix issue with mixed old and new formats on click.echo statement.
+  (See issue #419)
+
 **Enhancements:**
 
 **Known issues:**
