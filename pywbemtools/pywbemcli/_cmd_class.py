@@ -328,11 +328,6 @@ def class_associators(context, classname, **options):
 @class_group.command('find', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
                 required=True)
-@click.option('-n', '--namespace', type=str, multiple=True,
-              required=False, metavar='NAMESPACE',
-              help='Add a namespace to the search scope. '
-                   'May be specified multiple times. '
-                   'Default: Search in all namespaces of the server.')
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by namespace. Default is to sort by classname')
