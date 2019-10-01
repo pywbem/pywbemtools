@@ -26,6 +26,9 @@ Released: not yet
 * Fixed missing Python 3.7 in supported environments shown on Pypi.
   (See issue #416)
 
+* Fixed that the 'class find' command showed the --namespace option twice
+  (see issue #417)
+
 **Enhancements:**
 
 **Known issues:**
