@@ -534,9 +534,9 @@ def instance_query(context, query, **options):
 @instance_group.command('count', options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
+@add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by class name.')
-@add_options(multiple_namespaces_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
