@@ -21,6 +21,9 @@ Released: not yet
 * Fix issue with mixed old and new formats on click.echo statement.
   (See issue #419)
 
+* Fixed missing Python 3.7 in supported environments shown on Pypi.
+  (See issue #416)
+
 **Enhancements:**
 
 **Known issues:**
@@ -36,4 +39,3 @@ pywbemtools 0.5.0
 Released: 2019-09-29
 
 This is the initial release of pywbemtools.
-
