@@ -31,7 +31,7 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
-MOCK_SERVER_MODEL = os.path.join('utils', 'wbemserver_mock.py')
+MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
 #
 # The following list define the help for each command in terms of particular
