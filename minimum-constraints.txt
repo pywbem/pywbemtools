@@ -71,8 +71,7 @@ typing==3.6.1  # from M2Crypto
 # Direct dependencies for develop (must be consistent with dev-requirements.txt)
 
 # Unit test (imports into testcases):
-pytest==3.3.0
-testfixtures==4.3.3
+pytest==4.3.1
 httpretty==0.9.5
 lxml==4.2.4
 requests==2.20.1
@@ -175,4 +174,3 @@ urllib3==1.23
 virtualenv==14.0.0
 wcwidth==0.1.7
 widgetsnbextension==1.2.6
-

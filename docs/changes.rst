@@ -36,6 +36,12 @@ Released: not yet
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
   and ResourceWarning (py3 only), and fixed incorrect make variable for that.
 
+* Test: Removed testfixtures from minimum constraints file, as it is not used.
+
+* Test: Increased minimum version of pytest from 3.3.0 to 4.3.1 because
+  it fixed an issue that surfaced with pywbem minimum package levels
+  on Python 3.7.
+
 **Known issues:**
 
 * See `list of open issues`_.
