@@ -247,13 +247,11 @@ else
 endif
 
 ifeq ($(python_m_version),3)
-  pytest_warnings := --pythonwarnings=default
-  pytest_end2end_warnings_opts := --pythonwarnings=default
-  # TODO: Add "ignore::DeprecationWarning,ignore::PendingDeprecationWarning,ignore::ResourceWarning"
+  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning -W ignore::ResourceWarning
+	pytest_end2end_warning_opts := $(pytest_warning_opts)
 else
-  pytest_warnings := --pythonwarnings=default
-  pytest_end2end_warnings_opts := --pythonwarnings=default
-  # TODO: Add "ignore::DeprecationWarning,ignore::PendingDeprecationWarning"
+  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
+  pytest_end2end_warning_opts := $(pytest_warning_opts)
 endif
 
 # Files to be put into distribution archive.
@@ -619,7 +617,7 @@ safety_$(pymn).done: develop_$(pymn).done Makefile minimum-constraints.txt
 .PHONY: test
 test: develop_$(pymn).done
 	@echo "makefile: Running unit and function tests"
-	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warnings_opts) $(pytest_opts) tests/unit -s
+	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
  	@echo "makefile: Done running tests"
 
 # update the pywbemclicmdshelp.rst if any file that defines click commands changes.
