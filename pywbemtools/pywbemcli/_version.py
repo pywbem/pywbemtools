@@ -23,6 +23,9 @@ The actual package version is deterrmined through pbr package through
 git tag information  and is only referenced here to create the __version__
 variable.
 """
+
+from __future__ import absolute_import, print_function
+
 import sys
 import pbr.version
 

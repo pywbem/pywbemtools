@@ -19,6 +19,7 @@ used in pywbemcli.py and show up in the help output from pywbemcli --help.
 
 NOTE: The --log options are tested in a separate file.
 """
+
 from __future__ import absolute_import, print_function
 
 import os

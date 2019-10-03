@@ -20,11 +20,13 @@ loaded at startup and available through an interactive session.  Functions
 are provided to create, delete, and view existing connections. A set function
 allows setting the current active connection into the repository.
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 import os
 import yaml
 import six
+
 from ._pywbem_server import PywbemServer
 
 if six.PY2:

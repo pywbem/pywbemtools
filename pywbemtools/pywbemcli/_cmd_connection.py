@@ -19,11 +19,13 @@ cmds to list add, delete, show, and test server definitions in the
 connection information.  This also maintains a definition of servers on
 disk which is kept in sync with changes made with the add/delete commands.
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 from copy import deepcopy
 import click
 import six
+
 from pywbem import Error
 
 from .pywbemcli import cli

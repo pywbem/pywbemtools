@@ -18,12 +18,12 @@ Click Command definition for the qualifer command group  which includes
 cmds for get and enumerate for CIM qualifier types.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import six
-
 from asciitree import LeftAligned
 import click
+
 from pywbem.cim_obj import NocaseDict
 
 

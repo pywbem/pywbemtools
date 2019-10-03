@@ -19,10 +19,13 @@ cmds for inspection and management of the objects defined by the pywbem
 server class including namespaces, WBEMServer information, and profile
 information.
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 import click
+
 from pywbem import ValueMapping, Error
+
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, format_table
 

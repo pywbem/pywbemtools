@@ -20,6 +20,8 @@ was called.  If there is a connections file at the start of the test it is
 renamed for the test and restored at the end of the test.
 """
 
+from __future__ import absolute_import, print_function
+
 import os
 import pytest
 

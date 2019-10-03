@@ -24,7 +24,9 @@ everywhere a WBEMConnection possible pull operation is called.
 
 It also adds a method to FakeWBEMConnection to build the repository.
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
+
 import os
 import sys
 import traceback
