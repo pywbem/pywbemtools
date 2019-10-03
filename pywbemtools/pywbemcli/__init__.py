@@ -20,7 +20,7 @@ interface with WBEM Servers. It is written in pure Python and supports Python 2
 and Python 3.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import sys
 

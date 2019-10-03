@@ -17,10 +17,13 @@
 Click Command definition for the class command group which includes
 cmds for get, enumerate, list of classes.
 """
+
 from __future__ import absolute_import, print_function
 
 import click
+
 from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
+
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \

@@ -17,7 +17,8 @@
 Click command definition for the pywbemcli command, the top level command for
 the pywbemcli click tool
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 import os
 import sys

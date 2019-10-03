@@ -15,8 +15,12 @@
 """
 Tests the general log option
 """
+
+from __future__ import absolute_import, print_function
+
 import os
 import pytest
+
 from .cli_test_extensions import CLITestsBase
 
 TEST_DIR = os.path.dirname(__file__)

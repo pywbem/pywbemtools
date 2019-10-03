@@ -22,7 +22,7 @@ It contains data that is set in the top level and used in command calls
 This object is attached to the Click Context in pywbemcli.py
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import click
 import click_spinner

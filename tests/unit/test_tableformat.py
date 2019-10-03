@@ -19,12 +19,12 @@
 """
 Tests for functions in smipyping/_common.py
 """
+
 from __future__ import print_function, absolute_import
 
 import os
 import unittest
 import sys
-
 try:
     from StringIO import StringIO
 except ImportError:

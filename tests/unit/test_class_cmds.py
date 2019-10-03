@@ -15,8 +15,12 @@
 """
 Tests the class command
 """
+
+from __future__ import absolute_import, print_function
+
 import os
 import pytest
+
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
@@ -24,7 +28,6 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE, \
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE
-
 from .utils import execute_pywbemcli, assert_rc
 
 TEST_DIR = os.path.dirname(__file__)

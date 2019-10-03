@@ -18,7 +18,8 @@ Click Command definition for the class command group which includes
 commands for get, enumerate, associators, references, find, etc. of the objects
 CIMClass on a WBEM server
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 import click
 
@@ -31,7 +32,6 @@ from ._common import display_cim_objects, filter_namelist, \
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option
-
 from ._displaytree import display_class_tree
 
 

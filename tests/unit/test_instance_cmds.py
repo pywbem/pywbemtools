@@ -15,10 +15,12 @@
 """
 Tests the commands in the server command group.
 """
+
 from __future__ import absolute_import, print_function
 
 import os
 import pytest
+
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \

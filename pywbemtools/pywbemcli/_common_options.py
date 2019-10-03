@@ -18,7 +18,8 @@ Defines click options that are used for multiple scommands and that have
 the same definition throughout the environment.  This allows the characteristics
 and help to be defined once and used multiple times.
 """
-from __future__ import absolute_import
+
+from __future__ import absolute_import, print_function
 
 import click
 
