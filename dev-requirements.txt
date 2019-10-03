@@ -11,8 +11,9 @@
 
 # Unit test (imports into testcases):
 # pytest 5.0.0 requires Python version 3.5
-pytest>=3.3.0,<5.0.0; python_version <= '3.4'
-pytest>=3.3.0; python_version >= '3.5'
+# pytest 4.3.1 solves an issue on Python 3 with minimum package levels
+pytest>=4.3.1,<5.0.0; python_version < '3.5'
+pytest>=4.3.1; python_version >= '3.5'
 funcsigs>=1.0.2; python_version == '2'
 
 # Note: python-coveralls 2.9.1 has requirement coverage==4.0.3, and therefore
@@ -69,4 +70,3 @@ twine>=1.8.1
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
 # TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
-
