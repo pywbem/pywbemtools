@@ -31,6 +31,11 @@ Released: not yet
 
 **Enhancements:**
 
+**Cleanup:**
+
+* Test: Enabled Python warning suppression for PendingDeprecationWarning
+  and ResourceWarning (py3 only), and fixed incorrect make variable for that.
+
 **Known issues:**
 
 * See `list of open issues`_.
