@@ -27,6 +27,9 @@ Released: not yet
 * Fixed that the 'class find' command showed the --namespace option twice
   (see issue #417)
 
+* Added PyYAML>=5.1 as a prerequisite package for pywbemtools for installation.
+  So far, it was pulled in indirectly via pywbem.
+
 **Enhancements:**
 
 **Cleanup:**
@@ -39,6 +42,10 @@ Released: not yet
 * Test: Increased minimum version of pytest from 3.3.0 to 4.3.1 because
   it fixed an issue that surfaced with pywbem minimum package levels
   on Python 3.7.
+
+* Test: Added missing indirectly referenced prerequisite packages to
+  minimum-constraints.txt, for a defined package level when testing with
+  PACKAGE_LEVEL=minimum.
 
 **Known issues:**
 
