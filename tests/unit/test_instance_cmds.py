@@ -38,11 +38,12 @@ TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
-SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
+MOCK_PROMPT_PICK_RESPONSE_12_FILE = 'mock_prompt_pick_response_12.py'
+
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock.py'
@@ -201,6 +202,48 @@ instance of CIM_Foo {
    InstanceID = "CIM_Foo3";
 };
 
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo30";
+};
+
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo31";
+};
+
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub1";
+   IntegerProp = 4;
+};
+
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub2";
+   IntegerProp = 5;
+};
+
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub3";
+   IntegerProp = 6;
+};
+
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub4";
+   IntegerProp = 7;
+};
+
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub1";
+   IntegerProp = 8;
+};
+
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub2";
+   IntegerProp = 9;
+};
+
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub3";
+   IntegerProp = 10;
+};
 """
 
 GET_INSTANCE_ALL_TYPES = """instance of PyWBEM_AllTypes {
@@ -234,19 +277,6 @@ GET_INSTANCE_ALL_TYPES = """instance of PyWBEM_AllTypes {
 };
 
 """
-
-ENUM_INSTANCE_TABLE_RESP = """Instances: CIM_Foo
-+--------------+---------------+
-| InstanceID   | IntegerProp   |
-+==============+===============+
-| "CIM_Foo1"   | 1             |
-+--------------+---------------+
-| "CIM_Foo2"   | 2             |
-+--------------+---------------+
-| "CIM_Foo3"   |               |
-+--------------+---------------+
-"""
-
 
 ENUM_INSTANCE_GET_TABLE_RESP = """Instances: CIM_Foo
 InstanceID      IntegerProp
@@ -343,30 +373,48 @@ TEST_CASES = [
 
     ['Verify instance command enumerate names CIM_Foo --no',
      ['enumerate', 'CIM_Foo', '--no'],
-     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
-      'test': 'lines'},
+     {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo30"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo31"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"', ],
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate names CIM_Foo --no -s',
      ['enumerate', 'CIM_Foo', '--no', '--summary'],
-     {'stdout': ['3 CIMInstanceName(s) returned'],
+     {'stdout': ['12 CIMInstanceName(s) returned'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate names CIM_Foo --no --namespace',
      ['enumerate', 'CIM_Foo', '--no', '--namespace', 'root/cimv2'],
-     {'stdout': ['', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 '', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"', ],
-      'test': 'lines'},
+     {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo30"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo31"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"', ],
+      'test': 'llinesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate CIM_Foo --include-qualifiers',
      ['enumerate', 'CIM_Foo', '--include-qualifiers'],
      {'stdout': ENUM_INSTANCE_RESP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate CIM_Foo include-qualifiers and '
@@ -404,37 +452,83 @@ TEST_CASES = [
     ['Verify instance command enumerate deep-inheritance CIM_Foo --di',
      ['enumerate', 'CIM_Foo', '--di'],
      {'stdout': ENUM_INSTANCE_RESP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate deep-inheritance CIM_Foo '
      '--deep-inheritance',
      ['enumerate', 'CIM_Foo', '--deep-inheritance'],
      {'stdout': ENUM_INSTANCE_RESP,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo '
      '--di',
      {'args': ['enumerate', 'CIM_Foo', '--di'],
       'general': ['--output-format', 'grid']},
-     {'stdout': ENUM_INSTANCE_TABLE_RESP,
-      'test': 'lines'},
+     {'stdout': """Instances: CIM_Foo
++--------------------+---------------+
+| InstanceID         | IntegerProp   |
++====================+===============+
+| "CIM_Foo1"         | 1             |
++--------------------+---------------+
+| "CIM_Foo2"         | 2             |
++--------------------+---------------+
+| "CIM_Foo3"         |               |
++--------------------+---------------+
+| "CIM_Foo30"        |               |
++--------------------+---------------+
+| "CIM_Foo31"        |               |
++--------------------+---------------+
+| "CIM_Foo_sub1"     | 4             |
++--------------------+---------------+
+| "CIM_Foo_sub2"     | 5             |
++--------------------+---------------+
+| "CIM_Foo_sub3"     | 6             |
++--------------------+---------------+
+| "CIM_Foo_sub4"     | 7             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub1" | 8             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub2" | 9             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub3" | 10            |
++--------------------+---------------+
+""",
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate di CIM_Foo --di -o',
+    ['Verify instance command -o grid enumerate CIM_Foo --di --no',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
       'general': ['--output-format', 'grid']},
      {'stdout': """InstanceNames: CIM_Foo
-+--------+-------------+---------+-----------------------+
-| host   | namespace   | class   | keysbindings          |
-+========+=============+=========+=======================+
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo1" |
-+--------+-------------+---------+-----------------------+
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo2" |
-+--------+-------------+---------+-----------------------+
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo3" |
-+--------+-------------+---------+-----------------------+
++--------+-------------+-----------------+-------------------------------+
+| host   | namespace   | class           | keysbindings                  |
++========+=============+=================+===============================+
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo1"         |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo2"         |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo3"         |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo30"        |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo31"        |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub1"     |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub2"     |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub3"     |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub4"     |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub1" |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub2" |
++--------+-------------+-----------------+-------------------------------+
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub3" |
++--------+-------------+-----------------+-------------------------------+
 """,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -444,12 +538,21 @@ TEST_CASES = [
       'general': ['--output-format', 'txt']},
      {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
                  'root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"',
-                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"'],
-      'test': 'lines'},
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo30"',
+                 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo31"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"',
+                 'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"',
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"'],
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify instance command -o grid enumerate di CIM_Foo -d -o',
+    ['Verify instance command -o txt enumerate CIM_Foo',
      {'args': ['enumerate', 'CIM_Foo'],
       'general': ['--output-format', 'txt']},
      {'stdout': ["CIMInstance(classname='CIM_Foo', "
@@ -463,6 +566,42 @@ TEST_CASES = [
                  "CIMInstance(classname='CIM_Foo', "
                  "path=CIMInstanceName(classname='CIM_Foo', "
                  "keybindings=NocaseDict({'InstanceID': 'CIM_Foo3'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo', "
+                 "path=CIMInstanceName(classname='CIM_Foo', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo30'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo', "
+                 "path=CIMInstanceName(classname='CIM_Foo', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo31'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub1'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub2'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub3'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub4'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub_sub1'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub_sub2'}), "
+                 "namespace='root/cimv2', host=None), ...)",
+                 "CIMInstance(classname='CIM_Foo_sub_sub', "
+                 "path=CIMInstanceName(classname='CIM_Foo_sub_sub', "
+                 "keybindings=NocaseDict({'InstanceID': 'CIM_Foo_sub_sub3'}), "
                  "namespace='root/cimv2', host=None), ...)"],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
@@ -503,13 +642,22 @@ TEST_CASES = [
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
-+--------+-------------+---------+-----------------------+
-| host   | namespace   | class   | keysbindings          |
-|--------+-------------+---------+-----------------------|
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo1" |
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo2" |
-|        | root/cimv2  | CIM_Foo | InstanceID="CIM_Foo3" |
-+--------+-------------+---------+-----------------------+
++--------+-------------+-----------------+-------------------------------+
+| host   | namespace   | class           | keysbindings                  |
+|--------+-------------+-----------------+-------------------------------|
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo1"         |
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo2"         |
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo3"         |
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo30"        |
+|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo31"        |
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub1"     |
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub2"     |
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub3"     |
+|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub4"     |
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub1" |
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub2" |
+|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub3" |
++--------+-------------+-----------------+-------------------------------+
 
 """,
       'rc': 0,
@@ -523,7 +671,7 @@ TEST_CASES = [
 +---------+-------------+
 |   Count | CIM Type    |
 |---------+-------------|
-|       3 | CIMInstance |
+|      12 | CIMInstance |
 +---------+-------------+
 """,
       'rc': 0,
@@ -876,11 +1024,10 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify create, get, delete work with stdin',
-     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
-                'instance get CIM_Foo.?',
+    ['Verify get with prompt, delete works with prompt using stdin',
+     {'stdin': ['instance get CIM_Foo.?',
                 'instance delete CIM_Foo.?']},
-     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp= NULL'],
+     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'InstanceID = "CIM_Foo30"'],
       'rc': 0,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_3_FILE], OK],
@@ -890,7 +1037,7 @@ Instances: PyWBEM_AllTypes
                 'instance enumerate CIM_Foo -s',
                 'instance create CIM_Foo -p InstanceID=blah2',
                 'instance enumerate CIM_Foo -s']},
-     {'stdout': ['4 CIMInstance', '5 CIMInstance'],
+     {'stdout': ['13 CIMInstance', '14 CIMInstance'],
       'rc': 0,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
@@ -910,7 +1057,6 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, FAIL],
 
-    # TODO This sequence locks up pywbemcli
     ['Verify create, get, delete works with stdin, scnd delete fails',
      {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
                 'instance get CIM_Foo.?',
@@ -920,7 +1066,7 @@ Instances: PyWBEM_AllTypes
                  'CIM_ERR_NOT_FOUND'],
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_3_FILE], FAIL],
+     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_12_FILE], FAIL],
 
     ['Verify instance command create, new instance of all_types '
      'with scalar types',
@@ -1101,10 +1247,10 @@ Instances: PyWBEM_AllTypes
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'InstanceID=9'],
      {'stderr': 'Error: Server Error modifying instance. Exception: CIMError:'
-                " 4 (CIM_ERR_INVALID_PARAMETER): Property 'InstanceID' in "
-                "ModifiedInstance not in class 'PyWBEM_AllTypes'",
+                " 4 (CIM_ERR_INVALID_PARAMETER): ModifyInstance cannot modify "
+                "key property 'InstanceId'",
       'rc': 1,
-      'test': 'lines'},
+      'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, single property, Type Error uint32. '
@@ -1593,13 +1739,14 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command count CIM_* simple model, Rtn tbl of instances',
      {'args': ['count', 'CIM_*'],
       'general': ['--default-namespace', 'interop']},
-     {'stdout': """Count of instances per class
-+-------------+---------+---------+
-| Namespace   | Class   |   count |
-|-------------+---------+---------|
-| interop     | CIM_Foo |       3 |
-+-------------+---------+---------+
-""",
+     {'stdout': ['Count of instances per class',
+                 '+-------------+-----------------+---------+',
+                 '| Namespace   | Class           |   count |',
+                 '|-------------+-----------------+---------|',
+                 '| interop     | CIM_Foo         |       5 |',
+                 '| interop     | CIM_Foo_sub     |       4 |',
+                 '| interop     | CIM_Foo_sub_sub |       3 |',
+                 '+-------------+-----------------+---------+'],
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1618,7 +1765,7 @@ Instances: PyWBEM_AllTypes
 """,
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE_EXT, OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command count CIM_*. Rtn table of inst counts',
      {'args': ['count', 'CIM_*'],
@@ -1634,7 +1781,7 @@ Instances: PyWBEM_AllTypes
 """,
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE_EXT, OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command count mock assoc. Return table of instances',
      {'args': ['count', '*'],

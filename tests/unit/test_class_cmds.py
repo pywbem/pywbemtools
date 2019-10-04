@@ -35,7 +35,6 @@ TEST_DIR = os.path.dirname(__file__)
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
-SIMPLE_MOCK_FILE_EXT = 'simple_mock_model_ext.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 
@@ -871,13 +870,13 @@ TEST_CASES = [
      ['delete', 'CIM_Foo_sub_sub', '--force'],
      {'stdout': 'CIM_Foo_sub_sub delete successful',
       'test': 'in'},
-     [SIMPLE_MOCK_FILE_EXT], OK],
+     [SIMPLE_MOCK_FILE], OK],
 
     ['Verify class command delete fail instances exist',
      ['delete', 'CIM_Foo_sub_sub'],
-     {'stdout': 'CIM_Foo_sub_sub delete successful',
-      'rc': 0,
-      'test': 'in'},
+     {'stderr': 'Delete rejected; instances exist',
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     # Class delete errors
@@ -916,7 +915,7 @@ TEST_CASES = [
      {'stderr': 'Delete rejected; instances exist',
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE_EXT], OK],
+     [SIMPLE_MOCK_FILE], OK],
 
     #
     # command "class tree"

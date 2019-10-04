@@ -246,8 +246,8 @@ class WbemServerMock(object):
                                  namespace=namespace,
                                  LocalOnly=False,
                                  IncludeQualifiers=True,
-                                 include_class_origin=True,
-                                 property_list=property_list)
+                                 IncludeClassOrigin=True,
+                                 PropertyList=property_list)
 
         return CIMInstance.from_class(
             cls, namespace=namespace,
