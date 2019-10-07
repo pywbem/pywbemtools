@@ -973,7 +973,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command create, new instance already exists',
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance'],
-     {'stderr': ['Error: CIMClass: "PyWBEM_AllTypes" does not exist in ',
+     {'stderr': ['CIMClass: "PyWBEM_AllTypes" does not exist in ',
                  'namespace "root/cimv2" in WEB server: FakedWBEMConnection'],
       'rc': 1,
       'test': 'regex'},
@@ -982,15 +982,15 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command create, new instance invalid ns',
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=test_instance', '-n',
       'blah'],
-     {'stderr': ["Error: Exception 3", "CIM_ERR_INVALID_NAMESPACE"],
+     {'stderr': ['CIMError', '3', 'CIM_ERR_INVALID_NAMESPACE'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
 
     ['Verify instance command create, new instance invalid class',
      ['create', 'CIM_blah', '-p', 'InstanceID=test_instance'],
-     {'stderr': ["Error:", "CIMClass"],
+     {'stderr': ["CIMClass"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],

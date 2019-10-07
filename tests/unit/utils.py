@@ -93,7 +93,7 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     if verbose:
         display_envvars = '\n'.join(
             [var for var in os.environ if 'PYWBCLI' in var])
-        print('OS_ENVIRON %s' % display_envvars)
+        print('OS_ENVIRON {}'.format(display_envvars))
 
     assert isinstance(args, (list, tuple))
     cmd_args = [cli_cmd]
@@ -103,13 +103,13 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         cmd_args.append(arg)
 
     if verbose:
-        print("\nexecute_pywbemcli CMD_ARGS %s" % cmd_args)
+        print('\nexecute_pywbemcli CMD_ARGS {}'.format(cmd_args))
 
     if stdin and six.PY3:
         stdin = stdin.encode('utf-8')
 
     if verbose and stdin:
-        print('stdin %s' % stdin)
+        print('stdin {}'.format(stdin))
 
     # The click package on Windows writes NL at the Python level
     # as '\r\r\n' at the level of the shell under some cases. This is
@@ -134,9 +134,8 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         del os.environ[name]
 
     if verbose:
-        print('output type %s\nstdout:%r\nstderr:%r' % (type(stdout_str),
-                                                        stdout_str,
-                                                        stderr_str))
+        print('output type {}\nstdout:{!r}\nstderr:{!r}'
+              .format(type(stdout_str), stdout_str, stderr_str))
 
     if isinstance(stdout_str, six.binary_type):
         stdout_str = stdout_str.decode('utf-8')

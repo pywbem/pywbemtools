@@ -417,9 +417,6 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
-      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
-                                 specified multiple times. Default: Search in all
-                                 namespaces of the server.
       -s, --sort                 Sort by namespace. Default is to sort by
                                  classname
       -h, --help                 Show this message and exit.
@@ -1124,11 +1121,11 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       enumerates all instance names for all classes in all namespaces.
 
     Options:
-      -s, --sort                 Sort by instance count. Otherwise sorted by class
-                                 name.
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
+      -s, --sort                 Sort by instance count. Otherwise sorted by class
+                                 name.
       -h, --help                 Show this message and exit.
 
 

@@ -28,7 +28,7 @@ from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
-    format_table, process_invokemethod
+    format_table, process_invokemethod, raise_pywbem_error_exception
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option
@@ -433,7 +433,7 @@ def cmd_class_get(context, classname, options):
         display_cim_objects(context, result_class,
                             output_format=context.output_format)
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_invokemethod(context, classname, methodname, options):
@@ -442,8 +442,8 @@ def cmd_class_invokemethod(context, classname, methodname, options):
     """
     try:
         process_invokemethod(context, classname, methodname, options)
-    except Exception as ex:
-        raise click.ClickException("%s: %s" % (ex.__class__.__name__, ex))
+    except Error as er:
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_enumerate(context, classname, options):
@@ -470,7 +470,7 @@ def cmd_class_enumerate(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_references(context, classname, options):
@@ -500,7 +500,7 @@ def cmd_class_references(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_associators(context, classname, options):
@@ -534,7 +534,7 @@ def cmd_class_associators(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_find(context, classname_glob, options):
@@ -552,7 +552,7 @@ def cmd_class_find(context, classname_glob, options):
         except CIMError as ce:
             # allow processing to continue if no interop namespace
             if ce.status_code == CIM_ERR_NOT_FOUND:
-                click.echo('WARNING: %s' % ce)
+                click.echo('WARNING: {}'.format(ce))
                 ns_names = [context.conn.default_namespace]
 
     try:
@@ -573,18 +573,19 @@ def cmd_class_find(context, classname_glob, options):
         context.spinner.stop()
         if context.output_format in TABLE_FORMATS:
             headers = ['Namespace', 'Classname']
-            click.echo(format_table(rows, headers,
-                                    title='Find class %s' % classname_glob,
-                                    table_format=context.output_format))
+            click.echo(
+                format_table(rows, headers,
+                             title='Find class {}'.format(classname_glob),
+                             table_format=context.output_format))
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
             context.spinner.stop()
             for row in rows:
-                click.echo('  %s:%s' % (row[0], row[1]))
+                click.echo('  {}:{}'.format(row[0], row[1]))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_class_tree(context, classname, options):
@@ -620,7 +621,7 @@ def cmd_class_tree(context, classname, options):
                 namespace=options['namespace'],
                 DeepInheritance=True)
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
     # display the list of classes as a tree. The classname is the top
     # of the tree.
@@ -653,6 +654,6 @@ def cmd_class_delete(context, classname, options):
 
     try:
         context.conn.DeleteClass(classname)
-        click.echo('%s delete successful' % classname)
+        click.echo('{} delete successful'.format(classname))
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)

@@ -92,15 +92,16 @@ class BaseTableTests(unittest.TestCase):
         actual_lines = actual.split(os.linesep)
         expected_lines = expected.split(os.linesep)
         if len(actual_lines) != len(expected_lines):
-            print('Different number of lines actual %s, expected %s' %
-                  (len(actual_lines), len(expected_lines)))
+            print('Different number of lines actual {}, expected {}'
+                  .format(len(actual_lines), len(expected_lines)))
         line = 0
         for line_a, line_e in zip(actual_lines, expected_lines):
             if line_a != line_e:
-                print('Line %s: Difference\n%s\n%s' % (line, line_a, line_e))
+                print('Line {}: Difference\n{}\n{}'.format(line, line_a,
+                                                           line_e))
                 if len(line_a) != len(line_e):
-                    print('Different lengths act %s exp %s' % (len(line_a),
-                                                               len(line_e)))
+                    print('Different lengths act {} exp {}'.format(len(line_a),
+                                                                   len(line_e)))
             line += 1
 
 
@@ -133,7 +134,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_tpsql_table_hdr(self):
         """Test a table output_format table with header"""
@@ -161,7 +163,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_html_table_hdr(self):
         """Test a table output_format table with header"""
@@ -199,7 +202,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_simple_hdr(self):
         """Test a simple table with header"""
@@ -225,7 +229,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_simple_hdr_sort1(self):
         """Test a simple table with header and the sort option"""
@@ -252,7 +257,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_simple_hdr_sort2(self):
         """Test a simple table with header and the sort option"""
@@ -279,7 +285,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_simple_hdr_sort3(self):
         """Test a simple table with header and the sort option"""
@@ -306,7 +313,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_simple_no_hdr(self):
         """Test print a simple table no header"""
@@ -331,7 +339,8 @@ class FormatTableTests(BaseTableTests):
         self.compare_results(actual, expected)
 
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_plain_hdr(self):
         """Test a none table borders with header"""
@@ -357,7 +366,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_grid(self):
         """Test printing a plain table with borders and header"""
@@ -389,7 +399,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_table_rst_hdr(self):
         """Test a none table borders with header"""
@@ -418,7 +429,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_folded_cell_plain(self):
         """Test building a folded cell table plain with header"""
@@ -438,7 +450,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_folded_cell_simple(self):
         """Test a folded cell table simplewith header"""
@@ -465,7 +478,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
     def test_folded_cell_grid(self):
         """Test a folded cell table with header"""
@@ -489,7 +503,8 @@ class FormatTableTests(BaseTableTests):
 
         self.compare_results(actual, expected)
         self.assertEqual(actual, expected,
-                         'Actual:\n%s\nExpected:\n%s\n' % (actual, expected))
+                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
+                                                               expected))
 
 
 if __name__ == '__main__':

@@ -58,8 +58,8 @@ def _validate_server(server):
         url = server
 
     elif re.match(r"^[a-zA-Z0-9]+://", server) is not None:
-        raise click.ClickException('Invalid scheme on server argument. %s'
-                                   ' Use "http" or "https"' % server)
+        raise click.ClickException('Invalid scheme on server argument. {}'
+                                   ' Use "http" or "https"'.format(server))
     else:
         url = "{scheme}://{host}".format(
             scheme=DEFAULT_URL_SCHEME,
@@ -114,8 +114,8 @@ class PywbemServer(object):
 
         if server and mock_server:
             raise ValueError('Simultaneous "--server" and '
-                             '"--mock-server" not allowed. Server: %s, '
-                             'mock_server %s' % (server, mock_server))
+                             '"--mock-server" not allowed. Server: {}, '
+                             'mock_server {}'.format(server, mock_server))
         self.server = server
         self.mock_server = mock_server
         self.name = name
@@ -132,17 +132,17 @@ class PywbemServer(object):
         self._wbem_server = None
 
     def __str__(self):
-        return 'PywbemServer(url=%s name=%s)' % (self.server, self.name)
+        return 'PywbemServer(url={} name={})'.format(self.server, self.name)
 
     def __repr__(self):
-        return 'PywbemServer(server=%s name=%s ns=%s user=%s ' \
-               'password=%s timeout=%s verify=%s certfile=%s ' \
-               'keyfile=%s ca_certs=%s  ' \
-               'mock_server=%r wbem_server %r)' % \
-               (self.server, self.name, self.default_namespace,
-                self.user, self.password, self.timeout, self.verify,
-                self.certfile, self.keyfile, self.ca_certs, self.mock_server,
-                self.wbem_server)
+        return 'PywbemServer(server={} name={} ns={} user={} ' \
+               'password={} timeout={} verify={} certfile={} ' \
+               'keyfile={} ca_certs={}  ' \
+               'mock_server={!r} wbem_server {!r})' \
+               .format(self.server, self.name, self.default_namespace,
+                       self.user, self.password, self.timeout, self.verify,
+                       self.certfile, self.keyfile, self.ca_certs,
+                       self.mock_server, self.wbem_server)
 
     @property
     def server(self):
@@ -248,8 +248,8 @@ class PywbemServer(object):
         if timeout is None:   # disallow None
             ValueError('Timout of None not allowed')
         if timeout < 0 or timeout > MAX_TIMEOUT:
-            ValueError('Timeout option(%s) out of range %s to %s sec' %
-                       (timeout, 0, MAX_TIMEOUT))
+            ValueError('Timeout option({}) out of range {} to {} sec'
+                       .format(timeout, 0, MAX_TIMEOUT))
         # pylint: disable=attribute-defined-outside-init
         self._timeout = timeout
 
@@ -473,4 +473,4 @@ class PywbemServer(object):
                                               connection=conn, propagate=True)
             except ValueError as ve:
                 raise click.ClickException('Logger configuration error. input: '
-                                           '%s. Exception: %s' % (log, ve))
+                                           '{}. Exception: {}'.format(log, ve))

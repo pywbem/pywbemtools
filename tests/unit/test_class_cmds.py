@@ -883,18 +883,18 @@ TEST_CASES = [
     # Class delete errors
     ['Verify class command delete no classname',
      ['delete'],
-     {'stderr': 'Error: Missing argument "CLASSNAME"',
+     {'stderr': 'Missing argument "CLASSNAME"',
       'rc': 2,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     # class delete error tests
 
     ['Verify class command delete fail subclasses exist',
      ['delete', 'CIM_Foo', '--force'],
-     {'stderr': 'Error: Delete rejected; subclasses exist',
+     {'stderr': 'Delete rejected; subclasses exist',
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete no classname fails',
@@ -913,9 +913,9 @@ TEST_CASES = [
 
     ['Verify class command delete fails, instances exist',
      ['delete', 'CIM_Foo_sub_sub'],
-     {'stderr': 'Error: Delete rejected; instances exist',
+     {'stderr': 'Delete rejected; instances exist',
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE_EXT], OK],
 
     #
@@ -1248,7 +1248,7 @@ TEST_CASES = [
     #
     #  class invokemethod command without parameters
     #
-    ['Verify class command invokemethod',
+    ['Verify class command invokemethod. Class CIM_Foo, method Fuzzy',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
      {'stdout': ["ReturnValue=0"],
       'rc': 0,
@@ -1265,22 +1265,21 @@ TEST_CASES = [
 
     ['Verify class command invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
-     {'stderr': ["Error: CIMError: 6"],
+     {'stderr': ['CIMError', '6'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class command invokemethod fails Invalid Method',
      ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
-     {'stderr': ["Error: ClickException: .* CIM_Foo .* Fuzzyx"],
+     {'stderr': ['Class CIM_Foo does not have a method Fuzzyx'],
       'rc': 1,
-      'test': 'regex'},
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
-
 
     ['Verify class command invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stderr': ["CIMError: 17"],
+     {'stderr': ['CIMError', '17'],
       'rc': 1,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],

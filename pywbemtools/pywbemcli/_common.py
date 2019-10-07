@@ -107,8 +107,8 @@ def resolve_propertylist(propertylist):
 
 
 def warning_msg(msg):
-    """Issue the msg param as warning prefixed by WARNING:"""
-    click.echo('WARNING: %s' % msg)
+    """Issue the msg param as warning prefixed by WARNING: to stderr"""
+    click.echo('WARNING: {}'.format(msg), err=True)
 
 
 def pick_one_from_list(context, options, title):
@@ -140,10 +140,10 @@ def pick_one_from_list(context, options, title):
     index = -1
     for str_ in options:
         index += 1
-        click.echo('%s: %s' % (index, str_))
+        click.echo('{}: {}'.format(index, str_))
     selection = None
-    msg = 'Input integer between 0 and %s or Ctrl-C to exit selection: ' \
-        % index
+    msg = 'Input integer between 0 and {} or Ctrl-C to exit selection: ' \
+        .format(index)
     while True:
         try:
             selection_txt = click.prompt(msg)
@@ -158,8 +158,8 @@ def pick_one_from_list(context, options, title):
             raise click.ClickException("Pick Aborted. CTRL-C")
         except Exception as ex:
             raise click.ClickException(
-                'Selection exception: %s. Command Aborted' % ex)
-        click.echo('"%s" Invalid response %s' % (selection_txt, msg))
+                'Selection exception: {} Command Aborted'.format(ex))
+        click.echo('"{}" Invalid response {}'.format(selection_txt, msg))
 
 
 def pick_instance(context, objectname, namespace=None):
@@ -180,19 +180,19 @@ def pick_instance(context, objectname, namespace=None):
         ClickException if user choses to terminate the selection process
     """
     if not is_classname(objectname):
-        raise click.ClickException('%s must be a classname' % objectname)
+        raise click.ClickException('{} must be a classname'.format(objectname))
     instance_names = context.conn.PyWbemcliEnumerateInstancePaths(objectname,
                                                                   namespace)
 
     if not instance_names:
-        click.echo('No instance paths found for %s' % objectname)
+        click.echo('No instance paths found for {}'.format(objectname))
         return None
 
     try:
         return pick_one_from_list(context, instance_names,
                                   'Pick Instance name to process')
     except Exception as ex:
-        raise click.ClickException('Command Aborted. Exception %s' % ex)
+        raise click.ClickException('Command Aborted. Exception {}'.format(ex))
 
 
 def pick_multiple_from_list(context, options, title):
@@ -228,7 +228,7 @@ def pick_multiple_from_list(context, options, title):
     index = -1
     for str_ in options:
         index += 1
-        click.echo('%s: %s' % (index, str_))
+        click.echo('{}: {}'.format(index, str_))
     selection = None
     selection_list = []
     msg = 'Select entry by index or hit enter to end selection>'
@@ -248,8 +248,8 @@ def pick_multiple_from_list(context, options, title):
             pass
         except KeyboardInterrupt:
             raise ValueError
-        click.echo('%s Invalid. Input integer between 0 and %s hit enter to '
-                   'stop selection.' % (selection, index))
+        click.echo('{} Invalid. Input integer between 0 and {}; hit enter to '
+                   'stop selection.'.format(selection, index))
 
 
 def is_classname(str_):
@@ -301,9 +301,8 @@ def filter_namelist(pattern, name_list, ignore_case=True):
         compiled_regex = re.compile(regex, flags)
 
     except Exception as ex:
-        raise click.ClickException('Regex compile error. '
-                                   'Regex=%s. Er: %s: %s' %
-                                   (regex, ex.__class__.__name__, ex))
+        raise click.ClickException('Regex compile error. Regex={}. Er: {}: {}'
+                                   .format(regex, ex.__class__.__name__, ex))
 
     new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
 
@@ -354,22 +353,23 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
     # without the : before the classname
     if wbemuri_str and wbemuri_str[0] != ":":
         if re.match(r"^[a-zA-Z0-9_]+\.", wbemuri_str):
-            wbemuri_str = ':%s' % wbemuri_str
+            wbemuri_str = ':{}'.format(wbemuri_str)
 
     try:
         instance_name = CIMInstanceName.from_wbem_uri(wbemuri_str)
         if instance_name.namespace and namespace:
             if instance_name.namespace != namespace:
                 raise click.ClickException('Conflicting namespaces between '
-                                           'wbemuri %s and option %s' %
-                                           (instance_name.namespace, namespace))
+                                           'wbemuri {} and option {}'
+                                           .format(instance_name.namespace,
+                                                   namespace))
         elif instance_name.namespace is None and namespace:
             instance_name.namespace = namespace
 
         return instance_name
     except ValueError as ve:
-        raise click.ClickException('Invalid wbem uri input %s. Error %s' %
-                                   (wbemuri_str, ve))
+        raise click.ClickException('Invalid wbem uri input {}. Error {}'
+                                   .format(wbemuri_str, ve))
 
 
 def create_cimvalue(cim_type, value_str, is_array):
@@ -410,7 +410,7 @@ def create_cimvalue(cim_type, value_str, is_array):
                 return True
             if value.lower() == 'false':
                 return False
-        raise ValueError('Invalid boolean value: "%s"' % value)
+        raise ValueError('Invalid boolean value: "{}"'.format(value))
 
     cim_value = None
 
@@ -485,8 +485,8 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
         try:
             cl_prop = cim_class.properties[name]
         except KeyError:
-            raise click.ClickException('Property name "%s" not in class "%s".'
-                                       % (name, cim_class.classname))
+            raise click.ClickException('Property name "{}" not in class "{}".'
+                                       .format(name, cim_class.classname))
 
         try:
             properties[name] = create_cimproperty(cl_prop.type,
@@ -494,11 +494,12 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
                                                   name,
                                                   value_str)
         except ValueError as ex:
-            raise click.ClickException("Type mismatch property '%s' between "
-                                       "expected type='%s', array=%s and input "
-                                       "value='%s'. Exception: %s" %
-                                       (name, cl_prop.type, cl_prop.is_array,
-                                        value_str, ex))
+            raise click.ClickException("Type mismatch property '{}' between "
+                                       "expected type='{}', array={} and input "
+                                       "value='{}'. Exception: {}"
+                                       .format(name, cl_prop.type,
+                                               cl_prop.is_array,
+                                               value_str, ex))
 
     new_inst = CIMInstance(cim_class.classname,
                            properties=properties,
@@ -513,8 +514,8 @@ def compare_obj(obj1, obj2, msg):
     match or False if different
     """
     if obj1 != obj2:
-        click.echo('Obj Compare %s: compare mismatch:\n%r\n%r' %
-                   (msg, obj1, obj2))
+        click.echo('Obj Compare {}: compare mismatch:\n{!r}\n{!r}'
+                   .format(msg, obj1, obj2))
         return False
     return True
 
@@ -534,15 +535,15 @@ def compare_instances(inst1, inst2):
         if inst1.properties == inst2.properties:
             return True
         if len(inst1.properties) != len(inst2.properties):
-            click.echo('Different number of properties %s vs %s\n%s\n%s' %
-                       (len(inst1.properties), len(inst2.properties),
-                        inst1.keys(), inst2.keys()))
+            click.echo('Different number of properties {} vs {}\n{}\n{}'
+                       .format(len(inst1.properties), len(inst2.properties),
+                               inst1.keys(), inst2.keys()))
             return False
         keys1 = set(inst1.keys())
         keys2 = set(inst2.keys())
         if keys1 != keys2:
             diff = keys1.symmetric_difference(keys2)
-            click.echo('Property Name differences %s' % diff)
+            click.echo('Property Name differences {}'.format(diff))
             return False
 
         for n1, v1 in six.iteritems(inst1):
@@ -694,8 +695,8 @@ def process_invokemethod(context, objectname, methodname, options):
     cim_methods = cim_class.methods
     if methodname not in cim_methods:
         raise click.ClickException(
-            "Class {} does not have a method {}".
-            format(classname, methodname))
+            "Class {} does not have a method {}"
+            .format(classname, methodname))
     cim_method = cim_methods[methodname]
 
     params = create_params(classname, cim_method, options['parameter'])
@@ -703,7 +704,7 @@ def process_invokemethod(context, objectname, methodname, options):
     rtn = context.conn.InvokeMethod(methodname, objectname, params)
 
     # Output results, both ReturnValue and all output parameters
-    click.echo("ReturnValue=%s" % rtn[0])
+    click.echo('ReturnValue={}'.format(rtn[0]))
 
     if rtn[1]:
         cl_params = cim_method.parameters
@@ -712,7 +713,7 @@ def process_invokemethod(context, objectname, methodname, options):
             ptype = cl_params[pname].type if pname in cl_params else None
             val = _value_tomof(pvalue, ptype, maxline=DEFAULT_MAX_CELL_WIDTH,
                                avoid_splits=False)
-            click.echo("%s=%s" % (pname, val[0]))
+            click.echo('{}={}'.format(pname, val[0]))
 
 
 def sort_cimobjects(cim_objects):
@@ -750,7 +751,7 @@ def sort_cimobjects(cim_objects):
         sort_dict = {tup[0].to_wbem_uri(format="canonical"): tup for tup in
                      cim_objects}
     else:
-        raise TypeError('%s cannot be sorted' % type(cim_objects[0]))
+        raise TypeError('{} cannot be sorted'.format(type(cim_objects[0])))
 
     return [sort_dict[key] for key in sorted(sort_dict.keys())]
 
@@ -771,10 +772,11 @@ def display_cim_objects_summary(context, objects):
         if output_format_is_table(output_format):
             rows = [[len(objects), cim_type]]
             click.echo(format_table(rows, ['Count', 'CIM Type'],
-                                    title='Summary of %s returned' % cim_type,
+                                    title='Summary of {} returned'
+                                    .format(cim_type),
                                     table_format=output_format))
             return
-        click.echo('%s %s(s) returned' % (len(objects), cim_type))
+        click.echo('{} {}(s) returned'.format(len(objects), cim_type))
     else:
         click.echo('0 objects returned')
 
@@ -860,32 +862,35 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
             elif isinstance(object_, (CIMClassName, six.string_types)):
                 click.echo(object_)
             else:
-                raise click.ClickException('output_format %s invalid for %s '
-                                           % (output_format, type(object_)))
+                raise click.ClickException('output_format {} invalid for {} '
+                                           .format(output_format,
+                                                   type(object_)))
     elif output_format == 'xml':
         try:
             click.echo(object_.tocimxmlstr(indent=4))
         except AttributeError:
             # no tocimxmlstr functionality
-            raise click.ClickException('Output Format %s not supported. '
-                                       'Default to\n%r' %
-                                       (output_format, object_))
+            raise click.ClickException('Output Format {} not supported. '
+                                       'Default to\n{!r}'
+                                       .format(output_format, object_))
     elif output_format == 'repr':
         try:
             click.echo(repr(object_))
         except AttributeError:
-            raise click.ClickException('"repr" display of %r failed' % object_)
+            raise click.ClickException('"repr" display of {!r} failed'
+                                       .format(object_))
 
     elif output_format == 'txt':
         try:
             click.echo(object_)
         except AttributeError:
-            raise click.ClickException('"txt" display of %r failed' % object_)
+            raise click.ClickException('"txt" display of {!r} failed'
+                                       .format(object_))
     # elif output_format == 'tree':
     #    raise click.ClickException('Tree output format not allowed')
     else:
-        raise click.ClickException('Invalid output format %s' %
-                                   output_format)
+        raise click.ClickException('Invalid output format {}'
+                                   .format(output_format))
 
 
 #######################################################################
@@ -936,10 +941,10 @@ def format_keys(obj, max_width):
             one_key_obj = get_wbemurikeys((CIMInstanceName('x', {key: value})))
             if wbem_uri_keys:
                 if line_len + len(one_key_obj) > max_width:
-                    wbem_uri_keys += '\n%s' % one_key_obj
+                    wbem_uri_keys += '\n{}'.format(one_key_obj)
                     line_len = 0
                 else:
-                    wbem_uri_keys += ',%s' % one_key_obj
+                    wbem_uri_keys += ',{}'.format(one_key_obj)
                     line_len += len(one_key_obj) + 1
 
             else:  # must put on first line even if too long
@@ -966,7 +971,7 @@ def _print_paths_as_table(objects, table_width, table_format):
             headers = ('host', 'namespace', 'class')
             rows = [[obj.host, obj.namespace, obj.classname] for obj in objects]
         elif isinstance(objects[0], CIMInstanceName):
-            title = 'InstanceNames: %s' % objects[0].classname
+            title = 'InstanceNames: {}'.format(objects[0].classname)
             host_hdr = 'host'
             ns_hdr = 'namespace'
             class_hdr = 'class'
@@ -1060,8 +1065,8 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
     for inst in insts:
         if not isinstance(inst, CIMInstance):
-            raise ValueError('Only accepts CIMInstance; not type %s' %
-                             type(inst))
+            raise ValueError('Only accepts CIMInstance; not type {}'
+                             .format(type(inst)))
 
         # Insert classname as first col if flag set
         line = [inst.classname] if include_classes else []
@@ -1142,7 +1147,7 @@ def _print_instances_as_table(insts, table_width, table_format,
     rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
                                      include_classes=include_classes)
 
-    title = 'Instances: %s' % insts[0].classname
+    title = 'Instances: {}'.format(insts[0].classname)
     click.echo(format_table(rows, new_header_line, title=title,
                             table_format=table_format))
 
@@ -1171,8 +1176,8 @@ def _print_objects_as_table(context, objects):
                                      six.string_types)):
             _print_paths_as_table(objects, table_width, output_format)
         else:
-            raise click.ClickException("Cannot print %s as table" %
-                                       type(objects[0]))
+            raise click.ClickException("Cannot print {} as table"
+                                       .format(type(objects[0])))
 
 
 def _indent_str(indent):
@@ -1472,12 +1477,13 @@ def format_table(rows, headers, title=None, table_format='simple',
     if table_format == 'table':
         table_format = 'psql'
     if table_format not in TABLE_FORMATS:
-        raise click.ClickException('Invalid table format %s.' % table_format)
+        raise click.ClickException('Invalid table format {}.'
+                                   .format(table_format))
 
     result = tabulate.tabulate(rows, headers, tablefmt=table_format)
     if title:
         if table_format == 'html':
-            result = '<p>%s</p>\n%s' % (title, result)
+            result = '<p>{0}</p>\n{1}'.format(title, result)
         else:
             result = '{0}\n{1}'.format(title, result)
     return result
@@ -1505,3 +1511,12 @@ def fold_string(input_string, max_width):
             new_string = fill(input_string, max_width)
 
     return new_string
+
+
+def raise_pywbem_error_exception(er):
+    """
+    Raise the standard click exception for a pywbem Error exception.  These
+    exceptions do not cause interactive mode failure but display the exception
+    class and its str value and return to the repl mode.
+    """
+    raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))

@@ -28,7 +28,8 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
-    process_invokemethod
+    process_invokemethod, raise_pywbem_error_exception
+
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
     summary_option, verify_option, multiple_namespaces_option
@@ -609,7 +610,7 @@ def get_instancename(context, instancename, options):
         return instancepath
 
     except ValueError as ve:
-        raise click.ClickException("%s: %s" % (ve.__class__.__name__, ve))
+        raise click.ClickException('{}: {}'.format(ve.__class__.__name__, ve))
 
 
 def cmd_instance_get(context, instancename, options):
@@ -638,7 +639,7 @@ def cmd_instance_get(context, instancename, options):
         display_cim_objects(context, instance, context.output_format)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_instance_delete(context, instancename, options):
@@ -656,10 +657,10 @@ def cmd_instance_delete(context, instancename, options):
         context.conn.DeleteInstance(instancepath)
 
         if context.verbose:
-            click.echo('Deleted %s' % instancepath)
+            click.echo('Deleted {}'.format(instancepath))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_instance_create(context, classname, options):
@@ -673,14 +674,14 @@ def cmd_instance_create(context, classname, options):
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             ns = options['namespace'] or context.conn.default_namespace
-            raise click.ClickException('CIMClass: "%s" does not exist in '
-                                       'namespace "%s" in WEB '
-                                       'server: %s.'
-                                       % (classname, ns, context.conn))
+            raise click.ClickException('CIMClass: "{}" does not exist in '
+                                       'namespace "{}" in WEB '
+                                       'server: {}.'.format(classname, ns,
+                                                            context.conn))
+        raise_pywbem_error_exception(ce)
 
-        raise click.ClickException('Exception %s' % ce)
     except Error as er:
-        raise click.ClickException('Exception %s' % er)
+        raise_pywbem_error_exception(er)
 
     properties = options['property']
 
@@ -697,10 +698,10 @@ def cmd_instance_create(context, classname, options):
                                            namespace=options['namespace'])
 
         context.spinner.stop()
-        click.echo("%s" % name)
+        click.echo('{}'.format(name))
     except Error as er:
         raise click.ClickException("Server Error creating instance. Exception: "
-                                   "%s: %s" % (er.__class__.__name__, er))
+                                   '{}: {}'.format(er.__class__.__name__, er))
 
 
 def cmd_instance_modify(context, instancename, options):
@@ -726,14 +727,13 @@ def cmd_instance_modify(context, instancename, options):
             instancepath.classname, LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            raise click.ClickException('CIMClass: %r does not exist in WEB '
-                                       'server: %s'
-                                       % (instancepath.classname,
-                                          context.conn.url))
+            raise click.ClickException(
+                'CIMClass: {!r} does not exist in WEB server: {}'
+                .format(instancepath.classname, context.conn.url))
 
-        raise click.ClickException('Exception %s' % ce)
+        raise_pywbem_error_exception(ce)
     except Error as er:
-        raise click.ClickException('Exception %s' % er)
+        raise_pywbem_error_exception(er)
 
     property_list = resolve_propertylist(options['propertylist'])
 
@@ -753,7 +753,7 @@ def cmd_instance_modify(context, instancename, options):
                                     PropertyList=property_list)
     except Error as er:
         raise click.ClickException("Server Error modifying instance. "
-                                   "Exception: %s: %s" %
+                                   'Exception: {}: {}'.format
                                    (er.__class__.__name__, er))
 
 
@@ -766,8 +766,8 @@ def cmd_instance_invokemethod(context, instancename, methodname,
 
     try:
         process_invokemethod(context, instancepath, methodname, options)
-    except Exception as ex:
-        raise click.ClickException("%s: %s" % (ex.__class__.__name__, ex))
+    except Error as er:
+        raise_pywbem_error_exception(er)
 
 
 def get_filterquerylanguage(options):
@@ -814,15 +814,15 @@ def cmd_instance_enumerate(context, classname, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=True)
 
-    except (Error) as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except Error as er:
+        raise_pywbem_error_exception(er)
     except ValueError as ve:
         raise click.ClickException('instance enumerate failed because '
                                    'FilterQuery not allowed with traditional '
                                    'EnumerateInstance. --use-pull: '
-                                   '%s. Exception: %s: %s' %
-                                   (context.use_pull,
-                                    ve.__class__.__name__, ve))
+                                   '{}. Exception: {}: {}'
+                                   .format(context.use_pull,
+                                           ve.__class__.__name__, ve))
 
 
 def cmd_instance_references(context, instancename, options):
@@ -861,15 +861,15 @@ def cmd_instance_references(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=True)
 
-    except (Error) as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except Error as er:
+        raise_pywbem_error_exception(er)
     except ValueError as ve:
         raise click.ClickException('instance references failed because '
                                    'FilterQuery not allowed with traditional '
                                    'References. --use-pull: '
-                                   '%s. Exception: %s: %s' %
-                                   (context.use_pull,
-                                    ve.__class__.__name__, ve))
+                                   '{}. Exception: {}: {}'
+                                   .format(context.use_pull,
+                                           ve.__class__.__name__, ve))
 
 
 def cmd_instance_associators(context, instancename, options):
@@ -909,15 +909,16 @@ def cmd_instance_associators(context, instancename, options):
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=True)
 
-    except (Error) as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+    except Error as er:
+        raise_pywbem_error_exception(er)
+
     except ValueError as ve:
         raise click.ClickException('instance associators failed because '
                                    'FilterQuery not allowed with traditional '
                                    'Associators. --use-pull: '
-                                   '%s. Exception: %s: %s' %
-                                   (context.use_pull,
-                                    ve.__class__.__name__, ve))
+                                   '{}. Exception: {}: {}'
+                                   .format(context.use_pull,
+                                           ve.__class__.__name__, ve))
 
 
 def cmd_instance_count(context, classname, options):
@@ -936,7 +937,7 @@ def cmd_instance_count(context, classname, options):
         except CIMError as ce:
             # allow processing to continue if no interop namespace
             if ce.status_code == CIM_ERR_NOT_FOUND:
-                click.echo('WARNING: %s' % ce)
+                click.echo('WARNING: {}'.format(ce))
                 ns_names = [context.conn.default_namespace]
 
     ns_cln_tuples = []  # a list of tuples of namespace, classname
@@ -947,7 +948,7 @@ def cmd_instance_count(context, classname, options):
                 DeepInheritance=True,
                 namespace=namespace)
         except Error as er:
-            raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+            raise_pywbem_error_exception(er)
 
         if classnames:
             classlist = filter_namelist(classname, classnames, ignore_case=True)
@@ -969,8 +970,8 @@ def cmd_instance_count(context, classname, options):
         try:
             inst_names = context.conn.EnumerateInstanceNames(cln, namespace=ns)
         except Error as er:
-            click.echo('Server Error %s with %s:%s. Continuing' %
-                       (er, ns, cln), err=True)
+            click.echo('WARNING: Server Error {} with {}:{}. Continuing'
+                       .format(er, ns, cln), err=True)
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
@@ -1013,4 +1014,4 @@ def cmd_instance_query(context, query, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)

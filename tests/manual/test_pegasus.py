@@ -44,9 +44,9 @@ class TestsContainer(ClientTest):
     def execute_cmd(self, cmd_str):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
         if self.verbose:
-            print('cmd %s' % cmd_str)
+            print('cmd {}'.format(cmd_str))
         # Disable python warnings for pywbemcli call.See issue #42
-        command = 'export PYTHONWARNINGS="" && %s' % cmd_str
+        command = 'export PYTHONWARNINGS="" && {}'.format(cmd_str)
         proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
         std_out, std_err = proc.communicate()
         exitcode = proc.returncode
@@ -54,7 +54,7 @@ class TestsContainer(ClientTest):
             std_out = std_out.decode()
             std_err = std_err.decode()
         if self.verbose:
-            print('rtn %s\n%s\n%s' % (std_out, std_err, exitcode))
+            print('rtn {}\n{}\n{}'.format(std_out, std_err, exitcode))
 
         # return tuple of exitcode, stdout, stderr
         return exitcode, std_out, std_err
@@ -69,8 +69,8 @@ class TestsContainer(ClientTest):
         else:
             match = re.search(regex, test_str)
             if match:
-                self.fail('Found in error search regex %s, str %s' %
-                          (regex, test_str))
+                self.fail('Found in error search regex {}, str {}'
+                          .format(regex, test_str))
 
     def assert_found(self, regex, test_str):
         """ Test of find regex on multiline string.
@@ -82,7 +82,8 @@ class TestsContainer(ClientTest):
         else:
             match = re.search(regex, test_str)
             if match is None:
-                self.fail('Failed search regex %s, str %s' % (regex, test_str))
+                self.fail('Failed search regex {}, str {}'
+                          .format(regex, test_str))
 
     def assertRegexp(self, regex, test_str):
         """
@@ -103,7 +104,7 @@ class ClassTests(TestsContainer):
 
     def class_cmd(self, params):
         """Adds the cmd name prefix and executes"""
-        cmd = 'pywbemcli -s %s class %s' % (self.host, params)
+        cmd = 'pywbemcli -s {} class {}'.format(self.host, params)
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
@@ -112,8 +113,8 @@ class ClassTests(TestsContainer):
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement')
 
         self.assertEqual(exitcode, 0)
-        self.assertEqual(err, '', 'Expect no std_err. Found %s' % err)
-        self.assert_found('CIM_ManagedElement', out)
+        self.assertEqual(err, '', 'Expect no std_err. Found {}'.format(err))
+        self.assert_found('CIM_ManagedElement ', out)
 
     def test__get_localonly(self):
         """Test class get --local-only"""
@@ -180,7 +181,7 @@ class InstanceTests(TestsContainer):
 
     def instance_cmd(self, params):
         """Adds the instance cmd name prefix and executes"""
-        cmd = 'pywbemcli -s %s instance %s' % (self.host, params)
+        cmd = 'pywbemcli -s {} instance {}'.format(self.host, params)
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
@@ -263,9 +264,9 @@ class InstanceTests(TestsContainer):
             '--property scalDateTime="19991224120000.000000+360" '
             '--property scalString="A string value" ')
         self.assertEqual(exitcode, 0, 'Expected good response. Rcvd '
-                         ' code %s err %s' % (exitcode, err))
+                         ' exitcode {}, err {}'.format(exitcode, err))
         self.assertEqual(exitcode, 0, 'Create instance of Pywbem_AllTypes '
-                         'failed. exitcode %s, err %s' % (exitcode, err))
+                         'failed. exitcode {}, err {}'.format(exitcode, err))
 
         exitcode, out, err = self.instance_cmd(
             'delete PyWBEM_AllTypes.InstanceId=ScalarTest1')
@@ -279,7 +280,7 @@ class InstanceTests(TestsContainer):
         exitcode, out, err = self.instance_cmd(
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property BlahBool=True,False')
-        print('err %s' % err)
+        print('err {}'.format(err))
         self.assertEqual(exitcode, 1)
 
     def test_references(self):
