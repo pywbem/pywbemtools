@@ -100,7 +100,7 @@ class ConnectionRepository(object):
         #         for key, value in self._pywbemcli_servers.iteritems()]
         items = []
         for key, value in self._pywbemcli_servers.items():
-            items.append("%s: %s" % (key, value))
+            items.append('{}: {}'.format(key, value))
         items_str = ', '.join(items)
         return "{0.__class__.__name__}({{{1}}}, default_connection {2})]". \
             format(self, items_str, self.default_connection_name)
@@ -255,7 +255,7 @@ class ConnectionRepository(object):
 
             # Write to tmpfile and if successful create backup file and
             # move the tmpfile to be the new connections file contents.
-            tmpfile = "%s.tmp" % self._connections_file
+            tmpfile = '{}.tmp'.format(self._connections_file)
 
             with self.open_file(tmpfile, 'w') as _fp:
                 data = yaml.safe_dump(yaml_dict,
@@ -269,7 +269,7 @@ class ConnectionRepository(object):
 
         # create bak file and then rename tmp file
         if os.path.isfile(self._connections_file):
-            bakfile = "%s.bak" % self._connections_file
+            bakfile = '{}.bak'.format(self._connections_file)
             if os.path.isfile(bakfile):
                 os.remove(bakfile)
             if os.path.isfile(self._connections_file):
@@ -291,8 +291,10 @@ class ConnectionRepository(object):
             self._write_file()
 
         else:
-            raise ValueError('Connection name "%s" does not exist in set of '
-                             'connections' % connection_name)
+            # TODO should "Default failed be part of this message"?
+            raise ValueError('Connection name "{}" does not exist in '
+                             'connection repository {}'
+                             .format(connection_name, self.connections_file))
 
     def get_default_connection_name(self):
         """

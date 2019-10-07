@@ -26,14 +26,15 @@
 """
 from mock import Mock
 import pywbemtools
+RETURN_VALUE = "mypw"
 
 
 def mock_prompt(msg,
                 hide_input=True,
                 confirmation_prompt=False, type=str, err=True):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT %s' % msg)
-    return "mypw"
+    print('MOCK_CLICK_PROMPT {}'.format(msg))
+    return RETURN_VALUE
 
 
 # pylint: disable=protected-access

@@ -306,7 +306,7 @@ class BuildRepositoryMixin(object):
         """
         for file_path in file_path_list:
             if not os.path.exists(file_path):
-                raise IOError("No such file: %s" % file_path)
+                raise IOError('No such file: {}'.format(file_path))
 
             ext = os.path.splitext(file_path)[1]
             if ext == '.mof':

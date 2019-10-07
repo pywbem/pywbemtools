@@ -53,11 +53,11 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._wbem_server = None
 
     def __repr__(self):
-        return 'ContextObj(at 0x%08x, pywbem_server=%r, outputformat=%s, ' \
-               'use_pull=%s, pull_max_cnt=%s, timestats=%s, verbose=%s' % \
-               (id(self), self.pywbem_server, self.output_format,
-                self.use_pull, self.pull_max_cnt, self.timestats,
-                self.verbose)
+        return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
+               'use_pull={}, pull_max_cnt={}, timestats={}, verbose={}' \
+               .format(id(self), self.pywbem_server, self.output_format,
+                       self.use_pull, self.pull_max_cnt, self.timestats,
+                       self.verbose)
 
     @property
     def output_format(self):
@@ -111,9 +111,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         # The conn property is created in wbem_server and retained here.
         if self._conn:
             return self._conn
-        else:
-            self._conn = self.wbem_server.conn
-            return self._conn
+
+        self._conn = self.wbem_server.conn
+        return self._conn
 
     @property
     def wbem_server(self):
@@ -128,7 +128,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         # If no server defined, do not try to connect. This allows
         # commands like help, connection new, list to execute without
         # a target server defined.
-        if self._pywbem_server:
+        if self._pywbem_server:  # pylint: disable=no-else-return
             # If wbem_server not initialized, initialize it.
             if self._pywbem_server.wbem_server is None:
                 # get the password if it is required.  This may involve a
@@ -198,7 +198,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         # parameters from click context
         if self.verbose:
             ctx = click.get_current_context()
-            click.echo('COMMAND="%s", params=%r' % (ctx.info_name, ctx.params))
+            click.echo('COMMAND="{}", params={!r}'.format(ctx.info_name,
+                                                          ctx.params))
 
         if self.verbose:
             display_click_context_parents(display_attrs=True)
@@ -346,9 +347,9 @@ def display_click_context(ctx, msg=None, display_attrs=True):
     if not display_attrs:
         click.echo(ctx.obj)
     else:
-        click.echo('%s %s, attrs: %s' % (
+        click.echo('{} {}, attrs: {}'.format(
             msg, ctx,
-            '\n    '.join("%s: %s" % item for item in attrs.items())))
+            '\n    '.join('%s: %s' % item for item in attrs.items())))
 
 
 def display_click_context_parents(display_attrs=False):
@@ -359,7 +360,7 @@ def display_click_context_parents(display_attrs=False):
     ctx = click.get_current_context()
     disp_ctx = ctx.parent
     while disp_ctx is not None:
-        display_click_context(disp_ctx, msg='level %s' % level,
+        display_click_context(disp_ctx, msg='level {}'.format(level),
                               display_attrs=display_attrs)
         level += -1
         disp_ctx = disp_ctx.parent

@@ -42,6 +42,9 @@ Released: not yet
   it fixed an issue that surfaced with pywbem minimum package levels
   on Python 3.7.
 
+* Code: refactor code to use only the .format formatter and remove all use
+  of the % formatter.
+
 **Known issues:**
 
 * See `list of open issues`_.

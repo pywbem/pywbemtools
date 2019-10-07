@@ -283,9 +283,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         # test for conflicting server definitions.
         if server or resolved_mock_server:
             if svr_name:
-                click.ClickException('Option conflict: --name "%s" '
+                click.ClickException('Option conflict: --name "{}" '
                                      'conflicts with existence of --server and '
-                                     '--mock-server' % svr_name)
+                                     '--mock-server'.format(svr_name))
             svr_name = 'not-saved'
             pywbem_server = PywbemServer(server,
                                          resolved_default_namespace,
@@ -326,7 +326,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                         err=True)
                     raise click.Abort()
                 if verbose:
-                    click.echo('Current connection is "%s"' % local_svr_name)
+                    click.echo('Current connection: "{}"'
+                               .format(local_svr_name))
 
             # Get the named connection from the repo
             if local_svr_name:
@@ -335,8 +336,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                 for option in conditional_options:
                     if option[0]:
                         raise click.ClickException(
-                            '"--%s %s" option invalid when --name exists or '
-                            'default name set.' % (option[1], option[0]))
+                            '"--{} {}" option invalid when --name exists or '
+                            'default name set.'.format(option[1], option[0]))
 
             else:
                 # If no server defined, set None to allow commands that
@@ -547,8 +548,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_timestats,
                          log, verbose)
     if verbose:
-        print('CONTEXT_obj FROM generals loc 547 %r' % ctx.obj)
-        print('CLICK CTX %s' % ctx)
+        print('CONTEXT_obj FROM generals loc 547 {!r}'.format(ctx.obj))
+        print('CLICK CTX {}'.format(ctx))
         display_click_context(ctx, msg="After adding Context",
                               display_attrs=True)
     # Invoke command if one exists.

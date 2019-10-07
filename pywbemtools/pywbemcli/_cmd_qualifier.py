@@ -26,7 +26,7 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, CMD_OPTS_TXT, \
-    output_format_is_table, sort_cimobjects
+    output_format_is_table, sort_cimobjects, raise_pywbem_error_exception
 from ._common_options import add_options, namespace_option, summary_option
 
 
@@ -109,7 +109,7 @@ def cmd_qualifier_get(context, qualifiername, options):
                             qual_outputformat(context.output_format))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_qualifier_enumerate(context, options):
@@ -124,4 +124,4 @@ def cmd_qualifier_enumerate(context, options):
                             summary=options['summary'])
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)

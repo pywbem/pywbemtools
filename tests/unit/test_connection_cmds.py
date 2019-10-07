@@ -904,7 +904,7 @@ class TestSubcmdClass(CLITestsBase):
             if file_test == 'exists':
                 assert os.path.isfile(pywbemserversfile) and \
                     os.path.getsize(pywbemserversfile) > 0, \
-                    "Fail. File  %s should exist" % pywbemserversfile
+                    'Fail. File {} should exist'.format(pywbemserversfile)
             elif file_test.lower() == 'none':
                 if os.path.isfile(pywbemserversfile):
                     print('FILE THAT SHOULD NOT EXIST')
@@ -912,10 +912,11 @@ class TestSubcmdClass(CLITestsBase):
                         print(fin.read())
 
                 assert not os.path.isfile(pywbemserversfile), \
-                    "Fail. File %s should not exist" % pywbemserversfile
+                    'Fail. File {} should not exist'.format(pywbemserversfile)
 
             else:
-                assert False, 'File test option name %s invalid' % file_test
+                assert False, 'File test option name {} invalid' \
+                    .format(file_test)
 
         if not condition:
             pytest.skip("Condition for test case not met")

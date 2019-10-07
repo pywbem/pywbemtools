@@ -27,7 +27,8 @@ import click
 from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, format_table
+from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception
+
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -220,7 +221,7 @@ def cmd_server_namespaces(context, options):
                                 table_format=context.output_format))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
 
 
 def cmd_server_interop(context):
@@ -237,7 +238,7 @@ def cmd_server_interop(context):
                                 title='Server Interop Namespace:',
                                 table_format=context.output_format))
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_server_brand(context):
@@ -253,7 +254,7 @@ def cmd_server_brand(context):
                                 title='Server brand:',
                                 table_format=context.output_format))
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_server_info(context):
@@ -283,7 +284,7 @@ def cmd_server_info(context):
                                 table_format=context.output_format))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def get_profile_info(org_vm, inst):
@@ -324,7 +325,7 @@ def cmd_server_profiles(context, options):
                                 table_format=context.output_format))
 
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)
 
 
 def cmd_server_centralinsts(context, options):
@@ -356,7 +357,7 @@ def cmd_server_centralinsts(context, options):
                 row.append("\n".join([str(p) for p in ci]))
             # mark current inst as failed and continue
             except Exception as ex:  # pylint: disable=broad-except
-                click.echo('Exception: %s %s' % (row, ex))
+                click.echo('Exception: {} {}'.format(row, ex))
                 row.append("Failed")
             rows.append(row)
 
@@ -369,4 +370,4 @@ def cmd_server_centralinsts(context, options):
                                 title='Advertised Central Instances:',
                                 table_format=context.output_format))
     except Error as er:
-        raise click.ClickException("%s: %s" % (er.__class__.__name__, er))
+        raise_pywbem_error_exception(er)

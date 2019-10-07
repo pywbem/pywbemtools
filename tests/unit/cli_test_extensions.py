@@ -161,7 +161,7 @@ class CLITestsBase(object):
         # pylint: enable=line-too-long
 
         if not condition:
-            pytest.skip("Condition for test case %s not met" % desc)
+            pytest.skip('Condition for test case {} not met'.format(desc))
 
         env = None
         stdin = None
@@ -180,8 +180,8 @@ class CLITestsBase(object):
             local_args = inputs
             general_args = None
         else:
-            assert 'Invalid inputs param to test %r . Allowed types are ' \
-                   'dict, string, list, tuple.' % inputs
+            assert False, 'Invalid inputs param to test {!r}. Allowed types ' \
+                'are dict, string, list, tuple.'.format(inputs)
 
         if isinstance(local_args, six.string_types):
             local_args = local_args.split(" ")
@@ -202,7 +202,9 @@ class CLITestsBase(object):
                 cmd_line.extend(['--mock-server',
                                  os.path.join(TEST_DIR, mock_files)])
             else:
-                assert("CLI_TEST_EXTENSIONS mock_file %s invalid" % mock_files)
+                assert False, \
+                    'CLI_TEST_EXTENSIONS mock_file {} invalid' \
+                    .format(mock_files)
 
         if not stdin:
             cmd_line.append(command_grp)
@@ -211,10 +213,10 @@ class CLITestsBase(object):
             cmd_line.extend(local_args)
 
         if verbose:
-            print('\nCMDLINE: %s' % cmd_line)
+            print('\nCMDLINE: {}'.format(cmd_line))
 
         if verbose and env:
-            print('ENV: %s' % env)
+            print('ENV: {}'.format(env))
 
         rc, stdout, stderr = execute_pywbemcli(cmd_line, env=env, stdin=stdin,
                                                verbose=verbose)
@@ -223,7 +225,7 @@ class CLITestsBase(object):
         assert_rc(exp_rc, rc, stdout, stderr)
 
         if verbose:
-            print('RC=%s\nSTDOUT=%s\nSTDERR=%s' % (rc, stdout, stderr))
+            print('RC={}\nSTDOUT={}\nSTDERR={}'.format(rc, stdout, stderr))
 
         if exp_response['test']:
             test_definition = exp_response['test']
@@ -317,7 +319,7 @@ class CLITestsBase(object):
                             "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
                             "{!r}".format(desc, test_str, rtn_value)
                 else:
-                    assert 'test %s is invalid. Skipped' % test_definition
+                    assert 'Test {} is invalid. Skipped'.format(test_definition)
 
 
 def remove_ws(inputs):

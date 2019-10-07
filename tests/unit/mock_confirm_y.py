@@ -32,7 +32,7 @@ RETURN_VALUE = True
 
 def mock_confirm(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_CONFIRM(y): %s' % msg)
+    print('MOCK_CLICK_CONFIRM(y): {}'.format(msg))
     return RETURN_VALUE
 
 

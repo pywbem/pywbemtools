@@ -23,9 +23,9 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 import unittest
-import pytest
 import click
 from mock import patch
+import pytest
 
 try:
     from collections import OrderedDict
@@ -1166,9 +1166,9 @@ class SplitTestNone(object):  # pylint: disable=useless-object-inheritance
         result.
         """
         act_result = split_array_value(input_str, ',')
-        # print('split input %s result %s' % (input_str, result))
-        assert (exp_result == act_result) % \
-            'Failed split test exp %r, act %r' % (exp_result, act_result)
+        assert exp_result == act_result,  \
+            'Failed split test exp {!r}, act {!r}'.format(exp_result,
+                                                          act_result)
 
     def test_split(self):
         # pylint: disable=no-self-use
@@ -1197,10 +1197,10 @@ class KVPairParsingTest(object):  # pylint: disable=useless-object-inheritance
 
         assert (exp_name == act_name), \
             ' KVPairParsing. Expected ' \
-            ' name=%s, function returned %s' % (exp_name, act_name)
+            ' name={}, function returned {}'.format(exp_name, act_name)
         assert (exp_value == act_value), \
             ' KVPairParsing. Expected ' \
-            ' value=%s, act value=%s' % (exp_value, act_value)
+            ' value={}, act value={}'.format(exp_value, act_value)
 
     def test_scalar_int(self):
         # pylint: disable=no-self-use

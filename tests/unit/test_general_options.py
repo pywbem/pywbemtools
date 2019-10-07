@@ -779,7 +779,7 @@ TEST_CASES = [
      {'general': ['--verbose'],
       'args': ['show'],
       'cmdgrp': 'connection', },
-     {'stdout': ['Current connection is "test-default"'],
+     {'stdout': ['Current connection: "test-default"'],
       'test': 'innows'},
      None, OK],
 
@@ -1144,7 +1144,7 @@ TEST_CASES = [
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred ',
                 'connection save fred',
-                '--mock-server %s class enumerate' % BAD_MOF_FILE_PATH,
+                '--mock-server {} class enumerate'.format(BAD_MOF_FILE_PATH),
                 'connection select fred',
                 'connection show',
                 'connection delete fred'],

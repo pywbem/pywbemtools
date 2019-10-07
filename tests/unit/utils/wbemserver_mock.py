@@ -171,27 +171,26 @@ class WbemServerMock(object):
         self.build_mock()
 
     def __str__(self):
-        ret_str = 'object_manager_name=%r, interop_ns=%r, system_name=%r, ' \
-            'dmtf_schema_ver=%r, schema_dir=%r, wbem_server=%s' % \
-            (self.object_manager_name, self.interop_ns, self.system_name,
-             self.dmtf_schema_ver, self.schema_dir,
-             getattr(self, 'wbem_server', None))
-        return ret_str
+        return 'object_manager_name={!r}}, interop_ns={!r}}, system_name=' \
+            '{!r}}, dmtf_schema_ver={!r}}, schema_dir={!r}}, wbem_server={}' \
+            .format(self.object_manager_name, self.interop_ns, self.system_name,
+                    self.dmtf_schema_ver, self.schema_dir,
+                    getattr(self, 'wbem_server', None))
 
     def __repr__(self):
         """
         Return a representation of the class object
         with all attributes, that is suitable for debugging.
         """
-        ret_str = 'WBEMServerMock(object_manager_name=%r, interop_ns=%r, ' \
-            'system_name=%r, dmtf_schema_ver=%r, schema_dir=%r, ' \
-            'pg_schema_dir=%r, pg_schema_files=%s, wbem_server=%r, ' \
-            'registered_profiles=%r)' % \
-            (self.object_manager_name, self.interop_ns, self.system_name,
-             self.dmtf_schema_ver, self.schema_dir, self.pg_schema_dir,
-             self.pg_schema_files,
-             getattr(self, 'wbem_server', None), self.registered_profiles)
-        return ret_str
+        return 'WBEMServerMock(object_manager_name={!r}, interop_ns={!r}, ' \
+            'system_name={!r}, dmtf_schema_ver={!r}, schema_dir={!r}, ' \
+            'pg_schema_dir={!r}, pg_schema_files={}, wbem_server={!r}, ' \
+            'registered_profiles={!r})' \
+            .format(self.object_manager_name, self.interop_ns, self.system_name,
+                    self.dmtf_schema_ver, self.schema_dir, self.pg_schema_dir,
+                    self.pg_schema_files,
+                    getattr(self, 'wbem_server', None),
+                    self.registered_profiles)
 
     def build_classes(self, namespace):
         """
@@ -282,7 +281,7 @@ class WbemServerMock(object):
         rtn_ominsts = self.conn.EnumerateInstances("CIM_ObjectManager",
                                                    namespace=self.interop_ns)
         assert len(rtn_ominsts) == 1, \
-            "Expected 1 ObjetManager instance, got %r" % rtn_ominsts
+            "Expected 1 ObjetManager instance, got {!r}}".format(rtn_ominsts)
 
         return ominst
 
@@ -310,7 +309,8 @@ class WbemServerMock(object):
         rtn_namespaces = self.conn.EnumerateInstances("CIM_Namespace",
                                                       namespace=self.interop_ns)
         assert len(rtn_namespaces) == len(namespaces), \
-            "Expected namespaces: %r, got %s" % (namespaces, rtn_namespaces)
+            "Expected namespaces: {!r}, got {}".format(namespaces,
+                                                       rtn_namespaces)
 
     def build_reg_profile_insts(self, profiles):
         """
@@ -334,7 +334,7 @@ class WbemServerMock(object):
             org_vm_dict[org_vm.tovalues(value)] = value
 
         for profile in profiles:
-            instance_id = '%s+%s+%s' % (profile[0], profile[1], profile[2])
+            instance_id = '{}+{}+{}'.format(profile[0], profile[1], profile[2])
             reg_prof_dict = {'RegisteredOrganization': org_vm_dict[profile[0]],
                              'RegisteredName': profile[1],
                              'RegisteredVersion': profile[2],

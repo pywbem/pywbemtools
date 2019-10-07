@@ -38,7 +38,7 @@ RETURN_VALUE = "3"
 
 def mock_prompt(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT %s' % msg)
+    print('MOCK_CLICK_PROMPT {}'.format(msg))
     return RETURN_VALUE
 
 
