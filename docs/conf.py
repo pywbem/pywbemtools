@@ -472,8 +472,11 @@ extlinks = {
 
 # http://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html
 # Add the "intersphinx" extension
+# Add fulltoc to show the chapter TOC in the sidebar for the pywbemcli section
+# Also always shows the chapters in the sidebar
 extensions = [
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.fulltoc',
 ]
 # Addintersphinx mappings
 intersphinx_mapping = {

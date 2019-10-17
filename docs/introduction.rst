@@ -43,39 +43,9 @@ Storage Management Initiative Specification (`SMI-S`_).
 .. _SNIA: https://www.snia.org/
 .. _SMI-S: https://www.snia.org/forums/smi/tech_programs/smis_home
 
+The pywbemtools package includes the following tools:
 
-.. _`Pywbemcli command line interface WBEM client`:
-
-Pywbemcli command line interface WBEM client
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Pywbemcli provides access to WBEM servers from the command line.
-It provides functionality to:
-
-* Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
-  components including CIM classes, CIM instances, and CIM qualifiers and
-  execute CIM methods and queries on the WBEM server.
-
-* Execute specific CIM-XML operations on the WBEM server as defined in `DMTF`_
-  standard :term:`DSP0200` (CIM Operations over HTTP).
-
-* Inspect and manage WBEM server functionality including:
-
-  * :term:`CIM namespaces <CIM namespace>`
-  * Advertised :term:`WBEM management profiles <WBEM management profile>`
-  * WBEM server brand and version information
-
-* Capture detailed information on CIM-XML interactions with the WBEM server
-  including time statistics and details of data flow.
-
-* Maintain a file with persisted WBEM connection definitions so that pywbemcli
-  can access multiple WBEM servers by name.
-
-* Provide both a command line mode and an interactive mode where multiple
-  pywbemcli commands can be executed within the context of a WBEM server.
-
-* Use an integrated mock WBEM server to try out commands. The mock server
-  can be loaded with CIM objects defined in MOF files or via Python scripts.
+1. :ref:`Pywbemcli command` - provides access to WBEM servers from the command line
 
 
 .. _`Supported environments`:
