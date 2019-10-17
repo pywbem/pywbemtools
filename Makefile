@@ -205,13 +205,14 @@ doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_elements
 
 # File names of automatically generated utility help message text output
 doc_utility_help_files := \
-    $(doc_conf_dir)/pywbemclicmdshelp.rst \
+    $(doc_conf_dir)/pywbemcli/cmdshelp.rst \
 
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
     $(doc_conf_dir)/conf.py \
-    $(doc_conf_dir)/pywbemclicmdshelp.rst \
+    $(doc_conf_dir)/pywbemcli/cmdshelp.rst \
     $(wildcard $(doc_conf_dir)/*.rst) \
+    $(wildcard $(doc_conf_dir)/*/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
     $(wildcard $(pywbemcli_module_path)/*.py) \
 
@@ -620,8 +621,8 @@ test: develop_$(pymn).done
 	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
  	@echo "makefile: Done running tests"
 
-# update the pywbemclicmdshelp.rst if any file that defines click commands changes.
-$(doc_conf_dir)/pywbemclicmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
+# update the pywbemcli/cmdshelp.rst if any file that defines click commands changes.
+$(doc_conf_dir)/pywbemcli/cmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
 	@echo 'makefile: Creating $@ for documentation'
 	$(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp
 	-$(call RM_FUNC,$@)

@@ -1,13 +1,13 @@
 .. _`Using the pywbemcli command line general options`:
 
 Using the pywbemcli command line general options
-================================================
+------------------------------------------------
 
 
 .. _`Oveview of the general options`:
 
 Overview of the general options
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 General options define:
 
@@ -78,7 +78,7 @@ specified in the command line invocation:
 .. _`Defining the WBEM server`:
 
 Defining the WBEM server
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 The target WBEM server can be defined on the command line in several ways with
 the following arguments :
@@ -121,7 +121,7 @@ the following arguments :
 .. _`Controlling operation behavior and monitoring operations`:
 
 Controlling operation behavior and monitoring operations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Several general options control the behavior and monitoring of the operations
 executed against the WBEM server.
@@ -175,7 +175,7 @@ file ``pywbemcli.log``:
 .. _`Controlling output formats`:
 
 Controlling output formats
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Pywbemcli supports multiple output formats for command results by using the
 :ref:`--output-format general option`.
@@ -188,7 +188,7 @@ commands. For more details, see :ref:`Output formats`.
 .. _`Other miscellaneous general options`:
 
 Other miscellaneous general options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""
 
 The :ref:`--verbose general option` displays extra information about the pywbemcli
 internal processing, the :ref:`--version general option` displays pywbemcli version
@@ -198,7 +198,7 @@ information and the :ref:`--help general option` provides top level help
 .. _`General options descriptions`:
 
 General options descriptions
-----------------------------
+""""""""""""""""""""""""""""
 
 This section defines in detail the requirements, characteristics, and any special
 syntax of each general option.
@@ -207,7 +207,7 @@ syntax of each general option.
 .. _`--server general option`:
 
 --server general option
-^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""
 
 The argument value of the ``--server``/``-s`` general option is a string that is
 the URL of the WBEM server to which pywbemcli will connect, in the format:
@@ -245,7 +245,7 @@ Examples for the argument value of this option include:
 .. _`--name general option`:
 
 --name general option
-^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 The argument value of the ``--name``/``-n`` general option is a string that is
 the name of a connection definition in the :term:`connections file`.
@@ -277,7 +277,7 @@ connections.
 .. _`--default-namespace general option`:
 
 --default-namespace general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""
 
 The argument value of the ``--default-namespace``/``-d`` general option is a
 string that defines the default :term:`CIM namespace` to use for the target
@@ -295,7 +295,7 @@ the ``class find`` command.
 .. _`--user general option`:
 
 --user general option
-^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 The argument value of the ``--user``/``-u`` general option is a string that is
 the user name for authenticating with the WBEM server.
@@ -304,7 +304,7 @@ the user name for authenticating with the WBEM server.
 .. _`--password general option`:
 
 --password general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""
 
 The argument value of the ``--password``/``-p`` general option is a string that is the
 password for authenticating with the WBEM server.
@@ -377,7 +377,7 @@ any subsequent pywbemcli commands:
 .. _`--timeout general option`:
 
 --timeout general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 The argument value of the ``--timeout``/``-t`` general option is an integer that
 defines the
@@ -390,7 +390,7 @@ predefined timeout (normally 30 seconds) if this option is not defined.
 .. _`--verify general option`:
 
 --verify general option
-^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""
 
 The pair of ``--verify`` and ``--no-verify`` general options control whether or
 not the client verifies any certificates received from the WBEM server.
@@ -407,7 +407,7 @@ general option is used in interactive mode.
 .. _`--certfile general option`:
 
 --certfile general option
-^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""
 
 The argument value of the ``--certfile`` general option is the file path of a
 PEM file containing a X.509 client certificate to be presented to the WBEM
@@ -424,7 +424,7 @@ https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-type
 .. _`--keyfile general option`:
 
 --keyfile general option
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 The argument value of the ``--keyfile`` general option is the file path of a
 PEM file containing the private key belonging to the public key that is
@@ -441,7 +441,7 @@ key file. The client private key should then be part of the file defined by
 .. _`--ca-certs general option`:
 
 --ca-certs general option
-^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""
 
 The argument value of the ``--ca-certs`` general option is the path name of a file or
 directory containing certificates that will be matched against a certificate
@@ -456,7 +456,7 @@ bypasses client verification of the WBEM server certificate.
 .. _`--timestats general option`:
 
 --timestats general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""
 
 The ``--timestats`` general option is a boolean option that enables the
 gathering and display of time
@@ -468,7 +468,7 @@ operations executed, the size of the operations, and the execution time.
 .. _`--use-pull general option`:
 
 --use-pull general option
-^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""
 
 The argument value of the ``--use-pull``/``-u`` general option determines
 whether the pull operations or :term:`traditional operations` are used for the
@@ -487,7 +487,7 @@ for the argument value are as follows:
 .. _`--pull-max-cnt general option`:
 
 --pull-max-cnt general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""
 
 The argument value of the ``--pull-max-cnt`` general option is an integer
 passed to the WBEM server with the open and pull operation requests.
@@ -500,7 +500,7 @@ DMTF pull operations` for more information on pull operations.
 .. _`--mock-server general option`:
 
 --mock-server general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""
 
 The argument value of the ``--mock-server``/``-m`` general option is a file
 path of a MOF file or Python script that loads a mock WBEM server in the
@@ -539,7 +539,7 @@ the files for a mock server.
 .. _`--output-format general option`:
 
 --output-format general option
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""
 
 The argument value of the ``--output-format``/``-o`` general option is a string
 that defines the output format in which the result of any pywbemcli commands
@@ -551,7 +551,7 @@ For details, see :ref:`Output formats`.
 .. _`--log general option`:
 
 --log general option
-^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""
 
 The argument value of the  ``--log``/``-l`` general option defines the destination and
 parameters of logging of the requests and responses to the WBEM server.
@@ -562,7 +562,7 @@ For details, see :ref:`Pywbemcli defined logging`.
 .. _`--verbose general option`:
 
 --verbose general option
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 The ``--verbose``/``-v`` general option is a boolean option that enables the
 display of extra information about the processing.
@@ -571,7 +571,7 @@ display of extra information about the processing.
 .. _`--version general option`:
 
 --version general option
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 The ``--version``/``-V`` general option displays the version of this command
 and of the pywbem package it uses, and then exits.
@@ -580,7 +580,7 @@ and of the pywbem package it uses, and then exits.
 .. _`--help general option`:
 
 --help general option
-^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 The ``--help``/``-h`` general option displays help text which describes the
 command groups and general options, and then exits.
@@ -589,7 +589,7 @@ command groups and general options, and then exits.
 .. _`Environment variables for general options`:
 
 Environment variables for general options
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Pywbemcli defines environment variables corresponding to its general options
 as follows:
@@ -666,7 +666,7 @@ any subsequent pywbemcli commands:
 .. _`Pywbemcli and the DMTF pull operations`:
 
 Pywbemcli and the DMTF pull operations
---------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The DMTF specifications and pywbem includes two ways to execute the enumerate
 instance type operations (``Associators``, ``References``,``
@@ -739,7 +739,7 @@ pull operations are not supported in the WBEM server:
 .. _`Output formats`:
 
 Output formats
---------------
+^^^^^^^^^^^^^^
 
 Pywbemcli supports various output formats for the command result. The output
 format can be selected with the ``--output-format``/``-o`` option.
@@ -777,7 +777,7 @@ in those formats.
 .. _`Table formats`:
 
 Table formats
-^^^^^^^^^^^^^
+"""""""""""""
 
 The different variations of the table format define different formatting of the
 borders for tables. The following are examples of the table formats with a
@@ -895,7 +895,7 @@ single command ``class find CIM_Foo``:
 .. _`CIM object formats`:
 
 CIM object formats
-^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 The output of CIM objects allows multiple formats as follows:
 
@@ -985,7 +985,7 @@ The output of CIM objects allows multiple formats as follows:
 .. _`ASCII tree format`:
 
 ASCII tree format
-^^^^^^^^^^^^^^^^^
+"""""""""""""""""
 
 This output format is an ASCII based output that shows the tree structure of
 the results of the ``class tree`` command. It is the only output format
@@ -1009,7 +1009,7 @@ CIM_Foo_sub_sub is the subclass of CIM_Foo_sub.
 .. _`Pywbemcli defined logging`:
 
 Pywbemcli defined logging
--------------------------
+"""""""""""""""""""""""""
 
 Pywbemcli provides logging to either a file or the standard error stream
 of information passing between the pywbemcli client and a WBEM server using the
@@ -1110,7 +1110,7 @@ pywbemcli.log as follows showing the input parameters to the pywbem method
 .. _`Pywbemcli persisted connection definitions`:
 
 Pywbemcli persisted connection definitions
-------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Pywbemcli can manage persisted connection definitions via the
 :ref:`Connection command group`. These connection definitions are persisted in
