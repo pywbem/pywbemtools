@@ -11,6 +11,7 @@ import functools
 from collections import namedtuple
 import six
 import pytest
+import wrapt
 if six.PY3:
     # pylint: disable=no-name-in-module
     from inspect import Signature, Parameter
@@ -26,18 +27,29 @@ __all__ = ['simplified_test_function']
 # the wrapper function to its correct signature. To do that, we cannot use
 # signature() because its follow_wrapped parameter was introduced only in
 # Python 3.5. Instead, we build the signature manually.
-TESTFUNC_SIGNATURE = Signature(
-    parameters=[
-        Parameter('desc', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('kwargs', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('exp_exc_types', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('exp_warn_types', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('condition', Parameter.POSITIONAL_OR_KEYWORD),
-    ]
+#TESTFUNC_SIGNATURE = Signature(
+#    parameters=[
+#        Parameter('desc', Parameter.POSITIONAL_OR_KEYWORD),
+#        Parameter('kwargs', Parameter.POSITIONAL_OR_KEYWORD),
+#        Parameter('exp_exc_types', Parameter.POSITIONAL_OR_KEYWORD),
+#        Parameter('exp_warn_types', Parameter.POSITIONAL_OR_KEYWORD),
+#        Parameter('condition', Parameter.POSITIONAL_OR_KEYWORD),
+#        Parameter('add_kwargs', Parameter.VAR_KEYWORD),
+#    ]
+#)
+
+def _testfunc_prototype(desc, kwargs, exp_exc_types, exp_warn_types, condition):
+    pass
+
+# A testcase tuple
+_testcase_tuple = namedtuple(
+    'testcase_tuple',
+    ['desc', 'kwargs', 'exp_exc_types', 'exp_warn_types', 'condition']
 )
 
 
-def simplified_test_function(test_func):
+@wrapt.decorator(adapter=_testfunc_prototype)
+def simplified_test_function(wrapped, instance, args, kwargs):
     """
     A decorator for test functions that simplifies the test function by
     handling a number of things:
@@ -111,16 +123,12 @@ def simplified_test_function(test_func):
             assert equal == exp_equal
     """
 
-    # A testcase tuple
-    testcase_tuple = namedtuple(
-        'testcase_tuple',
-        ['desc', 'kwargs', 'exp_exc_types', 'exp_warn_types', 'condition']
-    )
+    def _execute(desc, kwargs, exp_exc_types, exp_warn_types, condition):
+        """
+        Execute the decorated test function.
+        """
 
-    def wrapper_func(desc, kwargs, exp_exc_types, exp_warn_types, condition):
-        """
-        Wrapper function that calls the test function that is decorated.
-        """
+        test_func = wrapped  # The decorated test function
 
         if not condition:
             pytest.skip("Condition for test case not met")
@@ -130,6 +138,8 @@ def simplified_test_function(test_func):
 
         testcase = testcase_tuple(desc, kwargs, exp_exc_types, exp_warn_types,
                                   condition)
+        # kwargs = kwargs.copy()
+        # kwargs.update(add_kwargs)
 
         if exp_warn_types:
             with pytest.warns(exp_warn_types) as rec_warnings:
@@ -170,7 +180,4 @@ def simplified_test_function(test_func):
                 ret = None  # Debugging hint
         return ret
 
-    # Needed because the decorator is signature-changin
-    wrapper_func.__signature__ = TESTFUNC_SIGNATURE
-
-    return functools.update_wrapper(wrapper_func, test_func)
+    return _execute(*args, **kwargs)

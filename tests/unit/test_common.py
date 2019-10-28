@@ -81,6 +81,9 @@ TESTCASES_ISCLASSNAME = [
 ]
 
 
+#@pytest.mark.parametrize(
+#    "classname",
+#    ('CIM_Blah', 'CIM_Foo'))
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_ISCLASSNAME)
@@ -89,6 +92,9 @@ def test_is_classname(testcase, name, exp_rtn):
     """Test for is_classname function"""
     # The code to be tested
 
+    # name.replace('CIM_Blah', classname)
+
+    # The code to be tested
     act_rtn = is_classname(name)
 
     # Ensure that exceptions raised in the remainder of this function
