@@ -52,6 +52,9 @@ Released: not yet
   minimum-constraints.txt, for a defined package level when testing with
   PACKAGE_LEVEL=minimum.
 
+* Clean up test mock files by merging mock_simple_model_ext.mof into
+  mock_simple_model.mof
+
 **Known issues:**
 
 * See `list of open issues`_.

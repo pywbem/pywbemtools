@@ -42,7 +42,7 @@ ALLTYPES_MOCK_FILE = 'all_types.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
-MOCK_PROMPT_PICK_RESPONSE_12_FILE = 'mock_prompt_pick_response_12.py'
+MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
 
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
@@ -1066,7 +1066,7 @@ Instances: PyWBEM_AllTypes
                  'CIM_ERR_NOT_FOUND'],
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_12_FILE], FAIL],
+     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_11_FILE], FAIL],
 
     ['Verify instance command create, new instance of all_types '
      'with scalar types',
@@ -1244,14 +1244,16 @@ Instances: PyWBEM_AllTypes
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, single property, Fail modifies key',
-     ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
-      '-p', 'InstanceID=9'],
-     {'stderr': 'Error: Server Error modifying instance. Exception: CIMError:'
-                " 4 (CIM_ERR_INVALID_PARAMETER): ModifyInstance cannot modify "
-                "key property 'InstanceId'",
+     ['modify', 'PyWBEM_AllTypes.InstanceId="test_instance"',
+      '-p', 'InstanceId=9'],
+     {'stderr': ['Server Error modifying instance.',
+                 'Exception: CIMError:',
+                 '4',
+                 'CIM_ERR_INVALID_PARAMETER',
+                 "'InstanceId'"],
       'rc': 1,
-      'test': 'linesnows'},
-     ALLTYPES_MOCK_FILE, OK],
+      'test': 'innows'},
+     ALLTYPES_MOCK_FILE, RUN],
 
     ['Verify instance command modify, single property, Type Error uint32. '
      'Uses regex because Exception msg different between python 2 and 3',
