@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Click Command definition for the class command group which includes
-cmds for get, enumerate, list of classes.
+Click Command definition for the instance command group which includes
+cmds for get, enumerate, list of instance.
+
+NOTE: Commands are ordered in help display by their order in this file.
 """
 
 from __future__ import absolute_import, print_function
@@ -34,7 +36,7 @@ from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
     summary_option, verify_option, multiple_namespaces_option
 from .config import DEFAULT_QUERY_LANGUAGE
-
+from ._click_extensions import PywbemcliGroup
 
 #
 #   Common option definitions for instance group
@@ -134,7 +136,7 @@ filter_query_option = [              # pylint: disable=invalid-name
 ###########################################################################
 
 
-@cli.group('instance', options_metavar=CMD_OPTS_TXT)
+@cli.group('instance', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def instance_group():
     """
     Command group for CIM instances.
@@ -149,6 +151,45 @@ def instance_group():
     'instance' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
+
+
+@instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
+@click.argument('classname', type=str, metavar='CLASSNAME', required=True)
+@add_options(local_only_list_option)
+@add_options(deep_inheritance_enum_option)
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
+@add_options(propertylist_option)
+@add_options(namespace_option)
+@add_options(names_only_option)
+@add_options(summary_option)
+@add_options(filter_query_option)
+@add_options(filter_query_language_option)
+@click.pass_obj
+def instance_enumerate(context, classname, **options):
+    """
+    List the instances of a class.
+
+    Enumerate the CIM instances of the specified class (CLASSNAME argument),
+    including instances of subclasses in the specified CIM namespace
+    (--namespace option), and display the returned instances, or instance paths
+    if --names-only was specified. If no namespace was specified, the default
+    namespace of the connection is used.
+
+    The instances to be retrieved can be filtered by the --filter-query option.
+
+    The --local-only, --deep-inheritance, --include-qualifiers,
+    --include-classorigin, and --propertylist options determine which parts
+    are included in each retrieved instance.
+
+    The --names-only option can be used to show only the instance paths.
+
+    In the output, the instances and instance paths will be formatted as
+    defined by the --output-format general option. Table formats on instances
+    will be replaced with MOF format.
+    """
+    context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
+                                                       options))
 
 
 @instance_group.command('get', options_metavar=CMD_OPTS_TXT)
@@ -297,156 +338,6 @@ def instance_modify(context, instancename, **options):
                                                     options))
 
 
-@instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
-@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.argument('methodname', type=str, metavar='METHODNAME', required=True)
-@click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
-              required=False, multiple=True,
-              help='Specify a method input parameter with its value. '
-                   'May be specified multiple times. '
-                   'Array property values are specified as a comma-separated '
-                   'list; embedded instances are not supported. '
-                   'Default: No input parameters.')
-@add_options(namespace_option)
-@click.pass_obj
-def instance_invokemethod(context, instancename, methodname, **options):
-    """
-    Invoke a method on an instance.
-
-    Invoke a CIM method (METHODNAME argument) on a CIM instance with the
-    specified input parameters (--parameter options), and display the method
-    return value and output parameters.
-
-    The CIM instance can be specified in two ways:
-
-    1. By specifying an untyped WBEM URI of an instance path in the
-    INSTANCENAME argument. The CIM namespace in which the instance is looked up
-    is the namespace specified in the WBEM URI, or otherwise the namespace
-    specified in the --namespace option, or otherwise the default namespace of
-    the connection. Any host name in the WBEM URI will be ignored.
-
-    2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
-    class are displayed and the user is prompted for an index number to select
-    an instance. The namespace in which the instances are looked up is the
-    namespace specified in the --namespace option, or otherwise the default
-    namespace of the connection.
-
-    The method input parameters are specified using the --parameter option,
-    which may be specified multiple times.
-
-    Pywbemcli retrieves the class definition of the creation class of the
-    instance from the server in order to verify that the specified input
-    parameters are consistent with the parameter characteristics in the method
-    definition.
-
-    Use the 'class invokemethod' command to invoke CIM methods on CIM classes.
-
-    Example:
-
-      pywbemcli -n myconn instance invokemethod CIM_x.id='hi" methodx -p id=3
-    """
-    context.execute_cmd(lambda: cmd_instance_invokemethod(context,
-                                                          instancename,
-                                                          methodname,
-                                                          options))
-
-
-@instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', type=str, metavar='CLASSNAME', required=True)
-@add_options(local_only_list_option)
-@add_options(deep_inheritance_enum_option)
-@add_options(include_qualifiers_list_option)
-@add_options(include_classorigin_instance_option)
-@add_options(propertylist_option)
-@add_options(namespace_option)
-@add_options(names_only_option)
-@add_options(summary_option)
-@add_options(filter_query_option)
-@add_options(filter_query_language_option)
-@click.pass_obj
-def instance_enumerate(context, classname, **options):
-    """
-    List the instances of a class.
-
-    Enumerate the CIM instances of the specified class (CLASSNAME argument),
-    including instances of subclasses in the specified CIM namespace
-    (--namespace option), and display the returned instances, or instance paths
-    if --names-only was specified. If no namespace was specified, the default
-    namespace of the connection is used.
-
-    The instances to be retrieved can be filtered by the --filter-query option.
-
-    The --local-only, --deep-inheritance, --include-qualifiers,
-    --include-classorigin, and --propertylist options determine which parts
-    are included in each retrieved instance.
-
-    The --names-only option can be used to show only the instance paths.
-
-    In the output, the instances and instance paths will be formatted as
-    defined by the --output-format general option. Table formats on instances
-    will be replaced with MOF format.
-    """
-    context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
-                                                       options))
-
-
-@instance_group.command('references', options_metavar=CMD_OPTS_TXT)
-@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
-@click.option('--rc', '--result-class', 'result_class', type=str,
-              required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
-@click.option('-r', '--role', type=str, required=False, metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
-@add_options(include_qualifiers_list_option)
-@add_options(include_classorigin_instance_option)
-@add_options(propertylist_option)
-@add_options(names_only_option)
-@add_options(namespace_option)
-@add_options(summary_option)
-@add_options(filter_query_option)
-@add_options(filter_query_language_option)
-@click.pass_obj
-def instance_references(context, instancename, **options):
-    """
-    List the instances referencing an instance.
-
-    List the CIM (association) instances that reference the specified CIM
-    instance, and display the returned instances, or instance paths if
-    --names-only was specified.
-
-    The CIM instance can be specified in two ways:
-
-    1. By specifying an untyped WBEM URI of an instance path in the
-    INSTANCENAME argument. The CIM namespace in which the instance is looked up
-    is the namespace specified in the WBEM URI, or otherwise the namespace
-    specified in the --namespace option, or otherwise the default namespace of
-    the connection. Any host name in the WBEM URI will be ignored.
-
-    2. By specifying a class name with wildcard for the keys in the
-    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
-    class are displayed and the user is prompted for an index number to select
-    an instance. The namespace in which the instances are looked up is the
-    namespace specified in the --namespace option, or otherwise the default
-    namespace of the connection.
-
-    The instances to be retrieved can be filtered by the --filter-query, --role
-    and --result-class options.
-
-    The --include-qualifiers, --include-classorigin, and --propertylist options
-    determine which parts are included in each retrieved instance.
-
-    The --names-only option can be used to show only the instance paths.
-
-    In the output, the instances and instance paths will be formatted as
-    defined by the --output-format general option. Table formats on instances
-    will be replaced with MOF format.
-    """
-    context.execute_cmd(lambda: cmd_instance_references(context, instancename,
-                                                        options))
-
-
 @instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
@@ -509,6 +400,117 @@ def instance_associators(context, instancename, **options):
     """
     context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
                                                          options))
+
+
+@instance_group.command('references', options_metavar=CMD_OPTS_TXT)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@click.option('--rc', '--result-class', 'result_class', type=str,
+              required=False, metavar='CLASSNAME',
+              help='Filter the result set by result class name. '
+                   'Subclasses of the specified class also match.')
+@click.option('-r', '--role', type=str, required=False, metavar='PROPERTYNAME',
+              help='Filter the result set by source end role name.')
+@add_options(include_qualifiers_list_option)
+@add_options(include_classorigin_instance_option)
+@add_options(propertylist_option)
+@add_options(names_only_option)
+@add_options(namespace_option)
+@add_options(summary_option)
+@add_options(filter_query_option)
+@add_options(filter_query_language_option)
+@click.pass_obj
+def instance_references(context, instancename, **options):
+    """
+    List the instances referencing an instance.
+
+    List the CIM (association) instances that reference the specified CIM
+    instance, and display the returned instances, or instance paths if
+    --names-only was specified.
+
+    The CIM instance can be specified in two ways:
+
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
+
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
+
+    The instances to be retrieved can be filtered by the --filter-query, --role
+    and --result-class options.
+
+    The --include-qualifiers, --include-classorigin, and --propertylist options
+    determine which parts are included in each retrieved instance.
+
+    The --names-only option can be used to show only the instance paths.
+
+    In the output, the instances and instance paths will be formatted as
+    defined by the --output-format general option. Table formats on instances
+    will be replaced with MOF format.
+    """
+    context.execute_cmd(lambda: cmd_instance_references(context, instancename,
+                                                        options))
+
+
+@instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
+@click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@click.argument('methodname', type=str, metavar='METHODNAME', required=True)
+@click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
+              required=False, multiple=True,
+              help='Specify a method input parameter with its value. '
+                   'May be specified multiple times. '
+                   'Array property values are specified as a comma-separated '
+                   'list; embedded instances are not supported. '
+                   'Default: No input parameters.')
+@add_options(namespace_option)
+@click.pass_obj
+def instance_invokemethod(context, instancename, methodname, **options):
+    """
+    Invoke a method on an instance.
+
+    Invoke a CIM method (METHODNAME argument) on a CIM instance with the
+    specified input parameters (--parameter options), and display the method
+    return value and output parameters.
+
+    The CIM instance can be specified in two ways:
+
+    1. By specifying an untyped WBEM URI of an instance path in the
+    INSTANCENAME argument. The CIM namespace in which the instance is looked up
+    is the namespace specified in the WBEM URI, or otherwise the namespace
+    specified in the --namespace option, or otherwise the default namespace of
+    the connection. Any host name in the WBEM URI will be ignored.
+
+    2. By specifying a class name with wildcard for the keys in the
+    INSTANCENAME argument, i.e. "CLASSNAME.?". The instances of the specified
+    class are displayed and the user is prompted for an index number to select
+    an instance. The namespace in which the instances are looked up is the
+    namespace specified in the --namespace option, or otherwise the default
+    namespace of the connection.
+
+    The method input parameters are specified using the --parameter option,
+    which may be specified multiple times.
+
+    Pywbemcli retrieves the class definition of the creation class of the
+    instance from the server in order to verify that the specified input
+    parameters are consistent with the parameter characteristics in the method
+    definition.
+
+    Use the 'class invokemethod' command to invoke CIM methods on CIM classes.
+
+    Example:
+
+      pywbemcli -n myconn instance invokemethod CIM_x.id='hi" methodx -p id=3
+    """
+    context.execute_cmd(lambda: cmd_instance_invokemethod(context,
+                                                          instancename,
+                                                          methodname,
+                                                          options))
 
 
 @instance_group.command('query', options_metavar=CMD_OPTS_TXT)

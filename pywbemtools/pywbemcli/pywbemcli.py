@@ -42,6 +42,7 @@ from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
 
 from ._connection_repository import ConnectionRepository
+from ._click_extensions import PywbemcliTopGroup
 
 __all__ = ['cli']
 
@@ -58,7 +59,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 # pylint: disable=bad-continuation
-@click.group(invoke_without_command=True,
+# PywbemcliTopGroup sets order commands listed in help output
+@click.group(invoke_without_command=True, cls=PywbemcliTopGroup,
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTIONS_METAVAR)
 @click.option('-n', '--name', 'svr_name', type=str, metavar='NAME',

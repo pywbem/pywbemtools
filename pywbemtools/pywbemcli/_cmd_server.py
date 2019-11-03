@@ -18,6 +18,8 @@ Click command definition for the server command group which includes
 cmds for inspection and management of the objects defined by the pywbem
 server class including namespaces, WBEMServer information, and profile
 information.
+
+NOTE: Commands are ordered in help display by their order in this file.
 """
 
 from __future__ import absolute_import, print_function
@@ -28,7 +30,7 @@ from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception
-
+from ._click_extensions import PywbemcliGroup
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -36,7 +38,7 @@ from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception
 # defined with underscore and not dash
 
 
-@cli.group('server', options_metavar=CMD_OPTS_TXT)
+@cli.group('server', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def server_group():
     """
     Command group for WBEM servers.

@@ -16,6 +16,8 @@
 """
 Click Command definition for the qualifer command group which includes
 cmds for get and enumerate for CIM qualifier types.
+
+NOTE: Commands are ordered in help display by their order in this file.
 """
 
 from __future__ import absolute_import, print_function
@@ -28,9 +30,10 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, CMD_OPTS_TXT, \
     output_format_is_table, sort_cimobjects, raise_pywbem_error_exception
 from ._common_options import add_options, namespace_option, summary_option
+from ._click_extensions import PywbemcliGroup
 
 
-@cli.group('qualifier', options_metavar=CMD_OPTS_TXT)
+@cli.group('qualifier', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def qualifier_group():
     """
     Command group for CIM qualifier declarations.

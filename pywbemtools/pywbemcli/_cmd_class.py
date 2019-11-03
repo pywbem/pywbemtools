@@ -16,7 +16,9 @@
 """
 Click Command definition for the class command group which includes
 commands for get, enumerate, associators, references, find, etc. of the objects
-CIMClass on a WBEM server
+CIMClass on a WBEM server.
+
+NOTE: Commands are ordered in help display by their order in this file.
 """
 
 from __future__ import absolute_import, print_function
@@ -33,6 +35,7 @@ from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option
 from ._displaytree import display_class_tree
+from ._click_extensions import PywbemcliGroup
 
 
 #
@@ -65,7 +68,7 @@ local_only_class_option = [              # pylint: disable=invalid-name
                       'Default: Include superclass properties and methods.')]
 
 
-@cli.group('class', options_metavar=CMD_OPTS_TXT)
+@cli.group('class', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
     Command group for CIM classes.
@@ -80,6 +83,47 @@ def class_group():
     'class' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
+
+
+@class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
+@click.argument('classname', type=str, metavar='CLASSNAME', required=False)
+@add_options(deep_inheritance_class_option)
+@add_options(local_only_class_option)
+@add_options(no_qualifiers_class_option)
+@add_options(include_classorigin_class_option)
+@add_options(names_only_option)
+@add_options(namespace_option)
+@add_options(summary_option)
+@click.pass_obj
+def class_enumerate(context, classname, **options):
+    """
+    List top classes or subclasses of a class in a namespace.
+
+    Enumerate CIM classes starting either at the top of the class hierarchy
+    in the specified CIM namespace (--namespace option), or at the specified
+    class (CLASSNAME argument) in the specified namespace. If no namespace was
+    specified, the default namespace of the connection is used.
+
+    The --local-only, --include-classorigin, and --no-qualifiers options
+    determine which parts are included in each retrieved class.
+
+    The --deep-inheritance option defines whether or not the complete subclass
+    hierarchy of the classes is retrieved.
+
+    The --names-only option can be used to show only the class paths.
+
+    In the output, the classes and class paths will be formatted as defined
+    by the --output-format general option. Table formats on classes will be
+    replaced with MOF format.
+
+    Examples:
+
+      pywbemcli -n myconn class enumerate -n interop
+
+      pywbemcli -n myconn class enumerate CIM_Foo -n interop
+    """
+    context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
+                                                    options))
 
 
 @class_group.command('get', options_metavar=CMD_OPTS_TXT)
@@ -185,47 +229,6 @@ def class_invokemethod(context, classname, methodname, **options):
                                                        classname,
                                                        methodname,
                                                        options))
-
-
-@class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
-@click.argument('classname', type=str, metavar='CLASSNAME', required=False)
-@add_options(deep_inheritance_class_option)
-@add_options(local_only_class_option)
-@add_options(no_qualifiers_class_option)
-@add_options(include_classorigin_class_option)
-@add_options(names_only_option)
-@add_options(namespace_option)
-@add_options(summary_option)
-@click.pass_obj
-def class_enumerate(context, classname, **options):
-    """
-    List top classes or subclasses of a class in a namespace.
-
-    Enumerate CIM classes starting either at the top of the class hierarchy
-    in the specified CIM namespace (--namespace option), or at the specified
-    class (CLASSNAME argument) in the specified namespace. If no namespace was
-    specified, the default namespace of the connection is used.
-
-    The --local-only, --include-classorigin, and --no-qualifiers options
-    determine which parts are included in each retrieved class.
-
-    The --deep-inheritance option defines whether or not the complete subclass
-    hierarchy of the classes is retrieved.
-
-    The --names-only option can be used to show only the class paths.
-
-    In the output, the classes and class paths will be formatted as defined
-    by the --output-format general option. Table formats on classes will be
-    replaced with MOF format.
-
-    Examples:
-
-      pywbemcli -n myconn class enumerate -n interop
-
-      pywbemcli -n myconn class enumerate CIM_Foo -n interop
-    """
-    context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
-                                                    options))
 
 
 @class_group.command('references', options_metavar=CMD_OPTS_TXT)
