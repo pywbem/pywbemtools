@@ -34,6 +34,12 @@ Released: not yet
 
 **Enhancements:**
 
+* Add capability to reorder commands in the help for each group.  The commands
+  in all groups except for the top group (pywbemcli -h) are ordered in the
+  help list by their order in their source file. The display of commands in
+  the top level group is alphabetical except that connection, help, and repl
+  are reordered to the bottom of the list. (See issue #466)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

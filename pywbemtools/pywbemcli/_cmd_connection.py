@@ -18,6 +18,8 @@ Click Command definition for the connection command group which includes
 cmds to list add, delete, show, and test server definitions in the
 connection information.  This also maintains a definition of servers on
 disk which is kept in sync with changes made with the add/delete commands.
+
+NOTE: Commands are ordered in help display by their order in this file.
 """
 
 from __future__ import absolute_import, print_function
@@ -34,9 +36,10 @@ from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
+from ._click_extensions import PywbemcliGroup
 
 
-@cli.group('connection', options_metavar=CMD_OPTS_TXT)
+@cli.group('connection', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def connection_group():
     """
     Command group for WBEM connection definitions.

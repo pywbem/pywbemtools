@@ -36,6 +36,7 @@ from ._connection_repository import *   # noqa: F403,F401
 from .pywbemcli import *       # noqa: F403,F401
 from .config import *  # noqa: F403,F401
 from ._pywbemcli_operations import *  # noqa: F403,F401
+from ._click_extensions import *  # noqa: F403,F401
 
 from ._version import __version__  # noqa: F401
 

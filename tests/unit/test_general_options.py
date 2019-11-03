@@ -172,13 +172,12 @@ Options:
 
 Commands:
   class       Command group for CIM classes.
-  connection  Command group for WBEM connection definitions.
-  help        Show help message for interactive mode.
   instance    Command group for CIM instances.
   qualifier   Command group for CIM qualifier declarations.
-  repl        Enter interactive mode (default).
   server      Command group for WBEM servers.
-
+  connection  Command group for WBEM connection definitions.
+  help        Show help message for interactive mode.
+  repl        Enter interactive mode (default).
 """
 
 REPL_HELP = """Usage: pywbemcli repl [OPTIONS]

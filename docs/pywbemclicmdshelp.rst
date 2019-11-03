@@ -148,12 +148,12 @@ Help text for ``pywbemcli``:
 
     Commands:
       class       Command group for CIM classes.
-      connection  Command group for WBEM connection definitions.
-      help        Show help message for interactive mode.
       instance    Command group for CIM instances.
       qualifier   Command group for CIM qualifier declarations.
-      repl        Enter interactive mode (default).
       server      Command group for WBEM servers.
+      connection  Command group for WBEM connection definitions.
+      help        Show help message for interactive mode.
+      repl        Enter interactive mode (default).
 
 
 .. _`pywbemcli class --help`:
@@ -185,13 +185,13 @@ Help text for ``pywbemcli class`` (see :ref:`class command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      associators   List the classes associated with a class.
-      delete        Delete a class.
       enumerate     List top classes or subclasses of a class in a namespace.
-      find          List the classes with matching class names on the server.
       get           Get a class.
+      delete        Delete a class.
       invokemethod  Invoke a method on a class.
       references    List the classes referencing a class.
+      associators   List the classes associated with a class.
+      find          List the classes with matching class names on the server.
       tree          Show the subclass or superclass hierarchy for a class.
 
 
@@ -669,13 +669,13 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      delete  Delete a WBEM connection definition.
       export  Export the current connection.
-      list    List the WBEM connection definitions.
-      save    Save the current connection to a new WBEM connection definition.
-      select  Select a WBEM connection definition as current or default.
       show    Show a WBEM connection definition or the current connection.
+      delete  Delete a WBEM connection definition.
+      select  Select a WBEM connection definition as current or default.
       test    Test the current connection with a predefined WBEM request.
+      save    Save the current connection to a new WBEM connection definition.
+      list    List the WBEM connection definitions.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -975,16 +975,16 @@ Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      associators   List the instances associated with an instance.
-      count         Count the instances of each class with matching class name.
-      create        Create an instance of a class in a namespace.
-      delete        Delete an instance of a class.
       enumerate     List the instances of a class.
       get           Get an instance of a class.
-      invokemethod  Invoke a method on an instance.
+      delete        Delete an instance of a class.
+      create        Create an instance of a class in a namespace.
       modify        Modify properties of an instance.
-      query         Execute a query on instances in a namespace.
+      associators   List the instances associated with an instance.
       references    List the instances referencing an instance.
+      invokemethod  Invoke a method on an instance.
+      query         Execute a query on instances in a namespace.
+      count         Count the instances of each class with matching class name.
 
 
 .. _`pywbemcli instance associators --help`:
@@ -1643,8 +1643,8 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      enumerate  List the qualifier declarations in a namespace.
       get        Get a qualifier declaration.
+      enumerate  List the qualifier declarations in a namespace.
 
 
 .. _`pywbemcli qualifier enumerate --help`:
@@ -1763,12 +1763,12 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      brand         Get the brand of the server.
-      centralinsts  List central instances of mgmt profiles on the server.
-      info          Get information about the server.
-      interop       Get the Interop namespace of the server.
       namespaces    List the namespaces of the server.
+      interop       Get the Interop namespace of the server.
+      brand         Get the brand of the server.
+      info          Get information about the server.
       profiles      List management profiles advertized by the server.
+      centralinsts  List central instances of mgmt profiles on the server.
 
 
 .. _`pywbemcli server brand --help`:
