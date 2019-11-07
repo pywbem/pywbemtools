@@ -14,7 +14,6 @@ The pywbemtools github page is: `https://github.com/pywbem/pywbemtools <https://
 
    introduction.rst
    pywbemcli/index.rst
-   mock_support.rst
    development.rst
    appendix.rst
    changes.rst
