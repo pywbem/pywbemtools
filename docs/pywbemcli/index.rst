@@ -49,11 +49,13 @@ It provides functionality to:
 .. _DMTF: https://www.dmtf.org/
 
 .. The maxdepth attribute overrides the maxdepth attribute of the
-.. mastertoc if used.  Just set :maxdepth: 2 on the line below toctree
+.. mastertoc if used.
+.. The numbered attribute intentionally is not set, because the numbering
+.. on sub-TOCs is created automatically when set on the top-level TOC.
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
+   :caption: Table of Contents in this Section:
 
    cmdlineinterface.rst
    generaloptions.rst
