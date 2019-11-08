@@ -10,6 +10,7 @@ The pywbemtools github page is: `https://github.com/pywbem/pywbemtools <https://
 .. toctree::
    :maxdepth: 2
    :numbered:
+   :caption: Table of Contents:
    :name: mastertoc
 
    introduction.rst
