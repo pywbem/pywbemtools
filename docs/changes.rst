@@ -30,6 +30,9 @@ Released: not yet
 * Added PyYAML>=5.1 as a prerequisite package for pywbemtools for installation.
   So far, it was pulled in indirectly via pywbem.
 
+* Fixed case sensitive matching of class names in instance modify by
+  picking up the fix in pywbem 0.14.6. (See issue #429).
+
 **Enhancements:**
 
 **Cleanup:**
