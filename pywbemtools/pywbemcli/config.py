@@ -99,3 +99,10 @@ USE_TERMINAL_WIDTH = True
 #: If this variable is an integer, that is the maximum width. If None, tables
 #: are output with no limit on width.
 DEFAULT_TABLE_WIDTH = 150
+
+
+#: If True, the auto-suggestion capability is enabled in the interactive
+#: mode.  This capability uses the history file to provide suggestions for
+#: the command file in addition to other auto-complete capabilities
+#: If False, auto-suggestion is disabled.
+USE_AUTOSUGGEST = True

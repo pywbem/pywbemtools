@@ -47,6 +47,12 @@ Released: not yet
   original form using, WBEMURI is error prone with quote marks.
   (see issue #390)
 
+* Add prompt-toolkit auto-suggest.  This extends the command completion 
+  capability in the repl mode (interactive mode) to make suggestions on
+  command line input based on the history file.  Usually auto-suggest completion 
+  will be shown as gray text behind the current input. Auto-suggest is not
+  available in command line mode.
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
