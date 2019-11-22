@@ -27,6 +27,8 @@ from copy import deepcopy
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
 
 import pywbem
 from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
@@ -39,7 +41,7 @@ from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
-    DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
+    DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
 
 from ._connection_repository import ConnectionRepository
 from ._click_extensions import PywbemcliTopGroup
@@ -607,4 +609,8 @@ def repl(ctx):
         'message': PYWBEMCLI_PROMPT,
         'history': FileHistory(history_file),
     }
+
+    if USE_AUTOSUGGEST:
+        prompt_kwargs['auto_suggest'] = AutoSuggestFromHistory()
+
     click_repl.repl(ctx, prompt_kwargs=prompt_kwargs)

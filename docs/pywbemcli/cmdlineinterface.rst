@@ -56,6 +56,15 @@ gets class ``CIM_ManagedElement`` in namespace ``interop`` and displays it in
 the MOF output format. The option ``--output-format`` is a general option
 and ``--namespace`` is a command option.
 
+.. index::
+   single: tab-completion
+   single: auto-completion
+   single: auto-suggestion
+
+Pywbemcli supports several modes of tab-completion, auto-completion suggestions 
+and depending on whether it is in command or interactive mode. This is detailed 
+in the following sections.
+
 
 .. _`Modes of operation`:
 
@@ -93,6 +102,10 @@ WBEM server on ``localhost``:
     Enter password: <password>
     . . .
     <Returns MOF for the enumerated classes>
+
+.. index::
+   single: tab-completion
+   single: auto-completion
 
 In command mode, tab completion is also supported for some command shells, but
 must be enabled specifically for each shell.
@@ -251,8 +264,13 @@ example:
       associators   List the classes associated with a class.
       . . .
 
+.. index::
+   single: tab-completion
+   single: auto-completion
+   single: auto-suggestion
+
 The pywbemcli shell in the interactive mode supports popup help text
-while typing, where the valid choices are shown based upon what was typed so
+while for commands, arguments, and options typing, where the valid choices are shown based upon what was typed so
 far, and where an item from the popup list can be picked with <TAB> or with the
 cursor keys. It can be used to select from the list of general options. In the
 following examples, an underscore ``_`` is shown as the cursor:
@@ -268,9 +286,22 @@ following examples, an underscore ``_`` is shown as the cursor:
     pywbemcli> cl_
                   class
 
+.. index::
+   single: command history
+
 The pywbemcli shell supports history across multiple invocations of the shell
 using <UP-ARROW>, <DOWN-ARROW>.
 The pywbemcli history is stored in ``~/.pywbemcli_history``.
+
+.. index::
+   single: auto-suggestion
+
+The pywbemcli interactive mode also supports automated parameter suggestions based on
+the pywbemcli history file which works with the auto completion described
+above. The input is compared to the history and when there is another entry
+starting with the given text, the completion will be shown as gray text behind
+the current input. Pressing the right arrow → or c-e will insert this
+suggestion.
 
 
 .. _`Error handling`:
