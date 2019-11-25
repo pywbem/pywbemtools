@@ -78,3 +78,6 @@ CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
 
 CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE = \
     '-n, --namespace NAMESPACE  Add a namespace to the search scope. May be'
+
+CMD_OPTION_KEYS_HELP_LINE = \
+    '-k, --key KEYNAME=VALUE         Value for a key in keybinding of'

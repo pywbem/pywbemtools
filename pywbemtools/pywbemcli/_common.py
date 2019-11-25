@@ -456,6 +456,51 @@ def create_cimproperty(cim_type, is_array, name, value_str):
     return CIMProperty(name, cim_value, cim_type)
 
 
+def create_ciminstancename(cim_class, kv_keys):
+    """
+    Create a cim instance name from the input parameters.
+
+      Parameters:
+
+        cim_class_: (:Class:`pywbem.CIMClass`)
+            The class from which the CIMInstanceName is to be created
+
+        kv_keys ():
+            A tuple of name/value pairs representing the keys and their
+            values that are to be constructed for the instance name. Required
+
+      Returns: CIMInstanceName with namespace = None and host = None
+
+      Exceptions:
+        click.ClickException if Property name not found in class or if mismatch
+          of property type in class vs value component of kv pair
+    """
+    # TODO make usable if no class can be acquired because GetClass not
+    # implemented in server.
+    keys = NocaseDict()
+    for kv_property in kv_keys:
+        name, value_str = parse_kv_pair(kv_property)
+        try:
+            cl_prop = cim_class.properties[name]
+        except KeyError:
+            raise click.ClickException('Property name "{}" not in class "{}".'
+                                       .format(name, cim_class.classname))
+
+        if value_str.startswith('"') and value_str.endswith('"'):
+            value_str = value_str[1:-1]
+        try:
+
+            keys[name] = create_cimvalue(cl_prop.type, value_str, False)
+        except ValueError as ex:
+            raise click.ClickException("Type mismatch property '{}' between "
+                                       "expected type='{}', array={} and input "
+                                       "value='{}'. Exception: {}"
+                                       .format(name, cl_prop.type,
+                                               cl_prop.is_array,
+                                               value_str, ex))
+    return CIMInstanceName(cim_class.classname, keybindings=keys)
+
+
 def create_ciminstance(cim_class, kv_properties, property_list=None):
     """
     Create a cim instance from the input parameters.

@@ -43,6 +43,10 @@ Released: not yet
   the top level group is alphabetical except that connection, help, and repl
   are reordered to the bottom of the list. (See issue #466)
 
+* Define alternatives for creating INSTANCENAME input parameter since the
+  original form using, WBEMURI is error prone with quote marks.
+  (see issue #390)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

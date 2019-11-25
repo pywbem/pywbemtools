@@ -32,7 +32,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE, \
-    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE
+    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE, \
+    CMD_OPTION_KEYS_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -91,6 +92,7 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_COUNT_HELP_LINES = [
@@ -115,6 +117,7 @@ INSTANCE_DELETE_HELP_LINES = [
     'Delete an instance of a class.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_ENUMERATE_HELP_LINES = [
@@ -142,6 +145,7 @@ INSTANCE_GET_HELP_LINES = [
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_INVOKEMETHOD_HELP_LINES = [
@@ -151,6 +155,7 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
     '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_MODIFY_HELP_LINES = [
@@ -161,6 +166,7 @@ INSTANCE_MODIFY_HELP_LINES = [
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_QUERY_HELP_LINES = [
@@ -170,6 +176,7 @@ INSTANCE_QUERY_HELP_LINES = [
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_REFERENCES_HELP_LINES = [
@@ -186,6 +193,7 @@ INSTANCE_REFERENCES_HELP_LINES = [
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 ENUM_INSTANCE_RESP = """instance of CIM_Foo {
@@ -800,6 +808,58 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance command get instname with path and --namespace',
+     ['get', '/root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"', '--namespace',
+      'root/cimv2'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify instance command get with instancename, --key, namespace returns '
+     'data',
+     ['get', 'CIM_Foo', '--namespace', 'root/cimv2', '--key',
+      'InstanceID=CIM_Foo1'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+
+    ['Verify instance command get with instancename with ":", --key, namespace '
+     'returns data',
+     ['get', ':CIM_Foo', '--namespace', 'root/cimv2', '--key',
+      'InstanceID=CIM_Foo1'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command get with instancename, -k namespace returns data',
+     ['get', 'CIM_Foo', '--namespace', 'root/cimv2', '-k',
+      'InstanceID=CIM_Foo1'],
+     {'stdout': ['instance of CIM_Foo {',
+                 '   InstanceID = "CIM_Foo1";',
+                 '   IntegerProp = 1;',
+                 '};',
+                 ''],
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify instance command get with instancename local_only returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
      {'stdout': ['instance of CIM_Foo {',
@@ -961,6 +1021,15 @@ Instances: PyWBEM_AllTypes
                  "'CIM_NOTEXIST'}), namespace='root/cimv2', host=None)"],
       'rc': 1,
       'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command get instname with path and --namespace',
+     ['get', '/cimv2/test:CIM_Foo.InstanceID="CIM_Foo1"', '--namespace',
+      'root/cimv2'],
+     {'stderr': "Conflicting namespaces between wbemuri cimv2/test and option"
+      " root/cimv2",
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -1164,6 +1233,14 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
+    ['Verify instance command modify with --key, single good change',
+     ['modify', 'PyWBEM_AllTypes', '--key', 'InstanceID=test_instance',
+      '-p', 'scalBool=False'],
+     {'stdout': "",
+      'rc': 0,
+      'test': 'linesnows'},
+     ALLTYPES_MOCK_FILE, OK],
+
     ['Verify instance command modify, single good change with verify yes',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False', '--verify'],
@@ -1337,6 +1414,13 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance command delete with --key, valid delete',
+     ['delete', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+     {'stdout': '',
+      'rc': 0,
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify instance command delete, valid delete, explicit ns',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"', '-n', 'root/cimv2'],
      {'stdout': '',
@@ -1413,6 +1497,13 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command references, returns instances',
      ['references', 'TST_Person.name="Mike"'],
+     {'stdout': REF_INSTS,
+      'rc': 0,
+      'test': 'lineswons'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command references with --key, returns instances',
+     ['references', 'TST_Person', '--key', 'name=Mike'],
      {'stdout': REF_INSTS,
       'rc': 0,
       'test': 'lineswons'},
@@ -1616,6 +1707,13 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command associators, returns instances',
      ['associators', 'TST_Person.name="Mike"'],
+     {'stdout': ASSOC_INSTS,
+      'rc': 0,
+      'test': 'lines'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command associators with --key, returns instances',
+     ['associators', 'TST_Person', '--key', 'name=Mike'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
@@ -1828,8 +1926,15 @@ interop      TST_Personsub        4
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
+    ['Verify instance command invokemethod with --key, returnvalue = 0',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy', '--key', 'InstanceID=CIM_Foo1'],
+     {'stdout': ['ReturnValue=0'],
+      'rc': 0,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
     ['Verify instance command invokemethod with multiple scalar params',
-     ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy',
+     ['invokemethod', 'CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy',
       '-p', 'TestInOutParameter="blah"',
       '-p', 'TestRef=CIM_Foo.InstanceID="CIM_Foo1"'],
      {'stdout': ['ReturnValue=0',
@@ -1863,7 +1968,7 @@ interop      TST_Personsub        4
      [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
 
     ['Verify instance command invokemethod fails Invalid Class',
-     ['invokemethod', ':CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
+     ['invokemethod', 'CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter="blah"'],
      {'stderr': ["Error: CIMError: 6"],
       'rc': 1,
@@ -1871,7 +1976,7 @@ interop      TST_Personsub        4
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify instance command invokemethod fails Method not registered',
-     ['invokemethod', ':CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
+     ['invokemethod', 'CIM_Foo.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
       'TestInOutParameter=blah'],
      {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
