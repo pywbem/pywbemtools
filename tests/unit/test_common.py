@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -41,7 +42,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
-    verify_operation, split_str_w_esc, format_keys
+    verify_operation, split_str_w_esc, format_keys, create_ciminstancename
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
@@ -404,8 +405,8 @@ TESTCASES_SPLIT_STR = [
 @simplified_test_function
 def test_split_str(testcase, input_str, delimiter, exp_rtn):
     """Test for resolve_propertylist function"""
-    # The code to be tested
 
+    # The code to be tested
     act_result = [item for item in split_str_w_esc(input_str, delimiter)]
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1484,6 +1485,189 @@ class CreateCIMInstanceTest(unittest.TestCase):
             pass
 
 
+######################################################
+#
+#  Test create_instancename
+#
+######################################################
+
+# Class definitions for create_instancename
+cls1 = dict(classname='CIM_Foo',
+            properties=[
+                CIMProperty(
+                    'P1', None, type='string',
+                    qualifiers=[
+                        CIMQualifier('Key', value=True)
+                    ]
+                ),
+                CIMProperty('P2', value='Cheese'),
+            ])
+
+cls2 = dict(classname='CIM_Foo',
+            properties=[
+                CIMProperty(
+                    'P1', None, type='string',
+                    qualifiers=[
+                        CIMQualifier('Key', value=True)
+                    ]
+                ),
+                CIMProperty(
+                    'P2', None, type='string',
+                    qualifiers=[
+                        CIMQualifier('Key', value=True)
+                    ]
+                ),
+                CIMProperty(
+                    'P3', None, type='uint32',
+                    qualifiers=[
+                        CIMQualifier('Key', value=True)
+                    ]
+                ),
+                CIMProperty('P4', value='Cheese'),
+            ])
+
+# TODO add one with ref property
+
+# Testcases for format_inst_to_table()
+
+# Each list item is a testcase tuple with these items:
+# * desc: Short testcase description.
+# * kwargs: Keyword arguments for the test function:
+#   * cls_kwargs: Dict with attributes from which test class is constructed
+#   * key-kv-pairs: Dict of name/value pairs for input keys.
+#   * exp_instname - The expected instance name
+# * exp_exc_types: Expected exception type(s), or None.
+# * exp_rtn: Expected warning type(s), or None.
+# * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+TESTCASES_CREATE_INSTNAME = [
+    (
+        "Verify simple key creation with single string key",
+        dict(
+            cls_kwargs=cls1,
+            kv_args=['P1=Fred'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1='Fred')
+            ),
+        ),
+        None, None, True, ),
+    (
+        "Verify simple key creation with single string key with space",
+        dict(
+            cls_kwargs=cls1,
+            kv_args=['P1="Fred Fred"'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1="Fred Fred")
+            ),
+        ),
+        None, None, True, ),
+    (
+        "Verify simple key creation with invalid key name",
+        dict(
+            cls_kwargs=cls1,
+            kv_args=['Px=Fred'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1='Fred')
+            ),
+        ),
+        click.exceptions.ClickException, None, True, ),
+    (
+        "Verify simple key creation with two string keys and one int",
+        dict(
+            cls_kwargs=cls2,
+            kv_args=['P1=Fred', 'P2=John', 'P3=1'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1='Fred', P2='John', P3=1)
+            ),
+        ),
+        None, None, True, ),
+    (
+        "Verify simple key creation with two string keys and one big int",
+        dict(
+            cls_kwargs=cls2,
+            kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1='Fred', P2='John', P3=123456)
+            ),
+        ),
+        None, None, True, ),
+    (
+        "Verify simple key creation with unicode char",
+        dict(
+            cls_kwargs=cls1,
+            kv_args=[u'P1=Fred\u0344\u0352'],
+            namespace=None,
+            host=None,
+            exp_attrs=dict(
+                classname=u'CIM_Foo',
+                keybindings=NocaseDict(P1=u'Fred\u0344\u0352')
+            ),
+        ),
+        None, None, True, ),
+]
+
+# TODO test integer key, key with no value, key with invalid name, datetime
+# key
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CREATE_INSTNAME)
+@simplified_test_function
+def test_create_instancename(testcase, cls_kwargs, kv_args, exp_attrs,
+                             namespace, host,):
+    """
+    Test the common function create_instancename()
+    """
+    # The code to be tested
+
+    cls = CIMClass(**cls_kwargs)
+    obj = create_ciminstancename(cls, kv_args)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+    # result is list of lists.  we want to test each item in inner list
+
+    assert isinstance(obj, CIMInstanceName)
+
+    exp_classname = exp_attrs['classname']
+    assert obj.classname == exp_classname
+    assert isinstance(obj.classname, type(exp_classname))
+
+    exp_keybindings = exp_attrs.get('keybindings', NocaseDict())
+    assert obj.keybindings == exp_keybindings
+    assert isinstance(obj.keybindings, type(exp_keybindings))
+
+    exp_namespace = exp_attrs.get('namespace', None)
+    assert obj.namespace == exp_namespace
+    assert isinstance(obj.namespace, type(exp_namespace))
+
+    exp_host = exp_attrs.get('host', None)
+    assert obj.host == exp_host
+    assert isinstance(obj.host, type(exp_host))
+
+    assert obj == CIMInstanceName(exp_classname,
+                                  keybindings=exp_keybindings,
+                                  host=exp_host,
+                                  namespace=exp_namespace)
+
+
 # TODO this is a pytest. param
 def simple_instance(pvalue=None):
     """
@@ -1690,7 +1874,6 @@ TESTCASES_FMT_INSTANCE_AS_ROWS = [
                 [u'"/:REF_CLN.k1=\\"v1\\""']],
         ),
         None, None, True, ),
-
 ]
 
 # TODO: See line 973. We have some test duplication.

@@ -230,6 +230,12 @@ The instance name (INSTANCENAME argument) can be specified in two ways:
   the ``-namespace``/``-n`` command option, or the default namespace of the
   connection.
 
+* By specifying the WBEM URI without keybindings and using the --key option
+  to specify the keybindings ad defined in section
+  :ref:`Defining INSTANCENAME command argument with --key option`. The
+  advantage of this technique is that it eliminates the use of the double
+  quote surrounding the key values.
+
 
 .. _`The INSTANCENAME command argument as a WBEM URI`:
 
@@ -361,3 +367,19 @@ interactive selection, as shown in the following example:
        InstanceID = "CIM_Foo1";
        IntegerProp = 1;
     };
+
+
+.. _`Defining INSTANCENAME command argument with --key option`:
+
+`Defining INSTANCENAME command argument with --key option`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The INSTANCENAME may be specified by a combination of the namespace/classname
+as an argument with the --key option to define keybindings. Each --key option
+definition defines a single keybinding in the form name=value.   In general,
+the value component does not require the double quote that is required with
+WBEM_URL unless there are space characters in a string value.
+
+  Example:
+
+    CIM_Foo --key InstanceId=inst1

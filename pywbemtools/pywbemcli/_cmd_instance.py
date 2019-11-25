@@ -22,6 +22,7 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
+import re
 import click
 
 from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
@@ -30,7 +31,8 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
-    process_invokemethod, raise_pywbem_error_exception
+    process_invokemethod, raise_pywbem_error_exception, \
+    create_ciminstancename, warning_msg
 
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
@@ -112,6 +114,14 @@ property_modify_option = [              # pylint: disable=invalid-name
                       'comma-separated list; embedded instances are not '
                       'supported. '
                       'Default: No properties modified.')]
+
+keybinding_key_option = [              # pylint: disable=invalid-name
+    click.option('-k', '--key', type=str, metavar='KEYNAME=VALUE',
+                 required=False, multiple=True,
+                 help='Value for a key in keybinding of CIM instance name. '
+                      'May be specified multiple times. '
+                      'Allows defining keys without the issues of quotes. '
+                      'Default: No keybindings provided.')]
 
 filter_query_language_option = [              # pylint: disable=invalid-name
     click.option('--fql', '--filter-query-language', 'filter_query_language',
@@ -198,6 +208,7 @@ def instance_enumerate(context, classname, **options):
 @add_options(include_qualifiers_get_option)
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_get(context, instancename, **options):
@@ -232,6 +243,7 @@ def instance_get(context, instancename, **options):
 
 @instance_group.command('delete', options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_delete(context, instancename, **options):
@@ -301,6 +313,7 @@ def instance_create(context, classname, **options):
               'be modified. '
               'Default: Do not reduce the properties to be modified.')
 @add_options(verify_option)
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_modify(context, instancename, **options):
@@ -358,6 +371,7 @@ def instance_modify(context, instancename, **options):
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(summary_option)
 @add_options(filter_query_option)
@@ -414,6 +428,7 @@ def instance_associators(context, instancename, **options):
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(summary_option)
 @add_options(filter_query_option)
@@ -468,6 +483,7 @@ def instance_references(context, instancename, **options):
                    'Array property values are specified as a comma-separated '
                    'list; embedded instances are not supported. '
                    'Default: No input parameters.')
+@add_options(keybinding_key_option)
 @add_options(namespace_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
@@ -577,42 +593,133 @@ def instance_count(context, classname, **options):
 
 ####################################################################
 #
-#  cmd_instance_<action> processors
+#  Common functions for cmd_instance processing
 #
 ####################################################################
 
+
+WBEM_URI_INSTANCEPATH_REGEXP = re.compile(
+    r'^(?:([\w\-]+):)?'  # namespace type (URI scheme)
+    r'(?://([\w.:@\[\]]*))?'  # authority (host)
+    r'(?:/|^/?)(\w+(?:/\w+)*)?'  # namespace name (leading slash optional)
+    r'(?::|^:?)(\w+)'  # class name (leading colon optional)
+    r'$',  # String end withou key bindings
+    flags=re.UNICODE)
+
+# Valid namespace types (URI schemes) for WBEM URI parsing
+WBEM_URI_NAMESPACE_TYPES = [
+    'http', 'https',
+    'cimxml-wbem', 'cimxml-wbems',
+]
+
+
 def get_instancename(context, instancename, options):
     """
-    Common function to get the instancename from either the input or the user.
+    Common function to get the instancename from the input defined as a
+    WBEM_URL, the user with a console prompt call, or from one or more
+    key options.
+
     If the instance name replaces the keys with ".?" execute the console
     prompt to select the instance name.
 
+    If there is data in the key element in the options dict, usees that data to
+    build the instance name.  The data ins in the form name=value.
+
+    Otherwise assume that the instancename is a WBEM_URI and parse it.
+
+    Parameters:
+
+      Context: :class:`~pywbem.CIMInstanceName`
+        The click context
+
+      instancename: (:term:`string`):
+
+      The WBEM URI string must be a CIM instance path in untyped WBEM URI
+      format as documented in the pywbem CIMInstanceName.from_wbem_uri except
+      that if the --keys option exists the keybindings compoment must not
+      exist or if the keybindings may be defined as ".?'
+
     Returns:
+
      CIMInstanceName with namespace retrieved either from the namespace option
      in options dictionary or the connection default_namespace.
+
+      :class:`~pywbem.CIMInstanceName`: The instance path created from the
+      specified input with namespace retrieved either the namespace option
+      in options dictionary, the instancename,  or the connection
+      default_namespace.
+
+    Raises:
+
+      ClickException: Invalid WBEM URI format for an instance path. This
+        includes typed WBEM URIs.
     """
-    try:
-        # if the keys component is the character ? execute select
-        if instancename.endswith(".?"):
-            instancename = instancename[:-2]
-            ns = options.get('namespace', context.conn.default_namespace)
+    # TODO: Future - Could we  make usable if no class can be acquired because
+    # GetClass not implemented in server. That would probably require
+    # getting at least an instance of the class and using the properties
+    # in that instance and the corresponding instancename to determine
+    # which properties are keys and the property types.
 
-            try:
-                instancepath = pick_instance(context, instancename,
-                                             namespace=ns)
-                return instancepath
+    # If the keybindings is the character ? execute select
+    if instancename.endswith(".?"):
+        if options['key']:
+            raise click.ClickException('Key option conflicts with '
+                                       'namespace wildcard "?"')
+        cln = instancename[:-2]
+        ns = options.get('namespace', context.conn.default_namespace)
 
-            except ValueError:
-                click.echo('Function aborted')
-                return None
+        try:
+            instancepath = pick_instance(context, cln, namespace=ns)
+        except ValueError:
+            click.echo('Request aborted')
+            return None
 
-        else:
+    # If the --key option contains data use that to build CIMInstanceName
+    elif options['key']:
+        # parse the prolog and classname from WBEM_URI to get classname
+        m = WBEM_URI_INSTANCEPATH_REGEXP.match(instancename)
+        if m is None:
+            raise click.ClickException("Invalid format for instance path {}".
+                                       format(instancename))
+
+        ns_type = m.group(1) or None
+        if ns_type and ns_type.lower() not in WBEM_URI_NAMESPACE_TYPES:
+            warning_msg("Tolerating unknown namespace type {} in WBEM URI: {}".
+                        format(ns_type, instancename))
+
+        namespace = m.group(3) or None
+        classname = m.group(4) or None
+        assert classname is not None  # should be ensured by regexp
+
+        try:
+            cim_class = context.conn.GetClass(classname, LocalOnly=False,
+                                              IncludeQualifiers=True)
+            instancepath = create_ciminstancename(cim_class, options['key'])
+            instancepath.namespace = namespace
+
+        except CIMError as ce:
+            if ce.status_code == CIM_ERR_NOT_FOUND:
+                raise click.ClickException('Class "{}" not found'.format(cln))
+        except ValueError as ve:
+            raise click.ClickException('{}: {}'.format(
+                ve.__class__.__name__, ve))
+
+    else:
+        try:
             instancepath = parse_wbemuri_str(instancename,
                                              options['namespace'])
-        return instancepath
+        except ValueError as ve:
+            raise click.ClickException('{}: {}'.format(
+                ve.__class__.__name__, ve))
 
-    except ValueError as ve:
-        raise click.ClickException('{}: {}'.format(ve.__class__.__name__, ve))
+    return instancepath
+
+
+####################################################################
+#
+#  cmd_instance_<action> processors
+#
+####################################################################
 
 
 def cmd_instance_get(context, instancename, options):
@@ -666,7 +773,8 @@ def cmd_instance_delete(context, instancename, options):
 
 
 def cmd_instance_create(context, classname, options):
-    """Create an instance and submit to wbemserver.
+    """
+       Create an instance and submit to wbemserver.
        If successful, this operation returns the new instance name. Otherwise
        it raises an exception
     """
