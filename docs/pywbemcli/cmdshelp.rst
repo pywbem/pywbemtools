@@ -352,24 +352,35 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
         pywbemcli -n myconn class enumerate CIM_Foo -n interop
 
     Options:
-      --di, --deep-inheritance      Include the complete subclass hierarchy of the
-                                    requested classes in the result set. Default:
-                                    Do not include subclasses.
-      --lo, --local-only            Do not include superclass properties and
-                                    methods in the returned class(es). Default:
-                                    Include superclass properties and methods.
-      --nq, --no-qualifiers         Do not include qualifiers in the returned
-                                    class(es). Default: Include qualifiers.
-      --ico, --include-classorigin  Include class origin information in the
-                                    returned class(es). Default: Do not include
-                                    class origin information.
-      --no, --names-only            Retrieve only the object paths (names).
-                                    Default: Retrieve the complete objects
-                                    including object paths.
-      -n, --namespace NAMESPACE     Namespace to use for this command, instead of
-                                    the default namespace of the connection.
-      -s, --summary                 Show only a summary (count) of the objects.
-      -h, --help                    Show this message and exit.
+      --di, --deep-inheritance        Include the complete subclass hierarchy of
+                                      the requested classes in the result set.
+                                      Default: Do not include subclasses.
+      --lo, --local-only              Do not include superclass properties and
+                                      methods in the returned class(es). Default:
+                                      Include superclass properties and methods.
+      --nq, --no-qualifiers           Do not include qualifiers in the returned
+                                      class(es). Default: Include qualifiers.
+      --ico, --include-classorigin    Include class origin information in the
+                                      returned class(es). Default: Do not include
+                                      class origin information.
+      --no, --names-only              Retrieve only the object paths (names).
+                                      Default: Retrieve the complete objects
+                                      including object paths.
+      -n, --namespace NAMESPACE       Namespace to use for this command, instead
+                                      of the default namespace of the connection.
+      -s, --summary                   Show only a summary (count) of the objects.
+      --association / --no-association
+                                      Filter the returned classes to return only
+                                      indication classes (--association) or
+                                      classes that are not associations(--no-
+                                      association). If the option is not defined
+                                      no filtering occurs
+      --indication / --no-indication  Filter the returned classes to return only
+                                      indication classes (--indication) or classes
+                                      that are not indications (--no-indication).
+                                      If the option is not defined no filtering
+                                      occurs
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli class find --help`:

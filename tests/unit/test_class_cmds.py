@@ -37,6 +37,7 @@ TEST_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
+QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
 
 #
@@ -487,7 +488,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate CIM_Foo names and --deep-inheritance '
-      '--names-only',
+     '--names-only',
      ['enumerate', 'CIM_Foo', '--names-only', '--deep-inheritance'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'in'},
@@ -498,7 +499,6 @@ TEST_CASES = [
      {'stdout': ['Key ( true )', '[Description (', 'class CIM_Foo'],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify class command get with xml output format).',
      {'args': ['enumerate'],
@@ -515,8 +515,7 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-
-    ['Verify class command get with repr output format).',
+    ['Verify class command enumerate with repr output format).',
      {'args': ['enumerate'],
       'general': ['--output-format', 'xml']},
      {'stdout': ['<CLASS NAME="CIM_Foo">',
@@ -525,6 +524,99 @@ TEST_CASES = [
                  '<METHOD NAME="DeleteNothing" PROPAGATED="false"'],
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --association filter.',
+     ['enumerate', '--association', '--names_only'],
+     {'stdout': ['TST_Lineage', 'TST_MemberOfFamilyCollection'],
+      'test': 'innows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --association filter and no '
+     'qualifiers.',
+     ['enumerate', '--association', '--nq'],
+     {'stdout': ['class TST_Lineage {',
+                 'string InstanceID;',
+                 'TST_Person REF parent;',
+                 'TST_Person REF child;',
+                 'class TST_MemberOfFamilyCollection {',
+                 'TST_Person REF family;',
+                 'TST_Person REF member;', '};'],
+      'test': 'innows'},
+     SIMPLE_ASSOC_MOCK_FILE, RUN],
+
+    ['Verify class command enumerate with --association filter.',
+     ['enumerate', '--no-association', '--names_only'],
+     {'stdout': ['TST_FamilyCollection', 'TST_Person'],
+      'test': 'in'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --indication filter.',
+     ['enumerate', '--indication', '--names_only'],
+     {'stdout': ['TST_Indication', 'TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-indication filter.',
+     ['enumerate', '--no-indication', '--names_only'],
+     {'stdout': ['TST_FamilyCollection',
+                 'TST_Lineage',
+                 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionSub',
+                 'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimentat filter.',
+     ['enumerate', '--experimental', '--names-only'],
+     {'stdout': ['TST_Indication', 'TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-experimental filter.',
+     ['enumerate', '--no-experimental', '--names-only'],
+     {'stdout': ['TST_FamilyCollection',
+                 'TST_Indication',
+                 'TST_Lineage',
+                 'TST_MemberOfFamilyCollection',
+                 'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental and --association.',
+     ['enumerate', '--experimental', '--association', '--names-only'],
+     {'stdout': ['TST_MemberOfFamilyCollectionSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental and '
+     '--not-association.',
+     ['enumerate', '--experimental', '--no-association', '--names-only'],
+     {'stdout': ['TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --indication and --experimental.',
+     ['enumerate', '--experimental', '--indication', '--names-only'],
+     {'stdout': ['TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --indication and --no-experimental.',
+     ['enumerate', '--no-experimental', '--indication', '--names-only'],
+     {'stdout': ['TST_Indication'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --noindication, --no-experimental.'
+     '--no-association',
+     ['enumerate', '--no-experimental', '--no-indication', '--no-association',
+      '--names-only'],
+     {'stdout': ['TST_FamilyCollection',
+                 'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+
     #
     # Enumerate errors
     #
@@ -707,7 +799,6 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command get with repr output format).',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--output-format', 'xml']},
@@ -849,6 +940,33 @@ TEST_CASES = [
      {'stdout': "  root/cimv2:CIM_Foo_sub2",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command find with --association filter',
+     ['find', '*TST_*', '-n', 'root/cimv2', '--association'],
+     {'stdout': ['TST_Lineage',
+                 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --indicationfilter',
+     ['find', '*TST_*', '-n', 'root/cimv2', '--indication'],
+     {'stdout': ['TST_Indication', 'root/cimv2:TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --indication & -no-experimental filters',
+     ['find', '*TST_*', '-n', 'root/cimv2', '--indication',
+      '--no-experimental'],
+     {'stdout': ['TST_Indication'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --association & --experimental filters',
+     ['find', '*TST_*', '-n', 'root/cimv2', '--association', '--experimental'],
+     {'stdout': ['TST_MemberOfFamilyCollectionSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
 
     #
     # command "class delete"

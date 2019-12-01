@@ -142,6 +142,7 @@ filter_query_option = [              # pylint: disable=invalid-name
 ##########################################################################
 #
 #   Click command group and command definitions
+#   These decorated functions implement the commands, arguments, and
 #
 ###########################################################################
 
