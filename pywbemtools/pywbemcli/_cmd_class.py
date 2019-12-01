@@ -25,7 +25,8 @@ from __future__ import absolute_import, print_function
 
 import click
 
-from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND
+from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
+from pywbem._nocasedict import NocaseDict
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
@@ -33,7 +34,8 @@ from ._common import display_cim_objects, filter_namelist, \
     format_table, process_invokemethod, raise_pywbem_error_exception
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
-    summary_option, multiple_namespaces_option
+    summary_option, multiple_namespaces_option, association_filter_option, \
+    indication_filter_option, experimental_filter_option
 from ._displaytree import display_class_tree
 from ._click_extensions import PywbemcliGroup
 
@@ -68,6 +70,14 @@ local_only_class_option = [              # pylint: disable=invalid-name
                       'Default: Include superclass properties and methods.')]
 
 
+##########################################################################
+#
+#   Click command group and command definitions
+#   These decorated functions implement the commands, arguments, and
+#   options for the top-level class command group
+#
+###########################################################################
+
 @cli.group('class', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
 def class_group():
     """
@@ -94,6 +104,9 @@ def class_group():
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(summary_option)
+@add_options(association_filter_option)
+@add_options(indication_filter_option)
+@add_options(experimental_filter_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
@@ -334,6 +347,9 @@ def class_associators(context, classname, **options):
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by namespace. Default is to sort by classname')
+@add_options(association_filter_option)
+@add_options(indication_filter_option)
+@add_options(experimental_filter_option)
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
@@ -408,6 +424,140 @@ def class_tree(context, classname, **options):
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
+
+####################################################################
+#
+#  Common functions for cmd_class processing
+#  This includes functions used by the command action functions
+#  in this fmodule and possibly other modules
+#
+####################################################################
+
+
+def _build_qualifier_filters(options):
+    """
+    Build a dictionary defining the qualifier filters to be processes from
+    their definitons in the Click options dictionary. There is an entry
+    in the dictionary for each qualifier filter where the key is the
+    association name and the value is True or False depending in the
+    value of the option ('x' or 'no-x' )
+    """
+    qualifier_filters = {}
+    if options['association'] is not None:
+        # show_assoc = options['association']
+        qualifier_filters['Association'] = options['association']
+    if options['indication'] is not None:
+        qualifier_filters['Indication'] = options['indication']
+    if options['experimental'] is not None:
+        qualifier_filters['Experimental'] = options['experimental']
+    return qualifier_filters
+
+
+def _filter_classes_for_qualifiers(qualifier_filters, results, names_only, iq):
+    """
+    Filter the results list for the qualifiers defined by filter
+    qualifier: a dictionary with qualifier name as key and Boolean defining
+    whether to display or not display if it exists.
+
+    This method only works for boolean qualifiers
+    """
+
+    filtered_results = []
+    if results:
+        assert isinstance(results[0], CIMClass)
+    for cls in results:
+        assert isinstance(cls, CIMClass)
+        show_this_class = True
+        for qname, show_if_true in qualifier_filters.items():
+            if qname in cls.qualifiers:
+                qvalue = cls.qualifiers[qname].value
+                show_this = True if qvalue == show_if_true else False
+            else:
+                show_this = not show_if_true
+            if not show_this:
+                show_this_class = False
+                break
+        if show_this_class:
+            # If returning instances, honor the names_only option
+            if not names_only:
+                if not iq:
+                    cls.qualifiers = NocaseDict()
+                    for p in cls.properties.values():
+                        p.qualifiers = NocaseDict()
+                    for m in cls.methods.values():
+                        m.qualifiers = NocaseDict()
+                        for p in m.parameters.values():
+                            p.qualifiers = NocaseDict()
+            filtered_results.append(cls)
+    if names_only:
+        filtered_results = [cls.classname for cls in filtered_results]
+    return filtered_results
+
+
+def enumerate_classes_filtered(context, classname, options):
+    """
+    Execute EnumerateClasses or EnumerateClassNames in a single namespace
+    defined in options['namespace'] and return results.
+
+    If any of the class qualifier filters are defined in the options parameter,
+    enumerate the classes, filter the result for those parameters, and return
+    only class names if --names-only set.
+
+    This function may be executed by multiple command action functions with
+    varying options in the options. Each option must be tested to validate
+    that it exists in the options dictionary
+
+    Parameters:
+
+      context:  Click context
+
+      classname:
+        Optional classname for the enumerate.
+
+      options:Click options dictionary
+        Options that form basis for this Enumerate and filter processing.
+
+    Returns:
+        List of classes or classnames that satisfy the criteria
+
+    Exceptions:
+
+        pywbem Error exceptions
+    """
+    qualifier_filters = _build_qualifier_filters(options)
+
+    names_only = options.get('names_only', False)
+
+    iq = options.get('no_qualifiers', True)
+
+    # Force IncludeQualifier true if results are to be filtered since
+    # the filter requires that qualifiers exist.
+    request_iq = True if qualifier_filters else iq
+
+    local_only = options.get('local_only', False)
+    deep_inheritance = options.get('deep_inheritance', True)
+    include_classorigin = options.get('include_classorigin', True)
+
+    if names_only and not qualifier_filters:
+        results = context.conn.EnumerateClassNames(
+            ClassName=classname,
+            namespace=options['namespace'],
+            DeepInheritance=deep_inheritance)
+    else:
+        results = context.conn.EnumerateClasses(
+            ClassName=classname,
+            namespace=options['namespace'],
+            LocalOnly=local_only,
+            DeepInheritance=deep_inheritance,
+            IncludeQualifiers=request_iq,
+            IncludeClassOrigin=include_classorigin)
+        if qualifier_filters:
+            results = _filter_classes_for_qualifiers(
+                qualifier_filters, results,
+                names_only, iq)
+    return results
+
+
 #####################################################################
 #
 #  Command functions for each of the commands in the class group
@@ -452,22 +602,11 @@ def cmd_class_invokemethod(context, classname, methodname, options):
 def cmd_class_enumerate(context, classname, options):
     """
         Enumerate the classes returning a list of classes from the WBEM server.
+        That match the qualifier filter options
     """
-    # results may be either classes or classnames
+
     try:
-        if options['names_only']:
-            results = context.conn.EnumerateClassNames(
-                ClassName=classname,
-                namespace=options['namespace'],
-                DeepInheritance=options['deep_inheritance'])
-        else:
-            results = context.conn.EnumerateClasses(
-                ClassName=classname,
-                namespace=options['namespace'],
-                LocalOnly=options['local_only'],
-                DeepInheritance=options['deep_inheritance'],
-                IncludeQualifiers=options['no_qualifiers'],
-                IncludeClassOrigin=options['include_classorigin'])
+        results = enumerate_classes_filtered(context, classname, options)
 
         display_cim_objects(context, results, context.output_format,
                             summary=options['summary'], sort=True)
@@ -561,14 +700,24 @@ def cmd_class_find(context, classname_glob, options):
     try:
         names_dict = {}
         for ns in ns_names:
-            classnames = context.conn.EnumerateClassNames(
-                namespace=ns, DeepInheritance=True)
+            # Set Options that are required for this command.
+            # 1. Always use deep_inheritance
+            # 2. Set namespace to each namespace in loop
+            options['deep_inheritance'] = True
+            options['namespace'] = ns
+
+            classes = enumerate_classes_filtered(context, None, options)
+            classnames = [cls.classname for cls in classes]
+
             filtered_classnames = filter_namelist(classname_glob, classnames)
             names_dict[ns] = filtered_classnames
 
+        # build rows of namespace, classname for each namespace, sort if
+        # necessary,  and add to common rows
         rows = []
         for ns_name in names_dict:
             ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
+            # sort by classname if sort option defined
             row = 0 if options['sort'] else 1
             ns_rows.sort(key=lambda x: x[row])
             rows.extend(ns_rows)

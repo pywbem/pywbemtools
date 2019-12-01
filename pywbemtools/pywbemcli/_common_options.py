@@ -85,6 +85,34 @@ multiple_namespaces_option = [              # pylint: disable=invalid-name
                       'May be specified multiple times. '
                       'Default: Search in all namespaces of the server.')]
 
+#
+#  The following options are implement the filtering of class request
+#  operations to filter by selected class qualifiers
+#
+association_filter_option = [              # pylint: disable=invalid-name
+    click.option('--association/--no-association',
+                 default=None,
+                 help='Filter the returned classes to return only indication '
+                      'classes (--association) or classes that are not '
+                      'associations(--no-association). If the option is not '
+                      'defined no filtering occurs')]
+
+indication_filter_option = [              # pylint: disable=invalid-name
+    click.option('--indication/--no-indication',
+                 default=None,
+                 help='Filter the returned classes to return only indication '
+                      'classes (--indication) or classes that are not '
+                      'indications (--no-indication). If the option is not '
+                      'defined no filtering occurs')]
+
+experimental_filter_option = [              # pylint: disable=invalid-name
+    click.option('--experimental/--no-experimental',
+                 default=None,
+                 help='Filter the returned classes to return only experimental '
+                      'classes (--experimental) or classes that are not '
+                      'experimental (--no-iexperimental). If the option is not '
+                      'defined no filtering occurs')]
+
 
 def add_options(options):
     """
