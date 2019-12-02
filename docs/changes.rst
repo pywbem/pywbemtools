@@ -64,6 +64,9 @@ Released: not yet
 * Clean up test mock files by merging mock_simple_model_ext.mof into
   mock_simple_model.mof
 
+* Changed some tests to account for behavior difference with pywbem 0.15.0
+  references and associations with invalid class, role
+
 **Known issues:**
 
 * See `list of open issues`_.
