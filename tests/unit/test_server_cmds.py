@@ -258,7 +258,7 @@ TEST_CASES = [
                  'SNIA            Server                1.1.0',
                  'SNIA            Software              1.4.0'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command profiles, filtered by org',
@@ -271,7 +271,7 @@ TEST_CASES = [
                  'DMTF            Indications           1.1.0',
                  'DMTF            Profile Registration  1.0.0'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command profiles, filtered by org, long',
@@ -284,7 +284,7 @@ TEST_CASES = [
                  'DMTF            Indications           1.1.0',
                  'DMTF            Profile Registration  1.0.0'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command profiles, filtered by name',
@@ -295,7 +295,7 @@ TEST_CASES = [
                  '--------------  --------------------  ---------',
                  'DMTF            Profile Registration  1.0.0'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command profiles, filtered by org, long',
@@ -306,7 +306,7 @@ TEST_CASES = [
                  '--------------  --------------------  ---------',
                  'DMTF            Profile Registration  1.0.0'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command centralinsts based on wbem server mock.',
