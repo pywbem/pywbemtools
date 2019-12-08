@@ -65,7 +65,13 @@ Released: not yet
   mock_simple_model.mof
 
 * Changed some tests to account for behavior difference with pywbem 0.15.0
-  references and associations with invalid class, role
+  references and associations with invalid class, role.
+
+* Changed minimun version of pywbem to 0.15.0 because of test differences
+  that resulted from differences between pywbem 0.14.6 and 0.15.0. The
+  differences are in pywbem_mock where the code was changed to return errors
+  for invalid classnames and roles in association and reference operations
+  where it previously return empty, ignoring the invalid classname.
 
 **Known issues:**
 

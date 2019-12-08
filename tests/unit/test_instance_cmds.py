@@ -1051,15 +1051,14 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, FAIL],
 
-    # Apparently the mock prompt does not work when processing stdin
-    # an exception is apparently returned
+    # Issue # 459. This test marked fail until issues sorted out.  It is
+    # dependent on ordering of instancenames in pick list which apparently
+    # is python version dependent.
     ['Verify create, get, delete works with stdin, scnd delete fails',
      {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
                 'instance get CIM_Foo.?',
-                'instance delete CIM_Foo.?',
                 'instance delete CIM_Foo.?']},
-     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp = NULL',
-                 'CIM_ERR_NOT_FOUND'],
+     {'stdout': ['CIM_Foo', 'instance of CIM_Foo', 'IntegerProp = NULL'],
       'rc': 0,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_11_FILE], FAIL],
@@ -1569,8 +1568,8 @@ Instances: PyWBEM_AllTypes
      ASSOC_MOCK_FILE, OK],
 
     # Because the order of pick is not guaranteed, we test minimum data
-    # TODO: Marked fail because for some rason with pywbem 0.15.0, this
-    # test fails without building instance sometimes.
+    # Issue #458 TODO: Marked fail because for some rason with pywbem 0.15.0.
+    # this test fails without building instance on some python version.
     ['Verify instance command references with selection suffix keys wild card ',
      ['references', 'TST_Person.?'],
      {'stdout':
@@ -1681,7 +1680,8 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO: Starting with pywbem 0.15.0, this fails on some python version
+    # Issue #457; Starting with pywbem 0.15.0, this fails on some python
+    # versions
     ['Verify instance command associators with interactive wild card on '
      'classname',
      ['associators', 'TST_Person.?'],
@@ -1926,4 +1926,4 @@ class TestSubcmd(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition, verbose=True)
