@@ -47,11 +47,20 @@ Released: not yet
   original form using, WBEMURI is error prone with quote marks.
   (see issue #390)
 
-* Add prompt-toolkit auto-suggest.  This extends the command completion 
+* Add prompt-toolkit auto-suggest.  This extends the command completion
   capability in the repl mode (interactive mode) to make suggestions on
-  command line input based on the history file.  Usually auto-suggest completion 
+  command line input based on the history file.  Usually auto-suggest completion
   will be shown as gray text behind the current input. Auto-suggest is not
   available in command line mode.
+
+* Add ability to filter results of 'class enumerate', 'class find', and
+  'instance count' commands for selected class qualifiers.  This ability
+  is based on 3 new options for each of the above commands '--association',
+  '--indication', and '--experimental' each of which has a corresponding
+  'no-...'. The user can filter to find classes with combinations of these
+  options returning only classes that meet the option criteria.  Thus,
+  '--association' returns classes that are associations and '--no-association'
+  returns only classes that are not associations.  See issue # 447
 
 **Cleanup:**
 

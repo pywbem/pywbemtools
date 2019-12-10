@@ -36,9 +36,12 @@ from ._common import display_cim_objects, parse_wbemuri_str, \
 
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
-    summary_option, verify_option, multiple_namespaces_option
+    summary_option, verify_option, multiple_namespaces_option, \
+    association_filter_option, indication_filter_option, \
+    experimental_filter_option
 from .config import DEFAULT_QUERY_LANGUAGE
 from ._click_extensions import PywbemcliGroup
+from ._cmd_class import get_namespaces, enumerate_classes_filtered
 
 #
 #   Common option definitions for instance group
@@ -558,6 +561,9 @@ def instance_query(context, query, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
 @add_options(multiple_namespaces_option)
+@add_options(association_filter_option)
+@add_options(indication_filter_option)
+@add_options(experimental_filter_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by class name.')
 @click.pass_obj
@@ -1036,28 +1042,27 @@ def cmd_instance_count(context, classname, options):
     """
     Get the number of instances of each class in the namespace
     """
+
+    # Differs from class find because it classname is optional.
+    # If None, select all
     if classname is None:
         classname = '*'
+
     # Create list of namespaces from the option or from all namespaces
-    if options['namespace']:
-        ns_names = options['namespace']
-    else:
-        try:
-            ns_names = context.wbem_server.namespaces
-            ns_names.sort()
-        except CIMError as ce:
-            # allow processing to continue if no interop namespace
-            if ce.status_code == CIM_ERR_NOT_FOUND:
-                click.echo('WARNING: {}'.format(ce))
-                ns_names = [context.conn.default_namespace]
+    ns_names = get_namespaces(context, options['namespace'])
 
     ns_cln_tuples = []  # a list of tuples of namespace, classname
     for namespace in ns_names:
         # Get all classes in Namespace
         try:
-            classnames = context.conn.EnumerateClassNames(
-                DeepInheritance=True,
-                namespace=namespace)
+            # Set cmd options that are required for this command.
+            # 1. Always use deep_inheritance
+            # 2. Set namespace to each namespace in loop
+            options['deep_inheritance'] = True
+            options['namespace'] = namespace
+            options['names_only'] = True
+
+            classnames = enumerate_classes_filtered(context, None, options)
         except Error as er:
             raise_pywbem_error_exception(er)
 

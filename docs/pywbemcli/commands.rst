@@ -137,6 +137,14 @@ If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
+.. index::
+   single: qualifier filters
+The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
+and ``--experimental``/``--no-experimental`` options filter the returned
+classes or classnames to include or exclude classes with the corresponding
+qualifiers.  Thus the ``--association`` option returns only classes or
+classnames that are association classes.
+
 The following example enumerates the class names of the root classes in the
 default namespace:
 
@@ -161,6 +169,14 @@ The ``class find`` command lists classes with a class name that matches the
 argument in all namespaces of the connection, or otherwise in the specified
 namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
+
+.. index::
+   single: qualifier filters
+The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
+and ``--experimental``/``--no-experimental`` options filter the returned
+classes or classnames to include or exclude classes with the corresponding
+qualifiers.  Thus the ``--association`` option returns only classes or
+classnames that are association classes.
 
 The command displays the namespaces and class names of the result using the
 ``txt`` output format (default), or using :term:`Table output formats`.
@@ -452,6 +468,14 @@ If the ``CLASSNAME-GLOB`` argument is specified, only instances of classes that
 match the specified :term:`Unix-style path name pattern` are counted. If the
 ``CLASSNAME-GLOB`` argument is not specified all instances of all classes in
 the target namespaces are counted.
+
+.. index::
+   single: qualifier filters
+The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
+and ``--experimental``/``--no-experimental`` options filter the returned
+classes or classnames to include or exclude classes with the corresponding
+qualifiers.  Thus the ``--association`` option returns only classes or
+classnames that are association classes.
 
 Results for classes that have no instances are not displayed.
 
