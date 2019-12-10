@@ -33,13 +33,17 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE, \
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE, \
-    CMD_OPTION_KEYS_HELP_LINE
+    CMD_OPTION_KEYS_HELP_LINE, \
+    CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
+    CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
+    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
+QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
@@ -101,6 +105,9 @@ INSTANCE_COUNT_HELP_LINES = [
     '-s, --sort Sort by instance count.',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
+    CMD_OPTION_INDICATION_FILTER_HELP_LINE,
+    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
 ]
 
 INSTANCE_CREATE_HELP_LINES = [
@@ -416,7 +423,7 @@ TEST_CASES = [
                  'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"',
                  'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"',
                  'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"', ],
-      'test': 'llinesnows'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate CIM_Foo --include-qualifiers',
@@ -1900,8 +1907,58 @@ interop      TST_Person           4
 interop      TST_Personsub        4
 """,
       'rc': 0,
-      'test': 'lonnows'},
+      'test': 'linenows'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command count *Person* . Return table of instances',
+     {'args': ['count', '*Person*'],
+      'general': ['--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
+Namespace    Class            count
+interop      TST_Person           4
+interop      TST_Personsub        4
+""",
+      'rc': 0,
+      'test': 'linennows'},
+     ASSOC_MOCK_FILE, RUN],
+
+    ['Verify instance command count *Person* with --association',
+     {'args': ['count', '*TST_*', '--association'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': """Count of instances per class
+Namespace    Class            count
+interop      TST_Lineage          3
+interop      TST_MemberOfFamilyCollection  3
+""",
+      'rc': 0,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify instance command count *Person* with --experimental',
+     {'args': ['count', '*TST_*', '--experimental'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': """Count of instances per class
+Namespace    Class            count
+interop      TST_Personsub        4
+""",
+      'rc': 0,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify instance command count *Person* with --indication',
+     {'args': ['count', '*TST_*', '--no-indication', '--association'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': """Count of instances per class
+Namespace    Class            count
+interop      TST_Lineage          3
+interop      TST_MemberOfFamilyCollection  3
+""",
+      'rc': 0,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
 
     #
     #  instance invokemethod tests

@@ -81,3 +81,12 @@ CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE = \
 
 CMD_OPTION_KEYS_HELP_LINE = \
     '-k, --key KEYNAME=VALUE         Value for a key in keybinding of'
+
+CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE = \
+    '--association / --no-association'
+
+CMD_OPTION_INDICATION_FILTER_HELP_LINE = \
+    '--indication / --no-indication'
+
+CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE = \
+    '--experimental / --no-experimental'

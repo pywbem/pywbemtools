@@ -679,45 +679,62 @@ def cmd_class_associators(context, classname, options):
         raise_pywbem_error_exception(er)
 
 
+def get_namespaces(context, namespaces):
+    """
+    Returns either the namespace provided or if that is None, the set of
+    namespaces that are defined in the wbem server as a list
+
+    Exceptions:
+
+        CIMError if status code not CIM_ERR_NOT_FOUND
+    """
+
+    ns_names = []
+    if namespaces:
+        return namespaces
+    # Otherwise get all namespaces from server
+    try:
+        ns_names = context.wbem_server.namespaces
+        ns_names.sort()
+    except CIMError as ce:
+        # allow processing to continue if no interop namespace
+        if ce.status_code == CIM_ERR_NOT_FOUND:
+            click.echo('WARNING: {}. Using default_namespace {}.'
+                       .format(ce, context.conn.default_namespace))
+            ns_names = [context.conn.default_namespace]
+    finally:
+        return ns_names
+
+
 def cmd_class_find(context, classname_glob, options):
     """
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
     """
-
-    if options['namespace']:
-        ns_names = options['namespace']
-    else:
-        try:
-            ns_names = context.wbem_server.namespaces
-            ns_names.sort()
-        except CIMError as ce:
-            # allow processing to continue if no interop namespace
-            if ce.status_code == CIM_ERR_NOT_FOUND:
-                click.echo('WARNING: {}'.format(ce))
-                ns_names = [context.conn.default_namespace]
+    context.spinner.stop()
+    ns_names = get_namespaces(context, options['namespace'])
 
     try:
         names_dict = {}
-        for ns in ns_names:
-            # Set Options that are required for this command.
+        for namespace in ns_names:
+            # Set cmd options that are required for this command.
             # 1. Always use deep_inheritance
             # 2. Set namespace to each namespace in loop
             options['deep_inheritance'] = True
-            options['namespace'] = ns
+            options['namespace'] = namespace
+            options['names_only'] = True
 
-            classes = enumerate_classes_filtered(context, None, options)
-            classnames = [cls.classname for cls in classes]
+            classnames = enumerate_classes_filtered(context, None, options)
 
             filtered_classnames = filter_namelist(classname_glob, classnames)
-            names_dict[ns] = filtered_classnames
+            names_dict[namespace] = filtered_classnames
 
         # build rows of namespace, classname for each namespace, sort if
         # necessary,  and add to common rows
         rows = []
         for ns_name in names_dict:
             ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
-            # sort by classname if sort option defined
+            # sort by classname if sort option defined, else by namespace
             row = 0 if options['sort'] else 1
             ns_rows.sort(key=lambda x: x[row])
             rows.extend(ns_rows)
