@@ -2031,4 +2031,4 @@ class TestSubcmd(CLITestsBase):
         Execute pybemcli with the defined input and test output.
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition, verbose=False)

@@ -380,6 +380,12 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       that are not indications (--no-indication).
                                       If the option is not defined no filtering
                                       occurs
+      --experimental / --no-experimental
+                                      Filter the returned classes to return only
+                                      experimental classes (--experimental) or
+                                      classes that are not experimental (--no-
+                                      iexperimental). If the option is not defined
+                                      no filtering occurs
       -h, --help                      Show this message and exit.
 
 
@@ -425,12 +431,29 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
         pywbemcli -n myconn class find *Foo*
 
     Options:
-      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
-                                 specified multiple times. Default: Search in all
-                                 namespaces of the server.
-      -s, --sort                 Sort by namespace. Default is to sort by
-                                 classname
-      -h, --help                 Show this message and exit.
+      -n, --namespace NAMESPACE       Add a namespace to the search scope. May be
+                                      specified multiple times. Default: Search in
+                                      all namespaces of the server.
+      -s, --sort                      Sort by namespace. Default is to sort by
+                                      classname
+      --association / --no-association
+                                      Filter the returned classes to return only
+                                      indication classes (--association) or
+                                      classes that are not associations(--no-
+                                      association). If the option is not defined
+                                      no filtering occurs
+      --indication / --no-indication  Filter the returned classes to return only
+                                      indication classes (--indication) or classes
+                                      that are not indications (--no-indication).
+                                      If the option is not defined no filtering
+                                      occurs
+      --experimental / --no-experimental
+                                      Filter the returned classes to return only
+                                      experimental classes (--experimental) or
+                                      classes that are not experimental (--no-
+                                      iexperimental). If the option is not defined
+                                      no filtering occurs
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli class get --help`:
@@ -1077,11 +1100,11 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
-      -k, --key KEYNAME=VALUE         Value for a key in keybinding of
-                                      CIMInstanceName. May be specified multiple
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
                                       times. Allows defining keys without the
-                                      issues of quotes. Default: No initial
-                                      properties provided.
+                                      issues of quotes. Default: No keybindings
+                                      provided.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -s, --summary                   Show only a summary (count) of the objects.
@@ -1227,10 +1250,10 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
       namespace of the connection.
 
     Options:
-      -k, --key KEYNAME=VALUE    Value for a key in keybinding of CIMInstanceName.
-                                 May be specified multiple times. Allows defining
-                                 keys without the issues of quotes. Default: No
-                                 initial properties provided.
+      -k, --key KEYNAME=VALUE    Value for a key in keybinding of CIM instance
+                                 name. May be specified multiple times. Allows
+                                 defining keys without the issues of quotes.
+                                 Default: No keybindings provided.
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
       -h, --help                 Show this message and exit.
@@ -1376,11 +1399,11 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
-      -k, --key KEYNAME=VALUE         Value for a key in keybinding of
-                                      CIMInstanceName. May be specified multiple
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
                                       times. Allows defining keys without the
-                                      issues of quotes. Default: No initial
-                                      properties provided.
+                                      issues of quotes. Default: No keybindings
+                                      provided.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -h, --help                      Show this message and exit.
@@ -1443,11 +1466,11 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
                                       Array property values are specified as a
                                       comma-separated list; embedded instances are
                                       not supported. Default: No input parameters.
-      -k, --key KEYNAME=VALUE         Value for a key in keybinding of
-                                      CIMInstanceName. May be specified multiple
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
                                       times. Allows defining keys without the
-                                      issues of quotes. Default: No initial
-                                      properties provided.
+                                      issues of quotes. Default: No keybindings
+                                      provided.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -h, --help                      Show this message and exit.
@@ -1517,11 +1540,11 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
                                       change, to allow for verification of
                                       parameters. Default: Do not prompt for
                                       confirmation.
-      -k, --key KEYNAME=VALUE         Value for a key in keybinding of
-                                      CIMInstanceName. May be specified multiple
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
                                       times. Allows defining keys without the
-                                      issues of quotes. Default: No initial
-                                      properties provided.
+                                      issues of quotes. Default: No keybindings
+                                      provided.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -h, --help                      Show this message and exit.
@@ -1634,11 +1657,11 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
-      -k, --key KEYNAME=VALUE         Value for a key in keybinding of
-                                      CIMInstanceName. May be specified multiple
+      -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM
+                                      instance name. May be specified multiple
                                       times. Allows defining keys without the
-                                      issues of quotes. Default: No initial
-                                      properties provided.
+                                      issues of quotes. Default: No keybindings
+                                      provided.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
       -s, --summary                   Show only a summary (count) of the objects.
