@@ -773,7 +773,7 @@ def cmd_instance_delete(context, instancename, options):
         context.conn.DeleteInstance(instancepath)
 
         if context.verbose:
-            click.echo('Deleted {}'.format(instancepath))
+            click.echo('Deleted instance {}'.format(instancepath))
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -868,6 +868,8 @@ def cmd_instance_modify(context, instancename, options):
     try:
         context.conn.ModifyInstance(modified_inst,
                                     PropertyList=property_list)
+        if context.verbose:
+            click.echo('Modified instance {}'.format(instancepath))
     except Error as er:
         raise click.ClickException("Server Error modifying instance. "
                                    'Exception: {}: {}'.format

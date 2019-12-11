@@ -874,6 +874,10 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
         display_cim_objects_summary(context, cim_objects)
         return
 
+    if not cim_objects and context.verbose:
+        click.echo("No objects returned")
+        return
+
     if sort:
         cim_objects = sort_cimobjects(cim_objects)
 
