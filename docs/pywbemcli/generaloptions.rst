@@ -191,7 +191,9 @@ Other miscellaneous general options
 """""""""""""""""""""""""""""""""""
 
 The :ref:`--verbose general option` displays extra information about the pywbemcli
-internal processing, the :ref:`--version general option` displays pywbemcli version
+internal processing.
+
+The :ref:`--version general option` displays pywbemcli version
 information and the :ref:`--help general option` provides top level help
 
 
@@ -553,8 +555,9 @@ For details, see :ref:`Output formats`.
 --log general option
 """"""""""""""""""""
 
-The argument value of the  ``--log``/``-l`` general option defines the destination and
-parameters of logging of the requests and responses to the WBEM server.
+The argument value of the  ``--log``/``-l`` general option defines the
+destination and parameters of logging of the requests and responses to the WBEM
+server.
 
 For details, see :ref:`Pywbemcli defined logging`.
 
@@ -567,14 +570,10 @@ For details, see :ref:`Pywbemcli defined logging`.
 The ``--verbose``/``-v`` general option is a boolean option that enables the
 display of extra information about the processing.
 
-
-.. _`--version general option`:
-
---version general option
-""""""""""""""""""""""""
-
-The ``--version``/``-V`` general option displays the version of this command
-and of the pywbem package it uses, and then exits.
+In particular it outputs text for a number of commands that
+normally return nothing upon successful execution(ex. instance delete,
+instance enumerate that returns no CIM objects) to indicate the successful
+command completion.
 
 
 .. _`--help general option`:

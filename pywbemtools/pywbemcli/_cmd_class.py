@@ -824,6 +824,7 @@ def cmd_class_delete(context, classname, options):
 
     try:
         context.conn.DeleteClass(classname)
-        click.echo('{} delete successful'.format(classname))
+        if context.verbose:
+            click.echo('Deleted class {}.'.format(classname))
     except Error as er:
         raise_pywbem_error_exception(er)

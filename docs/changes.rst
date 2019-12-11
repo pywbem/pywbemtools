@@ -71,6 +71,12 @@ Released: not yet
   any ongoing activities, by setting the env var PYWBEM_SPINNER to 'false',
   '0', or the empty string. This is useful when debugging.  See issue #465.
 
+* Modified the response handling on commands that may return nothing with
+  successful response to display a message if the general option --verbose
+  is defined and display nothing if --verbose not set.  This includes
+  class/instance delete, instance modify and the commands that display
+  cim objects. (See issue #123)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

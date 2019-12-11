@@ -440,6 +440,20 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance command enumerate CIM_Foo_sub2, rtns nothing,',
+     {'args': ['enumerate', 'CIM_Foo_sub2'],
+      'general': []},
+     {'stdout': "",
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, RUN],
+
+    ['Verify instance command enumerate CIM_Foo_sub2, w --verbose rtns msg.',
+     {'args': ['enumerate', 'CIM_Foo_sub2'],
+      'general': ['--verbose']},
+     {'stdout': 'No objects returned',
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, RUN],
+
     ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
      '--pull-max-cnt=2',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
@@ -1240,6 +1254,15 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
+    ['Verify instance modify, --verbose',
+     {'args': ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
+      '-p', 'scalBool=False'],
+      'general': ['--verbose']},
+     {'stdout': ['Modified'],
+      'rc': 0,
+      'test': 'innows'},
+     ALLTYPES_MOCK_FILE, OK],
+
     ['Verify instance command modify with --key, single good change',
      ['modify', 'PyWBEM_AllTypes', '--key', 'InstanceID=test_instance',
       '-p', 'scalBool=False'],
@@ -1426,6 +1449,14 @@ Instances: PyWBEM_AllTypes
      {'stdout': '',
       'rc': 0,
       'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command delete with --key, valid delete, --verbose',
+     {'args': ['delete', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+      'general': ['--verbose']},
+     {'stdout': ['Deleted'],
+      'rc': 0,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command delete, valid delete, explicit ns',

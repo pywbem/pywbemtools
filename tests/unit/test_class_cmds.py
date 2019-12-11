@@ -640,6 +640,12 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
+    ['Verify instance command enumerate CIM_Foo_sub2, w --verbose rtns msg.',
+     {'args': ['enumerate', 'CIM_Foo_sub2'],
+      'general': ['--verbose']},
+     {'stdout': 'No objects returned',
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
 
     #
     # Enumerate errors
@@ -1010,8 +1016,16 @@ TEST_CASES = [
     # Class delete successful
     ['Verify class command delete successful with no subclasses, --force',
      ['delete', 'CIM_Foo_sub_sub', '--force'],
-     {'stdout': 'CIM_Foo_sub_sub delete successful',
+     {'stdout': '',
       'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
+    # Class delete successful
+    ['Verify class command delete successful with no subclasses, --verbose',
+     {'args': ['delete', 'CIM_Foo_sub_sub', '--force'],
+      'general': ['--verbose']},
+     {'stdout': ['Deleted class', 'CIM_Foo_sub_sub'],
+      'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
 
     ['Verify class command delete fail instances exist',
