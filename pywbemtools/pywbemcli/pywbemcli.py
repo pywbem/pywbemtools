@@ -551,8 +551,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose)
-    if verbose:
-        print('CONTEXT_obj FROM generals loc 547 {!r}'.format(ctx.obj))
+    if verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
+        print('CONTEXT_OBJ {!r}'.format(ctx.obj))
         print('CLICK CTX {}'.format(ctx))
         display_click_context(ctx, msg="After adding Context",
                               display_attrs=True)

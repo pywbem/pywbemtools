@@ -35,6 +35,9 @@ Released: not yet
 * Fixed case sensitive matching of class names in instance modify by
   picking up the fix in pywbem 0.14.6. (See issue #429).
 
+* Fixed issue where extra diagnostic information about click was being displayed
+  when the general option --verbose was defined.
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands
@@ -47,9 +50,9 @@ Released: not yet
   original form using, WBEMURI is error prone with quote marks.
   (see issue #390)
 
-* Add prompt-toolkit auto-suggest.  This extends the command completion 
+* Add prompt-toolkit auto-suggest.  This extends the command completion
   capability in the repl mode (interactive mode) to make suggestions on
-  command line input based on the history file.  Usually auto-suggest completion 
+  command line input based on the history file.  Usually auto-suggest completion
   will be shown as gray text behind the current input. Auto-suggest is not
   available in command line mode.
 
