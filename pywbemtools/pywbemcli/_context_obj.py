@@ -24,6 +24,7 @@ This object is attached to the Click Context in pywbemcli.py
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import os
 import click
 import click_spinner
 
@@ -194,14 +195,14 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
-        # Verbose displays the click interpetation of the command and
-        # parameters from click context
-        if self.verbose:
+        # Verbose and env var PYWBEMCLI_DIAGNOSTICS displays the click
+        # interpetation of the command and parameters from click context
+        # This is a diagnostic for developer internal use so the
+        # env variable is not documented.
+        if self.verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
             ctx = click.get_current_context()
             click.echo('COMMAND="{}", params={!r}'.format(ctx.info_name,
                                                           ctx.params))
-
-        if self.verbose:
             display_click_context_parents(display_attrs=True)
 
         self.spinner.start()
@@ -339,6 +340,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 def display_click_context(ctx, msg=None, display_attrs=True):
     """
     Debug function displays attributes of click context
+    This is a diagnostic for developer use
     """
 
     attrs = vars(ctx)
@@ -354,7 +356,8 @@ def display_click_context(ctx, msg=None, display_attrs=True):
 
 def display_click_context_parents(display_attrs=False):
     """
-    Display the current click context and its all of its parents
+    Display the current click context and its all of its parents.
+    This is a diagnostic for developer use
     """
     level = 0
     ctx = click.get_current_context()

@@ -35,6 +35,9 @@ Released: not yet
 * Fixed case sensitive matching of class names in instance modify by
   picking up the fix in pywbem 0.14.6. (See issue #429).
 
+* Fixed issue where extra diagnostic information about click was being displayed
+  when the general option --verbose was defined.
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands
