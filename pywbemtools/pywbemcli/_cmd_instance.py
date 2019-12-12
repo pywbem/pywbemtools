@@ -1086,8 +1086,8 @@ def cmd_instance_count(context, classname, options):
         try:
             inst_names = context.conn.EnumerateInstanceNames(cln, namespace=ns)
         except Error as er:
-            click.echo('WARNING: Server Error {} with {}:{}. Continuing'
-                       .format(er, ns, cln), err=True)
+            warning_msg('Server Error {} with {}:{}. Continuing.'
+                        .format(er, ns, cln), err=True)
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
