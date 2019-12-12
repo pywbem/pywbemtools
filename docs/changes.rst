@@ -91,6 +91,14 @@ Released: not yet
   output formats now uses the order of properties as specified in the property
   list in the output table, instead of sorting them. (See issue #702)
 
+* Allow unsetting general options. Originally the general options could be
+  either set specifically by defining them on the command line or the
+  default would be enabled. However, in interactive mode the need may arise
+  to set an option back to its default value (i.e. the equivalent of not
+  including it on the command line). This fixes the options so that there is
+  an alternative that will will set them to the default value. (see issue
+  #350)
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py
