@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
+import six
 import traceback
 from copy import deepcopy
 import warnings
@@ -170,6 +171,11 @@ def _resolve_mock_server(mock_server):
 #   general options.
 #
 ############################################################################
+
+
+def or_default(str):
+    """"""
+    return None if str == "" else str
 
 
 # pylint: disable=bad-continuation
@@ -425,6 +431,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                            # Special because we resolve the mock-server list
                            # during initialization.
                            (resolved_mock_server, 'mock-server'))
+    print('certfile=%s keyfile=%s ca_certs=%s log=%s, timeout %s' % (certfile, keyfile,
+                                                         ca_certs, log, timeout))
 
     def create_server_instance(connection_name):
         """
@@ -546,6 +554,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         click.echo(str(connections_repo))
 
     if keyfile and not certfile:
+        # TODO: account for the "" option
         raise click.ClickException(
             'The --keyfile option "{}" is allowed only if the --certfile '
             'option is also used'.format(keyfile))
@@ -578,13 +587,18 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             'Conflicting server definitions: mock-server: {}, name: {}'.
             format(', '.join(resolved_mock_server), connection_name))
 
-    # Set pull default if necessary and create the resolved variable
-    use_pull = use_pull or DEFAULT_PULL_CHOICE
-    resolved_use_pull = USE_PULL_CHOICE[use_pull]
+	# NOTE WAS: TODO
+	#    # Set pull default if necessary and create the resolved variable
+	#    use_pull = use_pull or DEFAULT_PULL_CHOICE
+	#    resolved_use_pull = USE_PULL_CHOICE[use_pull]
 
-    # Resolved is the same as input including None.  Default is set on
-    # request if the value is None
-    resolved_pull_max_cnt = pull_max_cnt
+	#    # Resolved is the same as input including None.  Default is set on
+	#    # request if the value is None
+	#    resolved_pull_max_cnt = pull_max_cnt
+
+    resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
+        else DEFAULT_PULL_CHOICE
+    resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
     # Command mode (ctx is None). Processes command on comand line and quits
@@ -645,8 +659,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if user:
                     pywbem_server.user = user
                     modified_server = True
-                if password:
-                    pywbem_server.password = password
+                if isinstance(keyfile, six.string_types):
+                    pywbem_server.password = or_default(password)
                     modified_server = True
                 if verify is not None:
                     pywbem_server.verify = resolved_verify
@@ -654,11 +668,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if ca_certs:
                     pywbem_server.ca_certs = ca_certs
                     modified_server = True
-                if certfile:
-                    pywbem_server.certfile = certfile
+                if isinstance(certfile, six.string_types):
+                    pywbem_server.certfile = or_default(certfile)
                     modified_server = True
-                if keyfile:
-                    pywbem_server.keyfile = keyfile
+                if isinstance(keyfile, six.string_types):
+                    pywbem_server.keyfile = or_default(keyfile)
                     modified_server = True
                 if timeout:
                     pywbem_server.timeout = resolved_timeout
