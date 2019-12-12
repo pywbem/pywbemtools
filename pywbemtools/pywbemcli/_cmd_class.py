@@ -31,7 +31,8 @@ from pywbem._nocasedict import NocaseDict
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
-    format_table, process_invokemethod, raise_pywbem_error_exception
+    format_table, process_invokemethod, raise_pywbem_error_exception, \
+    warning_msg
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option, association_filter_option, \
@@ -699,8 +700,8 @@ def get_namespaces(context, namespaces):
     except CIMError as ce:
         # allow processing to continue if no interop namespace
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            click.echo('WARNING: {}. Using default_namespace {}.'
-                       .format(ce, context.conn.default_namespace))
+            warning_msg('{}. Using default_namespace {}.'
+                        .format(ce, context.conn.default_namespace))
             ns_names = [context.conn.default_namespace]
     finally:
         return ns_names
