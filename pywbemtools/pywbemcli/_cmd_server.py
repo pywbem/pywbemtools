@@ -213,7 +213,7 @@ def cmd_server_namespaces(context, options):
     try:
         namespaces = context.wbem_server.namespaces
         namespaces.sort()
-        context.spinner.stop()
+        context.spinner_stop()
 
         # create list for each row
         rows = [[ns] for ns in namespaces]
@@ -232,7 +232,7 @@ def cmd_server_interop(context):
     """
     try:
         interop_ns = context.wbem_server.interop_ns
-        context.spinner.stop()
+        context.spinner_stop()
 
         rows = [[interop_ns]]
 
@@ -249,7 +249,7 @@ def cmd_server_brand(context):
     """
     try:
         brand = context.wbem_server.brand
-        context.spinner.stop()
+        context.spinner_stop()
 
         rows = [[brand]]
         click.echo(format_table(rows, ['WBEM server brand'],
@@ -268,7 +268,7 @@ def cmd_server_info(context):
         # turning off the spinner.
         server = context.wbem_server
         server.namespaces  # pylint: disable=pointless-statement
-        context.spinner.stop()
+        context.spinner_stop()
 
         server = context.wbem_server
 

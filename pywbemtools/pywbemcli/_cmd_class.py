@@ -712,7 +712,7 @@ def cmd_class_find(context, classname_glob, options):
     Execute the command for get class and display the result. The result is
     a list of classes/namespaces
     """
-    context.spinner.stop()
+    context.spinner_stop()
     ns_names = get_namespaces(context, options['namespace'])
 
     try:
@@ -740,7 +740,7 @@ def cmd_class_find(context, classname_glob, options):
             ns_rows.sort(key=lambda x: x[row])
             rows.extend(ns_rows)
 
-        context.spinner.stop()
+        context.spinner_stop()
         if context.output_format in TABLE_FORMATS:
             headers = ['Namespace', 'Classname']
             click.echo(
@@ -750,7 +750,7 @@ def cmd_class_find(context, classname_glob, options):
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
-            context.spinner.stop()
+            context.spinner_stop()
             for row in rows:
                 click.echo('  {}:{}'.format(row[0], row[1]))
 
@@ -795,7 +795,7 @@ def cmd_class_tree(context, classname, options):
 
     # display the list of classes as a tree. The classname is the top
     # of the tree.
-    context.spinner.stop()
+    context.spinner_stop()
     display_class_tree(classes, classname)
 
 

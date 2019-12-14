@@ -313,7 +313,7 @@ def show_connection_information(context, connection, separate_line=True,
     else:
         disp_password = connection.password
 
-    context.spinner.stop()
+    context.spinner_stop()
 
     click.echo('\nname: {cn}{st}{sep}server: {sv}{sep}'
                'default-namespace: {dns}{sep}'
@@ -357,7 +357,7 @@ def select_connection(name, context, connections):
     connections in the connections file. If the name is provided, it is tested
     against the names in the connections file.  If it is not provided,
     """
-    context.spinner.stop()
+    context.spinner_stop()
     # get all names from dictionary
 
     if not connections:
@@ -392,7 +392,7 @@ def cmd_connection_export(context):
         Save the current connection information to env variables using an
         export statement
     """
-    context.spinner.stop()
+    context.spinner_stop()
     svr = context.pywbem_server
     if not svr:
         raise click.ClickException("No server currently defined as current")
@@ -476,7 +476,7 @@ def cmd_connection_test(context):
     """
     try:
         context.conn.EnumerateClassNames()
-        context.spinner.stop()
+        context.spinner_stop()
         click.echo('Connection successful')
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -505,7 +505,7 @@ def cmd_connection_select(context, name, options):
     # Update the root context making this context the basis for future
     # commands in the current interactive session
     ContextObj.update_root_click_context(new_ctx)
-    context.spinner.stop()
+    context.spinner_stop()
     if options['default']:
         connections.set_default_connection(name)
         click.echo('"{}" default and current'.format(name))
@@ -549,7 +549,7 @@ def cmd_connection_save(context, name):
 
     connections = ConnectionRepository()
 
-    context.spinner.stop()
+    context.spinner_stop()
 
     connections.add(save_connection.name, save_connection)
 
@@ -594,7 +594,7 @@ def cmd_connection_list(context):
 
     headers, rows = hide_empty_columns(headers, rows)
 
-    context.spinner.stop()
+    context.spinner_stop()
     click.echo(format_table(
         sorted(rows),
         headers,

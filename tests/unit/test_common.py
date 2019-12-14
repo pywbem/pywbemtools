@@ -465,7 +465,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
         title = "Test pick_one_from_list"
         context = ContextObj(None, None, None, None, None, None, None)
         act_rtn = pick_one_from_list(context, options, title)
-        context.spinner.stop()
+        context.spinner_stop()
         assert mock_prompt.call_count == len(choices)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -522,7 +522,7 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
         title = "test_pick_multiple_from_list"
         # context = ContextObj(None, None, None, None, None, None, None)
         act_rtn = pick_multiple_from_list(None, options, title)
-        # context.spinner.stop()
+        # context.spinner_stop()
         assert mock_prompt.call_count == len(choices)
 
     # Ensure that exceptions raised in the remainder of this function

@@ -806,7 +806,7 @@ def cmd_instance_create(context, classname, options):
     new_inst = create_ciminstance(class_, properties)
 
     if options['verify']:
-        context.spinner.stop()
+        context.spinner_stop()
         click.echo(new_inst.tomof())
         if not verify_operation("Execute CreateInstance", msg=True):
             return
@@ -814,7 +814,7 @@ def cmd_instance_create(context, classname, options):
         name = context.conn.CreateInstance(new_inst,
                                            namespace=options['namespace'])
 
-        context.spinner.stop()
+        context.spinner_stop()
         click.echo('{}'.format(name))
     except Error as er:
         raise click.ClickException("Server Error creating instance. Exception: "
@@ -860,7 +860,7 @@ def cmd_instance_modify(context, instancename, options):
     modified_inst.path = instancepath
 
     if options['verify']:
-        context.spinner.stop()
+        context.spinner_stop()
         click.echo(modified_inst.tomof())
         if not verify_operation("Execute ModifyInstance", msg=True):
             return
@@ -1110,7 +1110,7 @@ def cmd_instance_count(context, classname, options):
         for item in display_data:
             rows.append([item[0], item[1], item[2]])
 
-    context.spinner.stop()
+    context.spinner_stop()
     click.echo(format_table(rows, headers,
                             title='Count of instances per class',
                             table_format=context.output_format))
