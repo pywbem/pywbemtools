@@ -23,6 +23,7 @@ import re
 from collections import OrderedDict
 import click
 
+import pywbem
 from pywbem import WBEMServer, configure_loggers_from_string
 
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
@@ -455,14 +456,29 @@ class PywbemServer(object):
             else:
                 no_verification = not self.verify
 
-            conn = PYWBEMCLIConnection(
-                self.server, creds,
-                default_namespace=self.default_namespace,
-                no_verification=no_verification,
-                x509=x509_dict, ca_certs=self.ca_certs,
-                timeout=self.timeout,
-                use_pull_operations=use_pull,
-                stats_enabled=timestats)
+            # Convert ca_certs command line option to ca_certs parameter
+            if getattr(pywbem, 'PYWBEM_USES_REQUESTS', False):
+                if self.ca_certs == 'certifi':
+                    ca_certs = None
+                else:
+                    ca_certs = self.ca_certs
+            else:
+                ca_certs = self.ca_certs
+
+            try:
+                conn = PYWBEMCLIConnection(
+                    self.server, creds,
+                    default_namespace=self.default_namespace,
+                    no_verification=no_verification,
+                    x509=x509_dict, ca_certs=ca_certs,
+                    timeout=self.timeout,
+                    use_pull_operations=use_pull,
+                    stats_enabled=timestats)
+            except IOError as exc:
+                raise click.ClickException(
+                    'Cannot create connection to {}: {}'.
+                    format(self.server, exc))
+
             # Create a WBEMServer object
             self._wbem_server = WBEMServer(conn)
 

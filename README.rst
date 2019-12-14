@@ -1,10 +1,6 @@
 pywbemtools: Python tools for communicating with WBEM servers
 =============================================================
 
-.. |os-setup-link| raw:: html
-
-    <a href="https://pywbemtools.readthedocs.io/en/stable/_downloads/pywbem_os_setup.sh">pywbem_os_setup.sh</a>
-
 .. image:: https://img.shields.io/pypi/v/pywbemtools.svg
     :target: https://pypi.python.org/pypi/pywbemtools/
     :alt: Version on Pypi
@@ -84,7 +80,8 @@ Requirements:
 2. Operating Systems: Linux, OS-X, native Windows, UNIX-like environments on
    Windows (e.g. Cygwin)
 
-3. When using Python 2, the following OS-level packages:
+3. When using a pywbem version before 1.0.0 on Python 2, the following
+   OS-level packages are needed:
 
    * On native Windows:
 
@@ -99,10 +96,10 @@ Requirements:
      - ``wget`` - Download tool. Can be installed using the OS-level package
        manager for the platform.
 
-
 Installation:
 
-* When using Python 2, install OS-level packages needed by the pywbem package:
+* When using a pywbem version before 1.0.0 on Python 2, install OS-level
+  packages needed by the pywbem package:
 
   - On native Windows:
 

@@ -52,7 +52,8 @@ Requirements:
 2. Operating Systems: Linux, OS-X, native Windows, UNIX-like environments on
    Windows (e.g. Cygwin)
 
-3. When using Python 2, the following OS-level packages:
+3. When using a pywbem version before 1.0.0 on Python 2, the following
+   OS-level packages are needed:
 
    * On native Windows:
 
@@ -69,7 +70,8 @@ Requirements:
 
 Installation:
 
-* When using Python 2, install OS-level packages needed by the pywbem package:
+* When using a pywbem version before 1.0.0 on Python 2, install OS-level
+  packages needed by the pywbem package:
 
   - On native Windows:
 

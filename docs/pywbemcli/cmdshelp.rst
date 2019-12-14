@@ -81,13 +81,18 @@ Help text for ``pywbemcli``:
                                       verify client bypasses verification.
                                       Default: EnvVar PYWBEMCLI_VERIFY, or "--
                                       verify".
-      --ca-certs FILE                 Path name of a file or directory containing
-                                      certificates that will be matched against
-                                      the server certificate presented by the WBEM
-                                      server during TLS/SSL handshake. Default:
-                                      EnvVar PYWBEMCLI_CA_CERTS, or [/etc/pki/ca-
-                                      trust/extracted/openssl/ca-bundle.trust.crt,
-                                      /etc/ssl/certs, /etc/ssl/certificates].
+      --ca-certs CACERTS              Certificates to be used for validating the
+                                      certificate presented by the WBEM server
+                                      during TLS/SSL handshake: FILE: Use the
+                                      certs in the specified PEM file; DIR: Use
+                                      the certs in the PEM files in the specified
+                                      directory; "certifi" (pywbem 1.0 or later):
+                                      Use the certs provided by the certifi Python
+                                      package; Default: EnvVar PYWBEMCLI_CA_CERTS,
+                                      or "certifi" (pywbem 1.0 or later), or the
+                                      certs in the PEM files in the first existing
+                                      directory from from a list of system
+                                      directories (pywbem before 1.0).
       -c, --certfile FILE             Path name of a PEM file containing a X.509
                                       client certificate that is used to enable
                                       TLS/SSL 2-way authentication by presenting
