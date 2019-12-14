@@ -29,9 +29,8 @@ import click_repl
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
-
 import pywbem
-from pywbem import DEFAULT_CA_CERT_PATHS, LOGGER_SIMPLE_NAMES, \
+from pywbem import LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
     DEFAULT_LOG_DETAIL_LEVEL
 
@@ -42,7 +41,6 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_OUTPUT_FORMAT, DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
-
 from ._connection_repository import ConnectionRepository
 from ._click_extensions import PywbemcliTopGroup
 
@@ -119,15 +117,21 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
                    'handshake. If --no-verify client bypasses verification. '
                    'Default: EnvVar {ev}, or "--verify".'.
                    format(ev=PywbemServer.verify_envvar))
-@click.option('--ca-certs', type=str, metavar="FILE",
+@click.option('--ca-certs', type=str, metavar="CACERTS",
               default=None,  # defaulted in code
               envvar=PywbemServer.ca_certs_envvar,
-              help='Path name of a file or directory containing certificates '
-                   'that will be matched against the server certificate '
-                   'presented by the WBEM server during TLS/SSL handshake. '
-                   'Default: EnvVar {ev}, or [{dirs}].'.
-                   format(ev=PywbemServer.ca_certs_envvar,
-                          dirs=', '.join(DEFAULT_CA_CERT_PATHS)))
+              help='Certificates to be used for validating the certificate '
+                   'presented by the WBEM server during TLS/SSL handshake: '
+                   'FILE: Use the certs in the specified PEM file; '
+                   'DIR: Use the certs in the PEM files in the specified '
+                   'directory; '
+                   '"certifi" (pywbem 1.0 or later): Use the certs provided by '
+                   'the certifi Python package; '
+                   'Default: EnvVar {ev}, or "certifi" (pywbem 1.0 or later), '
+                   'or the certs in the PEM files in the first existing '
+                   'directory from from a list of system directories '
+                   '(pywbem before 1.0).'.
+                   format(ev=PywbemServer.ca_certs_envvar))
 @click.option('-c', '--certfile', type=str, metavar="FILE",
               # defaulted in code
               envvar=PywbemServer.certfile_envvar,
@@ -359,7 +363,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
     resolved_timestats = timestats or DEFAULT_TIMESTATS
     resolved_verify = DEFAULT_VERIFY if verify is None else verify
-    resolved_ca_certs = DEFAULT_CA_CERT_PATHS if ca_certs is None else ca_certs
+    resolved_ca_certs = ca_certs  # None should be passed on
 
     if server and svr_name:
         raise click.ClickException(

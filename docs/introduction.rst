@@ -98,8 +98,6 @@ prerequisites and its setup is described in the :ref:`Pywbemtools development` c
 Installation prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _pywbem installation documentation: https://pywbem.readthedocs.io/en/stable/intro.html#installation
-
 The Python environment into which you want to install must have the following
 Python packages installed:
 
@@ -108,14 +106,11 @@ Python packages installed:
 - pip - generally installed with Python 3.x but may be a separate install
   with Python 2.7 and with Cygwin Python releases.
 
-Pywbemtools installs the pywbem package which requires a number of OS-level
-packages as documented in the `pywbem installation documentation`_.
-The pywbem package provides the ``pywbem_os_setup.sh/.bat`` scripts that
-install the needed OS-level packages. These scripts are only needed when
-using Python 2.
+Pywbemtools installs the pywbem package.
 
-To use these scripts, your system must have the following commands installed
-when using Python 2:
+When using pywbem versions before 1.0.0 on Python 2, pywbem requires a number
+of OS-level packages, and your system must have the following commands
+installed:
 
 * On native Windows:
 
@@ -130,13 +125,13 @@ when using Python 2:
   - ``wget`` - Download tool. Can be installed using the OS-level package
     manager for the platform.
 
-
 .. _`Installation with pip`:
 
 Installation with pip
 ^^^^^^^^^^^^^^^^^^^^^
 
-When using Python 2, install OS-level packages needed by the pywbem package:
+When using pywbem versions before 1.0.0 on Python 2, install the OS-level
+packages needed by the pywbem package as follows:
 
 * On native Windows:
 

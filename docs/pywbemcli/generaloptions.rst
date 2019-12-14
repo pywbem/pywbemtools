@@ -445,14 +445,51 @@ key file. The client private key should then be part of the file defined by
 --ca-certs general option
 """"""""""""""""""""""""""
 
-The argument value of the ``--ca-certs`` general option is the path name of a file or
-directory containing certificates that will be matched against a certificate
-received from the WBEM server. The default is OS dependent and is a set of
-system directories where certificates are expected to be stored for the client
-OS.
+The argument value of the ``--ca-certs`` general option specifies which
+X.509 certificates are used on the client side for validating the X.509
+certificate received from the WBEM server during SSL/TLS handshake when HTTPS
+is used.
+
+The client-side and server-side certificates may be CA certificates (i.e.
+certificates issued by a certificate authority) or self-signed certificates.
+
+Its value must be one of:
+
+* The path name of a file in `PEM format`_ that contains one or more
+  certificates. See the description of the 'CAfile' argument of the
+  `OpenSSL SSL_CTX_load_verify_locations() function`_ for details.
+
+* The path name of a directory with files in `PEM format`_, each of which
+  contains exactly one certificate. The file names must follow a particular
+  naming convention. See the description of the 'CApath' argument of the
+  `OpenSSL SSL_CTX_load_verify_locations() function`_ for details.
+
+* The string 'certifi' (only for pywbem version 1.0 or later). This choice will
+  cause the certificates provided by the `certifi package`_ to be used. That
+  package provides the certificates from the
+  `Mozilla Included CA Certificate List`_. Note that this list only contains
+  CA certificates, so this choice does not work if the WBEM server uses
+  self-signed certificates.
+
+The default behavior depends on the version of the installed pywbem package:
+
+* Starting with pywbem version 1.0, the default is the behavior described
+  above for the string 'certifi'.
+
+* Before pywbem version 1.0, the default is the path name of the first existing
+  directory from a list of system directories where certificates are expected to
+  be stored.
+
+The version of the installed pywbem package can be displayed using the
+:ref:`--version general option`.
 
 Specifying the ``--no-verify`` general option (see :ref:`--verify general option`)
-bypasses client verification of the WBEM server certificate.
+bypasses client side verification of the WBEM server certificate.
+
+.. _PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail
+.. _OpenSSL SSL_CTX_load_verify_locations() function: https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_load_verify_locations.html
+.. _certifi package: https://certifi.io/en/latest/
+.. _Mozilla Included CA Certificate List: https://wiki.mozilla.org/CA/Included_Certificates
 
 
 .. _`--timestats general option`:
@@ -605,7 +642,7 @@ PYWBEMCLI_DEFAULT_NAMESPACE     ``--default-namespace``
 PYWBEMCLI_TIMEOUT               ``--timeout``
 PYWBEMCLI_KEYFILE               ``--keyfile``
 PYWBEMCLI_CERTFILE              ``--certfile``
-PYWBEMCLI_CACERTS               ``--ca-certs``
+PYWBEMCLI_CA_CERTS              ``--ca-certs``
 PYWBEMCLI_USE_PULL              ``--use-pull``
 PYWBEMCLI_PULL_MAX_CNT          ``--pull-max-cnt``
 PYWBEMCLI_STATS_ENABLED         ``--timestats``

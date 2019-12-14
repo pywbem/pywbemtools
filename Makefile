@@ -375,11 +375,11 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 # Scripts are required to install the OS-level components of pywbem.
 # Makefile gets the required scripts from the pywbem project on GitHub.
 pywbem_os_setup.sh:
-	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
+	wget -q -O pywbem_os_setup.sh https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
 	chmod 755 pywbem_os_setup.sh
 
 pywbem_os_setup.bat:
-	wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+	wget -q -O pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
 
 .PHONY: install_os
 install_os: install_os_$(pymn).done
@@ -479,7 +479,7 @@ all: install develop build builddoc check pylint test
 .PHONY: clobber
 clobber: clean
 	@echo "makefile: Removing everything for a fresh start"
-	-$(call RM_FUNC,*.done epydoc.log $(dist_files) $(pywbemcli_module_path)/*cover)
+	-$(call RM_FUNC,*.done epydoc.log $(dist_files) $(pywbemcli_module_path)/*cover pywbem_os_setup.*)
 	-$(call RMDIR_FUNC,$(doc_build_dir) .tox $(coverage_html_dir))
 	@echo "makefile: Done removing everything for a fresh start"
 	@echo "makefile: Target $@ done."

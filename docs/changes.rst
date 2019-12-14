@@ -80,6 +80,11 @@ Released: not yet
   class/instance delete, instance modify and the commands that display
   cim objects. (See issue #123)
 
+* Changed the `--ca-certs` general option to support the changes as of
+  pywbem version 1.0.0 (new values 'system' and 'certifi', and default changed
+  from a fixed set of directories to 'certifi'). The pywbem version is
+  determined at run time and pywbem versions before 1.0.0 are still supported.
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
