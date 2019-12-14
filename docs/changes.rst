@@ -67,6 +67,10 @@ Released: not yet
   '--association' returns classes that are associations and '--no-association'
   returns only classes that are not associations.  See issue # 447
 
+* Added support for disabling the spinner that is displayed by default during
+  any ongoing activities, by setting the env var PYWBEM_SPINNER to 'false',
+  '0', or the empty string. This is useful when debugging.  See issue #465.
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

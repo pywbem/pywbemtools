@@ -134,7 +134,7 @@ def pick_one_from_list(context, options, title):
     that would use curses for the selection process.
     """
     if context:
-        context.spinner.stop()
+        context.spinner_stop()
 
     click.echo(title)
     index = -1
@@ -150,7 +150,7 @@ def pick_one_from_list(context, options, title):
             selection = int(selection_txt)
             if 0 <= selection <= index:
                 if context:
-                    context.spinner.start()
+                    context.spinner_start()
                 return options[selection]
         except ValueError:  # This causes the retry of the request
             pass
@@ -222,7 +222,7 @@ def pick_multiple_from_list(context, options, title):
     curses for the selection process.
     """
     if context:
-        context.spinner.stop()
+        context.spinner_stop()
 
     click.echo(title)
     index = -1
@@ -237,7 +237,7 @@ def pick_multiple_from_list(context, options, title):
             selection_txt = click.prompt(msg)
             if not selection_txt:
                 if context:
-                    context.spinner.start()
+                    context.spinner_start()
                 return selection_list
 
             selection = int(selection_txt)
@@ -806,7 +806,7 @@ def display_cim_objects_summary(context, objects):
     Display a summary of the objects received. This only displays the
     count.
     """
-    context.spinner.stop()
+    context.spinner_stop()
 
     # default when displaying cim objects is mof
     output_format = context.output_format or 'mof'
@@ -868,7 +868,7 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
     """
-    context.spinner.stop()
+    context.spinner_stop()
 
     if summary:
         display_cim_objects_summary(context, cim_objects)

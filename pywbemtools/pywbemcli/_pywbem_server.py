@@ -332,12 +332,12 @@ class PywbemServer(object):
         Request password from console.
         """
         if self.user:
-            ctx.spinner.stop()
+            ctx.spinner_stop()
             password = click.prompt(
                 "Enter password (user {user})" .format(user=self.user),
                 hide_input=True,
                 confirmation_prompt=False, type=str, err=True)
-            ctx.spinner.start()
+            ctx.spinner_start()
             # pylint: disable=attribute-defined-outside-init
             self._password = password
         else:

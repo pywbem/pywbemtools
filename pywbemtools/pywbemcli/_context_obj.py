@@ -38,6 +38,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         communicates between the cli commands and command groups. It contains
         the information that is common to the multiple click commands
     """
+
+    spinner_envvar = 'PYWBEMCLI_SPINNER'
+
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, log, verbose):
@@ -46,19 +49,22 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._output_format = output_format
         self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
-        self._verbose = verbose
         self._timestats = timestats
-        self._spinner = click_spinner.Spinner()
         self._log = log
+        self._verbose = verbose
+
+        self._spinner_enabled = None  # Deferred init in getter
+        self._spinner_obj = click_spinner.Spinner()
         self._conn = None
         self._wbem_server = None
 
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
-               'use_pull={}, pull_max_cnt={}, timestats={}, verbose={}' \
+               'use_pull={}, pull_max_cnt={}, timestats={}, verbose={}, ' \
+               'spinner_enabled={}' \
                .format(id(self), self.pywbem_server, self.output_format,
                        self.use_pull, self.pull_max_cnt, self.timestats,
-                       self.verbose)
+                       self.verbose, self.spinner_enabled)
 
     @property
     def output_format(self):
@@ -164,12 +170,52 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return self._pywbem_server
 
     @property
-    def spinner(self):
+    def spinner_enabled(self):
         """
-        :class:`~click_spinner.Spinner` object. Controls start and stop of
-        the spinner object
+        :term: `bool`: Indicates and controls whether the spinner is enabled.
+
+        If the spinner is enabled, subcommands will display a spinning wheel
+        while waiting for completion.
+
+        This attribute can be modified.
+
+        The initial state of the spinner is enabled, but it can be disabled by
+        setting the {0} environment variable to 'false', '0', or the empty
+        value.
+        """.format(self.spinner_envvar)
+
+        # Deferred initialization
+        if self._spinner_enabled is None:
+            value = os.environ.get(self.spinner_envvar, None)
+            if value is None:
+                # Default if not set
+                self._spinner_enabled = True
+            elif value == '0' or value == '' or value.lower() == 'false':
+                self._spinner_enabled = False
+            else:
+                self._spinner_enabled = True
+
+        return self._spinner_enabled
+
+    @spinner_enabled.setter
+    def spinner_enabled(self, enabled):
+        """Setter method; for a description see the getter method."""
+        # pylint: disable=attribute-defined-outside-init
+        self._spinner_enabled = enabled
+
+    def spinner_start(self):
         """
-        return self._spinner
+        Start the spinner, if the spinner is enabled.
+        """
+        if self.spinner_enabled:
+            self._spinner_obj.start()
+
+    def spinner_stop(self):
+        """
+        Stop the spinner, if the spinner is enabled.
+        """
+        if self.spinner_enabled:
+            self._spinner_obj.stop()
 
     @property
     def verbose(self):
@@ -205,11 +251,11 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                                                           ctx.params))
             display_click_context_parents(display_attrs=True)
 
-        self.spinner.start()
+        self.spinner_start()
         try:
             cmd()
         finally:
-            self.spinner.stop()
+            self.spinner_stop()
 
             # Issue statistics if required. Note that we use _conn in order
             # not to create the connection if not created.

@@ -185,6 +185,21 @@ There are multiple types of tests in pywbemtools:
        $ tox -e py27                      # Run tests on Python 2.7
 
 
+.. _`Disabling the spinner when debugging`:
+
+Disabling the spinner when debugging
+------------------------------------
+
+Subcommands normally display a spinner (a character-based spinning wheel)
+while waiting for completion.
+
+For debugging, it is useful to disable that spinner. This can be done by
+setting the ``PYWBEM_SPINNER`` environment variable to 'false', '0', or the
+empty string. For example::
+
+    $ export PYWBEM_SPINNER=false
+
+
 .. _`Contributing`:
 
 Contributing
