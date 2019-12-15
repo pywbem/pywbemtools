@@ -185,14 +185,14 @@ Help text for ``pywbemcli class`` (see :ref:`class command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      enumerate     List top classes or subclasses of a class in a namespace.
-      get           Get a class.
-      delete        Delete a class.
-      invokemethod  Invoke a method on a class.
-      references    List the classes referencing a class.
       associators   List the classes associated with a class.
-      find          List the classes with matching class names on the server.
+      get           Get a class.
+      enumerate     List top classes or subclasses of a class in a namespace.
       tree          Show the subclass or superclass hierarchy for a class.
+      references    List the classes referencing a class.
+      invokemethod  Invoke a method on a class.
+      find          List the classes with matching class names on the server.
+      delete        Delete a class.
 
 
 .. _`pywbemcli class associators --help`:
@@ -703,13 +703,13 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      export  Export the current connection.
       show    Show a WBEM connection definition or the current connection.
-      delete  Delete a WBEM connection definition.
-      select  Select a WBEM connection definition as current or default.
+      list    List the WBEM connection definitions.
+      export  Export the current connection.
       test    Test the current connection with a predefined WBEM request.
       save    Save the current connection to a new WBEM connection definition.
-      list    List the WBEM connection definitions.
+      select  Select a WBEM connection definition as current or default.
+      delete  Delete a WBEM connection definition.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -1009,16 +1009,16 @@ Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      enumerate     List the instances of a class.
-      get           Get an instance of a class.
-      delete        Delete an instance of a class.
-      create        Create an instance of a class in a namespace.
-      modify        Modify properties of an instance.
-      associators   List the instances associated with an instance.
-      references    List the instances referencing an instance.
-      invokemethod  Invoke a method on an instance.
-      query         Execute a query on instances in a namespace.
       count         Count the instances of each class with matching class name.
+      associators   List the instances associated with an instance.
+      get           Get an instance of a class.
+      create        Create an instance of a class in a namespace.
+      invokemethod  Invoke a method on an instance.
+      modify        Modify properties of an instance.
+      references    List the instances referencing an instance.
+      enumerate     List the instances of a class.
+      query         Execute a query on instances in a namespace.
+      delete        Delete an instance of a class.
 
 
 .. _`pywbemcli instance associators --help`:
@@ -1160,12 +1160,29 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       enumerates all instance names for all classes in all namespaces.
 
     Options:
-      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
-                                 specified multiple times. Default: Search in all
-                                 namespaces of the server.
-      -s, --sort                 Sort by instance count. Otherwise sorted by class
-                                 name.
-      -h, --help                 Show this message and exit.
+      -n, --namespace NAMESPACE       Add a namespace to the search scope. May be
+                                      specified multiple times. Default: Search in
+                                      all namespaces of the server.
+      --association / --no-association
+                                      Filter the returned classes to return only
+                                      indication classes (--association) or
+                                      classes that are not associations(--no-
+                                      association). If the option is not defined
+                                      no filtering occurs
+      --indication / --no-indication  Filter the returned classes to return only
+                                      indication classes (--indication) or classes
+                                      that are not indications (--no-indication).
+                                      If the option is not defined no filtering
+                                      occurs
+      --experimental / --no-experimental
+                                      Filter the returned classes to return only
+                                      experimental classes (--experimental) or
+                                      classes that are not experimental (--no-
+                                      iexperimental). If the option is not defined
+                                      no filtering occurs
+      -s, --sort                      Sort by instance count. Otherwise sorted by
+                                      class name.
+      -h, --help                      Show this message and exit.
 
 
 .. _`pywbemcli instance create --help`:
@@ -1706,8 +1723,8 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      get        Get a qualifier declaration.
       enumerate  List the qualifier declarations in a namespace.
+      get        Get a qualifier declaration.
 
 
 .. _`pywbemcli qualifier enumerate --help`:
@@ -1826,12 +1843,12 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       -h, --help  Show this message and exit.
 
     Commands:
-      namespaces    List the namespaces of the server.
+      info          Get information about the server.
+      centralinsts  List central instances of mgmt profiles on the server.
       interop       Get the Interop namespace of the server.
       brand         Get the brand of the server.
-      info          Get information about the server.
       profiles      List management profiles advertized by the server.
-      centralinsts  List central instances of mgmt profiles on the server.
+      namespaces    List the namespaces of the server.
 
 
 .. _`pywbemcli server brand --help`:
