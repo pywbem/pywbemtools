@@ -38,6 +38,8 @@ Released: not yet
 * Fixed issue where extra diagnostic information about click was being displayed
   when the general option --verbose was defined.
 
+* Fixed issue with x509 parameter of WBEMConnection. (See issue #468)
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands
