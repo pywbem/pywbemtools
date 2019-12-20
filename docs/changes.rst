@@ -40,6 +40,9 @@ Released: not yet
 
 * Fixed issue with x509 parameter of WBEMConnection. (See issue #468)
 
+* Fixed issue with class find command not returning connection error when
+  cannot connect to server.
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands
@@ -106,6 +109,8 @@ Released: not yet
   differences are in pywbem_mock where the code was changed to return errors
   for invalid classnames and roles in association and reference operations
   where it previously return empty, ignoring the invalid classname.
+
+* Added tests of all command groups and commands for server connection error.
 
 **Known issues:**
 

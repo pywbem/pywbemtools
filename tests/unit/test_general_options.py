@@ -1176,8 +1176,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
-
-
 ]
 
 # TODO add test for pull operations with pull ops max size variations

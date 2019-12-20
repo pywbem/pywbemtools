@@ -1294,7 +1294,7 @@ Instances: PyWBEM_AllTypes
      [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
 
 
-    ['Verify instance command modify, single good change, explicit ns',
+    ['Verify instance command modify, single good change, explicit --n',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
       'root/cimv2', '-p', 'scalBool=False'],
      {'stdout': "",
@@ -1302,7 +1302,7 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance command modify, single good change, explicit ns',
+    ['Verify instance command modify, single good change, explicit --namespace',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '--namespace',
       'root/cimv2', '--property', 'scalBool=False'],
      {'stdout': "",
@@ -1348,7 +1348,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command modify, single property, Fail modifies key',
      ['modify', 'PyWBEM_AllTypes.InstanceId="test_instance"',
       '-p', 'InstanceId=9'],
-     {'stderr': ['Server Error modifying instance.',
+     {'stderr': ['Server Error modifying instance',
                  'Exception: CIMError:',
                  '4',
                  'CIM_ERR_INVALID_PARAMETER',

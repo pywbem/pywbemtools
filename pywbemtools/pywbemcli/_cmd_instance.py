@@ -785,12 +785,12 @@ def cmd_instance_create(context, classname, options):
        If successful, this operation returns the new instance name. Otherwise
        it raises an exception
     """
+    ns = options['namespace'] or context.conn.default_namespace
     try:
         class_ = context.conn.GetClass(
-            classname, namespace=options['namespace'], LocalOnly=False)
+            classname, namespace=ns, LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            ns = options['namespace'] or context.conn.default_namespace
             raise click.ClickException('CIMClass: "{}" does not exist in '
                                        'namespace "{}" in WEB '
                                        'server: {}.'.format(classname, ns,
@@ -812,13 +812,15 @@ def cmd_instance_create(context, classname, options):
             return
     try:
         name = context.conn.CreateInstance(new_inst,
-                                           namespace=options['namespace'])
+                                           namespace=ns)
 
         context.spinner_stop()
         click.echo('{}'.format(name))
     except Error as er:
-        raise click.ClickException("Server Error creating instance. Exception: "
-                                   '{}: {}'.format(er.__class__.__name__, er))
+        raise click.ClickException('Server Error creating instance in '
+                                   'namespace {}. Exception: '
+                                   '{}: {}'.format(ns, er.__class__.__name__,
+                                                   er))
 
 
 def cmd_instance_modify(context, instancename, options):
@@ -833,15 +835,18 @@ def cmd_instance_modify(context, instancename, options):
 
     If successful, this operation returns nothing.
     """
+    context.spinner_stop()
     # This function resolves any issues between namespace in instancename and
     # the namespace option.
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
         return
 
+    ns = options['namespace'] or context.conn.default_namespace
+
     try:
         class_ = context.conn.GetClass(
-            instancepath.classname, LocalOnly=False)
+            instancepath.classname, namespace=ns, LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException(
@@ -871,9 +876,10 @@ def cmd_instance_modify(context, instancename, options):
         if context.verbose:
             click.echo('Modified instance {}'.format(instancepath))
     except Error as er:
-        raise click.ClickException("Server Error modifying instance. "
-                                   'Exception: {}: {}'.format
-                                   (er.__class__.__name__, er))
+        raise click.ClickException('Server Error modifying instance {} '
+                                   'in namespace {}. Exception: {}: {}'.format
+                                   (instancepath, ns, er.__class__.__name__,
+                                    er))
 
 
 def cmd_instance_invokemethod(context, instancename, methodname,
@@ -1087,9 +1093,9 @@ def cmd_instance_count(context, classname, options):
         # are providers that return errors from the enumerate.
         try:
             inst_names = context.conn.EnumerateInstanceNames(cln, namespace=ns)
-        except Error as er:
+        except CIMError as ce:
             warning_msg('Server Error {} with {}:{}. Continuing.'
-                        .format(er, ns, cln), err=True)
+                        .format(ce, ns, cln))
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
