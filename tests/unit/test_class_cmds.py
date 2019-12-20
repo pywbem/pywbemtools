@@ -1020,6 +1020,12 @@ TEST_CASES = [
       'test': 'in'},
      [SIMPLE_MOCK_FILE], OK],
 
+    ['Verify class command delete successful with no subclasses and --n option',
+     ['delete', 'CIM_Foo_sub_sub', '--namespace', 'root/cimv2', '--force'],
+     {'stdout': '',
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
     # Class delete successful
     ['Verify class command delete successful with no subclasses, --verbose',
      {'args': ['delete', 'CIM_Foo_sub_sub', '--force'],
