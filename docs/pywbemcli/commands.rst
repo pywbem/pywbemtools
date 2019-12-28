@@ -139,6 +139,7 @@ the class hierarchy is in the result.
 
 .. index::
    single: qualifier filters
+
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
 classes or classnames to include or exclude classes with the corresponding
@@ -172,6 +173,7 @@ times.
 
 .. index::
    single: qualifier filters
+
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
 classes or classnames to include or exclude classes with the corresponding
@@ -471,6 +473,7 @@ the target namespaces are counted.
 
 .. index::
    single: qualifier filters
+
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
 classes or classnames to include or exclude classes with the corresponding
