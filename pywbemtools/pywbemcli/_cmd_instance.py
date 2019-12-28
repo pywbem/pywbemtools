@@ -773,6 +773,7 @@ def cmd_instance_delete(context, instancename, options):
         context.conn.DeleteInstance(instancepath)
 
         if context.verbose:
+            context.spinner_stop()
             click.echo('Deleted instance {}'.format(instancepath))
 
     except Error as er:
@@ -835,7 +836,6 @@ def cmd_instance_modify(context, instancename, options):
 
     If successful, this operation returns nothing.
     """
-    context.spinner_stop()
     # This function resolves any issues between namespace in instancename and
     # the namespace option.
     instancepath = get_instancename(context, instancename, options)
@@ -874,6 +874,7 @@ def cmd_instance_modify(context, instancename, options):
         context.conn.ModifyInstance(modified_inst,
                                     PropertyList=property_list)
         if context.verbose:
+            context.spinner_stop()
             click.echo('Modified instance {}'.format(instancepath))
     except Error as er:
         raise click.ClickException('Server Error modifying instance {} '

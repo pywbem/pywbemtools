@@ -875,6 +875,7 @@ def display_cim_objects(context, cim_objects, output_format=None, summary=False,
         return
 
     if not cim_objects and context.verbose:
+        context.spinner_stop()
         click.echo("No objects returned")
         return
 
