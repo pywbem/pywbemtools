@@ -43,6 +43,8 @@ Released: not yet
 * Fixed issue with class find command not returning connection error when
   cannot connect to server.
 
+* Added documentation for the --version general option.
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands

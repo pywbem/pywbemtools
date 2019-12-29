@@ -613,6 +613,15 @@ instance enumerate that returns no CIM objects) to indicate the successful
 command completion.
 
 
+.. _`--version general option`:
+
+--version general option
+""""""""""""""""""""""""
+
+The ``--version`` general option displays the version of the pywbemcli
+command and the version of the pywbem package used by it, and then exits.
+
+
 .. _`--help general option`:
 
 --help general option
