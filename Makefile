@@ -210,7 +210,7 @@ doc_utility_help_files := \
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
     $(doc_conf_dir)/conf.py \
-    $(doc_conf_dir)/pywbemcli/cmdshelp.rst \
+    $(doc_utility_help_files) \
     $(wildcard $(doc_conf_dir)/*.rst) \
     $(wildcard $(doc_conf_dir)/*/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
@@ -504,17 +504,17 @@ upload: _check_version $(dist_files)
 	@echo "makefile: Target $@ done."
 
 .PHONY: html
-html: develop_$(pymn).done $(doc_build_dir)/html/index.html
+html: $(doc_build_dir)/html/index.html
 	@echo "makefile: Target $@ done."
 
-$(doc_build_dir)/html/index.html: Makefile $(doc_utility_help_files) $(doc_dependent_files)
+$(doc_build_dir)/html/index.html: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "makefile: Creating the documentation as HTML pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b html $(doc_opts) $(doc_build_dir)/html
 	@echo "makefile: Done creating the documentation as HTML pages; top level file: $@"
 
 .PHONY: pdf
-pdf: develop_$(pymn).done Makefile $(doc_utility_help_files) $(doc_dependent_files)
+pdf: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "makefile: Creating the documentation as PDF file"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b latex $(doc_opts) $(doc_build_dir)/pdf
@@ -524,7 +524,7 @@ pdf: develop_$(pymn).done Makefile $(doc_utility_help_files) $(doc_dependent_fil
 	@echo "makefile: Target $@ done."
 
 .PHONY: man
-man: develop_$(pymn).done Makefile $(doc_utility_help_files) $(doc_dependent_files)
+man: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Creating the documentation as man pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b man $(doc_opts) $(doc_build_dir)/man
@@ -616,7 +616,7 @@ safety_$(pymn).done: develop_$(pymn).done Makefile minimum-constraints.txt
 	@echo "makefile: Done running pyup.io safety check"
 
 .PHONY: test
-test: develop_$(pymn).done
+test: develop_$(pymn).done $(doc_utility_help_files)
 	@echo "makefile: Running unit and function tests"
 	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
  	@echo "makefile: Done running tests"
