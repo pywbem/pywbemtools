@@ -50,6 +50,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Promoted development status of pywbemtools from Alpha to Beta.
+  (See issue #476)
+
 * Add capability to reorder commands in the help for each group.  The commands
   in all groups except for the top group (pywbemcli -h) are ordered in the
   help list by their order in their source file. The display of commands in
