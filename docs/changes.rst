@@ -45,6 +45,9 @@ Released: not yet
 
 * Added documentation for the --version general option.
 
+* Increased pywbem minimum version to 0.16.0 to accomodate install issues
+  on Python 3.4, and to pick up other fixes.
+
 **Enhancements:**
 
 * Add capability to reorder commands in the help for each group.  The commands
