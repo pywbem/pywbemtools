@@ -33,6 +33,9 @@ Released: not yet
 * Fixed case sensitive matching of class names in instance modify by
   picking up the fix in pywbem 0.14.6. (See issue #429).
 
+* Increased pywbem minimum version to 0.16.0 to accomodate install issues
+  on Python 3.4, and to pick up other fixes.
+
 **Enhancements:**
 
 **Cleanup:**
