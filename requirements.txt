@@ -8,7 +8,7 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-pywbem>=0.15.0
+pywbem>=0.16.0
 # git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 pbr>=1.10.0
@@ -21,4 +21,7 @@ tabulate>=0.8.2
 prompt-toolkit>=2.0.1; python_version >= '3.4'
 # See pywbemtools issue # 192. The repl mode fails with unexpected Exception
 prompt-toolkit>=1.0.15,<2.0.0; python_version == '2.7'
-PyYAML>=5.1
+# PyYAML 5.3 has removed support for Python 3.4
+PyYAML>=5.1; python_version == '2.7'
+PyYAML>=5.1,<5.3; python_version == '3.4'
+PyYAML>=5.1; python_version > '3.4'
