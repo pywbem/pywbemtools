@@ -228,7 +228,8 @@ The instance name (INSTANCENAME argument) can be specified in two ways:
   :ref:`Interactively selecting INSTANCENAME command argument` (i.e.
   CLASSNAME.?). The namespace of the instance is the namespace specified with
   the ``-namespace``/``-n`` command option, or the default namespace of the
-  connection.
+  connection.  If there is only a single instance, that instance is selected
+  automaticaly with without user request.
 
 * By specifying the WBEM URI without keybindings and using the --key option
   to specify the keybindings ad defined in section

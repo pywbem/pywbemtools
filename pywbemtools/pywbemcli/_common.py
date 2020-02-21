@@ -116,6 +116,9 @@ def pick_one_from_list(context, options, title):
     Interactive component that displays a set of options (strings) and asks
     the user to select one.  Returns the item and index of the selected string.
 
+    If there is only a single item in the options, simply return that choice
+    without user intervention.
+
     Parameters:
       options:
         List of strings from which one will is to be selected
@@ -133,6 +136,12 @@ def pick_one_from_list(context, options, title):
     TODO: Possible Future This could be replaced by the python pick library
     that would use curses for the selection process.
     """
+
+    # If there is only a single choice, return that choice.
+    if len(options) == 1:
+        return options[0]
+
+    # Issue list of choices and prompt for user choice of index
     if context:
         context.spinner_stop()
 
@@ -142,8 +151,11 @@ def pick_one_from_list(context, options, title):
         index += 1
         click.echo('{}: {}'.format(index, str_))
     selection = None
-    msg = 'Input integer between 0 and {} or Ctrl-C to exit selection: ' \
+    msg = 'Input integer between 0 and {} or Ctrl-C to exit selection' \
         .format(index)
+
+    # Loop for valid user choice until valid choice made or selection aborted
+    # by user
     while True:
         try:
             selection_txt = click.prompt(msg)

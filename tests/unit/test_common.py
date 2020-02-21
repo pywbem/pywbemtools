@@ -446,6 +446,11 @@ TESTCASES_PICK_ONE_FROM_LIST = [
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
           exp_rtn=u'TWO'),
      None, None, OK),
+
+    ('Verify returns correct choice with only single choice so no usr request',
+     dict(options=[u'ZERO'], choices=None,
+          exp_rtn=u'ZERO'),
+     None, None, OK),
 ]
 
 
@@ -458,15 +463,22 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     Test for pick_one_from_list function. Uses mock patch to define return
     values from the mock.
     """
-    # setup mock for this test
-    mock_function = 'pywbemtools.pywbemcli.click.prompt'
-    with patch(mock_function, side_effect=choices) as mock_prompt:
-        # The code to be tested
-        title = "Test pick_one_from_list"
+    title = "Test pick_one_from_list"
+
+    # test option with only one choice bypasses user request
+    if not choices:
         context = ContextObj(None, None, None, None, None, None, None)
         act_rtn = pick_one_from_list(context, options, title)
-        context.spinner_stop()
-        assert mock_prompt.call_count == len(choices)
+    else:
+        # setup mock for this test
+        mock_function = 'pywbemtools.pywbemcli.click.prompt'
+        with patch(mock_function, side_effect=choices) as mock_prompt:
+            # The code to be tested
+            # fake context object
+            context = ContextObj(None, None, None, None, None, None, None)
+            act_rtn = pick_one_from_list(context, options, title)
+            context.spinner_stop()
+            assert mock_prompt.call_count == len(choices)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
