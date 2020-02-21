@@ -599,11 +599,9 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'exists'}},
      MOCK_PROMPT0_FILE, OK],
 
-    ['Verify connection command delete with prompt that selects 0',
+    ['Verify connection command delete last one that  deletes w/o prompt',
      ['delete', ],
-     {'stdout': ['Select a connection or Ctrl_C to abort',
-                 '0: mocktest',
-                 'Input integer between 0 and 0 or Ctrl-C to exit selection:'],
+     {'stdout': ['Deleted  connection "mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
      MOCK_PROMPT0_FILE, OK],

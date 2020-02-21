@@ -1145,7 +1145,9 @@ The ``connection delete`` command deletes a connection definition from the
 
 If the ``NAME`` argument is specified, the connection definition with that name
 is deleted. Otherwise, the command displays the list of connection definitions
-and prompts the user for picking the one to be deleted.
+and prompts the user to select the one to be deleted. If there is only a
+single connection, that connection is deleted without the user selection
+request.
 
 Example that deletes a connection definition by the specified name:
 
@@ -1267,7 +1269,9 @@ The ``connection select`` command selects a connection definition from the
 
 If the ``NAME`` argument is specified, the connection definition with that name
 is selected. Otherwise, the command displays the list of connection definitions
-and prompts the user for picking the one to be selected.
+and prompts the user to pick the one to be selected. If there is only a
+single connection, that connection is selected without the user
+request.
 
 If the ``--default`` command option is set, the connection definition in
 addition becomes the default connection, by marking it accordingly in the
@@ -1322,8 +1326,9 @@ Connection show command
 
 The ``connection show`` command shows information about a connection definition:
 
-* If ``NAME`` is ``?``, pywbemcli prompts the user for picking one and shows
-  the existing current connection.
+* If ``NAME`` is ``?``, pywbemcli prompts the user to select one and shows
+  the existing current connection. If there is only a single connection the
+  user selection is bypassed.
 * If ``NAME`` is specified, show the connection definition with that name.
 * If ``NAME`` is not specified, show the existing current connection.
 
