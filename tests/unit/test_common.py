@@ -42,7 +42,8 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     _format_instances_as_rows, _print_instances_as_table, is_classname, \
     pick_one_from_list, pick_multiple_from_list, hide_empty_columns, \
-    verify_operation, split_str_w_esc, format_keys, create_ciminstancename
+    verify_operation, split_str_w_esc, format_keys, create_ciminstancename, \
+    NoCaseList
 # pylint: disable=unused-import
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
@@ -447,6 +448,99 @@ TESTCASES_PICK_ONE_FROM_LIST = [
           exp_rtn=u'TWO'),
      None, None, OK),
 ]
+
+TESTCASES_NOCASE_LIST = [
+    # TESTCASES for NoCaseList
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * input_list: string for construction of NoCaseList
+    #   * test_str: string for 'in' test
+    #   * add_strs: string or list of strings for .add test
+    #   * exp_rtn: expected list of strings returned
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify in test fails',
+     dict(input_list=['ABC', 'Def', 'ijK'],
+          test_str='AAA',
+          add_strs=None,
+          exp_rtn=False),
+     None, None, OK),
+
+    ('Verify in test fails, test string shorter',
+     dict(input_list=['ABC', 'Def', 'ijK'],
+          test_str='AB',
+          add_strs=None,
+          exp_rtn=False),
+     None, None, OK),
+
+    ('Verify test passes, test string ABC',
+     dict(input_list=['ABC', 'Def', 'ijK'],
+          test_str='ABC',
+          add_strs=None,
+          exp_rtn=True),
+     None, None, OK),
+
+    ('Verify test passes on first string 1',
+     dict(input_list=['Abc', 'Def', 'ijK'],
+          test_str='ABC',
+          add_strs=None,
+          exp_rtn=True),
+     None, None, OK),
+
+    ('Verify test passes on first string 2',
+     dict(input_list=['Abc', 'Def', 'ijK'],
+          test_str='aBC',
+          add_strs=None,
+          exp_rtn=True),
+     None, None, OK),
+
+    ('Verify test passes on first string 3',
+     dict(input_list=['Abc', 'Def', 'ijK'],
+          test_str='abc',
+          add_strs=None,
+          exp_rtn=True),
+     None, None, OK),
+
+    ('Verify add  test old string',
+     dict(input_list=['Abc', 'Def', 'ijK'],
+          test_str='abc',
+          add_strs='lmn',
+          exp_rtn=True),
+     None, None, OK),
+
+    ('Verify add test added string',
+     dict(input_list=['Abc', 'Def', 'ijK'],
+          test_str='lmn',
+          add_strs='LMN',
+          exp_rtn=True),
+     None, None, OK),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_NOCASE_LIST)
+@simplified_test_function
+def test_nocase_list(testcase, input_list, test_str, add_strs, exp_rtn):
+    """Test for resolve_propertylist function"""
+
+    # The code to be tested
+    test_list = NoCaseList(input_list)
+
+    if add_strs:
+        test_list.add(add_strs)
+
+    act_rslt = test_str in test_list
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rslt == exp_rtn
 
 
 @pytest.mark.parametrize(
