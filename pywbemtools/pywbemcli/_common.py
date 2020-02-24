@@ -1004,6 +1004,63 @@ def format_keys(obj, max_width):
     return wbem_uri_keys
 
 
+class NoCaseList(object):
+    """
+    This class is a dervivative of lists the simplifies working with
+    some of the CIM object attributes that are case insensitive such as
+    class names, roles, etc.
+
+    # TODO: Future; Possibly optimize by setting strs to lower in constructor
+    Right now the usage is primarily for small lists to this implementation
+    does not cause excessive overhead.
+
+    NOTE: This code does not handle None either for items in the list or for
+    the str parameter in __contains__
+
+    Example:
+
+        roles = NoCaseList(roles)
+        # the following does case insensitive test
+        if role in roles:
+            do something
+    """
+
+    def __init__(self, strs):
+        """
+        Constructor requires list of strings input
+
+        Parameters:
+
+          strs(list of :term: `string`)
+            The strings that will make up the list
+        """
+
+        assert isinstance(strs, list)
+        self.str_list = strs
+
+    def __contains__(self, str):
+        """
+        Implement 'in'
+        """
+
+        assert str is not None
+        return str.lower() in (n.lower() for n in self.str_list)
+
+    def add(self, strs):
+        """
+        add str or list of strings to the list
+
+        Example:
+
+        classnames = NoCaseList(conn.EnumerateClassNames(...))
+        """
+
+        if isinstance(strs, list):
+            self.str_list.extend(strs)
+        else:
+            self.str_list.append(strs)
+
+
 def _print_paths_as_table(objects, table_width, table_format):
     # pylint: disable=unused-argument
     """
