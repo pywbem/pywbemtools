@@ -73,6 +73,10 @@ Released: not yet
 * Adds command to test connection for existence of  the pull operations
   (connection test-pull)
 
+* Refactored display_class_tree() and other functions in _displaytree.py  and
+  _cmd_class.py cmd_class_tree function to eliminate boundary conditions, and
+  clarify code.
+
 **Known issues:**
 
 * See `list of open issues`_.
