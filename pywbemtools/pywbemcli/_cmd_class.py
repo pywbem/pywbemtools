@@ -823,56 +823,89 @@ def cmd_class_find(context, classname_glob, options):
         raise_pywbem_error_exception(er)
 
 
+def get_class_hierarchy(conn, classname, namespace, superclasses=None):
+    """
+    Get the class hierarchy from the server, either the superclasses
+    associated or subclasseswith classname .  If getting subclasses
+    the classname parameter may be None which requests that the complete
+    class hiearchy be retrieved.
+
+      Parameters:
+        conn (:class:`~pywbem.WBEMConnection` or subclass):
+            Current connection to a WBEM server.
+
+        classname(:term:`string):
+            classname if the tree is to be initiated from
+            within the class hiearchy. May be None
+
+        namespace(:term:`string):
+          Namespace to use to acquire classes from WBEM server
+
+        superclasses (:class:`py:bool`):
+            If `True` display the superclasses of classname. If not True
+            display the subclasses. The default is None (display subclasses).
+
+      Returns:
+        tuple of  classes, classnames where
+          classes (list of :class:`~pywbem.CIMClass`): that are either the
+          superclasses or the subclasses of classname.
+
+      Raises:
+        CIM_Error:
+    """
+
+    try:
+        if superclasses:
+            # classname must exist for superclass tree
+            assert classname is not None
+
+            # get the superclasses into a list
+            klass = conn.GetClass(classname, namespace=namespace)
+            classes = []
+            classes.append(klass)
+            while klass.superclass:
+                klass = conn.GetClass(klass.superclass, namespace=namespace)
+                classes.append(klass)
+        else:
+            # get the subclass hierarchy either complete or starting at the
+            # optional CLASSNAME. Gets minimum data from server to define
+            # class, superclass data
+            classes = conn.EnumerateClasses(ClassName=classname,
+                                            namespace=namespace,
+                                            LocalOnly=True,
+                                            IncludeQualifiers=False,
+                                            DeepInheritance=True)
+
+    except Error as er:
+        raise_pywbem_error_exception(er)
+
+    return classes
+
+
 def cmd_class_tree(context, classname, options):
     """
-    Execute the command to enumerate classes from the top or starting at the
-    classname argument. Then format the results to be displayed as a
-    left-justified tree using the asciitree library.
+    Execute the command to display graphical tree of either superclasses or
+    subclasses of classname. If classname is None, display tree starting from
+    the class hierarchy root.
+    Tree is displayed on the console as a left-justified tree using the
+    asciitree library.
     The --superclasses option determines if the superclass tree or the
     subclass tree is displayed.
     """
+    superclasses = options['superclasses']
 
-    # TODO FUTURE: Sort out how we handle output format with tree output.
-    try:
-        if options['superclasses']:
-            if classname is None:
-                raise click.ClickException('CLASSNAME argument required for '
-                                           '--superclasses option')
+    # Classname must exist as starting point for superclass tree.
+    if superclasses and classname is None:
+        raise click.ClickException('CLASSNAME argument required for '
+                                   '--superclasses option')
 
-            # Get the superclasses into a list
-            class_ = context.conn.GetClass(classname,
-                                           namespace=options['namespace'])
+    classes = get_class_hierarchy(context.conn, classname, options['namespace'],
+                                  superclasses)
 
-            # Include target class in display in list
-            classes = [class_]
-            # Get all superclasses to class_
-            while class_.superclass:
-                class_ = context.conn.GetClass(class_.superclass,
-                                               namespace=options['namespace'])
-                classes.append(class_)
-
-            # classname not used when displaying superclasses.
-            # display_class_tree sets it to root
-            classname = None
-
-        else:
-            # Get the subclass hierarchy either complete or starting at the
-            # optional CLASSNAME. NOTE: We do not include target_classname
-            # in lists of classes sent to display_class_tree. That function
-            # attaches it.
-            classes = context.conn.EnumerateClasses(
-                ClassName=classname,
-                namespace=options['namespace'],
-                DeepInheritance=True)
-
-            # Get correct case sensitive classname for target class if
-            # it exists. Simplifies display_class_tree
-            if classname:
-                tclass = context.conn.GetClass(classname,
-                                               namespace=options['namespace'])
-                classname = tclass.classname
-    except Error as er:
-        raise_pywbem_error_exception(er)
+    # If showing superclasses, set classname to None for the display
+    # to add the 'root' as top class.
+    if superclasses:
+        classname = None
 
     # Display the list of classes as a tree. The classname is the top
     # of the tree.

@@ -1119,12 +1119,27 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify class command tree top down starting at leaf class',
+     ['tree', 'CIM_Foo_sub'],
+     {'stdout': """CIM_Foo_sub_sub
+""",
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['Verify class command tree bottom up. -s',
      ['tree', '-s', 'CIM_Foo_sub_sub'],
      {'stdout': """root
     +-- CIM_Foo
         +-- CIM_Foo_sub
             +-- CIM_Foo_sub_sub
+""",
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command tree -s from top class',
+     ['tree', '-s', 'CIM_Foo'],
+     {'stdout': """root
+    +-- CIM_Foo
 """,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
