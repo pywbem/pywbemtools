@@ -1006,13 +1006,9 @@ def format_keys(obj, max_width):
 
 class NoCaseList(object):
     """
-    This class is a dervivative of lists the simplifies working with
-    some of the CIM object attributes that are case insensitive such as
-    class names, roles, etc.
-
-    # TODO: Future; Possibly optimize by setting strs to lower in constructor
-    Right now the usage is primarily for small lists to this implementation
-    does not cause excessive overhead.
+    This class simplifies working with lists of strings that are to be tested
+    case-insenstive. This simplifies working with  the CIM object attributes
+    that are case insensitive such as class names, roles, etc.
 
     NOTE: This code does not handle None either for items in the list or for
     the str parameter in __contains__
@@ -1040,7 +1036,13 @@ class NoCaseList(object):
 
     def __contains__(self, str):
         """
-        Implement 'in'
+        Implement Python 'in' functionality.
+
+        Parameters(:term:`string_types`):
+          String to test against the instance of NocaseList
+
+        Returns:
+          True if string in list (case insensitive compare)
         """
 
         assert str is not None
@@ -1048,13 +1050,14 @@ class NoCaseList(object):
 
     def add(self, strs):
         """
-        add str or list of strings to the list
+        Add string or list of strings to the list
 
-        Example:
+        Parameters:(:term:`string_types` or list, tuple of :term:`string_types`):  # noqa:E501
+          String to test against the instance of NocaseList.
 
-        classnames = NoCaseList(conn.EnumerateClassNames(...))
         """
-
+        if not strs:
+            return
         if isinstance(strs, list):
             self.str_list.extend(strs)
         else:
