@@ -237,7 +237,7 @@ REFERENCES_CLASS_RTN = [
     '   TST_Person REF member;',
     '',
     '};',
-    '', ]
+    '']
 
 REFERENCES_CLASS_RTN2 = [
     '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
@@ -342,7 +342,7 @@ TEST_CASES = [
 
     ['Verify class command enumerate CIM_Foo',
      ['enumerate', 'CIM_Foo'],
-     {'stdout': ['[Description ( "Subclass of CIM_Foo" )]', ],
+     {'stdout': ['[Description ( "Subclass of CIM_Foo" )]'],
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -563,7 +563,7 @@ TEST_CASES = [
                  '',
                  '   string cimfoo_sub2;',
                  '',
-                 '};', '', ],
+                 '};', ''],
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -573,7 +573,7 @@ TEST_CASES = [
                  '',
                  '   string cimfoo_sub2;',
                  '',
-                 '};', '', ],
+                 '};', ''],
       'test': 'patterns'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -597,7 +597,7 @@ TEST_CASES = [
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
-                 '', ],
+                 ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -620,7 +620,7 @@ TEST_CASES = [
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
-                 '', ],
+                 ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -654,7 +654,7 @@ TEST_CASES = [
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
-                 '', ],
+                 ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -685,7 +685,7 @@ TEST_CASES = [
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
-                 '', ],
+                 ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -742,7 +742,7 @@ TEST_CASES = [
                  '      [Description ( "Method with no Parameters" )]',
                  '',
                  '   uint32 DeleteNothing();', '',
-                 '};', '', ],
+                 '};', ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, FAIL],
 
@@ -832,7 +832,7 @@ TEST_CASES = [
                  '| root/cimv2  | CIM_Foo_sub2    |',
                  '+-------------+-----------------+',
                  '| root/cimv2  | CIM_Foo_sub_sub |',
-                 '+-------------+-----------------+', ],
+                 '+-------------+-----------------+'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -880,9 +880,9 @@ TEST_CASES = [
     # Class delete errors
     ['Verify class command delete no classname',
      ['delete'],
-     {'stderr': 'Error: Missing argument "CLASSNAME"',
+     {'stderr': ['Error: Missing argument .CLASSNAME.'],
       'rc': 2,
-      'test': 'in'},
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     # class delete error tests
@@ -895,8 +895,8 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete no classname fails',
-     ['delete', ],
-     {'stderr': 'Missing argument "CLASSNAME"',
+     ['delete'],
+     {'stderr': ['Error: Missing argument .CLASSNAME.'],
       'rc': 2,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -950,14 +950,14 @@ TEST_CASES = [
                  r' \+-- CIM_Foo',
                  r'     \+-- CIM_Foo_sub2',
                  r'     \+-- CIM_Foo_sub',
-                 r'[| ]*\+-- CIM_Foo_sub_sub', ],  # account for ordering issue
+                 r'[| ]*\+-- CIM_Foo_sub_sub'],  # account for ordering issue
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command tree top down starting at defined class ',
      ['tree', 'CIM_Foo_sub'],
      {'stdout': ['CIM_Foo_sub',
-                 ' +-- CIM_Foo_sub_sub', ],
+                 ' +-- CIM_Foo_sub_sub'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -966,7 +966,7 @@ TEST_CASES = [
      {'stdout': ['root',
                  ' +-- CIM_Foo',
                  '     +-- CIM_Foo_sub',
-                 '         +-- CIM_Foo_sub_sub', ],
+                 '         +-- CIM_Foo_sub_sub'],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -1003,7 +1003,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify class command associators simple request,',
-     ['associators', 'TST_Person', ],
+     ['associators', 'TST_Person'],
      {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
@@ -1140,9 +1140,9 @@ TEST_CASES = [
 
     ['Verify class command associators no CLASSNAME',
      ['associators'],
-     {'stderr': ['Error: Missing argument "CLASSNAME".', ],
+     {'stderr': ['Error: Missing argument .CLASSNAME.'],
       'rc': 2,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
     ['Verify class command associators non-existent CLASSNAME rtns empty',
@@ -1208,9 +1208,9 @@ TEST_CASES = [
 
     ['Verify class command references no CLASSNAME',
      ['references'],
-     {'stderr': ['Error: Missing argument "CLASSNAME".', ],
+     {'stderr': ['Error: Missing argument .CLASSNAME.'],
       'rc': 2,
-      'test': 'in'},
+      'test': 'regex'},
      None, OK],
 
     ['Verify class command references non-existent CLASSNAME rtns empty',
@@ -1361,7 +1361,7 @@ class TestClassGeneral(object):
         rc, stdout, stderr = execute_pywbemcli(['-s', 'http://fred', '-t', '1',
                                                 'class', 'get', 'CIM_blah'])
 
-        assert_rc(1, rc, stdout, stderr)
+        assert_rc(1, rc, stdout, stderr, "test_class_error_no_server")
 
         assert stdout == ""
         assert stderr.startswith(
@@ -1408,6 +1408,6 @@ class TestClassEnumerate(object):
             cmd_line.extend(tst_args)
         rc, stdout, stderr = execute_pywbemcli(cmd_line)
 
-        assert_rc(0, rc, stdout, stderr)
+        assert_rc(0, rc, stdout, stderr, "test_enumerate_simple_mock")
         assert stderr == ""
         assert stdout.startswith(exp_result_start)
