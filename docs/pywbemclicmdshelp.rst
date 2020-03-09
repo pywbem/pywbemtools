@@ -51,6 +51,7 @@ Help text for ``pywbemcli``:
                                       --mock-server options, since each defines a
                                       WBEM server. Default: EnvVar PYWBEMCLI_NAME,
                                       or none.
+
       -m, --mock-server FILE          Use a mock WBEM server that is automatically
                                       created in pywbemcli and populated with CIM
                                       objects that are defined in the specified
@@ -61,6 +62,7 @@ Help text for ``pywbemcli``:
                                       with the --server and --name options, since
                                       each defines a WBEM server. Default: EnvVar
                                       PYWBEMCLI_MOCK_SERVER, or none.
+
       -s, --server URL                Use the WBEM server at the specified URL
                                       with format: [SCHEME://]HOST[:PORT]. SCHEME
                                       must be "https" (default) or "http". HOST is
@@ -70,17 +72,21 @@ Help text for ``pywbemcli``:
                                       exclusive with the --mock-server and --name
                                       options, since each defines a WBEM server.
                                       Default: EnvVar PYWBEMCLI_SERVER, or none.
+
       -u, --user TEXT                 User name for the WBEM server. Default:
                                       EnvVar PYWBEMCLI_USER, or none.
+
       -p, --password TEXT             Password for the WBEM server. Default:
                                       EnvVar PYWBEMCLI_PASSWORD, or prompted for
                                       if --user specified.
+
       --verify / --no-verify          If --verify, client verifies the X.509
                                       server certificate presented by the WBEM
                                       server during TLS/SSL handshake. If --no-
                                       verify client bypasses verification.
                                       Default: EnvVar PYWBEMCLI_VERIFY, or "--
                                       verify".
+
       --ca-certs FILE                 Path name of a file or directory containing
                                       certificates that will be matched against
                                       the server certificate presented by the WBEM
@@ -88,20 +94,24 @@ Help text for ``pywbemcli``:
                                       EnvVar PYWBEMCLI_CA_CERTS, or [/etc/pki/ca-
                                       trust/extracted/openssl/ca-bundle.trust.crt,
                                       /etc/ssl/certs, /etc/ssl/certificates].
+
       -c, --certfile FILE             Path name of a PEM file containing a X.509
                                       client certificate that is used to enable
                                       TLS/SSL 2-way authentication by presenting
                                       the certificate to the WBEM server during
                                       TLS/SSL handshake. Default: EnvVar
                                       PYWBEMCLI_CERTFILE, or none.
+
       -k, --keyfile FILE              Path name of a PEM file containing a X.509
                                       private key that belongs to the certificate
                                       in the --certfile file. Not required if the
                                       private key is part of the --certfile file.
                                       Default: EnvVar PYWBEMCLI_KEYFILE, or none.
+
       -t, --timeout INT               Client-side timeout in seconds for
                                       operations with the WBEM server. Default:
                                       EnvVar PYWBEMCLI_TIMEOUT, or 30.
+
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used
                                       for operations with the WBEM server that
                                       return lists of instances, as follows: "yes"
@@ -112,6 +122,7 @@ Help text for ``pywbemcli``:
                                       server, and otherwise traditional
                                       operations. Default: EnvVar
                                       PYWBEMCLI_USE_PULL, or "either".
+
       --pull-max-cnt INT              Maximum number of instances to be returned
                                       by the WBEM server in each open or pull
                                       response, if pull operations are used. This
@@ -119,13 +130,16 @@ Help text for ``pywbemcli``:
                                       the external behavior of the commands.
                                       Default: EnvVar PYWBEMCLI_PULL_MAX_CNT, or
                                       1000
+
       -T, --timestats                 Show time statistics of WBEM server
                                       operations.
+
       -d, --default-namespace NAMESPACE
                                       Default namespace, to be used when commands
                                       do not specify the --namespace command
                                       option. Default: EnvVar
                                       PYWBEMCLI_DEFAULT_NAMESPACE, or root/cimv2.
+
       -o, --output-format FORMAT      Output format for the command result. The
                                       specified format may be overriden since not
                                       all formats apply to all result data types.
@@ -133,6 +147,7 @@ Help text for ``pywbemcli``:
                                       [table|plain|simple|grid|psql|rst|html] or
                                       object format [mof|xml|repr|txt]. Default:
                                       simple.
+
       -l, --log COMP[=DEST[:DETAIL]],...
                                       Enable logging of the WBEM operations,
                                       defined by a list of log configuration
@@ -140,14 +155,18 @@ Help text for ``pywbemcli``:
                                       [file|stderr], default: file; DETAIL:
                                       [all|paths|summary], default: all. Default:
                                       EnvVar PYWBEMCLI_LOG, or all.
+
       -v, --verbose / --no-verbose    Display extra information about the
                                       processing.
+
       --pdb                           Pause execution in the built-in pdb debugger
                                       just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or
                                       false.
+
       --version                       Show the version of this command and the
                                       pywbem package and exit.
+
       -h, --help                      Show this message and exit.
 
     Commands:
@@ -240,18 +259,23 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
       --ac, --assoc-class CLASSNAME   Filter the result set by association class
                                       name. Subclasses of the specified class also
                                       match.
+
       --rc, --result-class CLASSNAME  Filter the result set by result class name.
                                       Subclasses of the specified class also
                                       match.
+
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
+
       --rr, --result-role PROPERTYNAME
                                       Filter the result set by far end role name.
       --nq, --no-qualifiers           Do not include qualifiers in the returned
                                       class(es). Default: Include qualifiers.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned class(es). Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -261,11 +285,14 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this message and exit.
 
@@ -311,8 +338,10 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
                                  servers may still reject the class deletion.
                                  Default: Reject command if the class has any
                                  instances.
+
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
+
       -h, --help                 Show this message and exit.
 
 
@@ -359,19 +388,25 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
       --di, --deep-inheritance      Include the complete subclass hierarchy of the
                                     requested classes in the result set. Default:
                                     Do not include subclasses.
+
       --lo, --local-only            Do not include superclass properties and
                                     methods in the returned class(es). Default:
                                     Include superclass properties and methods.
+
       --nq, --no-qualifiers         Do not include qualifiers in the returned
                                     class(es). Default: Include qualifiers.
+
       --ico, --include-classorigin  Include class origin information in the
                                     returned class(es). Default: Do not include
                                     class origin information.
+
       --no, --names-only            Retrieve only the object paths (names).
                                     Default: Retrieve the complete objects
                                     including object paths.
+
       -n, --namespace NAMESPACE     Namespace to use for this command, instead of
                                     the default namespace of the connection.
+
       -s, --summary                 Show only a summary (count) of the objects.
       -h, --help                    Show this message and exit.
 
@@ -421,11 +456,10 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
-      -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
-                                 specified multiple times. Default: Search in all
-                                 namespaces of the server.
+
       -s, --sort                 Sort by namespace. Default is to sort by
                                  classname
+
       -h, --help                 Show this message and exit.
 
 
@@ -464,11 +498,14 @@ Help text for ``pywbemcli class get`` (see :ref:`class get command`):
       --lo, --local-only              Do not include superclass properties and
                                       methods in the returned class(es). Default:
                                       Include superclass properties and methods.
+
       --nq, --no-qualifiers           Do not include qualifiers in the returned
                                       class(es). Default: Include qualifiers.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned class(es). Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -478,8 +515,10 @@ Help text for ``pywbemcli class get`` (see :ref:`class get command`):
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -524,8 +563,10 @@ Help text for ``pywbemcli class invokemethod`` (see :ref:`class invokemethod com
                                       Specify a method input parameter with its
                                       value. May be specified multiple times.
                                       Default: No input parameters.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -570,13 +611,17 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
       --rc, --result-class CLASSNAME  Filter the result set by result class name.
                                       Subclasses of the specified class also
                                       match.
+
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
+
       --nq, --no-qualifiers           Do not include qualifiers in the returned
                                       class(es). Default: Include qualifiers.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned class(es). Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -586,11 +631,14 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this message and exit.
 
@@ -641,8 +689,10 @@ Help text for ``pywbemcli class tree`` (see :ref:`class tree command`):
     Options:
       -s, --superclasses         Show the superclass hierarchy. Default: Show the
                                  subclass hierarchy.
+
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
+
       -h, --help                 Show this message and exit.
 
 
@@ -853,6 +903,7 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
       -d, --default  If set, the connection is set to be the default connection
                      in the connections file in addition to setting it as the
                      current connection.
+
       -h, --help     Show this message and exit.
 
 
@@ -902,6 +953,7 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
     Options:
       --show-password  If set, show existing password in results. Otherwise,
                        password is masked
+
       -h, --help       Show this message and exit.
 
 
@@ -1045,11 +1097,14 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
       --ac, --assoc-class CLASSNAME   Filter the result set by association class
                                       name. Subclasses of the specified class also
                                       match.
+
       --rc, --result-class CLASSNAME  Filter the result set by result class name.
                                       Subclasses of the specified class also
                                       match.
+
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
+
       --rr, --result-role PROPERTYNAME
                                       Filter the result set by far end role name.
       --iq, --include-qualifiers      When traditional operations are used,
@@ -1057,10 +1112,12 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
                                       instances. Some servers may ignore this
                                       option. By default, and when pull operations
                                       are used, qualifiers will never be included.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned instance(s). Some servers may
                                       ignore this option. Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -1070,20 +1127,25 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
+
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1128,11 +1190,13 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       enumerates all instance names for all classes in all namespaces.
 
     Options:
-      -s, --sort                 Sort by instance count. Otherwise sorted by class
-                                 name.
       -n, --namespace NAMESPACE  Add a namespace to the search scope. May be
                                  specified multiple times. Default: Search in all
                                  namespaces of the server.
+
+      -s, --sort                 Sort by instance count. Otherwise sorted by class
+                                 name.
+
       -h, --help                 Show this message and exit.
 
 
@@ -1177,12 +1241,15 @@ Help text for ``pywbemcli instance create`` (see :ref:`instance create command`)
                                       separated list; embedded instances are not
                                       supported. Default: No initial properties
                                       provided.
+
       -V, --verify                    Prompt for confirmation before performing a
                                       change, to allow for verification of
                                       parameters. Default: Do not prompt for
                                       confirmation.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1220,6 +1287,7 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
     Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
+
       -h, --help                 Show this message and exit.
 
 
@@ -1265,18 +1333,22 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
                                       this option. By default, and when pull
                                       operations are used, superclass properties
                                       will always be included.
+
       --di, --deep-inheritance        Include subclass properties in the returned
                                       instances. Default: Do not include subclass
                                       properties.
+
       --iq, --include-qualifiers      When traditional operations are used,
                                       include qualifiers in the returned
                                       instances. Some servers may ignore this
                                       option. By default, and when pull operations
                                       are used, qualifiers will never be included.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned instance(s). Some servers may
                                       ignore this option. Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -1286,20 +1358,25 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
+
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
+
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1346,14 +1423,17 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
                                       returned instance. Some servers may ignore
                                       this option. Default: Include superclass
                                       properties.
+
       --iq, --include-qualifiers      Include qualifiers in the returned instance.
                                       Not all servers return qualifiers on
                                       instances. Default: Do not include
                                       qualifiers.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned instance(s). Some servers may
                                       ignore this option. Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -1363,8 +1443,10 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1425,8 +1507,10 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
                                       Array property values are specified as a
                                       comma-separated list; embedded instances are
                                       not supported. Default: No input parameters.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1481,6 +1565,7 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
                                       specified as a comma-separated list;
                                       embedded instances are not supported.
                                       Default: No properties modified.
+
       --pl, --propertylist PROPERTYLIST
                                       Reduce the properties to be modified (as per
                                       --property) to a specific property list.
@@ -1490,12 +1575,15 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
                                       will cause no properties to be modified.
                                       Default: Do not reduce the properties to be
                                       modified.
+
       -V, --verify                    Prompt for confirmation before performing a
                                       change, to allow for verification of
                                       parameters. Default: Do not prompt for
                                       confirmation.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1526,8 +1614,10 @@ Help text for ``pywbemcli instance query`` (see :ref:`instance query command`):
       --ql, --query-language QUERY-LANGUAGE
                                       The query language to be used with --query.
                                       Default: DMTF:CQL.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this message and exit.
 
@@ -1583,17 +1673,21 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       --rc, --result-class CLASSNAME  Filter the result set by result class name.
                                       Subclasses of the specified class also
                                       match.
+
       -r, --role PROPERTYNAME         Filter the result set by source end role
                                       name.
+
       --iq, --include-qualifiers      When traditional operations are used,
                                       include qualifiers in the returned
                                       instances. Some servers may ignore this
                                       option. By default, and when pull operations
                                       are used, qualifiers will never be included.
+
       --ico, --include-classorigin    Include class origin information in the
                                       returned instance(s). Some servers may
                                       ignore this option. Default: Do not include
                                       class origin information.
+
       --pl, --propertylist PROPERTYLIST
                                       Filter the properties included in the
                                       returned object(s). Multiple properties may
@@ -1603,20 +1697,25 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
                                       not in the object(s) will be ignored. The
                                       empty string will include no properties.
                                       Default: Do not filter properties.
+
       --no, --names-only              Retrieve only the object paths (names).
                                       Default: Retrieve the complete objects
                                       including object paths.
+
       -n, --namespace NAMESPACE       Namespace to use for this command, instead
                                       of the default namespace of the connection.
+
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the
                                       instances in the result via a filter query.
                                       By default, and when traditional operations
                                       are used, no such filtering takes place.
+
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with
                                       --filter-query. Default: DMTF:FQL.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1680,6 +1779,7 @@ Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate c
     Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
+
       -s, --summary              Show only a summary (count) of the objects.
       -h, --help                 Show this message and exit.
 
@@ -1710,6 +1810,7 @@ Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
     Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the
                                  default namespace of the connection.
+
       -h, --help                 Show this message and exit.
 
 
@@ -1840,18 +1941,23 @@ Help text for ``pywbemcli server centralinsts`` (see :ref:`server centralinsts c
     Options:
       -o, --organization ORG-NAME     Filter by the defined organization. (ex. -o
                                       DMTF
+
       -p, --profile PROFILE-NAME      Filter by the profile name. (ex. -p Array
       --cc, --central-class CLASSNAME
                                       Optional. Required only if profiles supports
                                       only scopig methodology
+
       --sc, --scoping-class CLASSNAME
                                       Optional. Required only if profiles supports
                                       only scopig methodology
+
       --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports
                                       only scopig methodology. Multiples allowed
+
       --rd, --reference-direction [snia|dmtf]
                                       Navigation direction for association.
                                       [default: dmtf]
+
       -h, --help                      Show this message and exit.
 
 
@@ -1948,6 +2054,7 @@ Help text for ``pywbemcli server profiles`` (see :ref:`server profiles command`)
     Options:
       -o, --organization ORG-NAME  Filter by the defined organization. (ex. -o
                                    DMTF
+
       -p, --profile PROFILE-NAME   Filter by the profile name. (ex. -p Array
       -h, --help                   Show this message and exit.
 
