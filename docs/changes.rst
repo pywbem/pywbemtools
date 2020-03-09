@@ -36,7 +36,12 @@ Released: not yet
 * Increased pywbem minimum version to 0.16.0 to accomodate install issues
   on Python 3.4, and to pick up other fixes.
 
+* Test: Accomodated new formatting of error messages in Click 7.1.1, and
+  excluded Click 7.1 due to bug.
+
 **Enhancements:**
+
+* Test: Improved assertion messages in tests.
 
 **Cleanup:**
 
