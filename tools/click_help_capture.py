@@ -119,7 +119,16 @@ def cmd_exists(cmd):
     msg is an error message.
     """
 
-    if True:  # TODO #103: Debug PATH for pywbemcli not found issue on Windows
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT)
+    out, _ = proc.communicate()
+    rc = proc.returncode
+    if rc == 0:
+        msg = None
+    else:
+        msg = out.strip()
+
+        # TODO #103: Debug PATH for pywbemcli not found issue on Windows
         if sys.platform == 'win32':
             echo_cmd = 'echo %PATH%'
         else:
@@ -129,14 +138,6 @@ def cmd_exists(cmd):
         out, _ = proc.communicate()
         print("Debug: {}: {}".format(echo_cmd, out), file=sys.stderr)
 
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT)
-    out, _ = proc.communicate()
-    rc = proc.returncode
-    if rc == 0:
-        msg = None
-    else:
-        msg = out.strip()
     return rc, msg
 
 
