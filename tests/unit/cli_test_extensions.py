@@ -222,7 +222,7 @@ class CLITestsBase(object):
                                                verbose=verbose)
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
-        assert_rc(exp_rc, rc, stdout, stderr)
+        assert_rc(exp_rc, rc, stdout, stderr, desc)
 
         if verbose:
             print('RC={}\nSTDOUT={}\nSTDERR={}'.format(rc, stdout, stderr))
@@ -251,7 +251,17 @@ class CLITestsBase(object):
                 if test_definition == 'startswith':
                     assert isinstance(test_value, six.string_types)
                     assert rtn_value.startswith(test_value), \
-                        "{}\n{}={!r}".format(desc, rtn_type, rtn_value)
+                        "Unexpected start of line on {} in test:\n" \
+                        "{}\n" \
+                        "Expected start of line:\n" \
+                        "------------\n" \
+                        "{}\n" \
+                        "------------\n" \
+                        "Actual output line(s):\n" \
+                        "------------\n" \
+                        "{}\n" \
+                        "------------\n". \
+                        format(rtn_type, desc, test_value, rtn_value)
                 # test that lines match between test_value and rtn_value
                 # base on regex match
                 elif test_definition == 'patterns':
@@ -259,8 +269,7 @@ class CLITestsBase(object):
                         test_value = test_value.splitlines()
                     assert isinstance(test_value, (list, tuple))
                     assert_patterns(test_value, rtn_value.splitlines(),
-                                    "{}\n{}={!r}".format(desc, rtn_type,
-                                                         rtn_value))
+                                    rtn_type, desc)
                 # test that each line in the test value matches the
                 # corresponding line in the rtn_value exactly
                 elif test_definition == 'lines':
@@ -268,56 +277,90 @@ class CLITestsBase(object):
                         test_value = test_value.splitlines()
                     if isinstance(test_value, (list, tuple)):
                         assert_lines(test_value, rtn_value.splitlines(),
-                                     "{}\n{}={!r}".format(desc, rtn_type,
-                                                          rtn_value))
+                                     rtn_type, desc)
                     else:
                         assert(isinstance(test_value, six.string_types))
                         assert_lines(test_value.splitlines(),
                                      rtn_value.splitlines(),
-                                     "{}\n{}={!r}".format(desc, rtn_type,
-                                                          rtn_value))
+                                     rtn_type, desc)
                 # compress test_value and rtn_value into whitespace single
                 # strings and assert_lines.
                 elif test_definition == 'linesnows':
                     assert_lines([remove_ws(test_value)],
                                  [remove_ws(rtn_value)],
-                                 "{}\n{}={!r}".format(desc, rtn_type,
-                                                      rtn_value))
+                                 rtn_type, desc)
 
                 # test with a regex search that all values in list exist in
                 # the return. Build rtn_value into single string and do
                 # re.search against it for each test_value
                 elif test_definition == 'regex':
-                    assert(isinstance(rtn_value, six.string_types))
-
+                    assert isinstance(rtn_value, six.string_types)
+                    if isinstance(test_value, six.string_types):
+                        test_value = [test_value]
                     for regex in test_value:
                         assert isinstance(regex, six.string_types)
                         match_result = re.search(regex, rtn_value, re.MULTILINE)
                         assert match_result, \
-                            "Desc: {}\nRegex: {}\nNot in\n{!r}".format(
-                                desc, regex, rtn_value)
+                            "Missing pattern on {} in test:\n" \
+                            "{}\n" \
+                            "Expected pattern in any line:\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n" \
+                            "Actual output line(s):\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n". \
+                            format(rtn_type, desc, regex, rtn_value)
                 elif test_definition == 'in':
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert test_str in rtn_value, \
-                            "Desc: {}\nString: {}\nNot in:\n{!r}".format(
-                                desc, test_str, rtn_value)
+                            "Missing in-string on {} in test:\n" \
+                            "{}\n" \
+                            "Expected in-string in any line:\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n" \
+                            "Actual output line(s):\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n". \
+                            format(rtn_type, desc, test_str, rtn_value)
                 elif test_definition == 'innows':
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str) in remove_ws(rtn_value), \
-                            "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
-                            "{!r}".format(desc, test_str, rtn_value)
+                            "Missing ws-agnostic in-string on {} in test:\n" \
+                            "{}\n" \
+                            "Expected ws-agnostic in-string in any line:\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n" \
+                            "Actual output line(s):\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n". \
+                            format(rtn_type, desc, test_str, rtn_value)
                 elif test_definition == 'not-innows':
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str) not in \
                             remove_ws(rtn_value), \
-                            "Desc: {}\nString: {}\nNot in (ws ignored):\n" \
-                            "{!r}".format(desc, test_str, rtn_value)
+                            "Unexpected ws-agnostic in-string on {} in test:\n"\
+                            "{}\n" \
+                            "Unexpected ws-agnostic in-string in any line:\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n" \
+                            "Actual output line(s):\n" \
+                            "------------\n" \
+                            "{}\n" \
+                            "------------\n". \
+                            format(rtn_type, desc, test_str, rtn_value)
                 else:
                     assert 'Test {} is invalid. Skipped'.format(test_definition)
 
