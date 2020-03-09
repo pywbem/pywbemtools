@@ -48,6 +48,9 @@ Released: not yet
 * Increased pywbem minimum version to 0.16.0 to accomodate install issues
   on Python 3.4, and to pick up other fixes.
 
+* Test: Accomodated new formatting of error messages in Click 7.1.1, and
+  excluded Click 7.1 due to bug.
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
@@ -92,6 +95,8 @@ Released: not yet
   pywbem version 1.0.0 (new values 'system' and 'certifi', and default changed
   from a fixed set of directories to 'certifi'). The pywbem version is
   determined at run time and pywbem versions before 1.0.0 are still supported.
+
+* Test: Improved assertion messages in tests.
 
 **Cleanup:**
 
