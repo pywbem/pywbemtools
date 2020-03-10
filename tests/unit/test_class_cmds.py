@@ -1081,19 +1081,22 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class command associators request, all filters short,  -a '
-     'does not pass test',
+    # Behavior changed pywbem 0.15.0 to exception rtn
+    ['Verify class command associators request, all filters short,  -ac '
+     'not valid class',
      ['associators', 'TST_Person',
       '--ac', 'TST_MemberOfFamilyCollectionx',
       '-r', 'member',
       '--rr', 'family',
       '--rc', 'TST_Person'],
-     {'stdout': [],
-      'test': 'lines'},
+     {'stderr': ['CIM_ERR_INVALID_PARAMETER'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+    # Behavior changed pywbem 0.15.0 to exception rtn
     ['Verify class command associators request, all filters short,  -r '
-     'does not pass test',
+     'not valid role',
      ['associators', 'TST_Person',
       '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'memberx',
@@ -1103,28 +1106,20 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class command associators request, all filters short,  -rr '
-     'does not pass test',
-     ['associators', 'TST_Person',
-      '--ac', 'TST_MemberOfFamilyCollection',
-      '-r', 'member',
-      '--rr', 'familyx',
-      '--rc', 'TST_Person'],
-     {'stdout': [],
-      'test': 'lines'},
-     SIMPLE_ASSOC_MOCK_FILE, OK],
-
+    # Behavior changed pywbem 0.15.0 to exception rtn
     ['Verify class command associators request, all filters short,  --rc '
-     'does not pass test',
+     'does not valid class',
      ['associators', 'TST_Person',
       '--ac', 'TST_MemberOfFamilyCollection',
       '-r', 'member',
       '--rr', 'family',
       '--rc', 'TST_Personx'],
-     {'stdout': [],
-      'test': 'lines'},
+     {'stderr': ['CIM_ERR_INVALID_PARAMETER'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+    # Behavior changed pywbem 0.15.0 to exception rtn
     ['Verify class command associators request, all filters long '
      'does not pass test',
      ['associators', 'TST_Person',
@@ -1132,8 +1127,9 @@ TEST_CASES = [
       '--role', 'member',
       '--result-role', 'family',
       '--result-class', 'TST_Personx'],
-     {'stdout': [],
-      'test': 'lines'},
+     {'stderr': ['CIM_ERR_INVALID_PARAMETER'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     # Associator errors
@@ -1145,11 +1141,12 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify class command associators non-existent CLASSNAME rtns empty',
+    # Behavior changed pywbem 0.15.0 to exception rtn
+    ['Verify class command associators non-existent CLASSNAME rtns error',
      ['associators', 'CIM_Nonexistentclass'],
-     {'stdout': "",
-      'rc': 0,
-      'test': 'regex'},
+     {'stderr': ["CIM_ERR_INVALID_PARAMETER"],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command associators non-existent namespace fails',
@@ -1213,11 +1210,12 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify class command references non-existent CLASSNAME rtns empty',
+    # Behavior changed pywbem 0.15.0, references bad param rtns except.
+    ['Verify class command references non-existent CLASSNAME rtns error',
      ['references', 'CIM_Nonexistentclass'],
-     {'stdout': "",
-      'rc': 0,
-      'test': 'regex'},
+     {'stderr': ["CIM_ERR_INVALID_PARAMETER"],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command references non-existent namespace fails',
