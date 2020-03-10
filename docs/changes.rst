@@ -51,6 +51,9 @@ Released: not yet
 * Test: Accomodated new formatting of error messages in Click 7.1.1, and
   excluded Click 7.1 due to bug.
 
+* Test: Fixed dependency to Python development packages on CygWin platform
+  in Appveyor CI.
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
