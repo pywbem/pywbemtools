@@ -98,6 +98,9 @@ Released: not yet
 
 * Test: Improved assertion messages in tests.
 
+* Output of "pywbemcli server profiles" command is now reliably sorted by
+  version in addition to org and name. (See issue #500)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

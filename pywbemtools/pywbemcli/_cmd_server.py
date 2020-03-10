@@ -300,6 +300,24 @@ def get_profile_info(org_vm, inst):
     return org, name, vers
 
 
+def profile_row_sortkey(row):
+    """
+    Return a sort key for profiles that sorts by org name, profile name, and
+    profile version (numeric).
+
+    row is a tuple(org, name, version) where version is a version string such
+    as "1.2.3" or "1.2.3a".
+    """
+    version_parts = []
+    for v_str in row[2].split('.'):
+        try:
+            v_int = int(v_str)
+        except ValueError:
+            v_int = v_str
+        version_parts.append(v_int)
+    return row[0], row[1], tuple(version_parts)
+
+
 def cmd_server_profiles(context, options):
     """
     Display general overview of info from current WBEM server
@@ -318,8 +336,7 @@ def cmd_server_profiles(context, options):
         for inst in found_server_profiles:
             row = get_profile_info(org_vm, inst)
             rows.append(row)
-        # sort by org
-        rows.sort(key=lambda x: (x[0], x[1]))
+        rows.sort(key=profile_row_sortkey)
         headers = ['Organization', 'Registered Name', 'Version']
 
         click.echo(format_table(rows, headers,
