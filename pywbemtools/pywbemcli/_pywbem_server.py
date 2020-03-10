@@ -444,9 +444,9 @@ class PywbemServer(object):
             # info)
             x509_dict = None
             if self.certfile is not None:
-                x509_dict = {"certfile": self.certfile}
+                x509_dict = {"cert_file": self.certfile}
                 if self.keyfile is not None:
-                    x509_dict.update({'keyfile': self.keyfile})
+                    x509_dict.update({'key_file': self.keyfile})
 
             # Create the WBEMConnection object and the _wbem_server object
 

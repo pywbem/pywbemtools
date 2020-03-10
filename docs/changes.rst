@@ -39,6 +39,8 @@ Released: not yet
 * Test: Accomodated new formatting of error messages in Click 7.1.1, and
   excluded Click 7.1 due to bug.
 
+* Fixed issue with x509 parameter of WBEMConnection. (See issue #468)
+
 **Enhancements:**
 
 * Test: Improved assertion messages in tests.
