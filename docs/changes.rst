@@ -41,6 +41,9 @@ Released: not yet
 
 * Fixed issue with x509 parameter of WBEMConnection. (See issue #468)
 
+* Test: Fixed dependency to Python development packages on CygWin platform
+  in Appveyor CI.
+
 **Enhancements:**
 
 * Test: Improved assertion messages in tests.
