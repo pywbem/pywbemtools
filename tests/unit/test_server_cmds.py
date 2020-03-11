@@ -109,7 +109,8 @@ TEST_CASES = [
     #          detailed documentation
     # exp_response - Dictionary of expected responses,
     # mock - None or name of files (mof or .py),
-    # condition - If True, the test is executed,  Otherwise it is skipped.
+    # condition - If True the test is executed, if 'pdb' the test breaks in
+    #             the debugger, otherwise the test is skipped.
 
     ['Verify server command --help response',
      '--help',

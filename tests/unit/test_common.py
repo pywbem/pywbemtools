@@ -670,7 +670,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
 
     # test option with only one choice bypasses user request
     if not choices:
-        context = ContextObj(None, None, None, None, None, None, None)
+        context = ContextObj(None, None, None, None, None, None, None, None)
         act_rtn = pick_one_from_list(context, options, title)
     else:
         # setup mock for this test
@@ -678,7 +678,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
         with patch(mock_function, side_effect=choices) as mock_prompt:
             # The code to be tested
             # fake context object
-            context = ContextObj(None, None, None, None, None, None, None)
+            context = ContextObj(None, None, None, None, None, None, None, None)
             act_rtn = pick_one_from_list(context, options, title)
             context.spinner_stop()
             assert mock_prompt.call_count == len(choices)
@@ -735,7 +735,7 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     with patch(mock_function, side_effect=choices) as mock_prompt:
         # The code to be tested
         title = "test_pick_multiple_from_list"
-        # context = ContextObj(None, None, None, None, None, None, None)
+        # context = ContextObj(None, None, None, None, None, None, None, None)
         act_rtn = pick_multiple_from_list(None, options, title)
         # context.spinner_stop()
         assert mock_prompt.call_count == len(choices)
@@ -994,7 +994,8 @@ class TestParseWbemUri(object):  # TODO: move this to pytest
         #     if expected to succeed. Exception type, if expected to fail.
         # * exp_warn_type: Expected warning type.
         #     None, if no warning expected.
-        # * condition: Condition for testcase to run.
+        # * condition: If True the test is executed, if 'pdb' the test breaks in
+        #     the debugger, otherwise the test is skipped.
         (
             "class and keys only case",
             '/root/cimv2:CIM_Foo.k1="v1"',
@@ -1051,7 +1052,7 @@ class TestParseWbemUri(object):  # TODO: move this to pytest
             exp_attrs = exp_result
 
         if condition == 'pdb':
-            import pdb
+            import pdb  # pylint: disable=import-outside-toplevel
             pdb.set_trace()
 
         if exp_warn_type:
