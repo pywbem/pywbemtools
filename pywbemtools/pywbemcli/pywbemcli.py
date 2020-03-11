@@ -214,13 +214,21 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-v', '--verbose/--no-verbose',
               default=None,
               help='Display extra information about the processing.')
+@click.option('--pdb', is_flag=True,
+              # defaulted in code
+              envvar=PywbemServer.pdb_envvar,
+              help='Pause execution in the built-in pdb debugger just before '
+                   'executing the command within pywbemcli. '
+                   'Default: EnvVar {ev}, or false.'.
+                   format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
     help='Show the version of this command and the pywbem package and exit.')
 @click.pass_context
 def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
-        pull_max_cnt, mock_server, verbose=None, timestats=None, log=None):
+        pull_max_cnt, mock_server, verbose=None, timestats=None, log=None,
+        pdb=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -536,6 +544,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             log = ctx.obj.log
         if verbose is None:
             verbose = ctx.obj.verbose
+        if pdb is None:
+            pdb = ctx.obj.pdb
 
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
@@ -544,7 +554,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
-                         log, verbose)
+                         log, verbose, pdb)
     if verbose:
         print('CONTEXT_obj FROM generals loc 547 %r' % ctx.obj)
         print('CLICK CTX %s' % ctx)

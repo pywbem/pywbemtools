@@ -152,8 +152,10 @@ class CLITestsBase(object):
             and options that do not communicate with a server.  It is faster
             than installing the mock repository
 
-          condition (None or False):
-            If False, the test is skipped
+          condition (True, False, or 'pdb'):
+            If True, the test is executed.
+            If False, the test is skipped.
+            If 'pdb', the test breaks in the debugger.
 
           verbose (:class:`py:bool`):
             If `True` the assembled command line will be displayed
@@ -209,6 +211,9 @@ class CLITestsBase(object):
 
         if local_args:
             cmd_line.extend(local_args)
+
+        if condition == 'pdb':
+            cmd_line.append('--pdb')
 
         if verbose:
             print('\nCMDLINE: %s' % cmd_line)

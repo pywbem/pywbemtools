@@ -36,7 +36,8 @@ TEST_CASES = [
     #                test definition (test: <testname>).
     #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
-    # condition - If True, the test is executed,  Otherwise it is skipped.
+    # condition - If True the test is executed, if 'pdb' the test breaks in
+    #             the debugger, otherwise the test is skipped.
 
     ['Verify log of class get blah. class get that fails',
      {'general': ['-l', 'all=stderr'],
