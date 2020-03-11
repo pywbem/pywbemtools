@@ -172,6 +172,10 @@ Options:
                                   EnvVar PYWBEMCLI_LOG, or all.
   -v, --verbose / --no-verbose    Display extra information about the
                                   processing.
+  --pdb                           Pause execution in the built-in pdb debugger
+                                  just before executing the command within
+                                  pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or
+                                  false.
   --version                       Show the version of this command and the
                                   pywbem package and exit.
   -h, --help                      Show this message and exit.
@@ -232,7 +236,8 @@ TEST_CASES = [
     #                test definition (test: <testname>).
     #                See CLITestsBase.subcmd_test() for detailed documentation.
     # mock - None or name of files (mof or .py),
-    # condition - If True, the test is executed,  Otherwise it is skipped.
+    # condition - If True the test is executed, if 'pdb' the test breaks in
+    #             the debugger, otherwise the test is skipped.
 
     ['Verify -help response.',
      {'general': ['--help'],

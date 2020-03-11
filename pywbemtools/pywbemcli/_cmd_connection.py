@@ -500,7 +500,8 @@ def cmd_connection_select(context, name, options):
                          context.pull_max_cnt,
                          context.timestats,
                          context.log,
-                         context.verbose)
+                         context.verbose,
+                         context.pdb)
 
     # Update the root context making this context the basis for future
     # commands in the current interactive session

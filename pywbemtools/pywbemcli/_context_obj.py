@@ -43,7 +43,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
-                 pull_max_cnt, timestats, log, verbose):
+                 pull_max_cnt, timestats, log, verbose, pdb):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -52,6 +52,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._timestats = timestats
         self._log = log
         self._verbose = verbose
+        self._pdb = pdb
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
@@ -104,6 +105,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         :term:`string`: log definition from cmd line
         """
         return self._log
+
+    @property
+    def pdb(self):
+        """
+        bool: Indicates whether to break in the debugger.
+        """
+        return self._pdb
 
     @property
     def conn(self):
@@ -251,11 +259,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                                                           ctx.params))
             display_click_context_parents(display_attrs=True)
 
-        self.spinner_start()
+        if not self.pdb:
+            self.spinner_start()
+        if self.pdb:
+            import pdb  # pylint: disable=import-outside-toplevel
+            pdb.set_trace()
         try:
             cmd()
         finally:
-            self.spinner_stop()
+            if not self.pdb:
+                self.spinner_stop()
 
             # Issue statistics if required. Note that we use _conn in order
             # not to create the connection if not created.
