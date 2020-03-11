@@ -568,6 +568,22 @@ The ``--verbose``/``-v`` general option is a boolean option that enables the
 display of extra information about the processing.
 
 
+.. _`--pdb general option`:
+
+--pdb general option
+""""""""""""""""""""
+
+The ``--pdb`` general option is a boolean option that enables debugging
+with the built-in pdb debugger.
+
+If debugging is enabled, execution of the pywbemcli command will pause just
+before the command within pywbemcli is executed, and the pdb debugger prompt
+will appear. See `pdb debugger commands`_ for details on how to operate the
+built-in pdb debugger.
+
+.. _`pdb debugger commands`: https://docs.python.org/2.7/library/pdb.html#debugger-commands
+
+
 .. _`--version general option`:
 
 --version general option
@@ -612,6 +628,7 @@ PYWBEMCLI_PULL_MAX_CNT          ``--pull-max-cnt``
 PYWBEMCLI_STATS_ENABLED         ``--timestats``
 PYWBEMCLI_MOCK_SERVER (1)       ``--mock-server``
 PYWBEMCLI_LOG                   ``--log``
+PYWBEMCLI_PDB                   ``--pdb``
 ==============================  ============================
 
 Notes:

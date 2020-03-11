@@ -102,6 +102,7 @@ class PywbemServer(object):
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
     log_envvar = 'PYWBEMCLI_LOG'
+    pdb_envvar = 'PYWBEMCLI_PDB'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default', user=None, password=None,

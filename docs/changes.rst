@@ -48,6 +48,17 @@ Released: not yet
 * Output of "pywbemcli server profiles" command is now reliably sorted by
   version in addition to org and name. (See issue #500)
 
+* Added support for a new `--pdb` general option and corresponding
+  `PYWBEMCLI_PDB` environment variable that causes the pywbemcli command
+  to come up with the pdb debugger before invoking the specified command.
+  This is a debug feature that is expected to be used mainly by the
+  developers of pywbemcli. (See issue #505)
+
+* Test: Added support for entering the pdb debugger from specific unit testcases
+  by setting the condition parameter of the testcase to the string 'pdb'.
+  This causes pywbemcli to be invoked with the new --pdb option for that
+  testcase. (See issue #505)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
