@@ -22,13 +22,14 @@ class PywbemcliGroup(click.Group):
         """
         Use OrderedDict to keep order commands inserted into command dict
         """
+        print('PYWBEMCI_INIT %s %s' % (name, commands))
+        print('attrs %s' % attrs)
         if commands is None:
             commands = OrderedDict()
         elif not isinstance(commands, OrderedDict):
+            print('PYWBEMCLI INIT pre commands %s' % commands)
             commands = OrderedDict(commands)
-        click.Group.__init__(self, name=name,
-                             commands=commands,
-                             **attrs)
+        click.Group.__init__(self, name=name, commands=commands, **attrs)
 
     def list_commands(self, ctx):
         """
@@ -49,14 +50,15 @@ class PywbemcliTopGroup(click.Group):
         to just move the generic ones to the end of the list.
 
     This extension has a general name because it may be used for more than
-    one extension to the Click.Group class..
+    one extension to the Click.Group class.
     """
 
     def list_commands(self, ctx):
         """
-        Order commands by sorting and then moving any commands defined in
-        move_to_end list to the end of the list.
+        Order The top level commands by sorting and then moving any commands
+        defined in  move_to_end list to the end of the list.
         """
+        print("LIST_COMMANDS %s" % self.commands.keys())
         # tuple of commands to move to bottom after sort
         move_to_end = ('connection', 'help', 'repl')
 
@@ -67,4 +69,5 @@ class PywbemcliTopGroup(click.Group):
             if cmd_list[i - pop_count] in move_to_end:
                 cmd_list.append(cmd_list.pop(i - pop_count))
                 pop_count += 1
+        print('RETURNS %s' % cmd_list)
         return cmd_list
