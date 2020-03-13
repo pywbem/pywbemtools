@@ -97,12 +97,6 @@ QD_GET_MOCK = """Qualifier Description : string,
     Flavor(EnableOverride, ToSubclass, Translatable);
 
 """
-# pylint: disable=line-too-long
-QD_GET_MOCK_XML = """<QUALIFIER.DECLARATION ISARRAY="false" NAME="Description" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true" TYPE="string">
-    <SCOPE ASSOCIATION="true" CLASS="true" INDICATION="true" METHOD="true" PARAMETER="true" PROPERTY="true" REFERENCE="true"/>
-</QUALIFIER.DECLARATION>
-
-"""  # noqa: E501
 
 QD_TBL_OUT = """Qualifier Declarations
 +-------------+---------+---------+---------+-------------+-----------------+
@@ -254,8 +248,9 @@ TEST_CASES = [
     ['Verify qualifier command get  Description outputformat xml',
      {'args': ['get', 'Description'],
       'general': ['--output-format', 'xml']},
-     {'stdout': QD_GET_MOCK_XML,
-      'test': 'lines'},
+     {'stdout': ['<QUALIFIER.DECLARATION( | .+ )NAME="Description"',
+                 '<SCOPE( | .+ )ASSOCIATION="true"'],
+      'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command -o grid enumerate produces table out',
