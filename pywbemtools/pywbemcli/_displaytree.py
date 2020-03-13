@@ -24,7 +24,10 @@ import six
 from asciitree import LeftAligned
 import click
 
-from pywbem.cim_obj import NocaseDict
+# Use an ordered Nocase dictionary for the tree. The Nocase allows
+# the input top_class to have a different case than the data from the classes
+# and the ordered keeps class order at each level on output.
+from pydicti import odicti
 
 
 def build_tree(class_subclass_dict, top_class):
@@ -42,7 +45,7 @@ def build_tree(class_subclass_dict, top_class):
 
         Returns dictionary of dictionaries in form suitable for asciitree
         """
-        node_dict = NocaseDict()
+        node_dict = odicti()
         # If there is no subclass, the class will not exist in this dictionary
         if cn in class_subclass_dict:
             cn_list = class_subclass_dict[cn]
@@ -51,13 +54,13 @@ def build_tree(class_subclass_dict, top_class):
                 for key in cn_list:
                     node_dict[key] = _tree_node(class_subclass_dict, key)
             else:
-                node_dict = NocaseDict()
+                node_dict = odicti()
         else:
-            return {}
+            return odicti()
 
         return node_dict
 
-    rtn_dict = {}
+    rtn_dict = odicti()
     # _tree_node generates dictionary node for elements in class-subclass
     # dictionary and returns complete node structure
     rtn_dict[top_class] = _tree_node(class_subclass_dict, top_class)
@@ -77,23 +80,30 @@ def display_class_tree(classes, top_class=None):
             from root.
     """
 
-    # build dictionary of classname : superclassname
-    cn_supercn = {cl.classname: cl.superclass for cl in classes}
+    # Build dictionary of classname : superclassname from list of CIM classes
+    cln_to_supercln = {cln.classname: cln.superclass for cln in classes}
+
+    cln_supercln_sorted = odicti()
+    for key in sorted(cln_to_supercln.keys()):
+        cln_supercln_sorted[key] = cln_to_supercln[key]
+    cln_to_supercln = cln_supercln_sorted
 
     # if top_class is none, create artifical root
     if top_class is None:
-        for cn in cn_supercn:
-            if not cn_supercn[cn]:
-                cn_supercn[cn] = 'root'
+        for cln in cln_to_supercln:
+            if not cln_to_supercln[cln]:
+                cln_to_supercln[cln] = 'root'
         top_class = 'root'
 
-    # Hack to build the class to subclass dictionary from the
-    # superclass to class dictionary
-    cn_subcn = NocaseDict()
+    # Build the class to subclass dictionary from the
+    # superclass to class dictionary by reversing the dictionary.
+    # Built within a comprehension but comprehension not assigned.
+    subcln_in_cln = odicti()
     # pylint: disable=bad-continuation, expression-not-assigned
-    [cn_subcn.setdefault(v, []).append(k) for (k, v) in
-            six.iteritems(cn_supercn)]  # noqa: F841
-    tree = build_tree(cn_subcn, top_class)
+    [subcln_in_cln.setdefault(v, []).append(k) for (k, v) in
+        six.iteritems(cln_to_supercln)]  # noqa: F841
+
+    tree = build_tree(subcln_in_cln, top_class)
 
     tr = LeftAligned()
     click.echo(tr(tree))

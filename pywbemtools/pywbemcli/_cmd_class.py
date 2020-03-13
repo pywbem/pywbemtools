@@ -26,7 +26,6 @@ from __future__ import absolute_import, print_function
 import click
 
 from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
-from pywbem._nocasedict import NocaseDict
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
@@ -811,14 +810,14 @@ def cmd_class_tree(context, classname, options):
     subclass tree is displayed.
     """
 
-    # TODO: Sort out how we handle output format with tree output.
+    # TODO FUTURE: Sort out how we handle output format with tree output.
     try:
         if options['superclasses']:
             if classname is None:
                 raise click.ClickException('CLASSNAME argument required for '
                                            '--superclasses option')
 
-            # get the superclasses into a list
+            # Get the superclasses into a list
             class_ = context.conn.GetClass(classname,
                                            namespace=options['namespace'])
             classes = []
@@ -830,7 +829,7 @@ def cmd_class_tree(context, classname, options):
             classname = None
 
         else:
-            # get the subclass hierarchy either complete or starting at the
+            # Get the subclass hierarchy either complete or starting at the
             # optional CLASSNAME
             classes = context.conn.EnumerateClasses(
                 ClassName=classname,

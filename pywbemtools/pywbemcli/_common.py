@@ -1182,6 +1182,28 @@ class NoCaseList(object):
         else:
             self.str_list.append(strs)
 
+    def get(self, str):
+        """
+        Get the string that matches str case insensitive
+
+        Parameters:(:term:`string_types` or list, tuple of :term:`string_types`):  # noqa:E501
+          String to test against the instance of NocaseList.
+
+        Returns:
+            String in list that matches No case the input str
+
+        Raises:
+            KeyError: If no match
+
+        """
+        if not str:
+            return
+        tstr = str.lower()
+        for str in self.str_list:
+            if tstr == str.lower():
+                return str
+        raise KeyError('{} not found in list'.format(str))
+
 
 def shorten_path_str(path, replacements, fullpath):
 
