@@ -64,6 +64,10 @@ Released: not yet
   because it failed during loading of pytest plugins on Python 3.8.
   (See issue #494)
 
+* Test: Changed testcases that check the CIM-XML generated with output format
+  'xml' to tolerate the different order of XML attributes that happens on
+  Python 3.8 (See issue #494)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
