@@ -147,6 +147,9 @@ Released: not yet
 
 * Added tests of all command groups and commands for server connection error.
 
+* Removed a circumvention for a pywbem bug related to colons in WBEM URIs
+  that was fixed in pywbem 0.13.0. (See issue #131)
+
 **Known issues:**
 
 * See `list of open issues`_.
