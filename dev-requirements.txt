@@ -15,6 +15,8 @@
 pytest>=4.3.1,<5.0.0; python_version < '3.5'
 pytest>=4.3.1; python_version >= '3.5'
 funcsigs>=1.0.2; python_version == '2'
+# Pluggy 0.12.0 has a bug causing pytest plugins to fail loading on py38
+pluggy>=0.13.0
 
 # Coverage reporting (no imports, invoked via coveralls script):
 # coverage 5.0 has removed support for py34

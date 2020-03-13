@@ -60,6 +60,10 @@ Released: not yet
 * Fix bug where order of commands listed in help output was different for
   different versions of Python. (See issue # 510)
 
+* Increased minimum version of pluggy package from 0.12.0 to 0.13.0
+  because it failed during loading of pytest plugins on Python 3.8.
+  (See issue #494)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
