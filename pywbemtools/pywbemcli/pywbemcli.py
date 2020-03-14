@@ -54,8 +54,14 @@ DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
 
-# enable -h as additional help option
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(
+
+    # Enable -h as additional help option:
+    help_option_names=['-h', '--help'],
+
+    # Default the output width properly:
+    terminal_width=click.get_terminal_size()[0],
+)
 
 
 # pylint: disable=bad-continuation
