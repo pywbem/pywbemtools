@@ -115,6 +115,17 @@ Released: not yet
   This causes pywbemcli to be invoked with the new --pdb option for that
   testcase. (See issue #505)
 
+* Removed usage of the "pbr" package. It was used for automatic versioning
+  of the pywbemtools package, but it had too many drawbacks for that small
+  benefit (See issue #178):
+
+  - Getting the minor version increased in a development version (instead of
+    the patch version) by means of markers in the commit message never worked.
+  - The package needed to be tagged twice during the release process.
+  - If the last tag was too far in the past of the commit history, the
+    shallow git checkout used by Travis failed and its depth needed to be
+    adjusted. At some point this defeats the purpose of a shallow checkout.
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

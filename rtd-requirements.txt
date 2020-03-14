@@ -1,7 +1,6 @@
 # Requirements for building with Sphinx at readthedocs.org
 #
 
-pbr>=1.10.0
 six>=1.10.0
 ply>=3.10
 PyYAML>=3.13

@@ -163,7 +163,7 @@ coverage_html_dir := coverage_html
 # e.g. because the pywbem.egg-info directory or the PKG-INFO file are deleted,
 # when a new version tag has been assigned. Therefore, this variable is assigned with
 # "=" so that it is evaluated every time it is used.
-package_version = $(shell $(PYTHON_CMD) tools/package_version.py $(package_name))
+package_version = $(shell $(PYTHON_CMD) setup.py --version)
 
 # Python versions
 python_version := $(shell $(PYTHON_CMD) tools/python_version.py 3)
@@ -214,7 +214,7 @@ doc_dependent_files := \
     $(wildcard $(doc_conf_dir)/*.rst) \
     $(wildcard $(doc_conf_dir)/*/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
-    $(wildcard $(pywbemcli_module_path)/*.py) \
+		$(package_py_files) \
 
 # PyLint config file
 pylint_rc_file := pylintrc
@@ -225,7 +225,7 @@ flake8_rc_file := .flake8
 # Python source files to be checked by PyLint and Flake8
 py_src_files := \
     setup.py \
-    $(wildcard $(pywbemcli_module_path)/*.py) \
+		$(package_py_files) \
     $(wildcard tests/*.py) \
     $(wildcard tests/*/*.py) \
     $(wildcard tests/*/*/*.py) \
@@ -263,7 +263,8 @@ dist_manifest_in_files := \
     LICENSE.txt \
     README.rst \
     *.py \
-    $(pywbemcli_module_path)/*.py \
+		$(package_name)/*.py \
+		$(package_name)/*/*.py \
 
 # Files that are dependents of the distribution archive.
 # Keep in sync with dist_manifest_in_files.
@@ -272,7 +273,7 @@ dist_dependent_files := \
     README.rst \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
-    $(wildcard $(pywbemcli_module_path)/*.py) \
+		$(wildcard $(package_name)/*/*.py) \
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
@@ -353,7 +354,7 @@ env:
 .PHONY: _check_version
 _check_version:
 ifeq (,$(package_version))
-	$(error Package version could not be determined - requires pbr - run "make install")
+	$(error Package version could not be determined)
 endif
 
 pip_upgrade_$(pymn).done: Makefile
@@ -368,7 +369,6 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 # Keep the condition for the 'wheel' package consistent with the requirements & constraints files.
 # The approach with "python -m pip" is needed for Windows because pip.exe may be locked.
 	$(PIP_CMD) install $(pip_level_opts) setuptools wheel
-	$(PIP_CMD) install $(pip_level_opts) pbr
 	echo "done" >$@
 	@echo "makefile: Done installing/upgrading basic Python packages"
 
@@ -402,7 +402,7 @@ _show_bitsize:
 	$(PYTHON_CMD) tools/python_bitsize.py
 	@echo "makefile: Done determining bit size of Python executable"
 
-install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirements.txt setup.py setup.cfg
+install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirements.txt setup.py
 	@echo "makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
