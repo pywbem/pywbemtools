@@ -15,15 +15,14 @@
 # limitations under the License.
 
 """
-Initialization of the pywbemtools package.
+Version of the pywbemtools package.
 """
 
-import sys
-
-# Keep these Python versions in sync with setup.py
-_python_m = sys.version_info[0]  # pylint: disable=invalid-name
-_python_n = sys.version_info[1]  # pylint: disable=invalid-name
-if _python_m == 2 and _python_n < 7:
-    raise RuntimeError('On Python 2, pywbemtools requires Python 2.7 or higher')
-if _python_m == 3 and _python_n < 4:
-    raise RuntimeError('On Python 3, pywbemtools requires Python 3.4 or higher')
+#: The full version of this package including any development levels, as a
+#: :term:`string`.
+#:
+#: Possible formats for this version string are:
+#:
+#: * "M.N.P.devD": Development level D of a not yet released version M.N.P
+#: * "M.N.P": A released version M.N.P
+__version__ = '0.6.0.dev1'

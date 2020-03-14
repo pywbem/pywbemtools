@@ -52,7 +52,22 @@ Its upstream repo is assumed to have the remote name `origin`.
     - `git pull`
     - `git checkout -b release_$MNU`
 
-4.  Edit the change log:
+4.  Edit the version file and set the version to be released:
+
+    - `vi pywbemtools/_version.py`
+
+    `__version__ = 'M.N.U'`
+
+    Where `M.N.U` is the version to be released, e.g. `0.8.1`.
+
+    You can verify that this version is picked up by setup.py as follows::
+
+    ```
+    ./setup.py --version
+    0.8.1
+    ```
+
+5.  Edit the change log:
 
     - `vi docs/changes.rst`
 
@@ -72,7 +87,7 @@ Its upstream repo is assumed to have the remote name `origin`.
       the changes listed with the commit log of the master branch.
 
     * Make sure the items in the change log are relevant for and understandable
-      by users of pywbem.
+      by users of pywbemtools.
 
     * In the "Known issues" list item, remove the link to the issue tracker
       and add text for any known issues you want users to know about.
@@ -82,14 +97,14 @@ Its upstream repo is assumed to have the remote name `origin`.
       version. In the "Starting a new version" section, the link will be added
       again for the new version.
 
-5.  Perform a complete build (in your favorite Python virtual environment):
+6.  Perform a complete build (in your favorite Python virtual environment):
 
     - `make clobber`
     - `make all`
 
     If this fails, fix and iterate over this step until it succeeds.
 
-6.  Optional: Perform a complete test using Tox:
+7.  Optional: Perform a complete test using Tox:
 
     - `tox`
 
@@ -99,48 +114,47 @@ Its upstream repo is assumed to have the remote name `origin`.
 
     If this fails, fix and iterate over this step until it succeeds.
 
-7.  Optional: Perform a test against a real WBEM server:
+8.  Optional: Perform a test against a real WBEM server:
 
     If this fails, fix and iterate over this step until it succeeds.
 
     Post the results to the release PR.
 
-8.  Commit the changes and push to upstream:
+9.  Commit the changes and push to upstream:
 
     - `git status` - to double check which files have been changed
     - `git commit -asm "Release $MNU"`
     - `git push --set-upstream origin release_$MNU`
 
-9.  On Github, create a Pull Request for branch `release_$MNU`. This will
+10. On Github, create a Pull Request for branch `release_$MNU`. This will
     trigger the CI runs in Travis and Appveyor.
 
     Important: When creating Pull Requests, GitHub by default targets
     the `master` branch. If you are releasing a fix version, you need to
     change the target branch of the Pull Request to `stable_M.N`.
 
-10. On GitHub, once the CI runs for the Pull Request succeed:
+11. On GitHub, once the CI runs for the Pull Request succeed:
 
     - Merge the Pull Request (no review is needed)
     - Delete the branch of the Pull Request (`release_M.N.U`)
 
-11. Checkout the branch you are releasing, update it from upstream, and
+12. Checkout the branch you are releasing, update it from upstream, and
     delete the local topic branch you created:
 
     - `git checkout $BRANCH`
     - `git pull`
     - `git branch -d release_$MNU`
 
-12. Tag the version and push the tag to upstream:
+13. Tag the version:
+
+    This step tags the local repo and pushes it upstream:
 
     - `git status` - double check that the branch to be released
       (`$BRANCH`) is checked out
     - `git tag $MNU`
     - `git push --tags`
 
-    The pushing of the tag triggers another RTD docs build of its stable
-    version, this time with the correct version as defined in the tag.
-
-13. If you released the `master` branch (for a new minor or major version),
+14. If you released the `master` branch (for a new minor or major version),
     it will be fixed separately, so it needs a new fix stream.
 
     * Create a branch for its fix stream and push it upstream:
@@ -153,15 +167,15 @@ Its upstream repo is assumed to have the remote name `origin`.
     * Log on to [RTD](https://readthedocs.org/), go to the `pywbemtools` project,
       and activate the new branch `stable_M.N` as a version to be built.
 
-14. On GitHub, edit the new tag, and create a release description on it. This
+15. On GitHub, edit the new tag, and create a release description on it. This
     will cause it to appear in the Release tab.
 
-15. On GitHub, close milestone `M.N.U`.
+16. On GitHub, close milestone `M.N.U`.
 
     Note: Issues with that milestone will be moved forward in the section
     "Starting a new version".
 
-16. Upload the package to PyPI:
+17. Upload the package to PyPI:
 
     **Attention!!** This only works once. You cannot re-release the same
     version to PyPI.
@@ -170,7 +184,7 @@ Its upstream repo is assumed to have the remote name `origin`.
 
     Verify that it arrived on PyPI: https://pypi.python.org/pypi/pywbemtools/
 
-17. Announce the new version on the
+18. Announce the new version on the
     [pywbem-devel mailing list](https://sourceforge.net/p/pywbem/mailman/pywbem-devel/).
 
 Starting a new version
@@ -202,7 +216,15 @@ It covers all variants of new versions:
     - `git pull`
     - `git checkout -b start_$MNU`
 
-4.  Edit the change log:
+4.  Edit the version file and set the version to the new development version:
+
+    - `vi pywbemtools/_version.py`
+
+    `__version__ = 'M.N.U.dev1'`
+
+    Where `M.N.U` is the new version to be started, e.g. `0.10.0`.
+
+5.  Edit the change log:
 
     - `vi docs/changes.rst`
 
@@ -233,31 +255,31 @@ It covers all variants of new versions:
     .. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
     ```
 
-5. Commit the changes and push to upstream:
+6. Commit the changes and push to upstream:
 
     - `git status` - to double check which files have been changed
     - `git commit -asm "Start $MNU"`
     - `git push --set-upstream origin start_$MNU`
 
-6.  On Github, create a Pull Request for branch `start_$MNU`.
+7.  On Github, create a Pull Request for branch `start_$MNU`.
 
     Important: When creating Pull Requests, GitHub by default targets
     the `master` branch. If you are starting a fix version, you need to
     change the target branch of the Pull Request to `stable_M.N`.
 
-7.  On GitHub, once all of these tests succeed:
+8.  On GitHub, once all of these tests succeed:
 
     - Merge the Pull Request (no review is needed)
     - Delete the branch of the Pull Request (`release_M.N.U`)
 
-8.  Checkout the branch the new version is based upon, update it from
+9.  Checkout the branch the new version is based upon, update it from
     upstream, and delete the local topic branch you created:
 
     - `git checkout $BRANCH`
     - `git pull`
     - `git branch -d start_$MNU`
 
-9.  On GitHub, create a new milestone `M.N.U` for the version that is started.
+10.  On GitHub, create a new milestone `M.N.U` for the version that is started.
 
-10. On GitHub, list all open issues that still have a milestone of less than
+11. On GitHub, list all open issues that still have a milestone of less than
     `M.N.U` set, and update them as needed to target milestone `M.N.U`.
