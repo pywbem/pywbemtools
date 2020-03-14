@@ -149,6 +149,9 @@ Released: not yet
 * Test: Added support for testing on Python 3.8 in Travis, Appveyor and Tox.
   (See issue #494)
 
+* Added support for adjusting the width of any help output to the terminal
+  width. (See issue #518)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
