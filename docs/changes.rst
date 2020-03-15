@@ -57,6 +57,9 @@ Released: not yet
 * Pygments 2.4.0 and readme-renderer 25.0 have removed support for Python 3.4
   and have therefore been pinned to below these versions on Python 3.4.
 
+* Fix bug where order of commands listed in help output was different for
+  different versions of Python. (See issue # 510)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.

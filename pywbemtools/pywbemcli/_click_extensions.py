@@ -1,7 +1,7 @@
 """
-This file contains extensions to Click
+This file contains extensions to Click specifically for pywbemcli
 """
-
+import sys
 from collections import OrderedDict
 import click
 
@@ -20,20 +20,19 @@ class PywbemcliGroup(click.Group):
     # _cmd_... source file.
     def __init__(self, name=None, commands=None, **attrs):
         """
-        Use OrderedDict to keep order commands inserted into command dict
+        Use OrderedDict to keep order commands inserted into command dict.
+        Only required for Python versions that do not order dictionaries.
+        Must be set after calling superclass __inits_ because click forces
+        {} even if user were to set commands to OrderedDict
         """
-        print('PYWBEMCI_INIT %s %s' % (name, commands))
-        print('attrs %s' % attrs)
-        if commands is None:
-            commands = OrderedDict()
-        elif not isinstance(commands, OrderedDict):
-            print('PYWBEMCLI INIT pre commands %s' % commands)
-            commands = OrderedDict(commands)
-        click.Group.__init__(self, name=name, commands=commands, **attrs)
+        super(PywbemcliGroup, self).__init__(name, commands, **attrs)
+        #: the registered subcommands by their exported names.
+        if sys.version_info < (3, 6):
+            self.commands = commands or OrderedDict()
 
     def list_commands(self, ctx):
         """
-        Replace list_commands to eliminate the sorting
+        Replace list_commands to eliminate the sort.
         """
         return self.commands.keys()
 
@@ -58,7 +57,6 @@ class PywbemcliTopGroup(click.Group):
         Order The top level commands by sorting and then moving any commands
         defined in  move_to_end list to the end of the list.
         """
-        print("LIST_COMMANDS %s" % self.commands.keys())
         # tuple of commands to move to bottom after sort
         move_to_end = ('connection', 'help', 'repl')
 
@@ -69,5 +67,4 @@ class PywbemcliTopGroup(click.Group):
             if cmd_list[i - pop_count] in move_to_end:
                 cmd_list.append(cmd_list.pop(i - pop_count))
                 pop_count += 1
-        print('RETURNS %s' % cmd_list)
         return cmd_list
