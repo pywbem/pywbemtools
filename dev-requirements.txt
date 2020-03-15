@@ -60,9 +60,10 @@ entrypoints>=0.3.0; python_version >= '3.8'
 # Twine (no imports, invoked via twine script):
 twine>=1.8.1
 # readme-renderer 25.0 has removed support for Python 3.4
-readme-renderer>21.0; python_version == '2.7'
-readme-renderer>21.0,<25.0; python_version == '3.4'
-readme-renderer>21.0; python_version >= '3.5'
+# readme-renderer 23.0 has made cmarkgfm part of extras (it fails on Cygwin)
+readme-renderer>=23.0; python_version == '2.7'
+readme-renderer>=23.0,<25.0; python_version == '3.4'
+readme-renderer>=23.0; python_version >= '3.5'
 
 # Jupyter Notebook (no imports, invoked via jupyter script)
 # TODO Future: currently jupyter not used by pywbemtools

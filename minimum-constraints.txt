@@ -34,9 +34,49 @@
 #   setuptools  33.1.1    2017-01-16
 #   wheel       0.29.0    2016-02-06
 
-pip==9.0.1
-setuptools==33.1.1
-wheel==0.29.0
+# Info: Python version supported by base packages (added / removed)
+# * Python 2.7 support:
+#   pip         ?
+#   setuptools  ? / 45.0.0
+#   wheel       ?
+# * Python 3.4 support:
+#   pip         ? / 19.2
+#   setuptools  ? / 44.0.0
+#   wheel       ? / 0.34.0
+# * Python 3.5 support:
+#   pip         8.0
+#   setuptools  18.3
+#   wheel       0.30.0
+# * Python 3.6 support:
+#   pip         10.0.0
+#   setuptools  34.0.0
+#   wheel       0.30.0
+# * Python 3.7 support:
+#   pip         18.1
+#   setuptools  40.6.0
+#   wheel       0.32.0
+# * Python 3.8 support:
+#   pip         19.3.1
+#   setuptools  41.5.0
+#   wheel       0.33.5
+
+
+# For the base packages, we use the versions from Ubuntu 17.04 as a general
+# minimum, and then increase it to the first version that introduced support
+# for a particular Python version:
+pip==9.0.1; python_version <= '3.5'
+pip==10.0.0; python_version == '3.6'
+pip==18.1; python_version == '3.7'
+pip==19.3.1; python_version >= '3.8'
+setuptools==33.1.1; python_version <= '3.5'
+setuptools==34.0.0; python_version == '3.6'
+setuptools==40.6.0; python_version == '3.7'
+setuptools==41.5.0; python_version >= '3.8'
+wheel==0.29.0; python_version <= '3.4'
+wheel==0.30.0; python_version == '3.5'
+wheel==0.30.0; python_version == '3.6'
+wheel==0.32.0; python_version == '3.7'
+wheel==0.33.5; python_version >= '3.8'
 
 
 # Direct dependencies for install (must be consistent with requirements.txt)
@@ -44,7 +84,7 @@ wheel==0.29.0
 pywbem==0.16.0
 
 six==1.10.0
-click==7.0
+Click==7.0
 click-spinner==0.1.8
 click-repl==0.1.6
 asciitree==0.3.3
@@ -60,7 +100,6 @@ M2Crypto==0.31.0
 mock==2.0.0
 ordereddict==1.1
 ply==3.10
-six==1.10.0
 typing==3.6.1  # from M2Crypto
 
 # Direct dependencies for develop (must be consistent with dev-requirements.txt)
@@ -75,7 +114,7 @@ yamlordereddictloader==0.4.0
 funcsigs==1.0.2
 
 # Coverage reporting (no imports, invoked via coveralls script):
-coverage==4.5.0
+coverage==4.5
 python-coveralls==2.9.2
 pytest-cov==2.7.0
 
@@ -90,7 +129,8 @@ tox==2.0.0
 Sphinx==1.7.6
 sphinx-git==10.1.1
 GitPython==2.1.1
-sphinxcontrib-fulltoc>=1.2.0
+sphinxcontrib-fulltoc==1.2.0
+sphinxcontrib-websupport==1.1.2
 
 # PyLint (no imports, invoked via pylint script) - does not support py3:
 pylint==1.6.4; python_version == '2.7'
@@ -112,6 +152,7 @@ entrypoints==0.3.0; python_version >= '3.8'
 
 # Twine (no imports, invoked via twine script):
 twine==1.8.1
+readme-renderer==23.0
 
 # Jupyter Notebook (no imports, invoked via jupyter script):
 #jupyter==1.0.0
@@ -130,12 +171,11 @@ chardet==3.0.2
 clint==0.5.1
 configparser==4.0.2
 contextlib2==0.6.0
-coverage==4.0.3
-decorator==4.0.10
 docutils==0.13.1
 enum34==1.1.6; python_version < "3.4"
 filelock==3.0.0
 functools32==3.2.3; python_version < "3.2"
+future==0.18.2
 futures==3.3.0; python_version < "3.2"
 gitdb2==2.0.0
 html5lib==0.999999999
@@ -156,13 +196,14 @@ lazy-object-proxy==1.4.2
 linecache2==1.0.0
 MarkupSafe==0.23
 mistune==0.8.1
-more-itertools==5.0.0,<6.0.0
+more-itertools==5.0.0
 nbconvert==5.0.0
 nbformat==4.2.0
 notebook==4.3.1
 packaging==19.2
 pandocfilters==1.4.1
 pathlib2==2.2.1
+pbr==1.8.0
 pexpect==4.2.1
 pickleshare==0.7.4
 pkginfo==1.4.1
@@ -174,7 +215,6 @@ pyparsing==2.3.1
 pytz==2016.10
 pyzmq==16.0.4
 qtconsole==4.2.1
-readme-renderer==21.0
 requests-toolbelt==0.7.0
 scandir==1.9.0
 sh==1.12.14
@@ -182,7 +222,6 @@ simplegeneric==0.8.1
 singledispatch==3.4.0.3; python_version < "3.4"
 smmap2==2.0.1
 snowballstemmer==1.2.1
-sphinxcontrib-websupport==1.1.2
 terminado==0.6
 testpath==0.3
 toml==0.10.0
