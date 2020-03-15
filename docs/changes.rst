@@ -54,6 +54,9 @@ Released: not yet
 * Test: Fixed dependency to Python development packages on CygWin platform
   in Appveyor CI.
 
+* Pygments 2.4.0 and readme-renderer 25.0 have removed support for Python 3.4
+  and have therefore been pinned to below these versions on Python 3.4.
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
