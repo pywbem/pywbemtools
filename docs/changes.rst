@@ -140,6 +140,9 @@ Released: not yet
     shallow git checkout used by Travis failed and its depth needed to be
     adjusted. At some point this defeats the purpose of a shallow checkout.
 
+* Test: Added support for testing on Python 3.8 in Travis, Appveyor and Tox.
+  (See issue #494)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
