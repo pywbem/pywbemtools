@@ -47,12 +47,14 @@ from asciitree import LeftAligned
 
 from pywbem import CIMInstanceName, CIMClassName, \
     CIMFloat, CIMInt, CIMError, CIMDateTime
-from pywbem._utils import _to_unicode, _ensure_unicode, _format
+from ._utils import _to_unicode, _ensure_unicode
 
 from pydicti import dicti
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg
+
+from ._utils import _ensure_unicode, _to_unicode
 
 # Same as in pwbem.cimtypes.py
 if six.PY2:
@@ -575,8 +577,7 @@ class AssociationShrub(object):
             return keys
 
         if format not in ('standard', 'canonical', 'cimobject', 'historical'):
-            raise ValueError(
-                _format("Invalid format argument: {0}", format))
+            raise ValueError('Invalid format argument: {0}'.format(format))
 
         if path.host is not None and format != 'cimobject':
             # The CIMObject format assumes there is no host component
@@ -642,8 +643,8 @@ class AssociationShrub(object):
                 ret.append('"')
             else:
                 raise TypeError(
-                    _format("Invalid type {0} in keybinding value: {1!A}={2!A}",
-                            type(value), key, value))
+                    "Invalid type {0} in keybinding value: {1}={2}"
+                    .format(type(value), key, value))
             ret.append(',\n')
 
         del ret[-1]

@@ -70,6 +70,10 @@ Released: not yet
 
 * Fixed several badges on the README page.
 
+* Remove use of pywbem internal functions from pywbemcli. This removes use of
+  NocaseDict, _to_unicode, _ensure_unicode, _format from pywbemcli. (See
+  issue #489)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.

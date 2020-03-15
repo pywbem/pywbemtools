@@ -24,9 +24,8 @@ import six
 from asciitree import LeftAligned
 import click
 
-# Use an ordered Nocase dictionary for the tree. The Nocase allows
-# the input top_class to have a different case than the data from the classes
-# and the ordered keeps class order at each level on output.
+# Use an ordered Nocase dictionary for the tree. Ordered dictionary creates
+# tree output that has the same order in multiple versions of python.
 from pydicti import odicti
 
 
@@ -38,21 +37,28 @@ def build_tree(class_subclass_dict, top_class):
     Returns the dictionary structure in a form suitable for ascii tree
     display
     """
-    def _tree_node(class_subclass_dict, cn):
+    def _tree_node(class_to_subclass_dict, cln):
         """
         Build dictionary of the class/subclass relationships for class cn
-        in dictionary of class_subclass names.
+        in dictionary of class_subclass names. This maps the input dictionary
+        that is a flat class_name: [subclass_name] dictionary to a tree
+        dictionary for the hiearchy of classes.
 
         Returns dictionary of dictionaries in form suitable for asciitree
+
+        Parameters:
+          class_to_subclass_dict:
+            Dictionary with all classes to be in as keys and the corresponding
+            subclasses for each class as a list of classnames
         """
         node_dict = odicti()
         # If there is no subclass, the class will not exist in this dictionary
-        if cn in class_subclass_dict:
-            cn_list = class_subclass_dict[cn]
+        if cln in class_to_subclass_dict:
+            cln_list = class_to_subclass_dict[cln]
             # This should not be necessary if end nodes are not in the dict.
-            if cn_list:
-                for key in cn_list:
-                    node_dict[key] = _tree_node(class_subclass_dict, key)
+            if cln_list:
+                for key in cln_list:
+                    node_dict[key] = _tree_node(class_to_subclass_dict, key)
             else:
                 node_dict = odicti()
         else:
@@ -70,14 +76,18 @@ def build_tree(class_subclass_dict, top_class):
 def display_class_tree(classes, top_class=None):
     """
     Display the list of classes as a left justified tree  in ascii to the
-    click.echo output
+    click.echo output.
 
     Parameters:
         classes (list of :class:`~pywbem.CIMClass`)
+            This is the classes that will be included in the display
+            including the top_class. If the top_class is None an
+            artificial top_class named 'root' will be added by this
+            function.
 
         top_class (:term: `string`)
-            The top level class to display or None if the display is
-            from root.
+            The top level class to display or None.
+
     """
 
     # Build dictionary of classname : superclassname from list of CIM classes

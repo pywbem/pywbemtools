@@ -820,6 +820,8 @@ def cmd_class_tree(context, classname, options):
             # Get the superclasses into a list
             class_ = context.conn.GetClass(classname,
                                            namespace=options['namespace'])
+            # get correct case sensitive classname
+            classname = class_.classname
             classes = []
             classes.append(class_)
             while class_.superclass:
@@ -835,10 +837,16 @@ def cmd_class_tree(context, classname, options):
                 ClassName=classname,
                 namespace=options['namespace'],
                 DeepInheritance=True)
+
+        # Get correct case sensitive classname for target class
+        if classname:
+            tclass = context.conn.GetClass(classname,
+                                           namespace=options['namespace'])
+            classname = tclass.classname
     except Error as er:
         raise_pywbem_error_exception(er)
 
-    # display the list of classes as a tree. The classname is the top
+    # Display the list of classes as a tree. The classname is the top
     # of the tree.
     context.spinner_stop()
     display_class_tree(classes, classname)

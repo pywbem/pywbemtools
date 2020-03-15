@@ -1127,28 +1127,15 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    # Order inconsistent on output. so we just test that some of the lines are
-
-    # in the output
-    # root
-    #  +-- CIM_Foo
-    #      +-- CIM_Foo_sub2
-    #      +-- CIM_Foo_sub
-    #          +-- CIM_Foo_sub_sub
-    # or
-    # root
-    #  +-- CIM_Foo
-    #      +-- CIM_Foo_sub
-    #      |   +-- CIM_Foo_sub_sub
-    #      +-- CIM_Foo_sub2
-    ['Verify class command tree top down. Order uncertain.',
+    ['Verify class command tree top down. Uses simple mock, no argument',
      ['tree'],
-     {'stdout': [r'root',
-                 r' \+-- CIM_Foo',
-                 r'     \+-- CIM_Foo_sub2',
-                 r'     \+-- CIM_Foo_sub',
-                 r'[| ]*\+-- CIM_Foo_sub_sub'],  # account for ordering issue
-      'test': 'regex'},
+     {'stdout': """root
+ +-- CIM_Foo
+     +-- CIM_Foo_sub
+     |   +-- CIM_Foo_sub_sub
+     +-- CIM_Foo_sub2
+""",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command tree top down starting at defined class ',
