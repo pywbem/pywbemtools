@@ -333,6 +333,21 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify class command --help command order',
+     ['--help'],
+     {'stdout': r'Commands:'
+                '.*\n  enumerate'
+                '.*\n  get'
+                '.*\n  delete'
+                '.*\n  invokemethod'
+                '.*\n  references'
+                '.*\n  associators'
+                '.*\n  find'
+                '.*\n  tree',
+      'test': 'regex'},
+     None, OK],
+
+
     ['Verify class command -h response',
      ['-h'],
      {'stdout': CLASS_HELP_LINES,

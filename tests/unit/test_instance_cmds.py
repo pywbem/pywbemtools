@@ -495,6 +495,24 @@ TEST_CASES = [
       'test': 'insnows'},
      None, OK],
 
+
+    ['Verify instance command --help command order',
+     ['--help'],
+     {'stdout': r'Commands:'
+                '.*\n  enumerate'
+                '.*\n  get'
+                '.*\n  delete'
+                '.*\n  create'
+                '.*\n  modify'
+                '.*\n  associators'
+                '.*\n  references'
+                '.*\n  invokemethod'
+                '.*\n  query'
+                '.*\n  count'
+                '.*\n  shrub',
+      'test': 'regex'},
+     None, OK],
+
     #
     #  Instance Enumerate command good responses
     #
