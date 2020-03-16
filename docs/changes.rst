@@ -68,6 +68,8 @@ Released: not yet
   'xml' to tolerate the different order of XML attributes that happens on
   Python 3.8 (See issue #494)
 
+* Fixed several badges on the README page.
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
