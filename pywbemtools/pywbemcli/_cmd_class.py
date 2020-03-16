@@ -820,29 +820,35 @@ def cmd_class_tree(context, classname, options):
             # Get the superclasses into a list
             class_ = context.conn.GetClass(classname,
                                            namespace=options['namespace'])
-            # get correct case sensitive classname
-            classname = class_.classname
-            classes = []
-            classes.append(class_)
+
+            # Include target class in display in list
+            classes = [class_]
+            # Get all superclasses to class_
             while class_.superclass:
                 class_ = context.conn.GetClass(class_.superclass,
                                                namespace=options['namespace'])
                 classes.append(class_)
+
+            # classname not used when displaying superclasses.
+            # display_class_tree sets it to root
             classname = None
 
         else:
             # Get the subclass hierarchy either complete or starting at the
-            # optional CLASSNAME
+            # optional CLASSNAME. NOTE: We do not include target_classname
+            # in lists of classes sent to display_class_tree. That function
+            # attaches it.
             classes = context.conn.EnumerateClasses(
                 ClassName=classname,
                 namespace=options['namespace'],
                 DeepInheritance=True)
 
-        # Get correct case sensitive classname for target class
-        if classname:
-            tclass = context.conn.GetClass(classname,
-                                           namespace=options['namespace'])
-            classname = tclass.classname
+            # Get correct case sensitive classname for target class if
+            # it exists. Simplifies display_class_tree
+            if classname:
+                tclass = context.conn.GetClass(classname,
+                                               namespace=options['namespace'])
+                classname = tclass.classname
     except Error as er:
         raise_pywbem_error_exception(er)
 
