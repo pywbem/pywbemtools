@@ -29,24 +29,12 @@ import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue, CIMFloat, CIMInt
-from pywbem.cim_obj import mofstr
+    cimvalue
 
 from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
 
-# Same as in pywbem.cimobj.py
-try:
-    from builtins import type as builtin_type
-except ImportError:  # py2
-    from __builtin__ import type as builtin_type
+from ._cimvalueformatter import cimvalue_to_fmtd_string
 
-# Same as in pwbem.cimtypes.py
-if six.PY2:
-    # pylint: disable=invalid-name,undefined-variable
-    _Longint = long  # noqa: F821
-else:
-    # pylint: disable=invalid-name
-    _Longint = int
 
 ##############################################################
 #
@@ -860,8 +848,9 @@ def process_invokemethod(context, objectname, methodname, options):
         rtn_params = rtn[1]
         for pname, pvalue in rtn_params.items():
             ptype = cl_params[pname].type if pname in cl_params else None
-            val = _value_tomof(pvalue, ptype, maxline=DEFAULT_MAX_CELL_WIDTH,
-                               avoid_splits=False)
+            val = cimvalue_to_fmtd_string(
+                pvalue, ptype, maxline=DEFAULT_MAX_CELL_WIDTH,
+                avoid_splits=False)
             click.echo('{}={}'.format(pname, val[0]))
 
 
@@ -1390,10 +1379,9 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                 if value is None:
                     val_str = u''
                 else:
-                    val_str, _ = _value_tomof(p.value, p.type, indent=0,
-                                              maxline=max_cell_width,
-                                              line_pos=0, end_space=0,
-                                              avoid_splits=False)
+                    val_str, _ = cimvalue_to_fmtd_string(
+                        p.value, p.type, indent=0, maxline=max_cell_width,
+                        line_pos=0, end_space=0, avoid_splits=False)
             line.append(val_str)
         lines.append(line)
 
@@ -1483,214 +1471,6 @@ def _print_objects_as_table(context, objects, output_format):
         else:
             raise click.ClickException("Cannot print {} as table"
                                        .format(type(objects[0])))
-
-
-def _indent_str(indent):
-    """
-    Return a MOF indent pad unicode string from the indent integer variable
-    that defines number of spaces to indent. Used to format MOF output.
-    """
-    return u''.ljust(indent, u' ')
-
-
-def mofval(value, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH, line_pos=0,
-           end_space=0):
-    """
-    Low level function that returns the MOF representation of a non-string
-    value (i.e. a value that cannot not be split into multiple parts, for
-    example a numeric or boolean value).
-
-    If the MOF representation of the value does not fit into the remaining
-    space of the current line, it is put into a new line, considering the
-    specified indentation.
-
-    NOTE: This method is derived from pywbem mofval but differs in that we
-    want to output even if we violate the maxline limit on the new line. This
-    method favors outputing data over exceptions.
-
-    Parameters:
-
-      value (:term:`unicode string`): The non-string value. Must not be `None`.
-
-      indent (:term:`integer`): Number of spaces to indent any new lines that
-        are generated.
-
-      maxline (:term:`integer`): Maximum line length for the generated MOF.
-
-      line_pos (:term:`integer`): Length of content already on the current
-        line.
-
-      end_space (:term:`integer`): Length of space to be left free on the last
-        line.
-
-    Returns:
-
-      tuple of
-        * :term:`unicode string`: MOF string.
-        * new line_pos
-    """
-
-    assert isinstance(value, six.text_type)
-
-    # Check for output on current line
-    # if fits or this is first entry on the line
-    avl_len = maxline - line_pos - end_space
-    if len(value) <= avl_len or line_pos == 0:
-        line_pos += len(value)
-        return value, line_pos
-
-    mof_str = u'\n' + _indent_str(indent) + value
-    line_pos = indent + len(value)
-    return mof_str, line_pos
-
-
-def _scalar_value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
-                        line_pos=0, end_space=0, avoid_splits=False):
-    # pylint: disable=line-too-long,redefined-builtin
-    """
-    Return a MOF string representing a scalar CIM-typed value.
-
-    `None` is returned as 'NULL'.
-
-    NOTE: This code taken from pywbem 0.14.0
-
-    Parameters:
-
-      value (:term:`CIM data type`, :term:`number`, :class:`~pywbem.CIMInstance`, :class:`~pywbem.CIMClass`):
-        The scalar CIM-typed value. May be `None`.
-
-        Must not be an array/list/tuple. Must not be a :ref:`CIM object` other
-        than those listed.
-
-      type (string): CIM data type name.
-
-      indent (:term:`integer`): Number of spaces to indent any new lines that
-        are generated.
-
-      maxline (:term:`integer`): Maximum line length for the generated MOF.
-
-      line_pos (:term:`integer`): Length of content already on the current
-        line.
-
-      end_space (:term:`integer`): Length of space to be left free on the last
-        line.
-
-      avoid_splits (bool): Avoid splits at the price of starting a new line
-        instead of using the current line.
-
-    Returns:
-
-      tuple of
-        * :term:`unicode string`: MOF string.
-        * new line_pos
-    """  # noqa: E501
-
-    if type == 'string':  # pylint: disable=no-else-raise
-        if isinstance(value, six.string_types):
-            return mofstr(value, indent, maxline, line_pos, end_space,
-                          avoid_splits)
-
-        if isinstance(value, (CIMInstance, CIMClass)):
-            # embedded instance or class
-            return mofstr(value.tomof(), indent, maxline, line_pos, end_space,
-                          avoid_splits)
-        raise TypeError("Scalar value of CIM type {0} has invalid Python type "
-                        "type {1} for conversion to a MOF string".format
-                        (type, builtin_type(value)))
-
-        # TODO Integrate _format into pywbemcli
-        #  _format("Scalar value of CIM type {0} has invalid Python type "
-        #        "type {1} for conversion to a MOF string",
-        #        type, builtin_type(value)))
-
-    elif type == 'char16':
-        return mofstr(value, indent, maxline, line_pos, end_space, avoid_splits,
-                      quote_char=u"'")
-    elif type == 'boolean':
-        val = u'true' if value else u'false'
-        return mofval(val, indent, maxline, line_pos, end_space)
-    elif type == 'datetime':
-        val = six.text_type(value)
-        return mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
-    elif type == 'reference':
-        val = value.to_wbem_uri()
-        return mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
-    elif isinstance(value, (CIMFloat, CIMInt, int, _Longint)):
-        val = six.text_type(value)
-        return mofval(val, indent, maxline, line_pos, end_space)
-    else:
-        assert isinstance(value, float), \
-            "Scalar value of CIM type {0} has invalid Python type {1} " \
-            "for conversion to a MOF string".format(type, builtin_type(value))
-        val = repr(value)
-        return mofval(val, indent, maxline, line_pos, end_space)
-
-
-def _value_tomof(value, type, indent=0, maxline=DEFAULT_MAX_CELL_WIDTH,
-                 line_pos=0, end_space=0, avoid_splits=False):
-    # pylint: disable=redefined-builtin
-    """
-    Return a MOF string representing a CIM-typed value (scalar or array).
-
-    In case of an array, the array items are separated by comma, but the
-    surrounding curly braces are not added.
-
-    Parameters:
-
-      value (CIM-typed value or list of CIM-typed values): The value.
-
-      indent (:term:`integer`): Number of spaces to indent any new lines that
-        are generated.
-
-      maxline (:term:`integer`): Maximum line length for the generated MOF.
-
-      line_pos (:term:`integer`): Length of content already on the current
-        line.
-
-      end_space (:term:`integer`): Length of space to be left free on the last
-        line.
-
-      avoid_splits (bool): Avoid splits at the price of starting a new line
-        instead of using the current line.
-
-    Returns:
-
-      tuple of
-        * :term:`unicode string`: MOF string.
-        * new line_pos
-    """
-
-    if isinstance(value, list):
-
-        mof = []
-
-        for i, v in enumerate(value):
-
-            if i > 0:
-                # Assume comma and space as separator
-                line_pos += 2
-
-            val_str, line_pos = _scalar_value_tomof(
-                v, type, indent, maxline, line_pos, end_space + 2, avoid_splits)
-
-            if i > 0:
-                # Add the actual separator
-                mof.append(u',')
-                if val_str[0] != '\n':
-                    mof.append(u' ')
-                else:
-                    # Adjust by the space we did not need
-                    line_pos -= 1
-
-            mof.append(val_str)
-
-        mof_str = u''.join(mof)
-
-    else:
-        mof_str, line_pos = _scalar_value_tomof(
-            value, type, indent, maxline, line_pos, end_space, avoid_splits)
-
-    return mof_str, line_pos
 
 
 def hide_empty_columns(headers, rows):
