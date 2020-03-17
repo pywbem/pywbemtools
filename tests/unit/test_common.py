@@ -1114,129 +1114,110 @@ def test_verify_operation(testcase, txt, abort_msg, result):
     assert rtn == result
 
 
-# TODO: move this to pytest
-class TestParseWbemUri(object):  # TODO: move this to pytest
-    # pylint: disable=too-few-public-methods, useless-object-inheritance
-    """
-    Test CIMClassName.from_wbem_uri().
-    """
-
-    testcases = [
-        # Testcases for CIMClassName.from_wbem_uri().
-        # Each testcase has these items:
-        # * desc: Short testcase description.
-        # * uri: WBEM URI string to be tested.
-        # * ns: namespace parameter or None
-        # * exp_result: Dict of all expected attributes of resulting object,
-        #     if expected to succeed. Exception type, if expected to fail.
-        # * exp_warn_type: Expected warning type.
-        #     None, if no warning expected.
-        # * condition: If True the test is executed, if 'pdb' the test breaks in
-        #     the debugger, otherwise the test is skipped.
-        (
-            "class and keys only case",
-            '/root/cimv2:CIM_Foo.k1="v1"',
-            None,
-            dict(
+TESTCASES_PARSE_WBEMURI_STR = [
+    # Testcases for CIMClassName.from_wbem_uri().
+    # Each testcase has these items:
+    # * uri: WBEM URI string to be tested.
+    # * ns: namespace parameter or None
+    # * exp_result: Dict of all expected attributes of resulting object,
+    #     if expected to succeed. Exception type, if expected to fail.
+    # * exp_warn_type: Expected warning type.
+    #     None, if no warning expected.
+    # * condition: If True the test is executed, if 'pdb' the test breaks in
+    #     the debugger, otherwise the test is skipped.
+    (
+        "class and keys only case",
+        dict(
+            url='/root/cimv2:CIM_Foo.k1="v1"',
+            ns=None,
+            exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace='root/cimv2',
                 keys={'k1': 'v1'},
                 host=None),
-            None, True
         ),
-        (
-            "all components, normal case",
-            'https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
-            None,
-            dict(
+        None, None, True
+    ),
+
+    (
+        "all components, normal case",
+        dict(
+            url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
+            ns=None,
+            exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace=u'root/cimv2',
                 keys={'k1': 'v1'},
                 host=u'10.11.12.13:5989'),
-            None, True
         ),
-        (
-            "class and keybinding only",
-            'CIM_Foo.k1="v1"',
-            None,
-            dict(
+        None, None, True
+    ),
+
+    (
+        "class and keybinding only",
+        dict(
+            url='CIM_Foo.k1="v1"',
+            ns=None,
+            exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace=None,
                 keys={'k1': 'v1'},
                 host=None,),
-            None, True
         ),
-    ]
+        None, None, True
+    ),
 
-    @pytest.mark.parametrize(
-        "desc, uri, ns, exp_result, exp_warn_type, condition",
-        testcases)
-    def test_parse_wbemuri_str(
-            self, desc, uri, ns, exp_result, exp_warn_type, condition):
-        # pylint: disable=unused-argument, no-self-use
-        """Test function for parse_wbemuri_str."""
-
-        if not condition:
-            pytest.skip("Condition for test case not met")
-
-        if isinstance(exp_result, type) and issubclass(exp_result, Exception):
-            # We expect an exception
-            exp_exc_type = exp_result
-            exp_attrs = None
-        else:
-            # We expect the code to return
-            exp_exc_type = None
-            exp_attrs = exp_result
-
-        if condition == 'pdb':
-            import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()
-
-        if exp_warn_type:
-            with pytest.warns(exp_warn_type) as rec_warnings:
-                if exp_exc_type:
-                    with pytest.raises(exp_exc_type):
-                        # The code to be tested
-                        obj = parse_wbemuri_str(uri)
-
-                else:
-                    # The code to be tested
-                    obj = parse_wbemuri_str(uri)
-
-            assert len(rec_warnings) == 1
-
-        else:
-            if exp_exc_type:
-                with pytest.raises(exp_exc_type):
-
-                    # The code to be tested
-                    obj = parse_wbemuri_str(uri)
-
-            else:
-
-                # The code to be tested
-                obj = parse_wbemuri_str(uri)
-
-        if exp_attrs:
-            exp_classname = exp_attrs['classname']
-            exp_namespace = exp_attrs['namespace']
-            exp_host = exp_attrs['host']
-            exp_keybindings = exp_attrs['keys']
-
-            assert isinstance(obj, CIMInstanceName)
-
-            assert obj.classname == exp_classname
-            assert isinstance(obj.classname, type(exp_classname))
-
-            assert obj.namespace == exp_namespace
-
-            assert obj.keybindings == exp_keybindings
-
-            assert obj.host == exp_host
-            assert isinstance(obj.host, type(exp_host))
+    (
+        "all components, But wbem uri invalid",
+        dict(
+            url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1=v1',
+            ns=None,
+            exp_result=dict(
+                classname=u'CIM_Foo',
+                namespace=u'root/cimv2',
+                keys={'k1': 'v1'},
+                host=u'10.11.12.13:5989'),
+        ),
+        click.ClickException, None, True
+    ),
+]
 
 
-# TODO: Future pytestify this test and the others in this file
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_PARSE_WBEMURI_STR)
+@simplified_test_function
+def test_parse_wbemuri_str(testcase, url, ns, exp_result):
+    """Test function for parse_wbemuri_str."""
+
+    # Code to be tested
+
+    obj = parse_wbemuri_str(url)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    if exp_result:
+        exp_classname = exp_result['classname']
+        exp_namespace = exp_result['namespace']
+        exp_host = exp_result['host']
+        exp_keybindings = exp_result['keys']
+
+        assert isinstance(obj, CIMInstanceName)
+
+        assert obj.classname == exp_classname
+        assert isinstance(obj.classname, type(exp_classname))
+
+        assert obj.namespace == exp_namespace
+
+        assert obj.keybindings == exp_keybindings
+
+        assert obj.host == exp_host
+        assert isinstance(obj.host, type(exp_host))
+
+
+# TODO: Convert to pytest
 class FilterNamelistTest(object):  # pylint: disable=useless-object-inheritance
     """Test the common filter_namelist function."""
 
@@ -1302,45 +1283,80 @@ class FilterNamelistTest(object):  # pylint: disable=useless-object-inheritance
         assert filter_namelist(r'.*def', name_list) == ['CIM_def']
 
 
-# TODO: move this to pytest
-class NameValuePairTest(object):
-    # pylint: disable=too-few-public-methods, , useless-object-inheritance
-    """Test simple name value pair parser"""
+TESTCASES_KVPAIR = [
+    #  Testcases for parse_kv_pair
+    #
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * kvpair: String defining the key=value to be tested.
+    #   * exp_name: Name expected in response.
+    #   * exp_value: Value expected in response.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+    ("Verify simple pair",
+     dict(kvpair='abc=test',
+          exp_name='abc',
+          exp_value='test'),
+     None, None, True),
+    ("Verify name no value",
+     dict(kvpair='abc=',
+          exp_name='abc',
+          exp_value=None),
+     None, None, True),
+    ("Verify name, no = or value",
+     dict(kvpair='abc',
+          exp_name='abc',
+          exp_value=None),
+     None, None, True),
+    ("Verify numeric value",
+     dict(kvpair='abc=12345',
+          exp_name='abc',
+          exp_value='12345'),
+     None, None, True),
+    ("Verify Value in quotes works",
+     dict(kvpair='abc="Fred"',
+          exp_name='abc',
+          exp_value='"Fred"'),
+     None, None, True),
+    ("Verify svalue with space works",
+     dict(kvpair='abc="Fr ed"',
+          exp_name='abc',
+          exp_value='"Fr ed"'),
+     None, None, True),
+    ("Verify simple pair",
+     dict(kvpair='abc="fre\"d"',
+          exp_name='abc',
+          exp_value='"fre\"d"'),
+     None, None, True),
+    ("Verify simple pair",
+     dict(kvpair='=def',
+          exp_name='',
+          exp_value='def'),
+     None, None, True),
 
-    def test_simple_pairs(self):
-        # pylint: disable=no-self-use
-        """Test simple pair parsing"""
-        pname, value = parse_kv_pair('abc=test')
-        assert pname == 'abc'
-        assert value == 'test'
+]
 
-        pname, value = parse_kv_pair('abc=')
-        assert pname == 'abc'
-        assert value is None
 
-        pname, value = parse_kv_pair('abc')
-        assert pname == 'abc'
-        assert value is None
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_KVPAIR)
+@simplified_test_function
+def test_parse_kv_pair(testcase, kvpair, exp_name, exp_value):
+    """
+    Test parse_kv_pair common function
+    """
 
-        pname, value = parse_kv_pair('abc=12345')
-        assert pname == 'abc'
-        assert value == '12345'
+    # Code to be tested
 
-        pname, value = parse_kv_pair('abc="fred"')
-        assert pname == 'abc'
-        assert value == '"fred"'
+    name, value = parse_kv_pair(kvpair)
 
-        pname, value = parse_kv_pair('abc="fr ed"')
-        assert pname == 'abc'
-        assert value == '"fr ed"'
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
 
-        pname, value = parse_kv_pair('abc="fre\"d"')
-        assert pname == 'abc'
-        assert value == '"fre"d"'
-
-        pname, value = parse_kv_pair('=def')
-        assert pname == ''
-        assert value == 'def'
+    assert name == exp_name
+    assert value == exp_value
 
 
 class SorterTest(unittest.TestCase):
@@ -2363,64 +2379,3 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
 # TODO Test compare with errors
 
 # NOTE: Format table is in test_tableformat.py
-
-
-TESTCASES_ASSOC_SHRUB = [
-    # TESTCASES for associatonshrub
-    #
-    # Each list item is a testcase tuple with these items:
-    # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
-    #   * pl_str: tuple of strings defining properties
-    #   * exp_pl: expected list return.
-    # * exp_exc_types: Expected exception type(s), or None.
-    # * exp_warn_types: Expected warning type(s), or None.
-    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
-
-    ('Verify simple property list with 2 entries',
-     dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
-     None, None, True),
-
-    ('Verify propertylist with single property entry',
-     dict(pl_str=("abc",), exp_pl=['abc']),
-     None, None, True),
-
-    ('Verify multiple properties',
-     dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
-     None, None, True),
-
-    ('Verify multiple properties and both multiple in on option and multiple '
-     'options.',
-     dict(pl_str=None, exp_pl=None),
-     None, None, True),
-
-    ('Verify multiple properties and both multiple in on option and multiple '
-     'options.',
-     dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
-     None, None, True),
-
-
-    ('Verify empty propertylist',
-     dict(pl_str=("",), exp_pl=[]),
-     None, None, False),
-]
-
-
-@pytest.mark.parametrize(
-    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_ASSOC_SHRUB)
-@simplified_test_function
-def test_associatonshrub(testcase, pl_str, exp_pl):
-    """Test for resolve_propertylist function"""
-    # The code to be tested
-
-    # wraps the test string in a tuple because that is the way the
-    # propertylist option returns the list since it is a multiple type
-    # option
-    plist = resolve_propertylist(pl_str)
-
-    # Ensure that exceptions raised in the remainder of this function
-    # are not mistaken as expected exceptions
-    assert testcase.exp_exc_types is None
-
-    assert plist == exp_pl
