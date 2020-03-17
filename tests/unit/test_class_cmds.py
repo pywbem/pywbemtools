@@ -1127,55 +1127,55 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    # Order inconsistent on output. so we just test that some of the lines are
-
-    # in the output
-    # root
-    #  +-- CIM_Foo
-    #      +-- CIM_Foo_sub2
-    #      +-- CIM_Foo_sub
-    #          +-- CIM_Foo_sub_sub
-    # or
-    # root
-    #  +-- CIM_Foo
-    #      +-- CIM_Foo_sub
-    #      |   +-- CIM_Foo_sub_sub
-    #      +-- CIM_Foo_sub2
-    ['Verify class command tree top down. Order uncertain.',
+    ['Verify class command tree top down. Uses simple mock, no argument',
      ['tree'],
-     {'stdout': [r'root',
-                 r' \+-- CIM_Foo',
-                 r'     \+-- CIM_Foo_sub2',
-                 r'     \+-- CIM_Foo_sub',
-                 r'[| ]*\+-- CIM_Foo_sub_sub'],  # account for ordering issue
-      'test': 'regex'},
+     {'stdout': """root
+ +-- CIM_Foo
+     +-- CIM_Foo_sub
+     |   +-- CIM_Foo_sub_sub
+     +-- CIM_Foo_sub2
+""",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command tree top down starting at defined class ',
      ['tree', 'CIM_Foo_sub'],
-     {'stdout': ['CIM_Foo_sub',
-                 ' +-- CIM_Foo_sub_sub'],
-      'test': 'lines'},
+     {'stdout': """CIM_Foo_sub
++-- CIM_Foo_sub_sub
+""",
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, RUN],
+
+    ['Verify class command tree bottom up. -s',
+     ['tree', '-s', 'CIM_Foo_sub_sub'],
+     {'stdout': """root
+    +-- CIM_Foo
+        +-- CIM_Foo_sub
+            +-- CIM_Foo_sub_sub
+""",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command tree bottom up. Ordering guaranteed here',
-     ['tree', '-s', 'CIM_Foo_sub_sub'],
-     {'stdout': ['root',
-                 ' +-- CIM_Foo',
-                 '     +-- CIM_Foo_sub',
-                 '         +-- CIM_Foo_sub_sub'],
-      'test': 'lines'},
+
+    ['Verify class command tree bottom up. --superclasses',
+     ['tree', '--superclasses', 'CIM_Foo_sub_sub'],
+     {'stdout': """root
+    +-- CIM_Foo
+        +-- CIM_Foo_sub
+            +-- CIM_Foo_sub_sub
+""",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     # class tree' error tests
-    ['Verify class command tree with invalid class',
+    ['Verify class command tree with invalid CLASSNAME fails',
      ['tree', '-s', 'CIM_Foo_subx'],
      {'stderr': ['CIMError:'],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command tree with superclass option, no class',
+    ['Verify class command tree with superclass option, CLASSNAME fails',
      ['tree', '-s'],
      {'stderr': ['Error: CLASSNAME argument required for --superclasses '
                  'option'],

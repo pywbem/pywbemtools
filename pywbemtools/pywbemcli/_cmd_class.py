@@ -26,7 +26,6 @@ from __future__ import absolute_import, print_function
 import click
 
 from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
-from pywbem._nocasedict import NocaseDict
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
@@ -482,13 +481,13 @@ def _filter_classes_for_qualifiers(qualifier_filters, results, names_only, iq):
             # If returning instances, honor the names_only option
             if not names_only:
                 if not iq:
-                    cls.qualifiers = NocaseDict()
+                    cls.qualifiers = []
                     for p in cls.properties.values():
-                        p.qualifiers = NocaseDict()
+                        p.qualifiers = []
                     for m in cls.methods.values():
-                        m.qualifiers = NocaseDict()
+                        m.qualifiers = []
                         for p in m.parameters.values():
-                            p.qualifiers = NocaseDict()
+                            p.qualifiers = []
             filtered_results.append(cls)
     if names_only:
         filtered_results = [cls.classname for cls in filtered_results]
@@ -811,35 +810,49 @@ def cmd_class_tree(context, classname, options):
     subclass tree is displayed.
     """
 
-    # TODO: Sort out how we handle output format with tree output.
+    # TODO FUTURE: Sort out how we handle output format with tree output.
     try:
         if options['superclasses']:
             if classname is None:
                 raise click.ClickException('CLASSNAME argument required for '
                                            '--superclasses option')
 
-            # get the superclasses into a list
+            # Get the superclasses into a list
             class_ = context.conn.GetClass(classname,
                                            namespace=options['namespace'])
-            classes = []
-            classes.append(class_)
+
+            # Include target class in display in list
+            classes = [class_]
+            # Get all superclasses to class_
             while class_.superclass:
                 class_ = context.conn.GetClass(class_.superclass,
                                                namespace=options['namespace'])
                 classes.append(class_)
+
+            # classname not used when displaying superclasses.
+            # display_class_tree sets it to root
             classname = None
 
         else:
-            # get the subclass hierarchy either complete or starting at the
-            # optional CLASSNAME
+            # Get the subclass hierarchy either complete or starting at the
+            # optional CLASSNAME. NOTE: We do not include target_classname
+            # in lists of classes sent to display_class_tree. That function
+            # attaches it.
             classes = context.conn.EnumerateClasses(
                 ClassName=classname,
                 namespace=options['namespace'],
                 DeepInheritance=True)
+
+            # Get correct case sensitive classname for target class if
+            # it exists. Simplifies display_class_tree
+            if classname:
+                tclass = context.conn.GetClass(classname,
+                                               namespace=options['namespace'])
+                classname = tclass.classname
     except Error as er:
         raise_pywbem_error_exception(er)
 
-    # display the list of classes as a tree. The classname is the top
+    # Display the list of classes as a tree. The classname is the top
     # of the tree.
     context.spinner_stop()
     display_class_tree(classes, classname)

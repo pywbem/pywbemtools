@@ -47,12 +47,14 @@ from asciitree import LeftAligned
 
 from pywbem import CIMInstanceName, CIMClassName, \
     CIMFloat, CIMInt, CIMError, CIMDateTime
-from pywbem._utils import _to_unicode, _ensure_unicode, _format
+from ._utils import _to_unicode, _ensure_unicode
 
-from pywbem._nocasedict import NocaseDict
+from pydicti import dicti
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg
+
+from ._utils import _ensure_unicode, _to_unicode
 
 # Same as in pwbem.cimtypes.py
 if six.PY2:
@@ -411,8 +413,8 @@ class AssociationShrub(object):
         assoctree = OrderedDict()
         # Create dictionary of standard instance keys to potentially hide.
         # For now we always hide the following independent of key value
-        replacements = NocaseDict((("SystemCreationClassName", None),
-                                   ("SystemName", None)))
+        replacements = dicti((("SystemCreationClassName", None),
+                              ("SystemName", None)))
         for role, ref_clns in six.iteritems(self.instance_shrub):
             elementstree = OrderedDict()
             for ref_cln in ref_clns:
@@ -575,8 +577,7 @@ class AssociationShrub(object):
             return keys
 
         if format not in ('standard', 'canonical', 'cimobject', 'historical'):
-            raise ValueError(
-                _format("Invalid format argument: {0}", format))
+            raise ValueError('Invalid format argument: {0}'.format(format))
 
         if path.host is not None and format != 'cimobject':
             # The CIMObject format assumes there is no host component
@@ -642,8 +643,8 @@ class AssociationShrub(object):
                 ret.append('"')
             else:
                 raise TypeError(
-                    _format("Invalid type {0} in keybinding value: {1!A}={2!A}",
-                            type(value), key, value))
+                    "Invalid type {0} in keybinding value: {1}={2}"
+                    .format(type(value), key, value))
             ret.append(',\n')
 
         del ret[-1]
@@ -681,8 +682,8 @@ class AssociationShrub(object):
           ref_cln (:term:`string`):
              Classname of the reference class.
 
-          replacements (:class:`NocaseDict`_)
-            NocaseDict containing the name of each key to be considered
+          replacements (:class:`dicti`)
+            No-case dictionary containing the name of each key to be considered
             for replacement with either the value None or a defined value
             for the key.  If the value is None the key will be replaced with
             '~' independent of its value.  If the value is not None, the
@@ -700,7 +701,7 @@ class AssociationShrub(object):
         assert isinstance(inst_names_tuple, list)
         assert isinstance(inst_names_tuple[0], tuple)
         assert len(inst_names_tuple[0]) == 2
-        assert isinstance(replacements, NocaseDict)
+        assert isinstance(replacements, dicti)
 
         # If path shortening specified, determine which keys can be shortened
         # based on keys with the same value in all instance names

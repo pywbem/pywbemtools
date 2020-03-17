@@ -36,7 +36,6 @@ except ImportError:
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, Uint32, Uint64, Sint32, \
     CIMDateTime, CIMClassName
-from pywbem._nocasedict import NocaseDict
 
 from tests.unit.pytest_extensions import simplified_test_function
 
@@ -253,78 +252,78 @@ TESTCASES_FORMAT_KEYBINDINGS = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify simple keybinding',
-     dict(kb=NocaseDict([('kEY1', u'Ham')]),
+     dict(kb=[('kEY1', u'Ham')],
           width=100,
           exp_rtn='kEY1="Ham"'),
      None, None, True),
 
     ('Verify multiple keys keybinding',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           width=100,
           exp_rtn='kEY1="Ham",key2=3'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
           width=100,
           exp_rtn='kEY1="Ham and eggs",key2="More eggs"'),
      None, None, True),
 
     ('Verify multiple keys binding multiple key types',
-     dict(kb=NocaseDict([('Name', 'Foo'),
-                         ('Number', Uint8(42)),
-                         ('Boolean', False),
-                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+     dict(kb=[('Name', 'Foo'),
+              ('Number', Uint8(42)),
+              ('Boolean', False),
+              ('Ref', CIMInstanceName('CIM_Bar'))],
           width=100,
           exp_rtn='Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
      None, None, True),
 
     ('Verify mutliple keys that fold into multiple lines',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           width=14,
           exp_rtn='kEY1="Ham"\nkey2=3'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys that fold',
-     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
           width=25,
           exp_rtn='kEY1="Ham and eggs"\nkey2="More eggs"'),
      None, None, True),
 
     ('Verify multiple keys binding with many keys keys without fold',
-     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)],
           width=100,
           exp_rtn=('k1=1,k2=2,k3=3,k4=4,k5=5,k6=6,k7=7,k8=8')),
      None, None, True),
 
     ('Verify multiple keys binding with many keys every key folds',
-     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)],
           width=3,
           exp_rtn=('k1=1\nk2=2\nk3=3\nk4=4\nk5=5\nk6=6\nk7=7\nk8=8')),
      None, None, True),
 
 
     ('Verify multiple keys binding with many keys keys some fold',
-     dict(kb=NocaseDict([('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)]),
+     dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
+                         ('k6', 6), ('k7', 7), ('k8', 8)],
           width=8,
           exp_rtn=('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')),
      None, None, False),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=NocaseDict([('Name', 'Foo'),
-                         ('Number', Uint8(42)),
-                         ('Boolean', False),
-                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+     dict(kb=[('Name', 'Foo'),
+              ('Number', Uint8(42)),
+              ('Boolean', False),
+              ('Ref', CIMInstanceName('CIM_Bar'))],
           width=4,
           exp_rtn='Name="Foo"\nNumber=42\nBoolean=FALSE\nRef="/:CIM_Bar"'),
      None, None, True),
 
     # Test no keys
     ('Verify no keys',
-     dict(kb=NocaseDict(),
+     dict(kb=[],
           width=100,
           exp_rtn=''),
      None, None, True),
@@ -363,35 +362,35 @@ TESTCASES_SHORT_PATH = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify simple keybinding replacement',
-     dict(kb=NocaseDict([('kEY1', u'Ham')]),
+     dict(kb=[('kEY1', u'Ham')],
           rpl={'kEY1': u'Ham'},
           fp=False,
           exp_rtn='/:cln.~'),
      None, None, True),
 
     ('Verify multiple keys keybinding, replace all',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': u'Ham', 'key2': 3},
           fp=False,
           exp_rtn='/:cln.~,~'),
      None, None, True),
 
     ('Verify multiple keys keybinding, one replacement',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': u'Ham', },
           fp=False,
           exp_rtn='/:cln.~,key2=3'),
      None, None, True),
 
     ('Verify multiple keys keybinding, no replacement because value different',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': u'Hamxxxx', },
           fp=False,
           exp_rtn='/:cln.kEY1="Ham",key2=3'),
      None, None, True),
 
     ('Verify multiple keys keybinding, replacement because value None',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': None, },
           fp=False,
           exp_rtn='/:cln.~,key2=3'),
@@ -399,7 +398,7 @@ TESTCASES_SHORT_PATH = [
 
     ('Verify multiple keys keybinding, replaced with tilde because values '
      'match',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': None, 'key2': None},
           fp=False,
           exp_rtn='/:cln.~,~'),
@@ -407,31 +406,31 @@ TESTCASES_SHORT_PATH = [
 
     ('Verify multiple keys keybinding, replaced with tilde because values '
      'match',
-     dict(kb=NocaseDict([('kEY1', u'Ham'), ('key2', 3)]),
+     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
           rpl={'kEY1': u'xxx', 'key2': 3},
           fp=False,
           exp_rtn='/:cln.kEY1="Ham",~'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
           rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
           fp=False,
           exp_rtn='/:cln.~,~'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=NocaseDict([('kEY1', u'Ham and eggs'), ('key2', 'More eggs')]),
+     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
           rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
           fp=True,
           exp_rtn='/:cln.kEY1="Ham and eggs",key2="More eggs"'),
      None, None, True),
 
     ('Verify multiple keys binding multiple key types',
-     dict(kb=NocaseDict([('Name', 'Foo'),
-                         ('Number', Uint8(42)),
-                         ('Boolean', False),
-                         ('Ref', CIMInstanceName('CIM_Bar'))]),
+     dict(kb=[('Name', 'Foo'),
+              ('Number', Uint8(42)),
+              ('Boolean', False),
+              ('Ref', CIMInstanceName('CIM_Bar'))],
           rpl={},
           fp=False,
           exp_rtn='/:cln.Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
@@ -447,7 +446,7 @@ def test_short_path(testcase, kb, rpl, fp, exp_rtn):
     """Test for resolve_propertylist function"""
     # The code to be tested
 
-    inst_name = CIMInstanceName('cln', kb)
+    inst_name = CIMInstanceName('cln', keybindings=kb)
     act_rtn = shorten_path_str(inst_name, rpl, fp)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1564,6 +1563,12 @@ class KVPairParsingTest(object):  # pylint: disable=useless-object-inheritance
         self.execute_test('prop_name=91999', 'prop_name', str(91999))
 
 
+######################################################
+#
+#  Test create_instance
+#
+######################################################
+
 # TODO; Convert this test to pytest
 class CreateCIMInstanceTest(unittest.TestCase):
     """Test the function that creates a CIMInstance from cli args"""
@@ -1877,10 +1882,11 @@ cls2 = dict(classname='CIM_Foo',
                         CIMQualifier('Key', value=True)
                     ]
                 ),
-                CIMProperty('P4', value='Cheese'),
+                CIMProperty('P4', value='Cheese',),
             ])
 
-# TODO add one with ref property
+
+# TODO: add one class with ref property as key. Is that even allowed?
 
 # Testcases for format_inst_to_table()
 
@@ -1902,12 +1908,10 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=['P1=Fred'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1='Fred')
-            ),
+            exp_iname=CIMInstanceName(u'CIM_Foo',
+                                      keybindings=[('P1', 'Fred')]),
         ),
-        None, None, True, ),
+        None, None, True),
     (
         "Verify simple key creation with single string key with space",
         dict(
@@ -1915,12 +1919,22 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=['P1="Fred Fred"'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1="Fred Fred")
-            ),
+            exp_iname=CIMInstanceName(u'CIM_Foo',
+                                      keybindings=[('P1', "Fred Fred")]),
         ),
-        None, None, True, ),
+        None, None, True),
+
+    (
+        "Verify simple key creation with single string key case independent",
+        dict(
+            cls_kwargs=cls1,
+            kv_args=['p1="Fred Fred"'],
+            namespace=None,
+            host=None,
+            exp_iname=CIMInstanceName(u'CIM_Foo',
+                                      keybindings=[('P1', "Fred Fred")]),
+        ),
+        None, None, True),
     (
         "Verify simple key creation with invalid key name",
         dict(
@@ -1928,12 +1942,9 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=['Px=Fred'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1='Fred')
-            ),
+            exp_iname=None
         ),
-        click.exceptions.ClickException, None, True, ),
+        click.exceptions.ClickException, None, True),
     (
         "Verify simple key creation with two string keys and one int",
         dict(
@@ -1941,12 +1952,11 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=['P1=Fred', 'P2=John', 'P3=1'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1='Fred', P2='John', P3=1)
-            ),
+            exp_iname=CIMInstanceName(u'CIM_Foo',
+                                      keybindings=[('P1', "Fred"),
+                                                   ('P2', 'John'), ('P3', 1)]),
         ),
-        None, None, True, ),
+        None, None, True),
     (
         "Verify simple key creation with two string keys and one big int",
         dict(
@@ -1954,10 +1964,10 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1='Fred', P2='John', P3=123456)
-            ),
+            exp_iname=CIMInstanceName(u'CIM_Foo',
+                                      keybindings=[('P1', "Fred"),
+                                                   ('P2', 'John'),
+                                                   ('P3', 123456)]),
         ),
         None, None, True, ),
     (
@@ -1967,23 +1977,19 @@ TESTCASES_CREATE_INSTNAME = [
             kv_args=[u'P1=Fred\u0344\u0352'],
             namespace=None,
             host=None,
-            exp_attrs=dict(
-                classname=u'CIM_Foo',
-                keybindings=NocaseDict(P1=u'Fred\u0344\u0352')
-            ),
+            exp_iname=CIMInstanceName(
+                u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
         ),
         None, None, True, ),
 ]
-
-# TODO test integer key, key with no value, key with invalid name, datetime
-# key
+# TODO key with no value, datetime key
 
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_CREATE_INSTNAME)
 @simplified_test_function
-def test_create_instancename(testcase, cls_kwargs, kv_args, exp_attrs,
+def test_create_instancename(testcase, cls_kwargs, kv_args, exp_iname,
                              namespace, host,):
     """
     Test the common function create_instancename()
@@ -2000,19 +2006,19 @@ def test_create_instancename(testcase, cls_kwargs, kv_args, exp_attrs,
 
     assert isinstance(obj, CIMInstanceName)
 
-    exp_classname = exp_attrs['classname']
+    exp_classname = exp_iname.classname
     assert obj.classname == exp_classname
     assert isinstance(obj.classname, type(exp_classname))
 
-    exp_keybindings = exp_attrs.get('keybindings', NocaseDict())
+    exp_keybindings = exp_iname.keybindings
     assert obj.keybindings == exp_keybindings
     assert isinstance(obj.keybindings, type(exp_keybindings))
 
-    exp_namespace = exp_attrs.get('namespace', None)
+    exp_namespace = exp_iname.namespace
     assert obj.namespace == exp_namespace
     assert isinstance(obj.namespace, type(exp_namespace))
 
-    exp_host = exp_attrs.get('host', None)
+    exp_host = exp_iname.host
     assert obj.host == exp_host
     assert isinstance(obj.host, type(exp_host))
 
