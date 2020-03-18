@@ -16,8 +16,7 @@
 # limitations under the License.
 
 """
-Tests for _common functions. This is a mix of pytest and unittests.
-TODO: Future, move all tests to pytest.
+Tests for _common.py functions.
 """
 
 from __future__ import absolute_import, print_function
@@ -1217,7 +1216,7 @@ def test_parse_wbemuri_str(testcase, url, ns, exp_result):
         assert isinstance(obj.host, type(exp_host))
 
 
-# TODO: Convert to pytest
+# TODO: Move to pytest
 class FilterNamelistTest(object):  # pylint: disable=useless-object-inheritance
     """Test the common filter_namelist function."""
 
