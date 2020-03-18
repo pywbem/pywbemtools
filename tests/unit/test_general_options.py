@@ -222,9 +222,9 @@ INTERACTIVE_HELP = """The following can be entered in interactive mode:
 
 """
 
-OK = True
-RUN = True
-FAIL = False
+OK = True     # mark tests OK when they execute correctly
+RUN = True    # Mark OK = False and current test case being created RUN
+FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False
 
 TEST_CASES = [
@@ -258,7 +258,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      None, OK],
 
-    ['Verify repl-help response.',
+    ['Verify repl -help response.',
      {'general': [],
       'cmdgrp': 'repl',
       'args': ['-h']},
@@ -677,7 +677,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection without server definition and command that '
-     ' requires connection fails.',
+     ' requires a connection actually fails.',
      {'cmdgrp': 'class',
       'args': ['enumerate']},
      {'stderr': ['No server specified for a command that requires a WBEM '
@@ -926,6 +926,40 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
+
+    ['Verify Change --server to --mock-server in interactive mode.',
+     {'general': ['--server', 'http://blah', ],
+      # args not allowed in interactive mode
+      'stdin': ['connection show',
+                '--mock-server tests/unit/simple_mock_model.mof '
+                '--server  http://blah connection show',
+                'connection show',
+                'connection show'],
+      'cmdgrp': None,
+      },
+     {'stderr': ['Conflicting server definitions:',
+                 'http://blah',
+                 'mock-server: tests/unit/simple_mock_model.mof'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify Change --name in interactive mode, name invalid.',
+     {'general': ['--server', 'http://blah', ],
+      # args not allowed in interactive mode
+      'stdin': ['--name NAMEDOESNOTEXIST connection show'],
+      'cmdgrp': None,
+      },
+     {'stderr': ['Connection definition ', 'NAMEDOESNOTEXIST',
+                 'not found in connections'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    # TODO: test use --name with valid name in interactive mode.
+    # This should go where we hav e a valid connection file.
+    # See below
 
     #
     #   The following is a sequence. Creates a server and changes almost all
@@ -1206,8 +1240,6 @@ class TestGeneralOptions(CLITestsBase):
     def test_execute_pywbemcli(self, desc, inputs, exp_response, mock,
                                condition):
         """
-
-
         Execute pybemcli with the defined input and test output.
         """
         # Temp bypass of windows platform because of issue with one test
@@ -1218,4 +1250,4 @@ class TestGeneralOptions(CLITestsBase):
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition, verbose=True)
