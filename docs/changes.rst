@@ -47,6 +47,9 @@ Released: not yet
 * Pygments 2.4.0 and readme-renderer 25.0 have removed support for Python 3.4
   and have therefore been pinned to below these versions on Python 3.4.
 
+* Corrected issue with use-pull general option that causes issues with using
+  the 'either' option with servers that do not have pull. (See issue #530)
+
 **Enhancements:**
 
 * Test: Improved assertion messages in tests.
