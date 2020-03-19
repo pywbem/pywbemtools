@@ -1497,8 +1497,10 @@ def hide_empty_columns(headers, rows):
         return True
 
     # Remove empty rows
+    len_hdr = len(headers)
     for row in rows:
-        assert len(row) == len(headers)
+        assert len(row) == len_hdr, "row: {}\nhdrs: {}". \
+            format(row, headers)
     for column in range(len(headers) - 1, -1, -1):
         if column_is_empty(rows, column):
             del headers[column]

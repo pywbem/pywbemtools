@@ -318,6 +318,7 @@ def show_connection_information(context, connection, separate_line=True,
     click.echo('\nname: {cn}{st}{sep}server: {sv}{sep}'
                'default-namespace: {dns}{sep}'
                'user: {usr}{sep}password: {pw}{sep}timeout: {to}{sep}'
+               'use_pull: {up}{sep}'
                'verify: {ve}{sep}certfile: {cf}{sep}keyfile: {kf}{sep}'
                'mock-server: {ms}{sep}ca-certs: {crts}{sep}'
                .format(cn=connection.name, st=state_str,
@@ -326,6 +327,7 @@ def show_connection_information(context, connection, separate_line=True,
                        usr=connection.user,
                        pw=disp_password,
                        to=connection.timeout,
+                       up=connection.use_pull,
                        ve=connection.verify,
                        cf=connection.certfile,
                        kf=connection.keyfile,
@@ -403,11 +405,12 @@ def cmd_connection_export(context):
                         svr.default_namespace)
     if_export_statement(PywbemServer.user_envvar, svr.user)
     if_export_statement(PywbemServer.password_envvar, svr.password)
-    if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
     if_export_statement(PywbemServer.verify_envvar, svr.verify)
     if_export_statement(PywbemServer.certfile_envvar, svr.certfile)
     if_export_statement(PywbemServer.keyfile_envvar, svr.keyfile)
     if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
+    if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
+    if_export_statement(PywbemServer.use_pull_envvar, svr.use_pull)
 
 
 def cmd_connection_show(context, name, options):
@@ -574,7 +577,7 @@ def cmd_connection_list(context):
         dc = dflt_sym if is_default_connection(svr) else ''
         name = '{}{}{}'.format(cc, dc, name)
         row = [name, svr.server, svr.default_namespace, svr.user,
-               svr.timeout, svr.verify, svr.certfile,
+               svr.timeout, svr.use_pull, svr.verify, svr.certfile,
                svr.keyfile, "\n".join(svr.mock_server)]
         rows.append(row)
 
@@ -586,13 +589,13 @@ def cmd_connection_list(context):
             cname = '{}{}'.format('*', cname)
             svr = current_connection
             rows.append([cname, svr.server, svr.default_namespace, svr.user,
-                         svr.timeout, svr.verify, svr.certfile,
+                         svr.timeout, svr.use_pull, svr.verify, svr.certfile,
                          svr.keyfile, "\n".join(svr.mock_server)])
 
     # NOTE: Does not show ca_certs because that creates a very big table
     # in particular if you use the default.
     headers = ['name', 'server', 'namespace', 'user',
-               'timeout', 'verify', 'certfile', 'keyfile',
+               'timeout', 'use_pull', 'verify', 'certfile', 'keyfile',
                'mock-server']
 
     headers, rows = hide_empty_columns(headers, rows)

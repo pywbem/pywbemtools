@@ -315,6 +315,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                                          user=user,
                                          password=password,
                                          timeout=resolved_timeout,
+                                         use_pull=resolved_use_pull,
                                          verify=resolved_verify,
                                          certfile=certfile,
                                          keyfile=keyfile,
@@ -368,7 +369,6 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                 pywbem_server = None
         return pywbem_server
 
-    #
     # Process cli options to produce resolved options, i.e. the
     # options with any defaults applied for non None options.
     # Produces new variables resolved... so that later tests can confirm that
@@ -532,6 +532,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                     modified_server = True
                 if timeout:
                     pywbem_server.timeout = resolved_timeout
+                if use_pull:
+                    pywbem_server.use_pull = resolved_use_pull
                 if server:
                     pywbem_server.server = server
                     modified_server = True
