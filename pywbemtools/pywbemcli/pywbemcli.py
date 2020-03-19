@@ -456,8 +456,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             'Conflicting server definitions: mock-server: {}, name: {}'.
             format(', '.join(resolved_mock_server), svr_name))
 
-    resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
-        else DEFAULT_PULL_CHOICE
+    # set pull default if necessary and create the resolved variable
+    use_pull = use_pull or DEFAULT_PULL_CHOICE
+    resolved_use_pull = USE_PULL_CHOICE[use_pull]
 
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 

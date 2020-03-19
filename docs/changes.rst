@@ -74,6 +74,9 @@ Released: not yet
   NocaseDict, _to_unicode, _ensure_unicode, _format from pywbemcli. (See
   issue #489)
 
+* Corrected issue with use-pull general option that causes issues with using
+  the 'either' option with servers that do not have pull. (See issue #530)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
@@ -186,6 +189,7 @@ Released: not yet
 
 * Removed a circumvention for a pywbem bug related to colons in WBEM URIs
   that was fixed in pywbem 0.13.0. (See issue #131)
+
 
 **Known issues:**
 
