@@ -192,6 +192,11 @@ Released: not yet
 * Removed a circumvention for a pywbem bug related to colons in WBEM URIs
   that was fixed in pywbem 0.13.0. (See issue #131)
 
+* Added the general option `--use-pull` to the the PywbemServer() class so that
+  it is persisted in the connection file and to the display of connection
+  information (`connection show` and `connection list`). This means that
+  `--use-pull` can now be set for a particular server permanently.(See issues
+  #529 and #534).
 
 **Known issues:**
 

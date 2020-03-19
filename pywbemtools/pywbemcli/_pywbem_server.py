@@ -106,7 +106,7 @@ class PywbemServer(object):
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default', user=None, password=None,
-                 timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None,
+                 timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None, use_pull=None,
                  certfile=None, keyfile=None, ca_certs=None, mock_server=None):
         """
             Create  a PywbemServer object. This contains the configuration
@@ -125,6 +125,7 @@ class PywbemServer(object):
         self.user = user
         self.password = password
         self.timeout = timeout
+        self.use_pull = use_pull
         self.verify = verify
         self.certfile = certfile
         self.keyfile = keyfile
@@ -138,12 +139,12 @@ class PywbemServer(object):
 
     def __repr__(self):
         return 'PywbemServer(server={} name={} ns={} user={} ' \
-               'password={} timeout={} verify={} certfile={} ' \
+               'password={} timeout={} use_pull={} verify={} certfile={} ' \
                'keyfile={} ca_certs={}  ' \
                'mock_server={!r} wbem_server {!r})' \
                .format(self.server, self.name, self.default_namespace,
-                       self.user, self.password, self.timeout, self.verify,
-                       self.certfile, self.keyfile, self.ca_certs,
+                       self.user, self.password, self.timeout, self.use_pull,
+                       self.verify, self.certfile, self.keyfile, self.ca_certs,
                        self.mock_server, self.wbem_server)
 
     @property
@@ -254,6 +255,23 @@ class PywbemServer(object):
                        .format(timeout, 0, MAX_TIMEOUT))
         # pylint: disable=attribute-defined-outside-init
         self._timeout = timeout
+
+    @property
+    def use_pull(self):
+        """
+        :term: `string`: Connection timeout to be used on requests in seconds
+        """
+        return self._use_pull
+
+    @use_pull.setter
+    def use_pull(self, use_pull):
+        """Setter method; for a description see the getter method."""
+
+        if use_pull is None or isinstance(use_pull, bool):
+            self._use_pull = use_pull
+        else:
+            ValueError("use_pull must be boolean, not {}.".
+                       format(type(use_pull)))
 
     @property
     def verify(self):
@@ -368,6 +386,7 @@ class PywbemServer(object):
                             "password": self.password,
                             "default-namespace": self.default_namespace,
                             "timeout": self.timeout,
+                            "use_pull": self.use_pull,
                             "verify": self.verify,
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,
