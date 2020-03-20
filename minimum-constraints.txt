@@ -175,7 +175,7 @@ contextlib2==0.6.0
 docutils==0.13.1
 enum34==1.1.6; python_version < "3.4"
 filelock==3.0.0
-functools32==3.2.3; python_version < "3.2"
+functools32==3.2.3.post2; python_version < "3.2"
 future==0.18.2
 futures==3.3.0; python_version < "3.2"
 gitdb2==2.0.0
