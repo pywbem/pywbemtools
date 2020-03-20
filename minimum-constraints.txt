@@ -65,8 +65,7 @@ mock==2.0.0
 ordereddict==1.1
 pbr==1.10.0
 ply==3.10
-six==1.10.0
-typing==3.6.1  # from M2Crypto
+typing==3.6.1; python_version < '3.5'  # from M2Crypto
 
 # Direct dependencies for develop (must be consistent with dev-requirements.txt)
 
@@ -128,7 +127,7 @@ bleach==2.1.4
 certifi==2019.9.11
 chardet==3.0.2
 clint==0.5.1
-configparser==4.0.2
+configparser==4.0.2; python_version < '3.2'
 contextlib2==0.6.0
 coverage==4.0.3
 decorator==4.0.10
