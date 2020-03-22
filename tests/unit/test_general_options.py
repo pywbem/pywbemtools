@@ -1250,4 +1250,4 @@ class TestGeneralOptions(CLITestsBase):
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition, verbose=False)

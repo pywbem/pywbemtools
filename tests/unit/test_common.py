@@ -662,43 +662,6 @@ def test_split_str(testcase, input_str, delimiter, exp_rtn):
     assert act_result == exp_rtn
 
 
-TESTCASES_PICK_ONE_FROM_LIST = [
-    # TESTCASES for resolve_propertylist
-    #
-    # Each list item is a testcase tuple with these items:
-    # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
-    #   * options: tuple of strings defining properties
-    #   * choices: list of choices to return from mock
-    #   * exp_rtn: expected function return.
-    # * exp_exc_types: Expected exception type(s), or None.
-    # * exp_warn_types: Expected warning type(s), or None.
-    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
-
-    ('Verify returns correct choice, in this case, ZERO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO'),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE'),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
-          exp_rtn=u'ONE'),
-     None, None, OK),
-
-    ('Verify returns correct choice, in this case ONE after multipleerror',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
-          exp_rtn=u'TWO'),
-     None, None, OK),
-
-    ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=[u'ZERO'], choices=None,
-          exp_rtn=u'ZERO'),
-     None, None, OK),
-]
-
 TESTCASES_NOCASE_LIST = [
     # TESTCASES for NoCaseList
     #
@@ -793,6 +756,44 @@ def test_nocase_list(testcase, input_list, test_str, add_strs, exp_rtn):
     assert act_rslt == exp_rtn
 
 
+TESTCASES_PICK_ONE_FROM_LIST = [
+    # TESTCASES for resolve_propertylist
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * options: tuple of strings defining properties
+    #   * choices: list of choices to return from mock
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify returns correct choice, in this case, ZERO',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after one error',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
+          exp_rtn=u'ONE'),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after multipleerror',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
+          exp_rtn=u'TWO'),
+     None, None, OK),
+
+    ('Verify returns correct choice with only single choice so no usr request',
+     dict(options=[u'ZERO'], choices=None,
+          exp_rtn=u'ZERO'),
+     None, None, OK),
+]
+
+
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_PICK_ONE_FROM_LIST)
@@ -810,14 +811,20 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
         act_rtn = pick_one_from_list(context, options, title)
     else:
         # setup mock for this test
-        mock_function = 'pywbemtools.pywbemcli.click.prompt'
-        with patch(mock_function, side_effect=choices) as mock_prompt:
-            # The code to be tested
-            # fake context object
-            context = ContextObj(None, None, None, None, None, None, None, None)
-            act_rtn = pick_one_from_list(context, options, title)
-            context.spinner_stop()
-            assert mock_prompt.call_count == len(choices)
+        # mock the prompt with choices from the testcases as prompt response
+        mock_prompt_funct = 'pywbemtools.pywbemcli.click.prompt'
+        # side_effect returns next item in choices for each prompt call
+        with patch(mock_prompt_funct, side_effect=choices) as mock_prompt:
+            # mock the echo to hide output
+            mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+            with patch(mock_echo_func):
+                # The code to be tested
+                # Fake context object
+                context = ContextObj(None, None, None, None, None, None, None,
+                                     None)
+                act_rtn = pick_one_from_list(context, options, title)
+                context.spinner_stop()
+                assert mock_prompt.call_count == len(choices)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -869,12 +876,14 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     # setup mock for this test
     mock_function = 'pywbemtools.pywbemcli.click.prompt'
     with patch(mock_function, side_effect=choices) as mock_prompt:
-        # The code to be tested
-        title = "test_pick_multiple_from_list"
-        # context = ContextObj(None, None, None, None, None, None, None, None)
-        act_rtn = pick_multiple_from_list(None, options, title)
-        # context.spinner_stop()
-        assert mock_prompt.call_count == len(choices)
+        # mock the echo to hide output
+        mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+        with patch(mock_echo_func):
+            # The code to be tested
+            title = "test_pick_multiple_from_list"
+            act_rtn = pick_multiple_from_list(None, options, title)
+            # context.spinner_stop()
+            assert mock_prompt.call_count == len(choices)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -1050,15 +1059,16 @@ TESTCASES_COMPARE_INSTANCES = [
 @simplified_test_function
 def test_compare_instances(testcase, inst1, inst2, result):
     """Test for _common compare_instances function"""
-    # The code to be tested
-
-    rtn = compare_instances(inst1, inst2)
+    mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+    with patch(mock_echo_func):
+        # The code to be tested
+        tst_rtn = compare_instances(inst1, inst2)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
     assert testcase.exp_exc_types is None
 
-    assert rtn == result
+    assert tst_rtn == result
 
 
 # TODO: The mock for the following test is broken. Not sure yet how to
@@ -1078,13 +1088,22 @@ TESTCASES_VERIFY_OPERATION = [
 
     ('Verify response y',
      dict(txt="blah",
+          clickconfirm=True,
           abort_msg=None,
           result=True),
      None, None, True),
 
     ('Verify response n',
      dict(txt="blahno",
+          clickconfirm=False,
           abort_msg=None,
+          result=False),
+     None, None, True),
+
+    ('Verify response n with msg',
+     dict(txt="blahno",
+          clickconfirm=False,
+          abort_msg=True,
           result=False),
      None, None, True),
 ]
@@ -1094,17 +1113,23 @@ TESTCASES_VERIFY_OPERATION = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_VERIFY_OPERATION)
 @simplified_test_function
-def test_verify_operation(testcase, txt, abort_msg, result):
+def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
     """
     This method mocks the click.confirm function to generate a response
-    to the verify operation function
+    to the verify operation function. It mocks both the click_confirm
+    and the click_echo. Mock Click.confirm returns a value defined by
+    the test. Mock click.echo confirms data in call to click_echo
     """
-    @patch('pywbemtools.pywbemcli.click.confirm', return_value=result)
-    def test_verify_operation(txt, test_patch):
-        return verify_operation(txt)
+    # TODO: This does not really test the abort_msg that is output
+    # only in some conditions, it just hides it since the mock is
+    # defined with called_with=txt
+    @patch('pywbemtools.pywbemcli.click.confirm', return_value=clickconfirm)
+    @patch('pywbemtools.pywbemcli.click.echo', called_with=txt)
+    def run_verify_operation(txt, mock_click_confirm, mock_click_echo):
+        return verify_operation(txt, abort_msg)
 
     # The code to be tested
-    rtn = test_verify_operation(txt)
+    rtn = run_verify_operation(txt)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -1714,7 +1739,10 @@ class CreateCIMInstanceTest(unittest.TestCase):
                          'Sint64p=-99', 'Strp=hoho']
         act_inst = create_ciminstance(cls, kv_properties)
 
-        self.assertTrue(compare_instances(exp_inst, act_inst))
+        # mock the echo to hide output
+        mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+        with patch(mock_echo_func):
+            self.assertTrue(compare_instances(exp_inst, act_inst))
 
         self.assertEqual(exp_inst, act_inst)
 
@@ -2362,9 +2390,10 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
     # capsys in a builtin fixture that must be passed to this function.
     # Currently the simplified_test_function does not allow any other
     # parameters so we cannot use pytest capsys
-
-    # The code to be tested
-    _print_instances_as_table(*args, **kwargs)
+    mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+    with patch(mock_echo_func):
+        # The code to be tested
+        _print_instances_as_table(*args, **kwargs)
     # stdout, stderr = capsys.readouterr()
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
