@@ -1241,70 +1241,133 @@ def test_parse_wbemuri_str(testcase, url, ns, exp_result):
         assert isinstance(obj.host, type(exp_host))
 
 
-# TODO: Move to pytest
-class FilterNamelistTest(object):  # pylint: disable=useless-object-inheritance
-    """Test the common filter_namelist function."""
+TESTCASES_FILTERNAMELIST = [
+    # Testcases for CIMClassName.from_wbem_uri().
+    # Each testcase has these items:
+    # * nl: List of names to filter
+    # * regex: Filter regex statement
+    # * ign_case: If True, ignore case in the match
+    # * exp: resulting list to match
+    #     None, if no warning expected.
+    # * condition: If True the test is executed, if 'pdb' the test breaks in
+    #     the debugger, otherwise the test is skipped.
+    (
+        "Verify TST_ case insensitive 1",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='TST_*',
+            ign_case=True,
+            exp_result=['TST_abc'],
+        ),
+        None, None, OK),
+    (
+        "Verify TST_ case insensitive 2. Returns nothing",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='TSt_*',
+            ign_case=True,
+            exp_result=['TST_abc'],
+        ),
+        None, None, OK),
+    (
+        "Verify TST_ case insensitive . Returns match to *abc",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='*abc',
+            ign_case=True,
+            exp_result=['CIM_abc', 'TST_abc'],
+        ),
+        None, None, OK),
+    (
+        "Verify TST_ case insensitive returns nothing",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='TSTX_*',
+            ign_case=True,
+            exp_result=[],
+        ),
+        None, None, OK),
+    (
+        "Verify TST_ case insensitive 3",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='CIM_*',
+            ign_case=True,
+            exp_result=['CIM_abc', 'CIM_def', 'CIM_123'],
+        ),
+        None, None, OK),
+    (
+        "Verify TST_ case sensitive 1",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='TSt_*',
+            ign_case=False,
+            exp_result=[],
+        ),
+        None, None, FAIL),
+    (
+        "Verify wildcard * filters",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='*def',
+            ign_case=True,
+            exp_result=['CIM_def'],
+        ),
+        None, None, OK),
+    (
+        "Verify wildcard * filters 2",
+        dict(
+            nl=['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc'],
+            regex='*abc',
+            ign_case=True,
+            exp_result=['CIM_abc', 'TST_abc'],
+        ),
+        None, None, OK),
+    (
+        "Verify ? wildcard",
+        dict(
+            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            regex='CIM_ab?',
+            ign_case=True,
+            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe'],
+        ),
+        None, None, OK),
+    (
+        "Verify ? wildcard 2",
+        dict(
+            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            regex='???_ab?',
+            ign_case=True,
+            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+        ),
+        None, None, OK),
+    (
+        "Verify ? and *wildcard ",
+        dict(
+            nl=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+            regex='*_ab?',
+            ign_case=True,
+            exp_result=['CIM_abc', 'CIM_abd', 'CIM_abe', 'TST_abc'],
+        ),
+        None, None, OK),
+]
 
-    name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
 
-    @pytest.mark.parametrize(
-        "desc, regex, nl, match, ign_case",
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_FILTERNAMELIST)
+@simplified_test_function
+def test_filternamelist(testcase, nl, regex, exp_result, ign_case):
+    """Test the _common.FilterNameList function"""
 
-        ['Verify TST_ case insensitive',
-         'TST_', name_list, ['TST_abc'], True],
+    # Code to test
+    tst_rslt = filter_namelist(regex, nl, ignore_case=ign_case)
 
-        ['Verify TSt_ case insensitive',
-         'TSt_', name_list, ['TST_abc'], True],
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
 
-        ['Verify TSt_ case insensitive',
-         'TXST_', name_list, [], True],
-
-        ['Verify TSt_ case insensitive',
-         'CIM_', name_list, ['CIM_abc', 'CIM_def', 'CIM_123'], True],
-
-        ['Verify TSt_ case sensitive',
-         'TSt__', name_list, [], False],
-
-        ['Verify wildcard filters',
-         r'.*abc$', name_list, ['CIM_abc', 'TST_abc'], True],
-
-        ['Verify wildcard filters',
-         r'.*def', name_list, ['CIM_def'], True],
-    )
-    def test_filter_nameslist(self, desc, regex, nl, match, ign_case):
-        # pylint: disable=no-self-use
-        """
-        Test filter_namelist function.
-        """
-        assert (filter_namelist(regex, nl, ignore_case=ign_case) == match), desc
-
-    def test_case_insensitive(self):
-        # pylint: disable=no-self-use
-        """Test case insensitive match"""
-        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
-
-        assert filter_namelist('TST_', name_list) == ['TST_abc']
-        assert filter_namelist('TSt_', name_list) == ['TST_abc']
-        assert filter_namelist('XST_', name_list) == []
-        assert filter_namelist('CIM_', name_list) == ['CIM_abc',
-                                                      'CIM_def',
-                                                      'CIM_123']
-
-    def test_case_sensitive(self):
-        # pylint: disable=no-self-use
-        """Test case sensitive matches"""
-        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
-
-        assert filter_namelist('TSt_', name_list,
-                               ignore_case=False) == []
-
-    def test_wildcard_filters(self):
-        # pylint: disable=no-self-use
-        """Test more complex regex"""
-        name_list = ['CIM_abc', 'CIM_def', 'CIM_123', 'TST_abc']
-        assert filter_namelist(r'.*abc$', name_list) == ['CIM_abc',
-                                                         'TST_abc']
-        assert filter_namelist(r'.*def', name_list) == ['CIM_def']
+    assert tst_rslt == exp_result
 
 
 TESTCASES_KVPAIR = [
@@ -1348,15 +1411,21 @@ TESTCASES_KVPAIR = [
           exp_name='abc',
           exp_value='"Fr ed"'),
      None, None, True),
-    ("Verify simple pair",
+    ("Verify pair with esc char",
      dict(kvpair='abc="fre\"d"',
           exp_name='abc',
           exp_value='"fre\"d"'),
      None, None, True),
-    ("Verify simple pair",
+    ("Verify pair, not name",
      dict(kvpair='=def',
           exp_name='',
           exp_value='def'),
+     None, None, True),
+
+    ("Verify pair, integer value",
+     dict(kvpair='prop_name=91999',
+          exp_name='prop_name',
+          exp_value='91999'),
      None, None, True),
 
 ]
@@ -1549,58 +1618,66 @@ class SorterTest(unittest.TestCase):
         self.assertEqual(sorted_rslt, ['abc', 'xyz'])
 
 
-# TODO: move this to pytest
-class SplitTestNone(object):  # pylint: disable=useless-object-inheritance
-    """Test splitting input parameters"""
+TESTCASES_SPLITARRAYVALUE = [
+    #  Testcases for split_array_value
+    #
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * in: String defining the key=value to be tested.
+    #   * exp_rslt: Name expected in response.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+    ("Verify simple numeric array",
+     dict(input='0,1,2,3,4,5,6',
+          exp_rslt=['0', '1', '2', '3', '4', '5', '6']),
+     None, None, OK),
 
-    def split_test(self, input_str, exp_result):
-        # pylint: disable=no-self-use
-        """
-        Common function to do the split and compare input to expected
-        result.
-        """
-        act_result = split_array_value(input_str, ',')
-        assert exp_result == act_result,  \
-            'Failed split test exp {!r}, act {!r}'.format(exp_result,
-                                                          act_result)
+    ("Verify simple non-numeric array",
+     dict(input='abc,def,jhi,klm,nop',
+          exp_rslt=['abc', 'def', 'jhi', 'klm', 'nop']),
+     None, None, OK),
 
-    def test_split(self):
-        # pylint: disable=no-self-use
-        """Define strings to split and call test function"""
-        self.split_test('0,1,2,3,4,5,6',
-                        ['0', '1', '2', '3', '4', '5', '6'])
+    ("Verify split array with escape for ,",
+     dict(input='abc,def,jhi,klm,n\\,op',
+          exp_rslt=['abc', 'def', 'jhi', 'klm', 'n,op']),
+     None, None, OK),
 
-        self.split_test('abc,def,jhi,klm,nop',
-                        ['abc', 'def', 'jhi', 'klm', 'nop'])
+    ("Verify split array with space ,",
+     dict(input='abc,de f',
+          exp_rslt=['abc', 'de f']),
+     None, None, OK),
 
-        self.split_test('abc,def,jhi,klm,n\\,op',
-                        ['abc', 'def', 'jhi', 'klm', 'n\\,op'])
+    ("Verify split single string with space ,",
+     dict(input='abcde f',
+          exp_rslt=['abcde f']),
+     None, None, OK),
 
-        # self.split_test('abc,de f', ['abc','de f'])
+    ("Verify split empty string ,",
+     dict(input='',
+          exp_rslt=['']),
+     None, None, OK),
+]
 
 
-# TODO: move this to pytest
-class KVPairParsingTest(object):  # pylint: disable=useless-object-inheritance
-    "Test parsing key/value pairs on input"
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_SPLITARRAYVALUE)
+@simplified_test_function
+def test_split_array_value(testcase, input, exp_rslt):
+    """
+    Test psplit_array_value common function
+    """
+    # Code to be tested
 
-    def execute_test(self, test_string, exp_name, exp_value):
-        # pylint: disable=no-self-use
-        """Execute the function and test result"""
+    act_rslt = split_array_value(input, ',')
 
-        act_name, act_value = parse_kv_pair(test_string)
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
 
-        assert (exp_name == act_name), \
-            ' KVPairParsing. Expected ' \
-            ' name={}, function returned {}'.format(exp_name, act_name)
-        assert (exp_value == act_value), \
-            ' KVPairParsing. Expected ' \
-            ' value={}, act value={}'.format(exp_value, act_value)
-
-    def test_scalar_int(self):
-        # pylint: disable=no-self-use
-        """Test for scalar integer value"""
-        self.execute_test('prop_name=1', 'prop_name', str(1))
-        self.execute_test('prop_name=91999', 'prop_name', str(91999))
+    assert exp_rslt == act_rslt,  \
+        'Failed split test exp {!r}, act {!r}'.format(exp_rslt, act_rslt)
 
 
 ######################################################
@@ -1609,7 +1686,7 @@ class KVPairParsingTest(object):  # pylint: disable=useless-object-inheritance
 #
 ######################################################
 
-# TODO; Convert this test to pytest
+# TODO: Convert this test to pytest
 class CreateCIMInstanceTest(unittest.TestCase):
     """Test the function that creates a CIMInstance from cli args"""
 
@@ -1709,7 +1786,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
                                properties=exp_properties)
         kv_properties = ['ID=Testid']
         act_inst = create_ciminstance(cls, kv_properties)
-        # pp(act_inst)
         self.assertEqual(exp_inst, act_inst)
 
     # TODO add datetime property
@@ -1756,7 +1832,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
                                properties=exp_properties)
         kv_properties = ['ID=Testid', 'Boolp=false']
         act_inst = create_ciminstance(cls, kv_properties)
-        # pp(act_inst)
         self.assertTrue(compare_instances(exp_inst, act_inst))
         self.assertEqual(exp_inst, act_inst)
 
@@ -2406,4 +2481,4 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
 
 # TODO Test compare with errors
 
-# NOTE: Format table is in test_tableformat.py
+# NOTE: Format table tests are in test_tableformat.py
