@@ -162,6 +162,8 @@ Released: not yet
   width. The width can be set using the PYWBEMCLI_TERMWIDTH env var.
   (See issues #518 and #542)
 
+* Docs: Increased the width of the help text to 120 (See issue #548).
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

@@ -220,7 +220,7 @@ doc_dependent_files := \
 # Used for generating docs/pywbemcli/cmdshelp.rst and for creating the help in
 # test cases. The expected help in test cases does not exactly need to match
 # this width because the comparison removes whitespace.
-pywbemcli_termwidth := 78
+pywbemcli_termwidth := 120
 
 # PyLint config file
 pylint_rc_file := pylintrc
