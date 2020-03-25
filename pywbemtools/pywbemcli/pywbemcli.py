@@ -54,13 +54,20 @@ DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
 
+TERMWIDTH_ENVVAR = os.getenv(PywbemServer.termwidth_envvar, None)
+if TERMWIDTH_ENVVAR:
+    try:
+        TERMWIDTH_ENVVAR = int(TERMWIDTH_ENVVAR)
+    except ValueError:
+        TERMWIDTH_ENVVAR = None
+
 CONTEXT_SETTINGS = dict(
 
     # Enable -h as additional help option:
     help_option_names=['-h', '--help'],
 
     # Default the output width properly:
-    terminal_width=click.get_terminal_size()[0],
+    terminal_width=TERMWIDTH_ENVVAR or click.get_terminal_size()[0],
 )
 
 
@@ -272,6 +279,9 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
 
     The general options shown below can also be specified on any of the
     commands, positioned right after the 'pywbemcli' command name.
+
+    The width of help texts of this command can be set with the
+    PYWBEMCLI_TERMWIDTH environment variable.
 
     For more detailed documentation, see:
 

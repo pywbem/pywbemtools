@@ -573,7 +573,8 @@ TEST_CASES = [
     ['Verify class command enumerate with --no-association filter and '
      'no-qualifiers. Tests no qualifiers on parameters',
      ['enumerate', '--no-association', '--no-qualifiers'],
-     {'stdout': ['class CIM_Foo {   string InstanceID;',
+     {'stdout': ['class CIM_Foo {',
+                 'string InstanceID;',
                  'uint32 IntegerProp;',
                  'uint32 Fuzzy(',
                  'string TestInOutParameter,',

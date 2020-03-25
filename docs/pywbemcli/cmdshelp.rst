@@ -40,6 +40,9 @@ Help text for ``pywbemcli``:
       The general options shown below can also be specified on any of the
       commands, positioned right after the 'pywbemcli' command name.
 
+      The width of help texts of this command can be set with the
+      PYWBEMCLI_TERMWIDTH environment variable.
+
       For more detailed documentation, see:
 
           https://pywbemtools.readthedocs.io/en/stable/
