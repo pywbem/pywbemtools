@@ -724,7 +724,7 @@ TEST_CASES = [
                  'root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"',
                  'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"',
                  'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"',
-                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"'],
+                 'root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"', ],
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -1923,7 +1923,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '--no'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"'
+     {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"',
                  '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
                  '//FakedUrl/root/cimv2:TST_Person.name="Sofi"'],
       'rc': 0,

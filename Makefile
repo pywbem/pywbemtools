@@ -95,7 +95,7 @@ ifeq ($(OS),Windows_NT)
   else
     PLATFORM := Windows_native
     ifdef COMSPEC
-      SHELL := $(subst \,/,$(COMSPEC))
+      SHELL := $(COMSPEC)
     else
       SHELL := cmd.exe
     endif
@@ -214,7 +214,13 @@ doc_dependent_files := \
     $(wildcard $(doc_conf_dir)/*.rst) \
     $(wildcard $(doc_conf_dir)/*/*.rst) \
     $(wildcard $(doc_conf_dir)/notebooks/*.ipynb) \
-		$(package_py_files) \
+    $(package_py_files) \
+
+# Width for help text display.
+# Used for generating docs/pywbemcli/cmdshelp.rst and for creating the help in
+# test cases. The expected help in test cases does not exactly need to match
+# this width because the comparison removes whitespace.
+pywbemcli_termwidth := 78
 
 # PyLint config file
 pylint_rc_file := pylintrc
@@ -225,7 +231,7 @@ flake8_rc_file := .flake8
 # Python source files to be checked by PyLint and Flake8
 py_src_files := \
     setup.py \
-		$(package_py_files) \
+    $(package_py_files) \
     $(wildcard tests/*.py) \
     $(wildcard tests/*/*.py) \
     $(wildcard tests/*/*/*.py) \
@@ -263,8 +269,8 @@ dist_manifest_in_files := \
     LICENSE.txt \
     README.rst \
     *.py \
-		$(package_name)/*.py \
-		$(package_name)/*/*.py \
+    $(package_name)/*.py \
+    $(package_name)/*/*.py \
 
 # Files that are dependents of the distribution archive.
 # Keep in sync with dist_manifest_in_files.
@@ -273,7 +279,7 @@ dist_dependent_files := \
     README.rst \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
-		$(wildcard $(package_name)/*/*.py) \
+    $(wildcard $(package_name)/*/*.py) \
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
@@ -618,13 +624,21 @@ safety_$(pymn).done: develop_$(pymn).done Makefile minimum-constraints.txt
 .PHONY: test
 test: develop_$(pymn).done $(doc_utility_help_files)
 	@echo "makefile: Running unit and function tests"
-	py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
- 	@echo "makefile: Done running tests"
+ifeq ($(PLATFORM),Windows_native)
+	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
+else
+	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+endif
+	@echo "makefile: Done running tests"
 
 # update the pywbemcli/cmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemcli/cmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
 	@echo 'makefile: Creating $@ for documentation'
-	$(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp
+ifeq ($(PLATFORM),Windows_native)
+	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp"
+else
+	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp
+endif
 	-$(call RM_FUNC,$@)
 	-$(call CP_FUNC,$@.tmp,$@)
 	-$(call RM_FUNC,$@.tmp)

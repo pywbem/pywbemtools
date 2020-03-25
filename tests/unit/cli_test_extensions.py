@@ -291,8 +291,8 @@ class CLITestsBase(object):
                 # compress test_value and rtn_value into whitespace single
                 # strings and assert_lines.
                 elif test_definition == 'linesnows':
-                    assert_lines([remove_ws(test_value)],
-                                 [remove_ws(rtn_value)],
+                    assert_lines(remove_ws(test_value),
+                                 remove_ws(rtn_value),
                                  rtn_type, desc)
 
                 # test with a regex search that all values in list exist in
@@ -337,7 +337,8 @@ class CLITestsBase(object):
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
-                        assert remove_ws(test_str) in remove_ws(rtn_value), \
+                        assert remove_ws(test_str, join=True) in \
+                            remove_ws(rtn_value, join=True), \
                             "Missing ws-agnostic in-string on {} in test:\n" \
                             "{}\n" \
                             "Expected ws-agnostic in-string in any line:\n" \
@@ -353,8 +354,8 @@ class CLITestsBase(object):
                     if isinstance(test_value, six.string_types):
                         test_value = [test_value]
                     for test_str in test_value:
-                        assert remove_ws(test_str) not in \
-                            remove_ws(rtn_value), \
+                        assert remove_ws(test_str, join=True) not in \
+                            remove_ws(rtn_value, join=True), \
                             "Unexpected ws-agnostic in-string on {} in test:\n"\
                             "{}\n" \
                             "Unexpected ws-agnostic in-string in any line:\n" \
@@ -370,14 +371,38 @@ class CLITestsBase(object):
                     assert 'Test {} is invalid. Skipped'.format(test_definition)
 
 
-def remove_ws(inputs):
+def remove_ws(inputs, join=False):
     """
-    Remove all whitespace from a tuple or list of strings or a single
-    string and return the result as a single string. Whitespace is
-    defined as spaces, tabs, newlines
-    """
-    if isinstance(inputs, (tuple, list)):
-        inputs = "".join(inputs)
+    Return the input with whitespace removed and empty lines removed.
 
-    # return inputs.replace(" ", "").replace("\t", "").replace("\n", "")
-    return re.sub(r"\s", "", inputs)
+    Whitespace is defined as spaces and tabs.
+
+    Parameters:
+
+      inputs: The input, which may be:
+        * a single string representing one or more lines.
+        * an iterable of strings, each representing one or more lines.
+
+      join (bool): Controls whether the returned list is joined into one line.
+
+    Returns:
+
+      string or list of string: Non-empty lines from the input with whitespace
+        removed, as one string if joined, or as a list of strings is not joined.
+    """
+
+    if isinstance(inputs, six.string_types):
+        inputs = [inputs]
+
+    input_lines = []
+    for line in inputs:
+        input_lines.extend(line.splitlines())
+
+    ret_lines = []
+    for line in input_lines:
+        line = re.sub(r"\s", "", line)
+        if line:
+            ret_lines.append(line)
+    if join:
+        ret_lines = ''.join(ret_lines)
+    return ret_lines

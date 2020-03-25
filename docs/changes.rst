@@ -155,7 +155,8 @@ Released: not yet
   (See issue #494)
 
 * Added support for adjusting the width of any help output to the terminal
-  width. (See issue #518)
+  width. The width can be set using the PYWBEMCLI_TERMWIDTH env var.
+  (See issues #518 and #542)
 
 **Cleanup:**
 
