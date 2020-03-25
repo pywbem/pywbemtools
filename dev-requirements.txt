@@ -23,6 +23,10 @@ python-coveralls>=2.8.0;
 
 # Safety CI by pyup.io
 safety>=1.8.4
+# dparse 0.5.0 has an infinite recursion issue on Python 2.7,
+#   see https://github.com/pyupio/dparse/issues/46
+dparse>=0.4.1,<0.5.0; python_version == '2.7'
+dparse>=0.4.1; python_version >= '3.4'
 
 # TODO: Remove the pinning of the pytest-cov version again once issue
 #       https://github.com/z4r/python-coveralls/issues/66
