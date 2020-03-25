@@ -50,6 +50,8 @@ Released: not yet
 * Corrected issue with use-pull general option that causes issues with using
   the 'either' option with servers that do not have pull. (See issue #530)
 
+* Pinned dparse to <0.5.0 on Python 2.7 due to an issue.
+
 **Enhancements:**
 
 * Test: Improved assertion messages in tests.
