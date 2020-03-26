@@ -79,6 +79,10 @@ Released: not yet
 
 * Pinned dparse to <0.5.0 on Python 2.7 due to an issue.
 
+* Test: Fixed incorrect coverage reported at the end of the pytest run,
+  by increasing the minimum version of the coverage package to 4.5.2.
+  (See issue #547)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
