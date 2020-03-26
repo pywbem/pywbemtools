@@ -115,7 +115,7 @@ yamlordereddictloader==0.4.0
 funcsigs==1.0.2
 
 # Coverage reporting (no imports, invoked via coveralls script):
-coverage==4.5
+coverage==4.5.2
 python-coveralls==2.9.2
 pytest-cov==2.7.0
 
