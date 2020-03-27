@@ -22,13 +22,13 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
-import re
 import click
 
-from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
+from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
+    CIM_ERR_NOT_FOUND
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, parse_wbemuri_str, \
+from ._common import display_cim_objects, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, format_table, verify_operation, \
     process_invokemethod, raise_pywbem_error_exception, \
@@ -687,61 +687,53 @@ def instance_shrub(context, instancename, **options):
 ####################################################################
 
 
-WBEM_URI_INSTANCEPATH_REGEXP = re.compile(
-    r'^(?:([\w\-]+):)?'  # namespace type (URI scheme)
-    r'(?://([\w.:@\[\]]*))?'  # authority (host)
-    r'(?:/|^/?)(\w+(?:/\w+)*)?'  # namespace name (leading slash optional)
-    r'(?::|^:?)(\w+)'  # class name (leading colon optional)
-    r'$',  # String end withou key bindings
-    flags=re.UNICODE)
-
-# Valid namespace types (URI schemes) for WBEM URI parsing
-WBEM_URI_NAMESPACE_TYPES = [
-    'http', 'https',
-    'cimxml-wbem', 'cimxml-wbems',
-]
-
-
 def get_instancename(context, instancename, options):
     """
-    Common function to get the instancename from the input defined as a
-    WBEM_URL, the user with a console prompt call, or from one or more
-    key options.
+    Common function to construct a CIMInstanceName object from the
+    INSTANCENAME argument and the --key and --namespace options specified
+    in the command line.
 
-    If the instance name replaces the keys with ".?" execute the console
-    prompt to select the instance name.
+    The keybindings of the returned CIM instance path must be specified in
+    exactly one of these ways:
 
-    If there is data in the key element in the options dict, usees that data to
-    build the instance name.  The data ins in the form name=value.
+    * If the keybindings component in the instance name string is "?"
+      (e.g. "CIM_Foo.?"), the instances of that class are listed and the user is
+      prompted to pick one.
 
-    Otherwise assume that the instancename is a WBEM_URI and parse it.
+    * If the "key" option is non-empty, the so specified key values are used as
+      keybindings for the returned instance path, and the instance name string
+      is interpreted as a class WBEM URI.
+
+    * If the instance name string specifies keybindings, they are used.
+
+    The namespace of the returned CIM instance path must be specified in
+    exactly one of these ways:
+
+    * If the instance name string specifies a namespace, it is used.
+
+    * If the "namespace" option is non-empty, it is used.
+
+    * Otherwise, the default namespace of the connection in the context is used.
 
     Parameters:
 
-      Context: :class:`~pywbem.CIMInstanceName`
-        The click context
+      context (:class:`'~pywbemtools._context_obj.ContextObj`):
+        The Click context object.
 
-      instancename: (:term:`string`):
+      instancename (:term:`string`):
+        The INSTANCENAME argument from the command line.
 
-      The WBEM URI string must be a CIM instance path in untyped WBEM URI
-      format as documented in the pywbem CIMInstanceName.from_wbem_uri except
-      that if the --keys option exists the keybindings compoment must not
-      exist or if the keybindings may be defined as ".?'
+      options (dict):
+        Command-specific options from the command line (including --key and
+        --namespace if specified).
 
     Returns:
 
-     CIMInstanceName with namespace retrieved either from the namespace option
-     in options dictionary or the connection default_namespace.
-
-      :class:`~pywbem.CIMInstanceName`: The instance path created from the
-      specified input with namespace retrieved either the namespace option
-      in options dictionary, the instancename,  or the connection
-      default_namespace.
+      :class:`~pywbem.CIMInstanceName`: CIM instance path.
 
     Raises:
 
-      ClickException: Invalid WBEM URI format for an instance path. This
-        includes typed WBEM URIs.
+      ClickException: Various reasons.
     """
     # TODO: Future - Could we  make usable if no class can be acquired because
     # GetClass not implemented in server. That would probably require
@@ -749,60 +741,78 @@ def get_instancename(context, instancename, options):
     # in that instance and the corresponding instancename to determine
     # which properties are keys and the property types.
 
-    # If the keybindings is the character ? execute select
     if instancename.endswith(".?"):
+
         if options['key']:
-            raise click.ClickException('Key option conflicts with '
-                                       'namespace wildcard "?"')
-        cln = instancename[:-2]
-        ns = options.get('namespace', context.conn.default_namespace)
+            raise click.ClickException(
+                "Using the --key option conflicts with specifying a "
+                "wildcard keybinding in INSTANCENAME: {}".
+                format(instancename))
+
+        class_uri = instancename[:-2]
+        try:
+            class_path = CIMClassName.from_wbem_uri(class_uri)
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
+
+        if class_path.namespace and options.get('namespace'):
+            raise click.ClickException(
+                "Using the --namespace option conflicts with specifying a "
+                "namespace in INSTANCENAME: {}".format(instancename))
+
+        ns = class_path.namespace or options.get('namespace') or \
+            context.conn.default_namespace
 
         try:
-            instancepath = pick_instance(context, cln, namespace=ns)
-        except ValueError:
-            click.echo('Request aborted')
-            return None
+            instance_path = pick_instance(
+                context, class_path.classname, namespace=ns)
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
 
-    # If the --key option contains data use that to build CIMInstanceName
     elif options['key']:
-        # parse the prolog and classname from WBEM_URI to get classname
-        m = WBEM_URI_INSTANCEPATH_REGEXP.match(instancename)
-        if m is None:
-            raise click.ClickException("Invalid format for instance path {}".
-                                       format(instancename))
-
-        ns_type = m.group(1) or None
-        if ns_type and ns_type.lower() not in WBEM_URI_NAMESPACE_TYPES:
-            warning_msg("Tolerating unknown namespace type {} in WBEM URI: {}".
-                        format(ns_type, instancename))
-
-        namespace = m.group(3) or None
-        classname = m.group(4) or None
-        assert classname is not None  # should be ensured by regexp
 
         try:
-            cim_class = context.conn.GetClass(classname, LocalOnly=False,
-                                              IncludeQualifiers=True)
-            instancepath = create_ciminstancename(cim_class, options['key'])
-            instancepath.namespace = namespace
+            class_path = CIMClassName.from_wbem_uri(instancename)
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
 
-        except CIMError as ce:
-            if ce.status_code == CIM_ERR_NOT_FOUND:
-                raise click.ClickException('Class "{}" not found'.
-                                           format(classname))
-        except ValueError as ve:
-            raise click.ClickException('{}: {}'.format(
-                ve.__class__.__name__, ve))
+        if class_path.namespace and options.get('namespace'):
+            raise click.ClickException(
+                "Using the --namespace option conflicts with specifying a "
+                "namespace in INSTANCENAME: {}".format(instancename))
+
+        ns = class_path.namespace or options.get('namespace') or \
+            context.conn.default_namespace
+
+        try:
+            cim_class = context.conn.GetClass(
+                class_path.classname, namespace=ns, LocalOnly=False,
+                IncludeQualifiers=True)
+        except CIMError as exc:
+            raise click.ClickException("CIMError: {}".format(exc))
+
+        instance_path = create_ciminstancename(cim_class, options['key'])
+        instance_path.namespace = ns
 
     else:
-        try:
-            instancepath = parse_wbemuri_str(instancename,
-                                             options['namespace'])
-        except ValueError as ve:
-            raise click.ClickException('{}: {}'.format(
-                ve.__class__.__name__, ve))
 
-    return instancepath
+        assert not options['key']  # There cannot be a conflict anymore
+
+        try:
+            instance_path = CIMInstanceName.from_wbem_uri(instancename)
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
+
+        if instance_path.namespace and options.get('namespace'):
+            raise click.ClickException(
+                "Using the --namespace option conflicts with specifying a "
+                "namespace in INSTANCENAME: {}".format(instancename))
+
+        if instance_path.namespace is None:
+            instance_path.namespace = options.get('namespace') or \
+                context.conn.default_namespace
+
+    return instance_path
 
 
 ####################################################################
@@ -922,8 +932,6 @@ def cmd_instance_modify(context, instancename, options):
 
     If successful, this operation returns nothing.
     """
-    # This function resolves any issues between namespace in instancename and
-    # the namespace option.
     instancepath = get_instancename(context, instancename, options)
     if instancepath is None:
         return

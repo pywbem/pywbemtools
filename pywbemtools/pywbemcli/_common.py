@@ -551,25 +551,39 @@ def create_cimproperty(cim_type, is_array, name, value_str):
 
 def create_ciminstancename(cim_class, kv_keys):
     """
-    Create a cim instance name from the input parameters.
+    Create a CIMInstanceName object from the input parameters.
 
-      Parameters:
+    The provided key values are verified against the properties of the class.
 
-        cim_class_: (:Class:`pywbem.CIMClass`)
-            The class from which the CIMInstanceName is to be created
+    Parameters:
 
-        kv_keys ():
-            A tuple of name/value pairs representing the keys and their
-            values that are to be constructed for the instance name. Required
+      cim_class (:class:`~pywbem.CIMClass`):
+        The class from which the CIMInstanceName is to be created.
+        The provided keys are validated against the properties of that class.
 
-      Returns: CIMInstanceName with namespace = None and host = None
+      kv_keys (tuple):
+        A tuple of name/value pairs representing the keys and their
+        values that are to be constructed for the instance name. Required
+
+      Returns:
+
+        CIMInstanceName: with namespace = None and host = None
 
       Exceptions:
+
         click.ClickException if Property name not found in class or if mismatch
           of property type in class vs value component of kv pair
     """
-    # TODO make usable if no class can be acquired because GetClass not
-    # implemented in server.
+    # TODO: Avoid the CIMClass object as input, because GetClass is not
+    # implemented by all WBEM servers. That is not easy however, because the
+    # name=value syntax used in the --key option does not allow distinguishing
+    # the string/numeric/boolean types sufficiently well. For example, one
+    # would need to find a way to resolve the ambiguity between numeric/boolean
+    # values and strings with that same string value. One option might be to
+    # have optional single or double quotes around string values, that normally
+    # would not be needed, but when the string value is a numeric or boolean
+    # string, then they would be used to turn the value into a string. For
+    # example: name=42 -> numeric, name="42" -> string.
     keys = []
     for kv_property in kv_keys:
         name, value_str = parse_kv_pair(kv_property)
@@ -579,7 +593,7 @@ def create_ciminstancename(cim_class, kv_keys):
             raise click.ClickException('Property name "{}" not in class "{}".'
                                        .format(name, cim_class.classname))
 
-        if value_str.startswith('"') and value_str.endswith('"'):
+        if value_str and value_str.startswith('"') and value_str.endswith('"'):
             value_str = value_str[1:-1]
         try:
             value = create_cimvalue(cl_prop.type, value_str, False)
@@ -591,23 +605,29 @@ def create_ciminstancename(cim_class, kv_keys):
                                        .format(name, cl_prop.type,
                                                cl_prop.is_array,
                                                value_str, ex))
-    return CIMInstanceName(cim_class.classname, keybindings=keys)
+
+    try:
+        instance_path = CIMInstanceName(cim_class.classname, keybindings=keys)
+    except ValueError as exc:
+        raise click.ClickException(str(exc))
+
+    return instance_path
 
 
 def create_ciminstance(cim_class, kv_properties, property_list=None):
     """
-    Create a cim instance from the input parameters.
+    Create a CIMInstance object from the input parameters.
 
       Parameters:
 
-        class_: (CIMClass)
+        cim_class (CIMClass):
             The class from which the CIMInstance is to be created
 
-        properties ():
+        kv_properties (tuple):
             A tuple of name/value pairs representing the properties and their
             values that are to be constructed for the instance. Required
 
-        property_list ():
+        property_list (list):
             a list of properties that is to be the list that is supplied
             when the instance is created. Optional
 
