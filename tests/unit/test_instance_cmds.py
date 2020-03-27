@@ -226,6 +226,13 @@ INSTANCE_SHRUB_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
+GET_INSTANCE_RESP = """instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+"""
+
 ENUM_INSTANCE_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
    IntegerProp = 1;
@@ -944,6 +951,259 @@ Instances: PyWBEM_AllTypes
      SIMPLE_MOCK_FILE, OK],
 
     #
+    #  exhaustive tests for INSTANCENAME parameter (using instance get command)
+    #  including variations on --namespace and --key options.
+    #
+
+    ['INSTANCENAME with one-key class and keybinding, no options',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, one-key class and keybinding, no options',
+     ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class and keybinding, option --namespace',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class and keybinding, option -n',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-n', 'root/cimv2'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class, option --key',
+     ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class, option -k',
+     ['get', 'CIM_Foo', '-k', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace and one-key class, option --key',
+     ['get', 'root/cimv2:CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace and one-key class, option -k',
+     ['get', 'root/cimv2:CIM_Foo', '-k', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class, options --namespace and --key',
+     ['get', 'CIM_Foo', '--namespace', 'root/cimv2',
+      '--key', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with one-key class, options -n and -k',
+     ['get', 'CIM_Foo', '-n', 'root/cimv2', '-k', 'InstanceID=CIM_Foo1'],
+     {'stdout': GET_INSTANCE_RESP,
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, option --namespace with same ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+      '--namespace', 'root/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, option -n with same ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+      '-n', 'root/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, option --namespace with diff ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+      '--namespace', 'test/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, option -n with diff ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+      '-n', 'test/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace, options --key and --namespace (error)',
+     ['get', 'root/cimv2:CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+      '--namespace', 'root/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with keybindings, option --key with same value (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--key', 'InstanceID=CIM_Foo1'],
+     {'stderr': "Invalid format for a class path in WBEM URI",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with keybindings, option -k with same value (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-k', 'InstanceID=CIM_Foo1'],
+     {'stderr': "Invalid format for a class path in WBEM URI",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with keybindings, option --key with diff value (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--key', 'InstanceID=CIM_Bla'],
+     {'stderr': "Invalid format for a class path in WBEM URI",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with keybindings, option -k with diff value (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '-k', 'InstanceID=CIM_Bla'],
+     {'stderr': "Invalid format for a class path in WBEM URI",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing namespace, no options (error)',
+     ['get', 'root/bla:CIM_Foo.InstanceID="CIM_Foo1"'],
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing namespace, --key option (error)',
+     ['get', 'root/bla:CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing namespace, --namespace option (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/bla'],
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing namespace, --namespace and --key options '
+     '(error)',
+     ['get', 'CIM_Foo', '--namespace', 'root/bla',
+      '--key', 'InstanceID=CIM_Foo1'],
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing class, no options (error)',
+     ['get', 'CIM_Bla.InstanceID="CIM_Foo1"'],
+     {'stderr': "CIMError: 5 (CIM_ERR_INVALID_CLASS): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing class, --key option (error)',
+     ['get', 'CIM_Bla', '--key', 'InstanceID=CIM_Foo1'],
+     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Class ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing instance, no options (error)',
+     ['get', 'CIM_Foo.InstanceID="CIM_Bla"'],
+     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with non-existing instance, --key option (error)',
+     ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Bla'],
+     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with "name=" keybinding, no options',
+     ['get', 'CIM_Foo.InstanceID='],
+     {'stderr': "WBEM URI has an invalid format for its keybindings",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with "name="',
+     ['get', 'CIM_Foo', '--key', 'InstanceID='],
+     {'stderr': "CIMInstance keybinding .* value is 'None'",
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with "name" keybinding, no options',
+     ['get', 'CIM_Foo.InstanceID'],
+     {'stderr': "WBEM URI has an invalid format for its keybindings",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with "name"',
+     ['get', 'CIM_Foo', '--key', 'InstanceID'],
+     {'stderr': "CIMInstance keybinding .* value is 'None'",
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with wildcard keybinding, no options',
+     ['get', 'TST_Person.?'],
+     {'stdout':
+      ['Input integer between 0 and 7',
+       'root/cimv2:TST_Person',
+       'instance of TST_Person'],
+      'rc': 0,
+      'test': 'regex'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+
+    ['INSTANCENAME with wildcard keybinding, --key option (error)',
+     ['get', 'TST_Person.?', '--key', 'name=Saara'],
+     {'stderr': "Using the --key option conflicts with specifying a "
+      "wildcard keybinding",
+      'rc': 1,
+      'test': 'regex'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+
+    #
     #  instance get command
     #
 
@@ -961,171 +1221,75 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
-    ['Verify instance command get with instancename returns data',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get with instancename, namespace returns data',
-     ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--namespace', 'root/cimv2'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get instname with path and --namespace',
-     ['get', '/root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"', '--namespace',
-      'root/cimv2'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'innows'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get with instancename, --key, namespace returns '
-     'data',
-     ['get', 'CIM_Foo', '--namespace', 'root/cimv2', '--key',
-      'InstanceID=CIM_Foo1'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get with instancename with ":", --key, namespace '
-     'returns data',
-     ['get', ':CIM_Foo', '--namespace', 'root/cimv2', '--key',
-      'InstanceID=CIM_Foo1'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get with instancename, -k namespace returns data',
-     ['get', 'CIM_Foo', '--namespace', 'root/cimv2', '-k',
-      'InstanceID=CIM_Foo1'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
-      'rc': 0,
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
     ['Verify instance command get with instancename local_only returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename --local-only returns '
      ' data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--local-only'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename --include-qualifiers '
      'returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--include-qualifiers'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename --include-qualifiers '
      'and general --use-pull returns data',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--iq'],
       'general': ['--use-pull', 'no']},
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename prop list -p returns '
-     ' one property',
+     'one property',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID'],
      {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
+                 'InstanceID = "CIM_Foo1";',
                  '};',
                  ''],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename prop list '
      '--propertylist returns property',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--propertylist', 'InstanceID'],
      {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
+                 'InstanceID = "CIM_Foo1";',
                  '};',
                  ''],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename prop list -p  '
      ' InstanceID,IntegerProp returns 2 properties',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID,IntegerProp'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename prop list -p '
      ' multiple instances of option returns 2 properties',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', 'InstanceID',
       '--pl', 'IntegerProp'],
-     {'stdout': ['instance of CIM_Foo {',
-                 '   InstanceID = "CIM_Foo1";',
-                 '   IntegerProp = 1;',
-                 '};',
-                 ''],
+     {'stdout': GET_INSTANCE_RESP,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with instancename empty  prop list '
@@ -1176,6 +1340,14 @@ Instances: PyWBEM_AllTypes
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['instance command get error. instance name invalid',
+     ['get', "blah"],
+     {'stderr':
+      ['Invalid format for an instance path in WBEM URI', ],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['instance command get error. invalid namespace',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/invalidnamespace'],
@@ -1194,15 +1366,6 @@ Instances: PyWBEM_AllTypes
                  "'CIM_NOTEXIST'}), namespace='root/cimv2', host=None)"],
       'rc': 1,
       'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify instance command get instname with path and --namespace',
-     ['get', '/cimv2/test:CIM_Foo.InstanceID="CIM_Foo1"', '--namespace',
-      'root/cimv2'],
-     {'stderr': "Conflicting namespaces between wbemuri cimv2/test and option"
-                " root/cimv2",
-      'rc': 1,
-      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -1646,7 +1809,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command delete, instance name invalid',
      ['delete', "blah"],
      {'stderr':
-      ['Invalid wbem uri', ],
+      ['Invalid format for an instance path in WBEM URI', ],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],

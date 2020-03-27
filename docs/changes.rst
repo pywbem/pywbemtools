@@ -88,6 +88,9 @@ Released: not yet
 
 * Fixed issues in README and README_PYPI file (See issue #555)
 
+* Improvements and bug fixes in the way the INSTANCENAME parameter of pywbemcli
+  commands is processed. (See issue #528)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
