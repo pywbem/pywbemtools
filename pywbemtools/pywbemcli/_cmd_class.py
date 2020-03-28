@@ -37,7 +37,7 @@ from ._common_options import add_options, propertylist_option, \
     summary_option, multiple_namespaces_option, association_filter_option, \
     indication_filter_option, experimental_filter_option
 from ._displaytree import display_class_tree
-from ._click_extensions import PywbemcliGroup
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 
 #
@@ -289,7 +289,7 @@ def class_references(context, classname, **options):
                                                      options))
 
 
-@class_group.command('associators', options_metavar=CMD_OPTS_TXT)
+@class_group.command('associators', options_metavar=CMD_OPTS_TXT, cls=PywbemcliCommand)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',

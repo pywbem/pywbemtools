@@ -68,3 +68,24 @@ class PywbemcliTopGroup(click.Group):
                 cmd_list.append(cmd_list.pop(i - pop_count))
                 pop_count += 1
         return cmd_list
+
+class PywbemcliCommand(click.Command):
+    """
+    Modify the command usage formatter to show the commands in a format
+    that fits how we use the tool
+    """
+
+    def format_usage(self, ctx, formatter):
+        """
+        """
+        pieces = self.collect_usage_pieces(ctx)
+        cmd_paths = ctx.command_path.split()
+
+        # If cmd_path has multiple components we are showing
+        # app name, CMDGRP <cmd>. Break out CMDGRP and <cmd>
+        # and reinsert after pieces[0] (the app name)
+        if len(cmd_path) > 1:
+            new_pieces = [pieces[0]] + cmd_paths[1:] + pieces[1:]
+            formatter.write_usage(cmds[0], " ".join(new_pieces))
+        else:
+            formatter.write_usage(ctx.command_path, " ".join(pieces))
