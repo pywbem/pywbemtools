@@ -1151,14 +1151,14 @@ Instances: PyWBEM_AllTypes
 
     ['INSTANCENAME with non-existing class, no options (error)',
      ['get', 'CIM_Bla.InstanceID="CIM_Foo1"'],
-     {'stderr': "CIMError: 5 (CIM_ERR_INVALID_CLASS): ",
+     {'stderr': "CIMError: 5 (CIM_ERR_INVALID_CLASS): Class 'CIM_Bla'",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['INSTANCENAME with non-existing class, --key option (error)',
      ['get', 'CIM_Bla', '--key', 'InstanceID=CIM_Foo1'],
-     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Class ",
+     {'stderr': "CIMError: 5 (CIM_ERR_INVALID_CLASS): Class 'CIM_Bla'",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1184,9 +1184,9 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['INSTANCENAME with no keybinding, --key option with "name="',
+    ['INSTANCENAME with no keybinding, --key option with missing VALUE',
      ['get', 'CIM_Foo', '--key', 'InstanceID='],
-     {'stderr': "CIMInstance keybinding .* value is 'None'",
+     {'stderr': "VALUE in --key option argument is missing",
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -1198,11 +1198,87 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['INSTANCENAME with no keybinding, --key option with "name"',
+    ['INSTANCENAME with no keybinding, --key option with missing =VALUE',
      ['get', 'CIM_Foo', '--key', 'InstanceID'],
-     {'stderr': "CIMInstance keybinding .* value is 'None'",
+     {'stderr': "VALUE in --key option argument is missing",
       'rc': 1,
-      'test': 'regex'},
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # In the following tests, we rely on the CIMInstanceName object being
+    # printed as part of the error message that the instance was not found.
+    # That allows verifying how the specified VALUE was parsed.
+
+    ['INSTANCENAME with no keybinding, --key option with boolean true',
+     ['get', 'CIM_Foo', '--key', 'InstanceID=true'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': True"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with string true',
+     ['get', 'CIM_Foo', '--key', 'InstanceID="true"'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': 'true'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with boolean false',
+     ['get', 'CIM_Foo', '--key', 'InstanceID=false'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': False"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with string false',
+     ['get', 'CIM_Foo', '--key', 'InstanceID="false"'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': 'false'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with int 42',
+     ['get', 'CIM_Foo', '--key', 'InstanceID=42'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': 42"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with string 42',
+     ['get', 'CIM_Foo', '--key', 'InstanceID="42"'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': '42'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with string with blanks',
+     ['get', 'CIM_Foo', '--key', 'InstanceID="a b"'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'InstanceID': 'a b'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, --key option with string with quote '
+     '(error)',
+     ['get', 'CIM_Foo', '--key', 'InstanceID="a"b"'],
+     {'stderr': "WBEM URI has an invalid format for its keybindings",
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with no keybinding, two --key options',
+     ['get', 'CIM_Foo', '--key', 'P1=a', '--key', 'P2=b'],
+     {'stderr': ["CIMError: 6 (CIM_ERR_NOT_FOUND): ",
+                 "'P1': 'a'", "'P2': 'b'"],
+      'rc': 1,
+      'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['INSTANCENAME with wildcard keybinding, no options',
@@ -1222,6 +1298,49 @@ Instances: PyWBEM_AllTypes
       'rc': 1,
       'test': 'regex'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+
+    ['INSTANCENAME with wildcard keybinding, invalid class path (error)',
+     ['get', 'TST_Person.name=1.?'],
+     {'stderr': "Invalid format for a class path in WBEM URI",
+      'rc': 1,
+      'test': 'regex'},
+     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+
+    ['INSTANCENAME with namespace and with wildcard keybinding, '
+     'option --namespace with same ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'root/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace and with wildcard keybinding, '
+     'option -n with same ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.?', '-n', 'root/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace and with wildcard keybinding, '
+     'option --namespace with diff ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'test/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['INSTANCENAME with namespace and with wildcard keybinding, '
+     'option -n with diff ns (error)',
+     ['get', 'root/cimv2:CIM_Foo.?', '-n', 'test/cimv2'],
+     {'stderr': "Using the --namespace option conflicts with specifying a "
+      "namespace",
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
 
     #
     #  instance get command
