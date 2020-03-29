@@ -90,3 +90,6 @@ CMD_OPTION_INDICATION_FILTER_HELP_LINE = \
 
 CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE = \
     '--experimental / --no-experimental'
+
+CMD_OPTION_HELP_INSTANCENAME_HELP_LINE = \
+    '--hi, --help-instancename Show help message for specifying INSTANCENAME'

@@ -36,7 +36,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_KEYS_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
-    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
+    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -82,6 +83,13 @@ INSTANCE_HELP_LINES = [
     'references    List the instances referencing an instance.',
 ]
 
+INSTANCE_HELP_INSTANCENAME_LINES = [
+    'An instance path is specified using the INSTANCENAME argument',
+    '1. By specifying the instance path as an untyped WBEM URI',
+    '2. By specifying the class path of the creation class of the instance',
+    '3. By specifying the class path of the creation class of the instance',
+]
+
 INSTANCE_ASSOCIATORS_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] instance associators INSTANCENAME [COMMAND-OPTIONS]',  # noqa: E501
     'List the instances associated with an instance.',
@@ -98,6 +106,7 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -129,6 +138,7 @@ INSTANCE_DELETE_HELP_LINES = [
     'Delete an instance of a class.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -159,6 +169,7 @@ INSTANCE_GET_HELP_LINES = [
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -169,6 +180,7 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
     '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -181,6 +193,7 @@ INSTANCE_MODIFY_HELP_LINES = [
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -209,6 +222,7 @@ INSTANCE_REFERENCES_HELP_LINES = [
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -224,6 +238,7 @@ INSTANCE_SHRUB_HELP_LINES = [
     '-f, --fullpath                  Normally the instance paths in the tree',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
+    CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
 ]
 
 GET_INSTANCE_RESP = """instance of CIM_Foo {
@@ -502,12 +517,14 @@ TEST_CASES = [
     ['Verify instance command --help response',
      '--help',
      {'stdout': INSTANCE_HELP_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
     ['Verify instance command -h response',
      '-h',
      {'stdout': INSTANCE_HELP_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
@@ -525,6 +542,7 @@ TEST_CASES = [
                 '.*\n  query'
                 '.*\n  count'
                 '.*\n  shrub',
+      'rc': 0,
       'test': 'regex'},
      None, OK],
 
@@ -534,12 +552,14 @@ TEST_CASES = [
     ['Verify instance command enumerate --help response',
      ['enumerate', '--help'],
      {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
     ['Verify instance command enumerate -h response',
      ['enumerate', '-h'],
      {'stdout': INSTANCE_ENUMERATE_HELP_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
@@ -1221,6 +1241,20 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
+    ['Verify instance command get --help-instancename response',
+     ['get', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command get --hi response',
+     ['get', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify instance command get with instancename local_only returns data',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
      {'stdout': GET_INSTANCE_RESP,
@@ -1560,6 +1594,20 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
+    ['Verify instance command modify --help-instancename response',
+     ['modify', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command modify --hi response',
+     ['modify', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify instance command modify, single good change',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"',
       '-p', 'scalBool=False'],
@@ -1751,6 +1799,20 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      None, OK],
 
+    ['Verify instance command delete --help-instancename response',
+     ['delete', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command delete --hi response',
+     ['delete', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify instance command delete, valid delete',
      ['delete', 'CIM_Foo.InstanceID="CIM_Foo1"'],
      {'stdout': '',
@@ -1843,6 +1905,20 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command references -h response',
      ['references', '-h'],
      {'stdout': INSTANCE_REFERENCES_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command references --help-instancename response',
+     ['references', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command references --hi response',
+     ['references', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -2053,6 +2129,20 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command associators -h response',
      ['associators', '-h'],
      {'stdout': INSTANCE_ASSOCIATORS_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command associators --help-instancename response',
+     ['associators', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command associators --hi response',
+     ['associators', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -2286,15 +2376,31 @@ interop      TST_MemberOfFamilyCollection  3
     #  instance invokemethod tests
     #
 
-    ['class command invokemethod --help',
+    ['Verify instance command invokemethod --help response',
      ['invokemethod', '--help'],
      {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    ['class command invokemethod -h',
+    ['Verify instance command invokemethod -h response',
      ['invokemethod', '-h'],
      {'stdout': INSTANCE_INVOKEMETHOD_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command invokemethod --help-instancename response',
+     ['invokemethod', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command invokemethod --hi response',
+     ['invokemethod', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
       'test': 'innows'},
      None, OK],
 
@@ -2397,6 +2503,27 @@ interop      TST_MemberOfFamilyCollection  3
     ['Verify instance subcommand shrub, --help response',
      ['shrub', '--help'],
      {'stdout': INSTANCE_SHRUB_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance subcommand shrub, -h response',
+     ['shrub', '-h'],
+     {'stdout': INSTANCE_SHRUB_HELP_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command shrub --help-instancename response',
+     ['shrub', '--help-instancename'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance command shrub --hi response',
+     ['shrub', '--hi'],
+     {'stdout': INSTANCE_HELP_INSTANCENAME_LINES,
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -2564,7 +2691,7 @@ interop      TST_MemberOfFamilyCollection  3
 
 class TestSubcmd(CLITestsBase):
     """
-    Test all of the class command variations.
+    Test all of the instance command variations.
     """
     command_group = 'instance'
     # mock_mof_file = 'simple_mock_model.mof'
