@@ -936,17 +936,8 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
       List the CIM instances that are associated with the specified CIM instance, and display the returned instances, or
       instance paths if --names-only was specified.
 
-      The CIM instance can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       The instances to be retrieved can be filtered by the --filter-query, --role, --result-role, --assoc-class, and
       --result-class options.
@@ -996,6 +987,9 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1115,23 +1109,17 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
 
       Delete an instance of a class.
 
-      The CIM instance to be deleted can be specified as follows:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
     Command Options:
       -k, --key KEYNAME=VALUE    Value for a key in keybinding of CIM instance name. May be specified multiple times. Allows
                                  defining keys without the issues of quotes. Default: No keybindings provided.
 
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
+      --hi, --help-instancename  Show help message for specifying INSTANCENAME including use of the --key and --namespace
+                                 options and exit.
+
       -h, --help                 Show this message and exit.
 
 
@@ -1216,17 +1204,8 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
 
       Get an instance of a class.
 
-      The instance can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       The --local-only, --include-qualifiers, --include-classorigin, and --propertylist options determine which parts are
       included in the retrieved instance.
@@ -1253,6 +1232,9 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1275,17 +1257,8 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
       Invoke a CIM method (METHODNAME argument) on a CIM instance with the specified input parameters (--parameter
       options), and display the method return value and output parameters.
 
-      The CIM instance can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       The method input parameters are specified using the --parameter option, which may be specified multiple times.
 
@@ -1308,6 +1281,9 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1327,17 +1303,8 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
 
       Modify properties of an instance.
 
-      The CIM instance to be modified can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       The properties to be modified and their new values are specified using the --property option, which may be specified
       multiple times.
@@ -1368,6 +1335,9 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1419,17 +1389,8 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       List the CIM (association) instances that reference the specified CIM instance, and display the returned instances,
       or instance paths if --names-only was specified.
 
-      The CIM instance can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       The instances to be retrieved can be filtered by the --filter-query, --role and --result-class options.
 
@@ -1473,6 +1434,9 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
+
       -h, --help                      Show this message and exit.
 
 
@@ -1499,17 +1463,8 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
 
       Displays the shrub of association components for the association source instance defined by INSTANCENAME.
 
-      The INSTANCENAME can be specified in two ways:
-
-      1. By specifying an untyped WBEM URI of an instance path in the INSTANCENAME argument. The CIM namespace in which
-      the instance is looked up is the namespace specified in the WBEM URI, or otherwise the namespace specified in the
-      --namespace option, or otherwise the default namespace of the connection. Any host name in the WBEM URI will be
-      ignored.
-
-      2. By specifying a class name with wildcard for the keys in the INSTANCENAME argument, i.e. "CLASSNAME.?". The
-      instances of the specified class are displayed and the user is prompted for an index number to select an instance.
-      The namespace in which the instances are looked up is the namespace specified in the --namespace option, or
-      otherwise the default namespace of the connection.
+      For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
+      --help-instancename.
 
       Normally the association information is displayed as a tree but it may also be displayed as a table or as one of the
       object formats (ex. MOF) of all instances that are part of the shrub if one of the cim object formats is selected
@@ -1536,6 +1491,9 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
                                       the tree simpler to read. This includes keys that have the same value for all
                                       instances and the "CreationClassName" key.  Whenthis option is used the full instance
                                       paths are displayed.
+
+      --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
+                                      --namespace options and exit.
 
       -h, --help                      Show this message and exit.
 
