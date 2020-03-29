@@ -32,7 +32,7 @@ from ._common import display_cim_objects, \
     pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, format_table, verify_operation, \
     process_invokemethod, raise_pywbem_error_exception, \
-    create_ciminstancename, warning_msg, validate_output_format, \
+    parse_kv_pair, warning_msg, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 from ._common_options import add_options, propertylist_option, \
@@ -40,6 +40,8 @@ from ._common_options import add_options, propertylist_option, \
     summary_option, verify_option, multiple_namespaces_option, \
     association_filter_option, indication_filter_option, \
     experimental_filter_option
+
+from ._cimvalueformatter import mof_escaped
 
 from ._association_shrub import AssociationShrub
 
@@ -712,15 +714,17 @@ An instance path is specified using the INSTANCENAME argument and optionally the
    approach and eliminates it for the most common cases, but the processing of
    special characters by the shell still needs to be considered.
 
-   The --key option can be specified multiple times, and the option argument
-   of each use has a NAME=VALUE format, where NAME is the name of the key
-   property and VALUE is its value. The string/numeric/boolean type needed for
-   creating a keybinding is determined automatically from VALUE. Valid integer
-   numbers are interpreted as a numeric type, the strings "true" and "false" in
-   any lexical case are interpreted as a boolean type, and anything else is
-   interpreted as a string type. If VALUE starts and ends with double quotes,
-   this forces the interpretation as a string type; this is useful for strings
-   that have a numeric value, or the string values "true" or "false".
+   The --key option can be specified multiple times, once for each key of the
+   instance name. The argument of the --key option has a NAME=VALUE format,
+   where NAME is the name of the key property and VALUE is its value. The
+   string/numeric/boolean type needed for creating a keybinding is determined
+   automatically from VALUE. Valid integer numbers are interpreted as a numeric
+   type, the strings "true" and "false" in any lexical case are interpreted as
+   a boolean type, and anything else is interpreted as a string type. Starting
+   and ending VALUE with double quotes forces interpretation as a string type;
+   in that case double quotes and backslashes inside of the double quotes need
+   to be backslash-escaped. This is useful for strings that have a numeric
+   value, or the string values "true" or "false".
 
    The CIM namespace of the instance can be specified in the WBEM URI, or using
    the --namespace option, or otherwise the default namespace of the connection
@@ -733,8 +737,8 @@ An instance path is specified using the INSTANCENAME argument and optionally the
      cimv2/test:TST_Person --key FirstName=Albert --key LastName=Einstein
      TST_Foo --namespace cimv2/test --key ID=42
      TST_Foo --key ID=42               # default namespace of connection is used
-     TST_Foo --key IntegerKey=42       # TODO: implement
-     TST_Foo --key BooleanKey=true     # TODO: implement
+     TST_Foo --key IntegerKey=42
+     TST_Foo --key BooleanKey=true
      TST_Foo --key StringKey=text
      TST_Foo --key StringKey=\\"42\\"    # shell processes escapes
      TST_Foo --key StringKey=\\"true\\"  # shell processes escapes
@@ -810,17 +814,12 @@ def get_instancename(context, instancename, options):
 
     Returns:
 
-      :class:`~pywbem.CIMInstanceName`: CIM instance path.
+      :class:`~pywbem.CIMInstanceName`: CIM instance path. It is never None.
 
     Raises:
 
       ClickException: Various reasons.
     """
-    # TODO: Future - Could we  make usable if no class can be acquired because
-    # GetClass not implemented in server. That would probably require
-    # getting at least an instance of the class and using the properties
-    # in that instance and the corresponding instancename to determine
-    # which properties are keys and the property types.
 
     if instancename.endswith(".?"):
 
@@ -836,44 +835,83 @@ def get_instancename(context, instancename, options):
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-        if class_path.namespace and options.get('namespace'):
-            raise click.ClickException(
-                "Using the --namespace option conflicts with specifying a "
-                "namespace in INSTANCENAME: {}".format(instancename))
-
-        ns = class_path.namespace or options.get('namespace') or \
-            context.conn.default_namespace
+        if class_path.namespace:
+            if options.get('namespace'):
+                raise click.ClickException(
+                    "Using the --namespace option conflicts with specifying a "
+                    "namespace in INSTANCENAME: {}".format(instancename))
+        else:
+            class_path.namespace = options.get('namespace') or \
+                context.conn.default_namespace
 
         try:
             instance_path = pick_instance(
-                context, class_path.classname, namespace=ns)
+                context, class_path.classname, class_path.namespace)
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
     elif options['key']:
 
+        # Transform the --key option values into WBEM URI keybinding strings
+        kb_strs = []
+        for kv in options['key']:
+            key, value = parse_kv_pair(kv)
+            if value is None:
+                raise click.ClickException(
+                    "VALUE in --key option argument is missing: {}".format(kv))
+            try:
+                int(value)
+                is_int = True
+            except (ValueError, TypeError):
+                is_int = False
+            if value is None:
+                # There is no official NULL representation in WBEM URI
+                kb_value = ''
+            elif is_int:
+                # integer - use without quotes
+                kb_value = value
+            elif value.upper() in ('TRUE', 'FALSE'):
+                # boolean - use the upper cased string without quotes
+                kb_value = value.upper()
+            elif value.startswith('"') and value.endswith('"'):
+                # string - the value between the double quotes is assumed to
+                # already be backslash-escaped, at the minimum for double
+                # quotes and backslashes.
+                kb_value = value
+            else:
+                # string - double quotes and escaping is added
+                # Note that a keybinding value in a WBEM URI only requires
+                # the minimal escaping for MOF string literals, i.e. double
+                # quotes and backslashes. However, we escape all control chars,
+                # double quotes, and single quotes, to ensure that there are no
+                # unprintable characters, and no quotes that might interfere
+                # with the shell.
+                kb_value = '"{}"'.format(mof_escaped(value))
+            kb_strs.append("{}={}".format(key, kb_value))
+
+        # We perform an extra verification that instancename was a class path,
+        # in order to get a more understandable error message if it is not,
+        # compared to leaving that to CIMInstanceName.from_wbem_uri().
         try:
-            class_path = CIMClassName.from_wbem_uri(instancename)
+            CIMClassName.from_wbem_uri(instancename)
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-        if class_path.namespace and options.get('namespace'):
-            raise click.ClickException(
-                "Using the --namespace option conflicts with specifying a "
-                "namespace in INSTANCENAME: {}".format(instancename))
-
-        ns = class_path.namespace or options.get('namespace') or \
-            context.conn.default_namespace
+        instancename_kb = "{}.{}".format(instancename, ','.join(kb_strs))
 
         try:
-            cim_class = context.conn.GetClass(
-                class_path.classname, namespace=ns, LocalOnly=False,
-                IncludeQualifiers=True)
-        except CIMError as exc:
-            raise click.ClickException("CIMError: {}".format(exc))
+            instance_path = CIMInstanceName.from_wbem_uri(instancename_kb)
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
 
-        instance_path = create_ciminstancename(cim_class, options['key'])
-        instance_path.namespace = ns
+        if instance_path.namespace:
+            if options.get('namespace'):
+                raise click.ClickException(
+                    "Using the --namespace option conflicts with specifying a "
+                    "namespace in INSTANCENAME: {}".format(instancename))
+        else:
+            instance_path.namespace = options.get('namespace') or \
+                context.conn.default_namespace
 
     else:
 
@@ -884,12 +922,12 @@ def get_instancename(context, instancename, options):
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-        if instance_path.namespace and options.get('namespace'):
-            raise click.ClickException(
-                "Using the --namespace option conflicts with specifying a "
-                "namespace in INSTANCENAME: {}".format(instancename))
-
-        if instance_path.namespace is None:
+        if instance_path.namespace:
+            if options.get('namespace'):
+                raise click.ClickException(
+                    "Using the --namespace option conflicts with specifying a "
+                    "namespace in INSTANCENAME: {}".format(instancename))
+        else:
             instance_path.namespace = options.get('namespace') or \
                 context.conn.default_namespace
 
@@ -914,12 +952,9 @@ def cmd_instance_get(context, instancename, options):
     instances to the console from which one can be picked to get from the
     server and display.
     """
-
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     try:
         instance = context.conn.GetInstance(
@@ -943,8 +978,6 @@ def cmd_instance_delete(context, instancename, options):
         Otherwise attempt to delete the instance defined by instancename
     """
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     try:
         context.conn.DeleteInstance(instancepath)
@@ -1014,8 +1047,6 @@ def cmd_instance_modify(context, instancename, options):
     If successful, this operation returns nothing.
     """
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     ns = options['namespace'] or context.conn.default_namespace
 
@@ -1060,10 +1091,10 @@ def cmd_instance_modify(context, instancename, options):
 
 def cmd_instance_invokemethod(context, instancename, methodname,
                               options):
-    """Create an instance and submit to wbemserver"""
+    """
+    Create an instance and submit to wbemserver
+    """
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     try:
         process_invokemethod(context, instancepath, methodname, options)
@@ -1139,8 +1170,6 @@ def cmd_instance_references(context, instancename, options):
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     try:
         if options['names_only']:
@@ -1185,8 +1214,6 @@ def cmd_instance_associators(context, instancename, options):
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
-    if instancepath is None:
-        return
 
     try:
         if options['names_only']:
@@ -1331,11 +1358,8 @@ def cmd_instance_shrub(context, instancename, options):
     showing the various steps to get through the roles, references, etc. to
     return the names of associated instances.
     """
-
     try:
         instancepath = get_instancename(context, instancename, options)
-        if instancepath is None:
-            return
 
         # Collect the data for the shrub
         shrub = AssociationShrub(context, instancepath,

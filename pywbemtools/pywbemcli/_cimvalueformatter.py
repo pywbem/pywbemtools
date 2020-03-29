@@ -197,7 +197,7 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
         return _mofval(val, indent, maxline, line_pos, end_space)
 
 
-def _mof_escaped(strvalue):
+def mof_escaped(strvalue):
     # Note: This is a raw docstring because it shows many backslashes, and
     # that avoids having to double them.
     r"""
@@ -319,7 +319,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
     reference or datetime typed value).
 
     The function performs the backslash-escaping of characters in the string
-    (for details, see function _mof_escaped()), handles the splitting into
+    (for details, see function mof_escaped()), handles the splitting into
     multiple string parts if the current line does not have sufficient space
     left, and surrounds the string parts (or the entire string, if it ends up
     having only one part) with the specified quote characters.
@@ -372,7 +372,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
 
     assert isinstance(value, six.text_type)
 
-    value = _mof_escaped(value)
+    value = mof_escaped(value)
 
     quote_len = 2  # length of the quotes surrounding a string part
     new_line = u'\n' + _indent_str(indent)

@@ -715,15 +715,17 @@ def compare_instances(inst1, inst2):
 
 def parse_kv_pair(pair):
     """
-    Parse a single key/value pair separated by = and return the key
-    and value components. Assumes that the key component does not
-    include = which is valid for CIM names.
+    Parse a single key/value pair string in 'KEY=VALUE' syntax, and return a
+    tuple (key, value).
 
-    If the value component is empty, returns value None
+    The parsing assumes that KEY does not include '=', which is always the case
+    for CIM names. VALUE may contain '=' characters, which are retained.
+
+    If 'VALUE' or '=VALUE' are missing, value is returned as None.
     """
     name, value = pair.partition("=")[::2]
 
-    # if value has nothing in it, return None.
+    # if VALUE is missing, return it as None.
     if not value:
         value = None
 
