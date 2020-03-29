@@ -218,7 +218,6 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify qualifier command enumerate summary returns qual decls table',
      {'args': ['enumerate', '--summary'],
       'general': ['--output-format', 'table']},
@@ -260,7 +259,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify qualifier command -o grid get Abstract table out',
      {'args': ['get', 'abstract'],

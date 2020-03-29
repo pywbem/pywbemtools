@@ -34,8 +34,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
-MOCK_PROMPT0_FILE = "mock_prompt_0.py"
-MOCK_CONFIRMY_FILE = "mock_confirm_y.py"
+MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -43,7 +42,6 @@ TEST_DIR = os.path.dirname(__file__)
 # test was run from the pywbemtools directory
 TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
-CONFIRM_FILE_PATH = os.path.join(TEST_DIR_REL, MOCK_CONFIRMY_FILE)
 
 CONNECTION_HELP_LINES = [
     'Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...',
@@ -73,28 +71,27 @@ CONNECTION_EXPORT_HELP_LINES = [
 CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli connection list [COMMAND-OPTIONS]',
     'List the WBEM connection definitions.',
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SAVE_HELP_LINES = [
     'Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME',
     'Save the current connection to a new WBEM connection definition.',
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME',
     'Select a WBEM connection definition as current or default.',
     '-d, --default  If set, the connection is set to be the default ',
-
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_SHOW_HELP_LINES = [
     'Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME',
     'Show a WBEM connection definition or the current connection.',
     '--show-password  If set, show existing password in results.',
-    CMD_OPTION_HELP_HELP_LINE
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 CONNECTION_TEST_HELP_LINES = [
@@ -106,6 +103,11 @@ CONNECTION_TEST_HELP_LINES = [
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
+
+# Note: Some test cases are sequences, where each test case depends on the
+# previous test case and what was in the repository when each test is executed.
+# The sequences always start and end with an empty repository, and are marked
+# with "Begin of sequence" and "End of sequence".
 
 
 TEST_CASES = [
@@ -242,9 +244,11 @@ TEST_CASES = [
      None, OK],
 
     #
-    # The following tests are a sequence. Each depends on the previous
-    # and what was in the repository when each test is executed.
+    #  Sequence for simple connection save, show, list, select, delete
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Verify connection command save creates file.',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'test1']},
@@ -288,7 +292,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show  test2 with --show-password',
+    ['Verify connection command show test2 with --show-password',
      ['show', 'test2', '--show-password'],
      {'stdout': ['name: test2',
                  'server: http://blahblah',
@@ -303,7 +307,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show  test2, masked password',
+    ['Verify connection command show test2, masked password',
      ['show', 'test2'],
      {'stdout': ['name: test2',
                  'server: http://blahblah',
@@ -354,16 +358,15 @@ TEST_CASES = [
      None, OK],
 
     ['Verify connection command list with 2 servers defined, not sel after '
-     ' next pywbemcli call',
+     'next pywbemcli call',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections:',
                  '(#: default, *: current)',
-                 'name    server namespace user timeout verify log',
-                 'test1   http://blah      root/cimv2        30  True',
-                 '*#test2   http://blahblah  root/cimv2   fred 18  False'
-                 'api=file,all'],
-      'test': 'insnows'},
+                 'name    server          namespace  user timeout verify',
+                 'test1   http://blah     root/cimv2           30   True',
+                 '*#test2 http://blahblah root/cimv2 fred      18  False', ],
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection command delete test1',
@@ -393,13 +396,16 @@ TEST_CASES = [
          "WBEM server connections:", ""],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
-
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    # The following tests are a new sequence and depends on empty repo.
-    # It creates, shows and deletes a single server definition.
+    #  Sequence that creates, shows and deletes a single server definition
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Verify connection command add with all arguments.',
      {'general': ['--server', 'http://blahblah',
                   '--default-namespace', 'root/blahblah',
@@ -496,10 +502,15 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    #  Test command line parameter errors, select, show, and delete with
-    #  no repository
+    #  Sequence that tests command line parameter errors, select, show, and
+    #  delete with no repository
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Verify connection command show with name not in empty repo',
      ['show', 'Blah'],
      {'stderr': ['Name "Blah" not current and no connections file'],
@@ -539,7 +550,6 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-
     ['Verify connection command delete, empty repo fails',
      ['delete', 'blah'],
      {'stderr': ["Connection repository", "empty"],
@@ -548,11 +558,13 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    #  The following is a sequence that starts with an empty repo
-    #  Verify create and save mock connection sequence. Starts with empty
-    #  server adds a mock server, shows it, tests if valid, and deletes
-    #  the connection
+    # End of sequence - repository is empty.
+
     #
+    #  Sequence that verifies create and save mock connection
+    #
+
+    # Begin of sequence - repository is empty.
 
     ['Verify mock connection exists.',
      {'general': ['--mock-server', MOCK_FILE_PATH],
@@ -581,7 +593,7 @@ TEST_CASES = [
      {'args': ['test'],
       'general': ['--name', 'mocktest']},
      {'stdout': "Connection successful",
-      'test': 'linnows',
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
@@ -590,22 +602,21 @@ TEST_CASES = [
      {'stdout': "",
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_PROMPT0_FILE, OK],
-
+     MOCK_PROMPT_0_FILE, OK],
 
     ['Verify connection command show with prompt',
      ['show', '?'],
      {'stdout': ['name: mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_PROMPT0_FILE, OK],
+     MOCK_PROMPT_0_FILE, OK],
 
-    ['Verify connection command delete last one that  deletes w/o prompt',
+    ['Verify connection command delete last one that deletes w/o prompt',
      ['delete', ],
-     {'stdout': ['Deleted  connection "mocktest'],
+     {'stdout': ['Deleted connection "mocktest"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
-     MOCK_PROMPT0_FILE, OK],
+     MOCK_PROMPT_0_FILE, OK],
 
     ['Verify Add mock server to empty connections file.',
      {'general': ['--mock-server', MOCK_FILE_PATH],
@@ -615,20 +626,22 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command delete'
-     'verify',
+    ['Verify connection command delete, empty repository',
      ['delete', 'mocktest'],
-     {'stdout': ['name: mocktest', 'Execute delete'],
-      'test': 'onnows',
+     {'stdout': ['Deleted connection "mocktest"'],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
-     MOCK_CONFIRMY_FILE, OK],
+     None, OK],
+
+    # End of sequence - repository is empty.
 
     #
-    #  Verify Create from mock with cmd line params, save, show, delete works
-    #  The following is a sequence of tests that must be run in order
-    #  The following test is artifical in that the first create actually
-    #  uses the mock but not to really create a server
+    #  Sequence that verifies create from mock with cmd line params, save,
+    #  show, delete works
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Verify save server with cmd line params to empty connections file.',
      {'args': ['save', 'svrtest2'],
       'general': ['--server', 'http://blah',
@@ -643,7 +656,7 @@ TEST_CASES = [
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
-     MOCK_CONFIRMY_FILE, OK],
+     None, OK],
 
     ['Verify save mock server with cmd line params to empty connections file.',
      {'args': ['save', 'mocktest2'],
@@ -707,9 +720,13 @@ TEST_CASES = [
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    #  Test select variations
+    #  Sequence that tests select variations
     #
+
+    # Begin of sequence - repository is empty.
 
     ['Verify connection show with just current server defined by --server',
      {'args': ['show'],
@@ -728,9 +745,13 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
     #  Sequence to test
     #
+
+    # Begin of sequence - repository is empty.
 
     ['Verify Create new connection names svrtest works.',
      {'general': ['--server', 'http://blah'],
@@ -788,11 +809,16 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    #   Test creating a server and saving it from stdin all in single
-    #   interactive sequence
+    #  Sequence that tests creating a server and saving it from stdin all in
+    #  single interactive sequence
     #
-    ['Verify Create new connection in interactive mode and delete.',
+
+    # Begin of sequence - repository is empty.
+
+    ['Verify Create new connection in interactive mode and delete - single',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
                 '--certfile cert1.pem --keyfile keys1.pem',
@@ -814,10 +840,15 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    # The following is a sequence to assure that the interactive creation
-    # of a server actually puts the server in the repository
+    #  Sequence to assure that the interactive creation of a server actually
+    #  puts the server in the repository
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Verify Create new connection in interactive mode and delete.',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
@@ -846,9 +877,14 @@ WBEM server connections: (#: default, *: current)
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
+    # End of sequence - repository is empty.
+
     #
-    #   The following is a sequence. Confirm fix to issue #396
+    #  Sequence to confirm fix to issue #396
     #
+
+    # Begin of sequence - repository is empty.
+
     ['Create mock server defintion.',
      {'args': ['save', 'mocktest3'],
       'general': ['--mock-server', MOCK_FILE_PATH]},
@@ -880,6 +916,8 @@ WBEM server connections: (#: default, *: current)
       'test': 'innows',
       'file': {'before': 'None', 'after': 'None'}},
      None, OK],
+
+    # End of sequence - repository is empty.
 
 ]
 

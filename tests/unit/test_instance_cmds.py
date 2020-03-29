@@ -96,8 +96,8 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_COUNT_HELP_LINES = [
@@ -105,10 +105,10 @@ INSTANCE_COUNT_HELP_LINES = [
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
-    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
+    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_CREATE_HELP_LINES = [
@@ -124,8 +124,8 @@ INSTANCE_DELETE_HELP_LINES = [
     'Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
     'Delete an instance of a class.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_ENUMERATE_HELP_LINES = [
@@ -152,8 +152,8 @@ INSTANCE_GET_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_INVOKEMETHOD_HELP_LINES = [
@@ -162,8 +162,8 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
     'Invoke a method on an instance.',
     '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_MODIFY_HELP_LINES = [
@@ -173,18 +173,17 @@ INSTANCE_MODIFY_HELP_LINES = [
     '--pl, --propertylist PROPERTYLIST Reduce the properties to be modified',
     CMD_OPTION_VERIFY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_QUERY_HELP_LINES = [
-    'Usage: pywbemcli instance query [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY-STRING',
     'Execute a query on instances in a namespace.',
-    '-l, --query-language QUERY-LANGUAGE The query language to be used',
+    '-ql, --query-language QUERY-LANGUAGE The query language to be used',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
-    CMD_OPTION_KEYS_HELP_LINE,
 ]
 
 INSTANCE_REFERENCES_HELP_LINES = [
@@ -200,8 +199,8 @@ INSTANCE_REFERENCES_HELP_LINES = [
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
-    CMD_OPTION_HELP_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
+    CMD_OPTION_HELP_HELP_LINE,
 ]
 
 INSTANCE_SHRUB_HELP_LINES = [
@@ -486,15 +485,14 @@ TEST_CASES = [
     ['Verify instance command --help response',
      '--help',
      {'stdout': INSTANCE_HELP_LINES,
-      'test': 'insnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance command -h response',
      '-h',
      {'stdout': INSTANCE_HELP_LINES,
-      'test': 'insnows'},
+      'test': 'innows'},
      None, OK],
-
 
     ['Verify instance command --help command order',
      ['--help'],
@@ -728,7 +726,6 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify instance command -o txt enumerate CIM_Foo',
      {'args': ['enumerate', 'CIM_Foo'],
       'general': ['--output-format', 'txt']},
@@ -813,7 +810,6 @@ TEST_CASES = [
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify command enumerate with CIM_Foo inst name table output',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
@@ -989,7 +985,6 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify instance command get with instancename, --key, namespace returns '
      'data',
      ['get', 'CIM_Foo', '--namespace', 'root/cimv2', '--key',
@@ -1002,7 +997,6 @@ Instances: PyWBEM_AllTypes
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify instance command get with instancename with ":", --key, namespace '
      'returns data',
@@ -1230,10 +1224,11 @@ Instances: PyWBEM_AllTypes
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
-                 'root/cimv2:CIM_Foo.InstanceID="blah"',
-                 'Execute CreateInstance'],
+                 '};',
+                 'Execute CreateInstance',
+                 'root/cimv2:CIM_Foo.InstanceID="blah"'],
       'rc': 0,
-      'test': 'in '},
+      'test': 'in'},
      [SIMPLE_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
 
     ['Verify instance command create, new instance of CIM_Foo one '
@@ -1241,11 +1236,11 @@ Instances: PyWBEM_AllTypes
      ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
-                 'root/cimv2:CIM_Foo.InstanceID="blah"',
-                 'Execute CreateInstance'
+                 '};',
+                 'Execute CreateInstance',
                  'Request aborted'],
       'rc': 0,
-      'test': 'in '},
+      'test': 'in'},
      [SIMPLE_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
 
     ['Verify instance command create, new instance of CIM_Foo, '
@@ -1273,7 +1268,6 @@ Instances: PyWBEM_AllTypes
       'rc': 0,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
-
 
     # TODO: For some reason the required quote marks on the instance IDs in
     # INSTANCENAME do not make it through stdin. What click presents is the
@@ -1366,7 +1360,6 @@ Instances: PyWBEM_AllTypes
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify instance command create, new instance invalid class',
      ['create', 'CIM_blah', '-p', 'InstanceID=test_instance'],
      {'stderr': ["CIMClass"],
@@ -1435,12 +1428,12 @@ Instances: PyWBEM_AllTypes
       '-p', 'scalBool=False', '--verify'],
      {'stdout': ['instance of PyWBEM_AllTypes {',
                  'scalBool = false;',
+                 '};',
                  'Execute ModifyInstance',
                  'Request aborted'],
       'rc': 0,
       'test': 'regex'},
      [ALLTYPES_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
-
 
     ['Verify instance command modify, single good change, explicit --n',
      ['modify', 'PyWBEM_AllTypes.InstanceID="test_instance"', '-n',
@@ -1685,21 +1678,21 @@ Instances: PyWBEM_AllTypes
      ['references', 'TST_Person.name="Mike"'],
      {'stdout': REF_INSTS,
       'rc': 0,
-      'test': 'lineswons'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references with --key, returns instances',
      ['references', 'TST_Person', '--key', 'name=Mike'],
      {'stdout': REF_INSTS,
       'rc': 0,
-      'test': 'lineswons'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references, returns instances, explicit ns',
      ['references', 'TST_Person.name="Mike"', '-n', 'root/cimv2'],
      {'stdout': REF_INSTS,
       'rc': 0,
-      'test': 'lineswons'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references --no, returns paths',
@@ -1778,7 +1771,6 @@ Instances: PyWBEM_AllTypes
       'test': 'lines'},
      ASSOC_MOCK_FILE, OK],
 
-
     ['Verify instance command references --no, returns paths with result '
      'class short form valid returns paths',
      {'args': ['references', 'TST_Person.name="Mike"', '--no', '--summary',
@@ -1823,9 +1815,10 @@ Instances: PyWBEM_AllTypes
      'class not a real ref returns no paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineagex'],
-     {'stderr': [''],
+     {'stderr': ["CIMError: 4 (CIM_ERR_INVALID_PARAMETER):",
+                 "Class 'TST_Lineagex'"],
       'rc': 1,
-      'test': 'linnows'},
+      'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references, no instance name',
@@ -2014,23 +2007,8 @@ Instances: PyWBEM_AllTypes
      None, OK],
 
     # The following use interop ns to avoid warning about namespaces.
-    ['Verify instance command count CIM_* simple model, Rtn tbl of instances',
-     {'args': ['count', 'CIM_*'],
-      'general': ['--output-format', 'table',
-                  '--default-namespace', 'interop']},
-     {'stdout': ['Count of instances per class',
-                 '+-------------+-----------------+---------+',
-                 '| Namespace   | Class           |   count |',
-                 '|-------------+-----------------+---------|',
-                 '| interop     | CIM_Foo         |       5 |',
-                 '| interop     | CIM_Foo_sub     |       4 |',
-                 '| interop     | CIM_Foo_sub_sub |       3 |',
-                 '+-------------+-----------------+---------+'],
-      'rc': 0,
-      'test': 'innows'},
-     SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count CIM_*  sorted, Rtn table of inst counts',
+    ['Verify instance command count CIM_* sorted, simple model, format table',
      {'args': ['count', 'CIM_*', '--sort'],
       'general': ['--output-format', 'table',
                   '--default-namespace', 'interop']},
@@ -2044,10 +2022,10 @@ Instances: PyWBEM_AllTypes
 +-------------+-----------------+---------+
 """,
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count CIM_*. Rtn table of inst counts',
+    ['Verify instance command count CIM_*, simple model, format table',
      {'args': ['count', 'CIM_*'],
       'general': ['--output-format', 'table',
                   '--default-namespace', 'interop']},
@@ -2061,47 +2039,36 @@ Instances: PyWBEM_AllTypes
 +-------------+-----------------+---------+
 """,
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count mock assoc. Return table of instances',
+    ['Verify instance command count *, assoc model, format plain',
      {'args': ['count', '*'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
-     {'stdout': [
-         'Count of instances per class',
-         'Namespace    Class                           count',
-         'interop      TST_FamilyCollection                2',
-         'interop      TST_Lineage                         3',
-         'interop      TST_MemberOfFamilyCollection        3',
-         'interop      TST_Person                          4',
-         'interop      TST_Personsub                       4', ],
+     {'stdout': """Count of instances per class
+Namespace    Class                           count
+interop      TST_FamilyCollection                2
+interop      TST_Lineage                         3
+interop      TST_MemberOfFamilyCollection        3
+interop      TST_Person                          4
+interop      TST_Personsub                       4
+""",
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command count *Person* . Return table of instances',
+    ['Verify instance command count *Person*, assoc model, default format',
      {'args': ['count', '*Person*'],
       'general': ['--default-namespace', 'interop']},
      {'stdout': """Count of instances per class
 Namespace    Class            count
+-----------  -------------  -------
 interop      TST_Person           4
 interop      TST_Personsub        4
 """,
       'rc': 0,
-      'test': 'linenows'},
-     ASSOC_MOCK_FILE, OK],
-
-    ['Verify instance command count *Person* . Return table of instances',
-     {'args': ['count', '*Person*'],
-      'general': ['--default-namespace', 'interop']},
-     {'stdout': """Count of instances per class
-Namespace    Class            count
-interop      TST_Person           4
-interop      TST_Personsub        4
-""",
-      'rc': 0,
-      'test': 'linennows'},
+      'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command count *Person* with --association',
@@ -2114,7 +2081,7 @@ interop      TST_Lineage          3
 interop      TST_MemberOfFamilyCollection  3
 """,
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify instance command count *Person* with --experimental',
@@ -2126,7 +2093,7 @@ Namespace    Class            count
 interop      TST_Personsub        4
 """,
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify instance command count *Person* with --indication',
@@ -2139,7 +2106,7 @@ interop      TST_Lineage          3
 interop      TST_MemberOfFamilyCollection  3
 """,
       'rc': 0,
-      'test': 'innows'},
+      'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     #
@@ -2183,7 +2150,6 @@ interop      TST_MemberOfFamilyCollection  3
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-
     ['Verify instance command invokemethod with all_types method',
      ['invokemethod', 'Pywbem_alltypes.InstanceID="test_instance"',
       'AllTypesMethod',
@@ -2226,7 +2192,6 @@ interop      TST_MemberOfFamilyCollection  3
     # in classnametests
     # TODO: Create new method that has all param types and options
 
-
     #
     #  instance query command. We have not implemented this command
     #
@@ -2234,14 +2199,14 @@ interop      TST_MemberOfFamilyCollection  3
      ['query', '--help'],
      {'stdout': INSTANCE_QUERY_HELP_LINES,
       'rc': 0,
-      'test': 'linnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance command query -h response',
      ['query', '-h'],
      {'stdout': INSTANCE_QUERY_HELP_LINES,
       'rc': 0,
-      'test': 'linnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify instance command query execution. Returns error becasue '
@@ -2343,7 +2308,6 @@ interop      TST_MemberOfFamilyCollection  3
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, RUN],
-
 
     ['Verify instance command shrub, simple tree with --assoc-class option2',
      ['shrub', 'TST_Person.name="Mike"', '--result-class', 'tst_person'],

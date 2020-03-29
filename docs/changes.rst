@@ -83,6 +83,9 @@ Released: not yet
   by increasing the minimum version of the coverage package to 4.5.2.
   (See issue #547)
 
+* Test: Fixed bug with detection of invalid test validation values, and fixed
+  testcases in turn (See issue #553).
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.

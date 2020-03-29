@@ -347,7 +347,6 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-
     ['Verify class command -h response',
      ['-h'],
      {'stdout': CLASS_HELP_LINES,
@@ -475,7 +474,6 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command enumerate CIM_Foo --names-only',
      ['enumerate', 'CIM_Foo', '--names-only'],
      {'stdout': ['CIM_Foo', 'CIM_Foo_sub', 'CIM_Foo_sub2'],
@@ -491,7 +489,7 @@ TEST_CASES = [
     ['Verify class command enumerate CIM_Foo summary, table',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': ['2 CIMClass(s) returned'],
-      'test': 'insnows'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate CIM_Foo summary table output',
@@ -846,7 +844,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command get with repr output format).',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--output-format', 'txt']},
@@ -910,7 +907,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command enumerate table output fails).',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--output-format', 'table']},
@@ -958,7 +954,6 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command find simple name in all namespaces wo case',
      ['find', '*sub_su?*'],
      {'stdout': ["  root/cimv2:CIM_Foo_sub_sub"],
@@ -973,7 +968,6 @@ TEST_CASES = [
                  "  root/cimv2:CIM_Foo_sub_sub"],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify class command find name in known namespace -o grid',
      {'general': ['-o', 'grid'],
@@ -1157,7 +1151,6 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-
     ['Verify class command tree bottom up. --superclasses',
      ['tree', '--superclasses', 'CIM_Foo_sub_sub'],
      {'stdout': """root
@@ -1215,7 +1208,6 @@ TEST_CASES = [
                  ''],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
-
 
     ['Verify class command associators simple request names only,',
      ['associators', 'TST_Person', '--names-only'],
@@ -1354,7 +1346,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-
     #
     # references command tests
     #
@@ -1390,7 +1381,6 @@ TEST_CASES = [
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
-
 
     ['Verify class command references request, filters short',
      ['references', 'TST_Person',

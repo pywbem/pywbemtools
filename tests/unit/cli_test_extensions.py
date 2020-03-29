@@ -368,7 +368,9 @@ class CLITestsBase(object):
                             "------------\n". \
                             format(rtn_type, desc, test_str, rtn_value)
                 else:
-                    assert 'Test {} is invalid. Skipped'.format(test_definition)
+                    raise AssertionError(
+                        "Test validation {!r} is invalid in test:\n"
+                        "{}\n".format(test_definition, desc))
 
 
 def remove_ws(inputs, join=False):
