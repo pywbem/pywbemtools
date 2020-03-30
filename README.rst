@@ -81,8 +81,7 @@ Requirements:
 2. Operating Systems: Linux, OS-X, native Windows, UNIX-like environments on
    Windows (e.g. Cygwin)
 
-3. When using a pywbem version before 1.0.0 on Python 2, the following
-   OS-level packages are needed:
+3. On Python 2, the following OS-level packages are needed:
 
    * On native Windows:
 
@@ -99,8 +98,7 @@ Requirements:
 
 Installation:
 
-* When using a pywbem version before 1.0.0 on Python 2, install OS-level
-  packages needed by the pywbem package:
+* On Python 2, install OS-level packages needed by the pywbem package:
 
   - On native Windows:
 
@@ -124,19 +122,19 @@ Installation:
 
   .. code-block:: bash
 
-      > pip install pywbemtools
+      $ pip install pywbemtools
 
 For more details, including how to install the needed OS-level packages
-manually, see `pywbemtools installation`_.
+manually, see `Installation`_.
 
 
 Documentation and change history
 --------------------------------
 
-For the latest version released on Pypi:
+For the latest version of pywbemtools released on Pypi:
 
-* `Pywbemtools documentation`_
-* `Pywbemtools change history`_
+* `Documentation`_
+* `Change history`_
 
 
 Quickstart
@@ -150,7 +148,7 @@ All commands within pywbemcli show help with the ``-help`` or ``-h`` options:
     . . .
     $ pywbemcli connection --help
     . . .
-    $ pywbemcli connection add --help
+    $ pywbemcli connection save --help
     . . .
 
 The following examples build on each other and show a typical sequence of
@@ -163,37 +161,45 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli connection add -s https://localhost -N -u user -p password -n conn1
+      $ pywbemcli -s https://localhost --no-verify -u user -p password connection save conn1
+
+* pywbemcli also supports mocked WBEM servers in memory, that are preloaded
+  with CIM objects defined in MOF files. Add a persistent connection definition
+  named ``assoc1`` to a mock server using one of the MOF files provided in
+  the repo:
+
+  .. code-block:: text
+
+      $ pywbemcli -m tests/unit/simple_assoc_mock_model.mof connection save assoc1
 
 * List the persistent connection definitions:
 
   .. code-block:: text
 
       $ pywbemcli connection list
-      WBEM server connections:
-      +--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------+
-      | name   | server            | namespace   | user   |   timeout | no-verify   | mock-server                            |
-      |--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------|
-      | conn1  | https://localhost | root/cimv2  | user   |        30 | True        |                                        |
-      +--------+-------------------+-------------+--------+-----------+-------------+----------------------------------------+
+      WBEM server connections: (#: default, *: current)
+      name    server             namespace    user      timeout  verify    mock-server
+      ------  -----------------  -----------  ------  ---------  --------  --------------------------------------
+      assoc1                     root/cimv2                  30  True      tests/unit/simple_assoc_mock_model.mof
+      conn1   https://localhost  root/cimv2   user           30  False
 
-* Show the class tree, using the previously added connection definition ``conn1``:
+* Show the class tree, using the previously added connection definition ``assoc1``:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 class tree
+      $ pywbemcli -n assoc1 class tree
       root
-       +-- TST_Lineage
-       +-- TST_Person
-       |   +-- TST_Personsub
        +-- TST_FamilyCollection
+       +-- TST_Lineage
        +-- TST_MemberOfFamilyCollection
+       +-- TST_Person
+           +-- TST_Personsub
 
 * Retrieve a single class from that class tree:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 class get TST_Person
+      $ pywbemcli -n assoc1 class get TST_Person
       class TST_Person {
 
             [Key ( true ),
@@ -209,7 +215,7 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 instance enumerate TST_Person --no
+      $ pywbemcli -n assoc1 instance enumerate TST_Person --no
       root/cimv2:TST_Person.name="Gabi"
       root/cimv2:TST_Person.name="Mike"
       root/cimv2:TST_Person.name="Saara"
@@ -223,7 +229,7 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 instance get 'root/cimv2:TST_Person.name="Sofi"'
+      $ pywbemcli -n assoc1 instance get 'root/cimv2:TST_Person.name="Sofi"'
       instance of TST_Person {
          name = "Sofi";
       };
@@ -233,17 +239,17 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 instance get TST_Person.?
+      $ pywbemcli -n assoc1 instance get TST_Person.?
       Pick Instance name to process
-      0: root/cimv2:TST_Person.name="Mike"
-      1: root/cimv2:TST_Person.name="Saara"
+      0: root/cimv2:TST_Person.name="Saara"
+      1: root/cimv2:TST_Person.name="Mike"
       2: root/cimv2:TST_Person.name="Sofi"
       3: root/cimv2:TST_Person.name="Gabi"
-      4: root/cimv2:TST_PersonSub.name="Mikesub"
-      5: root/cimv2:TST_PersonSub.name="Saarasub"
-      6: root/cimv2:TST_PersonSub.name="Sofisub"
-      7: root/cimv2:TST_PersonSub.name="Gabisub"
-      Input integer between 0 and 7 or Ctrl-C to exit selection: : 3
+      4: root/cimv2:TST_PersonSub.name="Gabisub"
+      5: root/cimv2:TST_PersonSub.name="Sofisub"
+      6: root/cimv2:TST_PersonSub.name="Mikesub"
+      7: root/cimv2:TST_PersonSub.name="Saarasub"
+      Input integer between 0 and 7 or Ctrl-C to exit selection: 3
       instance of TST_Person {
          name = "Gabi";
       };
@@ -254,7 +260,7 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 -o table instance enumerate TST_Person
+      $ pywbemcli -n assoc1 -o table instance enumerate TST_Person
       Instances: TST_Person
       +------------+
       | name       |
@@ -274,17 +280,17 @@ the server:
 
   .. code-block:: text
 
-      $ pywbemcli -n conn1 -o table instance associators TST_Person.?
+      $ pywbemcli -n assoc1 -o table instance associators TST_Person.?
       Pick Instance name to process
-      0: root/cimv2:TST_Person.name="Mike"
-      1: root/cimv2:TST_Person.name="Saara"
+      0: root/cimv2:TST_Person.name="Saara"
+      1: root/cimv2:TST_Person.name="Mike"
       2: root/cimv2:TST_Person.name="Sofi"
       3: root/cimv2:TST_Person.name="Gabi"
-      4: root/cimv2:TST_PersonSub.name="Mikesub"
-      5: root/cimv2:TST_PersonSub.name="Saarasub"
-      6: root/cimv2:TST_PersonSub.name="Sofisub"
-      7: root/cimv2:TST_PersonSub.name="Gabisub"
-      Input integer between 0 and 7 or Ctrl-C to exit selection: : 0
+      4: root/cimv2:TST_PersonSub.name="Gabisub"
+      5: root/cimv2:TST_PersonSub.name="Sofisub"
+      6: root/cimv2:TST_PersonSub.name="Mikesub"
+      7: root/cimv2:TST_PersonSub.name="Saarasub"
+      Input integer between 0 and 7 or Ctrl-C to exit selection: 1
       Instances: TST_FamilyCollection
       +-----------+
       | name      |
@@ -364,8 +370,7 @@ release.
 Contributing
 ------------
 
-For information on how to contribute to this project, see
-`pywbemtools contributions`_.
+For information on how to contribute to this project, see `Contributing`_.
 
 
 License
@@ -374,10 +379,10 @@ License
 The pywbemtools package is licensed under the `Apache 2.0 License`_.
 
 
-.. _pywbemtools documentation: https://pywbemtools.readthedocs.io/en/stable/
-.. _pywbemtools installation: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
-.. _pywbemtools contributions: https://pywbemtools.readthedocs.io/en/stable/development.html#contributing
-.. _pywbemtools change history: https://pywbemtools.readthedocs.io/en/stable/changes.html
+.. _Documentation: https://pywbemtools.readthedocs.io/en/stable/
+.. _Installation: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
+.. _Contributing: https://pywbemtools.readthedocs.io/en/stable/development.html#contributing
+.. _Change history: https://pywbemtools.readthedocs.io/en/stable/changes.html
 .. _pywbemtools issue tracker: https://github.com/pywbem/pywbemtools/issues
 .. _pywbem package on Pypi: https://pypi.org/project/pywbem/
 .. _DMTF: https://www.dmtf.org/
