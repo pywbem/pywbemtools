@@ -52,7 +52,7 @@ Requirements:
 2. Operating Systems: Linux, OS-X, native Windows, UNIX-like environments on
    Windows (e.g. Cygwin)
 
-3. When using Python 2, the following OS-level packages:
+3. On Python 2, the following OS-level packages are needed:
 
    * On native Windows:
 
@@ -69,7 +69,7 @@ Requirements:
 
 Installation:
 
-* When using Python 2, install OS-level packages needed by the pywbem package:
+* On Python 2, install OS-level packages needed by the pywbem package:
 
   - On native Windows:
 
@@ -93,25 +93,25 @@ Installation:
 
   .. code-block:: bash
 
-      > pip install pywbemtools
+      $ pip install pywbemtools
 
 For more details, including how to install the needed OS-level packages
-manually, see `pywbemtools installation`_.
+manually, see `Installation`_.
 
 
 Documentation and change history
 --------------------------------
 
-For the latest version released on Pypi:
+For the latest version of pywbemtools released on Pypi:
 
-* `Pywbemtools documentation`_
-* `Pywbemtools change history`_
+* `Documentation`_
+* `Change history`_
 
 
-.. _pywbemtools documentation: https://pywbemtools.readthedocs.io/en/stable/
-.. _pywbemtools installation: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
-.. _pywbemtools contributions: https://pywbemtools.readthedocs.io/en/stable/development.html#contributing
-.. _pywbemtools change history: https://pywbemtools.readthedocs.io/en/stable/changes.html
+.. _Documentation: https://pywbemtools.readthedocs.io/en/stable/
+.. _Installation: https://pywbemtools.readthedocs.io/en/stable/introduction.html#installation
+.. _Contributing: https://pywbemtools.readthedocs.io/en/stable/development.html#contributing
+.. _Change history: https://pywbemtools.readthedocs.io/en/stable/changes.html
 .. _pywbemtools issue tracker: https://github.com/pywbem/pywbemtools/issues
 .. _pywbem package on Pypi: https://pypi.org/project/pywbem/
 .. _DMTF: https://www.dmtf.org/
