@@ -86,6 +86,8 @@ Released: not yet
 * Test: Fixed bug with detection of invalid test validation values, and fixed
   testcases in turn (See issue #553).
 
+* Fixed issues in README and README_PYPI file (See issue #555)
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
