@@ -70,6 +70,8 @@ Released: not yet
   This causes pywbemcli to be invoked with the new --pdb option for that
   testcase. (See issue #505)
 
+* Added Python 3.8 as a supported version.
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
