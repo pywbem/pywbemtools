@@ -29,9 +29,9 @@ import click
 from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, format_table, raise_pywbem_error_exception, \
-    validate_output_format
-from ._click_extensions import PywbemcliGroup
+from ._common import format_table, raise_pywbem_error_exception, \
+    validate_output_format, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -39,7 +39,8 @@ from ._click_extensions import PywbemcliGroup
 # defined with underscore and not dash
 
 
-@cli.group('server', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
+@cli.group('server', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
 def server_group():
     """
     Command group for WBEM servers.
@@ -55,7 +56,8 @@ def server_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@server_group.command('namespaces', options_metavar=CMD_OPTS_TXT)
+@server_group.command('namespaces', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_namespaces(context, **options):
     """
@@ -65,7 +67,8 @@ def server_namespaces(context, **options):
     context.execute_cmd(lambda: cmd_server_namespaces(context, options))
 
 
-@server_group.command('interop', options_metavar=CMD_OPTS_TXT)
+@server_group.command('interop', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_interop(context):
     """
@@ -75,7 +78,8 @@ def server_interop(context):
     context.execute_cmd(lambda: cmd_server_interop(context))
 
 
-@server_group.command('brand', options_metavar=CMD_OPTS_TXT)
+@server_group.command('brand', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_brand(context):
     """
@@ -89,7 +93,8 @@ def server_brand(context):
     context.execute_cmd(lambda: cmd_server_brand(context))
 
 
-@server_group.command('info', options_metavar=CMD_OPTS_TXT)
+@server_group.command('info', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def server_info(context):
     """
@@ -100,7 +105,8 @@ def server_info(context):
     context.execute_cmd(lambda: cmd_server_info(context))
 
 
-@server_group.command('profiles', options_metavar=CMD_OPTS_TXT)
+@server_group.command('profiles', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
               help='Filter by the defined organization. (ex. -o DMTF')
@@ -127,7 +133,8 @@ def server_profiles(context, **options):
     context.execute_cmd(lambda: cmd_server_profiles(context, options))
 
 
-@server_group.command('centralinsts', options_metavar=CMD_OPTS_TXT)
+@server_group.command('centralinsts', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
               help='Filter by the defined organization. (ex. -o DMTF')

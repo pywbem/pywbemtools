@@ -169,6 +169,12 @@ Released: not yet
 
 * Docs: Increased the width of the help text to 120 (See issue #548).
 
+* Modified the help usage to better reflect the required and optional
+  components of the command line. This includes showing the location
+  in the cmd line for general options where before it was called
+  [COMMAND-OPTIONS] and showing the positioning of both arguments and
+  command arguments. (See issue #446)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

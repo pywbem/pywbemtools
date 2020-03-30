@@ -61,8 +61,8 @@ and ``--namespace`` is a command option.
    single: auto-completion
    single: auto-suggestion
 
-Pywbemcli supports several modes of tab-completion, auto-completion suggestions 
-and depending on whether it is in command or interactive mode. This is detailed 
+Pywbemcli supports several modes of tab-completion, auto-completion suggestions
+and depending on whether it is in command or interactive mode. This is detailed
 in the following sections.
 
 
@@ -175,7 +175,7 @@ user):
 
 .. code-block:: text
 
-    pywbemcli> [GENERAL-OPTIONS] [COMMAND-GROUP] COMMAND [COMMAND-OPTIONS] [ARGS]
+    pywbemcli> [GENERAL-OPTIONS] [COMMAND-GROUP] COMMAND [ARGS] [CMD-OPTIONS]
 
     pywbemcli> :INTERNAL-COMMAND
 
@@ -232,7 +232,7 @@ list of the supported command groups and commands without command group.
 
     $ pywbemcli
     pywbemcli> --help
-    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
     . . .
 
     Options:
@@ -254,7 +254,7 @@ example:
 .. code-block:: text
 
     pywbemcli> class --help
-    Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [CMD-OPTIONS]
     . . .
 
     Options:

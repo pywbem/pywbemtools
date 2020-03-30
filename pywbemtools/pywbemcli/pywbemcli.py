@@ -35,7 +35,7 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
     DEFAULT_LOG_DETAIL_LEVEL
 
 from ._context_obj import ContextObj, display_click_context
-from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
+from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TABLE_FORMATS, \
     CIM_OBJECT_OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
@@ -75,7 +75,8 @@ CONTEXT_SETTINGS = dict(
 # PywbemcliTopGroup sets order commands listed in help output
 @click.group(invoke_without_command=True, cls=PywbemcliTopGroup,
              context_settings=CONTEXT_SETTINGS,
-             options_metavar=GENERAL_OPTIONS_METAVAR)
+             options_metavar=GENERAL_OPTS_TXT,
+             subcommand_metavar=SUBCMD_HELP_TXT)
 @click.option('-n', '--name', 'svr_name', type=str, metavar='NAME',
               # defaulted in code
               envvar=PywbemServer.name_envvar,
@@ -616,7 +617,7 @@ The following can be entered in interactive mode:
 """)
 
 
-@cli.command('repl')
+@cli.command('repl', options_metavar=GENERAL_OPTS_TXT)
 @click.pass_context
 def repl(ctx):
     """

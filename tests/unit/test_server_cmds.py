@@ -42,7 +42,7 @@ MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 # 3. The last line CMD_OPTION_HELP_HELP_LINE
 # 4. Each option including at least the long and short names
 SERVER_HELP_LINES = [
-    'Usage: pywbemcli server [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server COMMAND [ARGS] [CMD-OPTIONS]',
     'Command group for WBEM servers.',
     CMD_OPTION_HELP_HELP_LINE,
     'brand             Get the brand of the server.',
@@ -54,14 +54,14 @@ SERVER_HELP_LINES = [
 ]
 
 SERVER_BRAND_HELP_LINES = [
-    'Usage: pywbemcli server brand [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server brand',
     'Get the brand of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 
 SERVER_CENTRAL_INSTS_HELP_LINES = [
-    'Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server centralinsts  [CMD-OPTIONS]',
     'List central instances of mgmt profiles on the server.',
     '-o, --organization ORG-NAME Filter by the defined organization',
     '-p, --profile PROFILE-NAME Filter by the profile name',
@@ -73,25 +73,25 @@ SERVER_CENTRAL_INSTS_HELP_LINES = [
 ]
 
 SERVER_INFO_HELP_LINES = [
-    'Usage: pywbemcli server info [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server info [CMD-OPTIONS]',
     'Get information about the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_INTEROP_HELP_LINES = [
-    'Usage: pywbemcli server interop [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server interop [CMD-OPTIONS]',
     'Get the Interop namespace of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_NAMESPACES_HELP_LINES = [
-    'Usage: pywbemcli server namespaces [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [CMD-OPTIONS]',
     'List the namespaces of the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_PROFILES_HELP_LINES = [
-    'Usage: pywbemcli server profiles [COMMAND-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] server profiles [CMD-OPTIONS]',
     'List management profiles advertized by the server.',
     CMD_OPTION_HELP_HELP_LINE,
 ]

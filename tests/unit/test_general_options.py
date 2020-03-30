@@ -38,7 +38,7 @@ BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
 BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
 MOCK_PW_PROMPT_PATH = os.path.join(SCRIPT_DIR, 'mock_password_prompt.py')
 
-GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
+GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
 
   Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol to communicate with WBEM servers.
   Pywbemcli can:
@@ -155,7 +155,7 @@ Commands:
   repl        Enter interactive mode (default).
 """  # noqa:E501 pylint: disable=line-too-long
 
-REPL_HELP = """Usage: pywbemcli repl [OPTIONS]
+REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
   Enter interactive mode (default).
 
@@ -210,7 +210,7 @@ TEST_CASES = [
       'args': ['get', 'blah']},
      {'stdout': GENERAL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify -h response.',
@@ -219,7 +219,7 @@ TEST_CASES = [
       'args': ['get', 'blah']},
      {'stdout': GENERAL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify repl -help response.',
@@ -228,7 +228,7 @@ TEST_CASES = [
       'args': ['-h']},
      {'stdout': REPL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify help response (interactive help)).',
@@ -237,7 +237,7 @@ TEST_CASES = [
       'args': []},
      {'stdout': INTERACTIVE_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify invalid server definition.',

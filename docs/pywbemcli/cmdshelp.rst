@@ -14,7 +14,7 @@ Help text for ``pywbemcli``:
 
 ::
 
-    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
 
       Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol to communicate with WBEM servers.
       Pywbemcli can:
@@ -143,11 +143,11 @@ Help text for ``pywbemcli class`` (see :ref:`class command group`):
 
 ::
 
-    Usage: pywbemcli class [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [CMD-OPTIONS]
 
       Command group for CIM classes.
 
-      This command group defines commands to inspect classes, to invoke methods on classes, and to delete classes.
+      This command group defines commands to inspect classes, invoke methods on classes, delete classes.
 
       Creation and modification of classes is not currently supported.
 
@@ -180,7 +180,7 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
 
 ::
 
-    Usage: pywbemcli class associators [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class associators CLASSNAME [CMD-OPTIONS]
 
       List the classes associated with a class.
 
@@ -241,7 +241,7 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
 
 ::
 
-    Usage: pywbemcli class delete [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class delete CLASSNAME [CMD-OPTIONS]
 
       Delete a class.
 
@@ -283,7 +283,7 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
 
 ::
 
-    Usage: pywbemcli class enumerate [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class enumerate CLASSNAME [CMD-OPTIONS]
 
       List top classes or subclasses of a class in a namespace.
 
@@ -352,7 +352,7 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
 
 ::
 
-    Usage: pywbemcli class find [COMMAND-OPTIONS] CLASSNAME-GLOB
+    Usage: pywbemcli [GENERAL-OPTIONS] class find CLASSNAME-GLOB [CMD-OPTIONS]
 
       List the classes with matching class names on the server.
 
@@ -410,7 +410,7 @@ Help text for ``pywbemcli class get`` (see :ref:`class get command`):
 
 ::
 
-    Usage: pywbemcli class get [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class get CLASSNAME [CMD-OPTIONS]
 
       Get a class.
 
@@ -457,7 +457,7 @@ Help text for ``pywbemcli class invokemethod`` (see :ref:`class invokemethod com
 
 ::
 
-    Usage: pywbemcli class invokemethod [COMMAND-OPTIONS] CLASSNAME METHODNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class invokemethod CLASSNAME METHODNAME [CMD-OPTIONS]
 
       Invoke a method on a class.
 
@@ -497,7 +497,7 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
 
 ::
 
-    Usage: pywbemcli class references [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class references CLASSNAME [CMD-OPTIONS]
 
       List the classes referencing a class.
 
@@ -553,7 +553,7 @@ Help text for ``pywbemcli class tree`` (see :ref:`class tree command`):
 
 ::
 
-    Usage: pywbemcli class tree [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] class tree CLASSNAME [CMD-OPTIONS]
 
       Show the subclass or superclass hierarchy for a class.
 
@@ -597,7 +597,7 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
 
 ::
 
-    Usage: pywbemcli connection [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] connection COMMAND [ARGS] [CMD-OPTIONS]
 
       Command group for WBEM connection definitions.
 
@@ -634,7 +634,7 @@ Help text for ``pywbemcli connection delete`` (see :ref:`connection delete comma
 
 ::
 
-    Usage: pywbemcli connection delete [COMMAND-OPTIONS] NAME
+    Usage: pywbemcli [GENERAL-OPTIONS] connection delete NAME [CMD-OPTIONS]
 
       Delete a WBEM connection definition.
 
@@ -661,7 +661,7 @@ Help text for ``pywbemcli connection export`` (see :ref:`connection export comma
 
 ::
 
-    Usage: pywbemcli connection export [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] connection export [CMD-OPTIONS]
 
       Export the current connection.
 
@@ -689,7 +689,7 @@ Help text for ``pywbemcli connection list`` (see :ref:`connection list command`)
 
 ::
 
-    Usage: pywbemcli connection list [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] connection list [CMD-OPTIONS]
 
       List the WBEM connection definitions.
 
@@ -717,7 +717,7 @@ Help text for ``pywbemcli connection save`` (see :ref:`connection save command`)
 
 ::
 
-    Usage: pywbemcli connection save [COMMAND-OPTIONS] NAME
+    Usage: pywbemcli [GENERAL-OPTIONS] connection save NAME [CMD-OPTIONS]
 
       Save the current connection to a new WBEM connection definition.
 
@@ -747,7 +747,7 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
 
 ::
 
-    Usage: pywbemcli connection select [COMMAND-OPTIONS] NAME
+    Usage: pywbemcli [GENERAL-OPTIONS] connection select NAME [CMD-OPTIONS]
 
       Select a WBEM connection definition as current or default.
 
@@ -795,7 +795,7 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
 
 ::
 
-    Usage: pywbemcli connection show [COMMAND-OPTIONS] NAME
+    Usage: pywbemcli [GENERAL-OPTIONS] connection show NAME [CMD-OPTIONS]
 
       Show a WBEM connection definition or the current connection.
 
@@ -840,7 +840,7 @@ Help text for ``pywbemcli connection test`` (see :ref:`connection test command`)
 
 ::
 
-    Usage: pywbemcli connection test [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] connection test [CMD-OPTIONS]
 
       Test the current connection with a predefined WBEM request.
 
@@ -867,7 +867,7 @@ Help text for ``pywbemcli help`` (see :ref:`help command`):
 
 ::
 
-    Usage: pywbemcli help [OPTIONS]
+    Usage: pywbemcli [OPTIONS] help
 
       Show help message for interactive mode.
 
@@ -887,7 +887,7 @@ Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
 
 ::
 
-    Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] instance COMMAND [ARGS] [CMD-OPTIONS]
 
       Command group for CIM instances.
 
@@ -928,7 +928,7 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
 
 ::
 
-    Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance associators INSTANCENAME [CMD-OPTIONS]
 
       List the instances associated with an instance.
 
@@ -1010,7 +1010,7 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
 
 ::
 
-    Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB
+    Usage: pywbemcli [GENERAL-OPTIONS] instance count CLASSNAME-GLOB [CMD-OPTIONS]
 
       Count the instances of each class with matching class name.
 
@@ -1067,7 +1067,7 @@ Help text for ``pywbemcli instance create`` (see :ref:`instance create command`)
 
 ::
 
-    Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance create CLASSNAME [CMD-OPTIONS]
 
       Create an instance of a class in a namespace.
 
@@ -1110,7 +1110,7 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
 
 ::
 
-    Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance delete INSTANCENAME [CMD-OPTIONS]
 
       Delete an instance of a class.
 
@@ -1146,7 +1146,7 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
 
 ::
 
-    Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance enumerate CLASSNAME [CMD-OPTIONS]
 
       List the instances of a class.
 
@@ -1211,7 +1211,7 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
 
 ::
 
-    Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance get INSTANCENAME [CMD-OPTIONS]
 
       Get an instance of a class.
 
@@ -1267,7 +1267,7 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
 
 ::
 
-    Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME METHODNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance invokemethod INSTANCENAME METHODNAME [CMD-OPTIONS]
 
       Invoke a method on an instance.
 
@@ -1322,7 +1322,7 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
 
 ::
 
-    Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance modify INSTANCENAME [CMD-OPTIONS]
 
       Modify properties of an instance.
 
@@ -1382,7 +1382,7 @@ Help text for ``pywbemcli instance query`` (see :ref:`instance query command`):
 
 ::
 
-    Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY-STRING
+    Usage: pywbemcli [GENERAL-OPTIONS] instance query QUERY-STRING [CMD-OPTIONS]
 
       Execute a query on instances in a namespace.
 
@@ -1411,7 +1411,7 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
 
 ::
 
-    Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance references INSTANCENAME [CMD-OPTIONS]
 
       List the instances referencing an instance.
 
@@ -1487,7 +1487,7 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
 
 ::
 
-    Usage: pywbemcli instance shrub [COMMAND-OPTIONS] INSTANCENAME
+    Usage: pywbemcli [GENERAL-OPTIONS] instance shrub INSTANCENAME [CMD-OPTIONS]
 
       Show the association shrub for INSTANCENAME.
 
@@ -1551,7 +1551,7 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
 
 ::
 
-    Usage: pywbemcli qualifier [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] qualifier COMMAND [ARGS] [CMD-OPTIONS]
 
       Command group for CIM qualifier declarations.
 
@@ -1582,7 +1582,7 @@ Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate c
 
 ::
 
-    Usage: pywbemcli qualifier enumerate [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] qualifier enumerate [CMD-OPTIONS]
 
       List the qualifier declarations in a namespace.
 
@@ -1609,7 +1609,7 @@ Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
 
 ::
 
-    Usage: pywbemcli qualifier get [COMMAND-OPTIONS] QUALIFIERNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] qualifier get QUALIFIERNAME [CMD-OPTIONS]
 
       Get a qualifier declaration.
 
@@ -1635,7 +1635,7 @@ Help text for ``pywbemcli repl`` (see :ref:`repl command`):
 
 ::
 
-    Usage: pywbemcli repl [OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] repl
 
       Enter interactive mode (default).
 
@@ -1662,7 +1662,7 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
 
 ::
 
-    Usage: pywbemcli server [COMMAND-OPTIONS] COMMAND [ARGS]...
+    Usage: pywbemcli [GENERAL-OPTIONS] server COMMAND [ARGS] [CMD-OPTIONS]
 
       Command group for WBEM servers.
 
@@ -1696,7 +1696,7 @@ Help text for ``pywbemcli server brand`` (see :ref:`server brand command`):
 
 ::
 
-    Usage: pywbemcli server brand [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server brand [CMD-OPTIONS]
 
       Get the brand of the server.
 
@@ -1719,7 +1719,7 @@ Help text for ``pywbemcli server centralinsts`` (see :ref:`server centralinsts c
 
 ::
 
-    Usage: pywbemcli server centralinsts [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server centralinsts [CMD-OPTIONS]
 
       List central instances of mgmt profiles on the server.
 
@@ -1763,7 +1763,7 @@ Help text for ``pywbemcli server info`` (see :ref:`server info command`):
 
 ::
 
-    Usage: pywbemcli server info [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server info [CMD-OPTIONS]
 
       Get information about the server.
 
@@ -1785,7 +1785,7 @@ Help text for ``pywbemcli server interop`` (see :ref:`server interop command`):
 
 ::
 
-    Usage: pywbemcli server interop [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server interop [CMD-OPTIONS]
 
       Get the Interop namespace of the server.
 
@@ -1805,7 +1805,7 @@ Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces comma
 
 ::
 
-    Usage: pywbemcli server namespaces [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [CMD-OPTIONS]
 
       List the namespaces of the server.
 
@@ -1825,7 +1825,7 @@ Help text for ``pywbemcli server profiles`` (see :ref:`server profiles command`)
 
 ::
 
-    Usage: pywbemcli server profiles [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] server profiles [CMD-OPTIONS]
 
       List management profiles advertized by the server.
 
