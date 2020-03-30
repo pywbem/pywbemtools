@@ -15,11 +15,15 @@
 pytest>=4.3.1,<5.0.0; python_version < '3.5'
 pytest>=4.3.1; python_version >= '3.5'
 funcsigs>=1.0.2; python_version == '2'
+# Pluggy 0.12.0 has a bug causing pytest plugins to fail loading on py38
+pluggy>=0.13.0
 
-# Note: python-coveralls 2.9.1 has requirement coverage==4.0.3, and therefore
-# must be stated before pytest-cov, whose 2.5.1 specifies requirement
-# coverage>=3.7.1 and thus would get coverage 4.5 1 if processed first.
-python-coveralls>=2.8.0;
+# Coverage reporting (no imports, invoked via coveralls script):
+# coverage 5.0 has removed support for py34
+coverage>=4.5.2,<5.0
+# python-coveralls 2.9.2 no longer has requirement coverage==4.0.3.
+python-coveralls>=2.9.2
+pytest-cov>=2.7.0
 
 # Safety CI by pyup.io
 safety>=1.8.4
@@ -27,15 +31,6 @@ safety>=1.8.4
 #   see https://github.com/pyupio/dparse/issues/46
 dparse>=0.4.1,<0.5.0; python_version == '2.7'
 dparse>=0.4.1; python_version >= '3.4'
-
-# TODO: Remove the pinning of the pytest-cov version again once issue
-#       https://github.com/z4r/python-coveralls/issues/66
-#       is resolved.
-#       Background: pytest-cov 2.6.0 has increased the version
-#       requirement for the coverage package from >=3.7.1 to
-#       >=4.4, which is in conflict with the version requirement
-#       defined by the python-coveralls package for coverage==4.0.3.
-pytest-cov>=2.4.0,<2.6
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx>=1.7.6
@@ -55,14 +50,19 @@ pylint>=1.6.4,<2.0.0; python_version == '2.7'
 pylint>=2.2.2; python_version >= '3.4'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
-flake8>=3.2.1;
+flake8>=3.7.9
+mccabe>=0.6.0
+pycodestyle>=2.5.0
+pyflakes>=2.1.0
+entrypoints>=0.3.0
 
 # Twine (no imports, invoked via twine script):
 twine>=1.8.1
 # readme-renderer 25.0 has removed support for Python 3.4
-readme-renderer>21.0; python_version == '2.7'
-readme-renderer>21.0,<25.0; python_version == '3.4'
-readme-renderer>21.0; python_version >= '3.5'
+# readme-renderer 23.0 has made cmarkgfm part of extras (it fails on Cygwin)
+readme-renderer>=23.0; python_version == '2.7'
+readme-renderer>=23.0,<25.0; python_version == '3.4'
+readme-renderer>=23.0; python_version >= '3.5'
 
 # Jupyter Notebook (no imports, invoked via jupyter script)
 # TODO Future: currently jupyter not used by pywbemtools
