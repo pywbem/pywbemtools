@@ -52,6 +52,8 @@ Released: not yet
 
 * Pinned dparse to <0.5.0 on Python 2.7 due to an issue.
 
+* Fixed issues in README and README_PYPI file (See issue #555)
+
 **Enhancements:**
 
 * Test: Improved assertion messages in tests.
