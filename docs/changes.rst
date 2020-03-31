@@ -8,13 +8,7 @@ Change log
 pywbemtools 0.5.1
 -----------------
 
-This version is currently in development and is shown as |version|.
-
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-03-31
 
 **Bug fixes:**
 
@@ -88,12 +82,6 @@ Released: not yet
 * Test: Added missing indirectly referenced prerequisite packages to
   minimum-constraints.txt, for a defined package level when testing with
   PACKAGE_LEVEL=minimum.
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.5.0
