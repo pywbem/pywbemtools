@@ -28,23 +28,39 @@ The command line can contain the following components:
 * **GENERAL-OPTIONS** - General options; they apply to all commands.
   See :ref:`Using the pywbemcli command line general options` for information
   on the pywbemcli general options.
-* **COMMAND-GROUP** - A name of a group of commands.
-  See :ref:`Pywbemcli command groups and commands`
-* **COMMAND** - A name of a command, normally within a command group.
-  There are however some special commands (``repl`` and ``help``) that are not
-  in any command group.
-* **COMMAND-OPTIONS** - Command options; they apply only to a particular
-  command.
+
+* **COMMAND** - A name of a command which may consist of:
+  * <group name> <command name> for those commands that are defined in
+    groups (ex. `class find`).
+  * Just the group name (ex. `class`).
+  * <command name> for those commands that are not part of a group. (``repl``
+    and ``help``) that are not in any command group.
 * **ARGS** - Arguments for a command.
+* **CMD-OPTIONS** - Command options; they apply only to a particular
+  command.
+
 
 Options are prefixed with the characters ``-`` for the short form or ``--`` for
 the long form (ex. ``-n`` or ``--namespace``). The other components do not
 begin with ``-``.
 
 Command groups are named after the objects the commands operate on
-(ex. ``class``, ``instance``, ``qualifier``, ``server``).
+(ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing 
+
+.. code-block::text
+
+   $ pywbemcli --help
+   ...
+   Commands:
+     class       Command group for CIM classes.
+   ...
+	
+
+returns the list of command groups under the title `COMMANDS`.
+ 
 Commands are named after actions on these objects
-(ex. ``get``, ``create``, ``delete``).
+(ex. ``get``, ``create``, ``delete``). The list of commands for each group
+is listed with the command `pywbemcli <group name> --help`.
 
 For example, the command:
 
@@ -91,7 +107,7 @@ command group name and arguments/options:
 
 .. code-block:: text
 
-    $ pywbemcli [GENERAL-OPTIONS] [COMMAND-GROUP] COMMAND [COMMAND-OPTIONS] [ARGS]
+    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGS]
 
 The following example enumerates classes in the ``root/cimv2`` namespace of the
 WBEM server on ``localhost``:
@@ -175,7 +191,10 @@ user):
 
 .. code-block:: text
 
-    pywbemcli> [GENERAL-OPTIONS] [COMMAND-GROUP] COMMAND [ARGS] [CMD-OPTIONS]
+    pywbemcli> [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
+
+        where: COMMAND can be either a group name and
+               a command (ex. class find or repl)
 
     pywbemcli> :INTERNAL-COMMAND
 
@@ -247,7 +266,7 @@ list of the supported command groups and commands without command group.
 The usage line in this help text shows the usage in command mode. In
 interactive mode, the ``pywbemcli`` word is omitted.
 
-Typing ``COMMAND-GROUP --help``,  or ``COMMAND-GROUP -h`` in the pywbemcli shell
+Typing ``COMMAND --help``,  or ``COMMAND -h`` in the pywbemcli shell
 displays help information for the specified pywbemcli command group, for
 example:
 

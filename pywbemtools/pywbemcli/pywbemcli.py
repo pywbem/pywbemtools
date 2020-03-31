@@ -595,7 +595,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         ctx.invoke(repl)
 
 
-@cli.command('help')
+@cli.command('help', options_metavar=GENERAL_OPTS_TXT)
 @click.pass_context
 def repl_help(ctx):  # pylint: disable=unused-argument
     """
@@ -614,6 +614,10 @@ The following can be entered in interactive mode:
   help                        Show this help message.
   :?, :h, :help               Show help message about interactive mode.
   <UP>, <DOWN>                Scroll through pwbemcli command history.
+
+  COMMAND: May be two words (class enumerate) for commands that are within
+  a group or a single word for special commands like `repl` that are not in
+  a group.
 """)
 
 

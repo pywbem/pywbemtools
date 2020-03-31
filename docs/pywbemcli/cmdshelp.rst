@@ -867,7 +867,7 @@ Help text for ``pywbemcli help`` (see :ref:`help command`):
 
 ::
 
-    Usage: pywbemcli [OPTIONS] help
+    Usage: pywbemcli [GENERAL-OPTIONS] help
 
       Show help message for interactive mode.
 
