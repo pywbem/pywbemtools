@@ -1,29 +1,29 @@
 pywbemtools: Python tools for communicating with WBEM servers
 =============================================================
 
-.. image:: https://img.shields.io/pypi/v/pywbemtools.svg
+.. image:: https://badge.fury.io/py/pywbemtools.svg
     :target: https://pypi.python.org/pypi/pywbemtools/
-    :alt: Latest version on Pypi
+    :alt: PyPI version
 
 .. image:: https://travis-ci.org/pywbem/pywbemtools.svg?branch=master
     :target: https://travis-ci.org/github/pywbem/pywbemtools/builds
-    :alt: Travis test status (master)
+    :alt: Travis status
 
 .. image:: https://ci.appveyor.com/api/projects/status/hc6bbf3so9fw72nx/branch/master?svg=true
     :target: https://ci.appveyor.com/project/KSchopmeyer/pywbemtools/history
-    :alt: Appveyor test status (master)
+    :alt: Appveyor status
 
 .. image:: https://readthedocs.org/projects/pywbem/badge/?version=latest
     :target: https://readthedocs.org/projects/pywbemtools/builds/
-    :alt: ReadTheDocs build status (master)
+    :alt: ReadTheDocs status
 
-.. image:: https://img.shields.io/coveralls/pywbem/pywbemtools.svg
-    :target: https://coveralls.io/r/pywbem/pywbemtools
-    :alt: Test coverage (master)
+.. image:: https://coveralls.io/repos/github/pywbem/pywbemtools/badge.svg?branch=master
+    :target: https://coveralls.io/github/pywbem/pywbemtools?branch=master
+    :alt: Coveralls result
 
 .. image:: https://img.shields.io/pypi/pyversions/pywbemtools.svg?color=brightgreen
     :target: https://pypi.python.org/pypi/pywbemtools/
-    :alt: Python versions supported by latest version on Pypi
+    :alt: Supported Python
 
 
 Overview
