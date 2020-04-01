@@ -31,6 +31,7 @@ from pywbem import ValueMapping, Error
 from .pywbemcli import cli
 from ._common import format_table, raise_pywbem_error_exception, \
     validate_output_format, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 # NOTE: A number of the options use double-dash as the short form.  In those
@@ -41,6 +42,7 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 @cli.group('server', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
 def server_group():
     """
     Command group for WBEM servers.
@@ -58,6 +60,7 @@ def server_group():
 
 @server_group.command('namespaces', cls=PywbemcliCommand,
                       options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def server_namespaces(context, **options):
     """
@@ -69,6 +72,7 @@ def server_namespaces(context, **options):
 
 @server_group.command('interop', cls=PywbemcliCommand,
                       options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def server_interop(context):
     """
@@ -80,6 +84,7 @@ def server_interop(context):
 
 @server_group.command('brand', cls=PywbemcliCommand,
                       options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def server_brand(context):
     """
@@ -95,6 +100,7 @@ def server_brand(context):
 
 @server_group.command('info', cls=PywbemcliCommand,
                       options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def server_info(context):
     """
@@ -113,6 +119,7 @@ def server_info(context):
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
               help='Filter by the profile name. (ex. -p Array')
+@add_options(help_option)
 @click.pass_obj
 def server_profiles(context, **options):
     """
@@ -158,6 +165,7 @@ def server_profiles(context, **options):
               default='dmtf',
               show_default=True,
               help='Navigation direction for association.')
+@add_options(help_option)
 @click.pass_obj
 def centralinsts(context, **options):
     """

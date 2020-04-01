@@ -142,8 +142,8 @@ General Options:
   --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                   pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.
 
-  --version                       Show the version of this command and the pywbem package and exit.
-  -h, --help                      Show this message and exit.
+  --version                       Show the version of this command and the pywbem package.
+  -h, --help                      Show this help message.
 
 Commands:
   class       Command group for CIM classes.
@@ -167,7 +167,7 @@ REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
   Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
 Command Options:
-  -h, --help  Show this message and exit.
+  -h, --help  Show this help message.
 """  # noqa:E501 pylint: disable=line-too-long
 
 INTERACTIVE_HELP = """

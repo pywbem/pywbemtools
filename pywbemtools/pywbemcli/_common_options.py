@@ -113,6 +113,9 @@ experimental_filter_option = [              # pylint: disable=invalid-name
                       'experimental (--no-iexperimental). If the option is not '
                       'defined no filtering occurs')]
 
+help_option = [              # pylint: disable=invalid-name
+    click.help_option('-h', '--help', help='Show this help message.')]
+
 
 def add_options(options):
     """

@@ -26,7 +26,7 @@ whitespace-tolerant test for whether the expected text is in the actual text.
 # defined with underscore and not dash
 
 CMD_OPTION_HELP_HELP_LINE = \
-    '-h, --help Show this message and exit.'
+    '-h, --help Show this help message.'
 
 CMD_OPTION_VERIFY_HELP_LINE = \
     '-V, --verify Prompt for confirmation before performing a change'

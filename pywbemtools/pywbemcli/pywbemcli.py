@@ -37,6 +37,7 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
 from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TABLE_FORMATS, \
     CIM_OBJECT_OUTPUT_FORMATS
+from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
@@ -246,7 +247,8 @@ CONTEXT_SETTINGS = dict(
                    format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
     message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
-    help='Show the version of this command and the pywbem package and exit.')
+    help='Show the version of this command and the pywbem package.')
+@add_options(help_option)
 @click.pass_context
 def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
@@ -596,6 +598,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
 
 
 @cli.command('help', options_metavar=GENERAL_OPTS_TXT)
+@add_options(help_option)
 @click.pass_context
 def repl_help(ctx):  # pylint: disable=unused-argument
     """
@@ -622,6 +625,7 @@ The following can be entered in interactive mode:
 
 
 @cli.command('repl', options_metavar=GENERAL_OPTS_TXT)
+@add_options(help_option)
 @click.pass_context
 def repl(ctx):
     """
