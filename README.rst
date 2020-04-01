@@ -13,7 +13,7 @@ pywbemtools: Python tools for communicating with WBEM servers
     :target: https://ci.appveyor.com/project/KSchopmeyer/pywbemtools/history
     :alt: Appveyor status
 
-.. image:: https://readthedocs.org/projects/pywbem/badge/?version=latest
+.. image:: https://readthedocs.org/projects/pywbemtools/badge/?version=latest
     :target: https://readthedocs.org/projects/pywbemtools/builds/
     :alt: ReadTheDocs status
 
