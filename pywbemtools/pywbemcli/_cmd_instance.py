@@ -39,7 +39,7 @@ from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
     summary_option, verify_option, multiple_namespaces_option, \
     association_filter_option, indication_filter_option, \
-    experimental_filter_option
+    experimental_filter_option, help_option
 
 from ._cimvalueformatter import mof_escaped
 
@@ -151,7 +151,7 @@ help_instancename_option = [              # pylint: disable=invalid-name
     click.option('--hi', '--help-instancename', 'help_instancename',
                  is_flag=True, required=False, is_eager=True,
                  help='Show help message for specifying INSTANCENAME including '
-                      'use of the --key and --namespace options and exit.')]
+                      'use of the --key and --namespace options.')]
 
 
 ##########################################################################
@@ -164,6 +164,7 @@ help_instancename_option = [              # pylint: disable=invalid-name
 
 @cli.group('instance', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
 def instance_group():
     """
     Command group for CIM instances.
@@ -193,6 +194,7 @@ def instance_group():
 @add_options(summary_option)
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
     """
@@ -231,6 +233,7 @@ def instance_enumerate(context, classname, **options):
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_get(context, instancename, **options):
     """
@@ -261,6 +264,7 @@ def instance_get(context, instancename, **options):
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_delete(context, instancename, **options):
     """
@@ -283,6 +287,7 @@ def instance_delete(context, instancename, **options):
 @add_options(property_create_option)
 @add_options(verify_option)
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_create(context, classname, **options):
     """
@@ -327,6 +332,7 @@ def instance_create(context, classname, **options):
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_modify(context, instancename, **options):
     """
@@ -383,6 +389,7 @@ def instance_modify(context, instancename, **options):
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_associators(context, instancename, **options):
     """
@@ -435,6 +442,7 @@ def instance_associators(context, instancename, **options):
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_references(context, instancename, **options):
     """
@@ -482,6 +490,7 @@ def instance_references(context, instancename, **options):
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_invokemethod(context, instancename, methodname, **options):
     """
@@ -529,6 +538,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
               format(default=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
 @add_options(summary_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_query(context, query, **options):
     """
@@ -554,6 +564,7 @@ def instance_query(context, query, **options):
 @add_options(experimental_filter_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help='Sort by instance count. Otherwise sorted by class name.')
+@add_options(help_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
     """
@@ -614,6 +625,7 @@ def instance_count(context, classname, **options):
                    'for all instances and the "CreationClassName" key.  When'
                    'this option is used the full instance paths are displayed.')
 @add_options(help_instancename_option)
+@add_options(help_option)
 @click.pass_obj
 def instance_shrub(context, instancename, **options):
     """

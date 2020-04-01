@@ -35,7 +35,7 @@ from ._common import display_cim_objects, filter_namelist, \
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option, association_filter_option, \
-    indication_filter_option, experimental_filter_option
+    indication_filter_option, experimental_filter_option, help_option
 from ._displaytree import display_class_tree
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -80,6 +80,7 @@ local_only_class_option = [              # pylint: disable=invalid-name
 
 @cli.group('class', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
 def class_group():
     """
     Command group for CIM classes.
@@ -109,6 +110,7 @@ def class_group():
 @add_options(association_filter_option)
 @add_options(indication_filter_option)
 @add_options(experimental_filter_option)
+@add_options(help_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
@@ -148,6 +150,7 @@ def class_enumerate(context, classname, **options):
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def class_get(context, classname, **options):
     """
@@ -180,6 +183,7 @@ def class_get(context, classname, **options):
                    'Some servers may still reject the class deletion. '
                    'Default: Reject command if the class has any instances.')
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def class_delete(context, classname, **options):
     """
@@ -218,6 +222,7 @@ def class_delete(context, classname, **options):
                    'May be specified multiple times. '
                    'Default: No input parameters.')
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def class_invokemethod(context, classname, methodname, **options):
     """
@@ -264,6 +269,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(summary_option)
+@add_options(help_option)
 @click.pass_obj
 def class_references(context, classname, **options):
     """
@@ -317,6 +323,7 @@ def class_references(context, classname, **options):
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(summary_option)
+@add_options(help_option)
 @click.pass_obj
 def class_associators(context, classname, **options):
     """
@@ -356,6 +363,7 @@ def class_associators(context, classname, **options):
 @add_options(association_filter_option)
 @add_options(indication_filter_option)
 @add_options(experimental_filter_option)
+@add_options(help_option)
 @click.pass_obj
 def class_find(context, classname_glob, **options):
     """
@@ -396,6 +404,7 @@ def class_find(context, classname_glob, **options):
               help='Show the superclass hierarchy. '
                    'Default: Show the subclass hierarchy.')
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def class_tree(context, classname, **options):
     """

@@ -118,8 +118,8 @@ Help text for ``pywbemcli``:
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.
 
-      --version                       Show the version of this command and the pywbem package and exit.
-      -h, --help                      Show this message and exit.
+      --version                       Show the version of this command and the pywbem package.
+      -h, --help                      Show this help message.
 
     Commands:
       class       Command group for CIM classes.
@@ -155,7 +155,7 @@ Help text for ``pywbemcli class`` (see :ref:`class command group`):
       can also be specified before the 'class' keyword.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
     Commands:
       enumerate     List top classes or subclasses of a class in a namespace.
@@ -226,7 +226,7 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       -s, --summary                   Show only a summary (count) of the objects.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class delete --help`:
@@ -268,7 +268,7 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
                                  deletion. Default: Reject command if the class has any instances.
 
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                 Show this message and exit.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli class enumerate --help`:
@@ -337,7 +337,7 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       classes that are not experimental (--no-iexperimental). If the option is not defined
                                       no filtering occurs
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class find --help`:
@@ -395,7 +395,7 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
                                       classes that are not experimental (--no-iexperimental). If the option is not defined
                                       no filtering occurs
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class get --help`:
@@ -442,7 +442,7 @@ Help text for ``pywbemcli class get`` (see :ref:`class get command`):
                                       empty string will include no properties. Default: Do not filter properties.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class invokemethod --help`:
@@ -482,7 +482,7 @@ Help text for ``pywbemcli class invokemethod`` (see :ref:`class invokemethod com
                                       Default: No input parameters.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class references --help`:
@@ -538,7 +538,7 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       -s, --summary                   Show only a summary (count) of the objects.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli class tree --help`:
@@ -582,7 +582,7 @@ Help text for ``pywbemcli class tree`` (see :ref:`class tree command`):
     Command Options:
       -s, --superclasses         Show the superclass hierarchy. Default: Show the subclass hierarchy.
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                 Show this message and exit.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli connection --help`:
@@ -610,7 +610,7 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       can also be specified before the 'connection' keyword.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
     Commands:
       export  Export the current connection.
@@ -646,7 +646,7 @@ Help text for ``pywbemcli connection delete`` (see :ref:`connection delete comma
         pywbemcli connection delete blah
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli connection export --help`:
@@ -674,7 +674,7 @@ Help text for ``pywbemcli connection export`` (see :ref:`connection export comma
         pywbemcli --server https://srv1 --user me --password pw connection export
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli connection list --help`:
@@ -703,7 +703,7 @@ Help text for ``pywbemcli connection list`` (see :ref:`connection list command`)
 
     Command Options:
       -f, --full  If set, display the full table. Otherwise display a brief view(name, server, mock_server columns).
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli connection save --help`:
@@ -733,7 +733,7 @@ Help text for ``pywbemcli connection save`` (see :ref:`connection save command`)
         pywbemcli --server https://srv1 connection save mysrv
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli connection select --help`:
@@ -781,7 +781,7 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
       -d, --default  If set, the connection is set to be the default connection  in the connections file in addition to
                      setting it as the current connection.
 
-      -h, --help     Show this message and exit.
+      -h, --help     Show this help message.
 
 
 .. _`pywbemcli connection show --help`:
@@ -826,7 +826,7 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
 
     Command Options:
       --show-password  If set, show existing password in results. Otherwise, password is masked
-      -h, --help       Show this message and exit.
+      -h, --help       Show this help message.
 
 
 .. _`pywbemcli connection test --help`:
@@ -853,7 +853,7 @@ Help text for ``pywbemcli connection test`` (see :ref:`connection test command`)
         pywbemcli --name mysrv connection test
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli help --help`:
@@ -873,7 +873,7 @@ Help text for ``pywbemcli help`` (see :ref:`help command`):
       Show help message for interactive mode.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli instance --help`:
@@ -901,7 +901,7 @@ Help text for ``pywbemcli instance`` (see :ref:`instance command group`):
       can also be specified before the 'instance' keyword.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
     Commands:
       enumerate     List the instances of a class.
@@ -988,9 +988,9 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance count --help`:
@@ -1047,7 +1047,7 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
                                       no filtering occurs
 
       -s, --sort                      Sort by instance count. Otherwise sorted by class name.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance create --help`:
@@ -1090,7 +1090,7 @@ Help text for ``pywbemcli instance create`` (see :ref:`instance create command`)
                                       parameters. Default: Do not prompt for confirmation.
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance delete --help`:
@@ -1118,9 +1118,9 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
 
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       --hi, --help-instancename  Show help message for specifying INSTANCENAME including use of the --key and --namespace
-                                 options and exit.
+                                 options.
 
-      -h, --help                 Show this message and exit.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli instance enumerate --help`:
@@ -1185,7 +1185,7 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance get --help`:
@@ -1233,9 +1233,9 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance invokemethod --help`:
@@ -1282,9 +1282,9 @@ Help text for ``pywbemcli instance invokemethod`` (see :ref:`instance invokemeth
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance modify --help`:
@@ -1336,9 +1336,9 @@ Help text for ``pywbemcli instance modify`` (see :ref:`instance modify command`)
 
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance query --help`:
@@ -1367,7 +1367,7 @@ Help text for ``pywbemcli instance query`` (see :ref:`instance query command`):
                                       The query language to be used with --query. Default: DMTF:CQL.
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       -s, --summary                   Show only a summary (count) of the objects.
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance references --help`:
@@ -1435,9 +1435,9 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli instance shrub --help`:
@@ -1493,9 +1493,9 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
                                       paths are displayed.
 
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
-                                      --namespace options and exit.
+                                      --namespace options.
 
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli qualifier --help`:
@@ -1522,7 +1522,7 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
       can also be specified before the 'qualifier' keyword.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
     Commands:
       get        Get a qualifier declaration.
@@ -1553,7 +1553,7 @@ Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate c
     Command Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       -s, --summary              Show only a summary (count) of the objects.
-      -h, --help                 Show this message and exit.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli qualifier get --help`:
@@ -1579,7 +1579,7 @@ Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
 
     Command Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                 Show this message and exit.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli repl --help`:
@@ -1606,7 +1606,7 @@ Help text for ``pywbemcli repl`` (see :ref:`repl command`):
       Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli server --help`:
@@ -1632,7 +1632,7 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       can also be specified before the 'server' keyword.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
     Commands:
       namespaces    List the namespaces of the server.
@@ -1663,7 +1663,7 @@ Help text for ``pywbemcli server brand`` (see :ref:`server brand command`):
       the brand information from multiple sources.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli server centralinsts --help`:
@@ -1707,7 +1707,7 @@ Help text for ``pywbemcli server centralinsts`` (see :ref:`server centralinsts c
 
       --rd, --reference-direction [snia|dmtf]
                                       Navigation direction for association.  [default: dmtf]
-      -h, --help                      Show this message and exit.
+      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli server info --help`:
@@ -1729,7 +1729,7 @@ Help text for ``pywbemcli server info`` (see :ref:`server info command`):
       The information includes CIM namespaces and server brand.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli server interop --help`:
@@ -1749,7 +1749,7 @@ Help text for ``pywbemcli server interop`` (see :ref:`server interop command`):
       Get the Interop namespace of the server.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli server namespaces --help`:
@@ -1769,7 +1769,7 @@ Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces comma
       List the namespaces of the server.
 
     Command Options:
-      -h, --help  Show this message and exit.
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli server profiles --help`:
@@ -1800,5 +1800,5 @@ Help text for ``pywbemcli server profiles`` (see :ref:`server profiles command`)
     Command Options:
       -o, --organization ORG-NAME  Filter by the defined organization. (ex. -o DMTF
       -p, --profile PROFILE-NAME   Filter by the profile name. (ex. -p Array
-      -h, --help                   Show this message and exit.
+      -h, --help                   Show this help message.
 

@@ -34,6 +34,7 @@ from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
     raise_pywbem_error_exception, validate_output_format
+from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
@@ -42,6 +43,7 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 @cli.group('connection', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
 def connection_group():
     """
     Command group for WBEM connection definitions.
@@ -61,6 +63,7 @@ def connection_group():
 
 @connection_group.command('export', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def connection_export(context):
     """
@@ -85,6 +88,7 @@ def connection_export(context):
               default=False,
               help='If set, show existing password in results. Otherwise, '
                    'password is masked')
+@add_options(help_option)
 @click.pass_obj
 def connection_show(context, name, **options):
     """
@@ -125,6 +129,7 @@ def connection_show(context, name, **options):
 @connection_group.command('delete', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
+@add_options(help_option)
 @click.pass_obj
 def connection_delete(context, name):
     """
@@ -149,6 +154,7 @@ def connection_delete(context, name):
               help='If set, the connection is set to be the default connection '
                    ' in the connections file in addition to setting it as the '
                    'current connection.')
+@add_options(help_option)
 @click.pass_obj
 def connection_select(context, name, **options):
     """
@@ -192,6 +198,7 @@ def connection_select(context, name, **options):
 
 @connection_group.command('test', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
 @click.pass_obj
 def connection_test(context):
     """
@@ -211,6 +218,7 @@ def connection_test(context):
 @connection_group.command('save', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True)
+@add_options(help_option)
 @click.pass_obj
 def connection_save(context, name):
     """
@@ -237,6 +245,7 @@ def connection_save(context, name):
               default=False,
               help='If set, display the full table. Otherwise display '
                    'a brief view(name, server, mock_server columns).')
+@add_options(help_option)
 @click.pass_obj
 def connection_list(context, **options):
     """

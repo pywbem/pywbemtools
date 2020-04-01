@@ -30,12 +30,14 @@ from .pywbemcli import cli
 from ._common import display_cim_objects, sort_cimobjects, \
     raise_pywbem_error_exception, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from ._common_options import add_options, namespace_option, summary_option
+from ._common_options import add_options, namespace_option, summary_option, \
+    help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 
 @cli.group('qualifier', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
 def qualifier_group():
     """
     Command group for CIM qualifier declarations.
@@ -58,6 +60,7 @@ def qualifier_group():
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
 @add_options(namespace_option)
+@add_options(help_option)
 @click.pass_obj
 def qualifier_get(context, qualifiername, **options):
     """
@@ -78,6 +81,7 @@ def qualifier_get(context, qualifiername, **options):
                          options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @add_options(summary_option)
+@add_options(help_option)
 @click.pass_obj
 def qualifier_enumerate(context, **options):
     """
