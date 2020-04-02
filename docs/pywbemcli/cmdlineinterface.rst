@@ -45,7 +45,7 @@ the long form (ex. ``-n`` or ``--namespace``). The other components do not
 begin with ``-``.
 
 Command groups are named after the objects the commands operate on
-(ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing 
+(ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing
 
 .. code-block::text
 
@@ -54,10 +54,10 @@ Command groups are named after the objects the commands operate on
    Commands:
      class       Command group for CIM classes.
    ...
-	
+
 
 returns the list of command groups under the title `COMMANDS`.
- 
+
 Commands are named after actions on these objects
 (ex. ``get``, ``create``, ``delete``). The list of commands for each group
 is listed with the command `pywbemcli <group name> --help`.
@@ -254,7 +254,7 @@ list of the supported command groups and commands without command group.
     Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
     . . .
 
-    Options:
+    General Options:
       -n, --name NAME                 Use the WBEM server ...
       . . .
 
@@ -276,7 +276,7 @@ example:
     Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [CMD-OPTIONS]
     . . .
 
-    Options:
+    Cmd Options:
       -h, --help  Show this message and exit.
 
     Commands:

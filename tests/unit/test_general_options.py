@@ -69,7 +69,7 @@ GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS
 
       https://pywbemtools.readthedocs.io/en/stable/
 
-GENERAL-OPTIONS:
+General Options:
   -n, --name NAME                 Use the WBEM server defined by the WBEM connection definition NAME. This option is
                                   mutually exclusive with the --server and --mock-server options, since each defines a
                                   WBEM server. Default: EnvVar PYWBEMCLI_NAME, or none.
@@ -166,7 +166,7 @@ REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
   Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
-GENERAL-OPTIONS:
+Cmd Options:
   -h, --help  Show this message and exit.
 """  # noqa:E501 pylint: disable=line-too-long
 
@@ -211,7 +211,7 @@ TEST_CASES = [
      {'stdout': GENERAL_HELP,
       'rc': 0,
       'test': 'innows'},
-     None, OK],
+     None, RUN],
 
     ['Verify -h response.',
      {'general': ['--help'],

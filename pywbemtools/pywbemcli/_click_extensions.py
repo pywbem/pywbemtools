@@ -43,7 +43,6 @@ class PywbemcliGroup(click.Group):
         click.core.Command.format_usage = pywbemcli_format_usage
         click.core.Command.format_options = pywbemcli_format_options
 
-
     def list_commands(self, ctx):
         """
         Replace click.list_commands to eliminate the sort of cmd names.
@@ -77,7 +76,6 @@ class PywbemcliTopGroup(click.Group):
 
         # Replace Click.Command.format_options with local version
         click.core.Command.format_options = pywbemcli_format_options
-
 
     def list_commands(self, ctx):
         """
@@ -139,15 +137,17 @@ def pywbemcli_format_usage(self, ctx, formatter):
 
 
 def pywbemcli_format_options(self, ctx, formatter):
-    """Writes all the options into the formatter if they exist."""
+    """
+    Writes all the options into the formatter if they exist.
+    """
     opts = []
     cmds_len = len(ctx.command_path.split())
-    # If group or command level, use CMD_OPTS_TXT. Remove
-    # leading and trailing square brackets.
-    if cmds_len <= 2:
-        options_title = GENERAL_OPTS_TXT[1:-1]
-    else:
-        options_title = CMD_OPTS_TXT[1:-1]
+
+    # If group or command level, use CMD_OPTS_TXT
+    options_title = CMD_OPTS_TXT if cmds_len > 1 else GENERAL_OPTS_TXT
+    # Cvt to string of words with first char of each word capitalized
+    options_title = options_title[1:-1].lower().replace('-', " ").title()
+
     for param in self.get_params(ctx):
         rv = param.get_help_record(ctx)
         if rv is not None:
