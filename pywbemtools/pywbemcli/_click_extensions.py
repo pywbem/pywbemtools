@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 import click
 
-from ._common import GENERAL_OPTS_TXT
+from ._common import GENERAL_OPTS_TXT, CMD_OPTS_TXT
 
 
 class PywbemcliGroup(click.Group):
@@ -41,6 +41,8 @@ class PywbemcliGroup(click.Group):
 
         # Replace Click.Command.format_usage with local version
         click.core.Command.format_usage = pywbemcli_format_usage
+        click.core.Command.format_options = pywbemcli_format_options
+
 
     def list_commands(self, ctx):
         """
@@ -63,6 +65,19 @@ class PywbemcliTopGroup(click.Group):
     This extension has a general name because it may be used for more than
     one extension to the Click.Group class.
     """
+
+    def __init__(self, name=None, commands=None, **attrs):
+        """
+        Use OrderedDict to keep order commands inserted into command dict.
+        Only required for Python versions that do not order dictionaries.
+        Must be set after calling superclass __inits_ because click forces
+        {} for this variable even if user were to set commands to OrderedDict
+        """
+        super(PywbemcliTopGroup, self).__init__(name, commands, **attrs)
+
+        # Replace Click.Command.format_options with local version
+        click.core.Command.format_options = pywbemcli_format_options
+
 
     def list_commands(self, ctx):
         """
@@ -112,6 +127,7 @@ def pywbemcli_format_usage(self, ctx, formatter):
     pieces = self.collect_usage_pieces(ctx)
     cmd_paths = ctx.command_path.split()
 
+    # cmd_path is [<appname>, group, cmd]
     # If cmd_path has multiple components we are showing
     # app name, CMDGRP <cmd>. Break out CMDGRP and <cmd>
     # and reinsert after pieces[0] (the app name)
@@ -120,3 +136,23 @@ def pywbemcli_format_usage(self, ctx, formatter):
         formatter.write_usage(cmd_paths[0], " ".join(new_pieces))
     else:
         formatter.write_usage(ctx.command_path, " ".join(pieces))
+
+
+def pywbemcli_format_options(self, ctx, formatter):
+    """Writes all the options into the formatter if they exist."""
+    opts = []
+    cmds_len = len(ctx.command_path.split())
+    # If group or command level, use CMD_OPTS_TXT. Remove
+    # leading and trailing square brackets.
+    if cmds_len <= 2:
+        options_title = GENERAL_OPTS_TXT[1:-1]
+    else:
+        options_title = CMD_OPTS_TXT[1:-1]
+    for param in self.get_params(ctx):
+        rv = param.get_help_record(ctx)
+        if rv is not None:
+            opts.append(rv)
+
+    if opts:
+        with formatter.section(options_title):
+            formatter.write_dl(opts)
