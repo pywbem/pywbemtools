@@ -55,7 +55,7 @@ FORMAT_GROUPS = ('CIM', 'TABLE')
 # Definitions of the components of the help Usage line used
 # by pywbemcli
 GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
-CMD_OPTS_TXT = '[CMD-OPTIONS]'
+CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
 
 DEFAULT_MAX_CELL_WIDTH = 100

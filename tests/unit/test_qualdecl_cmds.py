@@ -32,7 +32,8 @@ TEST_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 
 QD_HELP_LINES = [
-    'Usage: pywbemcli [GENERAL-OPTIONS] qualifier COMMAND [ARGS] [CMD-OPTIONS]'
+    'Usage: pywbemcli [GENERAL-OPTIONS] qualifier COMMAND [ARGS] '
+    '[COMMAND-OPTIONS]'
     'Command group for CIM qualifier declarations.',
     CMD_OPTION_HELP_HELP_LINE,
     'enumerate  List the qualifier declarations in a namespace.',
@@ -40,7 +41,7 @@ QD_HELP_LINES = [
 ]
 
 QD_ENUMERATE_HELP_LINES = [
-    'Usage: pywbemcli [GENERAL-OPTIONS] qualifier enumerate [CMD-OPTIONS]',
+    'Usage: pywbemcli [GENERAL-OPTIONS] qualifier enumerate [COMMAND-OPTIONS]',
     'List the qualifier declarations in a namespace.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
@@ -49,7 +50,7 @@ QD_ENUMERATE_HELP_LINES = [
 
 QD_GET_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] qualifier get QUALIFIERNAME '
-    '[CMD-OPTIONS]',
+    '[COMMAND-OPTIONS]',
     "Get a qualifier declaration.",
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,

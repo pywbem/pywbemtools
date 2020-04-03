@@ -36,7 +36,7 @@ The command line can contain the following components:
   * <command name> for those commands that are not part of a group. (``repl``
     and ``help``) that are not in any command group.
 * **ARGS** - Arguments for a command.
-* **CMD-OPTIONS** - Command options; they apply only to a particular
+* **COMMANDD-OPTIONS** - Command options; they apply only to a particular
   command.
 
 
@@ -191,7 +191,7 @@ user):
 
 .. code-block:: text
 
-    pywbemcli> [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
+    pywbemcli> [GENERAL-OPTIONS] COMMAND [ARGS] [COMMAND-OPTIONS]
 
         where: COMMAND can be either a group name and
                a command (ex. class find or repl)
@@ -251,7 +251,7 @@ list of the supported command groups and commands without command group.
 
     $ pywbemcli
     pywbemcli> --help
-    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [CMD-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [COMMAND-OPTIONS]
     . . .
 
     General Options:
@@ -273,10 +273,10 @@ example:
 .. code-block:: text
 
     pywbemcli> class --help
-    Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [CMD-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [COMMAND-OPTIONS]
     . . .
 
-    Cmd Options:
+    Command Options:
       -h, --help  Show this message and exit.
 
     Commands:
