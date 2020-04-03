@@ -175,6 +175,8 @@ Released: not yet
   [COMMAND-OPTIONS] and showing the positioning of both arguments and
   command arguments. (See issue #446)
 
+* Increased minimum version of pywbem to 0.17.0 (See issue #571)
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
