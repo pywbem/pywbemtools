@@ -36,7 +36,7 @@ The command line can contain the following components:
   * <command name> for those commands that are not part of a group. (``repl``
     and ``help``) that are not in any command group.
 * **ARGS** - Arguments for a command.
-* **COMMANDD-OPTIONS** - Command options; they apply only to a particular
+* **COMMAND-OPTIONS** - Command options; they apply only to a particular
   command.
 
 
