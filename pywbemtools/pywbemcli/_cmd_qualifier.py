@@ -27,13 +27,15 @@ import click
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, CMD_OPTS_TXT, sort_cimobjects, \
-    raise_pywbem_error_exception, validate_output_format
+from ._common import display_cim_objects, sort_cimobjects, \
+    raise_pywbem_error_exception, validate_output_format, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._common_options import add_options, namespace_option, summary_option
-from ._click_extensions import PywbemcliGroup
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 
-@cli.group('qualifier', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
+@cli.group('qualifier', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
 def qualifier_group():
     """
     Command group for CIM qualifier declarations.
@@ -51,7 +53,8 @@ def qualifier_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@qualifier_group.command('get', options_metavar=CMD_OPTS_TXT)
+@qualifier_group.command('get', cls=PywbemcliCommand,
+                         options_metavar=CMD_OPTS_TXT)
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
 @add_options(namespace_option)
@@ -71,7 +74,8 @@ def qualifier_get(context, qualifiername, **options):
                                                   options))
 
 
-@qualifier_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
+@qualifier_group.command('enumerate', cls=PywbemcliCommand,
+                         options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @add_options(summary_option)
 @click.pass_obj

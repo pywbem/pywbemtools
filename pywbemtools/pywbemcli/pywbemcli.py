@@ -35,7 +35,7 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
     DEFAULT_LOG_DETAIL_LEVEL
 
 from ._context_obj import ContextObj, display_click_context
-from ._common import GENERAL_OPTIONS_METAVAR, TABLE_FORMATS, \
+from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TABLE_FORMATS, \
     CIM_OBJECT_OUTPUT_FORMATS
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
@@ -75,7 +75,8 @@ CONTEXT_SETTINGS = dict(
 # PywbemcliTopGroup sets order commands listed in help output
 @click.group(invoke_without_command=True, cls=PywbemcliTopGroup,
              context_settings=CONTEXT_SETTINGS,
-             options_metavar=GENERAL_OPTIONS_METAVAR)
+             options_metavar=GENERAL_OPTS_TXT,
+             subcommand_metavar=SUBCMD_HELP_TXT)
 @click.option('-n', '--name', 'svr_name', type=str, metavar='NAME',
               # defaulted in code
               envvar=PywbemServer.name_envvar,
@@ -594,7 +595,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         ctx.invoke(repl)
 
 
-@cli.command('help')
+@cli.command('help', options_metavar=GENERAL_OPTS_TXT)
 @click.pass_context
 def repl_help(ctx):  # pylint: disable=unused-argument
     """
@@ -613,10 +614,14 @@ The following can be entered in interactive mode:
   help                        Show this help message.
   :?, :h, :help               Show help message about interactive mode.
   <UP>, <DOWN>                Scroll through pwbemcli command history.
+
+  COMMAND: May be two words (class enumerate) for commands that are within
+  a group or a single word for special commands like `repl` that are not in
+  a group.
 """)
 
 
-@cli.command('repl')
+@cli.command('repl', options_metavar=GENERAL_OPTS_TXT)
 @click.pass_context
 def repl(ctx):
     """

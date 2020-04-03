@@ -29,15 +29,15 @@ from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
-    resolve_propertylist, CMD_OPTS_TXT, TABLE_FORMATS, \
-    format_table, process_invokemethod, raise_pywbem_error_exception, \
-    warning_msg, validate_output_format
+    resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
+    TABLE_FORMATS, format_table, process_invokemethod, \
+    raise_pywbem_error_exception, warning_msg, validate_output_format
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option, association_filter_option, \
     indication_filter_option, experimental_filter_option
 from ._displaytree import display_class_tree
-from ._click_extensions import PywbemcliGroup
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 
 #
@@ -78,13 +78,14 @@ local_only_class_option = [              # pylint: disable=invalid-name
 #
 ###########################################################################
 
-@cli.group('class', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
+@cli.group('class', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
 def class_group():
     """
     Command group for CIM classes.
 
-    This command group defines commands to inspect classes, to invoke
-    methods on classes, and to delete classes.
+    This command group defines commands to inspect classes, invoke
+    methods on classes, delete classes.
 
     Creation and modification of classes is not currently supported.
 
@@ -95,7 +96,8 @@ def class_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@class_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
+@class_group.command('enumerate', cls=PywbemcliCommand,
+                     options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
 @add_options(deep_inheritance_class_option)
 @add_options(local_only_class_option)
@@ -139,7 +141,7 @@ def class_enumerate(context, classname, **options):
                                                     options))
 
 
-@class_group.command('get', options_metavar=CMD_OPTS_TXT)
+@class_group.command('get', cls=PywbemcliCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @add_options(local_only_class_option)
 @add_options(no_qualifiers_class_option)
@@ -170,7 +172,8 @@ def class_get(context, classname, **options):
     context.execute_cmd(lambda: cmd_class_get(context, classname, options))
 
 
-@class_group.command('delete', options_metavar=CMD_OPTS_TXT)
+@class_group.command('delete', cls=PywbemcliCommand,
+                     options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.option('-f', '--force', is_flag=True, default=False,
               help='Delete any instances of the class as well. '
@@ -205,7 +208,8 @@ def class_delete(context, classname, **options):
     context.execute_cmd(lambda: cmd_class_delete(context, classname, options))
 
 
-@class_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
+@class_group.command('invokemethod', cls=PywbemcliCommand,
+                     options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
 @click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
@@ -244,7 +248,8 @@ def class_invokemethod(context, classname, methodname, **options):
                                                        options))
 
 
-@class_group.command('references', options_metavar=CMD_OPTS_TXT)
+@class_group.command('references', cls=PywbemcliCommand,
+                     options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
@@ -289,7 +294,8 @@ def class_references(context, classname, **options):
                                                      options))
 
 
-@class_group.command('associators', options_metavar=CMD_OPTS_TXT)
+@class_group.command('associators', cls=PywbemcliCommand,
+                     options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
@@ -341,7 +347,7 @@ def class_associators(context, classname, **options):
                                                       options))
 
 
-@class_group.command('find', options_metavar=CMD_OPTS_TXT)
+@class_group.command('find', cls=PywbemcliCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
                 required=True)
 @add_options(multiple_namespaces_option)
@@ -384,7 +390,7 @@ def class_find(context, classname_glob, **options):
                                                options))
 
 
-@class_group.command('tree', options_metavar=CMD_OPTS_TXT)
+@class_group.command('tree', cls=PywbemcliCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
 @click.option('-s', '--superclasses', is_flag=True, default=False,
               help='Show the superclass hierarchy. '

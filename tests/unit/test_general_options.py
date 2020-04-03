@@ -38,7 +38,7 @@ BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
 BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
 MOCK_PW_PROMPT_PATH = os.path.join(SCRIPT_DIR, 'mock_password_prompt.py')
 
-GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
+GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [COMMAND-OPTIONS]
 
   Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol to communicate with WBEM servers.
   Pywbemcli can:
@@ -69,7 +69,7 @@ GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]...
 
       https://pywbemtools.readthedocs.io/en/stable/
 
-Options:
+General Options:
   -n, --name NAME                 Use the WBEM server defined by the WBEM connection definition NAME. This option is
                                   mutually exclusive with the --server and --mock-server options, since each defines a
                                   WBEM server. Default: EnvVar PYWBEMCLI_NAME, or none.
@@ -155,7 +155,7 @@ Commands:
   repl        Enter interactive mode (default).
 """  # noqa:E501 pylint: disable=line-too-long
 
-REPL_HELP = """Usage: pywbemcli repl [OPTIONS]
+REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
   Enter interactive mode (default).
 
@@ -166,7 +166,7 @@ REPL_HELP = """Usage: pywbemcli repl [OPTIONS]
 
   Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
-Options:
+Command Options:
   -h, --help  Show this message and exit.
 """  # noqa:E501 pylint: disable=line-too-long
 
@@ -210,8 +210,8 @@ TEST_CASES = [
       'args': ['get', 'blah']},
      {'stdout': GENERAL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
-     None, OK],
+      'test': 'innows'},
+     None, RUN],
 
     ['Verify -h response.',
      {'general': ['--help'],
@@ -219,7 +219,7 @@ TEST_CASES = [
       'args': ['get', 'blah']},
      {'stdout': GENERAL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify repl -help response.',
@@ -228,7 +228,7 @@ TEST_CASES = [
       'args': ['-h']},
      {'stdout': REPL_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify help response (interactive help)).',
@@ -237,7 +237,7 @@ TEST_CASES = [
       'args': []},
      {'stdout': INTERACTIVE_HELP,
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify invalid server definition.',

@@ -30,9 +30,10 @@ from pywbem import Error, CIMError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import display_cim_objects, parse_wbemuri_str, \
     pick_instance, resolve_propertylist, create_ciminstance, \
-    filter_namelist, CMD_OPTS_TXT, format_table, verify_operation, \
+    filter_namelist, format_table, verify_operation, \
     process_invokemethod, raise_pywbem_error_exception, \
-    create_ciminstancename, warning_msg, validate_output_format
+    create_ciminstancename, warning_msg, validate_output_format, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
@@ -43,7 +44,7 @@ from ._common_options import add_options, propertylist_option, \
 from ._association_shrub import AssociationShrub
 
 from .config import DEFAULT_QUERY_LANGUAGE
-from ._click_extensions import PywbemcliGroup
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 from ._cmd_class import get_namespaces, enumerate_classes_filtered
 
 #
@@ -153,7 +154,8 @@ filter_query_option = [              # pylint: disable=invalid-name
 ###########################################################################
 
 
-@cli.group('instance', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
+@cli.group('instance', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
 def instance_group():
     """
     Command group for CIM instances.
@@ -170,7 +172,8 @@ def instance_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@instance_group.command('enumerate', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('enumerate', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @add_options(local_only_list_option)
 @add_options(deep_inheritance_enum_option)
@@ -209,7 +212,8 @@ def instance_enumerate(context, classname, **options):
                                                        options))
 
 
-@instance_group.command('get', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('get', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @add_options(local_only_get_option)
 @add_options(include_qualifiers_get_option)
@@ -248,7 +252,8 @@ def instance_get(context, instancename, **options):
                                                  options))
 
 
-@instance_group.command('delete', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('delete', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
@@ -276,7 +281,8 @@ def instance_delete(context, instancename, **options):
                                                     options))
 
 
-@instance_group.command('create', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('create', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @add_options(property_create_option)
 @add_options(verify_option)
@@ -307,7 +313,8 @@ def instance_create(context, classname, **options):
                                                     options))
 
 
-@instance_group.command('modify', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('modify', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @add_options(property_modify_option)
 @click.option('--pl', '--propertylist', 'propertylist', multiple=True, type=str,
@@ -358,7 +365,8 @@ def instance_modify(context, instancename, **options):
                                                     options))
 
 
-@instance_group.command('associators', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('associators', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
@@ -423,7 +431,8 @@ def instance_associators(context, instancename, **options):
                                                          options))
 
 
-@instance_group.command('references', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('references', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
@@ -480,7 +489,8 @@ def instance_references(context, instancename, **options):
                                                         options))
 
 
-@instance_group.command('invokemethod', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('invokemethod', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
 @click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
@@ -536,7 +546,8 @@ def instance_invokemethod(context, instancename, methodname, **options):
                                                           options))
 
 
-@instance_group.command('query', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('query', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('query', type=str, required=True, metavar='QUERY-STRING')
 @click.option('--ql', '--query-language', 'query_language', type=str,
               metavar='QUERY-LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
@@ -560,7 +571,8 @@ def instance_query(context, query, **options):
     context.execute_cmd(lambda: cmd_instance_query(context, query, options))
 
 
-@instance_group.command('count', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('count', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
 @add_options(multiple_namespaces_option)
@@ -601,7 +613,8 @@ def instance_count(context, classname, **options):
     context.execute_cmd(lambda: cmd_instance_count(context, classname, options))
 
 
-@instance_group.command('shrub', options_metavar=CMD_OPTS_TXT)
+@instance_group.command('shrub', cls=PywbemcliCommand,
+                        options_metavar=CMD_OPTS_TXT)
 @click.argument('instancename', type=str, metavar='INSTANCENAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',

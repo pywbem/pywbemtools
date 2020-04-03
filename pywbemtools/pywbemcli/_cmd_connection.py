@@ -31,15 +31,17 @@ import six
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, pick_one_from_list, format_table, \
+from ._common import CMD_OPTS_TXT, CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
+    SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
     hide_empty_columns, raise_pywbem_error_exception, validate_output_format
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
-from ._click_extensions import PywbemcliGroup
+from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
 
-@cli.group('connection', cls=PywbemcliGroup, options_metavar=CMD_OPTS_TXT)
+@cli.group('connection', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
 def connection_group():
     """
     Command group for WBEM connection definitions.
@@ -57,7 +59,8 @@ def connection_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@connection_group.command('export', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('export', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def connection_export(context):
     """
@@ -75,7 +78,8 @@ def connection_export(context):
     context.execute_cmd(lambda: cmd_connection_export(context))
 
 
-@connection_group.command('show', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('show', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--show-password', is_flag=True,
               default=False,
@@ -118,7 +122,8 @@ def connection_show(context, name, **options):
     context.execute_cmd(lambda: cmd_connection_show(context, name, options))
 
 
-@connection_group.command('delete', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('delete', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.pass_obj
 def connection_delete(context, name):
@@ -136,7 +141,8 @@ def connection_delete(context, name):
     context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
 
-@connection_group.command('select', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('select', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('-d', '--default', is_flag=True,
               default=False,
@@ -184,7 +190,8 @@ def connection_select(context, name, **options):
     context.execute_cmd(lambda: cmd_connection_select(context, name, options))
 
 
-@connection_group.command('test', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('test', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def connection_test(context):
     """
@@ -201,7 +208,8 @@ def connection_test(context):
     context.execute_cmd(lambda: cmd_connection_test(context))
 
 
-@connection_group.command('save', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('save', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True)
 @click.pass_obj
 def connection_save(context, name):
@@ -223,7 +231,8 @@ def connection_save(context, name):
     context.execute_cmd(lambda: cmd_connection_save(context, name))
 
 
-@connection_group.command('list', options_metavar=CMD_OPTS_TXT)
+@connection_group.command('list', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
 @click.pass_obj
 def connection_list(context):
     """

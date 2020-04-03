@@ -65,7 +65,8 @@ ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock.py'
 # Defined in alphabetical order
 
 INSTANCE_HELP_LINES = [
-    'Usage: pywbemcli instance [COMMAND-OPTIONS] COMMAND [ARGS]...',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance COMMAND [ARGS] '
+    '[COMMAND-OPTIONS]',
     'Command group for CIM instances.',
     CMD_OPTION_HELP_HELP_LINE,
     'associators   List the instances associated with an instance.',
@@ -82,7 +83,7 @@ INSTANCE_HELP_LINES = [
 ]
 
 INSTANCE_ASSOCIATORS_HELP_LINES = [
-    'Usage: pywbemcli instance associators [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance associators INSTANCENAME [COMMAND-OPTIONS]',  # noqa: E501
     'List the instances associated with an instance.',
     '--ac, --assoc-class CLASSNAME Filter the result set by association clas',
     '--rc, --result-class CLASSNAME Filter the result set by result class',
@@ -101,7 +102,8 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
 ]
 
 INSTANCE_COUNT_HELP_LINES = [
-    'Usage: pywbemcli instance count [COMMAND-OPTIONS] CLASSNAME-GLOB',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance count CLASSNAME-GLOB '
+    '[COMMAND-OPTIONS]',
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
@@ -112,7 +114,8 @@ INSTANCE_COUNT_HELP_LINES = [
 ]
 
 INSTANCE_CREATE_HELP_LINES = [
-    'Usage: pywbemcli instance create [COMMAND-OPTIONS] CLASSNAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance create CLASSNAME '
+    '[COMMAND-OPTIONS]',
     'Create an instance of a class in a namespace.',
     '-p, --property PROPERTYNAME=VALUE Initial property value',
     CMD_OPTION_VERIFY_HELP_LINE,
@@ -121,7 +124,8 @@ INSTANCE_CREATE_HELP_LINES = [
 ]
 
 INSTANCE_DELETE_HELP_LINES = [
-    'Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance delete INSTANCENAME '
+    '[COMMAND-OPTIONS]',
     'Delete an instance of a class.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
@@ -129,7 +133,8 @@ INSTANCE_DELETE_HELP_LINES = [
 ]
 
 INSTANCE_ENUMERATE_HELP_LINES = [
-    'Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance enumerate CLASSNAME '
+    '[COMMAND-OPTIONS]',
     'List the instances of a class.',
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE,
     '--di, --deep-inheritance Include subclass properties in the returned',
@@ -145,7 +150,8 @@ INSTANCE_ENUMERATE_HELP_LINES = [
 ]
 
 INSTANCE_GET_HELP_LINES = [
-    'Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance get INSTANCENAME '
+    '[COMMAND-OPTIONS]',
     'Get an instance of a class.',
     CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE,
     CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE,
@@ -157,8 +163,8 @@ INSTANCE_GET_HELP_LINES = [
 ]
 
 INSTANCE_INVOKEMETHOD_HELP_LINES = [
-    'Usage: pywbemcli instance invokemethod [COMMAND-OPTIONS] INSTANCENAME '
-    'METHODNAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance invokemethod '
+    'INSTANCENAME METHODNAME [COMMAND-OPTIONS]',
     'Invoke a method on an instance.',
     '-p, --parameter PARAMETERNAME=VALUE Specify a method input parameter',
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -167,7 +173,8 @@ INSTANCE_INVOKEMETHOD_HELP_LINES = [
 ]
 
 INSTANCE_MODIFY_HELP_LINES = [
-    'Usage: pywbemcli instance modify [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance modify INSTANCENAME '
+    '[COMMAND-OPTIONS]',
     'Modify properties of an instance.',
     '-p, --property PROPERTYNAME=VALUE Property to be modified',
     '--pl, --propertylist PROPERTYLIST Reduce the properties to be modified',
@@ -178,7 +185,8 @@ INSTANCE_MODIFY_HELP_LINES = [
 ]
 
 INSTANCE_QUERY_HELP_LINES = [
-    'Usage: pywbemcli instance query [COMMAND-OPTIONS] QUERY-STRING',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance query QUERY-STRING '
+    '[COMMAND-OPTIONS]',
     'Execute a query on instances in a namespace.',
     '-ql, --query-language QUERY-LANGUAGE The query language to be used',
     CMD_OPTION_NAMESPACE_HELP_LINE,
@@ -187,7 +195,8 @@ INSTANCE_QUERY_HELP_LINES = [
 ]
 
 INSTANCE_REFERENCES_HELP_LINES = [
-    'Usage: pywbemcli instance references [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance references INSTANCENAME '
+    '[COMMAND-OPTIONS]',
     'List the instances referencing an instance.',
     '--rc, --result-class CLASSNAME Filter the result set by result class',
     '-r, --role PROPERTYNAME Filter the result set by source end role',
@@ -204,7 +213,8 @@ INSTANCE_REFERENCES_HELP_LINES = [
 ]
 
 INSTANCE_SHRUB_HELP_LINES = [
-    'Usage: pywbemcli instance shrub [COMMAND-OPTIONS] INSTANCENAME',
+    'Usage: pywbemcli [GENERAL-OPTIONS] instance shrub INSTANCENAME '
+    '[COMMAND-OPTIONS]',
     'Show the association shrub for INSTANCENAME.',
     '--ac, --assoc-class CLASSNAME   Filter the result set by association',
     '--rc, --result-class CLASSNAME Filter the result set by result class',
@@ -902,7 +912,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command enumerate error, no classname fails',
      ['enumerate'],
      {'stderr':
-      ['Usage: pywbemcli instance enumerate [COMMAND-OPTIONS] CLASSNAME', ],
+      ['Usage: pywbemcli [GENERAL-OPTIONS] instance enumerate CLASSNAME', ],
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1161,7 +1171,7 @@ Instances: PyWBEM_AllTypes
     ['instance command get error. no classname',
      ['get'],
      {'stderr':
-      ['Usage: pywbemcli instance get [COMMAND-OPTIONS] INSTANCENAME', ],
+      ['Usage: pywbemcli [GENERAL-OPTIONS] instance get INSTANCENAME', ],
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1628,7 +1638,7 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command delete, missing instance name',
      ['delete'],
      {'stderr':
-      ['Usage: pywbemcli instance delete [COMMAND-OPTIONS] INSTANCENAME', ],
+      ['Usage: pywbemcli [GENERAL-OPTIONS] instance delete INSTANCENAME', ],
       'rc': 2,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -1823,7 +1833,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command references, no instance name',
      ['references'],
-     {'stderr': ['Usage: pywbemcli instance references [COMMAND-OPTIONS] '
+     {'stderr': ['Usage: pywbemcli [GENERAL-OPTIONS] instance references '
                  'INSTANCENAME', ],
       'rc': 2,
       'test': 'in'},
@@ -1951,7 +1961,7 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command associators, no instance name',
      ['associators'],
-     {'stderr': ['Usage: pywbemcli instance associators [COMMAND-OPTIONS] '
+     {'stderr': ['Usage: pywbemcli [GENERAL-OPTIONS] instance associators '
                  'INSTANCENAME', ],
       'rc': 2,
       'test': 'in'},
