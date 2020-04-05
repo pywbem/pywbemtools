@@ -72,6 +72,7 @@ CONNECTION_EXPORT_HELP_LINES = [
 CONNECTION_LIST_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection list [COMMAND-OPTIONS]',
     'List the WBEM connection definitions.',
+    '-f, --full  If set, display the full table. Otherwise display  a brief',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -224,7 +225,7 @@ TEST_CASES = [
      {'general': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEM server connections:", ""],
+         "WBEM server connections(brief):", ""],
       'test': 'innows'},
      None, OK],
 
@@ -327,12 +328,15 @@ TEST_CASES = [
     ['Verify connection command list with 2 servers defined',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
-     {'stdout': ['WBEM server connections:',
-                 'name server namespace user timeout verify',
-                 "test1 http://blah root/cimv2 30  True",
-                 "test2 http://blahblah  root/cimv2 fred 18  False"],
+     {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
+                 'name    server           mock-server',
+                 'test1   http://blah',
+                 'test2   http://blahblah'],
       'test': 'innows'},
      None, OK],
+
+
+
 
     ['Verify connection command select test2',
      ['select', 'test2', '--default'],
@@ -363,11 +367,45 @@ TEST_CASES = [
      'next pywbemcli call',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
-     {'stdout': ['WBEM server connections:',
-                 '(#: default, *: current)',
-                 'name    server          namespace  user timeout verify',
-                 'test1   http://blah     root/cimv2           30   True',
-                 '*#test2 http://blahblah root/cimv2 fred      18  False', ],
+     {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
+                 'name     server           mock-server',
+                 '*#test2  http://blahblah',
+                 'test1    http://blah'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command list with 2 servers defined, not sel after '
+     'next pywbemcli call',
+     {'general': ['--output-format', 'plain'],
+      'args': ['list']},
+     {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
+                 'name    server           mock-server',
+                 'test1   http://blah',
+                 'test2   http://blahblah'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command list with 2 servers defined, not sel after '
+     'next pywbemcli call --full',
+     {'general': ['--output-format', 'plain'],
+      'args': ['list', '--full']},
+     {'stdout': ['WBEM server connections(full): (#: default, *: current)',
+                 'name   server namespace  user  timeout  use_pull  verify  '
+                 'certfile  keyfile  mock-server',
+                 '*#test2  http://blahblah  root/cimv2 fred 18 False',
+                 'test1  http://blah  root/cimv2 30  True'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command list with 2 servers defined, not sel after '
+     'next pywbemcli call -f',
+     {'general': ['--output-format', 'plain'],
+      'args': ['list', '-f']},
+     {'stdout': ['WBEM server connections(full): (#: default, *: current)',
+                 'name   server namespace  user  timeout  use_pull  verify  '
+                 'certfile  keyfile  mock-server',
+                 '*#test2  http://blahblah  root/cimv2 fred 18 False',
+                 'test1  http://blah  root/cimv2 30  True'],
       'test': 'innows'},
      None, OK],
 
@@ -395,7 +433,7 @@ TEST_CASES = [
      {'general': ['-o', 'simple'],
       'args': ['list']},
      {'stdout': [
-         "WBEM server connections:", ""],
+         "WBEM server connections(brief):", ""],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
@@ -741,8 +779,8 @@ TEST_CASES = [
     ['Verify connection list with current server from general options, plain',
      {'args': ['list'],
       'general': ['--server', 'http://blah', '--output-format', 'plain']},
-     {'stdout': ['WBEM server connections: (#: default, *: current)',
-                 '*not-saved http://blah root/cimv2  30 True'],
+     {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
+                 '*not-saved http://blah'],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
@@ -767,13 +805,13 @@ TEST_CASES = [
      {'args': ['list'],
       'general': ['--output-format', 'table', '--server', 'http://blah']},
      {'stdout': """
-WBEM server connections: (#: default, *: current)
-+------------+-------------+-------------+-----------+----------+
-| name       | server      | namespace   |   timeout | verify   |
-|------------+-------------+-------------+-----------+----------|
-| *not-saved | http://blah | root/cimv2  |        30 | True     |
-| svrtest    | http://blah | root/cimv2  |        30 | True     |
-+------------+-------------+-------------+-----------+----------+
+WBEM server connections(brief): (#: default, *: current)
++------------+-------------+---------------+
+| name       | server      | mock-server   |
+|------------+-------------+---------------|
+| *not-saved | http://blah |               |
+| svrtest    | http://blah |               |
++------------+-------------+---------------+
 """,
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},

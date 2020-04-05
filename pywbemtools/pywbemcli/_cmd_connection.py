@@ -31,9 +31,9 @@ import six
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
+from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
-    hide_empty_columns, raise_pywbem_error_exception, validate_output_format
+    raise_pywbem_error_exception, validate_output_format
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
@@ -233,8 +233,13 @@ def connection_save(context, name):
 
 @connection_group.command('list', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
+@click.option('-f', '--full', is_flag=True,
+              default=False,
+              help='If set, display the full table. Otherwise display '
+                   ' a brief view(name, server, mock_server columns). '
+                   'This table does not show the ca_certs field.')
 @click.pass_obj
-def connection_list(context):
+def connection_list(context, **options):
     """
     List the WBEM connection definitions.
 
@@ -248,7 +253,7 @@ def connection_list(context):
 
     See also the 'connection select' command.
     """
-    context.execute_cmd(lambda: cmd_connection_list(context))
+    context.execute_cmd(lambda: cmd_connection_list(context, options))
 
 
 ################################################################
@@ -567,14 +572,24 @@ def cmd_connection_save(context, name):
     connections.add(save_connection.name, save_connection)
 
 
-def cmd_connection_list(context):
+def cmd_connection_list(context, options):
     """
     Dump all of the current servers in the persistent repository line
     by line.  This method displays the information as a table independent
     of the value of the cmd line output_format general option.
     """
-    connections = ConnectionRepository()
+    def build_row(options, name, svr):
+        """
+        Append one row to the list
+        """
+        if options['full']:
+            return [name, svr.server, svr.default_namespace, svr.user,
+                    svr.timeout, svr.use_pull, svr.verify, svr.certfile,
+                    svr.keyfile, "\n".join(svr.mock_server)]
+        else:
+            return[name, svr.server, "\n".join(svr.mock_server)]
 
+    connections = ConnectionRepository()
     output_format = validate_output_format(context.output_format, 'TABLE')
 
     # build the table structure
@@ -585,34 +600,33 @@ def cmd_connection_list(context):
         cc = cur_sym if is_current_connection(svr, context) else ''
         dc = dflt_sym if is_default_connection(svr) else ''
         name = '{}{}{}'.format(cc, dc, name)
-        row = [name, svr.server, svr.default_namespace, svr.user,
-               svr.timeout, svr.use_pull, svr.verify, svr.certfile,
-               svr.keyfile, "\n".join(svr.mock_server)]
-        rows.append(row)
+
+        rows.append(build_row(options, name, svr))
 
     # add current connection if not in persistent connections
     current_connection = context.pywbem_server or None
+
     if current_connection:
         cname = current_connection.name
         if cname not in connections:
             cname = '{}{}'.format('*', cname)
             svr = current_connection
-            rows.append([cname, svr.server, svr.default_namespace, svr.user,
-                         svr.timeout, svr.use_pull, svr.verify, svr.certfile,
-                         svr.keyfile, "\n".join(svr.mock_server)])
+            rows.append(build_row(options, cname, svr))
 
     # NOTE: Does not show ca_certs because that creates a very big table
     # in particular if you use the default.
-    headers = ['name', 'server', 'namespace', 'user',
-               'timeout', 'use_pull', 'verify', 'certfile', 'keyfile',
-               'mock-server']
-
-    headers, rows = hide_empty_columns(headers, rows)
+    if options['full']:
+        headers = ['name', 'server', 'namespace', 'user',
+                   'timeout', 'use_pull', 'verify', 'certfile', 'keyfile',
+                   'mock-server']
+    else:
+        headers = ['name', 'server', 'mock-server']
 
     context.spinner_stop()
+    table_type = 'full' if options['full'] else 'brief'
     click.echo(format_table(
         sorted(rows),
         headers,
-        title='WBEM server connections: ({}: default, {}: current)'.format(
-            dflt_sym, cur_sym),
+        title='WBEM server connections({}): ({}: default, {}: current)'.format(
+            table_type, dflt_sym, cur_sym),
         table_format=output_format))
