@@ -236,8 +236,7 @@ def connection_save(context, name):
 @click.option('-f', '--full', is_flag=True,
               default=False,
               help='If set, display the full table. Otherwise display '
-                   ' a brief view(name, server, mock_server columns). '
-                   'This table does not show the ca_certs field.')
+                   'a brief view(name, server, mock_server columns).')
 @click.pass_obj
 def connection_list(context, **options):
     """

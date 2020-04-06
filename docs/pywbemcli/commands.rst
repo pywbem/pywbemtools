@@ -1378,8 +1378,9 @@ A more complete display of the server parameters is available with the
     +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
 
 
-`Connection list` does not display the password or the ca-certs fields.  See
-:ref:`Connection show command` to display these fields.
+`Connection list` does not display some fields such as the ca-certs field.  See
+:ref:`Connection show command` for more detailed display of individual fields
+used by the server.
 
 See :ref:`pywbemcli connection list --help` for the exact help output of the command.
 

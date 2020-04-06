@@ -702,9 +702,7 @@ Help text for ``pywbemcli connection list`` (see :ref:`connection list command`)
       See also the 'connection select' command.
 
     Command Options:
-      -f, --full  If set, display the full table. Otherwise display  a brief view(name, server, mock_server columns). This
-                  table does not show the ca_certs field.
-
+      -f, --full  If set, display the full table. Otherwise display a brief view(name, server, mock_server columns).
       -h, --help  Show this message and exit.
 
 
