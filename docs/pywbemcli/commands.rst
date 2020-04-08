@@ -1311,7 +1311,7 @@ See :ref:`pywbemcli connection export --help` for the exact help output of the c
 .. _`Connection list command`:
 
 Connection list command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection list`` command lists the connection definitions in the
 :term:`connections file` and also the current connection if it has not been
@@ -1331,19 +1331,56 @@ The default connection, if defined, is marked with `#` in the Name column.
     pywbemcli> --server http://localhost --user me --password mypw --no-verify connection save me
 
     pywbemcli> --server http://blahblah connection list
-    WBEM server connections:  (#: default, *: current)
-    +--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------+
-    | name         | server           | namespace   | user        |   timeout | verify   | mock-server                            |
-    |--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------|
-    | *blahblah    | http://blah      | root/cimv2  |             |        45 | False    |                                        |
-    | mock1        |                  | root/cimv2  |             |           | False    | tests/unit/simple_mock_model.mof       |
-    | mockalltypes |                  | root/cimv2  |             |        30 | False    | tests/unit/all_types.mof               |
-    | mockassoc    |                  | root/cimv2  |             |        30 | False    | tests/unit/simple_assoc_mock_model.mof |
-    | mockext      |                  | root/cimv2  |             |        30 | False    | tests/unit/simple_mock_model_ext.mof   |
-    | op           | http://localhost | root/cimv2  | xxxxxxxxxxx |           | False    |                                        |
-    | test3        |                  | root/cimv2  |             |           | False    | tests/unit/simple_mock_model.mof       |
-    |              |                  |             |             |           |          | tests/unit/mock_confirm_y.py           |
-    +--------------+------------------+-------------+-------------+-----------+----------+----------------------------------------+
+    WBEM server connections(brief):  (#: default, *: current)
+    +--------------+------------------+----------------------------------------+
+    | name         | server           | mock-server                            |
+    |--------------+------------------+----------------------------------------|
+    | *blahblah    | http://blah      |                                        |
+    | mock1        |                  | tests/unit/simple_mock_model.mof       |
+    | mockalltypes |                  | tests/unit/all_types.mof               |
+    | mockassoc    |                  | tests/unit/simple_assoc_mock_model.mof |
+    | mockext      |                  | tests/unit/simple_mock_model_ext.mof   |
+    | op           | http://localhost |                                        |
+    | test3        |                  | tests/unit/simple_mock_model.mof       |
+    |              |                  | tests/unit/mock_confirm_y.py           |
+    +--------------+------------------+----------------------------------------+
+
+A more complete display of the server parameters is available with the
+`--full` option as follows:
+
+.. code-block:: text
+
+    pywbemcli> connection list --full
+
+    WBEM server connections(full): (#: default, *: current)
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | name         | server               | namespace              | user        |   timeout | use_pull   | verify   | certfile   | keyfile   | mock-server                                      |
+    +==============+======================+========================+=============+===========+============+==========+============+===========+==================================================+
+    | #mockassoc   |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/simple_assoc_mock_model.mof           |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | alltypes     |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/all_types.mof                         |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | complexassoc |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/complex_assoc_model.mof               |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | mock1        |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/simple_mock_model.mof                 |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | mock1ext     |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/simple_mock_model_ext.mof             |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | mock1interop |                      | interop                |             |        30 |            | True     |            |           | tests/unit/simple_mock_model.mof                 |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | ophttp       | http://localhost     | root/cimv2             |             |        30 |            | True     |            |           |                                                  |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | ophttps      | https://localhost    | root/cimv2             | blahblah    |        30 |            | False    |            |           |                                                  |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | opt          | https://blah         | root/cimv2             |             |        45 |            | False    | c1.pem     | k1.pem    |                                                  |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+    | test1        |                      | root/cimv2             |             |        30 |            | True     |            |           | tests/unit/simple_assoc_mock_model.mof           |
+    +--------------+----------------------+------------------------+-------------+-----------+------------+----------+------------+-----------+--------------------------------------------------+
+
+
+`Connection list` does not display some fields such as the ca-certs field.  See
+:ref:`Connection show command` for more detailed display of individual fields
+used by the server.
 
 See :ref:`pywbemcli connection list --help` for the exact help output of the command.
 

@@ -177,6 +177,15 @@ Released: not yet
 
 * Increased minimum version of pywbem to 0.17.0 (See issue #571)
 
+* Add option `--full` to `connection list` to create both a brief table
+  output that only has 3 columns (name, server, mock-server) as default but
+  when the option is set all of the columns currently in the report. We did
+  this because it appears that the most frequent use of this command is to just
+  get the name of the various servers defined within an 80 column display.
+  This also now shows empty columns where the original report hid any columns
+  that were empty. (See issue #556)
+
+
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning

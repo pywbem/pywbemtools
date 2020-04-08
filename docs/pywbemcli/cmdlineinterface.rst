@@ -30,14 +30,15 @@ The command line can contain the following components:
   on the pywbemcli general options.
 
 * **COMMAND** - A name of a command which may consist of:
-  * <group name> <command name> for those commands that are defined in
-    groups (ex. `class find`).
-  * Just the group name (ex. `class`).
-  * <command name> for those commands that are not part of a group. (``repl``
-    and ``help``) that are not in any command group.
+   * <group name> <command name> for commands that are defined within
+     groups (ex. ``class find``).
+   * <group name> (ex. ``class``) to show group help including list of  command
+     within the group.
+   * <command name> for those commands that are not part of a group. For
+     example ``repl`` and ``help`` that are not in any command group.
 * **ARGS** - Arguments for a command.
-* **COMMAND-OPTIONS** - Command options; they apply only to a particular
-  command.
+* **COMMAND-OPTIONS** - Options that apply only to a particular
+  COMMAND.
 
 
 Options are prefixed with the characters ``-`` for the short form or ``--`` for
