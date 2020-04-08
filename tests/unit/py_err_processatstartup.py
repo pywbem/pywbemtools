@@ -7,6 +7,7 @@ extension for the test environment.
 """
 
 
+# pylint: disable=syntax-error
 def mock?prompt(msg):  # noqa: E999
     """Mock function to replace pywbemcli_prompt and return a value"""
     # pylint: disable=undefined-variable

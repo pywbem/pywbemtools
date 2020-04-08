@@ -91,6 +91,7 @@ INSTANCE_HELP_INSTANCENAME_LINES = [
 ]
 
 INSTANCE_ASSOCIATORS_HELP_LINES = [
+    # pylint: disable=line-too-long
     'Usage: pywbemcli [GENERAL-OPTIONS] instance associators INSTANCENAME [COMMAND-OPTIONS]',  # noqa: E501
     'List the instances associated with an instance.',
     '--ac, --assoc-class CLASSNAME Filter the result set by association clas',
@@ -1050,7 +1051,7 @@ Instances: PyWBEM_AllTypes
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1059,7 +1060,7 @@ Instances: PyWBEM_AllTypes
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '-n', 'root/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1068,7 +1069,7 @@ Instances: PyWBEM_AllTypes
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'test/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1077,7 +1078,7 @@ Instances: PyWBEM_AllTypes
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '-n', 'test/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1086,7 +1087,7 @@ Instances: PyWBEM_AllTypes
      ['get', 'root/cimv2:CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
       '--namespace', 'root/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1294,7 +1295,7 @@ Instances: PyWBEM_AllTypes
     ['INSTANCENAME with wildcard keybinding, --key option (error)',
      ['get', 'TST_Person.?', '--key', 'name=Saara'],
      {'stderr': "Using the --key option conflicts with specifying a "
-      "wildcard keybinding",
+                "wildcard keybinding",
       'rc': 1,
       'test': 'regex'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
@@ -1310,7 +1311,7 @@ Instances: PyWBEM_AllTypes
      'option --namespace with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'root/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1319,7 +1320,7 @@ Instances: PyWBEM_AllTypes
      'option -n with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '-n', 'root/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1328,7 +1329,7 @@ Instances: PyWBEM_AllTypes
      'option --namespace with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'test/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1337,7 +1338,7 @@ Instances: PyWBEM_AllTypes
      'option -n with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '-n', 'test/cimv2'],
      {'stderr': "Using the --namespace option conflicts with specifying a "
-      "namespace",
+                "namespace",
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],

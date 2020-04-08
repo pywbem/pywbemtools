@@ -180,7 +180,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     @property
     def spinner_enabled(self):
         """
-        :term: `bool`: Indicates and controls whether the spinner is enabled.
+        :class:`py:bool`: Indicates and controls whether the spinner is enabled.
 
         If the spinner is enabled, subcommands will display a spinning wheel
         while waiting for completion.

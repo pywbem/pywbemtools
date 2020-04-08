@@ -39,18 +39,18 @@ def _validate_server(server):
     """
     Validate  and possibly complete the wbemserver url provided.
 
-      Parameters:
+    Parameters:
 
-        server: (string):
-          url of the WBEMServer to which connection is being made including
-          scheme, hostname/IPAddress, and optional port
-      Returns:
+      server (string):
+        url of the WBEMServer to which connection is being made including
+        scheme, hostname/IPAddress, and optional port
+
+    Returns:
         The input url or url extended to use DEFAULT_SCHEME as the
         scheme if not is provided
 
-      Exceptions:
+    Raises:
         click.CLICKException if scheme invalid
-
     """
     if server[0] == '/':
         url = server
@@ -110,9 +110,9 @@ class PywbemServer(object):
                  timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None, use_pull=None,
                  certfile=None, keyfile=None, ca_certs=None, mock_server=None):
         """
-            Create  a PywbemServer object. This contains the configuration
-            and operation information to create a connection to the server
-            and execute cim_operations on the server.
+        Create  a PywbemServer object. This contains the configuration
+        and operation information to create a connection to the server
+        and execute cim_operations on the server.
         """
 
         if server and mock_server:
@@ -134,6 +134,7 @@ class PywbemServer(object):
 
         # dynamically created in create_connection
         self._wbem_server = None
+        self._conn = None
 
     def __str__(self):
         return 'PywbemServer(url={} name={})'.format(self.server, self.name)
@@ -168,7 +169,7 @@ class PywbemServer(object):
     @property
     def mock_server(self):
         """
-        :term: `list of strings`: list of file paths for mock server setup.
+        list of :term:`string`: list of file paths for mock server setup.
         """
         return self._mock_server
 
@@ -241,7 +242,7 @@ class PywbemServer(object):
     @property
     def timeout(self):
         """
-        :term: `int`: Connection timeout to be used on requests in seconds
+        :term:`int`: Connection timeout to be used on requests in seconds
         """
         return self._timeout
 
@@ -260,7 +261,7 @@ class PywbemServer(object):
     @property
     def use_pull(self):
         """
-        :term: `string`: Connection timeout to be used on requests in seconds
+        :term:`string`: Connection timeout to be used on requests in seconds
         """
         return self._use_pull
 
@@ -277,7 +278,7 @@ class PywbemServer(object):
     @property
     def verify(self):
         """
-        :term: `bool`: Connection server verfication flag. If True
+        :class:`py:bool`: Connection server verfication flag. If True
         server cert verified during connection.
         """
         return self._verify
@@ -292,7 +293,7 @@ class PywbemServer(object):
     @property
     def certfile(self):
         """
-        :term: `string`: certtificate for server or None if parameter not
+        :term:`string`: certtificate for server or None if parameter not
         provided on input
         """
         return self._certfile
@@ -307,7 +308,7 @@ class PywbemServer(object):
     @property
     def keyfile(self):
         """
-        :term: `string`: keyfile or None if no keyfile parameter input
+        :term:`string`: keyfile or None if no keyfile parameter input
         """
         return self._keyfile
 
@@ -321,7 +322,7 @@ class PywbemServer(object):
     @property
     def ca_certs(self):
         """
-        :term: `list of strings`: List of ca_certs if provided on cmd line
+        list of :term:`string`: List of ca_certs if provided on cmd line
         """
         return self._ca_certs
 
@@ -409,7 +410,7 @@ class PywbemServer(object):
         connection must be restablished
         """
         self._conn = None
-        self._wbemserver = None
+        self._wbem_server = None
 
     def create_connection(self, log=None, use_pull=None, pull_max_cnt=None,
                           verbose=None, timestats=None):

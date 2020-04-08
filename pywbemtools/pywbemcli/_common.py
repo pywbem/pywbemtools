@@ -73,16 +73,17 @@ def validate_output_format(output_format, valid_format_groups,
     context.output_format is None.
 
     Parameters:
-      output_format(:term:`string` or None):
+
+      output_format (:term:`string` or None):
         The output format string provided by input (i.e. ContextObj) or
         None if there is no defined format for this command execution.
 
-      valid_format_groups(list of :term:`string` or :term:`string`):
+      valid_format_groups (list of :term:`string` or :term:`string`):
         One or more strings in a list where the allowed strings are:
         'CIM', 'TABLE'. An empty list implies any output group if valid.
         A single string may be used to designate a single group
 
-      default_format(:term:`string` or None):
+      default_format (:term:`string` or None):
         One of the valid format definitions or None.  The format must be in the
         OUTPUT_FORMAT list. If None, the default format for the first group is
         returned
@@ -118,15 +119,13 @@ def validate_output_format(output_format, valid_format_groups,
     else:
         if default_format:
             return default_format
-        elif valid_format_groups:
+        if valid_format_groups:
             if valid_format_groups[0] == 'CIM':
                 return DEFAULT_CIM_OUTPUT_FORMAT
             if valid_format_groups[0] == 'TABLE':
                 return DEFAULT_TABLE_OUTPUT_FORMAT
-            else:
-                return DEFAULT_CIM_OUTPUT_FORMAT
-        else:
             return DEFAULT_CIM_OUTPUT_FORMAT
+        return DEFAULT_CIM_OUTPUT_FORMAT
 
     valid_formats = ""
     err_msg = "not allowed for this command"
@@ -159,14 +158,15 @@ def resolve_propertylist(propertylist):
     Further, property lists can be input as a comma separated list so this
     function also splits any string with embedded commas.
 
-    Parameters (list of :term:`string` or None):
+    Parameters:
+
+      propertylist (list of :term:`string` or None):
         Each item in list may be a single property name or a collection of
         property names separated by commas.
 
     Returns:
         list of property names resulting from parsing input or empty list
         or None
-
     """
     # If no property list, return None which means all properties
     if not propertylist:
@@ -217,11 +217,13 @@ def pick_one_from_list(context, options, title):
         Title to display before selection
 
     Retries until either integer within range of options list is input
-    or user enter no value. Ctrl_C ends even the REPL.
+    or user enter no value. Ctrl-C ends even the REPL.
 
-    Returns: Selected item from options_list
+    Returns:
+      Selected item from options_list
 
-    Exception: Returns ValueError if Ctrl-c input from console.
+    Raises:
+      ValueError if Ctrl-c input from console.
 
     TODO: Possible Future This could be replaced by the python pick library
     that would use curses for the selection process.
@@ -269,16 +271,18 @@ def pick_instance(context, objectname, namespace=None):
     Display list of instances names from provided classname to console and user
     selects one. Returns the selected instancename.
 
-      Parameters:
-        context:
-            Current click context or None
+    Parameters:
 
-        classname:
-            Classname to use to get instance names from server
+      context:
+        Current click context or None
 
-      Returns:
+      classname:
+        Classname to use to get instance names from server
+
+    Returns:
         instancename selected or None if there are no instances to pick
-      Exception:
+
+    Raises:
         ClickException if user choses to terminate the selection process
     """
     if not is_classname(objectname):
@@ -303,6 +307,9 @@ def pick_multiple_from_list(context, options, title):
     the user to select multiple entries from that list.  Returns a list of
     the items selected.
 
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl-C ends even the REPL.
+
     Parameters:
       context:
         If not None, the ContextObj which is used to stop and start the
@@ -313,12 +320,11 @@ def pick_multiple_from_list(context, options, title):
       title:
         Title to display before selection
 
-    Retries until either integer within range of options list is input
-    or user enter no value. Ctrl_C ends even the REPL.
+    Returns:
+      list of index of selected items
 
-    Returns: list of index of selected items
-
-    Exception: Returns ValueError if Ctrl-c input from console.
+    Raises:
+      ValueError if Ctrl-c input from console.
 
     TODO: This could be replaced by the python pick library that would use
     curses for the selection process.
@@ -354,17 +360,17 @@ def pick_multiple_from_list(context, options, title):
                    'stop selection.'.format(selection, index))
 
 
-def is_classname(str_):
+def is_classname(astring):
     """
-    Test if the str_ input is a classname or contains instance name
+    Test if the astring input is a classname or contains instance name
     components.  The existence of a period at the end of the name component
     determines if it is a classname or instance name.
 
     Returns:
         True if classname. Otherwise it returns False
     """
-    assert isinstance(str_, six.string_types)
-    return not re.match(r'[a-zA_Z0-9_].*\.', str_)
+    assert isinstance(astring, six.string_types)
+    return not re.match(r'[a-zA_Z0-9_].*\.', astring)
 
 
 def filter_namelist(pattern, name_list, ignore_case=True):
@@ -381,14 +387,18 @@ def filter_namelist(pattern, name_list, ignore_case=True):
         - *ABC matches any name that includes ABC
 
     Parameters:
-      pattern (:term: `String`) Python glob pattern to match.
 
-      name_list: List of strings to be matched.
+      pattern (:term:`string`):
+        Python glob pattern to match.
 
-      ignore_case: bool. If True, do case-insensitive match. Default = True
+      name_list:
+        List of strings to be matched.
+
+      ignore_case (bool):
+        If True, do case-insensitive match. Default = True
 
     Returns:
-     List of names that match.
+        List of names that match.
 
     Raises:
         click.ClickException for regex compile error
@@ -416,14 +426,15 @@ def verify_operation(txt, msg=None):
     Issue click confirm request and return result.  If msg is none and
     confirm response is n, output msg.
 
-      Parameters
-        txt(:term:`string`):
+    Parameters:
+
+      txt (:term:`string`):
         String that is prefixed to the prompt text.
 
-      msg (:class:`py:bool`)
+      msg (:class:`py:bool`):
         Optional parameter that if True causes an abort msg on the console.
 
-      Returns:
+    Returns:
         (:class:`py:bool`) where true corresponds to 'y' prompt response
     """
     if click.confirm(txt):
@@ -472,11 +483,11 @@ def create_cimvalue(cim_type, value_str, is_array):
     CIMValue or list of CIMValue elements.
 
     Parameters:
-      cim_type: (:term: `string`)
+      cim_type (:term:`string`):
         CIMType for this value. The CIM data type name for the CIM object.
         See :ref:`CIM data types` for valid type names.
 
-      value_str (:term: `string`):
+      value_str (:term:`string`):
         String defining the input to be parsed.
 
       is_array (:class:`py:bool`):
@@ -486,7 +497,7 @@ def create_cimvalue(cim_type, value_str, is_array):
         is_array == False. Returns a single CIMValue
         is_array == True. Returns a list of CIMValues
 
-    Exceptions:
+    Raises:
         ValueError if the value_str cannot be parsed consistent with
         the cim_type and is_array attributes of the call.
     """
@@ -527,21 +538,22 @@ def create_cimproperty(cim_type, is_array, name, value_str):
     Create and return a CIMProperty from the input parameters and the
     information in cim_class.
 
-      Parameters:
-        cim_class (:class:`~pywbem.CIMClass`)
-          CIM Class that includes the property defined by name
+    Parameters:
 
-        name (:term: `string`)
-            Name of the property to be constructed
+      cim_class (:class:`~pywbem.CIMClass`):
+        CIM Class that includes the property defined by name
 
-        value_str (:term: `string`)
-            String form for the value to be inserted.
+      name (:term:`string`):
+        Name of the property to be constructed
 
-      Return:
+      value_str (:term:`string`):
+        String form for the value to be inserted.
+
+    Returns:
         CIMProperty with name defined by name and CIMValue corresponding to
         value_str and property information from the class
 
-      Exception:
+    Raises:
         ValueError if value_str, cim_type and is_array mismatch.
     """
     cim_value = create_cimvalue(cim_type, value_str, is_array)
@@ -565,12 +577,10 @@ def create_ciminstancename(cim_class, kv_keys):
         A tuple of name/value pairs representing the keys and their
         values that are to be constructed for the instance name. Required
 
-      Returns:
-
+    Returns:
         CIMInstanceName: with namespace = None and host = None
 
-      Exceptions:
-
+    Raises:
         click.ClickException if Property name not found in class or if mismatch
           of property type in class vs value component of kv pair
     """
@@ -618,22 +628,23 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
     """
     Create a CIMInstance object from the input parameters.
 
-      Parameters:
+    Parameters:
 
-        cim_class (CIMClass):
-            The class from which the CIMInstance is to be created
+      cim_class (CIMClass):
+        The class from which the CIMInstance is to be created
 
-        kv_properties (tuple):
-            A tuple of name/value pairs representing the properties and their
-            values that are to be constructed for the instance. Required
+      kv_properties (tuple):
+        A tuple of name/value pairs representing the properties and their
+        values that are to be constructed for the instance. Required
 
-        property_list (list):
-            a list of properties that is to be the list that is supplied
-            when the instance is created. Optional
+      property_list (list):
+        a list of properties that is to be the list that is supplied
+        when the instance is created. Optional
 
-      Returns: CIMInstance
+    Returns:
+        CIMInstance
 
-      Exceptions:
+    Raises:
         click.ClickException if Property name not found in class or if mismatch
           of property type in class vs value component of kv pair
     """
@@ -647,11 +658,11 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
                                        .format(name, cim_class.classname))
 
         try:
-            property = create_cimproperty(cl_prop.type,
-                                          cl_prop.is_array,
-                                          name,
-                                          value_str)
-            properties.append((name, property))
+            prop = create_cimproperty(cl_prop.type,
+                                      cl_prop.is_array,
+                                      name,
+                                      value_str)
+            properties.append((name, prop))
         except ValueError as ex:
             raise click.ClickException("Type mismatch property '{}' between "
                                        "expected type='{}', array={} and input "
@@ -732,14 +743,14 @@ def parse_kv_pair(pair):
     return name, value
 
 
-def split_array_value(string, delimiter):
+def split_array_value(astring, delimiter):
     """Simple split of a string based on a delimiter"""
 
-    rslt = [item for item in split_str_w_esc(string, delimiter)]
+    rslt = split_str_w_esc(astring, delimiter)
     return rslt
 
 
-def split_str_w_esc(str_, delimiter, escape='\\'):
+def split_str_w_esc(astring, delimiter, escape='\\'):
     """
     Split string based on delimiter defined in call and the escape character \\
     To escape use of the delimiter in the strings. Delimiter may be multi
@@ -748,7 +759,7 @@ def split_str_w_esc(str_, delimiter, escape='\\'):
     """
     ret = []
     current_element = []
-    iterator = iter(str_)
+    iterator = iter(astring)
     for ch in iterator:
         if ch == escape:
             try:
@@ -820,7 +831,7 @@ def process_invokemethod(context, objectname, methodname, options):
 
         Parameters:
 
-          cim_method():
+          cim_method (CIMMethod):
             CIM Method that is the template for the parameters.  It is used to
             evaluate the kv_params and generate corresponding CIMParameter
             objects to be passed to the InvokeMethod
@@ -974,25 +985,27 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     the str of the type.
 
     Parameters:
+
       context (:class:`ContextObj`):
         Click context contained in ContextObj object.
 
       TODO: Future:This line was way too long. Since we are not putting it
             into docmentation today, we folded it.
-      objects(iterable of :class:`~pywbem.CIMInstance`,
+
+      objects (iterable of :class:`~pywbem.CIMInstance`,
         :class:`~pywbem.CIMInstanceName`, :class:`~pywbem.CIMClass`,
         :class:`~pywbem.CIMClassName`,
         or :class:`~pywbem.CIMQualifierDeclaration`):
         Iterable of zero or more CIM objects to be displayed.
 
-      output_format(:term:`strng`):
+      output_format (:term:`string`):
         String defining the preferred output format. Must not be None since
         the correct output_format must have been selected before this call.
         Note that the output formats allowed may depend on a) whether
         summary is True, b)the specific type because we do not have a table
         output format for CIMClass.
 
-      summary(:class:`py:bool`):
+      summary (:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
     """
@@ -1090,9 +1103,9 @@ def format_keys(obj, max_width):
 
     Parameters:
 
-        obj(:Class:`pwbem.CIMInstanceName`):
-            Instance name from which keybindings are to be extracted for
-            formatting.
+      obj (:class:`pwbem.CIMInstanceName`):
+        Instance name from which keybindings are to be extracted for
+        formatting.
 
     Returns:
         :term:`string` containing the keys from the input obj formatted for
@@ -1159,35 +1172,38 @@ class NoCaseList(object):
 
         Parameters:
 
-          strs(list of :term: `string`)
+          strs (list of :term:`string`):
             The strings that will make up the list
         """
 
         assert isinstance(strs, list)
         self.str_list = strs
 
-    def __contains__(self, str):
+    def __contains__(self, astring):
         """
         Implement Python 'in' functionality.
 
-        Parameters(:term:`string_types`):
-          String to test against the instance of NocaseList
+        Parameters:
+
+          astring (:term:`string`):
+            String to test against the instance of NocaseList
 
         Returns:
           True if string in list (case insensitive compare)
         """
 
-        assert str is not None
-        return str.lower() in (n.lower() for n in self.str_list)
+        assert astring is not None
+        return astring.lower() in (n.lower() for n in self.str_list)
 
     def add(self, strs):
         """
         Add string or list of strings to the list
 
-        Parameters:(:term:`string_types` or list, tuple of :term:`string_types`):  # noqa:E501
-          String to test against the instance of NocaseList.
+        Parameters:
 
-        """
+          strs (:term:`string` or list, tuple of :term:`string`):
+            String to test against the instance of NocaseList.
+      """
         if not strs:
             return
         if isinstance(strs, list):
@@ -1195,31 +1211,32 @@ class NoCaseList(object):
         else:
             self.str_list.append(strs)
 
-    def get(self, str):
+    def get(self, astring):
         """
-        Get the string that matches str case insensitive
+        Get the string that matches astring case insensitive
 
-        Parameters:(:term:`string_types` or list, tuple of :term:`string_types`):  # noqa:E501
-          String to test against the instance of NocaseList.
+        Parameters:
+
+          astring (:term:`string` or list, tuple of :term:`string`):
+            String to test against the instance of NocaseList.
 
         Returns:
-            String in list that matches No case the input str
+            String in list that matches No case the input string, or None
+            if the input string was empty or None.
 
         Raises:
             KeyError: If no match
-
         """
-        if not str:
-            return
-        tstr = str.lower()
-        for str in self.str_list:
-            if tstr == str.lower():
-                return str
-        raise KeyError('{} not found in list'.format(str))
+        if not astring:
+            return None
+        tstr = astring.lower()
+        for s in self.str_list:
+            if tstr == s.lower():
+                return s
+        raise KeyError('{} not found in list'.format(astring))
 
 
 def shorten_path_str(path, replacements, fullpath):
-
     """
     Create a short-form path str from the input CIMInstanceName with selected
     components shortened to just a single known character.  This allows
@@ -1239,7 +1256,7 @@ def shorten_path_str(path, replacements, fullpath):
         causes the replacement. Otherwise, both the name and value must
         match.
 
-      fullpath((:class:`py:bool`):):
+      fullpath (:class:`py:bool`):
         If True Return complete path using to_wbem_rul. Otherwise, shorten
         the path by replacing keys defined by the replacements dictionary.
         shorten the path, otherwise simply convert to string. Othewise
@@ -1541,39 +1558,39 @@ def format_table(rows, headers, title=None, table_format='simple',
     table format where each inner list is a row.
     This code is temporary while the tabulate package is updated
 
-      Parameters:
-          headers (list strings) where each string is a
-           table column name or None if no header is to be attached
+    Parameters:
 
-          table_data - list of lists where:
-             each the top level iterables represents the list of rows
-             and each row is an iterable of strings for the data in that
-             row.
+      headers (list strings):
+        where each string is a table column name or None if no header is to be
+        attached
 
-          title (:term: `string`):
-             Optional title to be places io the output above the table.
-             No title is output if this parameter is None
+      table_data (list of lists):
+        where each the top level iterables represents the list of rows
+        and each row is an iterable of strings for the data in that row.
 
-          table_format (:term: 'string'):
-            Output format defined by the string and limited to one of the
-            choice of table formats defined in TABLE_FORMATS list
+      title (:term:`string`):
+         Optional title to be places io the output above the table.
+         No title is output if this parameter is None
 
-          output_file (:term: 'string'):
-            If not None, a file name to which the output formatted data
-            is sent.
+      table_format (:term:`string`):
+        Output format defined by the string and limited to one of the
+        choice of table formats defined in TABLE_FORMATS list
 
-          sort_columns (int or list of int that defines sort):
-            Defines the cols that will be sorted. If int, it defines the column
-            that will be sorted. If list of int, the sort is in sort order of
-            cols in the list (i.e. minor sorts to the left, major sorts to the
-            right). Note that entries in each row of the columns to be sorted
-            must be of the same type (int, str, etc.) to be sortable.
+      output_file (:term:`string`):
+        If not None, a file name to which the output formatted data is sent.
 
-      Returns: (:term:`string`)
-        Returns the formatted table as a string
+      sort_columns (int or list of int that defines sort):
+        Defines the cols that will be sorted. If int, it defines the column
+        that will be sorted. If list of int, the sort is in sort order of
+        cols in the list (i.e. minor sorts to the left, major sorts to the
+        right). Note that entries in each row of the columns to be sorted
+        must be of the same type (int, str, etc.) to be sortable.
 
-      Exceptions:
-        Raises click.ClickException if invalid table format string
+    Returns:
+        :term:`string`: Returns the formatted table as a string
+
+    Raises:
+        click.ClickException if invalid table format string
     """
     if sort_columns is not None:
         if isinstance(sort_columns, int):
@@ -1613,46 +1630,45 @@ def fold_strings(input_strings, max_width, break_long_words=False,
     max_width criteria.  Lists of strings may be folded with one string per
     line or concatenated and then folded.
 
-      Parameters:
+    Parameters:
 
-        input_strings (:term:`string` or list of :term:`string`):
-          The string that will be contents of into the cell. This string may
-          already include multiple lines.
+      input_strings (:term:`string` or list of :term:`string`):
+        The string that will be contents of into the cell. This string may
+        already include multiple lines.
 
-        max_width (:term:`integer`):
-          Maximum width of cell containing the resulting string.  Data is
-          folded into multiple lines to fit into this width.
+      max_width (:term:`integer`):
+        Maximum width of cell containing the resulting string.  Data is
+        folded into multiple lines to fit into this width.
 
-        break_long_words(:class:`py:bool`)
-          Boolean that forces long words to be broken if True
-          If False, long words will not break at the max width
+      break_long_words (:class:`py:bool`):
+        Boolean that forces long words to be broken if True
+        If False, long words will not break at the max width
 
-        break_on_hyphens:(:class:`py:bool`):
-          If True use hypens as word separator.
+      break_on_hyphens (:class:`py:bool`):
+        If True use hypens as word separator.
 
-        fold_list_items(:class:`py:bool`):
-          If True, force fold for each item in list/tupe of input strings if
-          single line concatenation is longer than max_width. Otherwise list is
-          contatenated and the result folded.
+      fold_list_items (:class:`py:bool`):
+        If True, force fold for each item in list/tupe of input strings if
+        single line concatenation is longer than max_width. Otherwise list is
+        contatenated and the result folded.
 
-        separator(:term:`string`):
-          String that is separator between list items when folded into
-          string.
+      separator (:term:`string`):
+        String that is separator between list items when folded into
+        string.
 
-        initial_indent(:term:`integer` or :term:`string`):
-          Integer  or string defining the number of characters of indent for
-          the first line if single string or the first line of each string in
-          the list if input_strings is a list and fold_list_items is True.
+      initial_indent (:term:`integer` or :term:`string`):
+        Integer  or string defining the number of characters of indent for
+        the first line if single string or the first line of each string in
+        the list if input_strings is a list and fold_list_items is True.
 
-        subsequent_indent(:term:`integer`):
-          Integer or string, defining the number of characters of indent for
-          the all but the first lineif single string or the first line of
-          each string in the list if input_strings is a list and
-          fold_list_items is True.
+      subsequent_indent (:term:`integer`):
+        Integer or string, defining the number of characters of indent for
+        the all but the first lineif single string or the first line of
+        each string in the list if input_strings is a list and
+        fold_list_items is True.
 
-
-      Returns:
-          String representing the folded input_strings
+    Returns:
+        String representing the folded input_strings
     """
     def indent_str(indent):
         """
@@ -1688,9 +1704,7 @@ def fold_strings(input_strings, max_width, break_long_words=False,
                                      initial_indent=initial_indent,
                                      subsequent_indent=subsequent_indent))
                 return "\n".join(folded_strings)
-
-            else:
-                input_strings = build_str
+            input_strings = build_str
 
     # process single string
     input_string = input_strings

@@ -367,7 +367,7 @@ def show_connection_information(context, connection, separate_line=True,
     context.spinner_stop()
 
     click.echo(format_table(rows, headers, title='Connection status:',
-               table_format=output_format))
+                            table_format=output_format))
 
 
 def get_current_connection_name(context):
@@ -387,14 +387,12 @@ def raise_repository_empty(connections):
 
 
 def select_connection(name, context, connections):
-    # pylint: disable=inconsistent-return-statement
     """
     Use the interactive mode to select the connection from the list of
     connections in the connections file. If the name is provided, it is tested
     against the names in the connections file.  If it is not provided,
     """
     context.spinner_stop()
-    # get all names from dictionary
 
     if not connections:
         raise_repository_empty(connections)
@@ -407,13 +405,8 @@ def select_connection(name, context, connections):
             .format(name, connections.connections_file))
 
     conn_names = sorted(list(six.iterkeys(connections)))
-
-    # TODO: Really do not need the if on conn_names. already tested above
-    if conn_names:
-        # TODO the Ctrl_C should be part of the pick from list
-        return pick_one_from_list(context, conn_names,
-                                  "Select a connection or Ctrl_C to abort.")
-    raise_repository_empty(connections)
+    return pick_one_from_list(context, conn_names,
+                              "Select a connection or Ctrl-C to abort.")
 
 
 ################################################################
@@ -606,8 +599,7 @@ def cmd_connection_list(context, options):
             return [name, svr.server, svr.default_namespace, svr.user,
                     svr.timeout, svr.use_pull, svr.verify, svr.certfile,
                     svr.keyfile, "\n".join(svr.mock_server)]
-        else:
-            return[name, svr.server, "\n".join(svr.mock_server)]
+        return [name, svr.server, "\n".join(svr.mock_server)]
 
     connections = ConnectionRepository()
     output_format = validate_output_format(context.output_format, 'TABLE')

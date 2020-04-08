@@ -116,7 +116,7 @@ class ClassTests(TestsContainer):
         self.assertEqual(err, '', 'Expect no std_err. Found {}'.format(err))
         self.assert_found('CIM_ManagedElement ', out)
 
-    def test__get_localonly(self):
+    def test_get_localonly(self):
         """Test class get --local-only"""
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement -l')
 
@@ -131,7 +131,7 @@ class ClassTests(TestsContainer):
         self.assert_found('CIM_ManagedElement', out)
 
     def test_get_no_includequalifiers(self):
-        """ """
+        """Test class get --no-qualifiers"""
         exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement --no-qualifiers')
 
@@ -186,14 +186,14 @@ class InstanceTests(TestsContainer):
         return exitcode, std_out_str, std_err_str
 
     def test_enumerate_simple(self):
-        """ """
+        """Execute simple enumerate"""
         exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person')
 
         self.assertEqual(exitcode, 0)
         self.assert_found('instance of PyWBEM_Person', out)
 
     def test_enumerate_proplist(self):
-        """ """
+        """Execute enumerate with propertylist"""
         exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person '
                                                '-p Name')
 
@@ -202,7 +202,7 @@ class InstanceTests(TestsContainer):
         self.assert_not_found('CreationClassName', out)
 
     def test_get_simple(self):
-        """Execute simple get of known instance """
+        """Execute simple get of known instance"""
         exitcode, out, err = self.instance_cmd(
             'get PyWBEM_Person.CreationClassname=PyWBEM_Person,Name=Bob')
 
@@ -284,6 +284,7 @@ class InstanceTests(TestsContainer):
         self.assertEqual(exitcode, 1)
 
     def test_references(self):
+        """Test simple references"""
         exitcode, out, err = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
@@ -292,6 +293,7 @@ class InstanceTests(TestsContainer):
         self.assert_found('instance of PyWBEM_MemberOfPersonCollection', out)
 
     def test_reference_paths(self):
+        """Test references with -o"""
         exitcode, out, err = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')
@@ -300,6 +302,7 @@ class InstanceTests(TestsContainer):
         self.assert_found(':PyWBEM_MemberOfPersonCollection.Member', out)
 
     def test_associators(self):
+        """Test simple associators"""
         exitcode, out, err = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
@@ -308,6 +311,7 @@ class InstanceTests(TestsContainer):
         self.assert_found('instance of PyWBEM_PersonCollection', out)
 
     def test_associator_paths(self):
+        """Test simple associators with -o"""
         exitcode, out, err = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')

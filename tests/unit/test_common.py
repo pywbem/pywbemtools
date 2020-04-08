@@ -291,14 +291,14 @@ TESTCASES_FORMAT_KEYBINDINGS = [
 
     ('Verify multiple keys binding with many keys keys without fold',
      dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)],
+              ('k6', 6), ('k7', 7), ('k8', 8)],
           width=100,
           exp_rtn=('k1=1,k2=2,k3=3,k4=4,k5=5,k6=6,k7=7,k8=8')),
      None, None, True),
 
     ('Verify multiple keys binding with many keys every key folds',
      dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)],
+              ('k6', 6), ('k7', 7), ('k8', 8)],
           width=3,
           exp_rtn=('k1=1\nk2=2\nk3=3\nk4=4\nk5=5\nk6=6\nk7=7\nk8=8')),
      None, None, True),
@@ -306,7 +306,7 @@ TESTCASES_FORMAT_KEYBINDINGS = [
 
     ('Verify multiple keys binding with many keys keys some fold',
      dict(kb=[('k1', 1), ('k2', 2), ('k3', 3), ('k4', 4), ('k5', 5),
-                         ('k6', 6), ('k7', 7), ('k8', 8)],
+              ('k6', 6), ('k7', 7), ('k8', 8)],
           width=8,
           exp_rtn=('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')),
      None, None, False),
@@ -1668,7 +1668,7 @@ TESTCASES_SPLITARRAYVALUE = [
 @simplified_test_function
 def test_split_array_value(testcase, input, exp_rslt):
     """
-    Test psplit_array_value common function
+    Test split_array_value() common function
     """
     # Code to be tested
 

@@ -183,20 +183,20 @@ function-name-hint=_{0,2}([a-z][a-z0-9_]{0,28}[a-z0-9]|[a-z][a-zA-Z0-9]{1,29})(_
 # other variables; one leading underscore is allowed, and one trailing
 # underscore is allowed to avoid conflists with built-in names.
 # Names matching this expression are compatible with PEP-8.
-variable-rgx=_{0,1}([A-Z]([A-Z0-9_]{0,38}[A-Z0-9])?|[a-z]([a-z0-9_]{0,38}[a-z0-9])?|[a-z]([a-zA-Z0-9]{1,39})?)_{0,1}$
+variable-rgx=_{0,1}([A-Z]([A-Z0-9_]{0,48}[A-Z0-9])?|[a-z]([a-z0-9_]{0,48}[a-z0-9])?|[a-z]([a-zA-Z0-9]{1,49})?)_{0,1}$
 
 # Naming hint for variable names
-variable-name-hint=_{0,1}([A-Z]([A-Z0-9_]{0,38}[A-Z0-9])?|[a-z]([a-z0-9_]{0,38}[a-z0-9])?|[a-z]([a-zA-Z0-9]{1,39})?)_{0,1}$
+variable-name-hint=_{0,1}([A-Z]([A-Z0-9_]{0,48}[A-Z0-9])?|[a-z]([a-z0-9_]{0,48}[a-z0-9])?|[a-z]([a-zA-Z0-9]{1,49})?)_{0,1}$
 
 # Regular expression matching correct constant names.
 #
 # The expression below allows "UPPER_CASE_WITH_UNDERSCORES"; leading underscores
 # for privacy are allowed.
 # Names matching this expression are compatible with PEP-8.
-const-rgx=(_{0,1}[A-Z][A-Z0-9_]{0,38}[A-Z0-9]|(__.*__))$
+const-rgx=(_{0,1}[A-Z][A-Z0-9_]{0,48}[A-Z0-9]|(__.*__))$
 
 # Naming hint for constant names
-const-name-hint=(_{0,1}[A-Z][A-Z0-9_]{0,38}[A-Z0-9]|(__.*__))$
+const-name-hint=(_{0,1}[A-Z][A-Z0-9_]{0,48}[A-Z0-9]|(__.*__))$
 
 # Regular expression matching correct attribute names.
 #
@@ -226,10 +226,10 @@ argument-name-hint=([a-z][a-z0-9_]{0,28}[a-z0-9]|[a-z][a-zA-Z0-9]{1,29})_{0,1}$
 # and "lower_case_with_underscores" and "mixedCaseWithoutUnderscores" for
 # other variables; leading underscores for privacy are allowed.
 # Names matching this expression are compatible with PEP-8.
-class-attribute-rgx=_{0,2}([A-Z][A-Z0-9_]{0,38}[A-Z0-9]|[a-z][a-z0-9_]{0,38}[a-z0-9]|[a-z][a-zA-Z0-9]{0,39}|(__.*__))$
+class-attribute-rgx=_{0,2}([A-Z][A-Z0-9_]{0,48}[A-Z0-9]|[a-z][a-z0-9_]{0,48}[a-z0-9]|[a-z][a-zA-Z0-9]{0,49}|(__.*__))$
 
 # Naming hint for class attribute names
-class-attribute-name-hint=_{0,2}([A-Z][A-Z0-9_]{0,38}[A-Z0-9]|[a-z][a-z0-9_]{0,38}[a-z0-9]|[a-z][a-zA-Z0-9]{0,39}|(__.*__))$
+class-attribute-name-hint=_{0,2}([A-Z][A-Z0-9_]{0,48}[A-Z0-9]|[a-z][a-z0-9_]{0,48}[a-z0-9]|[a-z][a-zA-Z0-9]{0,49}|(__.*__))$
 
 # Regular expression matching correct inline iteration names.
 #

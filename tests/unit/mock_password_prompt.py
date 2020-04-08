@@ -19,13 +19,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-    Python code to mock click.click_prompt. Returns the
-    value defined in RETURN_VALUE
+Python code to mock click.click_prompt. Returns the
+value defined in RETURN_VALUE
 
-    Used to mock response from commmon_verify_operation
+Used to mock response from commmon_verify_operation
 """
+
 from mock import Mock
 import pywbemtools
+
 RETURN_VALUE = "mypw"
 
 

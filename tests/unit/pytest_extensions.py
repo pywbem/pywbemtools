@@ -126,7 +126,7 @@ def simplified_test_function(test_func):
             pytest.skip("Condition for test case not met")
 
         if condition == 'pdb':
-            import pdb
+            import pdb  # pylint: disable=import-outside-toplevel
 
         testcase = testcase_tuple(desc, kwargs, exp_exc_types, exp_warn_types,
                                   condition)
