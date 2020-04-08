@@ -266,17 +266,22 @@ TEST_CASES = [
     ['Verify connection command show of just created test1',
      {'general': [],
       'args': ['show', 'test1']},
-     {'stdout': [
-         "name: test1",
-         "server: http://blah",
-         "default-namespace: root/cimv2",
-         "user: None",
-         "password: None",
-         "timeout: 30",
-         "use-pull:",
-         "verify: True",
-         "certfile: None",
-         "keyfile: None", "  mock-server:"],
+     {'stdout': """Connection status:
+name               value  (state)
+-----------------  ----------------
+name               test1
+server             http://blah
+default-namespace  root/cimv2
+user
+password
+timeout            30
+use-pull
+verify             True
+certfile
+keyfile
+mock-server
+ca-certs
+""",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -285,20 +290,19 @@ TEST_CASES = [
      {'general': ['--output-format', 'plain'],
       'args': ['show', 'test1']},
      {'stdout': """Connection status:
-name                value  (state)
-name                test1
-server              http://blah
-default-namespace   root/cimv2
+name               value  (state)
+name               test1
+server             http://blah
+default-namespace  root/cimv2
 user
 password
-timeout             30
+timeout            30
 use-pull
-verify              True
+verify             True
 certfile
 keyfile
-pmock-server
-ca_certs
-
+mock-server
+ca-certs
 """,
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
@@ -315,43 +319,64 @@ ca_certs
 
     ['Verify connection command show named connnection test1',
      ['show', 'test1'],
-     {'stdout': [
-         "name: test1", "  server: http://blah",
-         "default-namespace: root/cimv2", "user: None", "password: None",
-         "timeout: 30",
-         "verify: True",
-         "certfile: None",
-         "keyfile: None", "mock-server:"],
+     {'stdout': """Connection status:
+name               value  (state)
+-----------------  ----------------
+name               test1
+server             http://blah
+default-namespace  root/cimv2
+user
+password
+timeout            30
+use-pull
+verify             True
+certfile
+keyfile
+mock-server
+ca-certs
+""",
       'test': 'innows'},
      None, OK],
 
     ['Verify connection command show test2 with --show-password',
      ['show', 'test2', '--show-password'],
-     {'stdout': ['name: test2',
-                 'server: http://blahblah',
-                 'default-namespace: root/cimv2',
-                 'user: fred',
-                 'password: argh',
-                 'timeout: 18',
-                 'verify: False',
-                 'certfile: None',
-                 'keyfile: None',
-                 'mock-server:'],
+     {'stdout': """Connection status:
+name               value  (state)
+-----------------  ----------------
+name               test2
+server             http://blahblah
+default-namespace  root/cimv2
+user               fred
+password           argh
+timeout            18
+use-pull
+verify             False
+certfile
+keyfile
+mock-server
+ca-certs
+""",
       'test': 'innows'},
      None, OK],
 
     ['Verify connection command show test2, masked password',
      ['show', 'test2'],
-     {'stdout': ['name: test2',
-                 'server: http://blahblah',
-                 'default-namespace: root/cimv2',
-                 'user: fred',
-                 'password: ****',
-                 'timeout: 18',
-                 'verify: False',
-                 'certfile: None',
-                 'keyfile: None',
-                 'mock-server:'],
+     {'stdout': """Connection status:
+name               value  (state)
+-----------------  ----------------
+name               test2
+server             http://blahblah
+default-namespace  root/cimv2
+user               fred
+password           ******
+timeout            18
+use-pull
+verify             False
+certfile
+keyfile
+mock-server
+ca-certs
+""",
       'test': 'innows'},
      None, OK],
 
@@ -364,9 +389,6 @@ ca_certs
                  'test2   http://blahblah'],
       'test': 'innows'},
      None, OK],
-
-
-
 
     ['Verify connection command select test2',
      ['select', 'test2', '--default'],
@@ -494,15 +516,15 @@ ca_certs
     ['Verify connection command show addallargs initial version',
      ['show', 'addallargs'],
      {'stdout': [
-         'name: addallargs',
-         '  server: http://blahblah',
-         '  default-namespace: root/blahblah',
-         '  user: john',
-         '  password: ******',
-         '  certfile: mycertfile.pem',
-         '  keyfile: mykeyfile.pem',
-         '  mock-server: '],
-      'test': 'in'},
+         'name addallargs',
+         'server http://blahblah',
+         'default-namespace root/blahblah',
+         'user john',
+         'password ******',
+         'certfile mycertfile.pem',
+         'keyfile mykeyfile.pem',
+         'mock-server'],
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection command with that overwrites existing name works.',
@@ -524,15 +546,15 @@ ca_certs
     ['Verify connection command show of name addallargs, overwrite changed',
      ['show', 'addallargs', '--show-password'],
      {'stdout': [
-         'name: addallargs',
-         '  server: http://blah',
-         '  default-namespace: root/blah',
-         '  user: john',
-         '  password: pw',
-         '  certfile: mycertfile.pem',
-         '  keyfile: mykeyfile.pem',
-         '  mock-server: '],
-      'test': 'in'},
+         'name addallargs',
+         'server http://blah',
+         'default-namespace root/blah',
+         'user john',
+         'password pw',
+         'certfile mycertfile.pem',
+         'keyfile mykeyfile.pem',
+         'mock-server'],
+      'test': 'innows'},
      None, OK],
 
     ['Verify connection command delete addallargs',
@@ -647,15 +669,15 @@ ca_certs
     ['Verify connection command shows mock file ',
      ['show', 'mocktest'],
      {'stdout': [
-         "name: mocktest",
-         "default-namespace: root/cimv2",
-         "user: None",
-         "password: None",
-         "timeout: 30",
-         "verify: True",
-         "certfile: None",
-         "keyfile: None",
-         "mock-server:", r"simple_mock_model.mof"],
+         "name mocktest",
+         "default-namespace root/cimv2",
+         "user",
+         "password",
+         "timeout 30",
+         "verify True",
+         "certfile",
+         "keyfile",
+         "mock-server", "simple_mock_model.mof"],
       'test': 'innows'},
      None, OK],
 
@@ -676,7 +698,7 @@ ca_certs
 
     ['Verify connection command show with prompt',
      ['show', '?'],
-     {'stdout': ['name: mocktest'],
+     {'stdout': ['name mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      MOCK_PROMPT_0_FILE, OK],
@@ -747,15 +769,15 @@ ca_certs
     ['Verify connection command shows mock file ',
      ['show', 'mocktest2'],
      {'stdout': [
-         "name: mocktest2",
-         "default-namespace: root/blah",
-         "user: john",
-         "password: **",
-         "timeout: 45",
-         "verify: False",
-         "certfile: mycertfile.pem",
-         "keyfile: mykeyfile.pem",
-         "mock-server:", "simple_mock_model.mof"],
+         "name mocktest2",
+         "default-namespace root/blah",
+         "user john",
+         "password **",
+         "timeout 45",
+         "verify False",
+         "certfile mycertfile.pem",
+         "keyfile mykeyfile.pem",
+         "mock-server", "simple_mock_model.mof"],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
@@ -763,15 +785,16 @@ ca_certs
     ['Verify connection command shows svrtest2 ',
      ['show', 'svrtest2'],
      {'stdout': [
-         "name: svrtest2",
-         "server: http://blah",
-         "default-namespace: root/blah", "user: john",
-         "password: **",
-         "timeout: 45",
-         "verify: True",
-         "certfile: mycertfile.pem",
-         "keyfile: mykeyfile.pem"],
-      'test': 'in',
+         "name svrtest2",
+         "server http://blah",
+         "default-namespace root/blah",
+         "user john",
+         "password **",
+         "timeout 45",
+         "verify True",
+         "certfile mycertfile.pem",
+         "keyfile mykeyfile.pem"],
+      'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
