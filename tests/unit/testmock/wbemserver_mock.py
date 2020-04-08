@@ -171,8 +171,8 @@ class WbemServerMock(object):
         self.build_mock()
 
     def __str__(self):
-        return 'object_manager_name={!r}}, interop_ns={!r}}, system_name=' \
-            '{!r}}, dmtf_schema_ver={!r}}, schema_dir={!r}}, wbem_server={}' \
+        return 'object_manager_name={!r}, interop_ns={!r}, system_name=' \
+            '{!r}, dmtf_schema_ver={!r}, schema_dir={!r}, wbem_server={}' \
             .format(self.object_manager_name, self.interop_ns, self.system_name,
                     self.dmtf_schema_ver, self.schema_dir,
                     getattr(self, 'wbem_server', None))
@@ -281,7 +281,7 @@ class WbemServerMock(object):
         rtn_ominsts = self.conn.EnumerateInstances("CIM_ObjectManager",
                                                    namespace=self.interop_ns)
         assert len(rtn_ominsts) == 1, \
-            "Expected 1 ObjetManager instance, got {!r}}".format(rtn_ominsts)
+            "Expected 1 ObjetManager instance, got {!r}".format(rtn_ominsts)
 
         return ominst
 

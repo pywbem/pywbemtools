@@ -41,19 +41,14 @@ from __future__ import absolute_import, print_function, unicode_literals
 from collections import defaultdict, OrderedDict, namedtuple
 import six
 import click
-
 # TODO: Future Could we combine this tree into tree file???
 from asciitree import LeftAligned
-
-from pywbem import CIMInstanceName, CIMClassName, \
-    CIMFloat, CIMInt, CIMError, CIMDateTime
-from ._utils import _to_unicode, _ensure_unicode
-
 from pydicti import dicti
+from pywbem import CIMInstanceName, CIMClassName, CIMFloat, CIMInt, CIMError, \
+    CIMDateTime
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg
-
 from ._utils import _ensure_unicode, _to_unicode
 
 # Same as in pwbem.cimtypes.py
@@ -146,8 +141,10 @@ class AssociationShrub(object):
         Get reference instances from host sorted by instance name
 
         Parameters:
-          source_path(:class:`pywbem:CIMInstancePath):
+
+          source_path (:class:`pywbem:CIMInstancePath):
             Source path for the References request to the host
+
         Returns:
            list of :class:`pywbem:CIMClassNames` returns from host
 
@@ -163,17 +160,22 @@ class AssociationShrub(object):
         Get associated instances from host sorted by instance name.
 
         Parameters:
-          source_path(:class:`pywbem:CIMInstancePath):
-          role(:term:`string`)
+
+          source_path (:class:`pywbem:CIMInstancePath):
+
+          role (:term:`string`):
             Optional string defining Role parameter of the Associators
             call to the host
-          assoc_class(:class:`pywbem:CIMClass`)
+
+          assoc_class (:class:`pywbem:CIMClass`):
             Optional string defining ResutRole parameter of the Associators
             call to the host.
-          result_role(:term:`string`)
+
+          result_role (:term:`string`):
             Optional string defining ResutRole parameter of the Associators
             call to the host
-          result_class(:class:`pywbem:CIMClass`)
+
+          result_class (:class:`pywbem:CIMClass`):
             Optional string defining ResutRole parameter of the Associators
             call to the host
 
@@ -563,11 +565,11 @@ class AssociationShrub(object):
 
         ret = []
 
-        def case(str_):
+        def case(astring):
             """Return the string in the correct lexical case for the format."""
             if format == 'canonical':
-                str_ = str_.lower()
-            return str_
+                astring = astring.lower()
+            return astring
 
         def case_sorted(keys):
             """Return the keys in the correct order for the format."""
@@ -675,14 +677,14 @@ class AssociationShrub(object):
 
         Parameters:
 
-          inst_names_tuple(:func:`~py:collections.namedtuple` object):
+          inst_names_tuple (:func:`~py:collections.namedtuple` object):
             namedtuple containing instancename and integer representing
             reference instance.
 
           ref_cln (:term:`string`):
              Classname of the reference class.
 
-          replacements (:class:`dicti`)
+          replacements (:class:`dicti`):
             No-case dictionary containing the name of each key to be considered
             for replacement with either the value None or a defined value
             for the key.  If the value is None the key will be replaced with
@@ -828,11 +830,11 @@ class AssociationShrub(object):
         executed.  to_wbem_uri(formt='canonical') accomplishes that
 
         Parameters:
-          inames(list of CIMInstanceName):
+
+          inames (list of CIMInstanceName):
 
         Returns:
             list of CIMInstance name sorted.
-
         """
         if len(instances) <= 1:
             return instances
@@ -852,11 +854,11 @@ class AssociationShrub(object):
         executed.  to_wbem_uri(formt='canonical') accomplishes that
 
         Parameters:
-          inames(list of CIMInstanceName):
+
+          inames (list of CIMInstanceName):
 
         Returns:
             list of CIMInstance name sorted.
-
         """
         if len(inames) <= 1:
             return inames

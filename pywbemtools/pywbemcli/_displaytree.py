@@ -79,15 +79,15 @@ def display_class_tree(classes, top_class=None):
     click.echo output.
 
     Parameters:
-        classes (list of :class:`~pywbem.CIMClass`)
-            This is the classes that will be included in the display
-            including the top_class. If the top_class is None an
-            artificial top_class named 'root' will be added by this
-            function.
 
-        top_class (:term: `string`)
-            The top level class to display or None.
+      classes (list of :class:`~pywbem.CIMClass`):
+        This is the classes that will be included in the display
+        including the top_class. If the top_class is None an
+        artificial top_class named 'root' will be added by this
+        function.
 
+      top_class (:term:`string`):
+        The top level class to display or None.
     """
 
     # Build dictionary of classname : superclassname from list of CIM classes

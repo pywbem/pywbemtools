@@ -38,6 +38,7 @@ BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
 BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
 MOCK_PW_PROMPT_PATH = os.path.join(SCRIPT_DIR, 'mock_password_prompt.py')
 
+# pylint: disable=line-too-long
 GENERAL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS] [COMMAND-OPTIONS]
 
   Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol to communicate with WBEM servers.
@@ -153,8 +154,9 @@ Commands:
   connection  Command group for WBEM connection definitions.
   help        Show help message for interactive mode.
   repl        Enter interactive mode (default).
-"""  # noqa:E501 pylint: disable=line-too-long
+"""  # noqa: E501
 
+# pylint: disable=line-too-long
 REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
   Enter interactive mode (default).
@@ -168,7 +170,7 @@ REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
 Command Options:
   -h, --help  Show this help message.
-"""  # noqa:E501 pylint: disable=line-too-long
+"""  # noqa: E501
 
 INTERACTIVE_HELP = """
 The following can be entered in interactive mode:

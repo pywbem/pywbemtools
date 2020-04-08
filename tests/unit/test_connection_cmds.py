@@ -44,6 +44,7 @@ TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
 
 CONNECTION_HELP_LINES = [
+    # pylint: disable=line-too-long
     'Usage: pywbemcli [GENERAL-OPTIONS] connection COMMAND [ARGS] [COMMAND-OPTIONS]',  # noqa: E501
     'Command group for WBEM connection definitions.',
     CMD_OPTION_HELP_HELP_LINE,

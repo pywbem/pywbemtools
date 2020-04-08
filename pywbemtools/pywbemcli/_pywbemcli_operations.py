@@ -262,6 +262,7 @@ class PYWBEMCLIConnectionMixin(object):
                                 OperationTimeout=None, ContinueOnError=None,
                                 MaxObjectCount=DEFAULT_MAXPULLCNT,
                                 **extra):
+        # pylint: disable=unused-argument
         # pylint: disable=invalid-name
         """
         Execute IterQueryInstances and retrieve the instances. Returns
@@ -300,7 +301,9 @@ class BuildRepositoryMixin(object):
     Returns a variety of errors for file not found, MOF syntax errors, and
     python syntax errors.
     """
-    def build_repository(self, conn, server, file_path_list, verbose):
+
+    @staticmethod
+    def build_repository(conn, server, file_path_list, verbose):
         """
         Build the repository from the file_path list
         """
