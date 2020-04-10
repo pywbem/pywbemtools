@@ -8,6 +8,8 @@ Change log
 pywbemtools 0.6.0
 -----------------
 
+This version contains all fixes up to pywbemtools 0.5.1.
+
 Released: 2020-04-10
 
 **Bug fixes:**
