@@ -8,15 +8,7 @@ Change log
 pywbemtools 0.6.0
 -----------------
 
-This version is currently in development and is shown as |version|.
-
-This version contains all fixes up to pywbemtools 0.5.0.
-
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-04-10
 
 **Bug fixes:**
 
@@ -191,7 +183,6 @@ Released: not yet
   This also now shows empty columns where the original report hid any columns
   that were empty. (See issue #556)
 
-
 **Cleanup:**
 
 * Test: Enabled Python warning suppression for PendingDeprecationWarning
@@ -235,12 +226,6 @@ Released: not yet
 
 * Added table formatted output for connection show and removed original
   free-form output format. (See issue #572)
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.5.0
