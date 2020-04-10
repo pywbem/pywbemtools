@@ -91,6 +91,9 @@ Released: not yet
 * Improvements and bug fixes in the way the INSTANCENAME parameter of pywbemcli
   commands is processed. (See issue #528)
 
+* Increased minimum versions of some packages used for development to address
+  security issues reported by the pyup.io safety tool: twine, bleach, urllib3.
+
 **Enhancements:**
 
 * Promoted development status of pywbemtools from Alpha to Beta.
