@@ -5,6 +5,30 @@ Change log
 ==========
 
 
+pywbemtools 0.6.1.dev1
+----------------------
+
+This version is currently in development.
+
+Released: not yet
+
+**Incompatible changes:**
+
+**Deprecations:**
+
+**Bug fixes:**
+
+**Enhancements:**
+
+**Cleanup:**
+
+**Known issues:**
+
+* See `list of open issues`_.
+
+.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+
+
 pywbemtools 0.6.0
 -----------------
 
