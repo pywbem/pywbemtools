@@ -610,6 +610,10 @@ The following can be entered in interactive mode:
   COMMAND                     Execute pywbemcli command COMMAND.
   !SHELL-CMD                  Execute shell command SHELL-CMD.
   <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+  <CTRL-r>  <search string>   To search the  command history file.
+                              Can be used with <UP>, <DOWN>
+                              to display commands that match the search string.
+                              Editing the search string updates the search.
   <TAB>                       Tab completion (can be used anywhere).
   -h, --help                  Show pywbemcli general help message, including a
                               list of pywbemcli commands.
@@ -639,13 +643,21 @@ def repl(ctx):
 
     Pywbemcli may be terminated from this mode by entering
     <CTRL-D>, :q, :quit, :exit
+
+    In the repl mode, <CTRL-r> man be used to initiate an interactive
+    search of the history file.
+
+    Interactive mode also includes an autosuggest feature that makes
+    suggestions from the command history as the command the user types in the
+    command and options.
     """
 
     history_file = PYWBEMCLI_HISTORY_FILE
     if history_file.startswith('~'):
         history_file = os.path.expanduser(history_file)
 
-    click.echo("Enter 'help' for help, <CTRL-D> or ':q' to exit pywbemcli.")
+    click.echo("Enter 'help' for help, <CTRL-D> or ':q' "
+               "to exit pywbemcli or <CTRL-r> to search history, ")
 
     prompt_kwargs = {
         'message': PYWBEMCLI_PROMPT,

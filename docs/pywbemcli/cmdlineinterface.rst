@@ -79,7 +79,7 @@ and ``--namespace`` is a command option.
    single: auto-suggestion
 
 Pywbemcli supports several modes of tab-completion, auto-completion suggestions
-and depending on whether it is in command or interactive mode. This is detailed
+depending on whether it is in command or interactive mode. This is detailed
 in the following sections.
 
 
@@ -99,6 +99,8 @@ Pywbemcli supports two modes of operation:
 
 Command mode
 ------------
+
+.. index:: command mode
 
 In command mode, the pywbemcli command performs its task and terminates
 like any other standalone non-interactive command.
@@ -121,11 +123,14 @@ WBEM server on ``localhost``:
     <Returns MOF for the enumerated classes>
 
 .. index::
-   single: tab-completion
-   single: auto-completion
+   pair: tab-completion; command mode
+   pair: auto-completion; command mode
 
 In command mode, tab completion is also supported for some command shells, but
 must be enabled specifically for each shell.
+
+.. index::
+   pair: command mode; bash
 
 For example, with a bash shell, enter the following to enable tab completion of
 pywbemcli:
@@ -224,6 +229,9 @@ above has the same effect as the standalone command:
     $ pywbemcli -s http://localhost -d root/cimv2 -u username class get CIM_System
     . . . <Class CIM_System in the default namespace in MOF format>
 
+
+.. index:: pair: interactive mode; help
+
 The internal commands ``:?``, ``:h``, or ``:help`` display general help
 information for external and internal commands:
 
@@ -240,9 +248,13 @@ information for external and internal commands:
         :?, :h, :help     displays general help information
         :exit, :q, :quit  exits the REPL
 
+.. index:: pair: interactive mode; exit
+
 In addition to using one of the internal exit commands shown in the help text
 above, you can also exit the pywbemcli shell by typing `Ctrl-D` (on Linux,
 OS-X and UNIX-like environments on Windows), or `Ctrl-C` (on native Windows).
+
+.. index:: pair: interactive mode; --help
 
 Typing ``--help`` or ``-h`` in the pywbemcli shell displays general help
 information for the pywbemcli commands which includes general options and a
@@ -267,6 +279,8 @@ list of the supported command groups and commands without command group.
 The usage line in this help text shows the usage in command mode. In
 interactive mode, the ``pywbemcli`` word is omitted.
 
+.. index:: pair: interactive mode; command help
+
 Typing ``COMMAND --help``,  or ``COMMAND -h`` in the pywbemcli shell
 displays help information for the specified pywbemcli command group, for
 example:
@@ -285,15 +299,15 @@ example:
       . . .
 
 .. index::
-   single: tab-completion
-   single: auto-completion
-   single: auto-suggestion
+   pair: tab-completion; interactive mode
+   pair: auto-completion; interactive mode
 
-The pywbemcli shell in the interactive mode supports popup help text
-while for commands, arguments, and options typing, where the valid choices are shown based upon what was typed so
-far, and where an item from the popup list can be picked with <TAB> or with the
-cursor keys. It can be used to select from the list of general options. In the
-following examples, an underscore ``_`` is shown as the cursor:
+The pywbemcli shell in the interactive mode supports popup help text while for
+commands, arguments, and options typing, where the valid choices are shown
+based upon what was typed so far, and where an item from the popup list can be
+picked with <TAB> or with the cursor keys. It can be used to select from the
+list of general options. In the following examples, an underscore ``_`` is
+shown as the cursor:
 
 .. code-block:: text
 
@@ -306,15 +320,42 @@ following examples, an underscore ``_`` is shown as the cursor:
     pywbemcli> cl_
                   class
 
-.. index::
-   single: command history
+.. index:: pair: command history; interactive mode
 
 The pywbemcli shell supports history across multiple invocations of the shell
-using <UP-ARROW>, <DOWN-ARROW>.
-The pywbemcli history is stored in ``~/.pywbemcli_history``.
+using <UP_ARROW>, <DOWN-ARROW> to step through the history line by line.
 
 .. index::
-   single: auto-suggestion
+   single: command history; search
+   pair: interactive mode; command history
+
+A incremental search of the history can be initiated by entering <CTRL-r>
+followed by one or more characters that define the search. The search displays
+the last command containing the search string. This search string can be
+modified in place to change the search, returning the last command in the
+command history that contains the the string. <UP_ARROW>, <DOWN-ARROW> will
+find other commands in the history containing the same string.
+
+.. code-block:: text
+
+    pywbemcli> <CTRL-r>
+    (reverse-i-search)`':
+                                                        ENTER Characters CIM
+    (reverse-i-search)`CIM': class get CIM_ManagedElement
+                                                        <UP-ARROW> and <DOWN-ARROW> find
+                                                        other commands containing of "CIM"
+
+    <DOWN_ARROW>
+    (i-search)`get': instance get CIM_ComputerSystem.?
+                                                        Hit <ENTER> selects current found command
+    pywbemcli> instance get CIM_ComputerSystem.?
+
+.. index:: pair: interactive mode; history file
+
+The pywbemcli history is stored in the user home directory, ``~/.pywbemcli_history``.
+
+.. index::
+   pair: interactive mode; auto-suggestion
 
 The pywbemcli interactive mode also supports automated parameter suggestions based on
 the pywbemcli history file which works with the auto completion described
@@ -328,6 +369,8 @@ suggestion.
 
 Error handling
 --------------
+
+.. index:: Exit codes
 
 Pywbemcli terminates with one of the following program exit codes:
 

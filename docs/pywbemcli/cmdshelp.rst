@@ -1605,6 +1605,11 @@ Help text for ``pywbemcli repl`` (see :ref:`repl command`):
 
       Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
+      In the repl mode, <CTRL-r> man be used to initiate an interactive search of the history file.
+
+      Interactive mode also includes an autosuggest feature that makes suggestions from the command history as the command
+      the user types in the command and options.
+
     Command Options:
       -h, --help  Show this help message.
 
