@@ -137,8 +137,7 @@ If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
-.. index::
-   single: qualifier filters
+.. index:: single: qualifier filters
 
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
@@ -171,8 +170,7 @@ argument in all namespaces of the connection, or otherwise in the specified
 namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
 
-.. index::
-   single: qualifier filters
+.. index:: qualifier filters
 
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
@@ -1465,6 +1463,9 @@ See :ref:`pywbemcli connection select --help` for the exact help output of the c
 Connection show command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+.. index:: single: connection show command
+.. index:: pair: command; connection show
+
 The ``connection show`` command shows information about a connection definition:
 
 * If ``NAME`` is ``?``, pywbemcli prompts the user to select one and shows
@@ -1496,6 +1497,10 @@ See :ref:`pywbemcli connection show --help` for the exact help output of the com
 Connection test command
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+.. index::
+    single: connection test command
+    pair: command; connection test
+
 The ``connection test`` command executes a single predefined operation on
 the current connection to verify that accessing the WBEM server works.
 
@@ -1520,6 +1525,10 @@ See :ref:`pywbemcli connection test --help` for the exact help output of the com
 Repl command
 ------------
 
+.. index::
+    single: repl command
+    pair: command; repl
+
 The ``repl`` command sets pywbemcli into the :ref:`interactive mode`. Pywbemcli
 can be started in the :ref:`interactive mode` either by entering:
 
@@ -1539,11 +1548,28 @@ or by executing the script without any command or command group:
 
 The repl mode is recognized by the prompt ``pywbemcli>``.
 
+Command history is available in the :ref:`interactive mode` either by using
+<UP-ARROW> and <DOWN-ARROW> keys to step through the history file or by using
+incremental search of the command history.
+
+The incremental search is initiated by <CTRL-r> and does a search based on a
+string entered after the <CTRL-r> for the last command containing the search
+string. The search string may be modified and <UP_ARROW>, <DOWN-ARROW> will
+find other commands containing the search string. Hitting <ENTER> selects
+the currently shown command.
+
+see :ref:`interactive mode` for more details on using this mode and the
+search.
+
 
 .. _`Help command`:
 
 Help command
 ------------
+
+.. index::
+    single: help command
+    pair: help; command
 
 The ``help`` command provides information on special commands and controls
 that can be executed in the :ref:`interactive mode` including:

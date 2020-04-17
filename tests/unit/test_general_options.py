@@ -161,15 +161,20 @@ REPL_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] repl
 
   Enter interactive mode (default).
 
-  Enter the interactive mode where pywbemcli commands can be entered interactively. The prompt is changed to
-  'pywbemcli>'.
+  Enter the interactive mode where pywbemcli commands can be entered interactively. The prompt is changed to 'pywbemcli>'.
 
   Command history is supported. The command history is stored in a file ~/.pywbemcli_history.
 
   Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
 
+  In the repl mode, <CTRL-r> man be used to initiate an interactive search of the history file.
+
+  Interactive mode also includes an autosuggest feature that makes suggestions from the command history as the command the user types in the
+  command and options.
+
 Command Options:
   -h, --help  Show this help message.
+
 """  # noqa: E501
 
 INTERACTIVE_HELP = """
@@ -178,6 +183,10 @@ The following can be entered in interactive mode:
   COMMAND                     Execute pywbemcli command COMMAND.
   !SHELL-CMD                  Execute shell command SHELL-CMD.
   <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+  <CTRL-r>  <search string>   To search the  command history file.
+                              Can be used with <UP>, <DOWN>
+                              to display commands that match the search string.
+                              Editing the search string updates the search.
   <TAB>                       Tab completion (can be used anywhere).
   -h, --help                  Show pywbemcli general help message, including a
                               list of pywbemcli commands.
@@ -186,6 +195,9 @@ The following can be entered in interactive mode:
   :?, :h, :help               Show help message about interactive mode.
   <UP>, <DOWN>                Scroll through pwbemcli command history.
 
+  COMMAND: May be two words (class enumerate) for commands that are within
+  a group or a single word for special commands like `repl` that are not in
+  a group.
 """
 
 OK = True     # mark tests OK when they execute correctly
@@ -213,7 +225,7 @@ TEST_CASES = [
      {'stdout': GENERAL_HELP,
       'rc': 0,
       'test': 'innows'},
-     None, RUN],
+     None, OK],
 
     ['Verify -h response.',
      {'general': ['--help'],
@@ -224,7 +236,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify repl -help response.',
+    ['Verify repl -h option shows REPL help',
      {'general': [],
       'cmdgrp': 'repl',
       'args': ['-h']},

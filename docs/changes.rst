@@ -229,6 +229,9 @@ Released: 2020-04-10
 * Added table formatted output for connection show and removed original
   free-form output format. (See issue #572)
 
+* Added documentation on incremental search option to search the command
+  history file in interactive mode. (See issue #595)
+
 
 pywbemtools 0.5.0
 -----------------
