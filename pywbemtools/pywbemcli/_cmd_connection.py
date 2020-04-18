@@ -37,7 +37,6 @@ from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     output_format_is_table
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
-from ._connection_repository import ConnectionRepository
 from ._context_obj import ContextObj
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -293,19 +292,19 @@ def if_export_statement(name, value):
         export_statement(name, value)
 
 
-def is_default_connection(connection):
+def is_default_connection(context, connection):
     """
     Returns True if connection is the default connection. Where
     default connection is defined in repository.
     """
 
-    default_connection = ConnectionRepository().get_default_connection_name()
+    default_connection = context.connections_repo.get_default_connection_name()
     if default_connection and default_connection == connection.name:
         return True
     return False
 
 
-def is_current_connection(connection, context):
+def is_current_connection(context, connection):
     """Returns True if connection named name is the default connection"""
 
     current_connection = context.pywbem_server or None
@@ -328,9 +327,9 @@ def show_connection_information(context, connection,
     state_str = ''
     if show_state:
         state = []
-        if is_current_connection(connection, context):
+        if is_current_connection(context, connection):
             state.append("current")
-        if is_default_connection(connection):
+        if is_default_connection(context, connection):
             state.append("default")
         if state:
             state_str = ' ({})'.format(", ".join(state))
@@ -384,12 +383,13 @@ def get_current_connection_name(context):
     return context.pywbem_server.name if context.pywbem_server else None
 
 
-def raise_repository_empty(connections):
+def raise_no_repository_file(connections):
     """
     Raise exception with message that repo is empty.
     """
     raise click.ClickException(
-        'Connection repository {} empty'.format(connections.connections_file))
+        'Connection repository {} does not exist'.
+        format(connections.connections_file))
 
 
 def select_connection(name, context, connections):
@@ -400,8 +400,8 @@ def select_connection(name, context, connections):
     """
     context.spinner_stop()
 
-    if not connections:
-        raise_repository_empty(connections)
+    if not connections.file_exists():
+        raise_no_repository_file(connections)
 
     if name:
         if name in connections:
@@ -508,6 +508,9 @@ def cmd_connection_export(context):
     if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
     if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
     if_export_statement(PywbemServer.use_pull_envvar, svr.use_pull)
+    # Additional exports available connections_file
+    if_export_statement(PywbemServer.connections_file_envvar,
+                        context.connections_repo.connections_file)
 
 
 def cmd_connection_show(context, name, options):
@@ -516,13 +519,13 @@ def cmd_connection_show(context, name, options):
     name is None. If Name exists, shows connections in connections file.
     """
 
-    connections = ConnectionRepository()
+    connections = context.connections_repo
 
     cname = get_current_connection_name(context)
     # If no name arg, fallback to selection unless there is no connections file
     if not name:
         name = cname or '?'
-        if not cname and not connections:
+        if not cname and not connections.file_exists():
             raise click.ClickException('No current connection and no '
                                        'connections file {}.'
                                        .format(connections.connections_file))
@@ -531,7 +534,7 @@ def cmd_connection_show(context, name, options):
     # if there is no connections file and fail if no current.
     if name == '?':
         # No connections exit in connections file.
-        if not connections:
+        if not connections.file_exists():
             if context.pywbem_server:
                 show_connection_information(
                     context,
@@ -545,7 +548,7 @@ def cmd_connection_show(context, name, options):
     # Have a name. If there are connections and this name is in connections
     # and that name is not current, use it. If current name is same as
     # name, use the current version.
-    if connections:
+    if connections.file_exists():
         # If name in connections same as currrent connection. use current
         connection = connections[name] if name in connections and \
             cname != name else context.pywbem_server
@@ -633,9 +636,9 @@ def cmd_connection_select(context, name, options):
     command accepts the click_context since it updates that context.
 
     If the --default flag is set, also set this connection as the persistent
-    default conneciton.
+    default connection.
     """
-    connections = ConnectionRepository()
+    connections = context.connections_repo
 
     name = select_connection(name, context, connections)
 
@@ -647,7 +650,8 @@ def cmd_connection_select(context, name, options):
                          context.log,
                          context.verbose,
                          context.pdb,
-                         context.deprecation_warnings)
+                         context.deprecation_warnings,
+                         context.connections_repo)
 
     # Update the root context making this context the basis for future
     # commands in the current interactive session
@@ -668,7 +672,7 @@ def cmd_connection_delete(context, name):
     is no name provided, a select list will be presented for the user
     to select the connection to be deleted.
     """
-    connections = ConnectionRepository()
+    connections = context.connections_repo
 
     # Select the connection with prompt if name is None.
     # This also stops the spinner
@@ -694,7 +698,7 @@ def cmd_connection_save(context, name):
     save_connection = deepcopy(current_connection)
     save_connection.name = name
 
-    connections = ConnectionRepository()
+    connections = context.connections_repo
 
     context.spinner_stop()
 
@@ -703,13 +707,16 @@ def cmd_connection_save(context, name):
 
 def cmd_connection_list(context, options):
     """
-    Dump all of the current servers in the persistent repository line
+    List all of the current servers in the persistent repository line
     by line.  This method displays the information as a table independent
     of the value of the cmd line output_format general option.
+
+    I includes both a full display that displays all variables and a brief
+    display that attempts to keep the table in about 80 columns.
     """
     def build_row(options, name, svr):
         """
-        Append one row to the list
+        Build a singe row of the table output and return it
         """
         if options['full']:
             return [name, svr.server, svr.default_namespace, svr.user,
@@ -717,29 +724,34 @@ def cmd_connection_list(context, options):
                     svr.keyfile, "\n".join(svr.mock_server)]
         return [name, svr.server, "\n".join(svr.mock_server)]
 
-    connections = ConnectionRepository()
+    connections = context.connections_repo
     output_format = validate_output_format(context.output_format, 'TABLE')
 
     # build the table structure
     rows = []
     cur_sym = '*'  # single char representing current connection
     dflt_sym = '#'  # single char representing persisted default connection
-    for name, svr in connections.items():
-        cc = cur_sym if is_current_connection(svr, context) else ''
-        dc = dflt_sym if is_default_connection(svr) else ''
-        name = '{}{}{}'.format(cc, dc, name)
 
-        rows.append(build_row(options, name, svr))
+    if connections.file_exists():
+        for name, svr in connections.items():
+            cc = cur_sym if is_current_connection(context, svr) else ''
+            dc = dflt_sym if is_default_connection(context, svr) else ''
+            name = '{}{}{}'.format(cc, dc, name)
+            rows.append(build_row(options, name, svr))
 
     # add current connection if not in persistent connections
     current_connection = context.pywbem_server or None
 
     if current_connection:
         cname = current_connection.name
-        if cname not in connections:
+        if connections.file_exists():
+            # Add connection that is current but not in connections repo
+            if cname not in connections:
+                cname = '{}{}'.format('*', cname)
+                rows.append(build_row(options, cname, current_connection))
+        else:
             cname = '{}{}'.format('*', cname)
-            svr = current_connection
-            rows.append(build_row(options, cname, svr))
+            rows.append(build_row(options, cname, current_connection))
 
     # NOTE: Does not show ca_certs because that creates a very big table
     # in particular if you use the default.

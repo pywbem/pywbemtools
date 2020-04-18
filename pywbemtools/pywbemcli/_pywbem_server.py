@@ -83,7 +83,8 @@ class PywbemServer(object):
     This class also holds the variables that determine whether the connection
     will use the pull operations or traditional operations
     """
-
+    # ISSUE: #658 - Reorganize the location for these variable names separate
+    # from the PywbemServer class.
     # The following class level variables are the names for the env variables
     # where server connection information are be saved and used as alternate
     # input sources for pywbemcli arguments and options.
@@ -102,9 +103,11 @@ class PywbemServer(object):
     pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
     log_envvar = 'PYWBEMCLI_LOG'
+    # The following exports are not part of the pywbem_server container
     pdb_envvar = 'PYWBEMCLI_PDB'
     deprecation_warnings_envvar = 'PYWBEMCLI_DEPRECATION_WARNINGS'
     termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
+    connections_file_envvar = 'PYWBEMCLI_CONNECTIONS_FILE'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default', user=None, password=None,

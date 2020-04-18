@@ -194,6 +194,14 @@ General Options:
                                   Enable deprecation warnings. Default: EnvVar
                                   PYWBEMCLI_DEPRECATION_WARNINGS, or true.
 
+  -C, --connections-file FILE PATH
+                                  File path of a YAML file containing named
+                                  connection definitions. The default if this
+                                  option is not specified is the file name
+                                  "pywbemcli_connection_definitions.yaml" in the
+                                  users home directory. EnvVar
+                                  (PYWBEMCLI_CONNECTIONS_FILE)
+
   --pdb                           Pause execution in the built-in pdb debugger
                                   just before executing the command within
                                   pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or
@@ -555,25 +563,27 @@ TEST_CASES = [
     #  Test errors with --name option, --mock-server option
     #
 
-    ['Verify -n option with new name but not in repo fails',
-     {'general': ['-n', 'fred'],
+    ['Verify -n option with non-existend connection file fails',
+     {'general': ['-n', 'fred', '--connections-file', './blah.yaml'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Connection definition', 'fred',
-                 'not found in connections file'],
+     {'stderr': ['Connections file: "./blah.yaml" does not exist.',
+                 'Aborted!'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      None, OK],
 
-    ['Verify --name option with new name but not in repo fails',
-     {'general': ['--name', 'fred'],
+    ['Verify --name with non-existend connection file fails',
+     {'general': ['--name', 'fred', '--connections-file', './blah.yaml'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Connection definition', 'fred',
-                 'not found in connections file'],
+     {'stderr': ['Connections file: "./blah.yaml" does not exist.',
+                 'Aborted!'],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      None, OK],
+
+    # TODO: Add test where file exists.
 
     ['Verify simultaneous --mock-server and --server options fail',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
@@ -723,7 +733,9 @@ TEST_CASES = [
     ['Verify connection already deleted.',
      {'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
-     {'stderr': ['Connection repository', 'empty'],
+     {'stderr': ['Connection repository',
+                 'pywbemcli_connection_definitions.yaml',
+                 'does not exist'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -859,7 +871,9 @@ TEST_CASES = [
     ['Verify delete worked by requesting again expecting failure.',
      {'args': ['delete', 'test-default'],
       'cmdgrp': 'connection', },
-     {'stderr': ['Connection repository', 'empty'],
+     {'stderr': ['Connection  repository',
+                 'pywbemcli_connection_definitions.yaml',
+                 'does not exist'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -1003,9 +1017,9 @@ TEST_CASES = [
       'stdin': ['--name NAMEDOESNOTEXIST connection show'],
       'cmdgrp': None,
       },
-     {'stderr': ['Connection definition ', 'NAMEDOESNOTEXIST',
-                 'not found in connections'],
-      'rc': 0,
+     {'stderr': ['Connections file',
+                 'does not exist'],
+      'rc': 1,
       'test': 'innows'},
      None, OK],
 
@@ -1244,7 +1258,8 @@ TEST_CASES = [
     # NOTE That we are not using this because of possible issue with previous
     # test and windows.  Enable this before we add any more tests in future.
     ['Delete fred. This one will fail if previous does not abort',
-     {'args': ['delete', 'fred'],
+     {'general': [],
+      'args': ['delete', 'fred'],
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},

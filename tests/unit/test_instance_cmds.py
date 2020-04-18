@@ -662,7 +662,7 @@ TEST_CASES = [
      {'args': ['enumerate', 'CIM_Foo_sub2'],
       'general': ['--verbose']},
      {'stdout': 'No objects returned',
-      'test': 'linesnows'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
@@ -2695,7 +2695,7 @@ interop      TST_MemberOfFamilyCollection  3
                  'scalRef=', 'PyWBEM_AllTypes.InstanceID='],
       'rc': 0,
       'test': 'innows'},
-     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], RUN],
+     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
 
     ['Verify instance command invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',

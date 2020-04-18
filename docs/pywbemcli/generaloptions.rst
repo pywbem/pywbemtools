@@ -635,6 +635,29 @@ normally return nothing upon successful execution(ex. instance delete,
 instance enumerate that returns no CIM objects) to indicate the successful
 command completion.
 
+.. index:: triple: --connections-file; general options; connection-file
+
+.. _`--connections-file general option`:
+
+``--connections-file`` general option
+""""""""""""""""""""""""""""""""""""""
+
+The ``--connections-file``/``-C`` general option allows the user to select
+a file path for the connections file. It is the file path of a YAML file
+that defines server configurations by name.  The default if this option is
+not specified is to use the configuration file
+``pywbemcli_connection_definitions.yaml`` defined in the user home directory.
+
+When this option is set, the YAML file defined with the option is used
+as the connections file.
+
+In the interactive mode, this option may not be modified after the command
+line is processed.
+
+The connections_file is managed with the commands in the
+:ref:`connection command group`
+
+
 .. index:: triple: --pdb; general options; pdb
 
 .. _`--deprecation-warnings general option`:
@@ -715,6 +738,7 @@ PYWBEMCLI_MOCK_SERVER (1)          ``--mock-server``
 PYWBEMCLI_LOG                      ``--log``
 PYWBEMCLI_PDB                      ``--pdb``
 PYWBEMCLI_DEPRECATION_WARNINGS     ``--deprecation-warnings``
+PYWBEMCLI_CONNECTIONS_FILE         ``--connections-file``
 =================================  =============================
 
 Notes:
@@ -724,10 +748,10 @@ Notes:
     the multiple path names with space.
 
 If these environment variables are set, the corresponding general options
-default to the value of the environment variables.
-If both an environment variable and its corresponding general option are
-set, the command line option overrides the environment variable with no
-warning.
+default to the value of the environment variables. If both an environment
+variable and its corresponding general option are set, the command line option
+overrides the environment variable with no warning.
+
 Environment variables are not provided for command options or command arguments.
 
 In the following example, the pywbemcli command uses server
@@ -740,7 +764,7 @@ In the following example, the pywbemcli command uses server
         <displays MOF for CIM_ManagedElement>
 
 The pywbemcli :ref:`Connection export command` outputs the (bash/Windows)
-shell commands to set all needed environment variables:
+shell commands to set all of the environment variables:
 
 .. code-block:: text
 
@@ -749,7 +773,7 @@ shell commands to set all needed environment variables:
     export PYWBEMCLI_NAMESPACE=root/cimv2
     . . .
 
-This ability can be used to set those environment variables and thus to persist
+This can be used to set those environment variables and thus to persist
 the connection name in the shell environment, from where it will be used in
 any subsequent pywbemcli commands:
 

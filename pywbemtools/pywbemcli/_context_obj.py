@@ -44,7 +44,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, log, verbose, pdb,
-                 deprecation_warnings):
+                 deprecation_warnings, connections_repo):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -55,6 +55,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._verbose = verbose
         self._pdb = pdb
         self._deprecation_warnings = deprecation_warnings
+        self._connections_repo = connections_repo
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
@@ -121,6 +122,15 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         bool: Indicates whether to enable deprecation warnings.
         """
         return self._deprecation_warnings
+
+    @property
+    def connections_repo(self):
+        """
+        :class:`ConnectionRepository` instance defining at least the filename
+        of the Connections repository. The connections_repo may not be
+        loaded at this point.
+        """
+        return self._connections_repo
 
     @property
     def conn(self):
