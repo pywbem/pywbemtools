@@ -3,6 +3,7 @@
 Using the pywbemcli command line general options
 ------------------------------------------------
 
+.. index:: single: general options
 
 .. _`Oveview of the general options`:
 
@@ -74,6 +75,7 @@ specified in the command line invocation:
     |             |         |         |         | REFERENCE | ToSubclass      |
     +-------------+---------+---------+---------+-----------+-----------------+
 
+.. index:: pair WBEM server; defining the WBEM server
 
 .. _`Defining the WBEM server`:
 
@@ -104,7 +106,7 @@ the following arguments :
    * The :ref:`--timeout general option` defines the client side timeout
      for operations.
 
-2. Define a mock WBEM server by using the :ref:`--mock-server general option`.
+2. Define a mock WBEM server () by using the :ref:`--mock-server general option`.
 
    The mock WBEM server is part of pywbemcli and allows testing or
    demonstrating pywbemcli without having access to a real WBEM server.
@@ -143,6 +145,8 @@ operations executed against the WBEM server, either the APIs executed in pywbem,
 or the HTTP requests and responses and the time statistics for these
 operations.
 
+.. index:: single: --log
+
 The :ref:`--log general option` provides the capability to log information about
 this flow including:
 
@@ -171,6 +175,7 @@ file ``pywbemcli.log``:
        </CIM>
    . . .
 
+.. index:: pair: controlling output format; output format
 
 .. _`Controlling output formats`:
 
@@ -205,6 +210,7 @@ General options descriptions
 This section defines in detail the requirements, characteristics, and any special
 syntax of each general option.
 
+.. index:: triple: --server; general options; server
 
 .. _`--server general option`:
 
@@ -243,6 +249,7 @@ Examples for the argument value of this option include:
     https://10.2.3.9              # https, port 5989, IPv4 address 10.2.3.9
     http://[2001:db8::1234-eth0]  # http, port 5988, IPv6 address 2001:db8::1234, interface eth0
 
+.. index:: triple: --name; general options; name
 
 .. _`--name general option`:
 
@@ -275,6 +282,7 @@ in the connections file, and then uses that connection to execute
 See :ref:`Connection command group` for more information on managing
 connections.
 
+.. index:: triple: --default-namespace; general options; default-namespace
 
 .. _`--default-namespace general option`:
 
@@ -302,6 +310,7 @@ the ``class find`` command.
 The argument value of the ``--user``/``-u`` general option is a string that is
 the user name for authenticating with the WBEM server.
 
+.. index:: triple: --password; general options; password
 
 .. _`--password general option`:
 
@@ -375,6 +384,7 @@ any subsequent pywbemcli commands:
     $ pywbemcli server namespaces
     . . . <list of namespaces for the defined server>
 
+.. index:: triple: --timeout; general options; timeout
 
 .. _`--timeout general option`:
 
@@ -388,6 +398,7 @@ that closes a WBEM connection if there is no response to a request to the WBEM
 server in the time defined by this value. Pywbemcli defaults to a
 predefined timeout (normally 30 seconds) if this option is not defined.
 
+.. index:: triple: --verify; general options; verify
 
 .. _`--verify general option`:
 
@@ -405,6 +416,7 @@ This general option uses the approach with two long option names to allow the
 user to specifically enable or disable certificate verification when this
 general option is used in interactive mode.
 
+.. index:: triple: --certfile; general options; certfile
 
 .. _`--certfile general option`:
 
@@ -422,6 +434,7 @@ resulting in 1-way authentication during the TLS/SSL handshake.
 For more information on authentication types, see:
 https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-types
 
+.. index:: triple: --keyfile; general options; keyfile
 
 .. _`--keyfile general option`:
 
@@ -439,6 +452,7 @@ Not required if the private key is part of the file defined in the
 key file. The client private key should then be part of the file defined by
 ``--certfile``.
 
+.. index:: triple: --ca-certs; general options; ca-certs
 
 .. _`--ca-certs general option`:
 
@@ -491,6 +505,7 @@ bypasses client side verification of the WBEM server certificate.
 .. _certifi package: https://certifi.io/en/latest/
 .. _Mozilla Included CA Certificate List: https://wiki.mozilla.org/CA/Included_Certificates
 
+.. index:: triple: --timestats; general options; timestats
 
 .. _`--timestats general option`:
 
@@ -503,6 +518,7 @@ statistics on the interactions with the WBEM server.  If enabled, the
 time statistics are output after each command is executed including the
 operations executed, the size of the operations, and the execution time.
 
+.. index:: triple: --use-pull; general options; use-pull
 
 .. _`--use-pull general option`:
 
@@ -522,6 +538,7 @@ for the argument value are as follows:
 * ``either`` - (default) pywbem tries both; first pull operations and then
   :term:`traditional operations`.
 
+.. index:: triple: --pull-max-cnt; general options; pull-max-cnt
 
 .. _`--pull-max-cnt general option`:
 
@@ -535,6 +552,7 @@ to be returned for each pull request if pull operations are used. This must
 be a positive non-zero integer. The default is 1000. See :ref:`Pywbemcli and the
 DMTF pull operations` for more information on pull operations.
 
+.. index:: triple: --mock-server; general options; mock-server
 
 .. _`--mock-server general option`:
 
@@ -574,6 +592,7 @@ connection named ``mymockserver``:
 See chapter :ref:`Mock WBEM server support` for more information on defining
 the files for a mock server.
 
+.. index:: triple: --output-format; general options; output-format
 
 .. _`--output-format general option`:
 
@@ -586,6 +605,7 @@ is displayed. The default output format depends on the command.
 
 For details, see :ref:`Output formats`.
 
+.. index:: triple: --log; general options; log
 
 .. _`--log general option`:
 
@@ -598,6 +618,7 @@ server.
 
 For details, see :ref:`Pywbemcli defined logging`.
 
+.. index:: triple: --verbose; general options; verbose
 
 .. _`--verbose general option`:
 
@@ -612,6 +633,7 @@ normally return nothing upon successful execution(ex. instance delete,
 instance enumerate that returns no CIM objects) to indicate the successful
 command completion.
 
+.. index:: triple: --pdb; general options; pdb
 
 .. _`--pdb general option`:
 
@@ -628,6 +650,7 @@ built-in pdb debugger.
 
 .. _`pdb debugger commands`: https://docs.python.org/2.7/library/pdb.html#debugger-commands
 
+.. index:: triple: --version; general options; version
 
 .. _`--version general option`:
 
@@ -637,6 +660,7 @@ built-in pdb debugger.
 The ``--version`` general option displays the version of the pywbemcli
 command and the version of the pywbem package used by it, and then exits.
 
+.. index:: triple: --help; general options; help
 
 .. _`--help general option`:
 
@@ -646,6 +670,7 @@ command and the version of the pywbem package used by it, and then exits.
 The ``--help``/``-h`` general option displays help text which describes the
 command groups and general options, and then exits.
 
+.. index:: pair: environment variables; general options
 
 .. _`Environment variables for general options`:
 
@@ -724,6 +749,12 @@ any subsequent pywbemcli commands:
     $ pywbemcli server namespaces
     . . . <list of namespaces for the defined server>
 
+
+.. index::
+    pair: pull operations; general options
+        single: --use-pull
+        single: --pull-max-count
+        single: traditional operations
 
 .. _`Pywbemcli and the DMTF pull operations`:
 
@@ -837,6 +868,7 @@ rejected with an exception.  For example, the command
 ``class enumerate`` only supports the CIM object formats and will generate an
 exception if the command ``pywbemcli -o table class enumerate`` is entered.
 
+.. index:: single: output formats
 
 .. _`Output formats for groups and commands`:
 
@@ -926,6 +958,8 @@ NOTES:
 
 1. While the display of classes allows only CIM object display format (`mof`, etc.) the display with
    the --names-only or --summary formats allows table output also.
+
+.. index:: pair: output formats; table formats
 
 .. _`Table formats`:
 
@@ -1044,6 +1078,10 @@ single command ``class find CIM_Foo``:
 .. _`LaTeX`: https://en.wikibooks.org/wiki/LaTeX/Tables
 .. _`JSON`: http://json.org/example.html
 
+
+.. index::
+    pair: CIM object output formats; output formats
+        pair: output formats; MOF
 
 .. _`CIM object formats`:
 
@@ -1259,6 +1297,8 @@ pywbemcli.log as follows showing the input parameters to the pywbem method
     2019-07-09 18:27:22,103-pywbem.api.1-27716-Request:1-27716 EnumerateClassNames(ClassName=None, DeepInheritance=False, namespace=None)
     2019-07-09 18:27:22,142-pywbem.api.1-27716-Return:1-27716 EnumerateClassNames(list of str; count=103)
 
+
+.. index:: single: connection definitions
 
 .. _`Pywbemcli persisted connection definitions`:
 

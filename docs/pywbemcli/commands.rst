@@ -28,6 +28,7 @@ commands, see :ref:`Pywbemcli command line interface`.
 **NOTE:** Many of the examples below use the :ref:`--mock-server general option`
 with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 
+.. index:: pair: command groups; class commands
 
 .. _`Class command group`:
 
@@ -47,6 +48,9 @@ The ``class`` command group has commands that act on CIM classes:
 
 See :ref:`pywbemcli class --help`.
 
+.. index::
+    pair: class commands; class associators
+    single: associators; class
 
 .. _`Class associators command`:
 
@@ -65,8 +69,8 @@ displayed, using :term:`CIM object output formats` or
 :term:`Table output formats`. Otherwise, the class definition is displayed,
 using :term:`CIM object output formats`.
 
-Note: This command returns the class associators, not the instance associators.
-The :ref:`Instance associators command` returns the instance associators.
+Note: This command returns class associations. The :ref:`Instance associators
+command` returns instance associations.
 
 Example:
 
@@ -77,6 +81,8 @@ Example:
 
 See :ref:`pywbemcli class associators --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class delete
+.. index:: delete classes; class commands
 
 .. _`Class delete command`:
 
@@ -109,6 +115,7 @@ Example:
 
 See :ref:`pywbemcli class delete --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class enumerate
 
 .. _`Class enumerate command`:
 
@@ -117,6 +124,8 @@ Class enumerate command
 
 The ``class enumerate`` command enumerates the subclasses of the specified
 class, or the root classes of the class hierarchy.
+
+.. index:: pair: CLASSNAME argument; class enumerate
 
 If the ``CLASSNAME`` argument is specified, the command enumerates the
 subclasses of the class named with the ``CLASSNAME`` argument in the
@@ -158,6 +167,8 @@ default namespace:
 
 See :ref:`pywbemcli class enumerate --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class find
+.. index:: pair: find command; class group
 
 .. _`Class find command`:
 
@@ -170,7 +181,7 @@ argument in all namespaces of the connection, or otherwise in the specified
 namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
 
-.. index:: qualifier filters
+.. index:: pair: qualifier filters; class find command
 
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
@@ -226,6 +237,7 @@ The command displays the namespaces and class names of the result using the
 
 See :ref:`pywbemcli class find --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class get
 
 .. _`Class get command`:
 
@@ -283,6 +295,7 @@ The following example shows getting the MOF representation of the class
 
 See :ref:`pywbemcli class get --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class invokemethod
 
 .. _`Class invokemethod command`:
 
@@ -318,6 +331,7 @@ Example:
 
 See :ref:`pywbemcli class invokemethod --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class references
 
 .. _`Class references command`:
 
@@ -347,6 +361,7 @@ The :ref:`Instance references command` returns the instance references.
 
 See :ref:`pywbemcli class references --help` for the exact help output of the command.
 
+.. index:: pair: class commands; class tree
 
 .. _`Class tree command`:
 
@@ -383,6 +398,7 @@ Example:
 
 See :ref:`pywbemcli class tree --help` for the exact help output of the command.
 
+.. index:: pair: command groups; instance commands
 
 .. _`Instance command group`:
 
@@ -405,6 +421,9 @@ The ``instance`` command group has commands that act on CIM instances:
 
 See :ref:`pywbemcli instance --help`.
 
+.. index::
+    pair: instance commands; instance associators
+    single: associators; instance
 
 .. _`Instance associators command`:
 
@@ -448,6 +467,7 @@ Example:
 
 See :ref:`pywbemcli instance associators --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance count
 
 .. _`Instance count command`:
 
@@ -470,8 +490,7 @@ match the specified :term:`Unix-style path name pattern` are counted. If the
 ``CLASSNAME-GLOB`` argument is not specified all instances of all classes in
 the target namespaces are counted.
 
-.. index::
-   single: qualifier filters
+.. index:: pair: qualifier filters; instance count command
 
 The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
 and ``--experimental``/``--no-experimental`` options filter the returned
@@ -510,6 +529,7 @@ instances for each class.
 
 See :ref:`pywbemcli instance count --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance create
 
 .. _`Instance create command`:
 
@@ -543,6 +563,7 @@ scalar and one array property:
 
 See :ref:`pywbemcli instance create --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance delete
 
 .. _`Instance delete command`:
 
@@ -564,6 +585,7 @@ escape the double quote on the terminal:
 
 See :ref:`pywbemcli instance delete --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance enumerate
 
 .. _`Instance enumerate command`:
 
@@ -602,6 +624,7 @@ The following example returns two instances as MOF:
 
 See :ref:`pywbemcli instance enumerate --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance get
 
 .. _`Instance get command`:
 
@@ -645,6 +668,7 @@ or using the keys wildcard:
 
 See :ref:`pywbemcli instance get --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance invokemethod
 
 .. _`Instance invokemethod command`:
 
@@ -691,6 +715,7 @@ Or using the wildcard to create a selection list for the instance names
 
 See :ref:`pywbemcli instance invokemethod --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance modify
 
 .. _`Instance modify command`:
 
@@ -731,6 +756,7 @@ scalar and one array property:
 
 See :ref:`pywbemcli instance modify --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance references
 
 .. _`Instance references command`:
 
@@ -765,6 +791,7 @@ Example:
 
 See :ref:`pywbemcli instance references --help` for the exact help output of the command.
 
+.. index:: pair: instance commands; instance query
 
 .. _`Instance query command`:
 
@@ -785,6 +812,8 @@ Valid output formats are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
 See :ref:`pywbemcli instance query --help` for the exact help output of the command.
+
+.. index:: pair: instance commands; instance shrub
 
 .. _`Instance shrub command`:
 
@@ -889,8 +918,9 @@ Example:
     |           |                   |              |                    | InstanceID=8(refinst:2) |
     +-----------+-------------------+--------------+--------------------+-------------------------+
 
+.. index:: pair: command groups; qualifier commands
 
-.. _`qualifier command group`:
+.. _`Qualifier command group`:
 
 Qualifier command group
 -----------------------
@@ -902,6 +932,7 @@ declarations:
 * :ref:`qualifier enumerate command` - List the qualifier declarations in a
   namespace.
 
+.. index:: pair: qualifier commands; qualifier get
 
 .. _`Qualifier get command`:
 
@@ -929,6 +960,7 @@ default namespace:
 
 See :ref:`pywbemcli qualifier get --help` for the exact help output of the command.
 
+.. index:: pair: qualifier commands; qualifier enumerate
 
 .. _`Qualifier enumerate command`:
 
@@ -969,6 +1001,7 @@ namespace as a table:
 
 See :ref:`pywbemcli qualifier enumerate --help` for the exact help output of the command.
 
+.. index:: pair: command groups; server commands
 
 .. _`Server command group`:
 
@@ -986,6 +1019,7 @@ WBEM server itself:
 * :ref:`Server namespaces command` - List the namespaces of the server.
 * :ref:`Server profiles command` - List management profiles advertized by the server.
 
+.. index:: pair: server commands; server brand
 
 .. _`Server brand command`:
 
@@ -1016,6 +1050,7 @@ Example:
 
 See :ref:`pywbemcli server brand --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server info
 
 .. _`Server info command`:
 
@@ -1061,6 +1096,7 @@ Example:
 
 See :ref:`pywbemcli server info --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server interop
 
 .. _`Server interop command`:
 
@@ -1086,6 +1122,7 @@ Example:
 
 See :ref:`pywbemcli server interop --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server namespaces
 
 .. _`Server namespaces command`:
 
@@ -1118,6 +1155,7 @@ Example:
 
 See :ref:`pywbemcli server namespaces --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server profiles
 
 .. _`Server profiles command`:
 
@@ -1166,6 +1204,7 @@ Example:
 
 See :ref:`pywbemcli server profiles --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server centralinsts
 
 .. _`Server centralinsts command`:
 
@@ -1198,6 +1237,7 @@ Example:
 
 See :ref:`pywbemcli server centralinsts --help` for the exact help output of the command.
 
+.. index:: pair: command groups;connection commands
 
 .. _`Connection command group`:
 
@@ -1207,9 +1247,14 @@ Connection command group
 The ``connection`` command group has commands that manage named connection
 definitions that are persisted in a :term:`connections file`.
 This allows maintaining multiple connection definitions and then using any
-one via the :ref:`--name general option`.
+one via the :ref:`--name general option`. Only a single connection is
+active (selected) at any point in time but the connection connection can
+be selected on the pywbemcli command line (:ref:`--name general option`) or
+changed within an interactive session using the :ref:`Connection select command`
 
-The attributes of each connection definition in the connections file are:
+.. index:: pair: connections file; persistent connection attributes
+
+The attributes of each connection definition in the :term:`connections file` are:
 
 * **name** - name of the connection definition. See :ref:`--name general option`.
 * **server** - URL of the WBEM server, or None if the connection definition is
@@ -1217,6 +1262,8 @@ The attributes of each connection definition in the connections file are:
 * **default-namespace** - default namespace for the WBEM server. See :ref:`--default-namespace general option`.
 * **user** - user name for the WBEM server. See :ref:`--user general option`.
 * **password** - password for the WBEM server. See :ref:`--password general option`.
+* **use-pull** - determines whether the pull operations are to be used for
+  the WBEM server. See :ref:`--use-pull general option`.
 * **verify** - a boolean flag controlling whether the pywbem client verifies
   any certificate received from the WBEM server. See :ref:`--verify general option`.
 * **certfile** - path name of the server certificate file. See :ref:`--certfile general option`.
@@ -1236,6 +1283,7 @@ The commands in this group are:
 * :ref:`Connection show command` - Show connection info of a WBEM connection definition.
 * :ref:`Connection test command` - Test the current connection with a predefined WBEM request.
 
+.. index:: pair: connection commands; connection delete
 
 .. _`Connection delete command`:
 
@@ -1271,6 +1319,7 @@ Example that deletes a connection definition by selecting it:
 
 See :ref:`pywbemcli connection delete --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection export
 
 .. _`Connection export command`:
 
@@ -1305,6 +1354,7 @@ as follows:
 
 See :ref:`pywbemcli connection export --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection list
 
 .. _`Connection list command`:
 
@@ -1382,6 +1432,7 @@ used by the server.
 
 See :ref:`pywbemcli connection list --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection save
 
 .. _`Connection save command`:
 
@@ -1397,6 +1448,7 @@ without notice.
 
 See :ref:`pywbemcli connection save --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection select
 
 .. _`Connection select command`:
 
@@ -1457,6 +1509,7 @@ mode of pywbemcli:
 
 See :ref:`pywbemcli connection select --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection show
 
 .. _`Connection show command`:
 
@@ -1491,6 +1544,7 @@ The ``connection show`` command shows information about a connection definition:
 
 See :ref:`pywbemcli connection show --help` for the exact help output of the command.
 
+.. index:: pair: connection commands; connection test
 
 .. _`Connection test command`:
 
@@ -1519,6 +1573,7 @@ and ``--password`` and executes the test with successful result:
 
 See :ref:`pywbemcli connection test --help` for the exact help output of the command.
 
+.. index:: pair: repl; command
 
 .. _`Repl command`:
 
@@ -1528,6 +1583,7 @@ Repl command
 .. index::
     single: repl command
     pair: command; repl
+    pair: repl; interactive mode
 
 The ``repl`` command sets pywbemcli into the :ref:`interactive mode`. Pywbemcli
 can be started in the :ref:`interactive mode` either by entering:
@@ -1561,6 +1617,7 @@ the currently shown command.
 see :ref:`interactive mode` for more details on using this mode and the
 search.
 
+.. index:: pair: help; command
 
 .. _`Help command`:
 
