@@ -13,6 +13,10 @@
 .. limitations under the License.
 ..
 
+.. index::
+    single; pywbemcli command line interface
+    single; command line interface
+
 .. _`Pywbemcli command line interface`:
 
 Pywbemcli command line interface
@@ -25,9 +29,13 @@ Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
 The command line can contain the following components:
 
+.. index:: pair: General Options; command components
+
 * **GENERAL-OPTIONS** - General options; they apply to all commands.
   See :ref:`Using the pywbemcli command line general options` for information
   on the pywbemcli general options.
+
+.. index:: pair: command components; command components
 
 * **COMMAND** - A name of a command which may consist of:
    * <group name> <command name> for commands that are defined within
@@ -36,14 +44,21 @@ The command line can contain the following components:
      within the group.
    * <command name> for those commands that are not part of a group. For
      example ``repl`` and ``help`` that are not in any command group.
+
+.. index:: pair: command arguments; command components
+
 * **ARGS** - Arguments for a command.
+
+.. index:: pair: command interface; Command Options
+
 * **COMMAND-OPTIONS** - Options that apply only to a particular
   COMMAND.
-
 
 Options are prefixed with the characters ``-`` for the short form or ``--`` for
 the long form (ex. ``-n`` or ``--namespace``). The other components do not
 begin with ``-``.
+
+.. index:: pair command groups; command interface
 
 Command groups are named after the objects the commands operate on
 (ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing
@@ -74,14 +89,14 @@ the MOF output format. The option ``--output-format`` is a general option
 and ``--namespace`` is a command option.
 
 .. index::
-   single: tab-completion
-   single: auto-completion
+   pair: tab-completion; auto-completion
    single: auto-suggestion
 
 Pywbemcli supports several modes of tab-completion, auto-completion suggestions
 depending on whether it is in command or interactive mode. This is detailed
 in the following sections.
 
+.. index:: single: Modes of operation
 
 .. _`Modes of operation`:
 
@@ -94,6 +109,8 @@ Pywbemcli supports two modes of operation:
 * `Interactive mode`_: Invoking an interactive pywbemcli shell for typing
   pywbemcli commands.
 
+.. index:: pair: interactive mode; command modes
+.. index:: pair: interactive mode; modes of operation
 
 .. _`Command mode`:
 
@@ -159,6 +176,8 @@ for its command line handling. See
 `Bash Complete in the Click documentation <https://click.palletsprojects.com/en/7.x/bashcomplete/>`_
 for additional features of the Bash tab completion of pywbemcli.
 
+.. index:: pair: interactive mode; command modes
+.. index:: pair: interactive mode; modes of operation
 
 .. _`Interactive mode`:
 
@@ -364,6 +383,7 @@ starting with the given text, the completion will be shown as gray text behind
 the current input. Pressing the right arrow → or c-e will insert this
 suggestion.
 
+.. index:: pair: Error handling; exit codes
 
 .. _`Error handling`:
 
@@ -384,8 +404,8 @@ Pywbemcli terminates with one of the following program exit codes:
 
   Examples for errors reported that way:
 
-  * Local system issues, e.g. pywbemcli history file or connections file cannot
-    be written to.
+  * Local system issues, e.g. pywbemcli history file or term:`connections file`
+    cannot be written to.
 
   * WBEM server access issues, e.g. pywbemcli cannot connect to or authenticate
     with the WBEM server. This includes CIM errors about failed authentication

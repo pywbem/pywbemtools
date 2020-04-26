@@ -232,6 +232,10 @@ Released: 2020-04-10
 * Added documentation on incremental search option to search the command
   history file in interactive mode. (See issue #595)
 
+* Added documentation index entries for commands, command groups, etc. (see
+  issue #598)
+
+
 
 pywbemtools 0.5.0
 -----------------

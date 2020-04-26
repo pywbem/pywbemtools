@@ -1,3 +1,5 @@
+.. index:: pair: Mock WBEM server support; server mock
+
 .. _`Mock WBEM server support`:
 
 Mock WBEM server support
@@ -9,29 +11,33 @@ Mock support overview
 ---------------------
 
 Pywbemcli has support for mocking a WBEM server with the general option
-``--mock-server/-m``. This allows executing pywbemcli against a mock
-WBEM server that is automatically created in pywbemcli, rather than a real
-WBEM server.
+:ref:`--mock-server general option` (``--mock-server/-m``) . This allows
+executing pywbemcli against a mock WBEM server that is automatically created in
+pywbemcli, rather than a real WBEM server.
 
-The ``--mock-server`` option is mutually exclusive with the ``--server`` and
-``--name`` options, since each defines a WBEM server.
+The :ref:`--mock-server general option` is mutually exclusive with the
+:ref:`--server general option` and :ref:`--name general option`, since each
+defines a WBEM server.
 
 The automatically created mock WBEM server has a in-memory repository for
 CIM objects (qualifier declarations, classes, and instances) and supports
 CIM namespaces. The operations performed against the mock WBEM server cause
 that mock repository to be inspected or manipulated accordingly.
 
-The mock repository can be loaded with CIM objects from files specified as
-an argument to the ``--mock-server`` option. Each use of the option specifies
-one file path of such a file. The option may be used multiple times and each
-specified file is processed sequentially, in the sequence of the options
-on the command line.
+The mock repository can be loaded with CIM objects from files specified as an
+argument to the :ref:`--mock-server general option`. Each use of the option
+specifies one file path of such a file. The option may be used multiple times
+and each specified file is processed sequentially, in the sequence of the
+options on the command line.
 
 The following types of files are supported for the ``--mock-server`` option:
 
+.. index:: pair: MOF; server mock
+.. index:: pair: compile_string(); mock setup methods
+
 * **MOF files**: If the file extension is ``.mof``, the file is considered a
   :term:`MOF` file. Pywbemcli compiles the MOF in the file and adds the
-  resulting CIM objects into the mock repository.
+  resulting CIM objects to the mock repository.
 
   The MOF file may define CIM qualifier declarations, CIM classes and CIM
   instances.
@@ -42,6 +48,8 @@ The following types of files are supported for the ``--mock-server`` option:
   option).
 
   If a CIM object already exists in the repository, it is updated accordingly.
+
+.. index:: triple: Python files; server mock; add_cimobjects()
 
 * **Python files**: If the file extension is ``.py``, the file is considered
   a Python file. The file is executed using Python's ``exec()`` (i.e. with
@@ -77,6 +85,9 @@ Pywbemcli logging (``-l`` or ``--log`` general option) can be used together
 with the mock support. Since the mock support does not use HTTP(S), only the
 "api" component in the log configuration string will generate any log output.
 
+.. index::
+    pair: Creating files for mock repository; server mock
+    pair: MOF; server mock
 
 .. _`Creating files for the mock repository`:
 
@@ -137,6 +148,9 @@ and then to enumerate its CIM class names is::
 
     $ pywbemcli --mock-server tst_file.mof class enumerate --names-only
     CIM_Foo
+
+
+.. index:: pair: add_cim_objects(); mock setup methods
 
 The following is Python code (in a file ``tst_file.py``) that will add the same
 CIM objects as in the MOF file to the mock repository using
