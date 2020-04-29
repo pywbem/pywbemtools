@@ -82,7 +82,7 @@ Example:
 See :ref:`pywbemcli class associators --help` for the exact help output of the command.
 
 .. index:: pair: class commands; class delete
-.. index:: delete classes; class commands
+.. index:: pair: delete classes; class commands
 
 .. _`Class delete command`:
 

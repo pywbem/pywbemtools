@@ -14,8 +14,8 @@
 ..
 
 .. index::
-    single; pywbemcli command line interface
-    single; command line interface
+    single: pywbemcli command line interface
+    single: command line interface
 
 .. _`Pywbemcli command line interface`:
 
@@ -58,7 +58,7 @@ Options are prefixed with the characters ``-`` for the short form or ``--`` for
 the long form (ex. ``-n`` or ``--namespace``). The other components do not
 begin with ``-``.
 
-.. index:: pair command groups; command interface
+.. index:: pair: command groups; command interface
 
 Command groups are named after the objects the commands operate on
 (ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing
