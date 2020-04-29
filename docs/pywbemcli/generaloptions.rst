@@ -75,7 +75,7 @@ specified in the command line invocation:
     |             |         |         |         | REFERENCE | ToSubclass      |
     +-------------+---------+---------+---------+-----------+-----------------+
 
-.. index:: pair WBEM server; defining the WBEM server
+.. index:: pair: WBEM server; defining the WBEM server
 
 .. _`Defining the WBEM server`:
 
@@ -106,7 +106,7 @@ the following arguments :
    * The :ref:`--timeout general option` defines the client side timeout
      for operations.
 
-2. Define a mock WBEM server () by using the :ref:`--mock-server general option`.
+2. Define a mock WBEM server by using the :ref:`--mock-server general option`.
 
    The mock WBEM server is part of pywbemcli and allows testing or
    demonstrating pywbemcli without having access to a real WBEM server.
@@ -752,9 +752,9 @@ any subsequent pywbemcli commands:
 
 .. index::
     pair: pull operations; general options
-        single: --use-pull
-        single: --pull-max-count
-        single: traditional operations
+    single: --use-pull
+    single: --pull-max-count
+    single: traditional operations
 
 .. _`Pywbemcli and the DMTF pull operations`:
 
@@ -1081,7 +1081,7 @@ single command ``class find CIM_Foo``:
 
 .. index::
     pair: CIM object output formats; output formats
-        pair: output formats; MOF
+    pair: output formats; MOF
 
 .. _`CIM object formats`:
 
