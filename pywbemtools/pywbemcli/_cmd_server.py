@@ -30,7 +30,8 @@ from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
 from ._common import format_table, raise_pywbem_error_exception, \
-    validate_output_format, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    validate_output_format, display_text, output_format_is_table, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, DEFAULT_TABLE_FORMAT
 from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -226,19 +227,23 @@ def cmd_server_namespaces(context, options):
     """
     Display namespaces in the current WBEM server
     """
-    output_format = validate_output_format(context.output_format, 'TABLE')
+    output_format = validate_output_format(
+        context.output_format,
+        ['TABLE', 'TEXT'], default_format=DEFAULT_TABLE_FORMAT)
 
     try:
         namespaces = context.wbem_server.namespaces
         namespaces.sort()
         context.spinner_stop()
+        if output_format_is_table(output_format):
+            # create list for each row
+            rows = [[ns] for ns in namespaces]
 
-        # create list for each row
-        rows = [[ns] for ns in namespaces]
-
-        click.echo(format_table(rows, ['Namespace Name'],
-                                title='Server Namespaces:',
-                                table_format=output_format))
+            click.echo(format_table(rows, ['Namespace Name'],
+                                    title='Server Namespaces:',
+                                    table_format=output_format))
+        else:
+            display_text(", ".join(namespaces))
 
     except Error as er:
         raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
@@ -248,17 +253,15 @@ def cmd_server_interop(context):
     """
     Display interop namespace in the current WBEM server
     """
-    output_format = validate_output_format(context.output_format, 'TABLE')
+
+    output_format = validate_output_format(context.output_format, 'TEXT')
 
     try:
         interop_ns = context.wbem_server.interop_ns
         context.spinner_stop()
 
-        rows = [[interop_ns]]
+        display_text(interop_ns, output_format)
 
-        click.echo(format_table(rows, ['Namespace Name'],
-                                title='Server Interop Namespace:',
-                                table_format=output_format))
     except Error as er:
         raise_pywbem_error_exception(er)
 
@@ -267,16 +270,14 @@ def cmd_server_brand(context):
     """
     Display product and version info of the current WBEM server
     """
-    output_format = validate_output_format(context.output_format, 'TABLE')
+    output_format = validate_output_format(context.output_format, 'TEXT')
 
     try:
         brand = context.wbem_server.brand
         context.spinner_stop()
 
-        rows = [[brand]]
-        click.echo(format_table(rows, ['WBEM server brand'],
-                                title='Server brand:',
-                                table_format=output_format))
+        display_text(brand, output_format)
+
     except Error as er:
         raise_pywbem_error_exception(er)
 

@@ -30,7 +30,7 @@ from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
-    TABLE_FORMATS, format_table, process_invokemethod, \
+    output_format_is_table, format_table, process_invokemethod, \
     raise_pywbem_error_exception, warning_msg, validate_output_format
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
@@ -586,7 +586,8 @@ def get_format_group(context, options):
 
         # This accounts for the fact that the results of a summary can be
         # either table or simply a string output
-        if context.output_format and context.output_format in TABLE_FORMATS:
+        if context.output_format and \
+                output_format_is_table(context.output_format):
             return ['TABLE']
 
         # Temporary hack. We need another format group, i.e. txt or str
@@ -801,7 +802,7 @@ def cmd_class_find(context, classname_glob, options):
             rows.extend(ns_rows)
 
         context.spinner_stop()
-        if context.output_format in TABLE_FORMATS:
+        if output_format_is_table(context.output_format):
             headers = ['Namespace', 'Classname']
             click.echo(
                 format_table(rows, headers,

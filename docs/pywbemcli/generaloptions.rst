@@ -185,9 +185,9 @@ Controlling output formats
 Pywbemcli supports multiple output formats for command results by using the
 :ref:`--output-format general option`.
 
-The output formats fall into three groups (table formats, CIM object formats,
-and a tree format); however, not all formats are supported or applicable for all
-commands. For more details, see :ref:`Output formats`.
+The output formats fall into several groups (table formats, CIM object formats,
+text formats, and a tree format); however, not all formats are supported or
+applicable for all commands. For more details, see :ref:`Output formats`.
 
 
 .. _`Other miscellaneous general options`:
@@ -838,7 +838,7 @@ Pywbemcli supports multiple output formats to present command results. The outpu
 format can be selected with the ``--output-format``/``-o`` option. The allowed
 output formats are different for the various command groups and commands.
 
-The output formats fall into three groups:
+The output formats fall into several groups:
 
 * **Table formats** - The :ref:`Table formats` format the result as a table
   with rows and columns. Many of the result types allow table formatted
@@ -858,15 +858,19 @@ The output formats fall into three groups:
   commands that return CIM objects support these output formats.
 
 * **ASCII tree format** - The :ref:`ASCII tree format` formats the result
-  as a tree, using ASCII characters to represent the tree. The only command
-  supporting the ASCII tree format is ``class tree``, and it supports only
-  that one output format.  The tree format is not supported by any other
-  command today.
+  as a tree, using ASCII characters to represent the tree to show the
+  hierarchial relationship between CIM classes. The only command supporting the
+  ASCII tree format is ``class tree``, and it supports only that one output
+  format.  The tree format is not supported by any other command today.
+
+* **TEXT format** - The :ref:`Text formats` is used for commands that output
+  small quantites of text (ex. the interop namespace name) and that could be
+  used as part of a command line redirection.
 
 When an unsupported output format is specified for a command response, it is
-rejected with an exception.  For example, the command
-``class enumerate`` only supports the CIM object formats and will generate an
-exception if the command ``pywbemcli -o table class enumerate`` is entered.
+rejected with an exception.  For example, the command ``class enumerate`` only
+supports the :ref:`CIM object formats` and will generate an exception if the
+command ``pywbemcli -o table class enumerate`` is entered.
 
 .. index:: single: output formats
 
@@ -927,15 +931,15 @@ table = table|plain|simple|grid|psql|rst|html
 +----------+---------------+----------+----------------+--------------------------------------------+
 |          |  get          | 'mof'    | table          |                                            |
 +----------+---------------+----------+----------------+--------------------------------------------+
-|server    |  brand        | 'simple' | table          |                                            |
+|server    |  brand        | 'text'   | text           | Alternate is table format                  |
 +----------+---------------+----------+----------------+--------------------------------------------+
 |          |centralinsts   | 'simple' | table          |                                            |
 +----------+---------------+----------+----------------+--------------------------------------------+
 |          |  info         | 'simple' | table          |                                            |
 +----------+---------------+----------+----------------+--------------------------------------------+
-|          |  interop      | 'simple' | table          |                                            |
+|          |  interop      | 'text'   | text           | Alternate is table format                  |
 +----------+---------------+----------+----------------+--------------------------------------------+
-|          |  namespaces   | 'simple' | table          |                                            |
+|          |  namespaces   | 'simple' | table          | Alternate is text format                   |
 +----------+---------------+----------+----------------+--------------------------------------------+
 |          |  profiles     | 'simple' | table          |                                            |
 +----------+---------------+----------+----------------+--------------------------------------------+
@@ -1195,6 +1199,31 @@ cannot be specified explicitly with the ``--output-format`` option.
 This shows a very simple mock repository with 4 classes where CIM_Foo is the
 top level in the hierarchy, CIM_Foo_sub and CIM_Foo_sub2 are its subclasses, and
 CIM_Foo_sub_sub is the subclass of CIM_Foo_sub.
+
+.. index:: pair: output formats; text formats
+
+.. _`Text formats`:
+
+Text formats
+""""""""""""
+
+The TEXT format group outputs the data returned from the command as text
+to the console without any formatting except for formatting lists and
+comma separated strings.  It is useful for use with data that might be
+redirected to other commands or output that is simple enough that a single
+line of output is sufficient.
+
+.. code-block:: text
+
+    $ pywbemcli --mock-server tests/unit/testmock/wbemserver_mock.py -o table server namespaces
+    Server Namespaces:
+    Namespace Name
+    ----------------
+    interop
+
+    $ pywbemcli --mock-server tests/unit/testmock/wbemserver_mock.py -o text server namespaces
+    interop
+
 
 
 .. _`Pywbemcli defined logging`:

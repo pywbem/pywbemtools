@@ -35,8 +35,7 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
     DEFAULT_LOG_DETAIL_LEVEL
 
 from ._context_obj import ContextObj, display_click_context
-from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TABLE_FORMATS, \
-    CIM_OBJECT_OUTPUT_FORMATS
+from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
@@ -215,10 +214,11 @@ CONTEXT_SETTINGS = dict(
                    'specific. '
                    'The default output_format is None so that each command '
                    'selects its own default format. '
-                   'FORMAT is either a table format: [{tb}] or CIM object '
-                   'format: [{ob}].'.
-                   format(tb='|'.join(TABLE_FORMATS),
-                          ob='|'.join(CIM_OBJECT_OUTPUT_FORMATS)))
+                   'FORMAT is: table formats: [{tb}]; CIM object '
+                   'formats: [{ob}]]; TEXT formats: [{tx}].'.
+                   format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0]),
+                          ob='|'.join(OUTPUT_FORMAT_GROUPS['CIM'][0]),
+                          tx='|'.join(OUTPUT_FORMAT_GROUPS['TEXT'][0])))
 @click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
               # defaulted in code
               envvar=PywbemServer.log_envvar,
