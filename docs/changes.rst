@@ -28,6 +28,13 @@ Released: not yet
   archive, and added install tests for various installation methods including
   this one. (see issues #590, #591).
 
+* Enhance output formats to allow an additional format group TEXT with
+  a single format ``text``. This format outputs the command result as a
+  text string to the console and is use for simple commands like
+  ``server interop`` that only output one piece of data. (see issue #594)
+
+**Cleanup**
+
 **Known issues:**
 
 * See `list of open issues`_.

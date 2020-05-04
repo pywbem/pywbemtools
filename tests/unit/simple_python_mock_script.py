@@ -11,7 +11,7 @@ from pywbem import CIMQualifier, CIMClass, CIMProperty, CIMMethod
 # test that GLOBALS exist
 assert "CONN" in globals()
 assert 'SERVER' in globals()
-assert 'VERBOSE'in globals()
+assert 'VERBOSE' in globals()
 
 
 def build_classes():

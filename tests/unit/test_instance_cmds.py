@@ -971,8 +971,17 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify instance command get with -o txt fails',
+     {'args': ['enumerate', 'CIM_Foo'],
+      'general': ['--output-format', 'text']},
+     {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
+                 'TABLE formats:'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
     #
-    #  exhaustive tests for INSTANCENAME parameter (using instance get command)
+    #  Exhaustive tests for INSTANCENAME parameter (using instance get command)
     #  including variations on --namespace and --key options.
     #
 
@@ -1484,7 +1493,7 @@ Instances: PyWBEM_AllTypes
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
 
     #
-    #  get command errors
+    #  instance get command errors
     #
     ['instance command get error. no classname',
      ['get'],
@@ -1520,6 +1529,15 @@ Instances: PyWBEM_AllTypes
                  "'CIM_NOTEXIST'}), namespace='root/cimv2', host=None)"],
       'rc': 1,
       'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command get with -o txt fails',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--lo'],
+      'general': ['--output-format', 'text']},
+     {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
+                 'TABLE formats:'],
+      'rc': 1,
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -2234,6 +2252,15 @@ Instances: PyWBEM_AllTypes
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance command references with --output-format text',
+     {'args': ['references', 'CIM_Foo.InstanceID="CIM_Foo1"'],
+      'general': ['--output-format', 'text']},
+     {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
+                 'TABLE formats:'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
     # TODO add more invalid references tests
 
     #
@@ -2661,35 +2688,35 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand shrub, simple tree no namepace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand shrub, simple tree no namepace. short path',
      ['shrub', 'TST_Person.name="Mike"'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand shrub, simple tree with --role option 1',
      ['shrub', 'TST_Person.name="Mike"', '--role', 'parent'],
      {'stdout': SIMPLE_SHRUB_TREE_ROLE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand shrub, simple tree with --role option 2',
      ['shrub', 'TST_Person.name="Mike"', '--role', 'Parent'],
      {'stdout': SIMPLE_SHRUB_TREE_ROLE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --role option err',
      ['shrub', 'TST_Person.name="Mike"', '--role', 'parentx'],
@@ -2698,21 +2725,21 @@ interop      TST_MemberOfFamilyCollection  3
       'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --assoc-class option1',
      ['shrub', 'TST_Person.name="Mike"', '--assoc-class', 'TST_Lineage'],
      {'stdout': SIMPLE_SHRUB_TREE_ASSOC_CLASS,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --assoc-class option2',
      ['shrub', 'TST_Person.name="Mike"', '--assoc-class', 'tst_lineage'],
      {'stdout': SIMPLE_SHRUB_TREE_ASSOC_CLASS,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --assoc-class option err',
      ['shrub', 'TST_Person.name="Mike"', '--assoc-class', 'TST_Lineagex'],
@@ -2720,28 +2747,28 @@ interop      TST_MemberOfFamilyCollection  3
       'stderr': "WARNING",
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --result-class option1',
      ['shrub', 'TST_Person.name="Mike"', '--result-class', 'TST_Person'],
      {'stdout': SIMPLE_SHRUB_TREE_RESULT_CLASS,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with --assoc-class option2',
      ['shrub', 'TST_Person.name="Mike"', '--result-class', 'tst_person'],
      {'stdout': SIMPLE_SHRUB_TREE_RESULT_CLASS,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance subcommand shrub, simple tree with --assoc-class error',
      ['shrub', 'TST_Person.name="Mike"', '--result-class', 'TST_Personx'],
      {'stdout': SIMPLE_SHRUB_TREE_RESULT_CLASS_NO_RTN,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple table request w ns',
      {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"',
@@ -2750,7 +2777,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tableno ns in request',
      {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"'],
@@ -2758,21 +2785,21 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with namespace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree without namespace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     # Test with a complex (ternary) association
     # TODO: Fix the following failed tests. Some minor diff in table I have
@@ -2793,7 +2820,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': COMPLEX_SHRUB_TABLE_SUMMARY,
       'rc': 0,
       'test': 'innows'},
-     COMPLEX_ASSOC_MODEL, RUN],
+     COMPLEX_ASSOC_MODEL, OK],
 
     ['Verify instance subcommand shrub, complex tree',
      {'args': ['shrub', 'TST_EP.InstanceID=1', '--fullpath'],
@@ -2801,7 +2828,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': COMPLEX_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     COMPLEX_ASSOC_MODEL, RUN],
+     COMPLEX_ASSOC_MODEL, OK],
 
     # TODO test results if we have keys that get hidden.  This will require
     # a more complex model with CreationClassName, etc. in paths.

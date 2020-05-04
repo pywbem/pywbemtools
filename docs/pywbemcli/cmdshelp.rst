@@ -106,8 +106,8 @@ Help text for ``pywbemcli``:
 
       -o, --output-format FORMAT      Output format for the command result. The default and allowed output formats are
                                       command specific. The default output_format is None so that each command selects its
-                                      own default format. FORMAT is either a table format:
-                                      [table|plain|simple|grid|psql|rst|html] or CIM object format: [mof|xml|repr|txt].
+                                      own default format. FORMAT is: table formats: [table|plain|simple|grid|psql|rst|html];
+                                      CIM object formats: [mof|xml|repr|txt]]; TEXT formats: [text].
 
       -l, --log COMP[=DEST[:DETAIL]],...
                                       Enable logging of the WBEM operations, defined by a list of log configuration strings

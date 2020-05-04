@@ -23,6 +23,12 @@ import fnmatch
 import re
 from textwrap import fill
 from operator import itemgetter
+from collections import namedtuple
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  # pylint: disable=import-error
+
 import six
 import click
 import tabulate
@@ -36,22 +42,6 @@ from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
 
-##############################################################
-#
-#     general option output format definitions and support for
-#     validating output formats
-#
-##############################################################
-
-TABLE_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html')
-CIM_OBJECT_OUTPUT_FORMATS = ('mof', 'xml', 'repr', 'txt')
-
-OUTPUT_FORMATS = TABLE_FORMATS + CIM_OBJECT_OUTPUT_FORMATS
-
-DEFAULT_CIM_OUTPUT_FORMAT = 'mof'
-DEFAULT_TABLE_OUTPUT_FORMAT = 'simple'
-FORMAT_GROUPS = ('CIM', 'TABLE')
-
 # Definitions of the components of the help Usage line used
 # by pywbemcli
 GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
@@ -60,14 +50,55 @@ SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
 
 DEFAULT_MAX_CELL_WIDTH = 100
 
+##############################################################
+#
+#     General option output format definitions and support for
+#     validating output formats
+#
+##############################################################
+
+# Definition of the format keywords within each format group
+TABLE_FORMATS = ('table', 'plain', 'simple', 'grid', 'psql', 'rst', 'html')
+CIM_OBJECT_FORMATS = ('mof', 'xml', 'repr', 'txt')
+TEXT_FORMATS = ('text',)
+
+# Definition of the default format for each format group
+DEFAULT_CIM_FORMAT = CIM_OBJECT_FORMATS[0]
+DEFAULT_TABLE_FORMAT = TABLE_FORMATS[2]
+DEFAULT_TEXT_FORMAT = TEXT_FORMATS[0]
+
+# Dictionary that relates group names to list of formats keywords for that
+# group and the default format for that group.  The order of the dictionary
+# entry determines the priority of selecting formats.
+GROUPVALUES = namedtuple('GROUPVALUES', 'keywords default')
+OUTPUT_FORMAT_GROUPS = OrderedDict(
+    [('CIM', GROUPVALUES(CIM_OBJECT_FORMATS, DEFAULT_CIM_FORMAT)),
+     ('TABLE', GROUPVALUES(TABLE_FORMATS, DEFAULT_TABLE_FORMAT)),
+     ('TEXT', GROUPVALUES(TEXT_FORMATS, DEFAULT_TEXT_FORMAT))])
+
+# All of the format strings
+OUTPUT_FORMATS = tuple(item for fmts in OUTPUT_FORMAT_GROUPS.values()
+                       for item in fmts.keywords)
+
 
 def output_format_is_table(output_format):
-    """ Return True if output format is a table form"""
+    """
+    Return True if output format is a table form.
+
+    Parameters:
+
+      output_format (:term:`string`):
+         String containing the output_format keyvalue.
+
+    Returns:
+      True: if `output_format` is one of the Table format keyword choises
+      False: if `output_format` is not a Table format.
+    """
     return output_format in TABLE_FORMATS
 
 
 def validate_output_format(output_format, valid_format_groups,
-                           default_format=None,):
+                           default_format=None):
     """
     Tests for valid format groups and provides a default format if the
     context.output_format is None.
@@ -75,70 +106,74 @@ def validate_output_format(output_format, valid_format_groups,
     Parameters:
 
       output_format (:term:`string` or None):
-        The output format string provided by input (i.e. ContextObj) or
-        None if there is no defined format for this command execution.
+        The output format string to be validated (normally provided by input
+        (i.e. ContextObj)) or None if there is no defined format for this
+        command execution.
 
       valid_format_groups (list of :term:`string` or :term:`string`):
-        One or more strings in a list where the allowed strings are:
-        'CIM', 'TABLE'. An empty list implies any output group if valid.
-        A single string may be used to designate a single group
+        One or more strings in a list where the allowed strings are: 'TABLE',
+        'CIM', or 'TEXT'. An empty list implies any output group if valid. A
+        single string may be used to designate a single group
 
       default_format (:term:`string` or None):
         One of the valid format definitions or None.  The format must be in the
-        OUTPUT_FORMAT list. If None, the default format for the first group is
-        returned
+        OUTPUT_FORMATS list. If None, the default format for the first group in
+        `valid_format_groups` is returned. This format keyword is returned if
+        `output_format` is None.
 
     Returns:
-       :term:`string` containing output format to be used.
+       :term:`string` containing output format keyword to be used.
 
     Raises:
         click.ClickException if format invalid for command
     """
+
     # These are asserts because they are coding errors in the input parameters
     # for this function
     if isinstance(valid_format_groups, six.string_types):
         valid_format_groups = [valid_format_groups]
-    assert all(element in FORMAT_GROUPS for element in valid_format_groups)
+
+    # Code error if this assert fails
+    assert all(element in OUTPUT_FORMAT_GROUPS for element in
+               valid_format_groups)
+
     if default_format:
         assert default_format in OUTPUT_FORMATS
 
-    # If valid = 1 assure that default in that group.
-    # confirm default matches group.
-
+    # Confirm default matches group.
     # CIM object type has priority over Table
     if output_format:
-        # Do invalid message here but really should be assert???
-        if 'CIM' in valid_format_groups:
-            if output_format in CIM_OBJECT_OUTPUT_FORMATS:
-                return output_format
-        if 'TABLE' in valid_format_groups:
-            if output_format in TABLE_FORMATS:
-                return output_format
+        # Do invalid message here but really should be assert because this
+        # is a error in the data defined for the validate call.
+        for group, value in OUTPUT_FORMAT_GROUPS.items():
+            if group in valid_format_groups:
+                if output_format in value.keywords:
+                    return output_format
         if not valid_format_groups:
             return output_format
-    else:
+
+    else:   # output_format is None
         if default_format:
             return default_format
         if valid_format_groups:
-            if valid_format_groups[0] == 'CIM':
-                return DEFAULT_CIM_OUTPUT_FORMAT
-            if valid_format_groups[0] == 'TABLE':
-                return DEFAULT_TABLE_OUTPUT_FORMAT
-            return DEFAULT_CIM_OUTPUT_FORMAT
-        return DEFAULT_CIM_OUTPUT_FORMAT
+            for group, value in OUTPUT_FORMAT_GROUPS.items():
+                if valid_format_groups[0] == group:
+                    return value.default
+            return OUTPUT_FORMAT_GROUPS['CIM'].default
+        return OUTPUT_FORMAT_GROUPS['CIM'].default
 
     valid_formats = ""
-    err_msg = "not allowed for this command"
+    for name, value in OUTPUT_FORMAT_GROUPS.items():
+        fmt_list = value.keywords
+        if name in valid_format_groups:
+            if valid_formats:
+                valid_formats += "; "
+            valid_formats += '{0} formats: "({1})"'.format(
+                name, '", "'.join(fmt_list))
 
-    valid_formats = ""
-    if 'TABLE' in valid_format_groups:
-        valid_formats += 'TABLE formats ({})'.format(','.join(TABLE_FORMATS))
-    if 'CIM' in valid_format_groups:
-        valid_formats += 'CIM Object formats ({})'.format(
-            ','.join(CIM_OBJECT_OUTPUT_FORMATS))
-
-    raise click.ClickException('Output format "{}" {}. Only {} allowed.'.
-                               format(output_format, err_msg, valid_formats))
+    raise click.ClickException('Output format "{}" not allowed for this '
+                               'command. Only {} allowed.'.
+                               format(output_format, valid_formats))
 
 
 ######################################################################
@@ -416,7 +451,7 @@ def filter_namelist(pattern, name_list, ignore_case=True):
         raise click.ClickException('Regex compile error. Regex={}. Er: {}: {}'
                                    .format(regex, ex.__class__.__name__, ex))
 
-    new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
+    new_list = [n for n in name_list for m in [compiled_regex.match(n)] if m]
 
     return new_list
 
@@ -1027,7 +1062,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
 
     if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
-        if output_format in TABLE_FORMATS:
+        if output_format_is_table(output_format):
             _print_objects_as_table(context, cim_objects, output_format)
         else:
             # Call to display each object
@@ -1039,7 +1074,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     # Display a single item.
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
-    if output_format in TABLE_FORMATS:
+    if output_format_is_table(output_format):
         _print_objects_as_table(context, [object_], output_format)
     elif output_format == 'mof':
         try:
@@ -1147,6 +1182,14 @@ def format_keys(obj, max_width):
                 line_len = len(one_key_obj) + 1
 
     return wbem_uri_keys
+
+
+def display_text(text, output_format=None):  # pylint: disable=unused-argument
+    """
+    Display the text output format. Currently this simply outputs to
+    click.echo
+    """
+    click.echo(text)
 
 
 class NoCaseList(object):
@@ -1604,7 +1647,7 @@ def format_table(rows, headers, title=None, table_format='simple',
         table_format = 'table'
     if table_format == 'table':
         table_format = 'psql'
-    if table_format not in TABLE_FORMATS:
+    if not output_format_is_table(table_format):
         raise click.ClickException('Invalid table format {}.'
                                    .format(table_format))
 
