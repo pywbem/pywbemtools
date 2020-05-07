@@ -90,11 +90,22 @@ the server:
   .. code-block:: text
 
       $ pywbemcli connection list
-      WBEM server connections: (#: default, *: current)
-      name    server             namespace    user      timeout  verify    mock-server
-      ------  -----------------  -----------  ------  ---------  --------  --------------------------------------
-      assoc1                     root/cimv2                  30  True      tests/unit/simple_assoc_mock_model.mof
-      conn1   https://localhost  root/cimv2   user           30  False
+      WBEM server connections(brief): (#: default, *: current)
+      name    server             mock-server
+      ------  -----------------  --------------------------------------
+      assoc1                     tests/unit/simple_assoc_mock_model.mof
+      conn1   https://localhost
+
+* List the persistent connection definitions with full information:
+
+  .. code-block:: text
+
+      $ pywbemcli connection list --full
+      WBEM server connections(full): (#: default, *: current)
+      name    server             namespace    user      timeout  use_pull    verify    certfile    keyfile    mock-server
+      ------  -----------------  -----------  ------  ---------  ----------  --------  ----------  ---------  --------------------------------------
+      assoc1                     root/cimv2                  30              True                             tests/unit/simple_assoc_mock_model.mof
+      conn1   https://localhost  root/cimv2   user           30  True        False
 
 * Show the class tree, using the previously added connection definition ``assoc1``:
 
