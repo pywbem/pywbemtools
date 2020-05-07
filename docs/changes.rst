@@ -20,6 +20,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fixed incorrect connection list output in readme files (see issue #593).
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution
