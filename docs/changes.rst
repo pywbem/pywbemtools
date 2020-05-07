@@ -22,6 +22,10 @@ Released: not yet
 
 **Enhancements:**
 
+* Enabled installation using 'setup.py install' from unpacked source distribution
+  archive, and added install tests for various installation methods including
+  this one. (see issues #590, #591).
+
 **Known issues:**
 
 * See `list of open issues`_.
