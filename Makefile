@@ -268,6 +268,8 @@ endif
 dist_manifest_in_files := \
     LICENSE.txt \
     README.rst \
+		README_PYPI.rst \
+		requirements.txt \
     *.py \
     $(package_name)/*.py \
     $(package_name)/*/*.py \
@@ -277,6 +279,8 @@ dist_manifest_in_files := \
 dist_dependent_files := \
     LICENSE.txt \
     README.rst \
+		README_PYPI.rst \
+		requirements.txt \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
@@ -305,6 +309,7 @@ help:
 	@echo "  pylint     - Run PyLint on sources"
 	@echo "  test       - Run unit and function tests"
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
+	@echo "  installtest - Run install tests"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
 	@echo "  upload     - build + Upload the distribution archive files to PyPI"
 	@echo "  clean      - Remove any temporary files"
@@ -479,7 +484,7 @@ pylint: pylint_$(pymn).done
 	@echo "makefile: Target $@ done."
 
 .PHONY: all
-all: install develop build builddoc check pylint test
+all: install develop build builddoc check pylint installtest test
 	@echo "makefile: Target $@ done."
 
 .PHONY: clobber
@@ -630,6 +635,16 @@ else
 	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) py.test --color=yes --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
 	@echo "makefile: Done running tests"
+
+.PHONY: installtest
+installtest: $(bdist_file) $(sdist_file) tests/install/test_install.sh
+	@echo "makefile: Running install tests"
+ifeq ($(PLATFORM),Windows_native)
+	@echo "makefile: Warning: Skipping install test on native Windows" >&2
+else
+	tests/install/test_install.sh $(bdist_file) $(sdist_file) $(PYTHON_CMD)
+endif
+	@echo "makefile: Done running install tests"
 
 # update the pywbemcli/cmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemcli/cmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)

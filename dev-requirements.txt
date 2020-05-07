@@ -18,6 +18,12 @@ funcsigs>=1.0.2; python_version == '2'
 # Pluggy 0.12.0 has a bug causing pytest plugins to fail loading on py38
 pluggy>=0.13.0
 
+# Virtualenv
+# Virtualenv 20.0.19 has an issue where it does not install pip on Python 3.4.
+virtualenv>=14.0.0,!=20.0.19; python_version < '3.5'
+virtualenv>=16.1.0; python_version >= '3.5' and python_version < '3.8'
+virtualenv>=20.0.0; python_version >= '3.8'
+
 # Coverage reporting (no imports, invoked via coveralls script):
 # coverage 5.0 has removed support for py34
 coverage>=4.5.2,<5.0
