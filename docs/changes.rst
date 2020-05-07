@@ -36,7 +36,11 @@ Released: not yet
   text string to the console and is use for simple commands like
   ``server interop`` that only output one piece of data. (see issue #594)
 
+
 **Cleanup**
+
+* Adds command to test connection for existence of  the pull operations
+  (connection test-pull)
 
 **Known issues:**
 

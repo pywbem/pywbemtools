@@ -194,33 +194,9 @@ def centralinsts(context, **options):
     context.execute_cmd(lambda: cmd_server_centralinsts(context, options))
 
 
-# TODO: reactivate and implement this in version 0.6.0
-# @server_group.command('test_pull', options_metavar=CMD_OPTS_TXT)
-# @click.pass_obj
-# def server_test_pull(context):
-#    """
-#    Test existence of pull opeations.
-#
-#    Test whether the pull WBEMConnection methods (ex. OpenEnumerateInstances)
-#    exist on the WBEM server.
-#
-#    This command tests all of the pull operations and reports any that
-#    return a NOT_SUPPORTED response.
-#    """
-#    context.execute_cmd(lambda: cmd_server_test_pull(context))
-
-
 ###############################################################
 #         Server cmds
 ###############################################################
-
-def cmd_server_test_pull(context):
-    """
-        Test the execution of pull operations against the target server.
-        Executes pull operations and reports whether pull is supported.
-
-    """
-    raise click.ClickException('test_pull Not implemented')
 
 
 def cmd_server_namespaces(context):
