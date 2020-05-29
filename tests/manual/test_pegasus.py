@@ -132,7 +132,7 @@ class ClassTests(TestsContainer):
 
     def test_get_no_includequalifiers(self):
         """Test class get --no-qualifiers"""
-        exitcode, out, err = self.class_cmd(
+        exitcode, out, _ = self.class_cmd(
             'get CIM_ManagedElement --no-qualifiers')
 
         self.assertEqual(exitcode, 0)
@@ -140,19 +140,19 @@ class ClassTests(TestsContainer):
 
     def test_propertylist(self):
         """Test property list on the get"""
-        exitcode, out, err = self.class_cmd(
+        exitcode, out, _ = self.class_cmd(
             'get CIM_ManagedElement -p InstanceID')
         self.assertEqual(exitcode, 0)
         self.assert_found(['class CIM_ManagedElement', 'InstanceID'], out)
 
-        exitcode, out, err = self.class_cmd(
+        exitcode, out, _ = self.class_cmd(
             'get CIM_ManagedElement -p InstanceID -p Caption')
         self.assertEqual(exitcode, 0)
         self.assert_found('class CIM_ManagedElement', out)
         self.assert_found('InstanceID', out)
         self.assert_found('Caption', out)
 
-        exitcode, out, err = self.class_cmd(
+        exitcode, out, _ = self.class_cmd(
             'get CIM_ManagedElement -p ""')
         self.assertEqual(exitcode, 0)
         self.assert_found('class CIM_ManagedElement', out)
@@ -160,7 +160,7 @@ class ClassTests(TestsContainer):
 
     def test_simple_invoke(self):
         """Execute simple invoke method defined in pegasus"""
-        exitcode, out, err = self.class_cmd(
+        exitcode, _, _ = self.class_cmd(
             'invokemethod Test_IndicationProviderClass '
             'SendTestIndicationsCount -p indicationSendCount=0 '
             ' -n test/TestProvider')
@@ -187,15 +187,15 @@ class InstanceTests(TestsContainer):
 
     def test_enumerate_simple(self):
         """Execute simple enumerate"""
-        exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person')
+        exitcode, out, _ = self.instance_cmd('enumerate PyWBEM_Person')
 
         self.assertEqual(exitcode, 0)
         self.assert_found('instance of PyWBEM_Person', out)
 
     def test_enumerate_proplist(self):
         """Execute enumerate with propertylist"""
-        exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person '
-                                               '-p Name')
+        exitcode, out, _ = self.instance_cmd('enumerate PyWBEM_Person '
+                                             '-p Name')
 
         self.assertEqual(exitcode, 0)
         self.assert_found(['instance of PyWBEM_Person', 'Name'], out)
@@ -203,7 +203,7 @@ class InstanceTests(TestsContainer):
 
     def test_get_simple(self):
         """Execute simple get of known instance"""
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'get PyWBEM_Person.CreationClassname=PyWBEM_Person,Name=Bob')
 
         self.assertEqual(exitcode, 0)
@@ -216,12 +216,12 @@ class InstanceTests(TestsContainer):
         test should leave the repository in the same state in which it
         was before the test.
         """
-        exitcode, out, err = self.instance_cmd(
+        exitcode, _, _ = self.instance_cmd(
             'create PyWBEM_Person --property name=Fred '
             '--property CreationClassname=PyWBEM_Person')
         self.assertEqual(exitcode, 0)
 
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'delete PyWBEM_Person.Name=Fred,CreationClassName=PyWBEM_Person')
         self.assertEqual(exitcode, 0)
         self.assert_found(['Deleted', 'Fred'], out)
@@ -229,18 +229,18 @@ class InstanceTests(TestsContainer):
     def test_create_array_prop(self):
         """Create an instance of an array property"""
 
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property arrayBool=True,False')
 
         self.assertEqual(exitcode, 0, "Failed create test")
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'get pywbem_alltypes.InstanceId=ArrayBool')
 
         self.assert_found(["instance of PyWBEM_AllTypes", 'ArrayBool',
                            "{True, False}"], out)
 
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'delete PyWBEM_AllTypes.InstanceId=ArrayBool')
         self.assertEqual(exitcode, 0)
         self.assert_found(['Deleted', 'ArrayBool'], out)
@@ -268,7 +268,7 @@ class InstanceTests(TestsContainer):
         self.assertEqual(exitcode, 0, 'Create instance of Pywbem_AllTypes '
                          'failed. exitcode {}, err {}'.format(exitcode, err))
 
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'delete PyWBEM_AllTypes.InstanceId=ScalarTest1')
         self.assertEqual(exitcode, 0)
         self.assert_found(['Deleted', 'ScalarTest1'], out)
@@ -277,7 +277,7 @@ class InstanceTests(TestsContainer):
         """
         Validate the error when property does not exist in class
         """
-        exitcode, out, err = self.instance_cmd(
+        exitcode, _, err = self.instance_cmd(
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property BlahBool=True,False')
         print('err {}'.format(err))
@@ -285,7 +285,7 @@ class InstanceTests(TestsContainer):
 
     def test_references(self):
         """Test simple references"""
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
 
@@ -294,7 +294,7 @@ class InstanceTests(TestsContainer):
 
     def test_reference_paths(self):
         """Test references with -o"""
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')
 
@@ -303,7 +303,7 @@ class InstanceTests(TestsContainer):
 
     def test_associators(self):
         """Test simple associators"""
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
 
@@ -312,7 +312,7 @@ class InstanceTests(TestsContainer):
 
     def test_associator_paths(self):
         """Test simple associators with -o"""
-        exitcode, out, err = self.instance_cmd(
+        exitcode, out, _ = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')
 

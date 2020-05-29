@@ -33,20 +33,31 @@ class ContextObjTests(unittest.TestCase):
 
     def simple_test(self):
         """Test create context object"""
+
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'
         pw = 'blah'
         svr = PywbemServer(server, ns, user=user, password=pw)
 
-        def password_prompt():
-            pass
         output_format = 'mof'
+        use_pull = 'either'
+        pull_max_cnt = 100
+        timestats = False
+        log = 'all'
         verbose = True
-        ctx = None
+        pdb = False
 
-        ctxobj = ContextObj(ctx, svr, password_prompt, output_format,
-                            verbose)
+        ctxobj = ContextObj(
+            pywbem_server=svr,
+            output_format=output_format,
+            use_pull=use_pull,
+            pull_max_cnt=pull_max_cnt,
+            timestats=timestats,
+            log=log,
+            verbose=verbose,
+            pdb=pdb)
+
         self.assertEqual(ctxobj.pywbem_server, svr)
 
 

@@ -12,6 +12,7 @@ from pywbem import CIMQualifier, CIMClass, CIMProperty, CIMMethod
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()
+global CONN  # pylint: disable=global-at-module-level
 
 
 def build_classes():
@@ -37,8 +38,10 @@ def build_classes():
                                     class_origin='CIM_Foo',
                                     propagated=False)})
     # add the objects to the mock repository
-    CONN.add_cimobjects(c)  # noqa: F821
+    CONN.add_cimobjects(c)  # noqa: F821 pylint: disable=undefined-variable
 
 
 build_classes()
-assert(CONN.GetClass('CIM_FooDirLoad'))  # noqa: F821
+# pylint: disable=undefined-variable
+cls = CONN.GetClass('CIM_FooDirLoad')  # noqa: F821
+assert cls

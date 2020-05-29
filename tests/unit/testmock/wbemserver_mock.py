@@ -9,7 +9,7 @@ from __future__ import print_function, absolute_import
 
 import os
 
-from pywbem import ValueMapping, CIMInstance, CIMInstanceName, Error, \
+from pywbem import ValueMapping, CIMInstance, CIMInstanceName, CIMError, \
     CIM_ERR_ALREADY_EXISTS
 from pywbem_mock import FakedWBEMConnection
 
@@ -211,7 +211,7 @@ class WbemServerMock(object):
         # pywbemcli it fails
         try:
             self.conn.add_namespace(namespace)
-        except Error as er:
+        except CIMError as er:
             if er.status_code != CIM_ERR_ALREADY_EXISTS:
                 raise
 
@@ -352,7 +352,7 @@ class WbemServerMock(object):
         assert rtn_rpinsts, \
             "Expected 1 or more RegisteredProfile instances, got none"
 
-    def build_elementconformstoprofile_inst(self, profile_path, element_path):
+    def build_ECTP_inst(self, profile_path, element_path):
         """
         Build an instance of CIM_ElementConformsToProfile and insert into
         repository
@@ -495,8 +495,7 @@ class WbemServerMock(object):
         # conforms to.  Should expand but need better way to define instance
         # at other end.
 
-        self.build_elementconformstoprofile_inst(prof_inst[0].path,
-                                                 om_inst.path)
+        self.build_ECTP_inst(prof_inst[0].path, om_inst.path)
 
         # build element_conforms_to_profile insts from dictionary
         for item in self.server_mock_data['element_conforms_to_profile']:
@@ -513,8 +512,7 @@ class WbemServerMock(object):
                 registered_version=profile_name[2])
             assert len(prof_insts) == 1
 
-            self.build_elementconformstoprofile_inst(prof_insts[0].path,
-                                                     central_inst_path)
+            self.build_ECTP_inst(prof_insts[0].path, central_inst_path)
 
         if self.verbose:
             print("Built central instances and element_conforms_to_Profile")
@@ -522,8 +520,5 @@ class WbemServerMock(object):
 
 
 # Execute the WBEM Server configuration build
-global VERBOSE  # pylint: disable=global-variable-not-assigned
-
 MOCK_WBEMSERVER = WbemServerMock(interop_ns="interop",
                                  verbose=False)  # noqa: F821
-# server = MOCK_WBEMSERVER.wbem_server

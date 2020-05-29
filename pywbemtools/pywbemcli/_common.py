@@ -1063,7 +1063,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
         if output_format_is_table(output_format):
-            _print_objects_as_table(context, cim_objects, output_format)
+            _print_objects_as_table(cim_objects, output_format)
         else:
             # Call to display each object
             for obj in cim_objects:
@@ -1075,7 +1075,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format_is_table(output_format):
-        _print_objects_as_table(context, [object_], output_format)
+        _print_objects_as_table([object_], output_format)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -1530,7 +1530,7 @@ def _print_instances_as_table(insts, table_width, table_format,
                             table_format=table_format))
 
 
-def _print_objects_as_table(context, objects, output_format):
+def _print_objects_as_table(objects, output_format):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -1736,18 +1736,17 @@ def fold_strings(input_strings, max_width, break_long_words=False,
         if len(build_str) <= max_width:
             return build_str
 
-        for fold_items in input_strings:
-            if fold_list_items:
-                folded_strings = []
-                for str_item in input_strings:
-                    folded_strings.append(
-                        fold_strings(str_item, max_width,
-                                     break_long_words=break_long_words,
-                                     break_on_hyphens=break_on_hyphens,
-                                     initial_indent=initial_indent,
-                                     subsequent_indent=subsequent_indent))
-                return "\n".join(folded_strings)
-            input_strings = build_str
+        if fold_list_items:
+            folded_strings = []
+            for str_item in input_strings:
+                folded_strings.append(
+                    fold_strings(str_item, max_width,
+                                 break_long_words=break_long_words,
+                                 break_on_hyphens=break_on_hyphens,
+                                 initial_indent=initial_indent,
+                                 subsequent_indent=subsequent_indent))
+            return "\n".join(folded_strings)
+        input_strings = build_str
 
     # process single string
     input_string = input_strings

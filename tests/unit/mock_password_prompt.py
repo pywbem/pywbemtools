@@ -31,9 +31,9 @@ import pywbemtools
 RETURN_VALUE = "mypw"
 
 
-def mock_prompt(msg,
-                hide_input=True,
+def mock_prompt(msg, hide_input=True,
                 confirmation_prompt=False, type=str, err=True):
+    # pylint: disable=unused-argument,redefined-builtin
     """Mock function to replace pywbemcli_prompt and return a value"""
     print('MOCK_CLICK_PROMPT {}'.format(msg))
     return RETURN_VALUE

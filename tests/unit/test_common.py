@@ -653,7 +653,7 @@ def test_split_str(testcase, input_str, delimiter, exp_rtn):
     """Test for split_str function"""
 
     # The code to be tested
-    act_result = [item for item in split_str_w_esc(input_str, delimiter)]
+    act_result = list(split_str_w_esc(input_str, delimiter))
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
