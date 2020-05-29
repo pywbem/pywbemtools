@@ -7,6 +7,7 @@ based on the CIM_Foo class in the simple_mock_model.mof test file
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()
+global CONN  # pylint: disable=global-at-module-level
 
 
 def fuzzy_callback(conn, object_name, methodname, **params):
@@ -33,8 +34,5 @@ def fuzzy_callback(conn, object_name, methodname, **params):
 
 
 # Add the the callback to the mock repository
-global CONN  # pylint: disable=global-at-module-level
-# This method expected to use the global namespace
 # pylint: disable=undefined-variable
-
 CONN.add_method_callback('CIM_Foo', 'Fuzzy', fuzzy_callback)  # noqa: F821

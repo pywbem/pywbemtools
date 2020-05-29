@@ -308,7 +308,7 @@ def is_current_connection(connection, context):
     return False
 
 
-def show_connection_information(context, connection, separate_line=True,
+def show_connection_information(context, connection,
                                 show_state=False, show_password=False):
     """
     Common function to display the connection information.  Note that this

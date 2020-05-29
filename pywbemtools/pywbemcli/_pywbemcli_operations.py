@@ -75,15 +75,15 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [path for path in self.IterEnumerateInstancePaths(
+        result = self.IterEnumerateInstancePaths(
             ClassName,
             namespace=namespace,
             FilterQueryLanguage=FilterQueryLanguage,
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliEnumerateInstances(self, ClassName, namespace=None,
                                     LocalOnly=None,
@@ -106,7 +106,7 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [inst for inst in self.IterEnumerateInstances(
+        result = self.IterEnumerateInstances(
             ClassName,
             namespace=namespace,
             LocalOnly=LocalOnly,
@@ -118,8 +118,8 @@ class PYWBEMCLIConnectionMixin(object):
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliReferenceInstancePaths(self, InstanceName, ResultClass=None,
                                         Role=None,
@@ -141,7 +141,7 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [path for path in self.IterReferenceInstancePaths(
+        result = self.IterReferenceInstancePaths(
             InstanceName,
             ResultClass=ResultClass,
             Role=Role,
@@ -149,8 +149,8 @@ class PYWBEMCLIConnectionMixin(object):
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliReferenceInstances(self, InstanceName, ResultClass=None,
                                     Role=None, IncludeQualifiers=None,
@@ -171,7 +171,7 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [inst for inst in self.IterReferenceInstances(
+        result = self.IterReferenceInstances(
             InstanceName,
             ResultClass=ResultClass,
             Role=Role,
@@ -182,8 +182,8 @@ class PYWBEMCLIConnectionMixin(object):
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliAssociatorInstancePaths(self, InstanceName, AssocClass=None,
                                          ResultClass=None,
@@ -206,7 +206,7 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [path for path in self.IterAssociatorInstancePaths(
+        result = self.IterAssociatorInstancePaths(
             InstanceName,
             AssocClass=AssocClass,
             ResultClass=ResultClass,
@@ -216,8 +216,8 @@ class PYWBEMCLIConnectionMixin(object):
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliAssociatorInstances(self, InstanceName, AssocClass=None,
                                      ResultClass=None,
@@ -241,7 +241,7 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [inst for inst in self.IterAssociatorInstances(
+        result = self.IterAssociatorInstances(
             InstanceName,
             AssocClass=AssocClass,
             ResultClass=ResultClass,
@@ -254,8 +254,8 @@ class PYWBEMCLIConnectionMixin(object):
             FilterQuery=FilterQuery,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
     def PyWbemcliQueryInstances(self, FilterQueryLanguage, FilterQuery,
                                 namespace=None, ReturnQueryResultClass=None,
@@ -274,15 +274,15 @@ class PYWBEMCLIConnectionMixin(object):
         method.
         """
 
-        result = [inst for inst in self.IterQueryInstances(
+        result = self.IterQueryInstances(
             FilterQueryLanguage,
             FilterQuery,
             namespace=namespace,
             ReturnQueryResultClass=ReturnQueryResultClass,
             OperationTimeout=OperationTimeout,
             ContinueOnError=ContinueOnError,
-            MaxObjectCount=MaxObjectCount)]
-        return result
+            MaxObjectCount=MaxObjectCount)
+        return list(result)
 
 
 class BuildRepositoryMixin(object):

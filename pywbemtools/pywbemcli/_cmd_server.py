@@ -63,12 +63,12 @@ def server_group():
                       options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
-def server_namespaces(context, **options):
+def server_namespaces(context):
     """
     List the namespaces of the server.
     """
     # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_namespaces(context, options))
+    context.execute_cmd(lambda: cmd_server_namespaces(context))
 
 
 @server_group.command('interop', cls=PywbemcliCommand,
@@ -223,7 +223,7 @@ def cmd_server_test_pull(context):
     raise click.ClickException('test_pull Not implemented')
 
 
-def cmd_server_namespaces(context, options):
+def cmd_server_namespaces(context):
     """
     Display namespaces in the current WBEM server
     """

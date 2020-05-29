@@ -793,11 +793,11 @@ def cmd_class_find(context, classname_glob, options):
 
         # build rows of namespace, classname for each namespace, sort if
         # necessary,  and add to common rows
+        row = 0 if options['sort'] else 1
         rows = []
         for ns_name in names_dict:
             ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
             # sort by classname if sort option defined, else by namespace
-            row = 0 if options['sort'] else 1
             ns_rows.sort(key=lambda x: x[row])
             rows.extend(ns_rows)
 
