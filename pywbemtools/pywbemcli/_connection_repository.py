@@ -25,6 +25,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import yaml
+import yamlloader
 import six
 
 from ._pywbem_server import PywbemServer
@@ -258,11 +259,12 @@ class ConnectionRepository(object):
             tmpfile = '{}.tmp'.format(self._connections_file)
 
             with self.open_file(tmpfile, 'w') as _fp:
-                data = yaml.safe_dump(yaml_dict,
-                                      encoding=None,
-                                      allow_unicode=True,
-                                      default_flow_style=False,
-                                      indent=4)
+                data = yaml.dump(yaml_dict,
+                                 encoding=None,
+                                 allow_unicode=True,
+                                 default_flow_style=False,
+                                 indent=4,
+                                 Dumper=yamlloader.ordereddict.CSafeDumper)
                 data = data.replace('\n\n', '\n')  # YAML dump dups newlines
                 _fp.write(data)
                 _fp.flush()

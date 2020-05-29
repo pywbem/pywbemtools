@@ -20,6 +20,9 @@ Released: not yet
 
 * Fixed incorrect connection list output in readme files (see issue #593).
 
+* Fixed yaml.RepresenterError during 'connection save' command. This introduced
+  a dependency on the yamlloader package. (see issue #603).
+
 **Enhancements:**
 
 **Cleanup:**
