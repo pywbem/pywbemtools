@@ -27,7 +27,7 @@ import sys
 import pytest
 import pywbem
 
-from .cli_test_extensions import CLITestsBase
+from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -318,7 +318,7 @@ TEST_CASES = [
       'test': 'in'},
      None, OK],
 
-    ['Verify invalid server port definition fails.',
+    ['Verify invalid server port definition fails. pywbem version 0.x',
      {'general': ['-s', 'http://blah:abcd'],
       'cmdgrp': 'class',
       'args': ['get', 'blah']},
@@ -328,7 +328,18 @@ TEST_CASES = [
                  else 'Socket error'],
       'rc': 1,
       'test': 'regex'},
-     None, OK],
+     None, PYWBEM_0],
+
+    ['Verify invalid server port definition fails. pywbem version 1',
+     {'general': ['-s', 'http://blah:abcd'],
+      'cmdgrp': 'class',
+      'args': ['get', 'blah']},
+     {'stderr': ['ValueError:', "Invalid port number 'abcd' in URL "
+                 "'http://blah:abcd'"],
+      'rc': 1,
+      'test': 'innows'},
+     None, PYWBEM_1],
+
 
     ['Verify valid --use-pull option parameter yes.',
      {'general': ['-s', 'http://blah', '--use-pull', 'yes'],
@@ -619,7 +630,7 @@ TEST_CASES = [
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
                  ' OpenEnumerateInstances'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify uses pull Operation with option yes',
@@ -632,7 +643,7 @@ TEST_CASES = [
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
                  ' OpenEnumerateInstances'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify uses pull Operation with option no',
@@ -645,7 +656,7 @@ TEST_CASES = [
                  '  Count    Exc    Time    ReqLen    ReplyLen  Operation',
                  ' EnumerateInstances'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      None, OK],
 
     ['Verify --mock-server and -server not allowed',

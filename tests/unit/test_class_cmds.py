@@ -21,7 +21,8 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
-from .cli_test_extensions import CLITestsBase
+from .cli_test_extensions import CLITestsBase, PYWBEM_0, \
+    FAKEURL_STR
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
@@ -32,21 +33,24 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
 
-from .utils import execute_pywbemcli, assert_rc
-
 TEST_DIR = os.path.dirname(__file__)
 
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
-INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
+
+INVOKE_METHOD_MOCK_FILE_0 = 'simple_mock_invokemethod_pywbem_V0.py'
+INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_pywbem_V1.py'
+INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
+    INVOKE_METHOD_MOCK_FILE_1
+
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
 
 #
-# The following list define the help for each command in terms of particular
-# parts of lines that are to be tested.
+# The following list defines the help for each command in terms of particular
+# parts of lines that are to be tested.//FakedUrl:5988
 # For each test, try to include:
 # 1. The usage line and in particular the argument component
 # 2. The single
@@ -236,7 +240,7 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
 };
 """
 REFERENCES_CLASS_RTN = [
-    '//FakedUrl/root/cimv2:TST_Lineage',
+    FAKEURL_STR + '/root/cimv2:TST_Lineage',
     'class TST_Lineage {',
     '',
     '   string InstanceID;',
@@ -247,7 +251,7 @@ REFERENCES_CLASS_RTN = [
     '',
     '};',
     '',
-    '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
+    FAKEURL_STR + '/root/cimv2:TST_MemberOfFamilyCollection',
     'class TST_MemberOfFamilyCollection {',
     '',
     '   TST_Person REF family;',
@@ -257,8 +261,9 @@ REFERENCES_CLASS_RTN = [
     '};',
     '']
 
+# TODO: This never referenced
 REFERENCES_CLASS_RTN2 = [
-    '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection',
+    FAKEURL_STR + '/root/cimv2:TST_MemberOfFamilyCollection',
     'class TST_MemberOfFamilyCollection {',
     '',
     '   TST_Person REF family;',
@@ -269,55 +274,22 @@ REFERENCES_CLASS_RTN2 = [
     '',
     '']
 
-REFERENCES_CLASS_RTN_QUALS1 = """
-//FakedUrl/root/cimv2:TST_Lineage
-   [Association ( true ),
-    Description (
-       " Lineage defines the relationship between parents and children." )]
-class TST_Lineage {
-
-      [key ( true )]
-   string InstanceID;
-
-   TST_Person REF parent;
-
-   TST_Person REF child;
-
-};
-
-//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
-   [Association ( true ),
-    Description ( " Family gathers person to family." )]
-class TST_MemberOfFamilyCollection {
-
-      [key ( true )]
-   TST_Person REF family;
-
-      [key ( true )]
-   TST_Person REF member;
-
-};
-"""
-
-REFERENCES_CLASS_RTN_QUALS2 = """
-//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection
-   [Association ( true ),
-    Description ( " Family gathers person to family." )]
-class TST_MemberOfFamilyCollection {
-
-      [key ( true )]
-   TST_Person REF family;
-
-      [key ( true )]
-   TST_Person REF member;
-
-};
-"""
+REFERENCES_CLASS_RTN_QUALS2 = [
+    FAKEURL_STR + '/root/cimv2:TST_MemberOfFamilyCollection',
+    '   [Association ( true ),',
+    '    Description ( " Family gathers person to family." )]',
+    'class TST_MemberOfFamilyCollection {',
+    '      [key ( true )]',
+    '   TST_Person REF family;',
+    '      [key ( true )]',
+    '   TST_Person REF member;',
+    '};']
 
 
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
+
 
 # pylint: enable=line-too-long
 TEST_CASES = [
@@ -1144,7 +1116,7 @@ TEST_CASES = [
 +-- CIM_Foo_sub_sub
 """,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command tree bottom up. -s',
      ['tree', '-s', 'CIM_Foo_sub_sub'],
@@ -1200,7 +1172,7 @@ TEST_CASES = [
 
     ['Verify class command associators simple request,',
      ['associators', 'TST_Person'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
                  '      [Key ( true ),',
@@ -1216,13 +1188,13 @@ TEST_CASES = [
 
     ['Verify class command associators simple request names only,',
      ['associators', 'TST_Person', '--names-only'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person'],
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person'],
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command associators simple request, one parameter',
      ['associators', 'TST_Person', '--ac', 'TST_MemberOfFamilyCollection'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
                  '      [Key ( true ),',
@@ -1242,7 +1214,7 @@ TEST_CASES = [
       '--role', 'member',
       '--result-role', 'family',
       '--result-class', 'TST_Person'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
                  '      [Key ( true ),',
@@ -1262,7 +1234,7 @@ TEST_CASES = [
       '-r', 'member',
       '--rr', 'family',
       '--rc', 'TST_Person'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Person',
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person',
                  'class TST_Person {',
                  '',
                  '      [Key ( true ),',
@@ -1368,14 +1340,26 @@ TEST_CASES = [
 
     ['Verify class command references simple request',
      ['references', 'TST_Person'],
-     {'stdout': REFERENCES_CLASS_RTN_QUALS1,
-      'test': 'linesnows'},
+     {'stdout': ['class TST_Lineage {',
+                 'Lineage defines the relationship',
+                 'string InstanceID;',
+                 'TST_Person REF parent;',
+                 'TST_Person REF child;',
+                 '[Association ( true )',
+                 'Description ( " Family gathers person to family." )',
+                 'class TST_MemberOfFamilyCollection {',
+                 '[key ( true )]',
+                 'TST_Person REF family;',
+                 'TST_Person REF member;',
+                 ],
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
+
 
     ['Verify class command references simple request -o',
      ['references', 'TST_Person', '--no'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage',
-                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection'],
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Lineage',
+                 FAKEURL_STR + '/root/cimv2:TST_MemberOfFamilyCollection'],
       'test': 'linesnows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
@@ -1384,7 +1368,7 @@ TEST_CASES = [
       '--role', 'member',
       '--result-class', 'TST_MemberOfFamilyCollection'],
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
-      'test': 'linesnows'},
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command references request, filters short',
@@ -1392,7 +1376,7 @@ TEST_CASES = [
       '-r', 'member',
       '--rc', 'TST_MemberOfFamilyCollection'],
      {'stdout': REFERENCES_CLASS_RTN_QUALS2,
-      'test': 'linesnows'},
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command refereces table output fails).',
@@ -1452,6 +1436,13 @@ TEST_CASES = [
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
+    ['Verify class command invokemethod. Class CIM_Foo, method Fuzzy',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+     {'stdout': ["ReturnValue=0"],
+      'rc': 0,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
     ['Verify class command invokemethod',
      ['invokemethod', 'CIM_Foo', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
      {'stdout': ['ReturnValue=0',
@@ -1476,13 +1467,13 @@ TEST_CASES = [
 
     ['Verify class command invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stderr': ['CIMError', '17'],
+     {'stderr': ['CIMError'],
       'rc': 1,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
 
-    ['Verify  --timestats gets stats output. Cannot test '
-     'with lines because execution time is variable.',
+    ['Verify  --timestats gets stats output. Cannot test with lines,execution '
+     'time is variable.',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--timestats']},
      {'stdout': ['class CIM_Foo {',
@@ -1491,7 +1482,7 @@ TEST_CASES = [
                  '      1      0',
                  '0           0  GetClass'],
       'rc': 0,
-      'test': 'regex'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify single command with stdin works',
@@ -1520,7 +1511,7 @@ TEST_CASES = [
 # are redundant.
 
 
-class TestSubcmdClass(CLITestsBase):
+class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
     """
     Test all of the class command variations.
     """
@@ -1541,72 +1532,3 @@ class TestSubcmdClass(CLITestsBase):
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition, verbose=False)
-
-
-class TestClassGeneral(object):
-    # pylint: disable=too-few-public-methods, useless-object-inheritance
-    """
-    Test class using pytest for the commands of the class command
-    """
-    # @pytest.mark.skip(reason="Unfinished test")
-    def test_class_error_no_server(self):  # pylint: disable=no-self-use
-        """Test 'pywbemcli ... class getclass' when no host is provided
-
-        This test runs against a real url so we set timeout to the mininum
-        to minimize test time since the expected result is a timeout exception.
-        """
-
-        # Invoke the command to be tested
-        rc, stdout, stderr = execute_pywbemcli(['-s', 'http://fred', '-t', '1',
-                                                'class', 'get', 'CIM_blah'])
-
-        assert_rc(1, rc, stdout, stderr, "test_class_error_no_server")
-
-        assert stdout == ""
-        assert stderr.startswith(
-            "Error: ConnectionError"), \
-            "stderr={!r}".format(stderr)
-
-
-class TestClassEnumerate(object):
-    # pylint: disable=too-few-public-methods, useless-object-inheritance
-    """
-    Test the options of the pywbemcli class enumerate' command
-    """
-    @pytest.mark.parametrize(
-        "desc, tst_args, exp_result_start, exp_result_end",
-        [
-            [
-                ["No extra parameters"],
-                [],
-                '   [Description ( "Simple CIM Class" )]\n',
-                None
-            ],
-            [
-                ["Class parameter"],
-                ['CIM_Foo'],
-                '   [Description ( "Subclass of CIM_Foo" )]\n',
-                None
-            ]
-        ]
-    )
-    # pylint: disable=unused-argument
-    def test_enumerate_simple_mock(self, desc, tst_args, exp_result_start,
-                                   exp_result_end):
-        # pylint: disable=no-self-use
-        """
-        Test 'pywbemcli class enumerate command based on a simple set of
-        classes defined in the file simple_mock_model.mof
-        """
-        mock_mof_path = os.path.join(TEST_DIR, 'simple_mock_model.mof')
-
-        # build basic cmd line, server, mock-server def, basic enum command
-        cmd_line = ['--mock-server', mock_mof_path, 'class', 'enumerate']
-
-        if tst_args:
-            cmd_line.extend(tst_args)
-        rc, stdout, stderr = execute_pywbemcli(cmd_line)
-
-        assert_rc(0, rc, stdout, stderr, "test_enumerate_simple_mock")
-        assert stderr == ""
-        assert stdout.startswith(exp_result_start)

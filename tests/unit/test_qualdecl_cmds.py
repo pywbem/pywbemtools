@@ -274,7 +274,7 @@ TEST_CASES = [
      ['enumerate', '--namespace', 'root/blah'],
      {'stderr': ["Error: CIMError: 3", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command --timestats gets stats output. Cannot test'
@@ -287,7 +287,7 @@ TEST_CASES = [
                  '      1      0',
                  '0           0  GetQualifier'],
       'rc': 0,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command -o repr get Description produces repr out',

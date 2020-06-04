@@ -25,7 +25,8 @@ from __future__ import absolute_import, print_function
 
 import click
 
-from pywbem import Error, CIMClassName, CIMError, CIM_ERR_NOT_FOUND, CIMClass
+from pywbem import Error, CIMClassName, CIMError, ModelError, \
+    CIM_ERR_NOT_FOUND, CIMClass
 
 from .pywbemcli import cli
 from ._common import display_cim_objects, filter_namelist, \
@@ -753,6 +754,9 @@ def get_namespaces(context, namespaces):
         ns_names = context.wbem_server.namespaces
         ns_names.sort()
         return ns_names
+
+    except ModelError:
+        return [context.conn.default_namespace]
     except CIMError as ce:
         # allow processing to continue if no interop namespace
         if ce.status_code == CIM_ERR_NOT_FOUND:
