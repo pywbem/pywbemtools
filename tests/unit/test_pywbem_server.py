@@ -26,6 +26,9 @@ import unittest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
+from .cli_test_extensions import PYWBEM_1
+
+
 # TODO: Future - Move these tests to pytest
 
 
@@ -56,7 +59,7 @@ class PywbemServerTests(unittest.TestCase):
         user = 'Fred'
         pw = 'blah'
         timeout = 10
-        verify = True
+        verify = False
         certfile = 'mycertfile.blah'
         keyfile = 'mykeys.blah'
 
@@ -72,8 +75,37 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.certfile, certfile)
         self.assertEqual(svr.keyfile, keyfile)
 
-    def test_all_connect(self):
-        """Test all input parameters"""
+    def test_all_connect1(self):
+        """Test all input parameters except certificates and keys"""
+        server = 'http://localhost'
+        ns = 'root/cimv2'
+        user = 'Fred'
+        pw = 'blah'
+        timeout = 10
+        verify = True
+
+        svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
+                           verify=verify, certfile=None,
+                           keyfile=None)
+
+        self.assertEqual(svr.server, server)
+        self.assertEqual(svr.default_namespace, ns)
+        self.assertEqual(svr.user, user)
+        self.assertEqual(svr.password, pw)
+        self.assertEqual(svr.verify, verify)
+        self.assertEqual(svr.certfile, None)
+        self.assertEqual(svr.keyfile, None)
+
+        # connect and test connection results
+        svr.create_connection(False)
+
+        if PYWBEM_1:
+            server += ":5988"
+        self.assertEqual(svr.conn.url, server)
+        self.assertEqual(svr.wbem_server.conn.url, svr.conn.url)
+
+    def test_all_connect2(self):
+        """Test all input parameters including certs and keys"""
         server = 'http://localhost'
         ns = 'root/cimv2'
         user = 'Fred'
@@ -96,11 +128,10 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.keyfile, keyfile)
 
         # connect and test connection results
-        svr.create_connection(False)
-        self.assertEqual(svr.conn.url, server)
-        self.assertEqual(svr.wbem_server.conn.url, svr.conn.url)
-
-        # TODO test for errors
+        try:
+            svr.create_connection(False)  # Fails because certs bad
+        except Exception as ex:
+            print(ex)
 
 
 if __name__ == '__main__':

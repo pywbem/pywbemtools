@@ -472,7 +472,7 @@ ca-certs
     ['Verify connection command test',
      ['test'],
      {'stdout': "Connection OK: FakedUrl",
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify connection command test with pull option',

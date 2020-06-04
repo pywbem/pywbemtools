@@ -9,7 +9,8 @@
 # Direct dependencies (except pip, setuptools, wheel):
 
 pywbem>=0.17.0
-# git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
+# Alternative to test against current github master pywbem
+#git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 six>=1.10.0
 # Click 7.1 has a bug with output capturing

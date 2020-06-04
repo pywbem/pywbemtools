@@ -21,7 +21,8 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
-from .cli_test_extensions import CLITestsBase
+from .cli_test_extensions import CLITestsBase, FAKEURL_STR, PYWBEM_0
+
 from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_HELP_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
@@ -45,7 +46,13 @@ SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 ALLTYPES_MOCK_FILE = 'all_types.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
-INVOKE_METHOD_MOCK_FILE = "simple_mock_invokemethod.py"
+
+INVOKE_METHOD_MOCK_FILE_0 = 'simple_mock_invokemethod_pywbem_V0.py'
+INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_pywbem_V1.py'
+INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
+    INVOKE_METHOD_MOCK_FILE_1
+
+
 COMPLEX_ASSOC_MODEL = "complex_assoc_model.mof"
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
@@ -53,7 +60,9 @@ MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
 
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
-ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock.py'
+
+ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock_V0.py' if PYWBEM_0 \
+    else 'all_types_method_mock_V1.py'
 
 
 #
@@ -248,6 +257,8 @@ GET_INSTANCE_RESP = """instance of CIM_Foo {
 };
 
 """
+# There are two forms for this response, because pywbem 1 and earlier
+# pywbems differ on returning properties with NULL in mof output
 
 ENUM_INSTANCE_RESP = """instance of CIM_Foo {
    InstanceID = "CIM_Foo1";
@@ -618,6 +629,14 @@ TEST_CASES = [
 
     ['Verify instance command enumerate CIM_Foo include-qualifiers and '
      ' --use-pull no',
+     {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers', '--di'],
+      'general': ['--use-pull', 'no']},
+     {'stdout': ENUM_INSTANCE_RESP,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command enumerate CIM_Foo include-qualifiers and '
+     ' --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'general': ['--use-pull', 'no']},
      {'stdout': ENUM_INSTANCE_RESP,
@@ -675,8 +694,44 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo '
-     '--di',
+    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di',
+     {'args': ['enumerate', 'CIM_Foo', '--di', '--pl', 'InstanceId', '--pl',
+               'IntegerProp'],
+      'general': ['--output-format', 'grid']},
+     {'stdout': """Instances: CIM_Foo
++--------------------+---------------+
+| InstanceID         | IntegerProp   |
++====================+===============+
+| "CIM_Foo1"         | 1             |
++--------------------+---------------+
+| "CIM_Foo2"         | 2             |
++--------------------+---------------+
+| "CIM_Foo3"         |               |
++--------------------+---------------+
+| "CIM_Foo30"        |               |
++--------------------+---------------+
+| "CIM_Foo31"        |               |
++--------------------+---------------+
+| "CIM_Foo_sub1"     | 4             |
++--------------------+---------------+
+| "CIM_Foo_sub2"     | 5             |
++--------------------+---------------+
+| "CIM_Foo_sub3"     | 6             |
++--------------------+---------------+
+| "CIM_Foo_sub4"     | 7             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub1" | 8             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub2" | 9             |
++--------------------+---------------+
+| "CIM_Foo_sub_sub3" | 10            |
++--------------------+---------------+
+""",
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di'
+     'all properties',
      {'args': ['enumerate', 'CIM_Foo', '--di'],
       'general': ['--output-format', 'grid']},
      {'stdout': """Instances: CIM_Foo
@@ -743,7 +798,7 @@ TEST_CASES = [
 |        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub3" |
 +--------+-------------+-----------------+-------------------------------+
 """,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command -o grid enumerate di CIM_Foo --di --no',
@@ -948,10 +1003,10 @@ Instances: PyWBEM_AllTypes
     ['Verify instance command enumerate error, invalid namespace',
      ['enumerate', 'CIM_Foo', '--namespace', 'root/blah'],
      {'stderr':
-      ["CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not exist in "
-       "mock repository: 'root/blah'", ],
+      # NOTE: Partial string becuase output formats differ starting pywbem 1.0.0
+      ["(CIM_ERR_INVALID_NAMESPACE): Namespace does not exist in ", ],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate fails invalid query language',
@@ -1515,20 +1570,24 @@ Instances: PyWBEM_AllTypes
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/invalidnamespace'],
      {'stderr':
-      ['CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not exist'
-       " in mock repository: 'root/invalidnamespace'", ],
+      # NOTE: cut out pieces of message because of pywbem 1.0.0 word difference
+      ['CIMError:', '3', '(CIM_ERR_INVALID_NAMESPACE):',
+       'Namespace does not exist in',
+       "repository: 'root/invalidnamespace'"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with none existentinstancename',
      ['get', 'CIM_Foo.InstanceID="CIM_NOTEXIST"'],
-     {'stderr': ["Error: CIMError: 6 (CIM_ERR_NOT_FOUND): Instance not found "
-                 "in repository namespace 'root/cimv2'. Path=CIMInstanceName("
+     # Output format diff starting pywbem 1.0.0, words cim repository
+     {'stderr': ['CIMError:', '6', '(CIM_ERR_NOT_FOUND):',
+                 'Instance not found in ',
+                 "namespace 'root/cimv2'. Path=CIMInstanceName("
                  "classname='CIM_Foo', keybindings=NocaseDict({'InstanceID': "
                  "'CIM_NOTEXIST'}), namespace='root/cimv2', host=None)"],
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command get with -o txt fails',
@@ -2086,9 +2145,10 @@ Instances: PyWBEM_AllTypes
      ['references', 'TST_Person.name="Mike"', '--no'],
      {'stdout': ['"root/cimv2:TST_FamilyCollection.name=\\"Family2\\"",member',
                  '=\"root/cimv2:TST_Person.name=\\"Mike\\""',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '//FakedUrl/root/cimv2:TST_MemberOfFamilyCollection.family'],
+                 FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 FAKEURL_STR + '/root/cimv2:TST_MemberOfFamilyCollection.family'
+                 ],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
@@ -2097,8 +2157,8 @@ Instances: PyWBEM_AllTypes
      'class valid returns paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeGabi"'],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
@@ -2133,8 +2193,8 @@ Instances: PyWBEM_AllTypes
      'class valid returns paths sorted',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--result-class', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"', ],
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeGabi"',
+                 FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeSofi"'],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
@@ -2143,8 +2203,8 @@ Instances: PyWBEM_AllTypes
      'class short form valid returns paths',
      ['references', 'TST_Person.name="Mike"', '--no',
       '--rc', 'TST_Lineage'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
-                 '//FakedUrl/root/cimv2:TST_Lineage.InstanceID="MikeGabi"', ],
+     {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeSofi"',
+                 FAKEURL_STR + '/root/cimv2:TST_Lineage.InstanceID="MikeGabi"'],
       'rc': 0,
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
@@ -2299,21 +2359,21 @@ Instances: PyWBEM_AllTypes
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
-     ASSOC_MOCK_FILE, OK],
+     ASSOC_MOCK_FILE, OK],  # returning different property set
 
     ['Verify instance command associators with --key, returns instances',
      ['associators', 'TST_Person', '--key', 'name=Mike'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
-     ASSOC_MOCK_FILE, OK],
+     ASSOC_MOCK_FILE, OK],  # returning different property set
 
     ['Verify instance command associators, --include-qualifiers',
      ['associators', 'TST_Person.name="Mike"', '--include-qualifiers'],
      {'stdout': ASSOC_INSTS,
       'rc': 0,
       'test': 'lines'},
-     ASSOC_MOCK_FILE, OK],
+     ASSOC_MOCK_FILE, OK],  # returning different property set
 
     ['Verify instance command associators, --include-qualifiers wo pull',
      {'general': ['--use-pull', 'no'],
@@ -2326,9 +2386,10 @@ Instances: PyWBEM_AllTypes
 
     ['Verify instance command associators -o, returns data',
      ['associators', 'TST_Person.name="Mike"', '--no'],
-     {'stdout': ['//FakedUrl/root/cimv2:TST_FamilyCollection.name="Family2"',
-                 '//FakedUrl/root/cimv2:TST_Person.name="Gabi"',
-                 '//FakedUrl/root/cimv2:TST_Person.name="Sofi"'],
+     {'stdout': [FAKEURL_STR +
+                 '/root/cimv2:TST_FamilyCollection.name="Family2"',
+                 FAKEURL_STR + '/root/cimv2:TST_Person.name="Gabi"',
+                 FAKEURL_STR + '/root/cimv2:TST_Person.name="Sofi"'],
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
@@ -2577,7 +2638,7 @@ interop      TST_MemberOfFamilyCollection  3
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify instance command invokemethod with all_types method',
-     ['invokemethod', 'Pywbem_alltypes.InstanceID="test_instance"',
+     ['invokemethod', 'Pywbem_Alltypes.InstanceID="test_instance"',
       'AllTypesMethod',
       '-p', 'scalBool=true',
       '-p', 'arrBool=false,true',
@@ -2596,7 +2657,7 @@ interop      TST_MemberOfFamilyCollection  3
                  'scalRef=', 'PyWBEM_AllTypes.InstanceID='],
       'rc': 0,
       'test': 'innows'},
-     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
+     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], RUN],
 
     ['Verify instance command invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
@@ -2612,7 +2673,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stderr': ["Error: CIMError: 17"],
       'rc': 1,
       'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
+     [SIMPLE_MOCK_FILE], OK],  # pywbem 1.0.0 reports Error 16
 
     # TODO expand the number of invokemethod tests to include all options
     # in classnametests
@@ -2836,7 +2897,7 @@ interop      TST_MemberOfFamilyCollection  3
 ]
 
 
-class TestSubcmd(CLITestsBase):
+class TestSubcmd(CLITestsBase):  # pylint: disable=too-few-public-methods
     """
     Test all of the instance command variations.
     """
