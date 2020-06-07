@@ -471,9 +471,31 @@ ca-certs
 
     ['Verify connection command test',
      ['test'],
-     {'stdout': "Connection successful",
+     {'stdout': "Connection OK: FakedUrl",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify connection command test with pull option',
+     ['test', '--test-pull'],
+     {'stdout': ["Pull Operation test results (Connection OK): FakedUrl",
+                 "Operation                    Result",
+                 "OpenEnumerateInstances       OK",
+                 "OpenEnumerateInstancePaths   OK",
+                 "OpenAssociatorInstances      OK",
+                 "OpenAssociatorInstancePaths  OK",
+                 "OpenReferenceInstances       OK",
+                 "OpenReferenceInstancePaths   OK",
+                 "OpenQueryInstances           14 "
+                 "(CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): FilterQueryLanguage "
+                 "'DMTF:CQL' not supported"],
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO: Future; Add test for --pull-options where the mocker has
+    # pull disabled.  Note that this must be a completely new test, not
+    # just the existing because there is no external way to turh off
+    # the mocker operations without creating a new python file to load and
+    # execute.so it is marked future
 
     ['Verify connection command delete test2',
      ['delete', 'test2'],
@@ -685,7 +707,7 @@ ca-certs
     ['Verify connection command test against existing mock def',
      {'args': ['test'],
       'general': ['--name', 'mocktest']},
-     {'stdout': "Connection successful",
+     {'stdout': "Connection OK: FakedUrl",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],

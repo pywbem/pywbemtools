@@ -25,6 +25,9 @@ Released: not yet
 * Fixed yaml.RepresenterError during 'connection save' command. This introduced
   a dependency on the yamlloader package. (see issue #603).
 
+* Fixed possible issue where the `connection test` command would fail on a
+  server that did not support class operations.  (See issue #606)
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution
@@ -35,6 +38,10 @@ Released: not yet
   a single format ``text``. This format outputs the command result as a
   text string to the console and is use for simple commands like
   ``server interop`` that only output one piece of data. (see issue #594)
+
+* Extended the command `connection test` so that it will also test for existence
+  of the DMTF pull operations.  It tests for all of the operations and
+  reports success or failure on each operation.
 
 
 **Cleanup**

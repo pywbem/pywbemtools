@@ -1558,9 +1558,18 @@ Connection test command
 The ``connection test`` command executes a single predefined operation on
 the current connection to verify that accessing the WBEM server works.
 
-The predefined operation is ``EnumerateClasses``.
+The predefined operation is ``EnumerateClasses`` which attempts to enumerate
+the classes in the default namespace of the WBEM Server.  Even if the server
+does not support the classes operations, this command should return a
+CIMError indicating that WBEM is supported (ex. CIM_ERR_NOT_SUPPORTED)
+indicating that WBEM is supported by the server.
 
-If the server accepts the request, a simple text ``Connection successful``
+If the `--test-pull` command option is included, pywbemcli will issue an
+instances request for each of the DMTF defined pull operations and report the
+results. This could be important because the pull operations are defined
+as optional and some server may not include them.
+
+If the server accepts the request, a simple text ``OK <server url``
 will be returned.
 
 The following example defines the connection with ``--server``, ``--user``,
@@ -1608,11 +1617,11 @@ Command history is available in the :ref:`interactive mode` either by using
 <UP-ARROW> and <DOWN-ARROW> keys to step through the history file or by using
 incremental search of the command history.
 
-The incremental search is initiated by <CTRL-r> and does a search based on a
-string entered after the <CTRL-r> for the last command containing the search
-string. The search string may be modified and <UP_ARROW>, <DOWN-ARROW> will
-find other commands containing the search string. Hitting <ENTER> selects
-the currently shown command.
+An incremental search is initiated by <CTRL-r> (similar to some shells like
+bash) and does a search based on a string entered after the <CTRL-r> for the
+last command containing the search string. The search string may be modified
+and <UP_ARROW>, <DOWN-ARROW> will find other commands containing the search
+string. Hitting <ENTER> selects the currently shown command.
 
 see :ref:`interactive mode` for more details on using this mode and the
 search.
