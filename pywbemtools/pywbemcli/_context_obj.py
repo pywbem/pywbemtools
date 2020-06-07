@@ -408,9 +408,9 @@ def display_click_context(ctx, msg=None, display_attrs=True):
     if not display_attrs:
         click.echo(ctx.obj)
     else:
-        click.echo('{} {}, attrs: {}'.format(
+        click.echo('{0} {1}, attrs: {2}'.format(
             msg, ctx,
-            '\n    '.join('%s: %s' % item for item in attrs.items())))
+            '\n    '.join('{0}: {1}'.format(i, v) for (i, v) in attrs.items())))
 
 
 def display_click_context_parents(display_attrs=False):
