@@ -52,7 +52,7 @@ def md_headline(title, level):
     except IndexError:
         level_char = '='
 
-    return '\n%s\n%s\n' % (title, (level_char * len(title)))
+    return '\n{0}\n{1}\n'.format(title, (level_char * len(title)))
 
 
 def headline(title, level):
@@ -61,7 +61,7 @@ def headline(title, level):
     if USE_MD:
         md_headline(title, level)
     else:
-        print('%s\n**%s**\n' % (title, ('-' * len(title))))
+        print('{0}\n**{1}**\n'.format(title, ('-' * len(title))))
 
 
 def print_md_verbatum_text(text_str):
@@ -83,11 +83,11 @@ def execute_pywbemcli_cmd(cmd_str, general_options=''):
         for cmd in cmd_str:
             execute_pywbemcli_cmd(cmd)
     else:
-        command = 'pywbemcli %s %s' % (general_options, cmd_str)
+        command = 'pywbemcli {0} {1}'.format(general_options, cmd_str)
         if USE_MD:
             print(md_headline(command, 1))
         else:
-            print('%s\nPYWBEMCLI COMMAND: %s' % (('=' * 50), command))
+            print('{0}\nPYWBEMCLI COMMAND: {1}'.format(('=' * 50), command))
 
         exitcode, out, err = execute_cmd(command)
 
@@ -96,11 +96,11 @@ def execute_pywbemcli_cmd(cmd_str, general_options=''):
         else:
             print(out)
         if err:
-            print('**STDER:** %s' % err)
+            print('**STDER:** {0}'.format(err))
 
         if exitcode != 0:
             ERRORS += 1
-            print('**ERROR:** cmd `%s`' % command)
+            print('**ERROR:** cmd `{0}`'.format(command))
 
 
 #
@@ -165,7 +165,8 @@ execute_pywbemcli_cmd("instance enumerate PyWBEM_Person")
 execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -p name")
 execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -o")
 
-execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -p name -p CreationClassName",
+execute_pywbemcli_cmd("instance enumerate PyWBEM_Person -p name -p ",
+                      "CreationClassName",
                       general_options='--output-format table')
 
 # TODO: Find way to do interactive in batch. This disabled for now

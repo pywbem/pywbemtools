@@ -177,12 +177,12 @@ class ConnectionRepository(object):
                                     replace_underscores=True, **svr)
                             ConnectionRepository._loaded = True
                     except KeyError as ke:
-                        raise KeyError("Items missing from record %s in "
-                                       "connections file %s" %
+                        raise KeyError("Items missing from record {0} in "
+                                       "connections file {1}".format
                                        (ke, self._connections_file))
                 except ValueError as ve:
-                    raise ValueError("Invalid YAML in connections file %s. "
-                                     "Exception %s" %
+                    raise ValueError("Invalid YAML in connections file {0}. "
+                                     "Exception {1}".format
                                      (self._connections_file, ve))
 
     def add(self, name, svr_definition):
@@ -293,7 +293,6 @@ class ConnectionRepository(object):
             self._write_file()
 
         else:
-            # TODO should "Default failed be part of this message"?
             raise ValueError('Connection name "{}" does not exist in '
                              'connection repository {}'
                              .format(connection_name, self.connections_file))

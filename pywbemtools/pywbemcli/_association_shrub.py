@@ -524,20 +524,6 @@ class AssociationShrub(object):
                                          'summary' if summary else 'paths')
         return format_table(rows, headers, title, table_format=output_format)
 
-    def display_dicts(self, loc=None):
-        """
-        Development diagnostic to display dictionaries build by this class
-        """
-        # TODO: Remove this before release
-        import pprint  # pylint: disable=import-outside-toplevel
-        pp = pprint.PrettyPrinter(indent=4)
-        if loc is None:
-            loc = ""
-        click.echo('INSTANCE_SHRUB %s' % loc)
-        pp.pprint(self.instance_shrub)
-        click.echo('ASSOC_INST_NAMES %s' % loc)
-        pp.pprint(self.assoc_instnames)
-
     def to_wbem_uri_folded(self, path, format='standard', max_len=15):
         # pylint: disable=redefined-builtin
         """
@@ -792,12 +778,13 @@ class AssociationShrub(object):
         try:
             ref_inst = self.conn.GetInstance(inst_name, LocalOnly=False)
         except CIMError as ce:
-            click.echo('Exception ref {}, exception: {}'.format(inst_name, ce))
+            click.echo('Exception ref {0}, exception: {1}'.format(inst_name,
+                                                                  ce))
             return None
         roles = [pname for pname, pvalue in six.iteritems(ref_inst.properties)
                  if pvalue.type == 'reference']
         if self.verbose:
-            print('class %s, roles %s' % (inst_name.classname, roles))
+            print('class {0}, roles {1}'.format(inst_name.classname, roles))
         return roles
 
     def _get_role_result_roles(self, roles, ref_classname):
@@ -818,8 +805,8 @@ class AssociationShrub(object):
             if refs:
                 rtn_roles[tst_role] = [r for r in roles if r != tst_role]
         if self.verbose:
-            print('ResultRoles: class=%s ResultClass=%s ResultRoles=%s'
-                  % (self.source_path.classname, ref_classname, rtn_roles))
+            print('ResultRoles: class={0} ResultClass={1} ResultRoles={2}'
+                  .format(self.source_path.classname, ref_classname, rtn_roles))
         return rtn_roles
 
     @staticmethod

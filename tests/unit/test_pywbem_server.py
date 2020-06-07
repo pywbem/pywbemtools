@@ -46,7 +46,7 @@ class PywbemServerTests(unittest.TestCase):
         self.assertEqual(svr.user, user)
         self.assertEqual(svr.password, pw)
 
-        self.assertEqual('%s' % svr,
+        self.assertEqual('{0}'.format(svr),
                          "PywbemServer(url=http://localhost name=default)")
 
     def test_all_parms(self):

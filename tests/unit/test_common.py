@@ -891,7 +891,7 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
     assert testcase.exp_exc_types is None
 
     if act_rtn != exp_rtn:
-        print('act %s\nexp %s' % (act_rtn, exp_rtn))
+        print('act {0}\nexp {1}'.format(act_rtn, exp_rtn))
     assert act_rtn == exp_rtn
 
 
@@ -1631,32 +1631,32 @@ TESTCASES_SPLITARRAYVALUE = [
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
     ("Verify simple numeric array",
-     dict(input='0,1,2,3,4,5,6',
+     dict(input_='0,1,2,3,4,5,6',
           exp_rslt=['0', '1', '2', '3', '4', '5', '6']),
-     None, None, OK),
+     None, None, 'OK'),
 
     ("Verify simple non-numeric array",
-     dict(input='abc,def,jhi,klm,nop',
+     dict(input_='abc,def,jhi,klm,nop',
           exp_rslt=['abc', 'def', 'jhi', 'klm', 'nop']),
      None, None, OK),
 
     ("Verify split array with escape for ,",
-     dict(input='abc,def,jhi,klm,n\\,op',
+     dict(input_='abc,def,jhi,klm,n\\,op',
           exp_rslt=['abc', 'def', 'jhi', 'klm', 'n,op']),
      None, None, OK),
 
     ("Verify split array with space ,",
-     dict(input='abc,de f',
+     dict(input_='abc,de f',
           exp_rslt=['abc', 'de f']),
      None, None, OK),
 
     ("Verify split single string with space ,",
-     dict(input='abcde f',
+     dict(input_='abcde f',
           exp_rslt=['abcde f']),
      None, None, OK),
 
     ("Verify split empty string ,",
-     dict(input='',
+     dict(input_='',
           exp_rslt=['']),
      None, None, OK),
 ]
@@ -1666,13 +1666,13 @@ TESTCASES_SPLITARRAYVALUE = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_SPLITARRAYVALUE)
 @simplified_test_function
-def test_split_array_value(testcase, input, exp_rslt):
+def test_split_array_value(testcase, input_, exp_rslt):
     """
     Test split_array_value() common function
     """
     # Code to be tested
 
-    act_rslt = split_array_value(input, ',')
+    act_rslt = split_array_value(input_, ',')
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -2425,7 +2425,8 @@ def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
     assert testcase.exp_exc_types is None
 
     if act_rtn != exp_rtn:
-        print('IN\n%s\nEXP\n%s\nACT\n%s\n' % (input_str, exp_rtn, act_rtn))
+        print('IN\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(input_str, exp_rtn,
+                                                     act_rtn))
     assert act_rtn == exp_rtn
 
 
