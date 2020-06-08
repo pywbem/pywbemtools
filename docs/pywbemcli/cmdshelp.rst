@@ -853,7 +853,10 @@ Help text for ``pywbemcli connection test`` (see :ref:`connection test command`)
         pywbemcli --name mysrv connection test
 
     Command Options:
-      -h, --help  Show this help message.
+      --test-pull  If set, the connection is tested to determine if theDMTF defined pull operations (ex.
+                   OpenEnumerateInstancesare implemented since these are optional.
+
+      -h, --help   Show this help message.
 
 
 .. _`pywbemcli help --help`:

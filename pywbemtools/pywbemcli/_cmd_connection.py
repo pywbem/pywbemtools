@@ -28,12 +28,13 @@ from copy import deepcopy
 import click
 import six
 
-from pywbem import Error
+from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
-    raise_pywbem_error_exception, validate_output_format, fold_strings
+    raise_pywbem_error_exception, validate_output_format, fold_strings, \
+    output_format_is_table
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._connection_repository import ConnectionRepository
@@ -198,9 +199,14 @@ def connection_select(context, name, **options):
 
 @connection_group.command('test', cls=PywbemcliCommand,
                           options_metavar=CMD_OPTS_TXT)
+@click.option('--test-pull', is_flag=True,
+              default=False,
+              help='If set, the connection is tested to determine if the'
+                   'DMTF defined pull operations (ex. OpenEnumerateInstances'
+                   'are implemented since these are optional.')
 @add_options(help_option)
 @click.pass_obj
-def connection_test(context):
+def connection_test(context, **options):
     """
     Test the current connection with a predefined WBEM request.
 
@@ -212,7 +218,7 @@ def connection_test(context):
 
       pywbemcli --name mysrv connection test
     """
-    context.execute_cmd(lambda: cmd_connection_test(context))
+    context.execute_cmd(lambda: cmd_connection_test(context, options))
 
 
 @connection_group.command('save', cls=PywbemcliCommand,
@@ -409,6 +415,70 @@ def select_connection(name, context, connections):
                               "Select a connection or Ctrl-C to abort.")
 
 
+def test_pull_operations(context, test_class):
+    """
+    Test if the pull operations are implemented by executing each of the
+    commands and report results.  Uses test_class for the commands that
+    require class input and an instance of that class for the commands that
+    require an instance.
+
+    Parameters:
+
+      conn (:class:`~pywbem.WBEMConnection`):
+        The connection object passed to the command that called this function.
+        Used to execute commands on the WBEM server
+
+      Returns:
+        List tuples where each tuple consists of the name of the WBEM
+        operation that was tested and the results of the test ('OK,
+        'NOT SUPPORTED, or the exception if any exception other than
+        CIMError(CIM_ERR_NOT_SUPPORTED)
+    """
+    def cimcall(request, *pargs, **kwargs):
+        try:
+            request(*pargs, **kwargs)
+            return 'OK'
+
+        except CIMError as er:
+            if er.status_code == CIM_ERR_NOT_SUPPORTED:
+                return 'NOT SUPPORTED'
+
+            return er
+
+    # Find a valid instance to use in tests.
+    test_instances = context.conn.EnumerateInstanceNames(test_class)
+    if not test_instances:
+        raise click.ClickException("No instances found for test class {}".
+                                   format(test_class))
+    test_instance = test_instances[0]
+
+    # execute each command and append the results to rows as a tuple
+    rows = []
+    result = cimcall(context.conn.OpenEnumerateInstances, test_class)
+    rows.append(('OpenEnumerateInstances', result))
+
+    result = cimcall(context.conn.OpenEnumerateInstancePaths, test_class)
+    rows.append(('OpenEnumerateInstancePaths', result))
+
+    result = cimcall(context.conn.OpenAssociatorInstances, test_instance)
+    rows.append(('OpenAssociatorInstances', result))
+
+    result = cimcall(context.conn.OpenAssociatorInstancePaths, test_instance)
+    rows.append(('OpenAssociatorInstancePaths', result))
+
+    result = cimcall(context.conn.OpenReferenceInstances, test_instance)
+    rows.append(('OpenReferenceInstances', result))
+
+    result = cimcall(context.conn.OpenReferenceInstancePaths, test_instance)
+    rows.append(('OpenReferenceInstancePaths', result))
+
+    result = cimcall(context.conn.OpenQueryInstances, "DMTF:CQL",
+                     "SELECT * FROM CIM_ManagedElement")
+    rows.append(('OpenQueryInstances', result))
+
+    return rows
+
+
 ################################################################
 #
 #   Common methods for The action functions for the connection click group
@@ -496,7 +566,7 @@ def cmd_connection_show(context, name, options):
                                 show_password=options['show_password'])
 
 
-def cmd_connection_test(context):
+def cmd_connection_test(context, options):
     """
     Test the current connection with a single command on the default_namespace.
     Uses enumerateClassNames against current workspace as most general
@@ -504,12 +574,57 @@ def cmd_connection_test(context):
     operation. Even if class operations are not supported, a return from the
     server such as "unsupported" indicates the server exists.
     """
+
+    output_format = validate_output_format(context.output_format, ['TABLE',
+                                                                   'TEXT'])
+
     try:
-        context.conn.EnumerateClassNames()
+        classnames = context.conn.EnumerateClassNames()
         context.spinner_stop()
-        click.echo('Connection successful')
+    except CIMError as ce:
+        # class request failed, try instance request
+        try:
+            test_classname = 'CIM_ManagedElement'
+            if ce.status_code == 'CIM_ERR_NOT_SUPPORTED':
+                context.conn.EnumerateInstances(test_classname)
+        except Error as er:
+            raise click.ClickException('Cannot interact with WBEM Server '
+                                       '{}. EnumerateInstanceNames exception '
+                                       '{} and EnumerateInstances {} exception '
+                                       ' {} '.format(context.conn.url,
+                                                     ce.status_code,
+                                                     test_classname,
+                                                     er))
     except Error as er:
         raise_pywbem_error_exception(er)
+
+    if classnames:
+        if 'CIM_ManagedElement' in classnames:
+            test_class = 'CIM_ManagedElement'
+        else:
+            test_class = classnames[0]
+    else:
+        raise click.ClickException('No classes found to test in namespace {}.'.
+                                   format(context.conn.defaultnamespace))
+
+    if options['test_pull']:
+        result = test_pull_operations(context, test_class)
+
+        if output_format_is_table(output_format):
+            headers = ['Operation', 'Result']
+            click.echo(format_table(
+                result, headers,
+                title='Pull Operation test results (Connection OK): {}'.
+                format(context.conn.host),
+                table_format=output_format))
+        else:
+            click.echo('Connection OK: {}'.format(context.conn.host))
+
+            for row in result:
+                click.echo("{}: {}".format(row[0], row[1]))
+
+    else:
+        click.echo('Connection OK: {}'.format(context.conn.host))
 
 
 def cmd_connection_select(context, name, options):
