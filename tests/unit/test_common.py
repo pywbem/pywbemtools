@@ -1119,15 +1119,18 @@ def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
     and the click_echo. Mock Click.confirm returns a value defined by
     the test. Mock click.echo confirms data in call to click_echo
     """
+
     # TODO: This does not really test the abort_msg that is output
     # only in some conditions, it just hides it since the mock is
     # defined with called_with=txt
     @patch('pywbemtools.pywbemcli.click.confirm', return_value=clickconfirm)
     @patch('pywbemtools.pywbemcli.click.echo', called_with=txt)
     def run_verify_operation(txt, mock_click_confirm, mock_click_echo):
+        # pylint: disable=unused-argument
         return verify_operation(txt, abort_msg)
 
     # The code to be tested
+    # pylint: disable=no-value-for-parameter
     rtn = run_verify_operation(txt)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1141,7 +1144,6 @@ TESTCASES_PARSE_WBEMURI_STR = [
     # Testcases for CIMClassName.from_wbem_uri().
     # Each testcase has these items:
     # * uri: WBEM URI string to be tested.
-    # * ns: namespace parameter or None
     # * exp_result: Dict of all expected attributes of resulting object,
     #     if expected to succeed. Exception type, if expected to fail.
     # * exp_warn_type: Expected warning type.
@@ -1152,7 +1154,6 @@ TESTCASES_PARSE_WBEMURI_STR = [
         "class and keys only case",
         dict(
             url='/root/cimv2:CIM_Foo.k1="v1"',
-            ns=None,
             exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace='root/cimv2',
@@ -1166,7 +1167,6 @@ TESTCASES_PARSE_WBEMURI_STR = [
         "all components, normal case",
         dict(
             url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
-            ns=None,
             exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace=u'root/cimv2',
@@ -1180,7 +1180,6 @@ TESTCASES_PARSE_WBEMURI_STR = [
         "class and keybinding only",
         dict(
             url='CIM_Foo.k1="v1"',
-            ns=None,
             exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace=None,
@@ -1194,7 +1193,6 @@ TESTCASES_PARSE_WBEMURI_STR = [
         "all components, But wbem uri invalid",
         dict(
             url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1=v1',
-            ns=None,
             exp_result=dict(
                 classname=u'CIM_Foo',
                 namespace=u'root/cimv2',
@@ -1210,7 +1208,7 @@ TESTCASES_PARSE_WBEMURI_STR = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_PARSE_WBEMURI_STR)
 @simplified_test_function
-def test_parse_wbemuri_str(testcase, url, ns, exp_result):
+def test_parse_wbemuri_str(testcase, url, exp_result):
     """Test function for parse_wbemuri_str."""
 
     # Code to be tested
@@ -2026,8 +2024,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls1,
             kv_args=['P1=Fred'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', 'Fred')]),
         ),
@@ -2037,8 +2033,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls1,
             kv_args=['P1="Fred Fred"'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
         ),
@@ -2049,8 +2043,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls1,
             kv_args=['p1="Fred Fred"'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
         ),
@@ -2060,8 +2052,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls1,
             kv_args=['Px=Fred'],
-            namespace=None,
-            host=None,
             exp_iname=None
         ),
         click.exceptions.ClickException, None, True),
@@ -2070,8 +2060,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls2,
             kv_args=['P1=Fred', 'P2=John', 'P3=1'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
                                                    ('P2', 'John'), ('P3', 1)]),
@@ -2082,8 +2070,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls2,
             kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
                                                    ('P2', 'John'),
@@ -2095,8 +2081,6 @@ TESTCASES_CREATE_INSTNAME = [
         dict(
             cls_kwargs=cls1,
             kv_args=[u'P1=Fred\u0344\u0352'],
-            namespace=None,
-            host=None,
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
         ),
@@ -2109,8 +2093,7 @@ TESTCASES_CREATE_INSTNAME = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_CREATE_INSTNAME)
 @simplified_test_function
-def test_create_instancename(testcase, cls_kwargs, kv_args, exp_iname,
-                             namespace, host,):
+def test_create_instancename(testcase, cls_kwargs, kv_args, exp_iname):
     """
     Test the common function create_instancename()
     """
@@ -2758,7 +2741,7 @@ def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
     # are not mistaken as expected exceptions
     assert testcase.exp_exc_types is None
 
-    # assertexp_tbl, stdout, testcase.desc)
+    # TODO: assert exp_tbl, stdout, testcase.desc
 
 
 # TODO Test compare and failure in compare_obj
