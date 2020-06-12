@@ -8,27 +8,13 @@ Change log
 pywbemtools 0.5.2
 -----------------
 
-This version is currently in development and is shown as |version|.
-
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-06-11
 
 **Bug fixes:**
 
 * Pinned pywbem to <1.0.0 due to the incompatibilities it will introduce.
   Support for working with pywbem 1.0.0 will be added in pywbemtools 0.7.0, and
   will not be rolled back into earlier versions of pywbemtools (see issue #616).
-
-**Enhancements:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.5.1
