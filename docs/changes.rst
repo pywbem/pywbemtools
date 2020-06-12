@@ -5,6 +5,28 @@ Change log
 ==========
 
 
+pywbemtools 0.5.2
+-----------------
+
+This version is currently in development and is shown as |version|.
+
+Released: not yet
+
+**Incompatible changes:**
+
+**Deprecations:**
+
+**Bug fixes:**
+
+**Enhancements:**
+
+**Known issues:**
+
+* See `list of open issues`_.
+
+.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+
+
 pywbemtools 0.5.1
 -----------------
 
