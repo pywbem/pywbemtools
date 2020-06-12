@@ -8,7 +8,7 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-pywbem>=0.16.0
+pywbem>=0.16.0,<1.0.0
 # git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 pbr>=1.10.0

@@ -18,6 +18,10 @@ Released: not yet
 
 **Bug fixes:**
 
+* Pinned pywbem to <1.0.0 due to the incompatibilities it will introduce.
+  Support for working with pywbem 1.0.0 will be added in pywbemtools 0.7.0, and
+  will not be rolled back into earlier versions of pywbemtools (see issue #616).
+
 **Enhancements:**
 
 **Known issues:**
