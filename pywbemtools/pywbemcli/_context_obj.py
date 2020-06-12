@@ -154,7 +154,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 self._pywbem_server.create_connection(
                     log=self.log,
                     use_pull=self.use_pull,
-                    pull_max_cnt=self.pull_max_cnt,
                     timestats=self.timestats,
                     verbose=self.verbose)
                 if self._conn and self.timestats:  # Enable stats gathering
@@ -373,7 +372,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             self._pywbem_server.create_connection(
                 log=self.log,
                 use_pull=self.use_pull,
-                pull_max_cnt=self.pull_max_cnt,
                 timestats=self.timestats,
                 verbose=self.verbose)
 

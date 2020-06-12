@@ -412,7 +412,7 @@ class PywbemServer(object):
         self._conn = None
         self._wbem_server = None
 
-    def create_connection(self, log=None, use_pull=None, pull_max_cnt=None,
+    def create_connection(self, log=None, use_pull=None,
                           verbose=None, timestats=None):
         """
         Initiate a WBEB connection, via PyWBEM api. Arguments for
@@ -422,15 +422,15 @@ class PywbemServer(object):
 
         If self.mock_server is set, a mock connection is created instead
         of a genuine connection to a server.
-        See the pywbem WBEMConnection class for more details on the parameters.
+        See the pywbem.WBEMConnection class for more details on the parameters.
 
-           Return:
-                pywbem WBEMConnection object that can be used to execute
-                other pywbem cim_operation requests
+        Return:
+            pywbem.WBEMConnection: Connection object that can be used to execute
+            other pywbem cim_operation requests
 
-           Exception:
-               ValueError: if server paramer is invalid or other issues with
-               the input values
+        Raises:
+           ValueError: if server paramer is invalid or other issues with
+           the input values
         """
         if self._mock_server:
             if self.conn is None:
@@ -446,7 +446,7 @@ class PywbemServer(object):
                                           verbose)
                 except click.Abort:
                     raise
-                except Exception as exc:
+                except Exception as exc:  # pylint: disable=broad-except
                     click.echo(
                         "Building the mock repository failed: {}".format(exc),
                         err=True)
