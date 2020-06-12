@@ -305,7 +305,7 @@ def filter_namelist(pattern, name_list, ignore_case=True):
                                    'Regex=%s. Er: %s: %s' %
                                    (regex, ex.__class__.__name__, ex))
 
-    new_list = [n for n in name_list for m in[compiled_regex.match(n)] if m]
+    new_list = [n for n in name_list for m in [compiled_regex.match(n)] if m]
 
     return new_list
 

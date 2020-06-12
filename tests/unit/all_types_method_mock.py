@@ -6,7 +6,7 @@ based on the CIM_Foo class in the simple_mock_model.mof test file
 # test that GLOBALS exist
 assert "CONN" in globals()
 assert 'SERVER' in globals()
-assert 'VERBOSE'in globals()
+assert 'VERBOSE' in globals()
 
 
 def alltypes_callback(conn, object_name, methodname, **params):

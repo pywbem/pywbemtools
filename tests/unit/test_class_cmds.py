@@ -486,7 +486,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate CIM_Foo names and --deep-inheritance '
-      '--names-only',
+     '--names-only',
      ['enumerate', 'CIM_Foo', '--names-only', '--deep-inheritance'],
      {'stdout': ['CIM_Foo_sub', 'CIM_Foo_sub2', 'CIM_Foo_sub_sub'],
       'test': 'in'},
