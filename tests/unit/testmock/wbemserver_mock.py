@@ -20,7 +20,7 @@ DMTF_TEST_SCHEMA_VER = (2, 49, 0)
 # test that GLOBALS exist. They should be provided by pywbemcli
 assert "CONN" in globals()
 assert 'SERVER' in globals()
-assert 'VERBOSE'in globals()
+assert 'VERBOSE' in globals()
 
 
 # Location of DMTF schema directory used by all tests.

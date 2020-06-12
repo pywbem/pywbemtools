@@ -91,8 +91,8 @@ def display_class_tree(classes, top_class=None):
     # superclass to class dictionary
     cn_subcn = NocaseDict()
     # pylint: disable=bad-continuation, expression-not-assigned
-    [cn_subcn.setdefault(v, []).append(k) for (k, v) in
-            six.iteritems(cn_supercn)]  # noqa: F841
+    [cn_subcn.setdefault(v, []).append(k)
+     for (k, v) in six.iteritems(cn_supercn)]
     tree = build_tree(cn_subcn, top_class)
 
     tr = LeftAligned()
