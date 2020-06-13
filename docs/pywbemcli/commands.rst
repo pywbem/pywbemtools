@@ -32,8 +32,8 @@ with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 
 .. _`Class command group`:
 
-Class command group
--------------------
+``class`` command group
+-----------------------
 
 The ``class`` command group has commands that act on CIM classes:
 
@@ -54,8 +54,8 @@ See :ref:`pywbemcli class --help`.
 
 .. _`Class associators command`:
 
-Class associators command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``class associators`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class associators`` command lists the CIM classes that are associated
 with the specified source class.
@@ -86,8 +86,8 @@ See :ref:`pywbemcli class associators --help` for the exact help output of the c
 
 .. _`Class delete command`:
 
-Class delete command
-^^^^^^^^^^^^^^^^^^^^
+``class delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class delete`` command deletes the specified class on the server.
 
@@ -119,8 +119,8 @@ See :ref:`pywbemcli class delete --help` for the exact help output of the comman
 
 .. _`Class enumerate command`:
 
-Class enumerate command
-^^^^^^^^^^^^^^^^^^^^^^^
+``class enumerate`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class enumerate`` command enumerates the subclasses of the specified
 class, or the root classes of the class hierarchy.
@@ -172,8 +172,8 @@ See :ref:`pywbemcli class enumerate --help` for the exact help output of the com
 
 .. _`Class find command`:
 
-Class find command
-^^^^^^^^^^^^^^^^^^
+``class find`` command
+^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class find`` command lists classes with a class name that matches the
 :term:`Unix-style path name pattern` specified in the ``CLASSNAME-GLOB``
@@ -241,8 +241,8 @@ See :ref:`pywbemcli class find --help` for the exact help output of the command.
 
 .. _`Class get command`:
 
-Class get command
-^^^^^^^^^^^^^^^^^
+``class get`` command
+^^^^^^^^^^^^^^^^^^^^^
 
 The ``class get`` command gets the specified class.
 
@@ -299,8 +299,8 @@ See :ref:`pywbemcli class get --help` for the exact help output of the command.
 
 .. _`Class invokemethod command`:
 
-Class invokemethod command
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``class invokemethod`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class invokemethod`` command invokes a CIM method on the specified class
 and displays the return value and any output parameters.
@@ -335,8 +335,8 @@ See :ref:`pywbemcli class invokemethod --help` for the exact help output of the 
 
 .. _`Class references command`:
 
-Class references command
-^^^^^^^^^^^^^^^^^^^^^^^^
+``class references`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class references`` command lists the CIM classes that reference
 the specified source class.
@@ -365,8 +365,8 @@ See :ref:`pywbemcli class references --help` for the exact help output of the co
 
 .. _`Class tree command`:
 
-Class tree command
-^^^^^^^^^^^^^^^^^^
+``class tree`` command
+^^^^^^^^^^^^^^^^^^^^^^
 
 The ``class tree`` command displays the subclass or superclass hierarchy of the
 specified class.
@@ -402,8 +402,8 @@ See :ref:`pywbemcli class tree --help` for the exact help output of the command.
 
 .. _`Instance command group`:
 
-Instance command group
-----------------------
+``instance`` command group
+--------------------------
 
 The ``instance`` command group has commands that act on CIM instances:
 
@@ -427,8 +427,8 @@ See :ref:`pywbemcli instance --help`.
 
 .. _`Instance associators command`:
 
-Instance associators command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``instance associators`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance associators`` command lists the CIM instances that are associated
 with the specified source instance.
@@ -471,8 +471,8 @@ See :ref:`pywbemcli instance associators --help` for the exact help output of th
 
 .. _`Instance count command`:
 
-Instance count command
-^^^^^^^^^^^^^^^^^^^^^^
+``instance count`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance count`` command counts the CIM instances of some or all classes
 in the namespaces specified with the ``-namespace``/``-n`` command option, or
@@ -533,8 +533,8 @@ See :ref:`pywbemcli instance count --help` for the exact help output of the comm
 
 .. _`Instance create command`:
 
-Instance create command
-^^^^^^^^^^^^^^^^^^^^^^^
+``instance create`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance create`` command creates a CIM instance in the namespace
 specified with the ``-namespace``/``-n`` command option, or otherwise in the
@@ -567,8 +567,8 @@ See :ref:`pywbemcli instance create --help` for the exact help output of the com
 
 .. _`Instance delete command`:
 
-Instance delete command
-^^^^^^^^^^^^^^^^^^^^^^^
+``instance delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance delete`` command deletes a CIM instance.
 
@@ -589,8 +589,8 @@ See :ref:`pywbemcli instance delete --help` for the exact help output of the com
 
 .. _`Instance enumerate command`:
 
-Instance enumerate command
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``instance enumerate`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance enumerate`` command lists the CIM instances of the specified
 class (including subclasses) in a namespace.
@@ -628,8 +628,8 @@ See :ref:`pywbemcli instance enumerate --help` for the exact help output of the 
 
 .. _`Instance get command`:
 
-Instance get command
-^^^^^^^^^^^^^^^^^^^^
+``instance get`` command
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance get`` command gets a CIM instance.
 
@@ -672,8 +672,8 @@ See :ref:`pywbemcli instance get --help` for the exact help output of the comman
 
 .. _`Instance invokemethod command`:
 
-Instance invokemethod command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``instance invokemethod`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance invokemethod`` command invokes a CIM method on the specified
 instance and displays the return value and any output parameters.
@@ -719,8 +719,8 @@ See :ref:`pywbemcli instance invokemethod --help` for the exact help output of t
 
 .. _`Instance modify command`:
 
-Instance modify command
-^^^^^^^^^^^^^^^^^^^^^^^
+``instance modify`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance modify`` command modifies the properties of an existing CIM
 instance.
@@ -760,8 +760,8 @@ See :ref:`pywbemcli instance modify --help` for the exact help output of the com
 
 .. _`Instance references command`:
 
-Instance references command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``instance references`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance references`` command lists the CIM instances that reference
 the specified source instance.
@@ -795,17 +795,17 @@ See :ref:`pywbemcli instance references --help` for the exact help output of the
 
 .. _`Instance query command`:
 
-Instance query command
-^^^^^^^^^^^^^^^^^^^^^^
+``instance query`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance query`` command executes a query for CIM instances in a
 namespace.
 
 The query is specified with the ``QUERY`` argument and must be a valid query
-in the query language specified with the ``--query-language`` command option.
-The default for that option is ``DMTF:CQL`` (see :term:`CQL`).
+in the query language specified with the ``--query-language``/``--ql`` command
+option. The default for that option is ``DMTF:CQL`` (see :term:`CQL`).
 
-The namespace is specified with the ``-namespace``/``-n`` command option, or
+The namespace is specified with the ``--namespace``/``-n`` command option, or
 otherwise is the default namespace of the connection.
 
 Valid output formats are :term:`CIM object output formats` or
@@ -817,8 +817,8 @@ See :ref:`pywbemcli instance query --help` for the exact help output of the comm
 
 .. _`Instance shrub command`:
 
-Instance shrub command
-^^^^^^^^^^^^^^^^^^^^^^
+``instance shrub`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``instance shrub`` command executes a set of requests to get the
 association relationships for a non-association CIM instance defined by
@@ -837,18 +837,18 @@ command option, or otherwise is the default namespace of the connection.
 Valid output formats are :term:`Table output formats` or the default which
 displays the a visual tree.
 
-The instance shrub command includes options to:
+The ``instance shrub`` command includes command options to:
 
-1. ``-s/--summary`` Show only the class components and a count of instancess.
+1. ``--summary``/``-s``: Show only the class components and a count of instances.
 
-2. ``-f/--fullpath`` option that shows the full path of the instances.  The
+2. ``--fullpath``/``-f``: Show the full path of the instances.  The
    default is to attempt to shorten the path by removing path components that
    are the same for all instances displayed.  This can be important for some
    of the components of the model where instance paths include keys like
    ``CreationClassName`` and 'SystemCreationClassName'which are either already
    known or do not distinguish instances but make the instance name difficult
    to visualize on the console. These key bindings are replaced with the
-   character ``~`` as a placemarker unless the ``--fullpath`` option is
+   character ``~`` as a placemarker unless the ``--fullpath``/``-f`` option is
    defined.
 
 Thus, a full path might look like:
@@ -859,12 +859,10 @@ But the shortened path would be:
 
    ``/:CIM_FCPort.~,~,~,DeviceID="ACME+CF2A5091300089+SP_A+10"``
 
-
 This command is primarily a diagnostic and test tool to help users understand what
 comprises CIM association relationships.
 
 See :ref:`pywbemcli instance shrub --help` for the exact help output of the command.
-
 
 Example:
 
@@ -892,13 +890,13 @@ contains 3 reference properties.  The tag ``refinst`` on each instance
 defines the corresponding reference instance so that the instances
 returned can be correlated back to their reference instances.
 
-The resulting table output for the same command but with -o table is:
+The resulting table output for the same command but with ``-o table`` is:
 
 Example:
 
 .. code-block:: text
 
-    $ pywbemcli instance shrub root/cimv2:TST_EP.InstanceID=1
+    $ pywbemcli -o table instance shrub root/cimv2:TST_EP.InstanceID=1
 
     Shrub of root/cimv2:TST_EP.InstanceID=1
     +-----------+-------------------+--------------+--------------------+-------------------------+
@@ -922,8 +920,8 @@ Example:
 
 .. _`Qualifier command group`:
 
-Qualifier command group
------------------------
+``qualifier`` command group
+---------------------------
 
 The ``qualifier`` command group has commands that act on CIM qualifier
 declarations:
@@ -936,8 +934,8 @@ declarations:
 
 .. _`Qualifier get command`:
 
-Qualifier get command
-^^^^^^^^^^^^^^^^^^^^^
+``qualifier get`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``qualifier get`` command gets the specified qualifier declaration.
 
@@ -964,8 +962,8 @@ See :ref:`pywbemcli qualifier get --help` for the exact help output of the comma
 
 .. _`Qualifier enumerate command`:
 
-Qualifier enumerate command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``qualifier enumerate`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``qualifier enumerate`` command enumerates the qualifier declarations in
 a namespace.
@@ -1005,8 +1003,8 @@ See :ref:`pywbemcli qualifier enumerate --help` for the exact help output of the
 
 .. _`Server command group`:
 
-Server command group
---------------------
+``server`` command group
+------------------------
 
 The ``server`` command group has commands that interact with the WBEM
 server of the :term:`current connection` to access information about the
@@ -1023,8 +1021,8 @@ WBEM server itself:
 
 .. _`Server brand command`:
 
-Server brand command
-^^^^^^^^^^^^^^^^^^^^
+``server brand`` command
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server brand`` command gets the brand of the WBEM server of the
 :term:`current connection`.
@@ -1054,8 +1052,8 @@ See :ref:`pywbemcli server brand --help` for the exact help output of the comman
 
 .. _`Server info command`:
 
-Server info command
-^^^^^^^^^^^^^^^^^^^
+``server info`` command
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server info`` command gets general information on the WBEM server of the
 :term:`current connection`.
@@ -1100,8 +1098,8 @@ See :ref:`pywbemcli server info --help` for the exact help output of the command
 
 .. _`Server interop command`:
 
-Server interop command
-^^^^^^^^^^^^^^^^^^^^^^
+``server interop`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server interop`` command gets the name of the Interop namespace of the
 WBEM server of the :term:`current connection`.
@@ -1126,8 +1124,8 @@ See :ref:`pywbemcli server interop --help` for the exact help output of the comm
 
 .. _`Server namespaces command`:
 
-Server namespaces command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``server namespaces`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server namespaces`` command lists the namespaces of the WBEM server of
 the :term:`current connection`.
@@ -1159,8 +1157,8 @@ See :ref:`pywbemcli server namespaces --help` for the exact help output of the c
 
 .. _`Server profiles command`:
 
-Server profiles command
-^^^^^^^^^^^^^^^^^^^^^^^
+``server profiles`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server profiles`` command lists the
 :term:`management profiles <management profile>` advertised by the
@@ -1208,8 +1206,8 @@ See :ref:`pywbemcli server profiles --help` for the exact help output of the com
 
 .. _`Server centralinsts command`:
 
-Server centralinsts command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``server centralinsts`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server centralinsts`` command gets the :term:`central instances`
 of the :term:`management profiles <management profile>` advertised by the
@@ -1241,8 +1239,8 @@ See :ref:`pywbemcli server centralinsts --help` for the exact help output of the
 
 .. _`Connection command group`:
 
-Connection command group
-------------------------
+``connection`` command group
+----------------------------
 
 The ``connection`` command group has commands that manage named connection
 definitions that are persisted in a :term:`connections file`.
@@ -1287,8 +1285,8 @@ The commands in this group are:
 
 .. _`Connection delete command`:
 
-Connection delete command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``connection delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection delete`` command deletes a connection definition from the
 :term:`connections file`.
@@ -1323,8 +1321,8 @@ See :ref:`pywbemcli connection delete --help` for the exact help output of the c
 
 .. _`Connection export command`:
 
-Connection export command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``connection export`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection export`` command exports the current connection as a set of
 environment variables.
@@ -1358,8 +1356,8 @@ See :ref:`pywbemcli connection export --help` for the exact help output of the c
 
 .. _`Connection list command`:
 
-Connection list command
-^^^^^^^^^^^^^^^^^^^^^^^
+``connection list`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection list`` command lists the connection definitions in the
 :term:`connections file` and also the current connection if it has not been
@@ -1436,8 +1434,8 @@ See :ref:`pywbemcli connection list --help` for the exact help output of the com
 
 .. _`Connection save command`:
 
-Connection save command
-^^^^^^^^^^^^^^^^^^^^^^^
+``connection save`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection save`` command saves the current connection in the
 :term:`connections file` as a connection definition with the name specified
@@ -1452,8 +1450,8 @@ See :ref:`pywbemcli connection save --help` for the exact help output of the com
 
 .. _`Connection select command`:
 
-Connection select command
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``connection select`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection select`` command selects a connection definition from the
 :term:`connections file` to become the current connection.
@@ -1464,7 +1462,7 @@ and prompts the user to pick the one to be selected. If there is only a
 single connection, that connection is selected without the user
 request.
 
-If the ``--default`` command option is set, the connection definition in
+If the ``--default``/``-d`` command option is set, the connection definition in
 addition becomes the default connection, by marking it accordingly in the
 :term:`connections file`.
 
@@ -1513,8 +1511,8 @@ See :ref:`pywbemcli connection select --help` for the exact help output of the c
 
 .. _`Connection show command`:
 
-Connection show command
-^^^^^^^^^^^^^^^^^^^^^^^
+``connection show`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index:: single: connection show command
 .. index:: pair: command; connection show
@@ -1548,8 +1546,8 @@ See :ref:`pywbemcli connection show --help` for the exact help output of the com
 
 .. _`Connection test command`:
 
-Connection test command
-^^^^^^^^^^^^^^^^^^^^^^^
+``connection test`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
     single: connection test command
@@ -1586,8 +1584,8 @@ See :ref:`pywbemcli connection test --help` for the exact help output of the com
 
 .. _`Repl command`:
 
-Repl command
-------------
+``repl`` command
+----------------
 
 .. index::
     single: repl command
@@ -1630,8 +1628,8 @@ search.
 
 .. _`Help command`:
 
-Help command
-------------
+``help`` command
+----------------
 
 .. index::
     single: help command
