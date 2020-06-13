@@ -84,7 +84,7 @@ This documentation uses a few special terms to refer to Python types:
       in the current directory. Multiple connections files may exist in
       different directories. This allows connection definitions to be
       predefined and pywbemcli commands executed against them using only the
-      connection definition name (via the ``--name`` general option).
+      connection definition name (via the :ref:`--name general option`).
 
    MOF
       MOF (Managed Object Format) is the language used by the DMTF to
@@ -177,7 +177,8 @@ This documentation uses a few special terms to refer to Python types:
       the default connection is defined.
       A connection definition in the :term:`connections file` becomes the
       default connection on pywbemcli startup if it is specified using the
-      :ref:`connection select command` and the ``--default option`` is used.
+      :ref:`connection select command` and the
+      ``--default``/``-d`` command option is used.
 
    current connection
       The connection definition in pywbemcli that is currently active; it is the

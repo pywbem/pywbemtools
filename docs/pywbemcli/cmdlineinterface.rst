@@ -63,7 +63,7 @@ begin with ``-``.
 Command groups are named after the objects the commands operate on
 (ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing
 
-.. code-block::text
+.. code-block:: text
 
    $ pywbemcli --help
    ...
@@ -427,7 +427,7 @@ Pywbemcli terminates with one of the following program exit codes:
 
   These Python tracebacks should never happen and are always considered a
   reason to open a bug in the
-  `pywbemtools issue tracker <https://github.com/pywbem/pywbemtools/issues>`_`.
+  `pywbemtools issue tracker <https://github.com/pywbem/pywbemtools/issues>`_.
 
   Note that an error message with a traceback from a mock Python script does
   not fall into this category and is an issue in that Python script and not

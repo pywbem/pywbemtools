@@ -195,8 +195,8 @@ applicable for all commands. For more details, see :ref:`Output formats`.
 Other miscellaneous general options
 """""""""""""""""""""""""""""""""""
 
-The :ref:`--verbose general option` displays extra information about the pywbemcli
-internal processing.
+The :ref:`--verbose general option` displays extra information about the
+pywbemcli internal processing.
 
 The :ref:`--version general option` displays pywbemcli version
 information and the :ref:`--help general option` provides top level help
@@ -207,15 +207,15 @@ information and the :ref:`--help general option` provides top level help
 General options descriptions
 """"""""""""""""""""""""""""
 
-This section defines in detail the requirements, characteristics, and any special
-syntax of each general option.
+This section defines in detail the requirements, characteristics, and any
+special syntax of each general option.
 
 .. index:: triple: --server; general options; server
 
 .. _`--server general option`:
 
---server general option
-"""""""""""""""""""""""
+``--server`` general option
+"""""""""""""""""""""""""""
 
 The argument value of the ``--server``/``-s`` general option is a string that is
 the URL of the WBEM server to which pywbemcli will connect, in the format:
@@ -253,8 +253,8 @@ Examples for the argument value of this option include:
 
 .. _`--name general option`:
 
---name general option
-"""""""""""""""""""""
+``--name`` general option
+"""""""""""""""""""""""""
 
 The argument value of the ``--name``/``-n`` general option is a string that is
 the name of a connection definition in the :term:`connections file`.
@@ -264,9 +264,9 @@ The parameters for this named connection definition will be loaded from the
 In the interactive mode the connection is not actually established until a
 command requiring access to the WBEM server is entered.
 
-This option is mutually exclusive with :ref:`--server general option` and
-:ref:`--mock-server general option` since each defines a connection to a WBEM
-server.
+This option is mutually exclusive with the :ref:`--server general option` and
+the :ref:`--mock-server general option` since each defines a connection to a
+WBEM server.
 
 The following example creates a connection definition named ``myserver``
 in the connections file, and then uses that connection to execute
@@ -286,8 +286,8 @@ connections.
 
 .. _`--default-namespace general option`:
 
---default-namespace general option
-""""""""""""""""""""""""""""""""""
+``--default-namespace`` general option
+""""""""""""""""""""""""""""""""""""""
 
 The argument value of the ``--default-namespace``/``-d`` general option is a
 string that defines the default :term:`CIM namespace` to use for the target
@@ -295,8 +295,8 @@ WBEM server.
 
 If this option is not specified, the default namespace will be ``root/cimv2``.
 
-The default namespace will be used if the ``--namespace``/``-n`` command
-option is not used on a command.
+The default namespace will be used if the ``--namespace``/``-n`` command option
+is not used on a command.
 
 Some commands execute against multiple or all namespaces, for example the
 the ``class find`` command.
@@ -304,8 +304,8 @@ the ``class find`` command.
 
 .. _`--user general option`:
 
---user general option
-"""""""""""""""""""""
+``--user`` general option
+"""""""""""""""""""""""""
 
 The argument value of the ``--user``/``-u`` general option is a string that is
 the user name for authenticating with the WBEM server.
@@ -314,15 +314,15 @@ the user name for authenticating with the WBEM server.
 
 .. _`--password general option`:
 
---password general option
-"""""""""""""""""""""""""
+``--password`` general option
+"""""""""""""""""""""""""""""
 
-The argument value of the ``--password``/``-p`` general option is a string that is the
-password for authenticating with the WBEM server.
+The argument value of the ``--password``/``-p`` general option is a string that
+is the password for authenticating with the WBEM server.
 
-This option is normally required if the
-:ref:`--user general option` is defined.  If passwords are saved into the
-:term:`connections file` they are not encrypted in the file.
+This option is normally required if the :ref:`--user general option` is defined.
+If passwords are saved into the :term:`connections file`, they are not encrypted
+in the file.
 
 If the WBEM operations performed by any pywbemcli command require a password,
 the password is prompted for if ``--user``/``-u`` is used (in both modes of
@@ -334,8 +334,8 @@ operation) and ``--password``/``-p`` is not used.
     Enter password: <password>
     . . . <The display output from get class>
 
-If both the ``--user``/``-u`` and ``--password``/``-p`` general options are
-used, the command is executed without a password prompt:
+If both ``--user``/``-u`` and ``--password``/``-p`` are used, the command is
+executed without a password prompt:
 
 .. code-block:: text
 
@@ -388,8 +388,8 @@ any subsequent pywbemcli commands:
 
 .. _`--timeout general option`:
 
---timeout general option
-""""""""""""""""""""""""
+``--timeout`` general option
+""""""""""""""""""""""""""""
 
 The argument value of the ``--timeout``/``-t`` general option is an integer that
 defines the
@@ -402,8 +402,8 @@ predefined timeout (normally 30 seconds) if this option is not defined.
 
 .. _`--verify general option`:
 
---verify general option
-"""""""""""""""""""""""
+``--verify`` general option
+"""""""""""""""""""""""""""
 
 The pair of ``--verify`` and ``--no-verify`` general options control whether or
 not the client verifies any certificates received from the WBEM server.
@@ -420,8 +420,8 @@ general option is used in interactive mode.
 
 .. _`--certfile general option`:
 
---certfile general option
-"""""""""""""""""""""""""
+``--certfile`` general option
+"""""""""""""""""""""""""""""
 
 The argument value of the ``--certfile`` general option is the file path of a
 PEM file containing a X.509 client certificate to be presented to the WBEM
@@ -438,8 +438,8 @@ https://pywbem.readthedocs.io/en/stable/client/security.html#authentication-type
 
 .. _`--keyfile general option`:
 
---keyfile general option
-""""""""""""""""""""""""
+``--keyfile`` general option
+""""""""""""""""""""""""""""
 
 The argument value of the ``--keyfile`` general option is the file path of a
 PEM file containing the private key belonging to the public key that is
@@ -447,17 +447,16 @@ part of the X.509 certificate. See :ref:`--certfile general option` for more
 information.
 
 Not required if the private key is part of the file defined in the
-:ref:`--certfile general option`. ``keyfile`` is not allowed if
-:ref:`--certfile general option` is not provided. Default: No client
-key file. The client private key should then be part of the file defined by
-``--certfile``.
+``--certfile`` option. ``--keyfile`` is not allowed if ``--certfile`` is not
+provided. Default: No client key file. The client private key should then be
+part of the file defined by ``--certfile``.
 
 .. index:: triple: --ca-certs; general options; ca-certs
 
 .. _`--ca-certs general option`:
 
---ca-certs general option
-""""""""""""""""""""""""""
+``--ca-certs`` general option
+""""""""""""""""""""""""""""""
 
 The argument value of the ``--ca-certs`` general option specifies which
 X.509 certificates are used on the client side for validating the X.509
@@ -497,7 +496,7 @@ The default behavior depends on the version of the installed pywbem package:
 The version of the installed pywbem package can be displayed using the
 :ref:`--version general option`.
 
-Specifying the ``--no-verify`` general option (see :ref:`--verify general option`)
+Specifying the ``--no-verify`` option (see :ref:`--verify general option`)
 bypasses client side verification of the WBEM server certificate.
 
 .. _PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail
@@ -509,8 +508,8 @@ bypasses client side verification of the WBEM server certificate.
 
 .. _`--timestats general option`:
 
---timestats general option
-""""""""""""""""""""""""""
+``--timestats`` general option
+""""""""""""""""""""""""""""""
 
 The ``--timestats`` general option is a boolean option that enables the
 gathering and display of time
@@ -522,15 +521,15 @@ operations executed, the size of the operations, and the execution time.
 
 .. _`--use-pull general option`:
 
---use-pull general option
-""""""""""""""""""""""""""
+``--use-pull`` general option
+""""""""""""""""""""""""""""""
 
 The argument value of the ``--use-pull``/``-u`` general option determines
 whether the pull operations or :term:`traditional operations` are used for the
 ``instance enumerate``, ``instance references``, ``instance associators``
-and ``instance query`` commands. See :ref:`Pywbemcli and
-the DMTF pull operations` for more information on pull operations. The choices
-for the argument value are as follows:
+and ``instance query`` commands. See
+:ref:`Pywbemcli and the DMTF pull operations` for more information on pull
+operations. The choices for the argument value are as follows:
 
 * ``yes`` - pull operations will be used and if the server does not
   support pull, the request will fail.
@@ -542,8 +541,8 @@ for the argument value are as follows:
 
 .. _`--pull-max-cnt general option`:
 
---pull-max-cnt general option
-""""""""""""""""""""""""""""""
+``--pull-max-cnt`` general option
+"""""""""""""""""""""""""""""""""
 
 The argument value of the ``--pull-max-cnt`` general option is an integer
 passed to the WBEM server with the open and pull operation requests.
@@ -556,8 +555,8 @@ DMTF pull operations` for more information on pull operations.
 
 .. _`--mock-server general option`:
 
---mock-server general option
-""""""""""""""""""""""""""""
+``--mock-server`` general option
+""""""""""""""""""""""""""""""""
 
 The argument value of the ``--mock-server``/``-m`` general option is a file
 path of a MOF file or Python script that loads a mock WBEM server in the
@@ -596,8 +595,8 @@ the files for a mock server.
 
 .. _`--output-format general option`:
 
---output-format general option
-""""""""""""""""""""""""""""""
+``--output-format`` general option
+""""""""""""""""""""""""""""""""""
 
 The argument value of the ``--output-format``/``-o`` general option is a string
 that defines the output format in which the result of any pywbemcli commands
@@ -609,8 +608,8 @@ For details, see :ref:`Output formats`.
 
 .. _`--log general option`:
 
---log general option
-""""""""""""""""""""
+``--log`` general option
+""""""""""""""""""""""""
 
 The argument value of the  ``--log``/``-l`` general option defines the
 destination and parameters of logging of the requests and responses to the WBEM
@@ -622,8 +621,8 @@ For details, see :ref:`Pywbemcli defined logging`.
 
 .. _`--verbose general option`:
 
---verbose general option
-""""""""""""""""""""""""
+``--verbose`` general option
+""""""""""""""""""""""""""""
 
 The ``--verbose``/``-v`` general option is a boolean option that enables the
 display of extra information about the processing.
@@ -637,8 +636,8 @@ command completion.
 
 .. _`--pdb general option`:
 
---pdb general option
-""""""""""""""""""""
+``--pdb`` general option
+""""""""""""""""""""""""
 
 The ``--pdb`` general option is a boolean option that enables debugging
 with the built-in pdb debugger.
@@ -654,8 +653,8 @@ built-in pdb debugger.
 
 .. _`--version general option`:
 
---version general option
-""""""""""""""""""""""""
+``--version`` general option
+""""""""""""""""""""""""""""
 
 The ``--version`` general option displays the version of the pywbemcli
 command and the version of the pywbem package used by it, and then exits.
@@ -664,8 +663,8 @@ command and the version of the pywbem package used by it, and then exits.
 
 .. _`--help general option`:
 
---help general option
-"""""""""""""""""""""
+``--help`` general option
+"""""""""""""""""""""""""
 
 The ``--help``/``-h`` general option displays help text which describes the
 command groups and general options, and then exits.
@@ -762,8 +761,8 @@ Pywbemcli and the DMTF pull operations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The DMTF specifications and pywbem includes two ways to execute the enumerate
-instance type operations (``Associators``, ``References``,``
-EnumerateInstances``, ``ExecQuery``):
+instance type operations (``Associators``, ``References``,
+``EnumerateInstances``, ``ExecQuery``):
 
 * The :term:`traditional operations` (ex. ``EnumerateInstances``)
 * The pull operations (ex. ``OpenEnumerateInstances``, etc.)
@@ -834,9 +833,10 @@ pull operations are not supported in the WBEM server:
 Output formats
 ^^^^^^^^^^^^^^
 
-Pywbemcli supports multiple output formats to present command results. The output
-format can be selected with the ``--output-format``/``-o`` option. The allowed
-output formats are different for the various command groups and commands.
+Pywbemcli supports multiple output formats to present command results. The
+output format can be selected with the :ref:`--output-format general option`.
+The allowed output formats are different for the various command groups and
+commands.
 
 The output formats fall into several groups:
 
@@ -881,87 +881,58 @@ Output formats for groups and commands
 
 Each of the commands may allow only a subset of the possible ouput formats. Thus,
 the `server brand` only outputs data in a table format so there is no defined
-default format for the `--output-format` general option.
+default format for the :ref:`--output-format general option`.
 
-The following shows the default format for each command the the alternate
-format groups where the groups are:
+The following shows the default format for each command and the alternate
+formats where the values mean:
 
-objects = xml|repr|txt
+objects: ``xml``, ``repr``, or ``txt``
 
-table = table|plain|simple|grid|psql|rst|html
+table: ``table``, ``plain``, ``simple``, ``grid``, ``psql``, ``rst``, ``text``,
+or ``html``
 
-+----------+---------------+----------+----------------+--------------------------------------------+
-|Group     |Command        | Default  | Alternates     | Comments                                   |
-+==========+===============+==========+================+============================================+
-| class    | associators   | 'mof'    | objects        | See Note 1 below.                          |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | delete        | None     | None           | Nothing returned                           |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | enumerate     | 'mof'    | objects        |  See Note 1 below.                         |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | find          | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | get           | 'mof'    | objects        |  See Note 1 below.                         |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | invokemethod  | 'mof'    | objects        |  See Note 1 below.                         |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | references    | 'mof'    | objects        |  See Note 1 below.                         |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | tree          | None     | None           | Only outputs as ascii tree                 |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|instance  | associators   | 'mof'    | objects, table | output as cim object or table of properties|
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | count         | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | create        | None     |                | Nothing returned                           |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | delete        | None     |                | Nothing returned                           |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  enumerate    | 'mof'    | objects, table |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  get          | 'mof'    | objects, table |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          | invokemethod  | 'mof'    | objexts, table |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  modify       | None     | None           |  Nothing returned                          |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  references   | 'mof'    | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|qualifier |  enumerate    | 'mof'    | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  get          | 'mof'    | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|server    |  brand        | 'text'   | text           | Alternate is table format                  |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |centralinsts   | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  info         | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  interop      | 'text'   | text           | Alternate is table format                  |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  namespaces   | 'simple' | table          | Alternate is text format                   |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  profiles     | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|connection|  delete       | None     | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  export       | None     | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  list         | 'simple' | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  save         |  None    | table          |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  select       |  None    | None           |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  show         |  None    |                | Currently ignores output format            |
-+----------+---------------+----------+----------------+--------------------------------------------+
-|          |  test         |  None    | None           |                                            |
-+----------+---------------+----------+----------------+--------------------------------------------+
+========== ============= ======== ============== ============================================
+Group      Command       Default  Alternates     Comments
+========== ============= ======== ============== ============================================
+class      associators   'mof'    objects        See Note 1 below
+class      delete        None     None           Nothing returned
+class      enumerate     'mof'    objects        See Note 1 below
+class      find          'simple' table
+class      get           'mof'    objects        See Note 1 below
+class      invokemethod  'mof'    objects        See Note 1 below
+class      references    'mof'    objects        See Note 1 below
+class      tree          None     None           Only outputs as ascii tree
+instance   associators   'mof'    objects, table Output as cim object or table of properties
+instance   count         'simple' table
+instance   create        None     None           Nothing returned
+instance   delete        None     None           Nothing returned
+instance   enumerate     'mof'    objects, table
+instance   get           'mof'    objects, table
+instance   invokemethod  'mof'    objects, table
+instance   modify        None     None           Nothing returned
+instance   references    'mof'    table
+qualifier  enumerate     'mof'    table
+qualifier  get           'mof'    table
+server     brand         'text'   text           Alternate is table format
+server     centralinsts  'simple' table
+server     info          'simple' table
+server     interop       'text'   text           Alternate is table format
+server     namespaces    'simple' table          Alternate is text format
+server     profiles      'simple' table
+connection delete        None     table
+connection export        None     table
+connection list          'simple' table
+connection save          None     table
+connection select        None     None
+connection show          None     None           Currently ignores output format
+connection test          None     None
+========== ============= ======== ============== ============================================
 
 NOTES:
 
-1. While the display of classes allows only CIM object display format (`mof`, etc.) the display with
-   the --names-only or --summary formats allows table output also.
+1. The display of classes with the ``--names-only``/``--no`` or
+   ``--summary``/``-s`` command options allows table output formats in addition
+   to the objects output formats.
 
 .. index:: pair: output formats; table formats
 
@@ -1169,8 +1140,8 @@ The output of CIM objects allows multiple formats as follows:
   This should be considered the output of last resort as it simply uses
   the ``__str__()`` method of the Python class for each CIM object to output.
 
-  Thus, for example the a ``class enumerate`` of a model with only a single
-  class is of the form:
+  Thus, for example, a ``class enumerate`` command of a model with only a single
+  class creates output of the form:
 
   .. code-block:: text
 
@@ -1185,7 +1156,7 @@ ASCII tree format
 This output format is an ASCII based output that shows the tree structure of
 the results of the ``class tree`` command. It is the only output format
 supported by this command, and therefore it is automatically selected and
-cannot be specified explicitly with the ``--output-format`` option.
+cannot be specified explicitly with the :ref:`--output-format general option`.
 
 .. code-block:: text
 
@@ -1235,7 +1206,7 @@ Pywbemcli provides logging to either a file or the standard error stream
 of information passing between the pywbemcli client and a WBEM server using the
 standard Python logging facility.
 
-Logging is configured and enabled using the ``--log`` general option on the
+Logging is configured and enabled using the :ref:`--log general option` on the
 commmand line or the `PYWBEMCLI_LOG` environment variable.
 
 Pywbemcli can log operation calls that send

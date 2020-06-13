@@ -10,12 +10,12 @@ Mock WBEM server support
 Mock support overview
 ---------------------
 
-Pywbemcli has support for mocking a WBEM server with the general option
-:ref:`--mock-server general option` (``--mock-server/-m``) . This allows
-executing pywbemcli against a mock WBEM server that is automatically created in
-pywbemcli, rather than a real WBEM server.
+Pywbemcli supports mocking a WBEM server with the
+:ref:`--mock-server general option`. This allows executing pywbemcli against a
+mock WBEM server that is automatically created in pywbemcli, rather than a real
+WBEM server.
 
-The :ref:`--mock-server general option` is mutually exclusive with the
+The ``--mock-server`` option is mutually exclusive with the
 :ref:`--server general option` and :ref:`--name general option`, since each
 defines a WBEM server.
 
@@ -25,7 +25,7 @@ CIM namespaces. The operations performed against the mock WBEM server cause
 that mock repository to be inspected or manipulated accordingly.
 
 The mock repository can be loaded with CIM objects from files specified as an
-argument to the :ref:`--mock-server general option`. Each use of the option
+argument to the ``--mock-server`` option. Each use of the option
 specifies one file path of such a file. The option may be used multiple times
 and each specified file is processed sequentially, in the sequence of the
 options on the command line.
@@ -44,8 +44,8 @@ The following types of files are supported for the ``--mock-server`` option:
 
   At this point, these CIM objects can be added to only one
   :term:`CIM namespace` in the repository of the mock WBEM server, namely the
-  default namespace of the connection (see ``--default-namespace`` global
-  option).
+  default namespace of the connection (see
+  :ref:`--default-namespace general option`).
 
   If a CIM object already exists in the repository, it is updated accordingly.
 
@@ -68,8 +68,8 @@ The following types of files are supported for the ``--mock-server`` option:
     for the mock repository.
 
   * ``VERBOSE`` (bool):
-    A flag that contains the value of the boolean ``--verbose`` general
-    option of pywbemcli.
+    A flag that contains the value of the boolean
+    :ref:`--verbose general option` of pywbemcli.
 
   The Python script can for example create Python objects of type
   :class:`~pywbem.CIMQualifierDeclaration`, :class:`~pywbem.CIMClass` and
@@ -81,7 +81,7 @@ The following types of files are supported for the ``--mock-server`` option:
   by implementing callbacks via :func:`pywbem_mock.method_callback_interface`,
   for handling CIM method invocations against the mock WBEM server.
 
-Pywbemcli logging (``-l`` or ``--log`` general option) can be used together
+Pywbemcli logging (see :ref:`--log general option`) can be used together
 with the mock support. Since the mock support does not use HTTP(S), only the
 "api" component in the log configuration string will generate any log output.
 
@@ -154,9 +154,9 @@ and then to enumerate its CIM class names is::
 
 The following is Python code (in a file ``tst_file.py``) that will add the same
 CIM objects as in the MOF file to the mock repository using
-:meth:`~pywbem_mock.FakedWBEMConnection.add_cim_objects`. If the ``--verbose``
-general option is set on the pywbemcli command line, the mock repository will
-be displayed:
+:meth:`~pywbem_mock.FakedWBEMConnection.add_cim_objects`. If the
+:ref:`--verbose general option` is set on the pywbemcli command line, the
+mock repository will be displayed:
 
 .. code-block:: python
 
@@ -262,7 +262,7 @@ course the Python script can contain logic, and it provides for
 implementing CIM method calls via callbacks.
 
 It is possible to mix MOF files and Python scripts by specifying the
-``--mock-server`` option multiple times.
+:ref:`--mock-server general option` multiple times.
 
 The pywbemcli command to use this Python file for loading into a mock WBEM
 server, and then to enumerate its CIM class names is::

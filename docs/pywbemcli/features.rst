@@ -25,7 +25,7 @@ syntactic implementation of the features. This includes:
 
 * The ability to receive either CIM instances or classes or only their names
   with only a change of an option on the commands that request CIM instances or
-  classes. The ``--names-only``/``-no`` command option defines whether only the
+  classes. The ``--names-only``/``--no`` command option defines whether only the
   name or the complete object will be displayed.
 
 * The ability to define complete INSTANCE name command arguments or
@@ -95,21 +95,24 @@ DeleteQualifier                    Not Implemented
 Specifying CIM property and parameter values
 --------------------------------------------
 
-The :ref:`instance create command`, :ref:`instance modify command`, :ref:`class invokemethod command`, and
-:ref:`instance invokemethod command` define the values of properties and parameters that
-are to be applied to CIM instances and methods to be sent to the WBEM server.
+The :ref:`instance create command`, :ref:`instance modify command`,
+:ref:`class invokemethod command`, and :ref:`instance invokemethod command`
+define the values of properties and parameters that are to be applied to CIM
+instances and methods to be sent to the WBEM server.
 
-For a single property or parameter this is the ``--property``/``-p`` or
-``--parameter``/``-p`` option with the name and value in the form:
+For a single property or parameter these are the ``--property``/``-p`` or
+``--parameter``/``-p`` command options with name and value in the form:
 
 .. code-block:: text
 
+    --property <name>=<value>
+    --parameter <name>=<value>
     -p <name>=<value>
 
 Where:
 
 * <name> is the name of the of the property or parameter.
-* <value> is the value of the property or parameter The values represent the
+* <value> is the value of the property or parameter. The values represent the
   value of CIM types (ex. Uint32, String, etc.) or arrays of these types.
 
 .. code-block:: text
@@ -148,19 +151,18 @@ The following are examples of scalar property definitions:
     -p pint=3
     -p psint=-3
 
-  For array properties the values are defined separated by commas:
+For array properties the values are defined separated by commas:
 
-  .. code-block:: text
+.. code-block:: text
 
     -p <property-name>=<value>(,<value>)
 
-  For example:
+For example:
 
-  .. code-block:: text
+.. code-block:: text
 
     -p strarray=abc,def,ghjk
     -p strarray2=\"ab c\",def
-
 
 
 .. _`Displaying CIM instances/classes or their names`:
@@ -173,12 +175,12 @@ The pywbem API includes different WBEM operations (ex. ``EnumerateInstances``,
 to request CIM objects or just their names. To simplify the overall command
 line syntax pywbemcli combines these into a single command (i.e. ``enumerate``,
 ``references``, ``associators``)  in the :ref:`class command group` and the
-:ref:`instance command group` and includes an option (``--no,`` or
-``--names-only``) that determines whether the names or the CIM objects are
-retrieved from the WBEM server.
+:ref:`instance command group` and includes the
+``--names-only``/``--no`` command option that determines whether the names or
+the CIM objects are retrieved from the WBEM server.
 
-Thus, for example an ``instance enumerate`` with and without the
-``--names-only`` option:
+Thus, for example an ``instance enumerate`` command with and without the
+``--names-only``/``--no`` option:
 
 .. code-block:: text
 
@@ -219,7 +221,7 @@ The instance name (INSTANCENAME argument) can be specified in two ways:
 * By specifying a complete untyped WBEM URI as defined in section
   :ref:`The INSTANCENAME command argument as a WBEM URI`. The
   namespace of the instance is the namespace specified in the WBEM URI, or the
-  namespace specified with the ``-namespace``/``-n`` command option, or the
+  namespace specified with the ``--namespace``/``-n`` command option, or the
   default namespace of the connection. Any host name in the WBEM URI will be
   ignored.
 
@@ -227,13 +229,13 @@ The instance name (INSTANCENAME argument) can be specified in two ways:
   component of the WBEM URI,  as defined in section
   :ref:`Interactively selecting INSTANCENAME command argument` (i.e.
   CLASSNAME.?). The namespace of the instance is the namespace specified with
-  the ``-namespace``/``-n`` command option, or the default namespace of the
+  the ``--namespace``/``-n`` command option, or the default namespace of the
   connection.  If there is only a single instance, that instance is selected
   automaticaly with without user request.
 
-* By specifying the WBEM URI without keybindings and using the --key option
-  to specify the keybindings ad defined in section
-  :ref:`Defining INSTANCENAME command argument with --key option`. The
+* By specifying the WBEM URI without keybindings and using the
+  ``--key``/``-k`` command option to specify the keybindings ad defined in
+  section :ref:`Defining INSTANCENAME command argument with --key option`. The
   advantage of this technique is that it eliminates the use of the double
   quote surrounding the key values.
 
@@ -372,15 +374,17 @@ interactive selection, as shown in the following example:
 
 .. _`Defining INSTANCENAME command argument with --key option`:
 
-`Defining INSTANCENAME command argument with --key option`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining INSTANCENAME command argument with --key option
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The INSTANCENAME may be specified by a combination of the namespace/classname
-as an argument with the --key option to define keybindings. Each --key option
-definition defines a single keybinding in the form name=value.   In general,
-the value component does not require the double quote that is required with
-WBEM_URL unless there are space characters in a string value.
+as an argument with the ``--key``/``-k`` command option to define keybindings.
+Each ``--key``/``-k`` option definition defines a single keybinding in the form
+``name=value``.
+In general, the value component does not require the double quote that is
+required with the WBEM URI format unless there are space characters in a string
+value.
 
-  Example:
+Example::
 
     CIM_Foo --key InstanceId=inst1
