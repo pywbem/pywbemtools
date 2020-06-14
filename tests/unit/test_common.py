@@ -21,8 +21,10 @@ Tests for _common.py functions.
 
 from __future__ import absolute_import, print_function
 
+import sys
 from datetime import datetime
 import unittest
+from packaging.version import parse as parse_version
 import click
 from mock import patch
 import pytest
@@ -34,7 +36,7 @@ except ImportError:
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, Uint32, Uint64, Sint32, \
-    CIMDateTime, CIMClassName
+    CIMDateTime, CIMClassName, __version__
 
 from tests.unit.pytest_extensions import simplified_test_function
 
@@ -57,6 +59,17 @@ OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
+
+# Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
+# the pytest capsys fixture is used. That happens only on Windows.
+# See Click issue https://github.com/pallets/click/issues/1590. This
+# run condition skips the testcases on Windows.
+CLICK_ISSUE_1590 = sys.platform == 'win32'
+
+_PYWBEM_VERSION = parse_version(__version__)
+# pywbem 1.0.0b1 or later
+PYWBEM_1_0_0B1 = _PYWBEM_VERSION.release >= (1, 0, 0) and \
+    _PYWBEM_VERSION.dev is None
 
 
 TESTCASES_ISCLASSNAME = [
@@ -2664,7 +2677,7 @@ def test_format_insts_as_rows(testcase, args, kwargs, exp_rtn):
     # * kwargs: Keyword arguments for the test function:
     #   * args: CIMInstance(s) object to be tested, col_width field, ouput_fmt
     #   * kwargs: Dict of input args for tocimxml().
-    #   * exp_tbl: Expected Table to be output.
+    #   * exp_stdout: Expected output on stdout.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
@@ -2675,27 +2688,33 @@ TESTCASES_PRINT_INSTANCE_AS_TABLE = [
         dict(
             args=([simple_instance()], None, 'simple'),
             kwargs=dict(),
-            exp_tbl=[
-                'Pbt    Pbf      Pint32    Pint64  Pdt                    '
-                'Pstr1\n'
-                '-----  -----  --------  --------  ---------------------  '
-                '-------------\n'
-                'true   false        99      9999  "20140922104920.5247"'
-                '  "Test String"\n'
-                '                                  "89+000"\n'
-            ],
+            exp_stdout="""\
+Instances: CIM_Foo
+Pbt    Pbf      Pint32    Pint64  Pdt                      Pstr1
+-----  -----  --------  --------  -----------------------  -------------
+true   false        99      9999  "20140922104920.524789"  "Test String"
+                                  "+000"
+""",
         ),
-        None, None, True, ),
-
+        None, None, not CLICK_ISSUE_1590
+    ),
     (
         "Verify print of simple instance to table with col limit",
         dict(
             args=([simple_instance2()], 80, 'simple'),
             kwargs=dict(),
-            exp_tbl=[
-                ["true", "false", "99", '"Test String"']],
+            exp_stdout="""\
+Instances: CIM_Foo
+Pbt    Pbf       Puint32      Psint32    Pint64  Pdt        Pstr1
+-----  -----  ----------  -----------  --------  ---------  --------
+true   false  4294967295  -2147483648      9999  "2014092"  "Test "
+                                                 "2104920"  "String"
+                                                 ".524789"
+                                                 "+000"
+""",
         ),
-        None, None, True, ),
+        None, None, not CLICK_ISSUE_1590
+    ),
     (
         "Verify print of instance with reference property",
         dict(
@@ -2710,38 +2729,51 @@ TESTCASES_PRINT_INSTANCE_AS_TABLE = [
                                                                k2=32)))])],
                   80, 'simple'),
             kwargs=dict(),
-            exp_tbl=[
-                ["/:REF_CLN.k2=32,k1=\"v1\""]],
+            exp_stdout="""\
+Instances: CIM_Foo
+P
+---------------------------
+"/:REF_CLN.k1=\\"v1\\",k2=32"
+""",
         ),
-        None, None, True, ),
+        None, None, not CLICK_ISSUE_1590 and PYWBEM_1_0_0B1
+    ),
 ]
 
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_PRINT_INSTANCE_AS_TABLE)
-@simplified_test_function
-def test_print_insts_as_table(testcase, args, kwargs, exp_tbl):
+def test_print_insts_as_table(
+        desc, kwargs, exp_exc_types, exp_warn_types, condition, capsys):
     """
     Test the output of the print_insts_as_table function. This primarily
     tests for overall format and the ability of the function to output to
     stdout. The previous test tests the row formatting and handling of
     multiple instances.
     """
-    # TODO fix simplified_test_function so we can use so we capture output.
-    # capsys in a builtin fixture that must be passed to this function.
-    # Currently the simplified_test_function does not allow any other
-    # parameters so we cannot use pytest capsys
-    mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
-    with patch(mock_echo_func):
-        # The code to be tested
-        _print_instances_as_table(*args, **kwargs)
-    # stdout, stderr = capsys.readouterr()
-    # Ensure that exceptions raised in the remainder of this function
-    # are not mistaken as expected exceptions
-    assert testcase.exp_exc_types is None
+    if not condition:
+        pytest.skip("Testcase condition not satisfied")
 
-    # TODO: assert exp_tbl, stdout, testcase.desc
+    # This logic only supports successful testcases without warnings
+    assert exp_exc_types is None
+    assert exp_warn_types is None
+
+    args = kwargs['args']
+    kwargs_ = kwargs['kwargs']
+    exp_stdout = kwargs['exp_stdout']
+
+    # The code to be tested
+    _print_instances_as_table(*args, **kwargs_)
+
+    stdout, stderr = capsys.readouterr()
+    assert exp_stdout == stdout, \
+        "Unexpected output in test case: {}\n" \
+        "Actual:\n" \
+        "{}\n" \
+        "Expected:\n" \
+        "{}\n" \
+        "End\n".format(desc, stdout, exp_stdout)
 
 
 # TODO Test compare and failure in compare_obj

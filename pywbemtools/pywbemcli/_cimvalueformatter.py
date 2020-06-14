@@ -184,7 +184,7 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
         val = six.text_type(value)
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
     elif type == 'reference':
-        val = value.to_wbem_uri()
+        val = value.to_wbem_uri(format='standard')
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
     elif isinstance(value, (CIMFloat, CIMInt, int, _Longint)):
         val = six.text_type(value)
