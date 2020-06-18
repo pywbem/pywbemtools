@@ -417,6 +417,11 @@ install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirem
 	@echo "makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
+# TODO: Remove the following workarouind once pywbem 1.0.0 is releaed.
+ifeq ($(PACKAGE_LEVEL),latest)
+	@echo "makefile: Installing pywbem 1.0.0b1 as long as 1.0.0 is not yet released"
+	-$(PIP_CMD) install $(pip_level_opts) pywbem=1.0.0b1
+endif
 	$(PIP_CMD) install $(pip_level_opts) -r requirements.txt
 	$(PIP_CMD) install $(pip_level_opts) -e .
 	echo "done" >$@
