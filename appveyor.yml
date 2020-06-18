@@ -69,7 +69,6 @@ environment:
 #      PIP_CMD: pip
 #      CYGWIN_PYTHON_DEVEL: python27-devel
 
-# TODO: Disabled because tox does nothing in this env.
 #    - TOX_ENV: cygwin32_py36
 #      UNIX_PATH: C:\cygwin\bin
 #      PYTHON_CMD: python3.6
@@ -86,7 +85,6 @@ environment:
 #      LC_ALL: C.UTF-8
 #      LANG: C.UTF-8
 
-# TODO: Disabled because tox does nothing in this env.
 #    - TOX_ENV: cygwin32_py37
 #      UNIX_PATH: C:\cygwin\bin
 #      PYTHON_CMD: python3.7
@@ -103,7 +101,6 @@ environment:
 #      LC_ALL: C.UTF-8
 #      LANG: C.UTF-8
 
-# TODO: Disabled because tox does nothing in this env.
 #    - TOX_ENV: cygwin32_py38
 #      UNIX_PATH: C:\cygwin\bin
 #      PYTHON_CMD: python3.8
