@@ -28,6 +28,8 @@ Released: not yet
 * Fixed possible issue where the `connection test` command would fail on a
   server that did not support class operations.  (See issue #606)
 
+* Pinned version of colorama to <0.4.0 for Python <=3.4.
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution
