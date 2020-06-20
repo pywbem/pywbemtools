@@ -55,8 +55,10 @@ environment:
 
 # Note: On CygWin with Python 3.x, LC_ALL/LANG need to be set to utf-8 for Click to install/work
 
-# TODO: Disabled because python2.7 with cygwin 32-bit fails with:
-#       "virtualenv is not compatible with this system or executable"
+# Note: The 32-bit version of CygWin fails with Python 2.7 and has therefore
+# been disabled. There have been different symptoms over time, including:
+# - "virtualenv is not compatible with this system or executable".
+# - M2Crypto installation raises "OSError: Unknown format of swig -version output"
 #    - TOX_ENV: cygwin32_py27
 #      UNIX_PATH: C:\cygwin\bin
 #      PYTHON_CMD: python2.7
