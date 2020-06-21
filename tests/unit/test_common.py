@@ -70,6 +70,8 @@ _PYWBEM_VERSION = parse_version(__version__)
 # pywbem 1.0.0b1 or later
 PYWBEM_1_0_0B1 = _PYWBEM_VERSION.release >= (1, 0, 0) and \
     _PYWBEM_VERSION.dev is None
+# pywbem 1.0.0 (dev, beta, final) or later
+PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 
 TESTCASES_ISCLASSNAME = [
@@ -281,14 +283,23 @@ TESTCASES_FORMAT_KEYBINDINGS = [
           exp_rtn='kEY1="Ham and eggs",key2="More eggs"'),
      None, None, True),
 
-    ('Verify multiple keys binding multiple key types',
+    ('Verify multiple unsorted keys binding multiple key types, pywbem >=1.0',
+     dict(kb=[('Name', 'Foo'),
+              ('Number', Uint8(42)),
+              ('Boolean', False),
+              ('Ref', CIMInstanceName('CIM_Bar'))],
+          width=100,
+          exp_rtn='Boolean=FALSE,Name="Foo",Number=42,Ref="/:CIM_Bar"'),
+     None, None, PYWBEM_1_0_0),
+
+    ('Verify multiple unsorted keys binding multiple key types, pywbem <1.0',
      dict(kb=[('Name', 'Foo'),
               ('Number', Uint8(42)),
               ('Boolean', False),
               ('Ref', CIMInstanceName('CIM_Bar'))],
           width=100,
           exp_rtn='Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
-     None, None, True),
+     None, None, not PYWBEM_1_0_0),
 
     ('Verify mutliple keys that fold into multiple lines',
      dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
@@ -323,15 +334,6 @@ TESTCASES_FORMAT_KEYBINDINGS = [
           width=8,
           exp_rtn=('k1=1,k2=2\nk3=3,k4=4\nk5=5,k6=6\nk7=7,k8=8')),
      None, None, False),
-
-    ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('Name', 'Foo'),
-              ('Number', Uint8(42)),
-              ('Boolean', False),
-              ('Ref', CIMInstanceName('CIM_Bar'))],
-          width=4,
-          exp_rtn='Name="Foo"\nNumber=42\nBoolean=FALSE\nRef="/:CIM_Bar"'),
-     None, None, True),
 
     # Test no keys
     ('Verify no keys',
@@ -439,13 +441,13 @@ TESTCASES_SHORT_PATH = [
      None, None, True),
 
     ('Verify multiple keys binding multiple key types',
-     dict(kb=[('Name', 'Foo'),
+     dict(kb=[('Boolean', False),
+              ('Name', 'Foo'),
               ('Number', Uint8(42)),
-              ('Boolean', False),
               ('Ref', CIMInstanceName('CIM_Bar'))],
           rpl={},
           fp=False,
-          exp_rtn='/:cln.Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
+          exp_rtn='/:cln.Boolean=FALSE,Name="Foo",Number=42,Ref="/:CIM_Bar"'),
      None, None, True),
 ]
 
