@@ -57,6 +57,10 @@ Released: not yet
   of the DMTF pull operations.  It tests for all of the operations and
   reports success or failure on each operation.
 
+* Added value-mapped strings to properties in instance table output.
+  For integer-typed (scalar or array) properties that have a ValueMap qualifier,
+  the output of instances in table format now includes the value of the Values
+  qualifier in parenthesis, in addition to the integer value. (See issue #634)
 
 **Cleanup**
 
