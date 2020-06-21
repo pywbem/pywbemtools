@@ -292,6 +292,7 @@ else
   pywbem_os_setup_file := pywbem_os_setup.sh
 endif
 
+PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
 
 .PHONY: help
 help:
@@ -379,7 +380,7 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 	$(PYTHON_CMD) remove_duplicate_setuptools.py
 # Keep the condition for the 'wheel' package consistent with the requirements & constraints files.
 # The approach with "python -m pip" is needed for Windows because pip.exe may be locked.
-	$(PIP_CMD) install $(pip_level_opts) setuptools wheel
+	$(PIP_INSTALL_CMD) $(pip_level_opts) setuptools wheel
 	echo "done" >$@
 	@echo "makefile: Done installing/upgrading basic Python packages"
 
@@ -420,10 +421,10 @@ install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirem
 # TODO: Remove the following workarouind once pywbem 1.0.0 is releaed.
 ifeq ($(PACKAGE_LEVEL),latest)
 	@echo "makefile: Installing pywbem 1.0.0b1 as long as 1.0.0 is not yet released"
-	-$(PIP_CMD) install $(pip_level_opts) pywbem=1.0.0b1
+	-$(PIP_INSTALL_CMD) $(pip_level_opts) pywbem=1.0.0b1
 endif
-	$(PIP_CMD) install $(pip_level_opts) -r requirements.txt
-	$(PIP_CMD) install $(pip_level_opts) -e .
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -r requirements.txt
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -e .
 	echo "done" >$@
 	@echo "makefile: Done installing $(package_name) and its Python runtime prerequisites"
 
@@ -464,7 +465,7 @@ develop: develop_$(pymn).done
 develop_$(pymn).done: pip_upgrade_$(pymn).done install_$(pymn).done develop_os_$(pymn).done install_basic_$(pymn).done dev-requirements.txt
 	@echo "makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
-	$(PIP_CMD) install $(pip_level_opts) -r dev-requirements.txt
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -r dev-requirements.txt
 	echo "done" >$@
 	@echo "makefile: Done installing Python development requirements"
 
