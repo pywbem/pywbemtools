@@ -659,7 +659,7 @@ def create_ciminstancename(cim_class, kv_keys):
     return instance_path
 
 
-def create_ciminstance(cim_class, kv_properties, property_list=None):
+def create_ciminstance(cim_class, kv_properties):
     """
     Create a CIMInstance object from the input parameters.
 
@@ -671,10 +671,6 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
       kv_properties (tuple):
         A tuple of name/value pairs representing the properties and their
         values that are to be constructed for the instance. Required
-
-      property_list (list):
-        a list of properties that is to be the list that is supplied
-        when the instance is created. Optional
 
     Returns:
         CIMInstance
@@ -706,9 +702,7 @@ def create_ciminstance(cim_class, kv_properties, property_list=None):
                                                cl_prop.is_array,
                                                value_str, ex))
 
-    new_inst = CIMInstance(cim_class.classname,
-                           properties=properties,
-                           property_list=property_list)
+    new_inst = CIMInstance(cim_class.classname, properties=properties)
 
     return new_inst
 
