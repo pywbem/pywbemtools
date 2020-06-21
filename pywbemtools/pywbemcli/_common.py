@@ -35,7 +35,7 @@ import tabulate
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue
+    cimvalue, ValueMapping
 
 from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
 
@@ -49,6 +49,8 @@ CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
 
 DEFAULT_MAX_CELL_WIDTH = 100
+
+INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
 ##############################################################
 #
@@ -1057,19 +1059,18 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
         if output_format_is_table(output_format):
-            _print_objects_as_table(cim_objects, output_format)
+            _print_objects_as_table(cim_objects, output_format, context=context)
         else:
             # Call to display each object
             for obj in cim_objects:
-                display_cim_objects(context, obj,
-                                    output_format=output_format)
+                display_cim_objects(context, obj, output_format=output_format)
         return
 
     # Display a single item.
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format_is_table(output_format):
-        _print_objects_as_table([object_], output_format)
+        _print_objects_as_table([object_], output_format, context=context)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -1403,7 +1404,7 @@ def _print_qual_decls_as_table(qual_decls, table_width, table_format):
 
 
 def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
-                              include_classes=False):
+                              include_classes=False, context=None):
     """
     Format the list of instances properties into as a list of the property
     values for each instance( a row of the table) gathered into a list of
@@ -1415,7 +1416,10 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
     max_width if not None folds col entries longer than the defined
     max_cell_width. If max_width is None, the data length is ignored.
 
-    Formatting is consistent with mof output for each value.
+    The property values are formatted similar to MOF output. Properties that
+    have a ValueMap qualifier (effectively, in the creation class of the
+    instance) are shown with both the actual property value and the mapped
+    value in parenthesis.
 
     NOTE: This is a separate function to allow testing of the table formatting
     independently of print output.
@@ -1431,10 +1435,17 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
     prop_names = []
 
     # find instance with max number of properties
+    # TODO: This misses properties if there are instances of different derived
+    # classes that added different extension properties.
     for inst in insts:
         pn = inst.keys()
         if len(pn) > len(prop_names):
             prop_names = pn
+
+    # Cache of ValueMapping objects for integer-typed properties.
+    # Key: classname.propertyname, both in lower case.
+    # A value of None indicates the property does not have a value mapping.
+    valuemappings = {}
 
     for inst in insts:
         if not isinstance(inst, CIMInstance):
@@ -1446,6 +1457,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
         # get value for each property in this object
         for name in prop_names:
+
             # Account for possible instances without all properties
             # Outputs empty  string.  Note that instance with no value
             # results in same output as not instance name.
@@ -1454,12 +1466,35 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
             else:
                 value = inst.get(name)
                 p = inst.properties[name]
+
+                # Cache value mappings for integer-typed properties
+                if INT_TYPE_PATTERN.match(p.type) and context:
+                    vm_key = '{}.{}'.format(
+                        inst.classname.lower(), name.lower())
+                    try:
+                        valuemapping = valuemappings[vm_key]
+                    except KeyError:
+                        try:
+                            valuemapping = ValueMapping.for_property(
+                                context.conn,
+                                context.conn.default_namespace,
+                                inst.classname,
+                                name)
+                        except ValueError:
+                            # Property does not have a value mapping.
+                            valuemapping = None
+                        valuemappings[vm_key] = valuemapping
+                else:
+                    valuemapping = None
+
                 if value is None:
                     val_str = u''
                 else:
                     val_str, _ = cimvalue_to_fmtd_string(
                         p.value, p.type, indent=0, maxline=max_cell_width,
-                        line_pos=0, end_space=0, avoid_splits=False)
+                        line_pos=0, end_space=0, avoid_splits=False,
+                        valuemapping=valuemapping)
+
             line.append(val_str)
         lines.append(line)
 
@@ -1467,14 +1502,19 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
 
 def _print_instances_as_table(insts, table_width, table_format,
-                              include_classes=False):
+                              include_classes=False, context=None):
     """
     Print the properties of the instances defined in insts as a table where
-    each row is an instance and each column is a property value.  The properties
-    are formatted similar to mof output. All properties in the instance are
-    included.
+    each row is an instance and each column is a property value.
 
-    The header line consists of property names.
+    All properties in the instance are included.
+
+    The header line consists of the property names.
+
+    The property values are formatted similar to MOF output. Properties that
+    have a ValueMap qualifier (effectively, in the creation class of the
+    instance) are shown with both the actual property value and the mapped
+    value in parenthesis.
     """
 
     if table_width is None:
@@ -1517,14 +1557,15 @@ def _print_instances_as_table(insts, table_width, table_format,
             raise ValueError('Only CIMInstance display allows table output')
 
     rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
-                                     include_classes=include_classes)
+                                     include_classes=include_classes,
+                                     context=context)
 
     title = 'Instances: {}'.format(insts[0].classname)
     click.echo(format_table(rows, new_header_line, title=title,
                             table_format=table_format))
 
 
-def _print_objects_as_table(objects, output_format):
+def _print_objects_as_table(objects, output_format, context=None):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -1538,7 +1579,8 @@ def _print_objects_as_table(objects, output_format):
 
     if objects:
         if isinstance(objects[0], CIMInstance):
-            _print_instances_as_table(objects, table_width, output_format)
+            _print_instances_as_table(objects, table_width, output_format,
+                                      context=context)
         elif isinstance(objects[0], CIMClass):
             _print_classes_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], CIMQualifierDeclaration):

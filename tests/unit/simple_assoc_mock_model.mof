@@ -22,10 +22,19 @@ Qualifier Out : boolean = false,
     Scope(parameter),
     Flavor(DisableOverride, ToSubclass);
 
+Qualifier ValueMap : string[],
+    Scope(property, method, parameter);
+
+Qualifier Values : string[],
+    Scope(property, method, parameter),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
 class TST_Person{
         [Key, Description ("This is key prop")]
     string name;
     string extraProperty = "defaultvalue";
+        [ValueMap {"1", "2"}, Values {"female", "male"}]
+    uint16 gender;
 };
 
 // NOTE: classname uses lower case s in sub.  Instance names use upper case
@@ -57,25 +66,29 @@ class TST_FamilyCollection {
 
 // Define instances of TST_Person
 
-instance of TST_Person as $Mike { name = "Mike"; };
-instance of TST_Person as $Saara { name = "Saara"; };
-instance of TST_Person as $Sofi { name = "Sofi"; };
-instance of TST_Person as $Gabi{ name = "Gabi"; };
+instance of TST_Person as $Mike { name = "Mike"; gender = 2; };
+instance of TST_Person as $Saara { name = "Saara"; gender = 1; };
+instance of TST_Person as $Sofi { name = "Sofi"; gender = 1; };
+instance of TST_Person as $Gabi{ name = "Gabi"; gender = 1; };
 
 // Define instances of the TST_PersonSub
 instance of TST_PersonSub as $Mikesub{ name = "Mikesub";
+                            gender = 2;
                             secondProperty = "one" ;
                             counter = 1; };
 
 instance of TST_PersonSub as $Saarasub { name = "Saarasub";
+                            gender = 1;
                             secondProperty = "two" ;
                             counter = 2; };
 
 instance of TST_PersonSub as $Sofisub{ name = "Sofisub";
+                            gender = 1;
                             secondProperty = "three" ;
                             counter = 3; };
 
 instance of TST_PersonSub as $Gabisub{ name = "Gabisub";
+                            gender = 1;
                             secondProperty = "four" ;
                             counter = 4; };
 

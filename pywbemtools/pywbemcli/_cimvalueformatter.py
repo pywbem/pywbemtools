@@ -438,13 +438,18 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
 
 def cimvalue_to_fmtd_string(value, type, indent=0,
                             maxline=DEFAULT_MAX_CELL_WIDTH,
-                            line_pos=0, end_space=0, avoid_splits=False):
+                            line_pos=0, end_space=0, avoid_splits=False,
+                            valuemapping=None):
     # pylint: disable=redefined-builtin
     """
     Return a MOF string representing a CIM-typed value (scalar or array).
 
     In case of an array, the array items are separated by comma, but the
     surrounding curly braces are not added.
+
+    In case a value mapping is provided, each value is followed by the
+    Values qualifier string in parenthesis. For example, "4" may become
+    "4 (Enabled)".
 
     Parameters:
 
@@ -463,6 +468,9 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
 
       avoid_splits (bool): Avoid splits at the price of starting a new line
         instead of using the current line.
+
+      valuemapping (:class:`pywbem.ValueMapping`): None or a value mapping
+        defining a string for the integer-typed property value(s).
 
     Returns:
 
@@ -483,6 +491,8 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
 
             val_str, line_pos = _scalar_value_tomof(
                 v, type, indent, maxline, line_pos, end_space + 2, avoid_splits)
+            if valuemapping:
+                val_str = "{} ({})".format(val_str, valuemapping.tovalues(v))
 
             if i > 0:
                 # Add the actual separator
@@ -500,5 +510,6 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
     else:
         mof_str, line_pos = _scalar_value_tomof(
             value, type, indent, maxline, line_pos, end_space, avoid_splits)
-
+        if valuemapping:
+            mof_str = "{} ({})".format(mof_str, valuemapping.tovalues(value))
     return mof_str, line_pos

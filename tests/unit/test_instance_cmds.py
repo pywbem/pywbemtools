@@ -380,10 +380,12 @@ ASSOC_INSTS = """instance of TST_FamilyCollection {
 
 instance of TST_Person {
    name = "Gabi";
+   gender = 1;
 };
 
 instance of TST_Person {
    name = "Sofi";
+   gender = 1;
 };
 
 """
