@@ -380,10 +380,14 @@ ASSOC_INSTS = """instance of TST_FamilyCollection {
 
 instance of TST_Person {
    name = "Gabi";
+   gender = 1;
+   likes = { };
 };
 
 instance of TST_Person {
    name = "Sofi";
+   gender = 1;
+   likes = NULL;
 };
 
 """
@@ -981,6 +985,26 @@ Instances: PyWBEM_AllTypes
       'rc': 0,
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
+
+    ['Verify instance command enumerate of TST_PersonSub shows value-mapped '
+     'properties in table output',
+     {'args': ['enumerate', 'TST_PersonSub', '--pl', 'name,gender,likes'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """
+Instances: TST_PersonSub
++------------+------------+-----------------------+
+| name       | gender     | likes                 |
+|------------+------------+-----------------------|
+| "Gabisub"  | 1 (female) |                       |
+| "Mikesub"  | 2 (male)   | 1 (books), 2 (movies) |
+| "Saarasub" | 1 (female) | 2 (movies)            |
+| "Sofisub"  | 1 (female) |                       |
++------------+------------+-----------------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
 
     #
     # instance enumerate error returns
