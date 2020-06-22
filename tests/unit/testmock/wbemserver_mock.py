@@ -11,7 +11,7 @@ import os
 
 from pywbem import ValueMapping, CIMInstance, CIMInstanceName, CIMError, \
     CIM_ERR_ALREADY_EXISTS
-from pywbem_mock import FakedWBEMConnection
+from pywbem_mock import FakedWBEMConnection, DMTFCIMSchema
 
 # from .dmtf_mof_schema_def import DMTF_TEST_SCHEMA_VER
 
@@ -215,11 +215,21 @@ class WbemServerMock(object):
             if er.status_code != CIM_ERR_ALREADY_EXISTS:
                 raise
 
-        self.conn.compile_dmtf_schema(
-            self.dmtf_schema_ver, self.schema_dir,
-            class_names=self.server_mock_data['class_names'],
-            namespace=namespace,
-            verbose=self.verbose)
+        if hasattr(self.conn, 'compile_schema_classes'):
+            schema = DMTFCIMSchema(self.dmtf_schema_ver, self.schema_dir,
+                                   use_experimental=False,
+                                   verbose=self.verbose)
+            self.conn.compile_schema_classes(
+                self.server_mock_data['class_names'],
+                schema.schema_pragma_file,
+                namespace=namespace,
+                verbose=self.verbose)
+        else:
+            self.conn.compile_dmtf_schema(
+                self.dmtf_schema_ver, self.schema_dir,
+                class_names=self.server_mock_data['class_names'],
+                namespace=namespace,
+                verbose=self.verbose)
 
         for filename in self.pg_schema_files:
             filepath = os.path.join(self.pg_schema_dir, filename)
