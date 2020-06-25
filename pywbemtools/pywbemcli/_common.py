@@ -464,7 +464,8 @@ def verify_operation(txt, msg=None):
     Parameters:
 
       txt (:term:`string`):
-        String that is prefixed to the prompt text.
+        String that is prefixed to the prompt text and defines the
+        verification request.
 
       msg (:class:`py:bool`):
         Optional parameter that if True causes an abort msg on the console.

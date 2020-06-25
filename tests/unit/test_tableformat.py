@@ -34,9 +34,11 @@ from pywbemtools.pywbemcli._common import format_table, fold_strings
 
 VERBOSE = False
 
-# TODO ks rewrite this test for pytest.  Note that the capture IO
+# TODO FUTURE: ks rewrite this test for pytest.  Note that the capture IO
 #      may be different in that they have fixtures such as capsys
-#      to capture output that may replace StringIO used below.
+#      to capture output that may replace StringIO used below. This should
+#      wait until we conclude that we can use a form of simplified_test
+#      with capsys.
 
 
 class BaseTableTests(unittest.TestCase):

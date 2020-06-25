@@ -409,7 +409,6 @@ TEST_CASES = [
       'test': 'in'},
      None, SKIP],
 
-    # TODO: This fails with pywbemcli version 0.5.0 PY2. Temporarily disabled
     ['Verify --version general option.',
      {'general': ['-s', 'http://blah', '--version'],
       'cmdgrp': 'connection',
@@ -418,7 +417,7 @@ TEST_CASES = [
                  r'^pywbem, version [0-9]+\.[0-9]+\.[0-9]+'],
       'rc': 0,
       'test': 'regex'},
-     None, FAIL],
+     None, OK],
 
     #
     #  Test --verify and --no-verify general option using the connection show
@@ -997,10 +996,6 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
-
-    # TODO: test use --name with valid name in interactive mode.
-    # This should go where we hav e a valid connection file.
-    # See below
 
     #
     #   The following is a sequence. Creates a server and changes almost all

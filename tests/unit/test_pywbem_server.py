@@ -22,117 +22,210 @@ Unit tests for PywbemServer class methods.
 
 from __future__ import absolute_import, print_function
 
-import unittest
+import pytest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
-from .cli_test_extensions import PYWBEM_1
+from tests.unit.pytest_extensions import simplified_test_function
 
 
-# TODO: Future - Move these tests to pytest
+TESTCASES_INITIALIZE = [
+    # TESTCASES for pywbem_server intitalize
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * init_kwargs: __init__ kwargs.
+    #   * exp_attrs: Dict of expected attributes of resulting object.
+    #   * exp_repr: string
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    (
+        "Verify url arg only",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://localhost',
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv2',
+                user=None,
+                password=None,
+                verify=None,
+                certfile=None,
+                keyfile=None,
+                mock_server=[]
+            )
+        ),
+        None, None, True
+    ),
+    (
+        "Verify multiple arguments",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://localhost',
+                default_namespace='root/cimv2',
+                user='fred',
+                password='blah',
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv2',
+                user='fred',
+                password='blah',
+                verify=None,
+                certfile=None,
+                keyfile=None,
+                mock_server=[]
+            )
+        ),
+        None, None, True
+    ),
+    (
+        "Verify url arg only",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://localhost',
+                default_namespace='root/cimv3',
+                user='fred',
+                password='blah',
+                verify=True,
+                certfile='mycert.pem',
+                keyfile='mykey.pem'
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv3',
+                user='fred',
+                password='blah',
+                verify=True,
+                certfile='mycert.pem',
+                keyfile='mykey.pem',
+                mock_server=[]
+            )
+        ),
+        None, None, True
+    ),
+    (
+        "Verify mockfile",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                mock_server='testmock.mof',
+            ),
+            exp_attrs=dict(
+                server=None,
+                default_namespace='root/cimv2',
+                user=None,
+                password=None,
+                verify=None,
+                certfile=None,
+                keyfile=None,
+                mock_server='testmock.mof'
+            )
+        ),
+        None, None, True
+    ),
+]
 
 
-class PywbemServerTests(unittest.TestCase):
-    """ Test the PywbemServer class """
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_INITIALIZE)
+@simplified_test_function
+def test_initialize(testcase, init_args, init_kwargs, exp_attrs):
+    """
+    Test object construction
+    """
+    svr = PywbemServer(*init_args, **init_kwargs)
 
-    def test_simple(self):
-        """ Create the object and test values"""
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
 
-        server = 'http://localhost'
-        ns = 'root/cimv2'
-        user = 'Fred'
-        pw = 'blah'
-        svr = PywbemServer(server, ns, user=user, password=pw)
+    assert svr.server == exp_attrs['server']
+    assert svr.default_namespace == exp_attrs['default_namespace']
+    assert svr.user == exp_attrs['user']
+    assert svr.password == exp_attrs['password']
+    assert svr.verify == exp_attrs['verify']
+    assert svr.certfile == exp_attrs['certfile']
+    assert svr.keyfile == exp_attrs['keyfile']
+    assert svr.mock_server == exp_attrs['mock_server']
 
-        self.assertEqual(svr.server, server)
-        self.assertEqual(svr.default_namespace, ns)
-        self.assertEqual(svr.user, user)
-        self.assertEqual(svr.password, pw)
-
-        self.assertEqual('{0}'.format(svr),
-                         "PywbemServer(url=http://localhost name=default)")
-
-    def test_all_parms(self):
-        """Test all the PywbemServer input parameters"""
-        server = 'http://localhost'
-        ns = 'root/cimv2'
-        user = 'Fred'
-        pw = 'blah'
-        timeout = 10
-        verify = False
-        certfile = 'mycertfile.blah'
-        keyfile = 'mykeys.blah'
-
-        svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
-                           verify=verify, certfile=certfile,
-                           keyfile=keyfile)
-
-        self.assertEqual(svr.server, server)
-        self.assertEqual(svr.default_namespace, ns)
-        self.assertEqual(svr.user, user)
-        self.assertEqual(svr.password, pw)
-        self.assertEqual(svr.verify, verify)
-        self.assertEqual(svr.certfile, certfile)
-        self.assertEqual(svr.keyfile, keyfile)
-
-    def test_all_connect1(self):
-        """Test all input parameters except certificates and keys"""
-        server = 'http://localhost'
-        ns = 'root/cimv2'
-        user = 'Fred'
-        pw = 'blah'
-        timeout = 10
-        verify = True
-
-        svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
-                           verify=verify, certfile=None,
-                           keyfile=None)
-
-        self.assertEqual(svr.server, server)
-        self.assertEqual(svr.default_namespace, ns)
-        self.assertEqual(svr.user, user)
-        self.assertEqual(svr.password, pw)
-        self.assertEqual(svr.verify, verify)
-        self.assertEqual(svr.certfile, None)
-        self.assertEqual(svr.keyfile, None)
-
-        # connect and test connection results
-        svr.create_connection(False)
-
-        if PYWBEM_1:
-            server += ":5988"
-        self.assertEqual(svr.conn.url, server)
-        self.assertEqual(svr.wbem_server.conn.url, svr.conn.url)
-
-    def test_all_connect2(self):
-        """Test all input parameters including certs and keys"""
-        server = 'http://localhost'
-        ns = 'root/cimv2'
-        user = 'Fred'
-        pw = 'blah'
-        timeout = 10
-        verify = True
-        certfile = 'mycertfile.blah'
-        keyfile = 'mykeys.blah'
-
-        svr = PywbemServer(server, ns, user=user, password=pw, timeout=timeout,
-                           verify=verify, certfile=certfile,
-                           keyfile=keyfile)
-
-        self.assertEqual(svr.server, server)
-        self.assertEqual(svr.default_namespace, ns)
-        self.assertEqual(svr.user, user)
-        self.assertEqual(svr.password, pw)
-        self.assertEqual(svr.verify, verify)
-        self.assertEqual(svr.certfile, certfile)
-        self.assertEqual(svr.keyfile, keyfile)
-
-        # connect and test connection results
-        try:
-            svr.create_connection(False)  # Fails because certs bad
-        except Exception as ex:
-            print(ex)
+    # assert '{0}'.format(svr) == \
+    #                 "PywbemServer(url=http://localhost name=default)"
 
 
-if __name__ == '__main__':
-    unittest.main()
+TESTCASES_CONNECT = [
+    # TESTCASES for pywbem_server connect
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * init_kwargs: __init__ positional args.
+    #   * exp_attrs: Dict of expected attributes of resulting object.
+    #   * exp_repr: string
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    (
+        "Verify url arg only",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://localhost',
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv2',
+                user=None,
+                password=None,
+                verify=None,
+                certfile=None,
+                keyfile=None,
+                ca_certs=None,
+                mock_server=None
+            )
+        ),
+        None, None, True
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CONNECT)
+@simplified_test_function
+def test_connect(testcase, init_args, init_kwargs, exp_attrs):
+    """
+    Test object connect
+    """
+    svr = PywbemServer(*init_args, **init_kwargs)
+
+    # connect and test connection results
+    svr.create_connection(False)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert svr.server == exp_attrs['server']
+    assert svr.default_namespace == exp_attrs['default_namespace']
+    assert svr.user == exp_attrs['user']
+    assert svr.password == exp_attrs['password']
+    assert svr.verify == exp_attrs['verify']
+    assert svr.certfile == exp_attrs['certfile']
+    assert svr.keyfile == exp_attrs['keyfile']
+
+
+# TODO test name setter
+# TODO password setter
+# TODO invalid timeout value
+# TODO password prompt (get_password)
+# TODO str and repr strings

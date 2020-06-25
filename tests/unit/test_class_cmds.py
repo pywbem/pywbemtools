@@ -239,6 +239,7 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
 
 };
 """
+# TODO: This never referenced
 REFERENCES_CLASS_RTN = [
     FAKEURL_STR + '/root/cimv2:TST_Lineage',
     'class TST_Lineage {',
@@ -1505,10 +1506,6 @@ TEST_CASES = [
 # namespace
 # TODO: add test for  errors: class invalid, namespace invalid
 # other tests.  Test local-only on top level
-
-
-# TODO the following two test classes should be removed as I believe they
-# are redundant.
 
 
 class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods

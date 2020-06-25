@@ -94,11 +94,6 @@ Qualifier Override : string,
 
 """
 
-QD_GET_MOCK = """Qualifier Description : string,
-    Scope(any),
-    Flavor(EnableOverride, ToSubclass, Translatable);
-
-"""
 
 QD_TBL_OUT = """Qualifier Declarations
 +-------------+---------+---------+---------+-------------+-----------------+
@@ -145,8 +140,6 @@ QD_TBL_GET_OUT = """Qualifier Declarations
 |          |         |         |         | INDICATION  |                |
 +----------+---------+---------+---------+-------------+----------------+
 """
-
-# TODO: Add tests for xml, repr, txt formats.
 
 # The following variables are used to control tests executed during
 # development of tests
@@ -233,10 +226,12 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify qualifier command get  Description',
+    ['Verify qualifier command get  Description qual decl',
      ['get', 'Description'],
-     {'stdout': QD_GET_MOCK,
-      'test': 'lines'},
+     {'stdout': "Qualifier Description : string,\n"
+                "    Scope(any),\n"
+                "    Flavor(EnableOverride, ToSubclass, Translatable);\n",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command get invalid qual decl name .',
@@ -252,6 +247,27 @@ TEST_CASES = [
      {'stdout': ['<QUALIFIER.DECLARATION( | .+ )NAME="Description"',
                  '<SCOPE( | .+ )ASSOCIATION="true"'],
       'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify qualifier command get  Description outputformat repr',
+     {'args': ['get', 'Description'],
+      'general': ['--output-format', 'repr']},
+     {'stdout': "CIMQualifierDeclaration(name='Description', value=None, "
+                "type='string', is_array=False, array_size=None, "
+                "scopes=NocaseDict({'CLASS': False, 'ASSOCIATION': False, "
+                "'INDICATION': False, 'PROPERTY': False, 'REFERENCE': False, "
+                "'METHOD': False, 'PARAMETER': False, 'ANY': True}), "
+                "tosubclass=True, overridable=True, translatable=True, "
+                "toinstance=None)",
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify qualifier command get  Description outputformat txt',
+     {'args': ['get', 'Description'],
+      'general': ['--output-format', 'txt']},
+     {'stdout': "CIMQualifierDeclaration(name='Description', value=None, "
+                "type='string', is_array=False, ...)",
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command -o grid enumerate produces table out',

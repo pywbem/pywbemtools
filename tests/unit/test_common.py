@@ -954,7 +954,7 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_RESOLVE_PROPERTYLIST)
 @simplified_test_function
-def test_propertylist(testcase, pl_str, exp_pl):
+def test_resolve_propertylist(testcase, pl_str, exp_pl):
     """Test for resolve_propertylist function"""
     # The code to be tested
 
@@ -975,7 +975,7 @@ TESTCASES_COMPARE_INSTANCES = [
     # * kwargs: Keyword arguments for the test function and response:
     #   * inst1: first instance for compare
     #   * inst2: second instance for compare
-    #   * result: TODO
+    #   * result: Boolean. Expect result
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
@@ -1085,15 +1085,13 @@ def test_compare_instances(testcase, inst1, inst2, result):
     assert tst_rtn == result
 
 
-# TODO: The mock for the following test is broken. Not sure yet how to
-# fix it
 TESTCASES_VERIFY_OPERATION = [
     # TESTCASES for verify_operation
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function and response:
-    #   * txt: Text that would be fdisplayed
+    #   * txt: Text that would be displayed
     #   * abort_msg: message that outputs with abort if response is n
     #   * result: True or False
     # * exp_exc_types: Expected exception type(s), or None.
@@ -1129,23 +1127,23 @@ TESTCASES_VERIFY_OPERATION = [
 @simplified_test_function
 def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
     """
-    This method mocks the click.confirm function to generate a response
-    to the verify operation function. It mocks both the click_confirm
-    and the click_echo. Mock Click.confirm returns a value defined by
-    the test. Mock click.echo confirms data in call to click_echo
+    This method mocks the click.confirm and click_echo function to generate a
+    response to the verify operation function. Mock Click.confirm returns a
+    value defined by the test. Mock click.echo confirms data in call to
+    click_echo
     """
 
-    # TODO: This does not really test the abort_msg that is output
-    # only in some conditions, it just hides it since the mock is
+    # NOTE: This does not really test the abort_msg that is output
+    # in some conditions, it just hides it since the mock of echo is
     # defined with called_with=txt
-    @patch('pywbemtools.pywbemcli.click.confirm', return_value=clickconfirm)
+    @patch('pywbemtools.pywbemcli.click.confirm', called_with=txt,
+           return_value=clickconfirm)
     @patch('pywbemtools.pywbemcli.click.echo', called_with=txt)
     def run_verify_operation(txt, mock_click_confirm, mock_click_echo):
         # pylint: disable=unused-argument
         return verify_operation(txt, abort_msg)
 
     # The code to be tested
-    # pylint: disable=no-value-for-parameter
     rtn = run_verify_operation(txt)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1604,7 +1602,6 @@ class SorterTest(unittest.TestCase):
         instances_sorted = sort_cimobjects(instances)
         self.assertEqual(len(instances), len(instances_sorted))
         self.assertEqual(instances_sorted[0].classname, 'CIM_Boo')
-        # TODO create multiple and test result
 
     def test_sort_qualifierdecls(self):
         """Test ability to sort list of qualifier declaractions"""
@@ -1803,7 +1800,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
         act_inst = create_ciminstance(cls, kv_properties)
         self.assertEqual(exp_inst, act_inst)
 
-    # TODO add datetime property
     def test_scalar_instance(self):
         """
         Creates an instance from cmd line parameters and tests against
@@ -1819,7 +1815,9 @@ class CreateCIMInstanceTest(unittest.TestCase):
                           'Sint32p': CIMProperty('Sint32p', -99, type='sint32'),
                           'Uint64p': CIMProperty('Uint64p', 999, type='uint64'),
                           'Sint64p': CIMProperty('Sint64p', -99, type='sint64'),
-
+                          'Dtp': CIMProperty('Dtp',
+                                             "19991224120000.000000+360",
+                                             type='datetime'),
                           'Strp': CIMProperty('Strp', 'hoho', type='string')}
 
         exp_inst = CIMInstance('CIM_Foo',
@@ -1827,7 +1825,8 @@ class CreateCIMInstanceTest(unittest.TestCase):
 
         kv_properties = ['ID=Testid', 'Boolp=true', 'Uint8p=220', 'Sint8p=-120',
                          'Uint32p=999', 'Sint32p=-99', 'Uint64p=999',
-                         'Sint64p=-99', 'Strp=hoho']
+                         'Sint64p=-99', 'Strp=hoho',
+                         'Dtp=19991224120000.000000+360']
         act_inst = create_ciminstance(cls, kv_properties)
 
         # mock the echo to hide output
@@ -1904,7 +1903,6 @@ class CreateCIMInstanceTest(unittest.TestCase):
 
         self.assertEqual(exp_inst, act_inst)
 
-    # TODO add datetime property
     def test_array_instance(self):
         """
         Creates an instance from cmd line parameters and tests against
@@ -1984,44 +1982,44 @@ class CreateCIMInstanceTest(unittest.TestCase):
 ######################################################
 
 # Class definitions for create_instancename
-cls1 = dict(classname='CIM_Foo',
-            properties=[
-                CIMProperty(
-                    'P1', None, type='string',
-                    qualifiers=[
-                        CIMQualifier('Key', value=True)
-                    ]
-                ),
-                CIMProperty('P2', value='Cheese'),
-            ])
+class_dict1 = dict(classname='CIM_Foo',
+                   properties=[
+                       CIMProperty(
+                           'P1', None, type='string',
+                           qualifiers=[
+                               CIMQualifier('Key', value=True)
+                           ]
+                       ),
+                       CIMProperty('P2', value='Cheese'),
+                   ])
 
-cls2 = dict(classname='CIM_Foo',
-            properties=[
-                CIMProperty(
-                    'P1', None, type='string',
-                    qualifiers=[
-                        CIMQualifier('Key', value=True)
-                    ]
-                ),
-                CIMProperty(
-                    'P2', None, type='string',
-                    qualifiers=[
-                        CIMQualifier('Key', value=True)
-                    ]
-                ),
-                CIMProperty(
-                    'P3', None, type='uint32',
-                    qualifiers=[
-                        CIMQualifier('Key', value=True)
-                    ]
-                ),
-                CIMProperty('P4', value='Cheese',),
-            ])
+class_dict2 = dict(classname='CIM_Foo',
+                   properties=[
+                       CIMProperty(
+                           'P1', None, type='string',
+                           qualifiers=[
+                               CIMQualifier('Key', value=True)
+                           ]
+                       ),
+                       CIMProperty(
+                           'P2', None, type='string',
+                           qualifiers=[
+                               CIMQualifier('Key', value=True)
+                           ]
+                       ),
+                       CIMProperty(
+                           'P3', None, type='uint32',
+                           qualifiers=[
+                               CIMQualifier('Key', value=True)
+                           ]
+                       ),
+                       CIMProperty('P4', value='Cheese',),
+                   ])
 
 
 # TODO: add one class with ref property as key. Is that even allowed?
 
-# Testcases for format_inst_to_table()
+# Testcases for create_instancename()
 
 # Each list item is a testcase tuple with these items:
 # * desc: Short testcase description.
@@ -2037,7 +2035,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key",
         dict(
-            cls_kwargs=cls1,
+            cls_kwargs=class_dict1,
             kv_args=['P1=Fred'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', 'Fred')]),
@@ -2046,7 +2044,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key with space",
         dict(
-            cls_kwargs=cls1,
+            cls_kwargs=class_dict1,
             kv_args=['P1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
@@ -2056,7 +2054,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key case independent",
         dict(
-            cls_kwargs=cls1,
+            cls_kwargs=class_dict1,
             kv_args=['p1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
@@ -2065,7 +2063,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with invalid key name",
         dict(
-            cls_kwargs=cls1,
+            cls_kwargs=class_dict1,
             kv_args=['Px=Fred'],
             exp_iname=None
         ),
@@ -2073,7 +2071,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with two string keys and one int",
         dict(
-            cls_kwargs=cls2,
+            cls_kwargs=class_dict2,
             kv_args=['P1=Fred', 'P2=John', 'P3=1'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
@@ -2083,25 +2081,34 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with two string keys and one big int",
         dict(
-            cls_kwargs=cls2,
+            cls_kwargs=class_dict2,
             kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
                                                    ('P2', 'John'),
                                                    ('P3', 123456)]),
         ),
-        None, None, True, ),
+        None, None, True),
     (
         "Verify simple key creation with unicode char",
         dict(
-            cls_kwargs=cls1,
+            cls_kwargs=class_dict1,
             kv_args=[u'P1=Fred\u0344\u0352'],
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
         ),
-        None, None, True, ),
+        None, None, True),
+    (
+        "Verify simple key creation no value",
+        dict(
+            cls_kwargs=class_dict1,
+            kv_args=[u'P1='],
+            exp_iname=CIMInstanceName(
+                u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
+        ),
+        click.ClickException, None, True),
 ]
-# TODO key with no value, datetime key
+# TODO reference property key(This is very hard to define on cmd line)
 
 
 @pytest.mark.parametrize(
@@ -2428,7 +2435,8 @@ def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
     assert act_rtn == exp_rtn
 
 
-# TODO this is a pytest. param
+# NOTE: The following methods are testcase parameters.  They define instances
+# used in TESTCASES_FMT_INSTANCE_AS_ROWS
 def simple_instance(pvalue=None):
     """
     Build a simple instance to test and return that instance. If the param
@@ -2636,8 +2644,6 @@ TESTCASES_FMT_INSTANCE_AS_ROWS = [
         None, None, True, ),
 ]
 
-# TODO: See line 973. We have some test duplication.
-
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
@@ -2778,8 +2784,7 @@ def test_print_insts_as_table(
         "End\n".format(desc, stdout, exp_stdout)
 
 
-# TODO Test compare and failure in compare_obj
+# TODO Test compare and failure in compare_obj and with errors.
 
-# TODO Test compare with errors
 
 # NOTE: Format table tests are in test_tableformat.py
