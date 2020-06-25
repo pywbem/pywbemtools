@@ -32,10 +32,15 @@ import sys
 import traceback
 import click
 
-from pywbem import WBEMConnection, MOFParseError
-import pywbem_mock
+from pywbem import WBEMConnection, Error, MOFParseError
 
+import pywbem_mock
 from .config import DEFAULT_MAXPULLCNT
+
+import pywbem
+import packaging.version
+PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
+
 
 #  __all__ = ['PYWBEMCLIConnection', 'PYWBEMCLIFakedConnection']
 
@@ -316,14 +321,23 @@ class BuildRepositoryMixin(object):
                 try:
                     # Displays any MOFParseError already
                     conn.compile_mof_file(file_path)
-                except MOFParseError:
+                except Error as er:
                     # Abort the entire pywbemcli command because the
                     # MOF compilation might have caused inconsistencies in the
                     # mock repository.
-                    click.echo(
-                        "Mock MOF file '{}' failed compiling (see above)".
-                        format(file_path),
-                        err=True)
+
+                    if PYWBEM_VERSION.release >= (1, 0, 0):
+                        # display just the exception.
+                        msg = "MOF compile failed:\n{0}".format(er)
+                    else:
+                        # display file name.  Error text displayed already.
+                        if isinstance(er, MOFParseError):
+                            msg = "MOF compile failed: File: '{0}'" \
+                                "(see above)".format(file_path)
+                        else:  # not parse error, display exception
+                            msg = "MOF compile failed: File: {0} " \
+                                "Error: {1}".format(file_path, er)
+                    click.echo(msg, err=True)
                     raise click.Abort()
             else:
                 assert ext == '.py'  # already checked
