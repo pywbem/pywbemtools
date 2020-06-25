@@ -59,14 +59,13 @@ class CIM_FooMethodProvider(MethodProvider):
 
         if isinstance(ObjectName, CIMInstanceName):
             instance_store = self.cimrepository.get_instance_store(namespace)
-            inst = self.find_instance(ObjectName, instance_store, copy=False)
-            if inst is None:
+            if not instance_store.object_exists(ObjectName):
                 raise CIMError(
                     CIM_ERR_NOT_FOUND,
-                    "Instance {0} does not exist in CIM repository, "
-                    "namespace {1}".format(ObjectName, namespace))
-        # This method expects a single parameter input
+                    "Instance {0} does not exist in CIM repository",
+                    format(ObjectName))
 
+        # This method expects a single parameter input
         return_params = []
         if MethodName.lower() == 'fuzzy':
             if Params:

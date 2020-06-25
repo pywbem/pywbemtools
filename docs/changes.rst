@@ -30,6 +30,9 @@ Released: not yet
 
 * Pinned version of colorama to <0.4.0 for Python <=3.4.
 
+* Adjusted to changes in the pywbem mock support for method providers, in the
+  sample method provider simple_mock_invokemethod_pywbem_V1.py. (See issue #646)
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution
