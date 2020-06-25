@@ -32,10 +32,6 @@ PYWBEM_0 = not PYWBEM_1
 # create it for the tests depending on pywbem version
 FAKEURL_STR = '//FakedUrl:5988' if PYWBEM_1 else '//FakedUrl'
 
-# TODO remove this.  Temp flag for condition that allows skipping tests that
-# are failing with pywbem 1.0.0
-ISSUE_100 = False
-
 
 class CLITestsBase(object):
     # pylint: disable=too-few-public-methods, useless-object-inheritance
