@@ -211,7 +211,7 @@ more-itertools==5.0.0
 nbconvert==5.0.0
 nbformat==4.2.0
 notebook==4.3.1
-packaging==19.2
+packaging==17.0
 pandocfilters==1.4.1
 pathlib2==2.2.1
 pbr==1.8.0

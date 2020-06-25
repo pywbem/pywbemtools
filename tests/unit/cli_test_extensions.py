@@ -9,6 +9,9 @@ import re
 import os
 import pytest
 import six
+
+# impoty pkgs to determine pywbem version
+import packaging.version
 import pywbem
 
 from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
@@ -19,8 +22,9 @@ TEST_DIR = os.path.dirname(__file__)
 # be executed.  Returns True if the pywbem >=1.0.0 is use. Otherwise returns
 # False. These variables can be applied to tests that are specific to one
 # version of pywbem or the other
-PYWBEM_0 = pywbem.__version__.startswith("0")
-PYWBEM_1 = not PYWBEM_0
+PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
+PYWBEM_1 = PYWBEM_VERSION.release >= (1, 0, 0)
+PYWBEM_0 = not PYWBEM_1
 
 
 # This variable defines the url returned from some of the commands.  Since it

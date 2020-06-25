@@ -33,6 +33,15 @@ Released: not yet
 * Adjusted to changes in the pywbem mock support for method providers, in the
   sample method provider simple_mock_invokemethod_pywbem_V1.py. (See issue #646)
 
+* Fix issue with MOF compile in pywbem_mock to account for changes to
+  pywbem.FakedWBEMConnection in pywbem 1.0.0.  Because the pywbem
+  mocker stopped displaying compile error messages, this change modifies the
+  code to display the compile errors as exceptions for pywbem 1.0 and use the
+  original display for pre 1.0 pywbem version.  With pywbem 1.0.0 it also
+  outputs the compile error message and exception to stderr whereas before
+  the compile error text was routed to stdout. (See issue #637)
+
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution

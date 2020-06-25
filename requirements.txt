@@ -28,3 +28,4 @@ PyYAML>=5.1; python_version == '2.7'
 PyYAML>=5.1,<5.3; python_version == '3.4'
 PyYAML>=5.1; python_version > '3.4'
 yamlloader>=0.5.5
+packaging>=17.0

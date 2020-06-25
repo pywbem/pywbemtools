@@ -39,7 +39,7 @@ def set_connections_file(request):
     def teardown():
         """
         Remove any created repository file and restore saved file. This
-        should occur as session end.
+        should occur at session end.
         """
         if os.path.isfile(REPO_FILE_PATH):
             os.remove(REPO_FILE_PATH)

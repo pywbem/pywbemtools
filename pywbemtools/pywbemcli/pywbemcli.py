@@ -29,7 +29,6 @@ import click_repl
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
-import pywbem
 from pywbem import LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
     DEFAULT_LOG_DETAIL_LEVEL
@@ -43,10 +42,10 @@ from .config import DEFAULT_NAMESPACE, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository
 from ._click_extensions import PywbemcliTopGroup
+from pywbem import __version__ as PYWBEM_VERSION
 
 __all__ = ['cli']
 
-PYWBEM_VERSION = "pywbem, version {}".format(pywbem.__version__)
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify
@@ -246,7 +245,8 @@ CONTEXT_SETTINGS = dict(
                    'Default: EnvVar {ev}, or false.'.
                    format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
-    message='%(prog)s, version %(version)s\n' + PYWBEM_VERSION,
+    message='%(prog)s, version %(version)s\npywbem, version {}'.format(
+        PYWBEM_VERSION),
     help='Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
