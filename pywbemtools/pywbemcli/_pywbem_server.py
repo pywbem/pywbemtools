@@ -103,6 +103,7 @@ class PywbemServer(object):
     mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
     log_envvar = 'PYWBEMCLI_LOG'
     pdb_envvar = 'PYWBEMCLI_PDB'
+    no_deprecation_warnings_envvar = 'PYWBEMCLI_NO_DEPRECATION_WARNINGS'
     termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,

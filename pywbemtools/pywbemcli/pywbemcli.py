@@ -32,6 +32,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pywbem import LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
     DEFAULT_LOG_DETAIL_LEVEL
+from pywbem import __version__ as PYWBEM_VERSION
 
 from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
@@ -42,7 +43,7 @@ from .config import DEFAULT_NAMESPACE, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository
 from ._click_extensions import PywbemcliTopGroup
-from pywbem import __version__ as PYWBEM_VERSION
+from ._utils import deprecation_warning
 
 __all__ = ['cli']
 
@@ -237,6 +238,12 @@ CONTEXT_SETTINGS = dict(
 @click.option('-v', '--verbose/--no-verbose',
               default=None,
               help='Display extra information about the processing.')
+@click.option('--no-deprecation-warnings', is_flag=True,
+              default=False,
+              envvar=PywbemServer.no_deprecation_warnings_envvar,
+              help='Suppress deprecation warnings (that otherwise are shown on '
+              'stderr). Default: EnvVar {ev}, or false.'.
+              format(ev=PywbemServer.no_deprecation_warnings_envvar))
 @click.option('--pdb', is_flag=True,
               # defaulted in code
               envvar=PywbemServer.pdb_envvar,
@@ -253,7 +260,7 @@ CONTEXT_SETTINGS = dict(
 def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
         pull_max_cnt, mock_server, verbose=None, timestats=None, log=None,
-        pdb=None):
+        pdb=None, no_deprecation_warnings=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -578,6 +585,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             verbose = ctx.obj.verbose
         if pdb is None:
             pdb = ctx.obj.pdb
+        if no_deprecation_warnings is None:
+            no_deprecation_warnings = ctx.obj.no_deprecation_warnings
 
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
@@ -586,12 +595,20 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
-                         log, verbose, pdb)
+                         log, verbose, pdb, no_deprecation_warnings)
     if verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
         print('CONTEXT_OBJ {!r}'.format(ctx.obj))
         print('CLICK CTX {}'.format(ctx))
         display_click_context(ctx, msg="After adding Context",
                               display_attrs=True)
+
+    _python_nm = sys.version_info[0:2]
+    if _python_nm == (2, 7) or _python_nm == (3, 4):
+        deprecation_warning(
+            "Deprecation: Pywbemcli support for Python {}.{} is deprecated "
+            "and will be removed in a future version".
+            format(_python_nm[0], _python_nm[1]), ctx.obj)
+
     # Invoke command if one exists.
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)

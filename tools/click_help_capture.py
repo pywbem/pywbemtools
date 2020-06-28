@@ -148,7 +148,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
 
     returns list of command groups/commands
     """
-    command = '{} {} --help'.format(script_cmd, cmd)
+    command = '{} --no-deprecation-warnings {} --help'.format(script_cmd, cmd)
     # Disable python warnings for script call.
     if sys.platform != 'win32':
         command = 'export PYTHONWARNINGS="" && {}'.format(command)
@@ -169,7 +169,7 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
         raise RuntimeError('Error: Shell execution of command {!r} failed with '
                            'rc={}: {}'.format(command, exitcode, std_err))
     if std_err:
-        raise RuntimeError("Error: Unexpected stderr from command {!r}}:\n"
+        raise RuntimeError("Error: Unexpected stderr from command {!r}:\n"
                            "{}".format(command, std_err))
 
     # Split stdout into list of lines

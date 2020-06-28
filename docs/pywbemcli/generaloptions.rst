@@ -198,6 +198,9 @@ Other miscellaneous general options
 The :ref:`--verbose general option` displays extra information about the
 pywbemcli internal processing.
 
+The :ref:`--no-deprecation-warnings general option` suppresses the display of
+deprecation warnings, that are otherwise shown on the standard error stream.
+
 The :ref:`--version general option` displays pywbemcli version
 information and the :ref:`--help general option` provides top level help
 
@@ -634,6 +637,18 @@ command completion.
 
 .. index:: triple: --pdb; general options; pdb
 
+.. _`--no-deprecation-warnings general option`:
+
+``--no-deprecation-warnings`` general option
+""""""""""""""""""""""""""""""""""""""""""""
+
+The ``--no-deprecation-warnings`` general option is a boolean option that
+suppresses the display of deprecation warnings.
+
+By default, deprecation warnings are displayed on the standard error stream.
+
+.. index:: triple: --no-deprecation-warnings; general options; deprecation warnings
+
 .. _`--pdb general option`:
 
 ``--pdb`` general option
@@ -679,26 +694,27 @@ Environment variables for general options
 Pywbemcli defines environment variables corresponding to its general options
 as follows:
 
-==============================  ============================
-Environment variable            Corresponding general option
-==============================  ============================
-PYWBEMCLI_SERVER                ``--server``
-PYWBEMCLI_NAME                  ``--name``
-PYWBEMCLI_USER                  ``--user``
-PYWBEMCLI_PASSWORD              ``--password``
-PYWBEMCLI_OUTPUT_FORMAT         ``--output-format``
-PYWBEMCLI_DEFAULT_NAMESPACE     ``--default-namespace``
-PYWBEMCLI_TIMEOUT               ``--timeout``
-PYWBEMCLI_KEYFILE               ``--keyfile``
-PYWBEMCLI_CERTFILE              ``--certfile``
-PYWBEMCLI_CA_CERTS              ``--ca-certs``
-PYWBEMCLI_USE_PULL              ``--use-pull``
-PYWBEMCLI_PULL_MAX_CNT          ``--pull-max-cnt``
-PYWBEMCLI_STATS_ENABLED         ``--timestats``
-PYWBEMCLI_MOCK_SERVER (1)       ``--mock-server``
-PYWBEMCLI_LOG                   ``--log``
-PYWBEMCLI_PDB                   ``--pdb``
-==============================  ============================
+=================================  =============================
+Environment variable               Corresponding general option
+=================================  =============================
+PYWBEMCLI_SERVER                   ``--server``
+PYWBEMCLI_NAME                     ``--name``
+PYWBEMCLI_USER                     ``--user``
+PYWBEMCLI_PASSWORD                 ``--password``
+PYWBEMCLI_OUTPUT_FORMAT            ``--output-format``
+PYWBEMCLI_DEFAULT_NAMESPACE        ``--default-namespace``
+PYWBEMCLI_TIMEOUT                  ``--timeout``
+PYWBEMCLI_KEYFILE                  ``--keyfile``
+PYWBEMCLI_CERTFILE                 ``--certfile``
+PYWBEMCLI_CA_CERTS                 ``--ca-certs``
+PYWBEMCLI_USE_PULL                 ``--use-pull``
+PYWBEMCLI_PULL_MAX_CNT             ``--pull-max-cnt``
+PYWBEMCLI_STATS_ENABLED            ``--timestats``
+PYWBEMCLI_MOCK_SERVER (1)          ``--mock-server``
+PYWBEMCLI_LOG                      ``--log``
+PYWBEMCLI_PDB                      ``--pdb``
+PYWBEMCLI_NO_DEPRECATION_WARNINGS  ``--no-deprecation-warnings``
+=================================  =============================
 
 Notes:
 

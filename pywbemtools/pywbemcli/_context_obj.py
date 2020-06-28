@@ -43,7 +43,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
-                 pull_max_cnt, timestats, log, verbose, pdb):
+                 pull_max_cnt, timestats, log, verbose, pdb,
+                 no_deprecation_warnings):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -53,6 +54,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._log = log
         self._verbose = verbose
         self._pdb = pdb
+        self._no_deprecation_warnings = no_deprecation_warnings
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
@@ -112,6 +114,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         bool: Indicates whether to break in the debugger.
         """
         return self._pdb
+
+    @property
+    def no_deprecation_warnings(self):
+        """
+        bool: Indicates whether to suppress deprecation warnings.
+        """
+        return self._no_deprecation_warnings
 
     @property
     def conn(self):

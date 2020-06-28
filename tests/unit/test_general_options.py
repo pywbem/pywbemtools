@@ -190,6 +190,10 @@ General Options:
   -v, --verbose / --no-verbose    Display extra information about the
                                   processing.
 
+  --no-deprecation-warnings       Suppress deprecation warnings (that otherwise
+                                  are shown on stderr). Default: EnvVar
+                                  PYWBEMCLI_NO_DEPRECATION_WARNINGS, or false.
+
   --pdb                           Pause execution in the built-in pdb debugger
                                   just before executing the command within
                                   pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or

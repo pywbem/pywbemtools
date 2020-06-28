@@ -646,7 +646,8 @@ def cmd_connection_select(context, name, options):
                          context.timestats,
                          context.log,
                          context.verbose,
-                         context.pdb)
+                         context.pdb,
+                         context.no_deprecation_warnings)
 
     # Update the root context making this context the basis for future
     # commands in the current interactive session
