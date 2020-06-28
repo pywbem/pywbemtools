@@ -72,8 +72,8 @@ def _eq_name(name1, name2):
 
 def deprecation_warning(msg, ctx_obj):
     """
-    Display a deprecation warning on stderr, unless suppressed via
-    ctx_obj.no_deprecation_warnings.
+    Display a deprecation warning on stderr, unless disabled via
+    ctx_obj.deprecation_warnings.
     """
-    if not ctx_obj.no_deprecation_warnings:
+    if ctx_obj.deprecation_warnings:
         click.echo(msg, err=True)
