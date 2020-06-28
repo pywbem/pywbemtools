@@ -238,12 +238,12 @@ CONTEXT_SETTINGS = dict(
 @click.option('-v', '--verbose/--no-verbose',
               default=None,
               help='Display extra information about the processing.')
-@click.option('--no-deprecation-warnings', is_flag=True,
-              default=False,
-              envvar=PywbemServer.no_deprecation_warnings_envvar,
-              help='Suppress deprecation warnings (that otherwise are shown on '
-              'stderr). Default: EnvVar {ev}, or false.'.
-              format(ev=PywbemServer.no_deprecation_warnings_envvar))
+@click.option('--deprecation-warnings/--no-deprecation-warnings', is_flag=True,
+              default=True,
+              envvar=PywbemServer.deprecation_warnings_envvar,
+              help='Enable deprecation warnings. '
+              'Default: EnvVar {ev}, or true.'.
+              format(ev=PywbemServer.deprecation_warnings_envvar))
 @click.option('--pdb', is_flag=True,
               # defaulted in code
               envvar=PywbemServer.pdb_envvar,
@@ -260,7 +260,7 @@ CONTEXT_SETTINGS = dict(
 def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
         verify, certfile, keyfile, ca_certs, output_format, use_pull,
         pull_max_cnt, mock_server, verbose=None, timestats=None, log=None,
-        pdb=None, no_deprecation_warnings=None):
+        pdb=None, deprecation_warnings=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -585,8 +585,8 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
             verbose = ctx.obj.verbose
         if pdb is None:
             pdb = ctx.obj.pdb
-        if no_deprecation_warnings is None:
-            no_deprecation_warnings = ctx.obj.no_deprecation_warnings
+        if deprecation_warnings is None:
+            deprecation_warnings = ctx.obj.deprecation_warnings
 
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
@@ -595,7 +595,7 @@ def cli(ctx, server, svr_name, default_namespace, user, password, timeout,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          resolved_timestats,
-                         log, verbose, pdb, no_deprecation_warnings)
+                         log, verbose, pdb, deprecation_warnings)
     if verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
         print('CONTEXT_OBJ {!r}'.format(ctx.obj))
         print('CLICK CTX {}'.format(ctx))

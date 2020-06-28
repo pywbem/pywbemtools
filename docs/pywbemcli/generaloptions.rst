@@ -198,8 +198,8 @@ Other miscellaneous general options
 The :ref:`--verbose general option` displays extra information about the
 pywbemcli internal processing.
 
-The :ref:`--no-deprecation-warnings general option` suppresses the display of
-deprecation warnings, that are otherwise shown on the standard error stream.
+The :ref:`--deprecation-warnings general option` controls the display of
+deprecation warnings.
 
 The :ref:`--version general option` displays pywbemcli version
 information and the :ref:`--help general option` provides top level help
@@ -637,17 +637,18 @@ command completion.
 
 .. index:: triple: --pdb; general options; pdb
 
-.. _`--no-deprecation-warnings general option`:
+.. _`--deprecation-warnings general option`:
 
-``--no-deprecation-warnings`` general option
+``--deprecation-warnings`` general option
 """"""""""""""""""""""""""""""""""""""""""""
 
-The ``--no-deprecation-warnings`` general option is a boolean option that
-suppresses the display of deprecation warnings.
+The ``--deprecation-warnings``/``--no-deprecation-warnings`` general option is
+a boolean option that controls the display of deprecation warnings on the
+standard error stream.
 
-By default, deprecation warnings are displayed on the standard error stream.
+By default, the display of deprecation warnings is enabled.
 
-.. index:: triple: --no-deprecation-warnings; general options; deprecation warnings
+.. index:: triple: --deprecation-warnings; --no-deprecation-warnings; general options; deprecation warnings
 
 .. _`--pdb general option`:
 
@@ -713,7 +714,7 @@ PYWBEMCLI_STATS_ENABLED            ``--timestats``
 PYWBEMCLI_MOCK_SERVER (1)          ``--mock-server``
 PYWBEMCLI_LOG                      ``--log``
 PYWBEMCLI_PDB                      ``--pdb``
-PYWBEMCLI_NO_DEPRECATION_WARNINGS  ``--no-deprecation-warnings``
+PYWBEMCLI_DEPRECATION_WARNINGS     ``--deprecation-warnings``
 =================================  =============================
 
 Notes:
