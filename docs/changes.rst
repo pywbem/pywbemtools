@@ -18,6 +18,10 @@ Released: not yet
 
 **Deprecations:**
 
+* Deprecated support for Python 2.7 and 3.4, because these Python versions have
+  reached their end of life. A future version of pywbemtools will remove support
+  for Python 2.7 and 3.4. (see issue #630).
+
 **Bug fixes:**
 
 * Fixed incorrect connection list output in readme files (see issue #593).
