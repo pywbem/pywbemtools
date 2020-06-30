@@ -41,6 +41,8 @@ Released: not yet
   outputs the compile error message and exception to stderr whereas before
   the compile error text was routed to stdout. (See issue #637)
 
+* Fixed an issue where displaying instances in a table format missed properties
+  if the list of instances had different sets of properties. (See issue #650)
 
 **Enhancements:**
 
@@ -61,6 +63,10 @@ Released: not yet
   For integer-typed (scalar or array) properties that have a ValueMap qualifier,
   the output of instances in table format now includes the value of the Values
   qualifier in parenthesis, in addition to the integer value. (See issue #634)
+
+* The order of properties when displaying instances in a table format is now
+  predictable: First the sorted key properties, then the sorted non-key
+  properties. (Part of fix for issue #650)
 
 **Cleanup**
 

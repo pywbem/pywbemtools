@@ -29,6 +29,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict  # pylint: disable=import-error
 
+from pydicti import odicti
 import six
 import click
 import tabulate
@@ -1405,11 +1406,18 @@ def _print_qual_decls_as_table(qual_decls, table_width, table_format):
 
 
 def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
-                              include_classes=False, context=None):
+                              include_classes=False, context=None,
+                              prop_names=None):
     """
     Format the list of instances properties into as a list of the property
     values for each instance( a row of the table) gathered into a list of
     the rows.
+
+    The prop_names parameter is the list of (originally cased) property names
+    to be output, in the desired output order. It could be determined from
+    the instances, but since it is determined already by the caller, it
+    is passed in as an optimization. For test convenience, None is permitted
+    and causes the properties to again be determined from the instances.
 
     Include_classes for each instance if True. Sets the classname as the first
     column.
@@ -1433,18 +1441,9 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
     if max_cell_width is None:
         max_cell_width = DEFAULT_MAX_CELL_WIDTH
     lines = []
-    prop_names = []
 
-    # find instance with max number of properties
-
-    # TODO: The following code misses properties if there are instances with
-    # different sets of properties where no instance has all of them.
-    # See issue #650.
-
-    for inst in insts:
-        pn = inst.keys()
-        if len(pn) > len(prop_names):
-            prop_names = pn
+    if prop_names is None:
+        prop_names = sorted_prop_names(insts)
 
     # Cache of ValueMapping objects for integer-typed properties.
     # Key: classname.propertyname, both in lower case.
@@ -1524,13 +1523,7 @@ def _print_instances_as_table(insts, table_width, table_format,
     if table_width is None:
         table_width = DEFAULT_TABLE_WIDTH
 
-    # Find instance with max number of prop names to determine number
-    # of columns
-    prop_names = []
-    for inst in insts:
-        pn = inst.keys()
-        if len(pn) > len(prop_names):
-            prop_names = pn
+    prop_names = sorted_prop_names(insts)
 
     # Try to estimate max cell width from number of cols
     # This allows folding long data.  However it is incomplete in
@@ -1562,11 +1555,47 @@ def _print_instances_as_table(insts, table_width, table_format,
 
     rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
                                      include_classes=include_classes,
-                                     context=context)
+                                     context=context, prop_names=prop_names)
 
     title = 'Instances: {}'.format(insts[0].classname)
     click.echo(format_table(rows, new_header_line, title=title,
                             table_format=table_format))
+
+
+def sorted_prop_names(insts):
+    """
+    Return the list of (originally cased) property names that is the superset
+    of all properties in the input instances.
+
+    The returned list has the key properties first, followed by the non-key
+    properties. Each group is sorted case insensitively.
+
+    The key properties are determined from the instance paths, if present.
+    The function tolerates it if only some of the instances have a path,
+    and if instances of subclasses have additional keys.
+    """
+
+    all_props = odicti()  # key: org prop name, value: lower cased prop name
+    key_props = odicti()  # key: org prop name, value: lower cased prop name
+    for inst in insts:
+        inst_props = inst.keys()
+        for pn in inst_props:
+            all_props[pn] = pn.lower()
+        if inst.path:
+            key_prop_names = inst.path.keys()
+            for pn in inst_props:
+                if pn in key_prop_names:
+                    key_props[pn] = pn.lower()
+
+    nonkey_props = odicti()  # key: org prop name, value: lower cased prop name
+    for pn in all_props:
+        if pn not in key_props:
+            nonkey_props[pn] = all_props[pn]
+
+    key_prop_list = sorted(key_props.keys(), key=lambda p: p.lower())
+    nonkey_prop_list = sorted(nonkey_props.keys(), key=lambda p: p.lower())
+    key_prop_list.extend(nonkey_prop_list)
+    return key_prop_list
 
 
 def _print_objects_as_table(objects, output_format, context=None):
