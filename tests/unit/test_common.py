@@ -2439,39 +2439,72 @@ def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
 # used in TESTCASES_FMT_INSTANCE_AS_ROWS
 def simple_instance(pvalue=None):
     """
-    Build a simple instance to test and return that instance. If the param
-    pvalue is provided it is a scalar value and the instance with just
-    this property is returned.
+    Build a simple instance to test and return that instance. The properties
+    in the instance are sorted by (lower cased) property name.
+
+    If the parameter pvalue is provided, it must be a scalar value and an
+    instance with a single property with that value is returned.
     """
     if pvalue:
         properties = [CIMProperty("P", pvalue)]
     else:
-        properties = [CIMProperty("Pbt", value=True),
-                      CIMProperty("Pbf", value=False),
-                      CIMProperty("Pint32", Uint32(99)),
-                      CIMProperty("Pint64", Uint64(9999)),
-                      CIMProperty("Pdt", DATETIME1_OBJ),
-                      CIMProperty("Pstr1", u"Test String")]
+        properties = [
+            CIMProperty("Pbf", value=False),
+            CIMProperty("Pbt", value=True),
+            CIMProperty("Pdt", DATETIME1_OBJ),
+            CIMProperty("Pint32", Uint32(99)),
+            CIMProperty("Pint64", Uint64(9999)),
+            CIMProperty("Pstr1", u"Test String"),
+        ]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
+def simple_instance_unsorted(pvalue=None):
+    """
+    Build a simple instance to test and return that instance. The properties
+    in the instance are not sorted by (lower cased) property name, but
+    the property order when sorted is the same as in the instance returned by
+    simple_instance().
+
+    If the parameter pvalue is provided, it must be a scalar value and an
+    instance with a single property with that value is returned.
+    """
+    if pvalue:
+        properties = [CIMProperty("P", pvalue)]
+    else:
+        properties = [
+            CIMProperty("Pbt", value=True),
+            CIMProperty("Pbf", value=False),  # out of order
+            CIMProperty("pdt", DATETIME1_OBJ),  # lower cased
+            CIMProperty("PInt64", Uint64(9999)),  # out of order when case ins.
+            CIMProperty("Pint32", Uint32(99)),
+            CIMProperty("Pstr1", u"Test String"),
+        ]
     inst = CIMInstance("CIM_Foo", properties)
     return inst
 
 
 def simple_instance2(pvalue=None):
     """
-    Build a simple instance to test and return that instance. If the param
-    pvalue is provided it is a scalar value and the instance with just
-    this property is returned.
+    Build a simple instance to test and return that instance. The properties
+    in the instance are sorted by (lower cased) property name.
+
+    If the parameter pvalue is provided, it must be a scalar value and an
+    instance with a single property with that value is returned.
     """
     if pvalue:
         properties = [CIMProperty("P", pvalue)]
     else:
-        properties = [CIMProperty("Pbt", value=True),
-                      CIMProperty("Pbf", value=False),
-                      CIMProperty("Puint32", Uint32(4294967295)),
-                      CIMProperty("Psint32", Sint32(-2147483648)),
-                      CIMProperty("Pint64", Uint64(9999)),
-                      CIMProperty("Pdt", DATETIME1_OBJ),
-                      CIMProperty("Pstr1", u"Test String")]
+        properties = [
+            CIMProperty("Pbf", value=False),
+            CIMProperty("Pbt", value=True),
+            CIMProperty("Pdt", DATETIME1_OBJ),
+            CIMProperty("Pint64", Uint64(9999)),
+            CIMProperty("Psint32", Sint32(-2147483648)),
+            CIMProperty("Pstr1", u"Test String"),
+            CIMProperty("Puint32", Uint32(4294967295)),
+        ]
     inst = CIMInstance("CIM_Foo", properties)
     return inst
 
@@ -2485,27 +2518,27 @@ def string_instance(tst_str):
     return inst
 
 
-# Testcases for format_inst_to_table()
+# Testcases for _format_instances_as_rows()
 
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
-    #   * args: CIMInstance(s) object to be tested and col_width field
-    #   * kwargs: Dict of input args for tocimxml().
-    #   * exp_xml_str: Expected CIM-XML string, as a tuple/list of parts.
+    #   * args: Positional args for _format_instances_as_rows().
+    #   * kwargs: Keyword args for _format_instances_as_rows().
+    #   * exp_rtn: Expected return value of _format_instances_as_rows().
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_rtn: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-TESTCASES_FMT_INSTANCE_AS_ROWS = [
+TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance to table",
         dict(
             args=([simple_instance()], None),
             kwargs=dict(),
             exp_rtn=[
-                ["true", "false", "99", "9999", DATETIME1_STR,
-                 u'"Test String"', ]],
+                ["false", "true", DATETIME1_STR, "99", "9999",
+                 u'"Test String"']],
         ),
         None, None, True, ),
 
@@ -2515,8 +2548,118 @@ TESTCASES_FMT_INSTANCE_AS_ROWS = [
             args=([simple_instance()], 30),
             kwargs=dict(),
             exp_rtn=[
-                ["true", "false", "99", "9999", DATETIME1_STR,
+                ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify simple instance to table, unsorted",
+        dict(
+            args=([simple_instance_unsorted()], None),
+            kwargs=dict(),
+            exp_rtn=[
+                ["false", "true", DATETIME1_STR, "99", "9999",
+                 u'"Test String"']],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify instance with 2 keys and 2 non-keys, unsorted",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[
+                    CIMInstance(
+                        "CIM_Foo",
+                        properties=[
+                            CIMProperty("P2", value="V2"),
+                            CIMProperty("p1", value="V1"),
+                            CIMProperty("Q2", value="K2"),
+                            CIMProperty("q1", value="K1"),
+                        ],
+                        path=CIMInstanceName(
+                            "CIM_Foo",
+                            keybindings=[
+                                CIMProperty("Q2", value="K2"),
+                                CIMProperty("q1", value="K1"),
+                            ]
+                        ),
+                    ),
+                ],
+            ),
+            exp_rtn=[
+                ['"K1"', '"K2"', '"V1"', '"V2"'],
+            ],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify 2 instances with different sets of properties",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[
+                    CIMInstance(
+                        "CIM_Foo",
+                        properties=[
+                            CIMProperty("P2", value="VP2a"),
+                            CIMProperty("p1", value="VP1a"),
+                            CIMProperty("P3", value="VP3a"),
+                        ],
+                    ),
+                    CIMInstance(
+                        "CIM_FooSub",
+                        properties=[
+                            CIMProperty("P2", value="VP2b"),
+                            CIMProperty("p1", value="VP1b"),
+                            CIMProperty("N1", value="VN1b"),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=[
+                ['', '"VP1a"', '"VP2a"', '"VP3a"'],
+                ['"VN1b"', '"VP1b"', '"VP2b"', ''],
+            ],
+        ),
+        None, None, True, ),
+
+    (
+        "Verify 2 instances where second one has path",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[
+                    CIMInstance(
+                        "CIM_Foo",
+                        properties=[
+                            CIMProperty("P2", value="VP2a"),
+                            CIMProperty("p1", value="VP1a"),
+                        ],
+                    ),
+                    CIMInstance(
+                        "CIM_FooSub",
+                        properties=[
+                            CIMProperty("P2", value="VP2b"),
+                            CIMProperty("p1", value="VP1b"),
+                            CIMProperty("Q2", value="K2b"),
+                            CIMProperty("q1", value="K1b"),
+                        ],
+                        path=CIMInstanceName(
+                            "CIM_Foo",
+                            keybindings=[
+                                CIMProperty("q2", value="K2b"),
+                                CIMProperty("Q1", value="K1b"),
+                            ]
+                        ),
+                    ),
+                ],
+            ),
+            exp_rtn=[
+                ['', '', '"VP1a"', '"VP2a"'],
+                ['"K1b"', '"K2b"', '"VP1b"', '"VP2b"'],
+            ],
         ),
         None, None, True, ),
 
@@ -2647,11 +2790,11 @@ TESTCASES_FMT_INSTANCE_AS_ROWS = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_FMT_INSTANCE_AS_ROWS)
+    TESTCASES_FORMAT_INSTANCES_AS_ROWS)
 @simplified_test_function
-def test_format_insts_as_rows(testcase, args, kwargs, exp_rtn):
+def test_format_instances_as_rows(testcase, args, kwargs, exp_rtn):
     """
-    Test the output of the common:format_insts_as_table function
+    Test the output of the common _format_instances_as_rows() function
     """
 
     # The code to be tested
@@ -2678,19 +2821,19 @@ def test_format_insts_as_rows(testcase, args, kwargs, exp_rtn):
         format(testcase.desc, exp_rtn, act_rtn)
 
 
-# Testcases for format_inst_to_table()
+# Testcases for _print_instances_as_table()
 
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
-    #   * args: CIMInstance(s) object to be tested, col_width field, ouput_fmt
-    #   * kwargs: Dict of input args for tocimxml().
+    #   * args: Positional args for _print_instances_as_table().
+    #   * kwargs: Keyword args for _print_instances_as_table().
     #   * exp_stdout: Expected output on stdout.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-TESTCASES_PRINT_INSTANCE_AS_TABLE = [
+TESTCASES_PRINT_INSTANCES_AS_TABLE = [
     (
         "Verify print of simple instance to table",
         dict(
@@ -2698,10 +2841,10 @@ TESTCASES_PRINT_INSTANCE_AS_TABLE = [
             kwargs=dict(),
             exp_stdout="""\
 Instances: CIM_Foo
-Pbt    Pbf      Pint32    Pint64  Pdt                      Pstr1
------  -----  --------  --------  -----------------------  -------------
-true   false        99      9999  "20140922104920.524789"  "Test String"
-                                  "+000"
+Pbf    Pbt    Pdt                        Pint32    Pint64  Pstr1
+-----  -----  -----------------------  --------  --------  -------------
+false  true   "20140922104920.524789"        99      9999  "Test String"
+              "+000"
 """,
         ),
         None, None, not CLICK_ISSUE_1590
@@ -2713,12 +2856,12 @@ true   false        99      9999  "20140922104920.524789"  "Test String"
             kwargs=dict(),
             exp_stdout="""\
 Instances: CIM_Foo
-Pbt    Pbf       Puint32      Psint32    Pint64  Pdt        Pstr1
------  -----  ----------  -----------  --------  ---------  --------
-true   false  4294967295  -2147483648      9999  "2014092"  "Test "
-                                                 "2104920"  "String"
-                                                 ".524789"
-                                                 "+000"
+Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
+-----  -----  ---------  --------  -----------  --------  ----------
+false  true   "2014092"      9999  -2147483648  "Test "   4294967295
+              "2104920"                         "String"
+              ".524789"
+              "+000"
 """,
         ),
         None, None, not CLICK_ISSUE_1590
@@ -2751,8 +2894,8 @@ P
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_PRINT_INSTANCE_AS_TABLE)
-def test_print_insts_as_table(
+    TESTCASES_PRINT_INSTANCES_AS_TABLE)
+def test_print_instances_as_table(
         desc, kwargs, exp_exc_types, exp_warn_types, condition, capsys):
     """
     Test the output of the print_insts_as_table function. This primarily

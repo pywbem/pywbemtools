@@ -380,14 +380,13 @@ ASSOC_INSTS = """instance of TST_FamilyCollection {
 
 instance of TST_Person {
    name = "Gabi";
+   likes = { 2 };
    gender = 1;
-   likes = { };
 };
 
 instance of TST_Person {
    name = "Sofi";
    gender = 1;
-   likes = NULL;
 };
 
 """
@@ -958,9 +957,9 @@ TEST_CASES = [
      {'stdout': """
 Instances: PyWBEM_AllTypes
 +-----------------+------------+--------------+--------------+
-| InstanceId      | scalBool   |   scalUint32 |   scalSint32 |
+| InstanceId      | scalBool   |   scalSint32 |   scalUint32 |
 +=================+============+==============+==============+
-| "test_instance" | true       |         9999 |        -9999 |
+| "test_instance" | true       |        -9999 |         9999 |
 +-----------------+------------+--------------+--------------+
 """,
       'rc': 0,
@@ -976,9 +975,9 @@ Instances: PyWBEM_AllTypes
      {'stdout': """
 Instances: PyWBEM_AllTypes
 +-----------------+-------------+---------------+---------------+
-| InstanceId      | arrayBool   | arrayUint32   | arraySint32   |
+| InstanceId      | arrayBool   | arraySint32   | arrayUint32   |
 +=================+=============+===============+===============+
-| "test_instance" | true, false | 0, 9999       | 0, -9999      |
+| "test_instance" | true, false | 0, -9999      | 0, 9999       |
 +-----------------+-------------+---------------+---------------+
 
 """,
@@ -986,18 +985,22 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate of TST_PersonSub shows value-mapped '
+    ['Verify instance command enumerate of TST_Person shows value-mapped '
      'properties in table output',
-     {'args': ['enumerate', 'TST_PersonSub', '--pl', 'name,gender,likes'],
+     {'args': ['enumerate', 'TST_Person', '--pl', 'name,gender,likes'],
       'general': ['--output-format', 'table']},
      {'stdout': """
-Instances: TST_PersonSub
+Instances: TST_Person
 +------------+------------+-----------------------+
 | name       | gender     | likes                 |
 |------------+------------+-----------------------|
+| "Gabi"     | 1 (female) | 2 (movies)            |
+| "Mike"     | 2 (male)   | 1 (books), 2 (movies) |
+| "Saara"    | 1 (female) | 1 (books)             |
+| "Sofi"     | 1 (female) |                       |
 | "Gabisub"  | 1 (female) |                       |
-| "Mikesub"  | 2 (male)   | 1 (books), 2 (movies) |
-| "Saarasub" | 1 (female) | 2 (movies)            |
+| "Mikesub"  | 2 (male)   |                       |
+| "Saarasub" | 1 (female) |                       |
 | "Sofisub"  | 1 (female) |                       |
 +------------+------------+-----------------------+
 
@@ -2566,7 +2569,7 @@ interop      TST_Personsub        4
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command count *Person* with --association',
+    ['Verify instance command count *TST_* with --association',
      {'args': ['count', '*TST_*', '--association'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
@@ -2579,7 +2582,7 @@ interop      TST_MemberOfFamilyCollection  3
       'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify instance command count *Person* with --experimental',
+    ['Verify instance command count *TST_* with --experimental',
      {'args': ['count', '*TST_*', '--experimental'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
@@ -2591,7 +2594,7 @@ interop      TST_Personsub        4
       'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify instance command count *Person* with --indication',
+    ['Verify instance command count *TST_* with --indication',
      {'args': ['count', '*TST_*', '--no-indication', '--association'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
