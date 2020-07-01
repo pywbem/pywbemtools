@@ -41,7 +41,15 @@ def build_classes():
     CONN.add_cimobjects(c)  # noqa: F821 pylint: disable=undefined-variable
 
 
-build_classes()
-# pylint: disable=undefined-variable
-cls = CONN.GetClass('CIM_FooDirLoad')  # noqa: F821
-assert cls
+def main():
+    """Main routine when called as script"""
+
+    build_classes()
+
+    # pylint: disable=undefined-variable
+    cls = CONN.GetClass('CIM_FooDirLoad')  # noqa: F821
+    assert cls
+
+
+if __name__ == '__main__':
+    main()

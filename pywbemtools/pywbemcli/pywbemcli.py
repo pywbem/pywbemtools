@@ -32,7 +32,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pywbem import LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
     DEFAULT_LOG_DETAIL_LEVEL
-from pywbem import __version__ as PYWBEM_VERSION
+from pywbem import __version__ as pywbem_version
 
 from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
@@ -253,7 +253,7 @@ CONTEXT_SETTINGS = dict(
                    format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
     message='%(prog)s, version %(version)s\npywbem, version {}'.format(
-        PYWBEM_VERSION),
+        pywbem_version),
     help='Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context

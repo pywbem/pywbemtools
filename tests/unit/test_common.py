@@ -1145,6 +1145,7 @@ def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
         return verify_operation(txt, abort_msg)
 
     # The code to be tested
+    # pylint: disable=no-value-for-parameter
     rtn = run_verify_operation(txt)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1983,7 +1984,7 @@ class CreateCIMInstanceTest(unittest.TestCase):
 ######################################################
 
 # Class definitions for create_instancename
-class_dict1 = dict(classname='CIM_Foo',
+CLASS_DICT1 = dict(classname='CIM_Foo',
                    properties=[
                        CIMProperty(
                            'P1', None, type='string',
@@ -1994,7 +1995,7 @@ class_dict1 = dict(classname='CIM_Foo',
                        CIMProperty('P2', value='Cheese'),
                    ])
 
-class_dict2 = dict(classname='CIM_Foo',
+CLASS_DICT2 = dict(classname='CIM_Foo',
                    properties=[
                        CIMProperty(
                            'P1', None, type='string',
@@ -2036,7 +2037,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=['P1=Fred'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', 'Fred')]),
@@ -2045,7 +2046,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key with space",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=['P1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
@@ -2055,7 +2056,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key case independent",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=['p1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
@@ -2064,7 +2065,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with invalid key name",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=['Px=Fred'],
             exp_iname=None
         ),
@@ -2072,7 +2073,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with two string keys and one int",
         dict(
-            cls_kwargs=class_dict2,
+            cls_kwargs=CLASS_DICT2,
             kv_args=['P1=Fred', 'P2=John', 'P3=1'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
@@ -2082,7 +2083,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with two string keys and one big int",
         dict(
-            cls_kwargs=class_dict2,
+            cls_kwargs=CLASS_DICT2,
             kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
@@ -2093,7 +2094,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with unicode char",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=[u'P1=Fred\u0344\u0352'],
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
@@ -2102,7 +2103,7 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation no value",
         dict(
-            cls_kwargs=class_dict1,
+            cls_kwargs=CLASS_DICT1,
             kv_args=[u'P1='],
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
@@ -2918,7 +2919,7 @@ def test_print_instances_as_table(
     # The code to be tested
     _print_instances_as_table(*args, **kwargs_)
 
-    stdout, stderr = capsys.readouterr()
+    stdout, _ = capsys.readouterr()
     assert exp_stdout == stdout, \
         "Unexpected output in test case: {}\n" \
         "Actual:\n" \
