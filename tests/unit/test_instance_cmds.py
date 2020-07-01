@@ -61,8 +61,8 @@ MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
-ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock__v0.py' if PYWBEM_0 \
-    else 'all_types_method_mock__v1.py'
+ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock_v0.py' if PYWBEM_0 \
+    else 'all_types_method_mock_v1.py'
 
 
 #
