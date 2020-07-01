@@ -40,7 +40,7 @@ class CLITestsBase(object):
 
     """
     def command_test(self, desc, command_grp, inputs, exp_response, mock_files,
-                     condition, verbose=None):
+                     condition, verbose=False):
         # pylint: disable=line-too-long, no-self-use
         """
         Test method to execute test on pywbemcli by calling the executable
@@ -184,17 +184,17 @@ class CLITestsBase(object):
             and options that do not communicate with a server.  It is faster
             than installing the mock repository
 
-          condition (True, False, or 'pdb', or 'verbose'):
+          condition (True, False, 'pdb', or 'verbose'):
             If True, the test is executed.
             If False, the test is skipped.
             If 'pdb', the test breaks in the debugger.
-            If 'verbose' and verbose is None, verbose is set to True.
+            If 'verbose', verbose mode is enabled for the test.
 
           verbose (:class:`py:bool`):
-            If `True` the assembled command line and the environment variables
-            set by 'env' will be displayed.
-            If `None`, verbose is set to True if condition=='verbose', otherwise
-            to False
+            If True, verbose mode is enabled for the test.
+
+            In verbose mode, the assembled command line, the environment
+            variables set by 'env', and other details will be displayed.
         """  # noqa: E501
         # pylint: enable=line-too-long
 
@@ -254,7 +254,7 @@ class CLITestsBase(object):
         if condition == 'pdb':
             cmd_line.append('--pdb')
 
-        if verbose is None:
+        if not verbose:
             verbose = condition == 'verbose'
 
         if verbose:
