@@ -52,13 +52,9 @@ import six
 # Flag that allows displaying the data as pure text rather than markdown
 # format
 USE_RST = True
-SCRIPT_NAME = 'pywbemcli'
 
-# SCRIPT_CMD = SCRIPT_NAME  # TODO #103: Reactivate once pywbemcli works
-# on Windows
-SCRIPT_CMD = 'python -c "import sys; from ' \
-    'pywbemtools.pywbemcli.pywbemcli import cli; ' \
-    'sys.argv[0]=\'pywbemcli\'; sys.exit(cli())"'
+SCRIPT_NAME = 'pywbemcli'
+SCRIPT_CMD = SCRIPT_NAME
 
 ERRORS = 0
 VERBOSE = False
@@ -127,17 +123,6 @@ def cmd_exists(cmd):
         msg = None
     else:
         msg = out.strip()
-
-        # TODO #103: Debug PATH for pywbemcli not found issue on Windows
-        if sys.platform == 'win32':
-            echo_cmd = 'echo %PATH%'
-        else:
-            echo_cmd = 'echo $PATH'
-        proc = subprocess.Popen(echo_cmd, shell=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT)
-        out, _ = proc.communicate()
-        print("Debug: {}: {}".format(echo_cmd, out), file=sys.stderr)
-
     return rc, msg
 
 

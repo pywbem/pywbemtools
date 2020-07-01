@@ -391,20 +391,19 @@ instance of TST_Person {
 
 """
 
-# Simplified to account for ordering issues. TODO. Use splitlines()
-SIMPLE_SHRUB_TREE = [
-    'TST_Person.name="Mike"',  # noqa E501
-    ' +-- parent(Role)',  # noqa E501
-    ' +-- TST_Lineage(AssocClass)',  # noqa E501
-    ' +-- child(ResultRole)',  # noqa E501
-    ' +-- TST_Person(ResultClass)(2 insts)',  # noqa E501
-    ' +-- /:TST_Person.name="Sofi"',  # noqa E501
-    ' +-- /:TST_Person.name="Gabi"',  # noqa E501
-    ' +-- member(Role)',  # noqa E501
-    ' +-- TST_MemberOfFamilyCollection(AssocClass)',  # noqa E501
-    ' +-- family(ResultRole)',  # noqa E501
-    ' +-- TST_FamilyCollection(ResultClass)(1 insts)',  # noqa E501
-    ' +-- /:TST_FamilyCollection.name="Family2"', ]  # noqa E501
+SIMPLE_SHRUB_TREE = """TST_Person.name="Mike"
+ +-- parent(Role)
+ |   +-- TST_Lineage(AssocClass)
+ |       +-- child(ResultRole)
+ |           +-- TST_Person(ResultClass)(2 insts)
+ |               +-- /:TST_Person.name="Gabi"
+ |               +-- /:TST_Person.name="Sofi"
+ +-- member(Role)
+     +-- TST_MemberOfFamilyCollection(AssocClass)
+         +-- family(ResultRole)
+             +-- TST_FamilyCollection(ResultClass)(1 insts)
+                 +-- /:TST_FamilyCollection.name="Family2"
+"""
 
 SIMPLE_SHRUB_TREE_ROLE = """TST_Person.name="Mike"
  +-- parent(Role)
