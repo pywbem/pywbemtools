@@ -31,14 +31,12 @@ import os
 import sys
 import traceback
 import click
-
-from pywbem import WBEMConnection, Error, MOFParseError
-
+import packaging.version
+import pywbem
 import pywbem_mock
+
 from .config import DEFAULT_MAXPULLCNT
 
-import pywbem
-import packaging.version
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
 
@@ -321,7 +319,7 @@ class BuildRepositoryMixin(object):
                 try:
                     # Displays any MOFParseError already
                     conn.compile_mof_file(file_path)
-                except Error as er:
+                except pywbem.Error as er:
                     # Abort the entire pywbemcli command because the
                     # MOF compilation might have caused inconsistencies in the
                     # mock repository.
@@ -331,7 +329,7 @@ class BuildRepositoryMixin(object):
                         msg = "MOF compile failed:\n{0}".format(er)
                     else:
                         # display file name.  Error text displayed already.
-                        if isinstance(er, MOFParseError):
+                        if isinstance(er, pywbem.MOFParseError):
                             msg = "MOF compile failed: File: '{0}'" \
                                 "(see above)".format(file_path)
                         else:  # not parse error, display exception
@@ -369,7 +367,7 @@ class BuildRepositoryMixin(object):
                         raise click.Abort()
 
 
-class PYWBEMCLIConnection(WBEMConnection, PYWBEMCLIConnectionMixin):
+class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
     """
     PyWBEMCLIConnection subclass adds the methods added by
     PYWBEMCLIConnectionMixin

@@ -39,8 +39,8 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 
-INVOKE_METHOD_MOCK_FILE_0 = 'simple_mock_invokemethod_pywbem_V0.py'
-INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_pywbem_V1.py'
+INVOKE_METHOD_MOCK_FILE_0 = 'simple_mock_invokemethod_v0.py'
+INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_v1.py'
 INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
     INVOKE_METHOD_MOCK_FILE_1
 
