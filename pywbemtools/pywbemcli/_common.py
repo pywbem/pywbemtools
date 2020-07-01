@@ -1022,9 +1022,6 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
       context (:class:`ContextObj`):
         Click context contained in ContextObj object.
 
-      TODO: Future:This line was way too long. Since we are not putting it
-            into docmentation today, we folded it.
-
       objects (iterable of :class:`~pywbem.CIMInstance`,
         :class:`~pywbem.CIMInstanceName`, :class:`~pywbem.CIMClass`,
         :class:`~pywbem.CIMClassName`,
@@ -1042,6 +1039,9 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
     """
+    # Note: In the docstring above, the line for parameter 'objects' was way too
+    #       long. Since we are not putting it into docmentation, we folded it.
+
     context.spinner_stop()
 
     if summary:
