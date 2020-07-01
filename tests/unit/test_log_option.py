@@ -32,16 +32,22 @@ RUN = True
 FAIL = False
 
 TEST_CASES = [
-    # desc - Description of test
-    # inputs - String, or list of args or dict of 'env', 'args', 'general',
-    #          and 'stdin'. See See CLITestsBase.subcmd_test()  for
-    #          detailed documentation
-    # exp_response - Dictionary of expected responses (stdout, stderr, rc) and
-    #                test definition (test: <testname>).
-    #                See CLITestsBase.subcmd_test() for detailed documentation.
-    # mock - None or name of files (mof or .py),
-    # condition - If True the test is executed, if 'pdb' the test breaks in
-    #             the debugger, otherwise the test is skipped.
+
+    # List of testcases.
+    # Each testcase is a list with the following items:
+    # * desc: Description of testcase.
+    # * inputs: String, or tuple/list of strings, or dict of 'env', 'args',
+    #     'general', and 'stdin'. See the 'inputs' parameter of
+    #     CLITestsBase.command_test() in cli_test_extensions.py for detailed
+    #     documentation.
+    # * exp_response: Dictionary of expected responses (stdout, stderr, rc) and
+    #     test definition (test: <testname>). See the 'exp_response' parameter
+    #     of CLITestsBase.command_test() in cli_test_extensions.py for
+    #     detailed documentation.
+    # * mock: None, name of file (.mof or .py), or list thereof.
+    # * condition: If True the test is executed, if 'pdb' the test breaks in the
+    #     the debugger, if 'verbose' print verbose messages, if False the test
+    #     is skipped.
 
     ['Verify log of class get blah. class get that fails',
      {'general': ['-l', 'all=stderr'],

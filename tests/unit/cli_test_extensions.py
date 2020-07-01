@@ -55,47 +55,61 @@ class CLITestsBase(object):
             Description of the test
 
           command_grp (:term:`string`):
-            pywbemcli command_grp definedfor this test.  This is the first
-            level of the command(the command group) (ex. class).
+            Pywbemcli command group for this test. This is the first level of
+            the command, e.g. 'class' or 'instance'.
 
-          inputs (:class:`py:dict` or :class:`py:list` of :term:`string` or :term:`string`):
+          inputs (:term:`string` or tuple/list of :term:`string` or :class:`py:dict`):
 
-            If inputs is a list of strings, it contains the command
-            line arguments, without the command name.
+            * If inputs is a string or a tuple/list of strings, it contains the
+              command line arguments, without the command name or command group.
 
-            Each single argument must be its own item in the iterable; combining
-            the arguments into a string does not work.
-            The arguments may be binary strings encoded in UTF-8, or unicode
-            strings.
+              Each single argument must be its own item in the iterable;
+              combining the arguments into a string does not work, and the
+              string is not split into words (anymore).
 
-            If inputs is a dict it can contain the following possible keys:
+              The arguments may be binary strings encoded in UTF-8, or unicode
+              strings.
 
-              * 'args': defines local arguments to append to the command after
-                  the command name. Each single argument must be its own
-                  item in the iterable.
+            * If inputs is a dict it can contain the following optional items:
 
-              * 'general': defines general arguments that will be inserted
-                  into the command line before the command name. Each
-                  single argument must be its own item in the iterable.
+              - 'args': String or tuple/list of strings with local
+                (command-level) options that will be added to the command
+                line after the command name.
 
-              * 'env': Dictionary of environment variables where  key is the
-                variable name as a :term:`string`; dict value is the variable
-                value as a :term:`string` (without any shell escaping needed).
-                If None, no environment variables are set for the test.
+                Each single argument (e.g. option name and option arguments)
+                must be its own item in the iterable.
 
-              * 'stdin': If the key is `stdin`, the value is either a string or
-                list of strings. If `stdin` is a list or tuple of strings, each
-                string defines a line of text that will be included as stdin to
-                the call to pywbemcli. The iterable is mapped to a single string
-                with each line separated by an EOL char. This becomes the stdin
-                parameter for the call to pywbemcli. Each line is processed
-                as a separate repl line by the pybemcli executable.
-                If `stdin` is a single string it is passed  to the stdin
-                parameter for the call to pywbemcli. If `stdin` is defined, the
-                parameters defining a command to be executed are ignored and
-                the full command must be in the `stdin` iterable.
+              - 'general': String or tuple/list of strings with general
+                options that will be added to the command line before the
+                command name.
 
-                If None, no stdin input is defined for the test.
+                Each single argument (e.g. option name and option arguments)
+                must be its own item in the iterable.
+
+              - 'env': Dictionary of environment variables where key is the
+                variable name; dict value is the variable value (without any
+                shell escaping needed).
+
+                If omitted, None, or empty, no environment variables will be
+                set for the test.
+
+              - 'stdin': A string or a tuple/list of strings, that contains the
+                standard input for the command.
+
+                This can be used for commands in interactive mode, and for
+                responding to prompts.
+
+                If present, the command group specified in the `command_grp`
+                parameter is not added to the command line, but the local and
+                global options are added.
+
+                If specified as a tuple/list of strings, these strings are
+                joined into a single string separated by an EOL char. Each line
+                is processed as a separate repl line or prompt input by
+                pybemcli.
+
+                If omitted or None, no standard input will be provided to the
+                pywbemcli command.
 
           exp_response (:class:`py:dict`)
 
@@ -170,13 +184,17 @@ class CLITestsBase(object):
             and options that do not communicate with a server.  It is faster
             than installing the mock repository
 
-          condition (True, False, or 'pdb'):
+          condition (True, False, or 'pdb', or 'verbose'):
             If True, the test is executed.
             If False, the test is skipped.
             If 'pdb', the test breaks in the debugger.
+            If 'verbose' and verbose is None, verbose is set to True.
 
           verbose (:class:`py:bool`):
-            If `True` the assembled command line will be displayed
+            If `True` the assembled command line and the environment variables
+            set by 'env' will be displayed.
+            If `None`, verbose is set to True if condition=='verbose', otherwise
+            to False
         """  # noqa: E501
         # pylint: enable=line-too-long
 
@@ -185,6 +203,7 @@ class CLITestsBase(object):
 
         env = None
         stdin = None
+        general_args = None
         if isinstance(inputs, dict):
             general_args = inputs.get("general", None)
             local_args = inputs.get("args", None)
@@ -194,20 +213,20 @@ class CLITestsBase(object):
                 if isinstance(stdin, (tuple, list)):
                     stdin = '\n'.join(stdin)
         elif isinstance(inputs, six.string_types):
-            local_args = inputs.split(" ")
-            general_args = None
+            local_args = inputs
         elif isinstance(inputs, (list, tuple)):
             local_args = inputs
-            general_args = None
         else:
             assert False, 'Invalid inputs param to test {!r}. Allowed types ' \
                 'are dict, string, list, tuple.'.format(inputs)
 
         if isinstance(local_args, six.string_types):
-            local_args = local_args.split(" ")
+            # Is not split into words anymore
+            local_args = [local_args]
 
         if isinstance(general_args, six.string_types):
-            general_args = general_args.split(" ")
+            # Is not split into words anymore
+            general_args = [general_args]
 
         cmd_line = []
         if general_args:
@@ -234,6 +253,9 @@ class CLITestsBase(object):
 
         if condition == 'pdb':
             cmd_line.append('--pdb')
+
+        if verbose is None:
+            verbose = condition == 'verbose'
 
         if verbose:
             print('\nCMDLINE: {}'.format(cmd_line))
