@@ -913,15 +913,15 @@ ca-certs
     ['Verify connection list with current server from general options, grid',
      {'args': ['list'],
       'general': ['--output-format', 'table', '--server', 'http://blah']},
-     {'stdout': """
-WBEM server connections(brief): (#: default, *: current)
-+------------+-------------+---------------+
-| name       | server      | mock-server   |
-|------------+-------------+---------------|
-| *not-saved | http://blah |               |
-| svrtest    | http://blah |               |
-+------------+-------------+---------------+
-""",
+     {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
+                 'file:',
+                 'pywbemcli_connection_definitions.yaml',
+                 '+------------+-------------+---------------+',
+                 '| name       | server      | mock-server   |',
+                 '|------------+-------------+---------------|',
+                 '| *not-saved | http://blah |               |',
+                 '| svrtest    | http://blah |               |',
+                 '+------------+-------------+---------------+'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],

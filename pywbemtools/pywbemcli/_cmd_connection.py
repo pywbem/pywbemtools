@@ -767,6 +767,7 @@ def cmd_connection_list(context, options):
     click.echo(format_table(
         sorted(rows),
         headers,
-        title='WBEM server connections({}): ({}: default, {}: current)'.format(
-            table_type, dflt_sym, cur_sym),
+        title='WBEM server connections({0}): ({1}: default, {2}: '
+              'current)\nfile: {3}'.format(
+            table_type, dflt_sym, cur_sym, connections.connections_file),
         table_format=output_format))

@@ -119,8 +119,8 @@ Help text for ``pywbemcli``:
                                       Enable deprecation warnings. Default: EnvVar PYWBEMCLI_DEPRECATION_WARNINGS, or true.
       -C, --connections-file FILE PATH
                                       File path of a YAML file containing named connection definitions. The default if this
-                                      option is not specified is /home/kschopmeyer/pywbemcli_connection_definitions.yaml.
-                                      EnvVar (PYWBEMCLI_CONNECTIONS_FILE)
+                                      option is not specified is the file name "pywbemcli_connection_definitions.yaml" in
+                                      the users home directory. EnvVar (PYWBEMCLI_CONNECTIONS_FILE)
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.

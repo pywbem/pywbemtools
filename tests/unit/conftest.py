@@ -18,11 +18,12 @@ BACK_FILE = DEFAULT_CONNECTIONS_FILE + '.bak'
 REPO_FILE_BACKUP_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
                                      DEFAULT_CONNECTIONS_FILE)
 # if there is a config file or backup, save to this name during tests
-SAVE_FILE = DEFAULT_CONNECTIONS_FILE + '.testsave'
+SAVE_FILE_SUFFIX = '.testsave'
+SAVE_FILE = DEFAULT_CONNECTIONS_FILE + SAVE_FILE_SUFFIX
 SAVE_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
                               SAVE_FILE)
 
-SAVE_BAK_FILE = BACK_FILE + '.testsave'
+SAVE_BAK_FILE = BACK_FILE + SAVE_FILE_SUFFIX
 SAVE_BAK_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR, SAVE_BAK_FILE)
 
 
@@ -44,6 +45,11 @@ def set_connections_file(request):
 
     This saves and restores any connections file and backup connections file
     in the home directory.
+
+    This fixture should execute once per session (execution of one of the
+    test_*.py files) so the load of creating backups and restoring them is
+    very low.  In case the fixture fails to restore the backed up connections
+    files are saved  with with their full names and the suffix `.testsave`.
     """
     if os.path.isfile(REPO_FILE_PATH):
         os.rename(REPO_FILE_PATH, SAVE_FILE_PATH)

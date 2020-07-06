@@ -640,13 +640,16 @@ command completion.
 .. _`--connections-file general option`:
 
 ``--connections-file`` general option
-""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""
 
 The ``--connections-file``/``-C`` general option allows the user to select
 a file path for the connections file. It is the file path of a YAML file
 that defines server configurations by name.  The default if this option is
-not specified is to use the configuration file
-``pywbemcli_connection_definitions.yaml`` defined in the user home directory.
+not specified is to use the connections file
+``pywbemcli_connection_definitions.yaml`` in the users home directory.
+
+The users home directory is OS dependent.  The connection file name is
+displayed in the ``connections list`` command
 
 When this option is set, the YAML file defined with the option is used
 as the connections file.
@@ -663,7 +666,7 @@ The connections_file is managed with the commands in the
 .. _`--deprecation-warnings general option`:
 
 ``--deprecation-warnings`` general option
-""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""
 
 The ``--deprecation-warnings``/``--no-deprecation-warnings`` general option is
 a boolean option that controls the display of deprecation warnings on the

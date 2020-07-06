@@ -1360,17 +1360,20 @@ See :ref:`pywbemcli connection export --help` for the exact help output of the c
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection list`` command lists the connection definitions in the
-:term:`connections file` and also the current connection if it has not been
-saved to the connections file.
+:term:`connections file` and the current connection(if it has not been
+saved to the connections file).
 
 Valid output formats are :term:`Table output formats`.
 
-This shows if a connection is the current connection
+This shows which connection is the current connection
 and if any connection is set as the default connection (:ref:`Connection select
 command` ).
 
 The current connection is marked with `*` in the Name column.
 The default connection, if defined, is marked with `#` in the Name column.
+
+The title also displays the path of the file that is being used as the
+current connections file.
 
 .. code-block:: text
 
@@ -1378,6 +1381,7 @@ The default connection, if defined, is marked with `#` in the Name column.
 
     pywbemcli> --server http://blahblah connection list
     WBEM server connections(brief):  (#: default, *: current)
+    file: ./pywbemcli_connection_definitions.yaml
     +--------------+------------------+----------------------------------------+
     | name         | server           | mock-server                            |
     |--------------+------------------+----------------------------------------|
