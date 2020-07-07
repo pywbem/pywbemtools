@@ -10,7 +10,7 @@ import os
 import pytest
 import six
 
-# impoty pkgs to determine pywbem version
+# import pkgs to determine pywbem version
 import packaging.version
 import pywbem
 

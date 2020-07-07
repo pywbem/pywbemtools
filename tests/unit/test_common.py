@@ -823,7 +823,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     # test option with only one choice bypasses user request
     if not choices:
         context = ContextObj(None, None, None, None, None, None, None, None,
-                             None)
+                             None, None)
         act_rtn = pick_one_from_list(context, options, title)
     else:
         # setup mock for this test
@@ -837,7 +837,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
                 # The code to be tested
                 # Fake context object
                 context = ContextObj(None, None, None, None, None, None, None,
-                                     None, None)
+                                     None, None, None)
                 act_rtn = pick_one_from_list(context, options, title)
                 context.spinner_stop()
                 assert mock_prompt.call_count == len(choices)

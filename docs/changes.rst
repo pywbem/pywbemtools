@@ -16,6 +16,11 @@ Released: not yet
 
 **Incompatible changes:**
 
+* The default location for the connections file (pywbemcli_connection_definitions.yaml)
+  has been moved from the users current directory to the users home directory.
+  A general option "connections_file" allows the user to set other directories
+  and file names for this file. (See issue # 596)
+
 **Deprecations:**
 
 * Deprecated support for Python 2.7 and 3.4, because these Python versions have
@@ -71,6 +76,11 @@ Released: not yet
 * The order of properties when displaying instances in a table format is now
   predictable: First the sorted key properties, then the sorted non-key
   properties. (Part of fix for issue #650)
+
+* Modify connection file location functionality so that default is
+  the users home directory but any other directory can be specified using the
+  general option "connections_file" which has a corresponding environment
+  variable.  (See issue # 596)
 
 **Cleanup**
 

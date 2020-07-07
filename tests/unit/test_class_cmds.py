@@ -643,7 +643,7 @@ TEST_CASES = [
      {'args': ['enumerate', 'CIM_Foo_sub2'],
       'general': ['--verbose']},
      {'stdout': 'No objects returned',
-      'test': 'linesnows'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     #
@@ -846,34 +846,37 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # pylint: enable=line-too-long
-    # TODO include class origin. TODO not returning class origin correctly.
     ['Verify class command get with propertylist and classorigin,',
-     ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID', '-c'],
-     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
-                 '      [Key ( true ),',
-                 '       Description ( "This is key property." )]', ''
-                 '   string InstanceID;', '',
-                 '      [Description ( "Method with in and out parameters" )'
-                 ']',
+     ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID', '--ico'],
+     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
+                 '     [Key ( true ),',
+                 '      Description ( "This is key property." )]',
+                 '   string InstanceID;',
+                 '      [Description ( "Method with in and out parameters" )]',
                  '   uint32 Fuzzy(',
                  '         [IN ( true ),',
-                 '          Description ( "FuzzyMethod Param" )]',
-                 '      string FuzzyParameter,',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in '
+                 'output parameter" )]',
+                 '      string TestInOutParameter,',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF Foo,',
+                 '      CIM_Foo REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
-                 '          Description ( "TestMethod Param" )]',
+                 '          Description ( "Rtns method name if exists on '
+                 'input" )]',
                  '      string OutputParam,',
-                 '',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if '
+                 'provided." )]',
+                 '      uint32 OutputRtnValue);',
                  '      [Description ( "Method with no Parameters" )]',
-                 '',
-                 '   uint32 DeleteNothing();', '',
+                 '   uint32 DeleteNothing();',
                  '};', ''],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, FAIL],
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
 
     # get command errors
 
