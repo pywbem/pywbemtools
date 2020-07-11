@@ -149,8 +149,8 @@ def validate_connections_file(connections_repo):
 @click.option('--ca-certs', type=str, metavar="CACERTS",
               default=None,  # defaulted in code
               envvar=PywbemServer.ca_certs_envvar,
-              help='Certificates to be used for validating the certificate '
-                   'presented by the WBEM server during TLS/SSL handshake: '
+              help='Certificates used to validate the certificate presented '
+                   'by the WBEM server during TLS/SSL handshake: '
                    'FILE: Use the certs in the specified PEM file; '
                    'DIR: Use the certs in the PEM files in the specified '
                    'directory; '
@@ -158,7 +158,7 @@ def validate_connections_file(connections_repo):
                    'the certifi Python package; '
                    'Default: EnvVar {ev}, or "certifi" (pywbem 1.0 or later), '
                    'or the certs in the PEM files in the first existing '
-                   'directory from from a list of system directories '
+                   'directory from from a system defined list of directories '
                    '(pywbem before 1.0).'.
                    format(ev=PywbemServer.ca_certs_envvar))
 @click.option('-c', '--certfile', type=str, metavar="FILE",
@@ -426,6 +426,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
     resolved_timestats = timestats or DEFAULT_TIMESTATS
     resolved_verify = DEFAULT_VERIFY if verify is None else verify
+
+    # There is no default ca_certs
     resolved_ca_certs = ca_certs  # None should be passed on
 
     # Create the connections repository object that will be included in the

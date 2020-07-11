@@ -25,8 +25,8 @@ from __future__ import absolute_import, print_function
 
 import os
 import yaml
-import yamlloader
 import six
+import yamlloader
 import click
 
 from ._pywbem_server import PywbemServer
@@ -221,8 +221,6 @@ class ConnectionRepository(object):
                     dict_ = yaml.safe_load(_fp)
                     # put all the connection definitions into a group
                     # in the connection file
-                    # TODO: on file created with touch this responds
-                    # TypeError: 'NoneType' object is not subscriptable
                     connections_dict = dict_[
                         ConnectionRepository.connections_group_name]
 
@@ -236,8 +234,14 @@ class ConnectionRepository(object):
                             self._loaded = True
                     except KeyError as ke:
                         raise KeyError("Items missing from record {0} in "
-                                       "connections file {1}".format
+                                       "connections file. Exception {1}".format
                                        (ke, self._connections_file))
+                    except TypeError as te:
+                        raise TypeError('Invalid object type in connections '
+                                        'file: "{0}"; server name: "{1}". '
+                                        'Item: {2}'.
+                                        format(self._connections_file, name,
+                                               te))
                 except ValueError as ve:
                     raise ValueError("Invalid YAML in connections file {0}. "
                                      "Exception {1}".format

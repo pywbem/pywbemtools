@@ -114,17 +114,17 @@ General Options:
                                   client bypasses verification. Default: EnvVar
                                   PYWBEMCLI_VERIFY, or "--verify".
 
-  --ca-certs CACERTS              Certificates to be used for validating the
-                                  certificate presented by the WBEM server
-                                  during TLS/SSL handshake: FILE: Use the certs
-                                  in the specified PEM file; DIR: Use the certs
-                                  in the PEM files in the specified directory;
+  --ca-certs CACERTS              Certificates used to validate the certificate
+                                  presented by the WBEM server during TLS/SSL
+                                  handshake: FILE: Use the certs in the
+                                  specified PEM file; DIR: Use the certs in the
+                                  PEM files in the specified directory;
                                   "certifi" (pywbem 1.0 or later): Use the certs
                                   provided by the certifi Python package;
                                   Default: EnvVar PYWBEMCLI_CA_CERTS, or
                                   "certifi" (pywbem 1.0 or later), or the certs
                                   in the PEM files in the first existing
-                                  directory from from a list of system
+                                  directory from from a system defined list of
                                   directories (pywbem before 1.0).
 
   -c, --certfile FILE             Path name of a PEM file containing a X.509
@@ -563,21 +563,22 @@ TEST_CASES = [
     #  Test errors with --name option, --mock-server option
     #
 
-    ['Verify -n option with non-existend connection file fails',
-     {'general': ['-n', 'fred', '--connections-file', './blah.yaml'],
+    ['Verify -n option with non-existent connection file fails',
+     {'general': ['-n', 'fred', '--connections-file', './filenotfound.yaml'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Connections file: "./blah.yaml" does not exist.',
+     {'stderr': ['Connections file: "./filenotfound.yaml" does not exist.',
                  'Aborted!'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
 
     ['Verify --name with non-existend connection file fails',
-     {'general': ['--name', 'fred', '--connections-file', './blah.yaml'],
+     {'general': ['--name', 'fred', '--connections-file',
+                  './filenotfound.yaml'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Connections file: "./blah.yaml" does not exist.',
+     {'stderr': ['Connections file: "./filenotfound.yaml" does not exist.',
                  'Aborted!'],
       'rc': 1,
       'test': 'innows'},
