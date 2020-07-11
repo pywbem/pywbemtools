@@ -21,6 +21,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import re
 from collections import OrderedDict
+import six
 import click
 
 import pywbem
@@ -35,7 +36,16 @@ WBEM_SERVER_OBJ = None
 PYWBEMCLI_LOG = 'pywbemcli.log'
 
 
-def _validate_server(server):
+def _raise_typeerror(name, value, rqd_type):
+    """
+    Generate a TypeError for a property in pywbem_server setter that has an
+    invalid type
+    """
+    raise TypeError('Property "{0}" value: {1} must be type: "{2}", not type: '
+                    '"{3}"'.format(name, value, rqd_type, type(value)))
+
+
+def _validate_server_url(server):
     """
     Validate  and possibly complete the wbemserver url provided.
 
@@ -58,6 +68,8 @@ def _validate_server(server):
     elif re.match(r"^https{0,1}://", server) is not None:
         url = server
 
+    # TODO Future: We are trying to make exceptions in these support classes
+    # independent of click so this should become ValueError
     elif re.match(r"^[a-zA-Z0-9]+://", server) is not None:
         raise click.ClickException('Invalid scheme on server argument. {}'
                                    ' Use "http" or "https"'.format(server))
@@ -166,7 +178,7 @@ class PywbemServer(object):
 
         # pylint: disable=attribute-defined-outside-init
         if server:
-            self._server = _validate_server(server)
+            self._server = _validate_server_url(server)
         else:
             self._server = server
 
@@ -180,7 +192,12 @@ class PywbemServer(object):
     @mock_server.setter
     def mock_server(self, mock_server):
         """Setter method; for a description see the getter method."""
-
+        if mock_server:
+            if not isinstance(mock_server, (list, six.string_types)):
+                _raise_typeerror("mock_server", mock_server, 'list, string')
+            for ms in mock_server:
+                if not isinstance(ms, six.string_types):
+                    _raise_typeerror("mock_server item", mock_server, 'string')
         # assure this is list type in yaml output
         if mock_server is None:
             mock_server = []
@@ -197,6 +214,9 @@ class PywbemServer(object):
     @name.setter
     def name(self, name):
         """Setter method; for a description see the getter method."""
+        if name:
+            if not isinstance(name, six.string_types):
+                _raise_typeerror("name", name, 'string')
 
         # pylint: disable=attribute-defined-outside-init
         self._name = name
@@ -212,6 +232,9 @@ class PywbemServer(object):
     def user(self, user):
         """Setter method; for a description see the getter method."""
 
+        if user and not isinstance(user, six.string_types):
+            _raise_typeerror("user", user, 'string')
+
         # pylint: disable=attribute-defined-outside-init
         self._user = user
 
@@ -225,7 +248,8 @@ class PywbemServer(object):
     @password.setter
     def password(self, password):
         """Setter method; for a description see the getter method."""
-
+        if password and not isinstance(password, six.string_types):
+            _raise_typeerror("password", password, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._password = password
 
@@ -239,7 +263,9 @@ class PywbemServer(object):
     @default_namespace.setter
     def default_namespace(self, default_namespace):
         """Setter method; for a description see the getter method."""
-
+        if default_namespace and not isinstance(default_namespace,
+                                                six.string_types):
+            _raise_typeerror("default-namespace", default_namespace, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._default_namespace = default_namespace
 
@@ -248,17 +274,20 @@ class PywbemServer(object):
         """
         :term:`int`: Connection timeout to be used on requests in seconds
         """
+        if self._timeout:
+            assert isinstance(self._timeout, int)
         return self._timeout
 
     @timeout.setter
     def timeout(self, timeout):
         """Setter method; for a description see the getter method."""
-
         if timeout is None:   # disallow None
-            ValueError('Timout of None not allowed')
-        if timeout < 0 or timeout > MAX_TIMEOUT:
-            ValueError('Timeout option({}) out of range {} to {} sec'
-                       .format(timeout, 0, MAX_TIMEOUT))
+            raise ValueError('timeout option of None not allowed')
+        if not isinstance(timeout, int):
+            _raise_typeerror("timeout", timeout, 'integer')
+        if not 0 < timeout <= MAX_TIMEOUT:
+            raise ValueError('Timeout option "{0}" out of range {1} to {2} sec'
+                             .format(timeout, 0, MAX_TIMEOUT))
         # pylint: disable=attribute-defined-outside-init
         self._timeout = timeout
 
@@ -274,10 +303,10 @@ class PywbemServer(object):
         """Setter method; for a description see the getter method."""
 
         if use_pull is None or isinstance(use_pull, bool):
+            # pylint: disable=attribute-defined-outside-init
             self._use_pull = use_pull
         else:
-            ValueError("use_pull must be boolean, not {}.".
-                       format(type(use_pull)))
+            _raise_typeerror("use-pull", use_pull, 'boolean')
 
     @property
     def verify(self):
@@ -290,22 +319,26 @@ class PywbemServer(object):
     @verify.setter
     def verify(self, verify):
         """Setter method; for a description see the getter method."""
-
+        if verify and not isinstance(verify, bool):
+            _raise_typeerror("verify", verify, 'boolean')
         # pylint: disable=attribute-defined-outside-init
         self._verify = verify
 
     @property
     def certfile(self):
         """
-        :term:`string`: certtificate for server or None if parameter not
+        :term:`string`: certificate for server or None if parameter not
         provided on input
         """
+        if self._certfile:
+            assert isinstance(self._certfile, six.string_types)
         return self._certfile
 
     @certfile.setter
     def certfile(self, certfile):
         """Setter method; for a description see the getter method."""
-
+        if certfile and not isinstance(certfile, six.string_types):
+            _raise_typeerror("certfile", certfile, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._certfile = certfile
 
@@ -314,11 +347,15 @@ class PywbemServer(object):
         """
         :term:`string`: keyfile or None if no keyfile parameter input
         """
+        if self._keyfile:
+            assert isinstance(self._keyfile, six.string_types)
         return self._keyfile
 
     @keyfile.setter
     def keyfile(self, keyfile):
         """Setter method; for a description see the getter method."""
+        if keyfile and not isinstance(keyfile, six.string_types):
+            _raise_typeerror("keyfile", keyfile, 'string')
 
         # pylint: disable=attribute-defined-outside-init
         self._keyfile = keyfile
@@ -326,14 +363,17 @@ class PywbemServer(object):
     @property
     def ca_certs(self):
         """
-        list of :term:`string`: List of ca_certs if provided on cmd line
+        :term:`string`: String that defines certs for server validation"
         """
+        if self._ca_certs:
+            assert isinstance(self._ca_certs, six.string_types)
         return self._ca_certs
 
     @ca_certs.setter
     def ca_certs(self, ca_certs):
         """Setter method; for a description see the getter method."""
-
+        if ca_certs and not isinstance(ca_certs, six.string_types):
+            _raise_typeerror("ca_certs", ca_certs, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._ca_certs = ca_certs
 
@@ -365,8 +405,9 @@ class PywbemServer(object):
                 confirmation_prompt=False, type=str, err=True)
             ctx.spinner_start()
             # pylint: disable=attribute-defined-outside-init
-            self._password = password
+            self.password = password
         else:
+            # TODO: Again we want to isolate the click excpetions in future
             raise click.ClickException("{cmd} requires user/password, but "
                                        "no password provided."
                                        .format(cmd=ctx.invoked_subcommand))

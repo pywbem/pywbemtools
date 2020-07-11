@@ -91,6 +91,12 @@ Released: not yet
   _cmd_class.py cmd_class_tree function to eliminate boundary conditions, and
   clarify code.
 
+* Extended parameter type testing in class PywbemServer so that all
+  constructor parameters are value tested.  This specifically fixes issue
+  where we were depending on WBEMConnection to test types of ca_certs
+  and invalid data types could get into the connections file. (See issue
+  #663).
+
 **Known issues:**
 
 * See `list of open issues`_.

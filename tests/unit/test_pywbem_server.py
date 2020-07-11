@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -22,11 +20,24 @@ Unit tests for PywbemServer class methods.
 
 from __future__ import absolute_import, print_function
 
+import os
 import pytest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 from tests.unit.pytest_extensions import simplified_test_function
+
+OK = True
+RUN = True
+FAIL = False
+PDB = "pdb"
+
+# This is needed by the connect test. Just the file name
+# created is required for WBEMConnection constructor with
+# cert and key files.
+SCRIPT_DIR = os.path.dirname(__file__)
+FAKE_PEM = 'test.pem'
+FAKE_PEM_PATH = os.path.join(SCRIPT_DIR, FAKE_PEM)
 
 
 TESTCASES_INITIALIZE = [
@@ -37,13 +48,12 @@ TESTCASES_INITIALIZE = [
     # * kwargs: Keyword arguments for the test function and response:
     #   * init_kwargs: __init__ kwargs.
     #   * exp_attrs: Dict of expected attributes of resulting object.
-    #   * exp_repr: string
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     (
-        "Verify url arg only",
+        "1. Verify url arg only",
         dict(
             init_args=[],
             init_kwargs=dict(
@@ -52,41 +62,49 @@ TESTCASES_INITIALIZE = [
             exp_attrs=dict(
                 server=u'http://localhost',
                 default_namespace='root/cimv2',
+                name='default',
                 user=None,
                 password=None,
+                timeout=30,
                 verify=None,
+                use_pull=None,
                 certfile=None,
                 keyfile=None,
+                ca_certs=None,
                 mock_server=[]
             )
         ),
-        None, None, True
+        None, None, OK
     ),
     (
-        "Verify multiple arguments",
+        "2. Verify server, default_namespace, user, password",
         dict(
             init_args=[],
             init_kwargs=dict(
                 server='http://localhost',
-                default_namespace='root/cimv2',
+                default_namespace='interop',
                 user='fred',
                 password='blah',
             ),
             exp_attrs=dict(
                 server=u'http://localhost',
-                default_namespace='root/cimv2',
+                default_namespace='interop',
+                name='default',
                 user='fred',
                 password='blah',
+                timeout=30,
                 verify=None,
+                use_pull=True,
                 certfile=None,
                 keyfile=None,
+                ca_certs=None,
                 mock_server=[]
             )
         ),
-        None, None, True
+        None, None, OK
     ),
     (
-        "Verify url arg only",
+        "3. Verify url plus all allowed other arguments",
         dict(
             init_args=[],
             init_kwargs=dict(
@@ -94,25 +112,32 @@ TESTCASES_INITIALIZE = [
                 default_namespace='root/cimv3',
                 user='fred',
                 password='blah',
-                verify=True,
-                certfile='mycert.pem',
-                keyfile='mykey.pem'
-            ),
-            exp_attrs=dict(
-                server=u'http://localhost',
-                default_namespace='root/cimv3',
-                user='fred',
-                password='blah',
-                verify=True,
+                timeout=50,
+                use_pull=True,
+                verify=False,
                 certfile='mycert.pem',
                 keyfile='mykey.pem',
+                ca_certs='blah'
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv3',
+                name='default',
+                user='fred',
+                password='blah',
+                timeout=50,
+                verify=False,
+                use_pull=True,
+                certfile='mycert.pem',
+                keyfile='mykey.pem',
+                ca_certs='blah',
                 mock_server=[]
             )
         ),
-        None, None, True
+        None, None, OK
     ),
     (
-        "Verify mockfile",
+        "4. Verify mockfile",
         dict(
             init_args=[],
             init_kwargs=dict(
@@ -121,15 +146,293 @@ TESTCASES_INITIALIZE = [
             exp_attrs=dict(
                 server=None,
                 default_namespace='root/cimv2',
+                name='default',
                 user=None,
                 password=None,
+                timeout=30,
                 verify=None,
+                use_pull=None,
                 certfile=None,
                 keyfile=None,
+                ca_certs=None,
                 mock_server='testmock.mof'
             )
         ),
-        None, None, True
+        None, None, OK
+    ),
+    (
+        "5. Verify mockfile, list",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                mock_server=['testmock.mof'],
+            ),
+            exp_attrs=dict(
+                server=None,
+                default_namespace='root/cimv2',
+                name='default',
+                user=None,
+                password=None,
+                timeout=30,
+                verify=None,
+                use_pull=None,
+                certfile=None,
+                keyfile=None,
+                ca_certs=None,
+                mock_server=['testmock.mof']
+            )
+        ),
+        None, None, OK
+    ),
+    (
+        "6. Verify mockfile, list with multiple and timeout 0",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                timeout=100,
+                mock_server=['testmock.mof', 'test.py'],
+            ),
+            exp_attrs=dict(
+                server=None,
+                default_namespace='root/cimv2',
+                name='default',
+                user=None,
+                password=None,
+                timeout=100,
+                verify=None,
+                use_pull=None,
+                certfile=None,
+                keyfile=None,
+                ca_certs=None,
+                mock_server=['testmock.mof', 'test.py']
+            )
+        ),
+        None, None, OK
+    ),
+
+    # verify type errors
+    (
+        "E1. Verify mockfile, list with multiple and timeout 0",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                timeout=0,
+                mock_server=3,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+
+    (
+        "E2. Verify server TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server=['fred'],
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E3. Verify name TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                name=['fred'],
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E4. Verify name TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                name=1.3456,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+
+    (
+        "E5. Verify default-namespace TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                default_namespace=3,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E6. Verify name TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                name=3,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E7. Verify user TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                user=3,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E8. Verify password TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                password=3,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E9. Verify timeout TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                timeout='3',
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E10. Verify verify TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                verify='3',
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E11. Verify use-pull TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                use_pull='blah',
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E12. Verify certfile TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                certfile=True,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E13. Verify keyfile TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                keyfile=True,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E14. Verify ca_certs TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                ca_certs=True,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E15. Verify ca_certs TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                ca_certs=True,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E15. Verify mock_server TypeError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                mock_server=True,
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E15. Verify mock_server TypeError with array",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                mock_server=["blah.mof", 3],
+            ),
+        ),
+        TypeError, None, OK
+    ),
+    (
+        "E16. Verify timeout None valueError",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                timeout=None,
+            ),
+            exp_attrs=dict(),
+        ),
+        ValueError, None, OK
+    ),
+
+    # ValueError tests
+
+    (
+        "E17. Simultaneous server and mock server not allowed",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server="http://blay",
+                mock_server="blah.mof"
+            ),
+            exp_attrs=dict(),
+        ),
+        ValueError, None, OK
+    ),
+    (
+        "E18. Verify timeout < 0 ValueError ",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://blah',
+                timeout=-3,
+            ),
+            exp_attrs=dict(),
+        ),
+        ValueError, None, OK
+    ),
+    (
+        "E19. Verify timeout < 0 ValueError ",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://blah',
+                timeout=99999,
+            ),
+            exp_attrs=dict(),
+        ),
+        ValueError, None, OK
     ),
 ]
 
@@ -152,13 +455,17 @@ def test_initialize(testcase, init_args, init_kwargs, exp_attrs):
     assert svr.default_namespace == exp_attrs['default_namespace']
     assert svr.user == exp_attrs['user']
     assert svr.password == exp_attrs['password']
+    assert svr.timeout == exp_attrs['timeout']
     assert svr.verify == exp_attrs['verify']
     assert svr.certfile == exp_attrs['certfile']
     assert svr.keyfile == exp_attrs['keyfile']
+    assert svr.ca_certs == exp_attrs['ca_certs']
     assert svr.mock_server == exp_attrs['mock_server']
 
-    # assert '{0}'.format(svr) == \
-    #                 "PywbemServer(url=http://localhost name=default)"
+    repr_str = repr(svr)
+    if exp_attrs['server']:
+        assert "server=" in repr_str
+        assert exp_attrs['server'] in repr_str
 
 
 TESTCASES_CONNECT = [
@@ -193,7 +500,33 @@ TESTCASES_CONNECT = [
                 mock_server=None
             )
         ),
-        None, None, True
+        None, None, OK
+    ),
+    (
+        "Verify with security params",
+        dict(
+            init_args=[],
+            init_kwargs=dict(
+                server='http://localhost',
+                user='fred',
+                password='blah',
+                verify=True,
+                certfile=FAKE_PEM_PATH,
+                keyfile=FAKE_PEM_PATH,
+            ),
+            exp_attrs=dict(
+                server=u'http://localhost',
+                default_namespace='root/cimv2',
+                user='fred',
+                password='blah',
+                verify=True,
+                certfile=FAKE_PEM_PATH,
+                keyfile=FAKE_PEM_PATH,
+                ca_certs=None,
+                mock_server=None
+            )
+        ),
+        None, None, OK
     ),
 ]
 
@@ -208,8 +541,19 @@ def test_connect(testcase, init_args, init_kwargs, exp_attrs):
     """
     svr = PywbemServer(*init_args, **init_kwargs)
 
-    # connect and test connection results
-    svr.create_connection(False)
+    # Create temp fake file.
+    # NOTE: We cannot use fixtures because we are using simplified_test_function
+    open(FAKE_PEM_PATH, 'a').close()
+
+    # connect and test connection results. Try block insures finally is
+    # called.
+    try:
+        svr.create_connection(False)
+    except Exception:
+        pass  # pass all exceptions
+    finally:
+        # remove the PEM file
+        os.remove(FAKE_PEM_PATH)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -223,9 +567,4 @@ def test_connect(testcase, init_args, init_kwargs, exp_attrs):
     assert svr.certfile == exp_attrs['certfile']
     assert svr.keyfile == exp_attrs['keyfile']
 
-
-# TODO test name setter
-# TODO password setter
-# TODO invalid timeout value
-# TODO password prompt (get_password)
-# TODO str and repr strings
+# TODO: Add test for get_password.
