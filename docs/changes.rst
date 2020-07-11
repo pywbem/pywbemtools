@@ -97,6 +97,9 @@ Released: not yet
   and invalid data types could get into the connections file. (See issue
   #663).
 
+* Added a function test test module test_misc_errors.py that tests for some
+  common exceptions that apply to many commands (ex. connection error).
+
 **Known issues:**
 
 * See `list of open issues`_.
