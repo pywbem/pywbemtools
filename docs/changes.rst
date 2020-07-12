@@ -5,6 +5,30 @@ Change log
 ==========
 
 
+pywbemtools 0.8.0
+-----------------
+
+This version is currently in development and is shown as |version|.
+
+This version contains all fixes up to pywbemtools 0.7.x.
+
+Released: not yet
+
+**Incompatible changes:**
+
+**Deprecations:**
+
+**Bug fixes:**
+
+**Enhancements:**
+
+**Known issues:**
+
+* See `list of open issues`_.
+
+.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+
+
 pywbemtools 0.7.0
 -----------------
 
@@ -97,12 +121,6 @@ Released: 2020-07-12
 
 * Added a function test test module test_misc_errors.py that tests for some
   common exceptions that apply to many commands (ex. connection error).
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.6.0
