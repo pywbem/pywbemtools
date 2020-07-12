@@ -8,18 +8,16 @@ Change log
 pywbemtools 0.7.0
 -----------------
 
-This version is currently in development and is shown as |version|.
+This version contains all fixes up to pywbemtools 0.6.1.
 
-This version contains all fixes up to pywbemtools 0.6.x.
-
-Released: not yet
+Released: 2020-07-12
 
 **Incompatible changes:**
 
 * The default location for the connections file (pywbemcli_connection_definitions.yaml)
   has been moved from the users current directory to the users home directory.
   A general option "connections_file" allows the user to set other directories
-  and file names for this file. (See issue # 596)
+  and file names for this file. (See issue #596)
 
 **Deprecations:**
 
@@ -80,7 +78,7 @@ Released: not yet
 * Modify connection file location functionality so that default is
   the users home directory but any other directory can be specified using the
   general option "connections_file" which has a corresponding environment
-  variable.  (See issue # 596)
+  variable.  (See issue #596)
 
 **Cleanup**
 
@@ -154,7 +152,7 @@ Released: 2020-04-10
   and have therefore been pinned to below these versions on Python 3.4.
 
 * Fix bug where order of commands listed in help output was different for
-  different versions of Python. (See issue # 510)
+  different versions of Python. (See issue #510)
 
 * Increased minimum version of pluggy package from 0.12.0 to 0.13.0
   because it failed during loading of pytest plugins on Python 3.8.
@@ -218,7 +216,7 @@ Released: 2020-04-10
   'no-...'. The user can filter to find classes with combinations of these
   options returning only classes that meet the option criteria.  Thus,
   '--association' returns classes that are associations and '--no-association'
-  returns only classes that are not associations.  See issue # 447
+  returns only classes that are not associations.  See issue #447
 
 * Added support for disabling the spinner that is displayed by default during
   any ongoing activities, by setting the env var PYWBEM_SPINNER to 'false',
