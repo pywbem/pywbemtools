@@ -17,6 +17,7 @@ six>=1.10.0
 Click>=7.0,!=7.1
 click-spinner>=0.1.8
 click-repl>=0.1.6
+click-option-group
 asciitree>=0.3.3
 tabulate>=0.8.2
 prompt-toolkit>=2.0.1; python_version >= '3.4'
