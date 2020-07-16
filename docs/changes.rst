@@ -37,6 +37,10 @@ Released: not yet
 * Move the commands associated with WBEM management profiles from the server
   group to a new profile group. (See issue #612). See also Incompatible changes.
 
+* Organize the general options into logical groups in the help output. This creates
+  groups of commands (server, server configuration , general) using the
+  package click-option-group. (see issue
+  # 672)
 
 **Known issues:**
 

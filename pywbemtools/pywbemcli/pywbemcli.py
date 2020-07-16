@@ -36,7 +36,8 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
 from pywbem import __version__ as pywbem_version
 
 from ._context_obj import ContextObj, display_click_context
-from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
+from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS, \
+    warning_msg
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
@@ -93,27 +94,26 @@ def validate_connections_file(connections_repo):
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTS_TXT,
              subcommand_metavar=SUBCMD_HELP_TXT)
-@optgroup.group('Server definition',
-                help='The alternatives for defining a server')
+@optgroup.group('Server Definition Options (Mutually exclusive options)',
+                help='Define the server to which pywbemcli will connect; a '
+                     'specific server, a server named in a connections file '
+                     'or a mock server. These options are mutually exclusive.')
 @optgroup.option('-n', '--name', 'connection_name', type=str, metavar='NAME',
                  # defaulted in code
                  envvar=PywbemServer.name_envvar,
-                 help='Use the WBEM server defined by the WBEM connection '
-                     'definition NAME. '
-                      'This option is mutually exclusive with the --server and '
-                      '--mock-server options, since each defines a WBEM '
-                      'server. Default: EnvVar {ev}, or none.'.
+                 help='Use the WBEM server defined by NAME  that is defined '
+                      'in a connections file. See ``connections-file`` option. '
+                      'Default: EnvVar {ev}, or none.'.
                       format(ev=PywbemServer.name_envvar))
 @optgroup.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
                  # defaulted in code
                  envvar=PywbemServer.mock_server_envvar,
-                 help='Use a mock WBEM server that is automatically created in '
-                      'pywbemcli and populated with CIM objects that are defined '
-                      'in the specified MOF file or Python script file. '
-                      'See the pywbemcli documentation for more information. '
-                      'This option may be specified multiple times, and is '
-                      'mutually exclusive with the --server and --name options, '
-                      'since each defines a WBEM server. '
+                 help='Use a mock WBEM server that is created in '
+                      'pywbemcli and populated with CIM objects that are '
+                      'defined in the specified MOF file or Python script '
+                      'file. See the pywbemcli documentation for more '
+                      'information. This option may be specified multiple '
+                      'times. '
                       'Default: EnvVar {ev}, or none.'.
                       format(ev=PywbemServer.mock_server_envvar))
 @optgroup.option('-s', '--server', type=str, metavar='URL',
@@ -125,164 +125,169 @@ def validate_connections_file(connections_repo):
                       'HOST is a short or long hostname or literal IPV4/v6 '
                       'address. '
                       'PORT defaults to 5989 for https and 5988 for http. '
-                      'This option is mutually exclusive with the --mock-server '
-                      'and --name options, since each defines a WBEM server. '
                       'Default: EnvVar {ev}, or none.'.
                       format(ev=PywbemServer.server_envvar))
-@optgroup.group('Server configuration',
-                help='The options for configuring a server with --server')
-@optgroup.option('-u', '--user', type=str, metavar='TEXT',
-              # defaulted in code
-              envvar=PywbemServer.user_envvar,
-              help='User name for the WBEM server. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PywbemServer.user_envvar))
-@optgroup.option('-p', '--password', type=str, metavar='TEXT',
-              # defaulted in code
-              envvar=PywbemServer.password_envvar,
-              help='Password for the WBEM server. '
-                   'Default: EnvVar {ev}, or prompted for if --user specified.'.
-                   format(ev=PywbemServer.password_envvar))
-@optgroup.option('--verify/--no-verify', 'verify', default=None,
-              # defaulted in code
-              envvar=PywbemServer.verify_envvar,
-              help='If --verify, client verifies the X.509 server '
-                   'certificate presented by the WBEM server during TLS/SSL '
-                   'handshake. If --no-verify client bypasses verification. '
-                   'Default: EnvVar {ev}, or "--verify".'.
-                   format(ev=PywbemServer.verify_envvar))
-@optgroup.option('--ca-certs', type=str, metavar="CACERTS",
-              default=None,  # defaulted in code
-              envvar=PywbemServer.ca_certs_envvar,
-              help='Certificates used to validate the certificate presented '
-                   'by the WBEM server during TLS/SSL handshake: '
-                   'FILE: Use the certs in the specified PEM file; '
-                   'DIR: Use the certs in the PEM files in the specified '
-                   'directory; '
-                   '"certifi" (pywbem 1.0 or later): Use the certs provided by '
-                   'the certifi Python package; '
-                   'Default: EnvVar {ev}, or "certifi" (pywbem 1.0 or later), '
-                   'or the certs in the PEM files in the first existing '
-                   'directory from from a system defined list of directories '
-                   '(pywbem before 1.0).'.
-                   format(ev=PywbemServer.ca_certs_envvar))
-@optgroup.option('-c', '--certfile', type=str, metavar="FILE",
-              # defaulted in code
-              envvar=PywbemServer.certfile_envvar,
-              help='Path name of a PEM file containing a X.509 client '
-                   'certificate that is used to enable TLS/SSL 2-way '
-                   'authentication by presenting the certificate to the '
-                   'WBEM server during TLS/SSL handshake. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PywbemServer.certfile_envvar))
-@optgroup.option('-k', '--keyfile', type=str, metavar='FILE',
-              # defaulted in code
-              envvar=PywbemServer.keyfile_envvar,
-              help='Path name of a PEM file containing a X.509 private key '
-                   'that belongs to the certificate in the --certfile file. '
-                   'Not required if the private key is part of the '
-                   '--certfile file. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PywbemServer.keyfile_envvar))
-@optgroup.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
-              metavar='INT',
-              # defaulted in code
-              envvar=PywbemServer.timeout_envvar,
-              help='Client-side timeout in seconds for operations with the '
-                   'WBEM server. '
-                   'Default: EnvVar {ev}, or {default}.'.
-                   format(ev=PywbemServer.timeout_envvar,
-                          default=DEFAULT_CONNECTION_TIMEOUT))
-@optgroup.group('Pull operation options',
-                help='Options for configuring use of pull operations')
-@optgroup.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
-              # defaulted in code
-              envvar=PywbemServer.use_pull_envvar,
-              help='Determines whether pull operations are used for '
-                   'operations with the WBEM server that return lists of '
-                   'instances, as follows: '
-                   '"yes" uses pull operations and fails if not supported by '
-                   'the server; '
-                   '"no" uses traditional operations; '
-                   '"either" (default) uses pull operations if supported by '
-                   'the server, and otherwise traditional operations. '
-                   'Default: EnvVar {ev}, or "either".'.
-                   format(ev=PywbemServer.use_pull_envvar))
-@optgroup.option('--pull-max-cnt', type=int, metavar='INT',
-              # defaulted in code
-              envvar=PywbemServer.pull_max_cnt_envvar,
-              help='Maximum number of instances to be returned by the WBEM '
-                   'server in each open or pull response, if pull operations '
-                   'are used. '
-                   'This is a tuning parameter that does not affect the '
-                   'external behavior of the commands. '
-                   'Default: EnvVar {ev}, or {default}'.
-                   format(ev=PywbemServer.pull_max_cnt_envvar,
-                          default=DEFAULT_MAXPULLCNT))
-@optgroup.group('Configuring pywbemcli',
-                help='setup of pywbemcli and its display, etc.')
-@optgroup.option('-T', '--timestats', is_flag=True,
-              # defaulted in code
-              help='Show time statistics of WBEM server operations.')
+@optgroup.group('Server Configure Options',
+                help='Options that define the server configuration properties '
+                     'for a server defined with --server option or modify '
+                     'existing named server (--name option). These options do '
+                     'not apply to a mock server except for '
+                     '--default-namespace. These options generally become part '
+                     'of the server definition.')
 @optgroup.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
-              default=None,
-              envvar=PywbemServer.defaultnamespace_envvar,
-              help='Default namespace, to be used when commands do not '
-                   'specify the --namespace command option. '
-                   'Default: EnvVar {ev}, or {default}.'.
-                   format(ev=PywbemServer.defaultnamespace_envvar,
-                          default=DEFAULT_NAMESPACE))
+                 default=None,
+                 envvar=PywbemServer.defaultnamespace_envvar,
+                 help='Default namespace, to be used when commands do not '
+                      'specify the --namespace command option. '
+                      'Default: EnvVar {ev}, or {default}.'.
+                      format(ev=PywbemServer.defaultnamespace_envvar,
+                             default=DEFAULT_NAMESPACE))
+@optgroup.option('-u', '--user', type=str, metavar='TEXT',
+                 # defaulted in code
+                 envvar=PywbemServer.user_envvar,
+                 help='User name for the WBEM server. '
+                      'Default: EnvVar {ev}, or none.'.
+                      format(ev=PywbemServer.user_envvar))
+@optgroup.option('-p', '--password', type=str, metavar='TEXT',
+                 # defaulted in code
+                 envvar=PywbemServer.password_envvar,
+                 help='Password for the WBEM server. '
+                      'Default: EnvVar {ev}, or prompted for if --user '
+                      'specified.'.
+                      format(ev=PywbemServer.password_envvar))
+@optgroup.option('--verify/--no-verify', 'verify', default=None,
+                 # defaulted in code
+                 envvar=PywbemServer.verify_envvar,
+                 help='If --verify, client verifies the X.509 server '
+                      'certificate presented by the WBEM server during TLS/SSL '
+                      'handshake. If --no-verify client bypasses verification. '
+                      'Default: EnvVar {ev}, or "--verify".'.
+                      format(ev=PywbemServer.verify_envvar))
+@optgroup.option('--ca-certs', type=str, metavar="CACERTS",
+                 default=None,  # defaulted in code
+                 envvar=PywbemServer.ca_certs_envvar,
+                 help='Certificates used to validate the certificate presented '
+                      'by the WBEM server during TLS/SSL handshake: '
+                      'FILE: Use the certs in the specified PEM file; '
+                      'DIR: Use the certs in the PEM files in the specified '
+                      'directory; '
+                      '"certifi" (pywbem 1.0 or later): Use the certs provided '
+                      'by the certifi Python package; '
+                      'Default: EnvVar {ev}, or "certifi" (pywbem 1.0 or '
+                      'later), or the certs in the PEM files in the first '
+                      'existing directory from from a system defined list of '
+                      'directories (pywbem before 1.0).'.
+                      format(ev=PywbemServer.ca_certs_envvar))
+@optgroup.option('-c', '--certfile', type=str, metavar="FILE",
+                 # defaulted in code
+                 envvar=PywbemServer.certfile_envvar,
+                 help='Path name of a PEM file containing a X.509 client '
+                      'certificate that is used to enable TLS/SSL 2-way '
+                      'authentication by presenting the certificate to the '
+                      'WBEM server during TLS/SSL handshake. '
+                      'Default: EnvVar {ev}, or none.'.
+                      format(ev=PywbemServer.certfile_envvar))
+@optgroup.option('-k', '--keyfile', type=str, metavar='FILE',
+                 # defaulted in code
+                 envvar=PywbemServer.keyfile_envvar,
+                 help='Path name of a PEM file containing a X.509 private key '
+                      'that belongs to the certificate in the --certfile file. '
+                      'Not required if the private key is part of the '
+                      '--certfile file. '
+                      'Default: EnvVar {ev}, or none.'.
+                      format(ev=PywbemServer.keyfile_envvar))
+@optgroup.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
+                 metavar='INT',
+                 # defaulted in code
+                 envvar=PywbemServer.timeout_envvar,
+                 help='Client-side timeout in seconds for operations with the '
+                      'WBEM server. '
+                      'Default: EnvVar {ev}, or {default}.'.
+                      format(ev=PywbemServer.timeout_envvar,
+                             default=DEFAULT_CONNECTION_TIMEOUT))
+@optgroup.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
+                 # defaulted in code
+                 envvar=PywbemServer.use_pull_envvar,
+                 help='Determines whether pull operations are used for '
+                      'operations with the WBEM server that return lists of '
+                      'instances, as follows: '
+                      '"yes" uses pull operations and fails if not supported '
+                      'by the server; '
+                      '"no" uses traditional operations; '
+                      '"either" (default) uses pull operations if supported by '
+                      'the server, and otherwise traditional operations. '
+                      'Default: EnvVar {ev}, or "either".'.
+                      format(ev=PywbemServer.use_pull_envvar))
+@optgroup.option('--pull-max-cnt', type=int, metavar='INT',
+                 # defaulted in code
+                 envvar=PywbemServer.pull_max_cnt_envvar,
+                 help='Maximum number of instances to be returned by the WBEM '
+                      'server in each open or pull response, if pull '
+                      'operations are used. '
+                      'This is a tuning parameter that does not affect the '
+                      'external behavior of the commands. '
+                      'Default: EnvVar {ev}, or {default}'.
+                      format(ev=PywbemServer.pull_max_cnt_envvar,
+                             default=DEFAULT_MAXPULLCNT))
+@optgroup.group('General Pywbemcli Options',
+                help='These options control the behavior of pywbemcli. They '
+                     'are not part of a server definition and are retained '
+                     'through an interactive session.')
+@optgroup.option('-T', '--timestats', is_flag=True,
+                 # defaulted in code
+                 help='Show time statistics of WBEM server operations.')
 @optgroup.option('-o', '--output-format', metavar='FORMAT',
-              help='Output format for the command result. '
-                   'The default and allowed output formats are command '
-                   'specific. '
-                   'The default output_format is None so that each command '
-                   'selects its own default format. '
-                   'FORMAT is: table formats: [{tb}]; CIM object '
-                   'formats: [{ob}]]; TEXT formats: [{tx}].'.
-                   format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0]),
-                          ob='|'.join(OUTPUT_FORMAT_GROUPS['CIM'][0]),
-                          tx='|'.join(OUTPUT_FORMAT_GROUPS['TEXT'][0])))
+                 help='Output format for the command result. '
+                      'The default and allowed output formats are command '
+                      'specific. '
+                      'The default output_format is None so that each command '
+                      'selects its own default format. '
+                      'FORMAT is: table formats: [{tb}]; CIM object '
+                      'formats: [{ob}]]; TEXT formats: [{tx}].'.
+                      format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0]),
+                             ob='|'.join(OUTPUT_FORMAT_GROUPS['CIM'][0]),
+                             tx='|'.join(OUTPUT_FORMAT_GROUPS['TEXT'][0])))
 @optgroup.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
-              # defaulted in code
-              envvar=PywbemServer.log_envvar,
-              help='Enable logging of the WBEM operations, defined by a list '
-                   'of log configuration strings with: '
-                   'COMP: [{comp_choices}]; '
-                   'DEST: [{dest_choices}], default: {dest_default}; '
-                   'DETAIL: [{detail_choices}], default: {detail_default}. '
-                   'Default: EnvVar {ev}, or {default}.'.
-                   format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
-                          dest_choices='|'.join(LOG_DESTINATIONS),
-                          dest_default=DEFAULT_LOG_DESTINATION,
-                          detail_choices='|'.join(LOG_DETAIL_LEVELS),
-                          detail_default=DEFAULT_LOG_DETAIL_LEVEL,
-                          ev=PywbemServer.log_envvar,
-                          default='all'))
+                 # defaulted in code
+                 envvar=PywbemServer.log_envvar,
+                 help='Enable logging of the WBEM operations, defined by a '
+                      'list of log configuration strings with: '
+                      'COMP: [{comp_choices}]; '
+                      'DEST: [{dest_choices}], default: {dest_default}; '
+                      'DETAIL: [{detail_choices}], default: {detail_default}. '
+                      'Default: EnvVar {ev}, or {default}.'.
+                      format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
+                             dest_choices='|'.join(LOG_DESTINATIONS),
+                             dest_default=DEFAULT_LOG_DESTINATION,
+                             detail_choices='|'.join(LOG_DETAIL_LEVELS),
+                             detail_default=DEFAULT_LOG_DETAIL_LEVEL,
+                             ev=PywbemServer.log_envvar,
+                             default='all'))
 @optgroup.option('-v', '--verbose/--no-verbose',
-              default=None,
-              help='Display extra information about the processing.')
-@optgroup.option('--deprecation-warnings/--no-deprecation-warnings', is_flag=True,
-              default=True,
-              envvar=PywbemServer.deprecation_warnings_envvar,
-              help='Enable deprecation warnings. '
-              'Default: EnvVar {ev}, or true.'.
-              format(ev=PywbemServer.deprecation_warnings_envvar))
+                 default=None,
+                 help='Display extra information about the processing.')
+@optgroup.option('--deprecation-warnings/--no-deprecation-warnings',
+                 is_flag=True,
+                 default=True,
+                 envvar=PywbemServer.deprecation_warnings_envvar,
+                 help='Enable deprecation warnings. '
+                 'Default: EnvVar {ev}, or true.'.
+                 format(ev=PywbemServer.deprecation_warnings_envvar))
 @optgroup.option('-C', '--connections-file', metavar='FILE PATH',
-              envvar=PywbemServer.connections_file_envvar,
-              help='File path of a YAML file containing named connection '
-                   'definitions. The default if this option is not specified '
-                   'is the file "{df}" (in the users home directory). '
-                   'EnvVar ({ev})'.
-                   format(df=HOME_CONNECTIONS_PATH,
-                          ev=PywbemServer.connections_file_envvar))
+                 envvar=PywbemServer.connections_file_envvar,
+                 help='File path of a YAML file containing named connection '
+                      'definitions. The default if this option is not '
+                      'specified is the file "{df}" (in the users home '
+                      'directory). EnvVar ({ev})'.
+                      format(df=HOME_CONNECTIONS_PATH,
+                             ev=PywbemServer.connections_file_envvar))
 @optgroup.option('--pdb', is_flag=True,
-              # defaulted in code
-              envvar=PywbemServer.pdb_envvar,
-              help='Pause execution in the built-in pdb debugger just before '
-                   'executing the command within pywbemcli. '
-                   'Default: EnvVar {ev}, or false.'.
-                   format(ev=PywbemServer.pdb_envvar))
+                 # defaulted in code
+                 envvar=PywbemServer.pdb_envvar,
+                 help='Pause execution in the built-in pdb debugger just '
+                      'before executing the command within pywbemcli. '
+                      'Default: EnvVar {ev}, or false.'.
+                      format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
     message='%(prog)s, version %(version)s\npywbem, version {}'.format(
         pywbem_version),
@@ -359,8 +364,9 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if server or resolved_mock_server:
             if connection_name:
                 click.ClickException('Option conflict: --name "{}" '
-                                     'conflicts with existence of --server and '
-                                     '--mock-server'.format(connection_name))
+                                     'mutually exclusive with existence of '
+                                     '--server and --mock-server'.
+                                     format(connection_name))
             connection_name = 'not-saved'
             pywbem_server = PywbemServer(server,
                                          resolved_default_namespace,
@@ -451,12 +457,12 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         connections_repo = ctx.obj.connections_repo
 
     if verbose:
-        click.echo(str(connections_repo))
+        click.echo("Connection file: {}".format(connections_repo))
 
     if server and connection_name:
         raise click.ClickException(
-            'Conflicting server definitions: name: {}, server: {}'.
-            format(connection_name, server))
+            'Conflicting server definitions: name: {}, server: {}. These '
+            'options are mutually exclusive.'.format(connection_name, server))
 
     if keyfile and not certfile:
         raise click.ClickException(
@@ -518,18 +524,31 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 else:  # not processed during startup
                     resolved_mock_server.append(file_path)
 
-    # Simultaneous mock_server and server fails
+    # Simultaneous mock_server and server fails. This is tested after
+    # the mock_server is resolved because the resolve removes python defintions
+    # that are marked to work at startup.
     if server and resolved_mock_server:
         raise click.ClickException(
-            'Conflicting server definitions: server: {}, mock-server: {}'.
+            'Conflicting server definitions: server: {}, mock-server: {}. '
+            'These options are mutually exclusive'.
             format(server, ', '.join(resolved_mock_server)))
 
     # Simultaneous mock_server and connection_name: Generate Exception.
     # Note: resolve mock_server does not include any mocks processedatstartup
     if resolved_mock_server and connection_name:
         raise click.ClickException(
-            'Conflicting server definitions: mock-server: {}, name: {}'.
+            'Conflicting server definitions: mock-server: {}, name: {}. These'
+            'options are mutually exclusieve.'.
             format(', '.join(resolved_mock_server), connection_name))
+
+    # Issue warning if options that are not part of mock server are defined
+    if resolved_mock_server:
+        if user or password or verify or keyfile or ca_certs or certfile:
+            warning_msg(
+                'The options --user, --password, --verify, --keyfile, '
+                '--ca-certs, and --certfile are ignored. They are not used '
+                'with a mock server definition. {}'.
+                format(', '.join(resolved_mock_server)))
 
     # Set pull default if necessary and create the resolved variable
     use_pull = use_pull or DEFAULT_PULL_CHOICE
