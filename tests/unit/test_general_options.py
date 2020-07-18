@@ -103,20 +103,12 @@ GENERAL_HELP_LINES = [
     """Commands:
       class       Command group for CIM classes.
       instance    Command group for CIM instances.
+      profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.
       connection  Command group for WBEM connection definitions.
       help        Show help message for interactive mode.
       repl        Enter interactive mode (default)."""
-
-    # "Commands:",
-    # "class Command group for CIM classes.",
-    # "instance Command group for CIM instances.",
-    # "qualifier Command group for CIM qualifier declarations.",
-    # "server Command group for WBEM servers.",
-    # "connection Command group for WBEM connection definitions.",
-    # "help Show help message for interactive mode.",
-    # "repl Enter interactive mode (default)."
 ]
 
 # pylint: disable=line-too-long

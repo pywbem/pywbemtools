@@ -65,8 +65,9 @@ TEST_CASES_CONNECTION_FAIL = [
     ['server', 'interop', OK],
     ['server', 'brand', OK],
     ['server', 'info', OK],
-    ['server', 'profiles', OK],
-    ['server', 'centralinsts', OK],
+
+    ['profile', 'list', OK],
+    ['profile', 'centralinsts', OK],
 ]
 
 

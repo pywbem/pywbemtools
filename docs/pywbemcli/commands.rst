@@ -999,7 +999,96 @@ namespace as a table:
 
 See :ref:`pywbemcli qualifier enumerate --help` for the exact help output of the command.
 
-.. index:: pair: command groups; server commands
+.. index:: pair: command groups; profile commands
+
+.. _`Profile command group`:
+
+``profile`` command group
+-------------------------
+* :ref:`Profile list command` - List management profiles advertised by the server.
+* :ref:`Profile centralinsts command` - List central instances of management profiles on the server.
+
+.. index:: pair: profile commands; profile list
+
+.. _`Profile list command`:
+
+``Profile list`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``profile list`` command lists the
+:term:`management profiles <management profile>` advertised by the
+WBEM server of the :term:`current connection`.
+
+The returned management profiles are displayed with organization, profile name,
+and profile version using the :term:`Table output formats`.
+
+The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
+used to filter the returned management profiles by organization and profile
+name, respectively.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver --output-format simple profile list
+    Advertised management profiles:
+    Organization    Registered Name           Version
+    --------------  ------------------------  ---------
+    DMTF            CPU                       1.0.0
+    DMTF            Computer System           1.0.0
+    DMTF            Ethernet Port             1.0.0
+    DMTF            Fan                       1.0.0
+    DMTF            Indications               1.1.0
+    DMTF            Profile Registration      1.0.0
+    Other           Some Other Subprofile     0.1.0
+    Other           Some Subprofile           0.1.0
+    Other           SomeSystemProfile         0.1.0
+    SNIA            Array                     1.1.0
+    SNIA            Block Server Performance  1.1.0
+    SNIA            Disk Drive Lite           1.1.0
+    SNIA            Indication                1.1.0
+    SNIA            Indication                1.2.0
+    SNIA            Profile Registration      1.0.0
+    SNIA            SMI-S                     1.2.0
+    SNIA            Server                    1.1.0
+    SNIA            Server                    1.2.0
+    SNIA            Software                  1.1.0
+    SNIA            Software                  1.2.0
+
+See :ref:`pywbemcli profile list --help` for the exact help output of the command.
+
+.. index:: pair: sprofile commands; profile centralinsts
+
+.. _`Profile centralinsts command`:
+
+``profile centralinsts`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``profile centralinsts`` command gets the :term:`central instances`
+of the :term:`management profiles <management profile>` advertised by the
+WBEM server of the :term:`current connection`.
+
+The command displays the instance paths of the central instances by profile,
+using the :term:`Table output formats`.
+
+The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
+used to filter the result by organization and name of the management profiles,
+respectively.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli profile centralinsts --organization DMTF --profile "Computer System"
+    Advertised Central Instances:
+    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
+    | Profile                         | Central Instances                                                                                                    |
+    |---------------------------------+----------------------------------------------------------------------------------------------------------------------|
+    | DMTF:Computer System:1.0.0      | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance1",CreationClassName="Test_StorageSystem"  |
+    |                                 | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem"  |
+    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
+
+See :ref:`pywbemcli profile centralinsts --help` for the exact help output of the command.
 
 .. _`Server command group`:
 
@@ -1011,11 +1100,9 @@ server of the :term:`current connection` to access information about the
 WBEM server itself:
 
 * :ref:`Server brand command` - Get the brand of the server.
-* :ref:`Server centralinsts command` - List central instances of mgmt profiles on the server.
 * :ref:`Server info command` - Get information about the server.
 * :ref:`Server interop command` - Get the Interop namespace of the server.
 * :ref:`Server namespaces command` - List the namespaces of the server.
-* :ref:`Server profiles command` - List management profiles advertized by the server.
 
 .. index:: pair: server commands; server brand
 
@@ -1152,88 +1239,6 @@ Example:
     test/static
 
 See :ref:`pywbemcli server namespaces --help` for the exact help output of the command.
-
-.. index:: pair: server commands; server profiles
-
-.. _`Server profiles command`:
-
-``server profiles`` command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``server profiles`` command lists the
-:term:`management profiles <management profile>` advertised by the
-WBEM server of the :term:`current connection`.
-
-The returned management profiles are displayed with organization, name, and
-version using the :term:`Table output formats`.
-
-The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
-used to filter the returned management profiles by organization and name,
-respectively.
-
-Example:
-
-.. code-block:: text
-
-    $ pywbemcli --name myserver --output-format simple server profiles
-    Advertised management profiles:
-    Organization    Registered Name           Version
-    --------------  ------------------------  ---------
-    DMTF            CPU                       1.0.0
-    DMTF            Computer System           1.0.0
-    DMTF            Ethernet Port             1.0.0
-    DMTF            Fan                       1.0.0
-    DMTF            Indications               1.1.0
-    DMTF            Profile Registration      1.0.0
-    Other           Some Other Subprofile     0.1.0
-    Other           Some Subprofile           0.1.0
-    Other           SomeSystemProfile         0.1.0
-    SNIA            Array                     1.1.0
-    SNIA            Block Server Performance  1.1.0
-    SNIA            Disk Drive Lite           1.1.0
-    SNIA            Indication                1.1.0
-    SNIA            Indication                1.2.0
-    SNIA            Profile Registration      1.0.0
-    SNIA            SMI-S                     1.2.0
-    SNIA            Server                    1.1.0
-    SNIA            Server                    1.2.0
-    SNIA            Software                  1.1.0
-    SNIA            Software                  1.2.0
-
-See :ref:`pywbemcli server profiles --help` for the exact help output of the command.
-
-.. index:: pair: server commands; server centralinsts
-
-.. _`Server centralinsts command`:
-
-``server centralinsts`` command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``server centralinsts`` command gets the :term:`central instances`
-of the :term:`management profiles <management profile>` advertised by the
-WBEM server of the :term:`current connection`.
-
-The command displays the instance paths of the central instances by profile,
-using the :term:`Table output formats`.
-
-The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
-used to filter the result by organization and name of the management profiles,
-respectively.
-
-Example:
-
-.. code-block:: text
-
-    $ pywbemcli server centralinsts --organization DMTF --profile "Computer System"
-    Advertised Central Instances:
-    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
-    | Profile                         | Central Instances                                                                                                    |
-    |---------------------------------+----------------------------------------------------------------------------------------------------------------------|
-    | DMTF:Computer System:1.0.0      | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance1",CreationClassName="Test_StorageSystem"  |
-    |                                 | //leonard/test/TestProvider:Test_StorageSystem.Name="StorageSystemInstance2",CreationClassName="Test_StorageSystem"  |
-    +---------------------------------+----------------------------------------------------------------------------------------------------------------------+
-
-See :ref:`pywbemcli server centralinsts --help` for the exact help output of the command.
 
 .. index:: pair: command groups;connection commands
 
