@@ -118,8 +118,9 @@ Help text for ``pywbemcli``:
                                       Enable deprecation warnings. Default: EnvVar PYWBEMCLI_DEPRECATION_WARNINGS, or true.
       -C, --connections-file FILE PATH
                                       File path of a YAML file containing named connection definitions. The default if this
-                                      option is not specified is the file name "pywbemcli_connection_definitions.yaml" in
-                                      the users home directory. EnvVar (PYWBEMCLI_CONNECTIONS_FILE)
+                                      option is not specified is the file
+                                      "/home/kschopmeyer/pywbemcli_connection_definitions.yaml" (in the users home
+                                      directory). EnvVar (PYWBEMCLI_CONNECTIONS_FILE)
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.
@@ -130,6 +131,7 @@ Help text for ``pywbemcli``:
     Commands:
       class       Command group for CIM classes.
       instance    Command group for CIM instances.
+      profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.
       connection  Command group for WBEM connection definitions.
@@ -1507,6 +1509,110 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
       -h, --help                      Show this help message.
 
 
+.. _`pywbemcli profile --help`:
+
+pywbemcli profile --help
+------------------------
+
+
+
+Help text for ``pywbemcli profile`` (see :ref:`profile command group`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] profile COMMAND [ARGS] [COMMAND-OPTIONS]
+
+      Command group for WBEM management profiles.
+
+      This command group defines commands to inspect and manage the WBEM management profiles maintained by the WBEM
+      server.
+
+      In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
+      can also be specified before the 'server' keyword.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+    Commands:
+      list          List WBEM management profiles advertised by the server.
+      centralinsts  List WBEM management profile central instances on the server.
+
+
+.. _`pywbemcli profile centralinsts --help`:
+
+pywbemcli profile centralinsts --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli profile centralinsts`` (see :ref:`profile centralinsts command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] profile centralinsts [COMMAND-OPTIONS]
+
+      List WBEM management profile central instances on the server.
+
+      Retrieve the CIM instances that are central instances of the specified WBEM management profiles, and display these
+      instances. By default, all management profiles advertized on the server are included. The profiles can be filtered
+      by using the --organization and --profile options.
+
+      The central instances are determined using all methodologies defined in DSP1033 V1.1 in the order of
+      GetCentralInstances, central class, and scoping class methodology.
+
+      Profiles that only use the scoping class methodology require the specification of the --central-class, --scoping-
+      class, and --scoping-path options because additional information is needed to perform the scoping class methodology.
+
+      The retrieved central instances are displayed along with the organization, name, and version of the profile they
+      belong to, formatted as a table. The --output-format general option is ignored unless it specifies a table format.
+
+    Command Options:
+      -o, --organization ORG-NAME     Filter by the defined organization. (ex. -o DMTF
+      -p, --profile PROFILE-NAME      Filter by the profile name. (ex. -p Array
+      --cc, --central-class CLASSNAME
+                                      Optional. Required only if profiles supports only scopig methodology
+      --sc, --scoping-class CLASSNAME
+                                      Optional. Required only if profiles supports only scopig methodology
+      --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports only scopig methodology. Multiples
+                                      allowed
+
+      --rd, --reference-direction [snia|dmtf]
+                                      Navigation direction for association.  [default: dmtf]
+      -h, --help                      Show this help message.
+
+
+.. _`pywbemcli profile list --help`:
+
+pywbemcli profile list --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli profile list`` (see :ref:`profile list command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] profile list [COMMAND-OPTIONS]
+
+      List WBEM management profiles advertised by the server.
+
+      Retrieve  the WBEM management profiles advertised by the WBEM server, and display information about each profile.
+      WBEM management profiles are defined by DMTF and SNIA and define the management functionality that is available.
+
+      The retrieved profiles can be filtered using the --organization and --profile options.
+
+      The output is formatted as a table showing the organization, name, and version for each profile. The --output-format
+      option is ignored unless it specifies a table format.
+
+    Command Options:
+      -o, --organization ORG-NAME  Filter by the defined organization. (ex. -o DMTF
+      -p, --profile PROFILE-NAME   Filter by the profile name. (ex. -p Array
+      -h, --help                   Show this help message.
+
+
 .. _`pywbemcli qualifier --help`:
 
 pywbemcli qualifier --help
@@ -1649,12 +1755,10 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       -h, --help  Show this help message.
 
     Commands:
-      namespaces    List the namespaces of the server.
-      interop       Get the Interop namespace of the server.
-      brand         Get the brand of the server.
-      info          Get information about the server.
-      profiles      List management profiles advertized by the server.
-      centralinsts  List central instances of mgmt profiles on the server.
+      namespaces  List the namespaces of the server.
+      interop     Get the Interop namespace of the server.
+      brand       Get the brand of the server.
+      info        Get information about the server.
 
 
 .. _`pywbemcli server brand --help`:
@@ -1678,50 +1782,6 @@ Help text for ``pywbemcli server brand`` (see :ref:`server brand command`):
 
     Command Options:
       -h, --help  Show this help message.
-
-
-.. _`pywbemcli server centralinsts --help`:
-
-pywbemcli server centralinsts --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-Help text for ``pywbemcli server centralinsts`` (see :ref:`server centralinsts command`):
-
-
-::
-
-    Usage: pywbemcli [GENERAL-OPTIONS] server centralinsts [COMMAND-OPTIONS]
-
-      List central instances of mgmt profiles on the server.
-
-      Retrieve the CIM instances that are central instances of the specified WBEM management profiles, and display these
-      instances. By default, all management profiles advertized on the server are used. The profiles can be filtered by
-      using the --organization and --profile options.
-
-      The central instances are determined using all methodologies defined in DSP1033 V1.1 in the order of
-      GetCentralInstances, central class, and scoping class methodology.
-
-      Profiles that only use the scoping class methodology require the specification of the --central-class, --scoping-
-      class, and --scoping-path options because additional information is needed to perform the scoping class methodology.
-
-      The retrieved central instances are displayed along with the organization, name, and version of the profile they
-      belong to, formatted as a table. The --output-format general option is ignored unless it specifies a table format.
-
-    Command Options:
-      -o, --organization ORG-NAME     Filter by the defined organization. (ex. -o DMTF
-      -p, --profile PROFILE-NAME      Filter by the profile name. (ex. -p Array
-      --cc, --central-class CLASSNAME
-                                      Optional. Required only if profiles supports only scopig methodology
-      --sc, --scoping-class CLASSNAME
-                                      Optional. Required only if profiles supports only scopig methodology
-      --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports only scopig methodology. Multiples
-                                      allowed
-
-      --rd, --reference-direction [snia|dmtf]
-                                      Navigation direction for association.  [default: dmtf]
-      -h, --help                      Show this help message.
 
 
 .. _`pywbemcli server info --help`:
@@ -1784,35 +1844,4 @@ Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces comma
 
     Command Options:
       -h, --help  Show this help message.
-
-
-.. _`pywbemcli server profiles --help`:
-
-pywbemcli server profiles --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-Help text for ``pywbemcli server profiles`` (see :ref:`server profiles command`):
-
-
-::
-
-    Usage: pywbemcli [GENERAL-OPTIONS] server profiles [COMMAND-OPTIONS]
-
-      List management profiles advertized by the server.
-
-      Retrieve the CIM instances representing the WBEM management profiles advertized by the WBEM server, and display
-      information about each profile. WBEM management profiles are defined by DMTF and SNIA and define the management
-      functionality that is available.
-
-      The retrieved profiles can be filtered using the --organization and --profile options.
-
-      The output is formatted as a table showing the organization, name, and version for each profile. The --output-format
-      option is ignored unless it specifies a table format.
-
-    Command Options:
-      -o, --organization ORG-NAME  Filter by the defined organization. (ex. -o DMTF
-      -p, --profile PROFILE-NAME   Filter by the profile name. (ex. -p Array
-      -h, --help                   Show this help message.
 

@@ -16,6 +16,11 @@ Released: not yet
 
 **Incompatible changes:**
 
+* Moving the commands "server profiles" and "serve centralinsts" to the
+  new group profiles with the commmand names "profile list" and
+  "profile centralinsts" added a command group and removed 2 commands
+  from the server command group. (See issue #612)
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -28,6 +33,10 @@ Released: not yet
 
 * Modify general help to display the full path of the default connections file.
   (See issue #660)
+
+* Move the commands associated with WBEM management profiles from the server
+  group to a new profile group. (See issue #612). See also Incompatible changes.
+
 
 **Known issues:**
 
