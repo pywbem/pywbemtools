@@ -38,7 +38,6 @@ if six.PY2:
 # Normal definition for location of connection file
 DEFAULT_CONNECTIONS_FILE = 'pywbemcli_connection_definitions.yaml'
 
-LOCAL_CONNECTIONS_PATH = os.path.join(os.getcwd(), DEFAULT_CONNECTIONS_FILE)
 HOME_CONNECTIONS_PATH = os.path.join(os.path.expanduser("~"),
                                      DEFAULT_CONNECTIONS_FILE)
 
