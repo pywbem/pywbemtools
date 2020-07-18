@@ -41,7 +41,7 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, \
     PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
     DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
-from ._connection_repository import ConnectionRepository
+from ._connection_repository import ConnectionRepository, HOME_CONNECTIONS_PATH
 from ._click_extensions import PywbemcliTopGroup
 from ._utils import deprecation_warning
 
@@ -263,9 +263,9 @@ def validate_connections_file(connections_repo):
               envvar=PywbemServer.connections_file_envvar,
               help='File path of a YAML file containing named connection '
                    'definitions. The default if this option is not specified '
-                   'is the file name "{df}" in the users home directory. '
+                   'is the file "{df}" (in the users home directory). '
                    'EnvVar ({ev})'.
-                   format(df=DEFAULT_CONNECTIONS_FILE,
+                   format(df=HOME_CONNECTIONS_PATH,
                           ev=PywbemServer.connections_file_envvar))
 @click.option('--pdb', is_flag=True,
               # defaulted in code

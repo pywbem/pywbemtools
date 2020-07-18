@@ -26,6 +26,8 @@ Released: not yet
 
 **Enhancements:**
 
+* Modify general help to display the full path of the default connections file.
+  (See issue #660)
 
 **Known issues:**
 
@@ -45,7 +47,7 @@ Released: 2020-07-12
 
 * The default location for the connections file (pywbemcli_connection_definitions.yaml)
   has been moved from the users current directory to the users home directory.
-  A general option "connections_file" allows the user to set other directories
+  A general option (``connections_file``) allows the user to set other directories
   and file names for this file. (See issue #596)
 
 **Deprecations:**
@@ -104,10 +106,10 @@ Released: 2020-07-12
   predictable: First the sorted key properties, then the sorted non-key
   properties. (Part of fix for issue #650)
 
-* Modify connection file location functionality so that default is
-  the users home directory but any other directory can be specified using the
-  general option "connections_file" which has a corresponding environment
-  variable.  (See issue #596)
+* Modify connections file location functionality so that the default file
+  location is the users home directory. Any other directory and filename can
+  be specified using the general option ``connections_file`` which has a
+  corresponding environment variable.  (See issue #596)
 
 **Cleanup**
 
