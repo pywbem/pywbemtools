@@ -2775,15 +2775,12 @@ interop      TST_MemberOfFamilyCollection  3
      None, OK],
 
     # Test simple mock association with namespace and host in INSTANCENAME
-
-    # TODO #657: Instance shrub command misses associated instances when
-    #      specifying host and namespace. Test marked as failing.
-    ['Verify instance command shrub, simple tree',
+    ['Verify instance command shrub, INSTANCENAME with host and namespace',
      ['shrub', '//FakedUrl/root/cimv2:TST_Person.name="Mike"', '--fullpath'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, FAIL],
+     ASSOC_MOCK_FILE, RUN],
 
     ['Verify instance command shrub, simple tree, namespace in INSTNAME',
      ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
@@ -2881,13 +2878,21 @@ interop      TST_MemberOfFamilyCollection  3
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command shrub, simple tableno ns in request',
+    ['Verify instance command shrub, simple table; ns in request',
      {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"'],
       'general': ['--output-format', 'plain']},
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, simple table; ns/host in request',
+     {'args': ['shrub', '//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+      'general': ['--output-format', 'plain']},
+     {'stdout': SIMPLE_SHRUB_TABLE1,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, RUN],
 
     ['Verify instance command shrub, simple tree with namespace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
