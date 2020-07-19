@@ -849,7 +849,7 @@ def process_invokemethod(context, objectname, methodname, options):
 
     Parameters:
 
-      objectname (:term:`string` or :class:`~pywbem.CIMInstanceName` or :class:`~pywbem.CIMInstanceName`)  # noqa: E501
+      objectname (:term:`string` or :class:`~pywbem.CIMClassName` or :class:`~pywbem.CIMInstanceName`)  # noqa: E501
 
       methodname (:term:`string`):
         The name of the method to be executed

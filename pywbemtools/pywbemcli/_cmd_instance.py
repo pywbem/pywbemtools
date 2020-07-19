@@ -1374,7 +1374,7 @@ def cmd_instance_shrub(context, instancename, options):
         instancepath = get_instancename(context, instancename, options)
 
         # Collect the data for the shrub
-        shrub = AssociationShrub(context, instancepath,
+        shrub = AssociationShrub(context.conn, instancepath,
                                  Role=options['role'],
                                  AssocClass=options['assoc_class'],
                                  ResultRole=options['result_role'],

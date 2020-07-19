@@ -48,7 +48,7 @@ from pywbem import CIMInstanceName, CIMClassName, CIMFloat, CIMInt, CIMError, \
     CIMDateTime
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
-    warning_msg
+    warning_msg, sort_cimobjects
 from ._utils import _ensure_unicode, _to_unicode
 
 # Same as in pwbem.cimtypes.py
@@ -66,24 +66,68 @@ else:
 AssocNameTuple = namedtuple('AssocName', 'Name, RefInst')
 
 
+def _match_instname_wo_host(instance_name1, instance_name2):
+    """
+    Test 2 instance names for equality ignoring the host name. Creates copy
+    to avoid changing input instance names.
+    """
+    in1 = instance_name1.copy()
+    in2 = instance_name2.copy()
+    in1.host = None
+    in2.host = None
+    return in1 == in2
+
+
 class AssociationShrub(object):
     # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
     This class provides tools for the acquisition and display of an association
     that includes much more information than the DMTF defined operation
     Associatiors.  Using the same input parameters, it allows displaying
-    the the components that make up an association as either a table or a
+    the components that make up an association as either a table or a
     tree including the reference classes, and roles.
 
     This class does not handle Error exceptions from the host WBEM Server.
     They must be handled by the user.
     """
-    def __init__(self, context, source_path, Role=None, AssocClass=None,
+    def __init__(self, conn, source_path, Role=None, AssocClass=None,
                  ResultRole=None, ResultClass=None, fullpath=True,
                  verbose=None):
+        """
+        Parameters:
+
+          conn (:class:`~pywbem.WBEMConnection`):
+            The current connection object.
+
+          source_path (:class:`CIMInstanceName`):
+            Source instance path for the reference and association lookup. This
+            may include namespace and host name but the host name is ignored.
+            This is the same source as an associators or references call.
+
+          Role (:term:`string):
+            See pywbem Associators for the definition of this parameter
+
+
+          AssocClass (:term:`string`):
+            See pywbem Associators for the definition of this parameter
+
+          ResultRole (:term:`string):
+            See pywbem Associators for the definition of this parameter
+
+          ResultClass (:term:`string`):
+            See pywbem Associators for the definition of this parameter
+
+          fullpath (:class:`py:bool`):
+            If True, the full path of instances is displayed
+
+        Raises:
+           Error: If the server returns exceptions
+        """
+
+        # set the host to None. We already know that is is our host
+        source_path.host = None
         self.source_path = source_path
-        self.conn = context.conn
-        self.context = context
+        self.conn = conn
 
         self.role = Role
         self.assoc_class = AssocClass
@@ -95,8 +139,8 @@ class AssociationShrub(object):
 
         #  Dictionary view of the shrub. This is a dictionary of dictionaries
         #  role:ReferenceClassNames:
-        #  NOTE: OrderedDict is used to assure that table and tree outputs
-        #  show results in deterministic order.
+        #  NOTE: OrderedDict assures that table and tree output order is
+        #  deterministic.
         self.instance_shrub = OrderedDict()
 
         # associated instance names dictionary organized by:
@@ -109,16 +153,14 @@ class AssociationShrub(object):
 
         self.source_namespace = source_path.namespace or \
             self.conn.default_namespace
-
         self.source_host = source_path.host or self.conn.host
-
-        # Cache for the results of conn.ReferenceNames(self.source+path)
-        self.reference_names = None
-
         # Copy of source_path with namespace
         self.full_source_path = self.source_path.copy()
         if self.full_source_path.namespace is None:
             self.full_source_path.namespace = self.source_namespace
+
+        # Cache the results of conn.ReferenceNames(self.source+path)
+        self.reference_names = None
 
         self.ternary_ref_classes = OrderedDict()
 
@@ -152,7 +194,7 @@ class AssociationShrub(object):
             Error if Error returned from host
         """
         reference_instances = self.conn.References(source_path)
-        return self.sort_instances(reference_instances)
+        return sort_cimobjects(reference_instances)
 
     def sorted_associator_names(self, source_path, role=None, assoc_class=None,
                                 result_role=None, result_class=None):
@@ -192,7 +234,7 @@ class AssociationShrub(object):
             AssocClass=assoc_class,
             ResultRole=result_role,
             ResultClass=result_class)
-        return self.sort_instance_names(rtnd_assoc_inames)
+        return sort_cimobjects(rtnd_assoc_inames)
 
     def _build_instance_shrub(self):
         """
@@ -205,15 +247,15 @@ class AssociationShrub(object):
         # already in class_roles dictionary. Get the instance from
         # the host and roles from the instance.
         # ref_class_roles dictionary {<cln>:[roles]}
-        reference_instances = self.sorted_references(self.source_path)
+        ref_insts = self.sorted_references(self.source_path)
 
-        self.define_ternary_references(reference_instances)
+        self.define_ternary_references(ref_insts)
 
         # Build list of reference CIMClassName objects and add to a
         # ref_class_roles dict
         # Test for input --AssocClass parameter and limit ref names to this
         # class if it exists and is one of the defined classes
-        reference_instnames = [i.path for i in reference_instances]
+        reference_instnames = [i.path for i in ref_insts]
 
         if self.assoc_class:
             # Test if AssocClass parameter represents class in rtnd references
@@ -223,7 +265,7 @@ class AssociationShrub(object):
                                        self.assoc_class.lower() ==
                                        rn.classname.lower()]
             else:
-                reference_instnames = [i.path for i in reference_instances]
+                reference_instnames = [i.path for i in ref_insts]
                 ref_clns = {n.classname for n in reference_instnames}
                 warning_msg(
                     'Option --assoc-name "{}" not found in associator names '
@@ -255,7 +297,7 @@ class AssociationShrub(object):
                 if cln not in self.instance_shrub[role]:
                     self.instance_shrub[role][cln] = result_roles
 
-        # If self.roles exists, remove any unwanted roles from dict
+        # If self.role exists, remove any unwanted roles from dict
         # Accounts for case differences between self.role and roles from
         # target server
         if self.role:
@@ -343,35 +385,10 @@ class AssociationShrub(object):
                         # Build namedtuple of name, ref_inst  integer.
                         # This ties each output instance to a particular
                         # reference instance.
-                        aname_tuples = OrderedDict()
-                        for aname in assoc_inames:
-                            for ref_inst_ctr, ref_inst in \
-                                    enumerate(reference_instances):
-                                if role not in ref_inst:
-                                    continue
-                                if ref_inst.get(role) != self.full_source_path:
-                                    continue
-                                # Find other properties with this result_role
-                                # and create a tuple for each one found.
-                                # The second data in the tuple identifies the
-                                # reference instance by its position in the
-                                # list of reference instances.
-                                for name in ref_inst.properties:
-                                    if name.lower() == result_role.lower():
-                                        pvalue = ref_inst.properties[name].value
-                                        anamex = aname.copy()
-                                        anamex.host = None
-                                        if pvalue == anamex:
-                                            aname_tuples[aname] = \
-                                                AssocNameTuple(
-                                                    Name=aname,
-                                                    RefInst=ref_inst_ctr)
-
-                        # pylint: disable=line-too-long
-                        if disp_result_role not in self.assoc_instnames[role][ref_classname]:  # noqa: E501
-                            self.assoc_instnames[role][ref_classname][disp_result_role] = OrderedDict()  # noqa: E501
-                        self.assoc_instnames[role][ref_classname][disp_result_role][assoc_cln] = list(aname_tuples.values())  # noqa: E501
-                        # pylint: enable=line-too-long
+                        self.build_assoc_name_tuples(
+                            assoc_inames, assoc_cln,
+                            disp_result_role, role, ref_classname,
+                            ref_insts, result_role)
 
     def display_shrub(self, output_format, summary=None):
         """
@@ -425,13 +442,13 @@ class AssociationShrub(object):
                         self.assoc_instnames[role][ref_cln]):
                     assoc_clns_dict = OrderedDict()
 
-                    for assoc_cln, inst_names in six.iteritems(assoc_clns):
-                        if not inst_names:
+                    for assoc_cln, inst_names_tup in six.iteritems(assoc_clns):
+                        if not inst_names_tup:
                             continue
 
                         disp_assoc_cln = self.simplify_path(assoc_cln)
                         key = "{}(ResultClass)({} insts)". \
-                            format(disp_assoc_cln, len(inst_names))
+                            format(disp_assoc_cln, len(inst_names_tup))
 
                         # Build dictionary of associated instance names
                         assoc_clns_dict[key] = OrderedDict()
@@ -440,12 +457,13 @@ class AssociationShrub(object):
                             # for ascii tree compatibility. i.e. this
                             # is the lowest level in the tree.
                             # Returns OrderedDict
-                            inst_names = self.build_inst_names(
-                                inst_names,
+                            inst_names_tup = self.build_inst_names(
+                                inst_names_tup,
                                 ref_cln,
                                 replacements,
                                 self.fullpath)
-                            assoc_clns_dict[key] = inst_names
+
+                            assoc_clns_dict[key] = inst_names_tup
 
                     # Add the role tree element
                     rrole_disp = "{}(ResultRole)".format(rrole)
@@ -524,6 +542,44 @@ class AssociationShrub(object):
                                          'summary' if summary else 'paths')
         return format_table(rows, headers, title, table_format=output_format)
 
+    def build_assoc_name_tuples(self, assoc_inames, assoc_cln,
+                                disp_result_role, role, ref_classname,
+                                ref_insts, result_role):
+        """
+        Build the iname tuples for the instance names defined in assoc_inames
+        and add to self.assoc_instnames
+        """
+        aname_tuples = OrderedDict()
+        for aname in assoc_inames:
+            for ref_inst_ctr, ref_inst in enumerate(ref_insts):
+                if role not in ref_inst:
+                    continue
+                # If not the reference defined by role,
+                # ignore
+                if not _match_instname_wo_host(ref_inst.get(role),
+                                               self.full_source_path):
+                    continue
+                # Find other properties with this result_role
+                # and create a tuple for each one found.
+                # The second data in the tuple identifies the
+                # reference instance by its position in the
+                # list of reference instances.
+                for name in ref_inst.properties:
+                    if name.lower() == result_role.lower():
+                        pvalue = ref_inst.properties[name].value
+                        anamecpy = aname.copy()
+                        anamecpy.host = None
+                        if pvalue == anamecpy:
+                            aname_tuples[aname] = AssocNameTuple(
+                                Name=aname,
+                                RefInst=ref_inst_ctr)
+
+                        # pylint: disable=line-too-long
+                        if disp_result_role not in self.assoc_instnames[role][ref_classname]:  # noqa: E501
+                            self.assoc_instnames[role][ref_classname][disp_result_role] = OrderedDict()  # noqa: E501
+                        self.assoc_instnames[role][ref_classname][disp_result_role][assoc_cln] = list(aname_tuples.values())  # noqa: E501
+                        # pylint: enable=line-too-long
+
     def to_wbem_uri_folded(self, path, format='standard', max_len=15):
         # pylint: disable=redefined-builtin
         """
@@ -532,7 +588,23 @@ class AssociationShrub(object):
         to return a slightly formated string where components are on
         separate lines if the length is longer than the max_len argument.
 
-        See pywbem.CIMInstanceName.to_wbem_uri for detailed information
+        See :meth:`pywbem.CIMInstanceName.to_wbem_uri` for detailed
+        information. This method was derived from
+        :meth:`pywbem.CIMInstanceName.to_wbem_uri`
+
+        Parameters:
+
+          path (:class:`CIMInstanceName`):
+            The instance name to convert to a wbem uri and fold based on
+            the max_len parameter
+
+          format  (:term:`string`): Format for the generated WBEM URI string
+            using one of the formats defined in
+            :meth:`pywbem.CIMInstanceName.to_wbem_uri`
+
+          max_len (:term:`integer`):
+            Maximum length of the resulting URI before it is folded into
+            multiple lines.
 
         Returns:
 
@@ -736,13 +808,13 @@ class AssociationShrub(object):
             modified_inames[iname_display] = OrderedDict()
         return modified_inames
 
-    def define_ternary_references(self, reference_instances):
+    def define_ternary_references(self, ref_insts):
         """
         Build dictionary of reference classes (ternary_ref_classes) in
         conn.References return with Value True if > 2 reference properties
         and False if == 2 reference properties
         """
-        for ref_inst in reference_instances:
+        for ref_inst in ref_insts:
             count = 0
             if ref_inst.classname not in self.ternary_ref_classes:
                 for v in ref_inst.properties.values():
@@ -759,6 +831,15 @@ class AssociationShrub(object):
         the source instance.  This allows the tree to show only the
         classname for all components of the tree that are in the same
         namespace as the association source instance.
+
+        Parameters:
+
+          path(:class:`~pywbem.CIMInstanceName`):
+            Instance name to simplify
+
+        Returns:
+          :class:`~pywbem.CIMInstanceName` containing the simplified name
+
         """
         simple_path = path.copy()
         if simple_path.host and \
@@ -774,6 +855,16 @@ class AssociationShrub(object):
         Internal method to get the list of roles for an association class.
         Uses instance get rather than class get because some
         servers may not support class get operation.
+
+        Parameters:
+
+          inst_name(:class:`~pywbem.CIMInstanceName`):
+            instance for which roles will be returned
+
+        Returns:
+          List of :term:`string` containg the classnames (roles) contained
+          in the defined instance
+
         """
         try:
             ref_inst = self.conn.GetInstance(inst_name, LocalOnly=False)
@@ -808,51 +899,3 @@ class AssociationShrub(object):
             print('ResultRoles: class={0} ResultClass={1} ResultRoles={2}'
                   .format(self.source_path.classname, ref_classname, rtn_roles))
         return rtn_roles
-
-    @staticmethod
-    def sort_instances(instances):
-        """
-        Sort list of CIMInstanceName objects.  To sort an instance name
-        it must be converted to a string where gt and lt compares can be
-        executed.  to_wbem_uri(formt='canonical') accomplishes that
-
-        Parameters:
-
-          inames (list of CIMInstanceName):
-
-        Returns:
-            list of CIMInstance name sorted.
-        """
-        if len(instances) <= 1:
-            return instances
-
-        d = {}
-        for instance in instances:
-            key = instance.path.to_wbem_uri(format="canonical")
-            d[key] = instance
-
-        return [d[k] for k in sorted(d.keys())]
-
-    @staticmethod
-    def sort_instance_names(inames):
-        """
-        Sort list of CIMInstanceName objects.  To sort an instance name
-        it must be converted to a string where gt and lt compares can be
-        executed.  to_wbem_uri(formt='canonical') accomplishes that
-
-        Parameters:
-
-          inames (list of CIMInstanceName):
-
-        Returns:
-            list of CIMInstance name sorted.
-        """
-        if len(inames) <= 1:
-            return inames
-
-        d = {}
-        for iname in inames:
-            key = iname.to_wbem_uri(format="canonical")
-            d[key] = iname
-
-        return [d[k] for k in sorted(d.keys())]
