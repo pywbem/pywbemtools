@@ -251,7 +251,7 @@ def pick_one_from_list(context, options, title):
       options:
         List of strings from which one will is to be selected
 
-      title:
+      title (:term:`string`):
         Title to display before selection
 
     Retries until either integer within range of options list is input
@@ -276,9 +276,7 @@ def pick_one_from_list(context, options, title):
         context.spinner_stop()
 
     click.echo(title)
-    index = -1
-    for str_ in options:
-        index += 1
+    for index, str_ in enumerate(options):
         click.echo('{}: {}'.format(index, str_))
     selection = None
     msg = 'Input integer between 0 and {} or Ctrl-C to exit selection' \
@@ -333,7 +331,7 @@ def pick_instance(context, objectname, namespace=None):
         return None
 
     try:
-        return pick_one_from_list(context, instance_names,
+        return pick_one_from_list(context, sort_cimobjects(instance_names),
                                   'Pick Instance name to process')
     except Exception as ex:
         raise click.ClickException('Command Aborted. Exception {}'.format(ex))
@@ -936,6 +934,16 @@ def sort_cimobjects(cim_objects):
     on the name value (name, classname, wbemuri(canonical form)
     Returns new list with the sorted objects.  This was defined as a common
     sort mechanism for all of the CIM object responses from WBEM servers.
+
+    For classes it sorts by classnames. For instances and instancenames, it
+    sorts by instancename. For qualifier declarations it sorts by name
+
+    Parameters:
+
+      cim_objects (list of CIMObjects):
+
+    Returns:
+        A list of the same types as input but sorted as defined above.
     """
     if len(cim_objects) < 2:
         return cim_objects
