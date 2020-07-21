@@ -35,8 +35,8 @@ from ._common import display_cim_objects, filter_namelist, \
     raise_pywbem_error_exception, warning_msg, validate_output_format
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
-    summary_option, multiple_namespaces_option, association_filter_option, \
-    indication_filter_option, experimental_filter_option, help_option
+    summary_option, multiple_namespaces_option, class_filter_options, \
+    help_option
 from ._displaytree import display_class_tree
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -108,9 +108,7 @@ def class_group():
 @add_options(names_only_option)
 @add_options(namespace_option)
 @add_options(summary_option)
-@add_options(association_filter_option)
-@add_options(indication_filter_option)
-@add_options(experimental_filter_option)
+@add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
@@ -361,9 +359,7 @@ def class_associators(context, classname, **options):
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help=u'Sort by namespace. Default is to sort by classname')
-@add_options(association_filter_option)
-@add_options(indication_filter_option)
-@add_options(experimental_filter_option)
+@add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
 def class_find(context, classname_glob, **options):
@@ -450,64 +446,155 @@ def class_tree(context, classname, **options):
 ####################################################################
 
 
-def _build_qualifier_filters(options):
+def _build_qualifier_filters(conn, ns, options):
     """
     Build a dictionary defining the qualifier filters to be processes from
     their definitons in the Click options dictionary. There is an entry
     in the dictionary for each qualifier filter where the key is the
     association name and the value is True or False depending in the
     value of the option ('x' or 'no-x' )
+
+    Returns:
+      List of qualifier_filters where the names are the qualifiers
+      themselves and the value for each is a tuple:
+      * Name of the qualifier (:term:`string`)
+      * The value of the qualifier filter option (True or False which
+        determines whether to display the existence or non-existence of the
+        qualifier
+      * A tuple containing Booleans for the value of each of the possible
+        element scopes (class, property, method, parameter) indicating whether
+        the qualifier is allowed in that element.
     """
-    qualifier_filters = {}
+    qualifier_filters = []
+
+    def set_option(qname):
+        option_value = options[qname]
+        qualdecl = conn.GetQualifier(qname, ns)
+        scopes_map = []
+        # TODO: Do we have a case test issue here with the scopes?
+        scopes_map.append('class' in qualdecl.scopes)
+        scopes_map.append('property' in qualdecl.scopes)
+        scopes_map.append('method' in qualdecl.scopes)
+        scopes_map.append('parameter' in qualdecl.scopes)
+        qualifier_filters.append((qname, option_value, tuple(scopes_map)))
+
     if options['association'] is not None:
-        # show_assoc = options['association']
-        qualifier_filters['Association'] = options['association']
+        set_option('association')
     if options['indication'] is not None:
-        qualifier_filters['Indication'] = options['indication']
+        set_option('indication')
     if options['experimental'] is not None:
-        qualifier_filters['Experimental'] = options['experimental']
+        set_option('experimental')
+    if options['deprecated'] is not None:
+        set_option('deprecated')
     return qualifier_filters
 
 
-def _filter_classes_for_qualifiers(qualifier_filters, results, names_only, iq):
+def _filter_classes_for_qualifiers(classes, qualifier_filters, names_only, iq):
     """
-    Filter the results list for the qualifiers defined by filter
-    qualifier: a dictionary with qualifier name as key and Boolean defining
+    Filter a list of classes for the qualifiers defined by  the
+    qualifier_filter parameter where this parameter is a list of tuples.
+    each tuple contains the qualifier name and a dictionary with qualifier
+     name as key and tuple containing the option_value(True or False) and
+    a list of booleans where each boolean represents one of the scope types
+    ()
     whether to display or not display if it exists.
 
     This method only works for boolean qualifiers
+
+    Parameters:
+
+      classes (list of :class:`~pywbem.CIMClass`):
+        list of classes to be filtered
+
+      qualifier_filters (list):
+        List defining the filtering to be performed. It contains an entry for
+        each qualifier filter that is defined. See _build_qualifier_filters for
+        a definition of this list.
+
+      names_only (:class:`py:bool`):
+        If True, return only the classnames. Otherwise returns the filtered
+        classes. This is because we must get the classes from the server to
+        perform the filtering
+
+      iq (:class:`py:bool`):
+        If not True, remove any qualifiers from the classes.  This is because
+        we must get the classes from the server with qualifiers to
+        perform the filtering.
     """
 
-    filtered_results = []
-    if results:
-        assert isinstance(results[0], CIMClass)
-    for cls in results:
+    def class_has_qualifier(cls, qname, scopes):
+        """
+        Determine if the qualifier defined by qname exists in the elements
+        of the class where the elements are defined by the scopes parameter
+        for this filter.
+
+        Parameters:
+
+          cls (:class:`~pywbem.CIMClass`):
+            The class to be inspected for the qualifier defined by qname
+
+          qname (:term:`string`):
+            The qualifier for which we are searching
+
+          scopes (tuple of booleans):
+            A tuple containing a boolean value for each of the possible scopes
+            (class, property, method, parameter)
+
+        Returns:
+          True if the qualifier with name quname is found in the elements where
+          the scope is True. Otherwise, False is returned
+
+        """
+        # Test class scope
+        if scopes[0] and qname in cls.qualifiers:
+            return True
+
+        # if property scope, test properties
+        if scopes[1]:
+            for property in cls.properties.values():
+                if qname in property.qualifiers:
+                    return True
+        # If method scope, test methods and if parameter scope, test parameters
+        if scopes[2]:
+            for method in cls.methods.values():
+                if qname in method.qualifiers:
+                    return True
+                if scopes[3]:
+                    params = method.parameters
+                    for param in params.values():
+                        if qname in param.qualifiers:
+                            return True
+        return False
+
+    # Test all classes in the input property for the defined filters.
+    filtered_classes = []
+    for cls in classes:
         assert isinstance(cls, CIMClass)
-        show_this_class = True
-        for qname, show_if_true in qualifier_filters.items():
-            if qname in cls.qualifiers:
-                qvalue = cls.qualifiers[qname].value
-                show_this = (qvalue == show_if_true)
+        show_class_list = []
+        for qual_name, disp_if_exists, scopes in qualifier_filters:
+            if class_has_qualifier(cls, qual_name, scopes):
+                show_class_list.append(disp_if_exists)
             else:
-                show_this = not show_if_true
-            if not show_this:
-                show_this_class = False
-                break
+                show_class_list.append(not disp_if_exists)
+
+        show_this_class = all(show_class_list)
+
         if show_this_class:
             # If returning instances, honor the names_only option
-            if not names_only:
-                if not iq:
-                    cls.qualifiers = []
-                    for p in cls.properties.values():
+            if not names_only and not iq:
+                cls.qualifiers = []
+                for p in cls.properties.values():
+                    p.qualifiers = []
+                for m in cls.methods.values():
+                    m.qualifiers = []
+                    for p in m.parameters.values():
                         p.qualifiers = []
-                    for m in cls.methods.values():
-                        m.qualifiers = []
-                        for p in m.parameters.values():
-                            p.qualifiers = []
-            filtered_results.append(cls)
+            filtered_classes.append(cls)
+
+    # If names_only parameter create list of classnames
     if names_only:
-        filtered_results = [cls.classname for cls in filtered_results]
-    return filtered_results
+        filtered_classes = [cls.classname for cls in filtered_classes]
+    return filtered_classes
 
 
 def enumerate_classes_filtered(context, classname, options):
@@ -528,7 +615,7 @@ def enumerate_classes_filtered(context, classname, options):
       context:  Click context
 
       classname:
-        Optional classname for the enumerate.
+        classname for the enumerate or None if all classes to be enumerated.
 
       options:Click options dictionary
         Options that form basis for this Enumerate and filter processing.
@@ -540,7 +627,10 @@ def enumerate_classes_filtered(context, classname, options):
         pywbem Error exceptions generated by EnumerateClassNames and
         enumerateClasses
     """
-    qualifier_filters = _build_qualifier_filters(options)
+
+    namespace = options['namespace']
+    qualifier_filters = _build_qualifier_filters(context.conn, namespace,
+                                                 options)
 
     names_only = options.get('names_only', False)
 
@@ -557,20 +647,19 @@ def enumerate_classes_filtered(context, classname, options):
     if names_only and not qualifier_filters:
         results = context.conn.EnumerateClassNames(
             ClassName=classname,
-            namespace=options['namespace'],
+            namespace=namespace,
             DeepInheritance=deep_inheritance)
     else:
         results = context.conn.EnumerateClasses(
             ClassName=classname,
-            namespace=options['namespace'],
+            namespace=namespace,
             LocalOnly=local_only,
             DeepInheritance=deep_inheritance,
             IncludeQualifiers=request_iq,
             IncludeClassOrigin=include_classorigin)
         if qualifier_filters:
             results = _filter_classes_for_qualifiers(
-                qualifier_filters, results,
-                names_only, iq)
+                results, qualifier_filters, names_only, iq)
     return results
 
 

@@ -345,6 +345,10 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       classes that are not experimental (--no-iexperimental). If the option is not defined
                                       no filtering occurs
 
+      --deprecated / --no-deprecated  Filter the returned classes to return only deprecated classes (--deprecated) or
+                                      classes that are not deprecated (--no-deprecated). If the option is not defined no
+                                      filtering occurs
+
       -h, --help                      Show this help message.
 
 
@@ -402,6 +406,10 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
                                       Filter the returned classes to return only experimental classes (--experimental) or
                                       classes that are not experimental (--no-iexperimental). If the option is not defined
                                       no filtering occurs
+
+      --deprecated / --no-deprecated  Filter the returned classes to return only deprecated classes (--deprecated) or
+                                      classes that are not deprecated (--no-deprecated). If the option is not defined no
+                                      filtering occurs
 
       -h, --help                      Show this help message.
 
@@ -1043,6 +1051,7 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       -n, --namespace NAMESPACE       Add a namespace to the search scope. May be specified multiple times. Default: Search
                                       in all namespaces of the server.
 
+      -s, --sort                      Sort by instance count. Otherwise sorted by class name.
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
                                       classes that are not associations(--no-association). If the option is not defined no
@@ -1057,7 +1066,10 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
                                       classes that are not experimental (--no-iexperimental). If the option is not defined
                                       no filtering occurs
 
-      -s, --sort                      Sort by instance count. Otherwise sorted by class name.
+      --deprecated / --no-deprecated  Filter the returned classes to return only deprecated classes (--deprecated) or
+                                      classes that are not deprecated (--no-deprecated). If the option is not defined no
+                                      filtering occurs
+
       -h, --help                      Show this help message.
 
 

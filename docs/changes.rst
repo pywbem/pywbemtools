@@ -37,6 +37,12 @@ Released: not yet
 * Move the commands associated with WBEM management profiles from the server
   group to a new profile group. (See issue #612). See also Incompatible changes.
 
+* Add --deprecated/-no-deprecated as a new qualifier filter for the class
+  enumerate, class find, and instance count commands. Extend the behavior so
+  that for each of the possible filters it looks for the qualifier on all
+  of the elements (property, method, parameter) in addition to the class
+  itself.  See issue #678)
+
 
 **Known issues:**
 

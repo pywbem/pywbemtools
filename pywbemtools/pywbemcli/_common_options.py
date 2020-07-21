@@ -113,6 +113,23 @@ experimental_filter_option = [              # pylint: disable=invalid-name
                       u'are not experimental (--no-iexperimental). If the '
                       u'option is not defined no filtering occurs')]
 
+deprecated_filter_option = [              # pylint: disable=invalid-name
+    click.option('--deprecated/--no-deprecated',
+                 default=None,
+                 help='Filter the returned classes to return only deprecated '
+                      'classes (--deprecated) or classes that are not '
+                      'deprecated (--no-deprecated). If the option is not '
+                      'defined no filtering occurs')]
+
+# List of the class filter options that are common to multiple class commands
+# Since the filters are in a list to allow them to be used individually, the
+# first item of each list must be used for the combined defintion that can
+# be use with add_options
+class_filter_options = [association_filter_option[0],
+                        indication_filter_option[0],
+                        experimental_filter_option[0],
+                        deprecated_filter_option[0]]
+
 help_option = [              # pylint: disable=invalid-name
     click.help_option('-h', '--help', help=u'Show this help message.')]
 
@@ -120,7 +137,7 @@ help_option = [              # pylint: disable=invalid-name
 def add_options(options):
     """
     Accumulate multiple options into a list. This list can be referenced as
-    a click decorator @att_options(name_of_list)
+    a click decorator @add_options(name_of_list)
 
     The list is reversed because of the way click processes options
 
@@ -134,6 +151,8 @@ def add_options(options):
     """
     def _add_options(func):
         """ Reverse options list"""
+        # TODO: Future.  This should account for a single option not
+        # in a list.
         for option in reversed(options):
             func = option(func)
         return func

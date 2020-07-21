@@ -584,7 +584,7 @@ TEST_CASES = [
      {'stdout': ['TST_FamilyCollection',
                  'TST_Lineage',
                  'TST_MemberOfFamilyCollection',
-                 'TST_MemberOfFamilyCollectionSub',
+                 'TST_MemberOfFamilyCollectionExp',
                  'TST_Person'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
@@ -607,7 +607,7 @@ TEST_CASES = [
 
     ['Verify class command enumerate with --experimental and --association.',
      ['enumerate', '--experimental', '--association', '--names-only'],
-     {'stdout': ['TST_MemberOfFamilyCollectionSub'],
+     {'stdout': ['TST_MemberOfFamilyCollectionExp'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
@@ -990,7 +990,7 @@ TEST_CASES = [
      ['find', '*TST_*', '-n', 'root/cimv2', '--association'],
      {'stdout': ['TST_Lineage',
                  'TST_MemberOfFamilyCollection',
-                 'TST_MemberOfFamilyCollectionSub'],
+                 'TST_MemberOfFamilyCollectionExp'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
@@ -1009,7 +1009,7 @@ TEST_CASES = [
 
     ['Verify class command find with --association & --experimental filters',
      ['find', '*TST_*', '-n', 'root/cimv2', '--association', '--experimental'],
-     {'stdout': ['TST_MemberOfFamilyCollectionSub'],
+     {'stdout': ['TST_MemberOfFamilyCollectionExp'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 

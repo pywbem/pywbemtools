@@ -38,8 +38,7 @@ from ._common import display_cim_objects, \
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
     summary_option, verify_option, multiple_namespaces_option, \
-    association_filter_option, indication_filter_option, \
-    experimental_filter_option, help_option
+    class_filter_options, help_option
 
 from ._cimvalueformatter import mof_escaped
 
@@ -565,11 +564,9 @@ def instance_query(context, query, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME-GLOB',
                 required=False)
 @add_options(multiple_namespaces_option)
-@add_options(association_filter_option)
-@add_options(indication_filter_option)
-@add_options(experimental_filter_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help=u'Sort by instance count. Otherwise sorted by class name.')
+@add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
 def instance_count(context, classname, **options):

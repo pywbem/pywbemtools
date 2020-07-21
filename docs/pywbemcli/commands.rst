@@ -146,13 +146,14 @@ If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
-.. index:: single: qualifier filters
+.. index:: single: qualifier filters; class enumerate command
 
-The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
-and ``--experimental``/``--no-experimental`` options filter the returned
-classes or classnames to include or exclude classes with the corresponding
-qualifiers.  Thus the ``--association`` option returns only classes or
-classnames that are association classes.
+The ``--association``/``--no-association``,
+``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
+and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
+classnames to include or exclude classes with the corresponding qualifiers.
+Thus the ``--association`` option returns only classes or classnames that are
+association classes.
 
 The following example enumerates the class names of the root classes in the
 default namespace:
@@ -183,11 +184,12 @@ times.
 
 .. index:: pair: qualifier filters; class find command
 
-The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
-and ``--experimental``/``--no-experimental`` options filter the returned
-classes or classnames to include or exclude classes with the corresponding
-qualifiers.  Thus the ``--association`` option returns only classes or
-classnames that are association classes.
+The ``--association``/``--no-association``,
+``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
+and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
+classnames to include or exclude classes with the corresponding qualifiers.
+Thus the ``--association`` option returns only classes or classnames that are
+association classes.
 
 The command displays the namespaces and class names of the result using the
 ``txt`` output format (default), or using :term:`Table output formats`.
@@ -492,11 +494,12 @@ the target namespaces are counted.
 
 .. index:: pair: qualifier filters; instance count command
 
-The ``--association``/``--no-association``, ``--indication``/``--no-indication``,
-and ``--experimental``/``--no-experimental`` options filter the returned
-classes or classnames to include or exclude classes with the corresponding
-qualifiers.  Thus the ``--association`` option returns only classes or
-classnames that are association classes.
+The ``--association``/``--no-association``,
+``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
+and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
+classnames to include or exclude classes with the corresponding qualifiers.
+Thus the ``--association`` option returns only classes or classnames that are
+association classes.
 
 Results for classes that have no instances are not displayed.
 
