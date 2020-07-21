@@ -11,20 +11,22 @@ from pywbemtools.pywbemcli._connection_repository \
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
+# Define the paths for the default connection file and its .bak file
 DEFAULT_CONNECTION_FILE_DIR = os.path.expanduser("~")
 REPO_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
                               DEFAULT_CONNECTIONS_FILE)
-BACK_FILE = DEFAULT_CONNECTIONS_FILE + '.bak'
-REPO_FILE_BACKUP_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
-                                     DEFAULT_CONNECTIONS_FILE)
-# if there is a config file or backup, save to this name during tests
-SAVE_FILE_SUFFIX = '.testsave'
-SAVE_FILE = DEFAULT_CONNECTIONS_FILE + SAVE_FILE_SUFFIX
-SAVE_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
-                              SAVE_FILE)
+REPO_BAK_FILE = DEFAULT_CONNECTIONS_FILE + '.bak'
+REPO_FILE_BAK_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR, REPO_BAK_FILE)
 
-SAVE_BAK_FILE = BACK_FILE + SAVE_FILE_SUFFIX
-SAVE_BAK_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR, SAVE_BAK_FILE)
+# Define names and paths for save files for the connection file and backup
+SAVE_FILE_SUFFIX = '.testsavepywbemclitests'
+REPO_SAVE_FILE = DEFAULT_CONNECTIONS_FILE + SAVE_FILE_SUFFIX
+REPO_FILE_SAVE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
+                                   REPO_SAVE_FILE)
+
+REPO_BAK_SAVE_FILE = REPO_BAK_FILE + SAVE_FILE_SUFFIX
+REPO_FILE_BAK_SAVE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
+                                       REPO_BAK_SAVE_FILE)
 
 
 @pytest.fixture
@@ -51,24 +53,28 @@ def set_connections_file(request):
     very low.  In case the fixture fails to restore the backed up connections
     files are saved  with with their full names and the suffix `.testsave`.
     """
+    # Save the default connection and bak file with a temporary suffix
     if os.path.isfile(REPO_FILE_PATH):
-        os.rename(REPO_FILE_PATH, SAVE_FILE_PATH)
-    if os.path.isfile(REPO_FILE_BACKUP_PATH):
-        os.rename(REPO_FILE_BACKUP_PATH, SAVE_BAK_FILE_PATH)
+        os.rename(REPO_FILE_PATH, REPO_FILE_SAVE_PATH)
+    if os.path.isfile(REPO_FILE_BAK_PATH):
+        os.rename(REPO_FILE_BAK_PATH, REPO_FILE_BAK_SAVE_PATH)
 
     def teardown():
         """
         Remove any created repository file and restore saved file. This
         should occur at session end.
         """
+        # Remove test yaml file
         if os.path.isfile(REPO_FILE_PATH):
             os.remove(REPO_FILE_PATH)
-        if os.path.isfile(SAVE_FILE_PATH):
-            os.rename(SAVE_FILE_PATH, REPO_FILE_PATH)
+        # Restore saved yaml
+        if os.path.isfile(REPO_FILE_SAVE_PATH):
+            os.rename(REPO_FILE_SAVE_PATH, REPO_FILE_PATH)
 
-        if os.path.isfile(REPO_FILE_BACKUP_PATH):
-            os.remove(REPO_FILE_BACKUP_PATH)
-        if os.path.isfile(SAVE_BAK_FILE_PATH):
-            os.rename(SAVE_BAK_FILE_PATH, REPO_FILE_BACKUP_PATH)
+        # Repeat for the bak file
+        if os.path.isfile(REPO_FILE_BAK_PATH):
+            os.remove(REPO_FILE_BAK_PATH)
+        if os.path.isfile(REPO_FILE_BAK_SAVE_PATH):
+            os.rename(REPO_FILE_BAK_SAVE_PATH, REPO_FILE_BAK_PATH)
 
     request.addfinalizer(teardown)
