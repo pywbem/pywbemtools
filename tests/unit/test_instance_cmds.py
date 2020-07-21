@@ -2588,6 +2588,7 @@ interop      TST_Personsub        4
 Namespace    Class            count
 interop      TST_Lineage          3
 interop      TST_MemberOfFamilyCollection  3
+interop      TST_MemberOfFamilyCollectionExp 1
 """,
       'rc': 0,
       'test': 'linesnows'},
@@ -2599,7 +2600,8 @@ interop      TST_MemberOfFamilyCollection  3
                   'plain']},
      {'stdout': """Count of instances per class
 Namespace    Class            count
-interop      TST_Personsub        4
+interop      TST_MemberOfFamilyCollectionExp 1
+interop      TST_PersonExp        4
 """,
       'rc': 0,
       'test': 'linesnows'},
@@ -2613,6 +2615,7 @@ interop      TST_Personsub        4
 Namespace    Class            count
 interop      TST_Lineage          3
 interop      TST_MemberOfFamilyCollection  3
+interop      TST_MemberOfFamilyCollectionExp        1
 """,
       'rc': 0,
       'test': 'linesnows'},
@@ -2780,7 +2783,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree, namespace in INSTNAME',
      ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
@@ -2892,7 +2895,7 @@ interop      TST_MemberOfFamilyCollection  3
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with namespace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
