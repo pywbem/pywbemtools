@@ -38,6 +38,8 @@ However, they should be used from the ``pywbemcli`` namespace.
 
 # This module is meant to be safe for 'import *'.
 
+# Issue 224: Some strings are unicode because of this issue.
+
 
 __all__ = ['DEFAULT_CONNECTION_TIMEOUT',
            'DEFAULT_NAMESPACE', 'PYWBEMCLI_PROMPT', 'PYWBEMCLI_HISTORY_FILE',
@@ -51,11 +53,11 @@ DEFAULT_CONNECTION_TIMEOUT = 30
 
 #: Specifies the default namespace uses if no default namespace is defined
 #: on the cmd line, environment variable, or a config file.
-DEFAULT_NAMESPACE = 'root/cimv2'
+DEFAULT_NAMESPACE = u'root/cimv2'
 
 #: Specifies the default query language to be used for exedquery operations
-#: when a query language is not specified in the request or config
-DEFAULT_QUERY_LANGUAGE = 'DMTF:CQL'
+#: when a query language is not specified in the request or config.
+DEFAULT_QUERY_LANGUAGE = u'DMTF:CQL'
 
 #: Characters for cmdline prompt when the pywbemcli repl is executing.
 #: The prompt is presented at the beginning of a line awaiting a command

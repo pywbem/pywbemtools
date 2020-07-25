@@ -34,6 +34,12 @@ from ._common_options import add_options, namespace_option, summary_option, \
     help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
+# Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
+# with prompt-toolkit 2 + the completer requires unicode and click_repl not
+# passing help as unicode in options as unicode
+# NOTE: Insure that all option help attributes are unicode to get around this
+#       issue
+
 
 @cli.group('qualifier', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
