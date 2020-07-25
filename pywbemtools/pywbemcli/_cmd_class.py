@@ -53,22 +53,22 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 no_qualifiers_class_option = [              # pylint: disable=invalid-name
     click.option('--nq', '--no-qualifiers', 'no_qualifiers', is_flag=True,
                  default=True,
-                 help='Do not include qualifiers in the returned class(es). '
+                 help=u'Do not include qualifiers in the returned class(es). '
                       'Default: Include qualifiers.')]
 
 deep_inheritance_class_option = [              # pylint: disable=invalid-name
     click.option('--di', '--deep-inheritance', 'deep_inheritance', is_flag=True,
                  default=False,
-                 help='Include the complete subclass hierarchy of the '
+                 help=u'Include the complete subclass hierarchy of the '
                       'requested classes in the result set. '
                       'Default: Do not include subclasses.')]
 
 local_only_class_option = [              # pylint: disable=invalid-name
     click.option('--lo', '--local-only', 'local_only', is_flag=True,
                  default=False,
-                 help='Do not include superclass properties and methods in '
-                      'the returned class(es). '
-                      'Default: Include superclass properties and methods.')]
+                 help=u'Do not include superclass properties and methods in '
+                      u'the returned class(es). '
+                      u'Default: Include superclass properties and methods.')]
 
 
 ##########################################################################
@@ -180,7 +180,7 @@ def class_get(context, classname, **options):
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.option('-f', '--force', is_flag=True, default=False,
-              help='Delete any instances of the class as well. '
+              help=u'Delete any instances of the class as well. '
                    'Some servers may still reject the class deletion. '
                    'Default: Reject command if the class has any instances.')
 @add_options(namespace_option)
@@ -219,7 +219,7 @@ def class_delete(context, classname, **options):
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
 @click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
-              help='Specify a method input parameter with its value. '
+              help=u'Specify a method input parameter with its value. '
                    'May be specified multiple times. '
                    'Default: No input parameters.')
 @add_options(namespace_option)
@@ -259,11 +259,11 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
+              help=u'Filter the result set by result class name. '
                    'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
+              help=u'Filter the result set by source end role name.')
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
@@ -306,18 +306,18 @@ def class_references(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by association class name. '
+              help=u'Filter the result set by association class name. '
                    'Subclasses of the specified class also match.')
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
+              help=u'Filter the result set by result class name. '
                    'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
+              help=u'Filter the result set by source end role name.')
 @click.option('--rr', '--result-role', 'result_role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by far end role name.')
+              help=u'Filter the result set by far end role name.')
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
@@ -360,7 +360,7 @@ def class_associators(context, classname, **options):
                 required=True)
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help='Sort by namespace. Default is to sort by classname')
+              help=u'Sort by namespace. Default is to sort by classname')
 @add_options(association_filter_option)
 @add_options(indication_filter_option)
 @add_options(experimental_filter_option)
@@ -402,7 +402,7 @@ def class_find(context, classname_glob, **options):
 @class_group.command('tree', cls=PywbemcliCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
 @click.option('-s', '--superclasses', is_flag=True, default=False,
-              help='Show the superclass hierarchy. '
+              help=u'Show the superclass hierarchy. '
                    'Default: Show the subclass hierarchy.')
 @add_options(namespace_option)
 @add_options(help_option)
