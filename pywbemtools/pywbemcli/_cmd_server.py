@@ -40,6 +40,12 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 # the corresponding option name, ex. 'include_qualifiers'. It should be
 # defined with underscore and not dash
 
+# Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
+# with prompt-toolkit 2 + the completer requires unicode and click_repl not
+# passing help as unicode in options as unicode
+# NOTE: Insure that all option help attributes are unicode to get around this
+#       issue
+
 
 @cli.group('server', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)

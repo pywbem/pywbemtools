@@ -784,7 +784,7 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
           . . .
 
     Command Options:
-      -d, --default  If set, the connection is set to be the default connection  in the connections file in addition to
+      -d, --default  If set, the connection is set to be the default connection in the connections file in addition to
                      setting it as the current connection.
 
       -h, --help     Show this help message.

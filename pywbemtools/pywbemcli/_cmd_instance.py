@@ -58,100 +58,106 @@ from ._cmd_class import get_namespaces, enumerate_classes_filtered
 # the corresponding option name, ex. 'include_qualifiers'. It should be
 # defined with underscore and not dash
 
+# Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
+# with prompt-toolkit 2 + the completer requires unicode and click_repl not
+# passing help as unicode in options as unicode
+# NOTE: Insure that all option help attributes are unicode to get around this
+#       issue
+
 
 # This is instance-only because the default is False for include-qualifiers
 # on instances but True on classes
 include_qualifiers_get_option = [              # pylint: disable=invalid-name
     click.option('--iq', '--include-qualifiers', 'include_qualifiers',
                  is_flag=True, required=False,
-                 help='Include qualifiers in the returned instance. '
-                      'Not all servers return qualifiers on instances. '
-                      'Default: Do not include qualifiers.')]
+                 help=u'Include qualifiers in the returned instance. '
+                      u'Not all servers return qualifiers on instances. '
+                      u'Default: Do not include qualifiers.')]
 
 include_qualifiers_list_option = [              # pylint: disable=invalid-name
     click.option('--iq', '--include-qualifiers', 'include_qualifiers',
                  is_flag=True, required=False,
-                 help='When traditional operations are used, include '
-                      'qualifiers in the returned instances. '
-                      'Some servers may ignore this option. '
-                      'By default, and when pull operations are used, '
-                      'qualifiers will never be included.')]
+                 help=u'When traditional operations are used, include '
+                      u'qualifiers in the returned instances. '
+                      u'Some servers may ignore this option. '
+                      u'By default, and when pull operations are used, '
+                      u'qualifiers will never be included.')]
 
 # specific to instance because DeepInheritance differs between class and
 # instance operations.
 deep_inheritance_enum_option = [              # pylint: disable=invalid-name
     click.option('--di', '--deep-inheritance', 'deep_inheritance',
                  is_flag=True, required=False,
-                 help='Include subclass properties in the returned '
-                      'instances. '
-                      'Default: Do not include subclass properties.')]
+                 help=u'Include subclass properties in the returned '
+                      u'instances. '
+                      u'Default: Do not include subclass properties.')]
 
 local_only_get_option = [              # pylint: disable=invalid-name
     click.option('--lo', '--local-only', 'local_only', is_flag=True,
                  required=False,
-                 help='Do not include superclass properties in the returned '
-                      'instance. '
-                      'Some servers may ignore this option. '
-                      'Default: Include superclass properties.')]
+                 help=u'Do not include superclass properties in the returned '
+                      u'instance. '
+                      u'Some servers may ignore this option. '
+                      u'Default: Include superclass properties.')]
 
 local_only_list_option = [              # pylint: disable=invalid-name
     click.option('--lo', '--local-only', 'local_only', is_flag=True,
                  required=False,
-                 help='When traditional operations are used, do not include '
-                      'superclass properties in the returned instances. '
-                      'Some servers may ignore this option. '
-                      'By default, and when pull operations are used, '
-                      'superclass properties will always be included.')]
+                 help=u'When traditional operations are used, do not include '
+                      u'superclass properties in the returned instances. '
+                      u'Some servers may ignore this option. '
+                      u'By default, and when pull operations are used, '
+                      u'superclass properties will always be included.')]
 
 property_create_option = [              # pylint: disable=invalid-name
     click.option('-p', '--property', type=str, metavar='PROPERTYNAME=VALUE',
                  required=False, multiple=True,
-                 help='Initial property value for the new instance. '
-                      'May be specified multiple times. '
-                      'Array property values are specified as a '
-                      'comma-separated list; embedded instances are not '
-                      'supported. '
-                      'Default: No initial properties provided.')]
+                 help=u'Initial property value for the new instance. '
+                      u'May be specified multiple times. '
+                      u'Array property values are specified as a '
+                      u'comma-separated list; embedded instances are not '
+                      u'supported. '
+                      u'Default: No initial properties provided.')]
 
 property_modify_option = [              # pylint: disable=invalid-name
     click.option('-p', '--property', type=str, metavar='PROPERTYNAME=VALUE',
                  required=False, multiple=True,
-                 help='Property to be modified, with its new value. '
-                      'May be specified once for each property to be '
-                      'modified. '
-                      'Array property values are specified as a '
-                      'comma-separated list; embedded instances are not '
-                      'supported. '
-                      'Default: No properties modified.')]
+                 help=u'Property to be modified, with its new value. '
+                      u'May be specified once for each property to be '
+                      u'modified. '
+                      u'Array property values are specified as a '
+                      u'comma-separated list; embedded instances are not '
+                      u'supported. '
+                      u'Default: No properties modified.')]
 
 keybinding_key_option = [              # pylint: disable=invalid-name
     click.option('-k', '--key', type=str, metavar='KEYNAME=VALUE',
                  required=False, multiple=True,
-                 help='Value for a key in keybinding of CIM instance name. '
-                      'May be specified multiple times. '
-                      'Allows defining keys without the issues of quotes. '
-                      'Default: No keybindings provided.')]
+                 help=u'Value for a key in keybinding of CIM instance name. '
+                      u'May be specified multiple times. '
+                      u'Allows defining keys without the issues of quotes. '
+                      u'Default: No keybindings provided.')]
 
 filter_query_language_option = [              # pylint: disable=invalid-name
     click.option('--fql', '--filter-query-language', 'filter_query_language',
                  type=str, metavar='QUERY-LANGUAGE', default=None,
-                 help='The filter query language to be used with '
-                      '--filter-query. '
-                      'Default: DMTF:FQL.')]
+                 help=u'The filter query language to be used with '
+                      u'--filter-query. '
+                      u'Default: DMTF:FQL.')]
 
 filter_query_option = [              # pylint: disable=invalid-name
     click.option('--fq', '--filter-query', 'filter_query', type=str,
                  metavar='QUERY-STRING', default=None,
-                 help='When pull operations are used, filter the instances in '
-                      'the result via a filter query. '
-                      'By default, and when traditional operations are used, '
-                      'no such filtering takes place.')]
+                 help=u'When pull operations are used, filter the instances in '
+                      u'the result via a filter query. '
+                      u'By default, and when traditional operations are used, '
+                      u'no such filtering takes place.')]
 
 help_instancename_option = [              # pylint: disable=invalid-name
     click.option('--hi', '--help-instancename', 'help_instancename',
                  is_flag=True, required=False, is_eager=True,
-                 help='Show help message for specifying INSTANCENAME including '
-                      'use of the --key and --namespace options.')]
+                 help=u'Show help message for specifying INSTANCENAME '
+                      u'including use of the --key and --namespace options.')]
 
 
 ##########################################################################
@@ -321,13 +327,13 @@ def instance_create(context, classname, **options):
 @add_options(property_modify_option)
 @click.option('--pl', '--propertylist', 'propertylist', multiple=True, type=str,
               default=None, required=False, metavar='PROPERTYLIST',
-              help='Reduce the properties to be modified (as per '
-              '--property) to a specific property list. '
-              'Multiple properties may be specified with either a '
-              'comma-separated list or by using the option multiple '
-              'times. The empty string will cause no properties to '
-              'be modified. '
-              'Default: Do not reduce the properties to be modified.')
+              help=u'Reduce the properties to be modified (as per '
+              u'--property) to a specific property list. '
+              u'Multiple properties may be specified with either a '
+              u'comma-separated list or by using the option multiple '
+              u'times. The empty string will cause no properties to '
+              u'be modified. '
+              u'Default: Do not reduce the properties to be modified.')
 @add_options(verify_option)
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
@@ -367,18 +373,18 @@ def instance_modify(context, instancename, **options):
                 required=False)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by association class name. '
-                   'Subclasses of the specified class also match.')
+              help=u'Filter the result set by association class name. '
+                   u'Subclasses of the specified class also match.')
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
+              help=u'Filter the result set by result class name. '
+                   u'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
+              help=u'Filter the result set by source end role name.')
 @click.option('--rr', '--result-role', 'result_role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by far end role name.')
+              help=u'Filter the result set by far end role name.')
 @add_options(include_qualifiers_list_option)
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
@@ -428,10 +434,10 @@ def instance_associators(context, instancename, **options):
                 required=False)
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
+              help=u'Filter the result set by result class name. '
+                   u'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False, metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
+              help=u'Filter the result set by source end role name.')
 @add_options(include_qualifiers_list_option)
 @add_options(include_classorigin_instance_option)
 @add_options(propertylist_option)
@@ -482,11 +488,11 @@ def instance_references(context, instancename, **options):
 @click.argument('methodname', type=str, metavar='METHODNAME', required=False)
 @click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
-              help='Specify a method input parameter with its value. '
-                   'May be specified multiple times. '
-                   'Array property values are specified as a comma-separated '
-                   'list; embedded instances are not supported. '
-                   'Default: No input parameters.')
+              help=u'Specify a method input parameter with its value. '
+                   u'May be specified multiple times. '
+                   u'Array property values are specified as a comma-separated '
+                   u'list; embedded instances are not supported. '
+                   u'Default: No input parameters.')
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
@@ -533,8 +539,8 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.argument('query', type=str, required=True, metavar='QUERY-STRING')
 @click.option('--ql', '--query-language', 'query_language', type=str,
               metavar='QUERY-LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
-              help='The query language to be used with --query. '
-              'Default: {default}.'.
+              help=u'The query language to be used with --query. '
+              u'Default: {default}.'.
               format(default=DEFAULT_QUERY_LANGUAGE))
 @add_options(namespace_option)
 @add_options(summary_option)
@@ -563,7 +569,7 @@ def instance_query(context, query, **options):
 @add_options(indication_filter_option)
 @add_options(experimental_filter_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help='Sort by instance count. Otherwise sorted by class name.')
+              help=u'Sort by instance count. Otherwise sorted by class name.')
 @add_options(help_option)
 @click.pass_obj
 def instance_count(context, classname, **options):
@@ -603,26 +609,26 @@ def instance_count(context, classname, **options):
                 required=False)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
-              help='Filter the result set by association class name. '
+              help=u'Filter the result set by association class name. '
                    'Subclasses of the specified class also match.')
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help='Filter the result set by result class name. '
-                   'Subclasses of the specified class also match.')
+              help=u'Filter the result set by result class name. '
+                   u'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by source end role name.')
+              help=u'Filter the result set by source end role name.')
 @click.option('--rr', '--result-role', 'result_role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help='Filter the result set by far end role name.')
+              help=u'Filter the result set by far end role name.')
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(summary_option)
 @click.option('-f', '--fullpath', default=False, is_flag=True,
-              help='Normally the instance paths in the tree views are '
-                   'by hiding some keys with ~ to make the tree simpler '
-                   'to read. This includes keys that have the same value '
-                   'for all instances and the "CreationClassName" key.  When'
+              help=u'Normally the instance paths in the tree views are '
+                   u'by hiding some keys with ~ to make the tree simpler '
+                   u'to read. This includes keys that have the same value '
+                   u'for all instances and the "CreationClassName" key.  When'
                    'this option is used the full instance paths are displayed.')
 @add_options(help_instancename_option)
 @add_options(help_option)
