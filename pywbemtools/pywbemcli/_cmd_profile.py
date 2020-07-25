@@ -39,6 +39,12 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 # the corresponding option name, ex. 'include_qualifiers'. It should be
 # defined with underscore and not dash
 
+# Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
+# with prompt-toolkit 2 + the completer requires unicode and click_repl not
+# passing help as unicode in options as unicode
+# NOTE: Insure that all option help attributes are unicode to get around this
+#       issue
+
 
 @cli.group('profile', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
@@ -61,10 +67,10 @@ def profile_group():
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
-              help='Filter by the defined organization. (ex. -o DMTF')
+              help=u'Filter by the defined organization. (ex. -o DMTF')
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
-              help='Filter by the profile name. (ex. -p Array')
+              help=u'Filter by the profile name. (ex. -p Array')
 @add_options(help_option)
 @click.pass_obj
 def profile_list(context, **options):
@@ -90,27 +96,27 @@ def profile_list(context, **options):
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
-              help='Filter by the defined organization. (ex. -o DMTF')
+              help=u'Filter by the defined organization. (ex. -o DMTF')
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
-              help='Filter by the profile name. (ex. -p Array')
+              help=u'Filter by the profile name. (ex. -p Array')
 @click.option('--cc', '--central-class', 'central_class', type=str,
               metavar='CLASSNAME', required=False,
-              help='Optional. Required only if profiles supports only '
-              'scopig methodology')
+              help=u'Optional. Required only if profiles supports only '
+              u'scopig methodology')
 @click.option('--sc', '--scoping-class', 'scoping_class', type=str,
               metavar='CLASSNAME', required=False,
-              help='Optional. Required only if profiles supports only '
-              'scopig methodology')
+              help=u'Optional. Required only if profiles supports only '
+              u'scopig methodology')
 @click.option('--sp', '--scoping-path', 'scoping_path', type=str,
               metavar='CLASSLIST', required=False, multiple=True,
-              help='Optional. Required only if profiles supports only '
-              'scopig methodology. Multiples allowed')
+              help=u'Optional. Required only if profiles supports only '
+              u'scopig methodology. Multiples allowed')
 @click.option('--rd', '--reference-direction', 'reference_direction',
               type=click.Choice(['snia', 'dmtf']),
               default='dmtf',
               show_default=True,
-              help='Navigation direction for association.')
+              help=u'Navigation direction for association.')
 @add_options(help_option)
 @click.pass_obj
 def centralinsts(context, **options):

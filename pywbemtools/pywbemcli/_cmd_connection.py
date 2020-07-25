@@ -40,6 +40,12 @@ from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
+# Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
+# with prompt-toolkit 2 + the completer requires unicode and click_repl not
+# passing help as unicode in options as unicode
+# NOTE: Insure that all option help attributes are unicode to get around this
+#       issue
+
 
 @cli.group('connection', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
@@ -86,8 +92,8 @@ def connection_export(context):
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--show-password', is_flag=True,
               default=False,
-              help='If set, show existing password in results. Otherwise, '
-                   'password is masked')
+              help=u'If set, show existing password in results. Otherwise, '
+                   u'password is masked')
 @add_options(help_option)
 @click.pass_obj
 def connection_show(context, name, **options):
@@ -151,9 +157,9 @@ def connection_delete(context, name):
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('-d', '--default', is_flag=True,
               default=False,
-              help='If set, the connection is set to be the default connection '
-                   ' in the connections file in addition to setting it as the '
-                   'current connection.')
+              help=u'If set, the connection is set to be the default '
+                   u'connection in the connections file in addition to setting '
+                   u'it as the current connection.')
 @add_options(help_option)
 @click.pass_obj
 def connection_select(context, name, **options):
@@ -200,9 +206,9 @@ def connection_select(context, name, **options):
                           options_metavar=CMD_OPTS_TXT)
 @click.option('--test-pull', is_flag=True,
               default=False,
-              help='If set, the connection is tested to determine if the'
-                   'DMTF defined pull operations (ex. OpenEnumerateInstances'
-                   'are implemented since these are optional.')
+              help=u'If set, the connection is tested to determine if the'
+                   u'DMTF defined pull operations (ex. OpenEnumerateInstances'
+                   u'are implemented since these are optional.')
 @add_options(help_option)
 @click.pass_obj
 def connection_test(context, **options):
@@ -248,8 +254,8 @@ def connection_save(context, name):
                           options_metavar=CMD_OPTS_TXT)
 @click.option('-f', '--full', is_flag=True,
               default=False,
-              help='If set, display the full table. Otherwise display '
-                   'a brief view(name, server, mock_server columns).')
+              help=u'If set, display the full table. Otherwise display '
+                   u'a brief view(name, server, mock_server columns).')
 @add_options(help_option)
 @click.pass_obj
 def connection_list(context, **options):
