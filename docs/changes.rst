@@ -43,6 +43,10 @@ Released: not yet
   of the elements (property, method, parameter) in addition to the class
   itself.  See issue #678)
 
+**Cleanup**
+
+* Remove unused NocaseList from __common.py
+
 
 **Known issues:**
 
