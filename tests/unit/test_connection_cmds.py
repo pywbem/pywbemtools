@@ -33,6 +33,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+ONE_CLASS_MOCK_FILE = 'one_class_mock.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 
@@ -508,6 +509,31 @@ ca-certs
                  "'DMTF:CQL' not supported"],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify connection command test with pull option, no',
+     {'general': ['-o', 'text'],
+      'args': ['test', '--test-pull']},
+     {'stdout': ["Connection OK: FakedUrl",
+                 "OpenEnumerateInstances: OK",
+                 "OpenEnumerateInstancePaths: OK",
+                 "OpenAssociatorInstances: OK",
+                 "OpenAssociatorInstancePaths: OK",
+                 "OpenReferenceInstances: OK",
+                 "OpenReferenceInstancePaths: OK",
+                 "OpenQueryInstances: 14 "
+                 "(CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED): FilterQueryLanguage "
+                 "'DMTF:CQL' not supported"],
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify connection command test with pull but no instances fails',
+     {'general': [],
+      'args': ['test', '--test-pull']},
+     {'stderr': "No instances",
+      'rc': 1,
+      'test': 'innows'},
+     ONE_CLASS_MOCK_FILE, OK],
+
 
     # TODO: Future; Add test for --pull-options where the mocker has
     # pull disabled.  Note that this must be a completely new test, not
@@ -1016,7 +1042,7 @@ ca-certs
                  'keyfile', 'keys1.pem'],
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
-     None, FAIL],   # TODO does not create file
+     None, OK],
 
     ['Verify connection delete fred',
      {'args': ['delete', 'fred'],
@@ -1024,7 +1050,7 @@ ca-certs
      {'stdout': 'Deleted connection "fred"',
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
-     None, FAIL],  # TODO because previous test bypassed.
+     None, OK],
 
     # End of sequence - repository is empty.
 
@@ -1040,7 +1066,7 @@ ca-certs
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'none', 'after': 'exists'}},
-     None, FAIL],
+     None, OK],
 
     ['Verify sequence select, list, create new and save, list works.',
      {'general': [],
@@ -1055,7 +1081,7 @@ ca-certs
      {'stdout': ['Deleted connection "mocktest3"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'None'}},
-     None, FAIL],  # TODO: does not delete repository
+     None, OK],
 
     ['Verify connection list with mof output format mof fails',
      {'args': ['list'],
@@ -1064,9 +1090,18 @@ ca-certs
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'None', 'after': 'None'}},
-     None, FAIL],  # TODO fails because of problems with previous test
+     None, OK],
 
     # End of sequence - repository is empty.
+
+    ['Verify connection show no connection fails',
+     {'args': ['show'],
+      'general': []},
+     {'stderr': ['No current connection'],
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'None', 'after': 'None'}},
+     None, OK],
 
 ]
 

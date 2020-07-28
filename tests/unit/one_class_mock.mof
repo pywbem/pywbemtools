@@ -1,0 +1,16 @@
+// This mock model contains only a single class and no instances
+
+#pragma locale ("en_US")
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+     [Description ("Simple CIM Class")]
+class CIM_Foo {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+};
