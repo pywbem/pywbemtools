@@ -1196,6 +1196,7 @@ def display_text(text, output_format=None):  # pylint: disable=unused-argument
     """
     click.echo(text)
 
+
 def shorten_path_str(path, replacements, fullpath):
     """
     Create a short-form path str from the input CIMInstanceName with selected
@@ -1443,6 +1444,10 @@ def _print_instances_as_table(insts, table_width, table_format,
     if table_width is None:
         table_width = DEFAULT_TABLE_WIDTH
 
+    for inst in insts:
+        if not isinstance(inst, CIMInstance):
+            raise ValueError('Only CIMInstance display allows table output')
+
     prop_names = sorted_prop_names(insts)
 
     # Try to estimate max cell width from number of cols
@@ -1468,10 +1473,6 @@ def _print_instances_as_table(insts, table_width, table_format,
             new_header_line.append(fold_strings(header, max_cell_width))
         else:
             new_header_line.append(header)
-
-    for inst in insts:
-        if not isinstance(inst, CIMInstance):
-            raise ValueError('Only CIMInstance display allows table output')
 
     rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
                                      include_classes=include_classes,

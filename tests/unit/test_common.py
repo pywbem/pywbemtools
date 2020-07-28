@@ -232,6 +232,28 @@ TESTCASES_VALID_OUTPUT_FORMAT = [
           groups=[],
           exp_rtn='xml'),
      None, None, True),
+
+    ('Verify cmd input xml, default xml group empty OK',
+     dict(fmt='xml',
+          default='xml',
+          groups=[],
+          exp_rtn='xml'),
+     None, None, True),
+
+    ('Verify cmd input None, default xml group TABLE, CIM OK',
+     dict(fmt=None,
+          default='xml',
+          groups=['TABLE', 'CIM'],
+          exp_rtn='xml'),
+     None, None, True),
+
+    ('Verify cmd input None, default xml group empty OK',
+     dict(fmt=None,
+          default=None,
+          groups=[],
+          exp_rtn='mof'),
+     None, None, True),
+
 ]
 
 
@@ -854,6 +876,10 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
     ('Verify empty propertylist',
      dict(pl_str=("",), exp_pl=[]),
      None, None, False),
+
+    ('Verify empty propertylist',
+     dict(pl_str=(""), exp_pl=[]),
+     None, None, False),
 ]
 
 
@@ -1222,7 +1248,7 @@ TESTCASES_FILTERNAMELIST = [
             ign_case=False,
             exp_result=[],
         ),
-        None, None, FAIL),
+        None, None, FAIL),  # Failing with regex compile error
     (
         "Verify wildcard * filters",
         dict(
@@ -2308,8 +2334,7 @@ TESTCASES_FOLD_STRINGS = [
           init_indent=None,
           sub_indent=None,
           exp_rtn='The red fox jumped over the fence.'),
-     None, None, RUN),
-
+     None, None, OK),
 
 ]
 
@@ -2797,6 +2822,17 @@ P
         ),
         None, None, not CLICK_ISSUE_1590 and PYWBEM_1_0_0B1
     ),
+
+    (
+        "Verify fails if not instances",
+        dict(
+            args=([CIMClass("CIM_Foo")],
+                  80, 'simple'),
+            kwargs=dict(),
+            exp_stdout="",
+        ),
+        ValueError, None, not CLICK_ISSUE_1590 and PYWBEM_1_0_0B1
+    ),
 ]
 
 
@@ -2815,7 +2851,7 @@ def test_print_instances_as_table(
         pytest.skip("Testcase condition not satisfied")
 
     # This logic only supports successful testcases without warnings
-    assert exp_exc_types is None
+    # assert exp_exc_types is None
     assert exp_warn_types is None
 
     args = kwargs['args']
@@ -2823,16 +2859,21 @@ def test_print_instances_as_table(
     exp_stdout = kwargs['exp_stdout']
 
     # The code to be tested
-    _print_instances_as_table(*args, **kwargs_)
+    if not exp_exc_types:
+        _print_instances_as_table(*args, **kwargs_)
 
-    stdout, _ = capsys.readouterr()
-    assert exp_stdout == stdout, \
-        "Unexpected output in test case: {}\n" \
-        "Actual:\n" \
-        "{}\n" \
-        "Expected:\n" \
-        "{}\n" \
-        "End\n".format(desc, stdout, exp_stdout)
+        stdout, _ = capsys.readouterr()
+        assert exp_stdout == stdout, \
+            "Unexpected output in test case: {}\n" \
+            "Actual:\n" \
+            "{}\n" \
+            "Expected:\n" \
+            "{}\n" \
+            "End\n".format(desc, stdout, exp_stdout)
+
+    else:
+        with pytest.raises(exp_exc_types):
+            _print_instances_as_table(*args, **kwargs_)
 
 
 # TODO Test compare and failure in compare_obj and with errors.
