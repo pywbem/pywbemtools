@@ -509,7 +509,7 @@ SIMPLE_SHRUB_TABLE1 = [
 
 # pylint: enable=line-too-long
 
-OK = True     # mark tests OK when they execute correctly
+OK = True    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -2322,14 +2322,13 @@ Instances: TST_Person
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO #458: The order of instances in the selection list is unpredictable,
-    #      and some of the instances do not have references. Therefore, the
-    #      result list of instances may be empty or not. We are circumventing
-    #      this by not expecting result instances, but this should be improved.
     ['Verify instance command references with wildcard keybinding',
      ['references', 'TST_Person.?'],
      {'stdout':
-      ['root/cimv2:TST_Person.name="Mike"'],
+      ['root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_Lineage {',
+       'InstanceID = "MikeGabi";',
+       'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'innows'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
@@ -2467,14 +2466,18 @@ Instances: TST_Person
       'test': 'in'},
      ASSOC_MOCK_FILE, OK],
 
-    # TODO #458: The order of instances in the selection list is unpredictable,
-    #      and some of the instances do not have associators. Therefore, the
-    #      result list of instances may be empty or not. We are circumventing
-    #      this by not expecting result instances, but this should be improved.
     ['Verify instance command associators with wildcard keybinding',
      ['associators', 'TST_Person.?'],
      {'stdout':
-      ['root/cimv2:TST_Person.name="Mike"'],
+      ['root/cimv2:TST_Person.name="Mike"',
+       'instance of TST_FamilyCollection {',
+       'name = "family1";',
+       '};',
+       'instance of TST_Person {',
+       'name = "Mike";',
+       'likes = { 1, 2 };',
+       'gender = 2;',
+       '};'],
       'rc': 0,
       'test': 'innows'},
      [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
