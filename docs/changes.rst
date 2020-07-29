@@ -27,7 +27,7 @@ Released: not yet
 
 * Order display of instance names when the .? is used to pick an instance
   name so the same order of instance names is displayed for all versions of
-  Python. (See issue #459)
+  Python. (See issue #458 and #459)
 
 **Enhancements:**
 
