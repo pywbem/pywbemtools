@@ -19,6 +19,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Pinned prompt-toolkit to <3.0 on Python 3.8 on Windows to avoid WinError 995.
+  (See issue #690)
+
 **Enhancements:**
 
 **Cleanup:**
