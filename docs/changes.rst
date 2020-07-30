@@ -43,6 +43,9 @@ Released: not yet
   of the elements (property, method, parameter) in addition to the class
   itself.  See issue #678)
 
+* Test: Enabled coveralls to run on all Python versions in the Travis CI,
+  resulting in a combined coverage for all Python versions.
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py
