@@ -29,6 +29,9 @@ Released: not yet
   name so the same order of instance names is displayed for all versions of
   Python. (See issue #458 and #459)
 
+* Pinned prompt-toolkit to <3.0 on Python 3.8 on Windows to avoid WinError 995.
+  (See issue #690)
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.
