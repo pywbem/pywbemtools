@@ -5,32 +5,21 @@ Change log
 ==========
 
 
+pywbemtools 0.7.1
+-----------------
 
-pywbemtools 0.7.1.dev1
-----------------------
-
-This version is currently in development and is shown as |version|.
-
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-07-31
 
 **Bug fixes:**
 
 * Pinned prompt-toolkit to <3.0 on Python 3.8 on Windows to avoid WinError 995.
   (See issue #690)
 
-**Enhancements:**
+* Fixed exception when command entered in interactive mode, on Python 2.
+  (See issue #224)
 
-**Cleanup:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+* Test: Default connection file does not get restored in some cases during test.
+  (See issue #680)
 
 
 pywbemtools 0.7.0
