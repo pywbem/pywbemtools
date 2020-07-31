@@ -32,6 +32,12 @@ Released: not yet
 * Pinned prompt-toolkit to <3.0 on Python 3.8 on Windows to avoid WinError 995.
   (See issue #690)
 
+* Fixed exception when command entered in interactive mode, on Python 2.
+  (See issue #224)
+
+* Test: Default connection file does not get restored in some cases during test.
+  (See issue #680)
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.
