@@ -286,6 +286,7 @@ user
 password
 timeout            30
 use-pull
+pull-max-cnt
 verify             True
 certfile
 keyfile
@@ -308,6 +309,7 @@ user
 password
 timeout            30
 use-pull
+pull-max-cnt
 verify             True
 certfile
 keyfile
@@ -340,6 +342,7 @@ user
 password
 timeout            30
 use-pull
+pull-max-cnt
 verify             True
 certfile
 keyfile
@@ -362,6 +365,7 @@ user               fred
 password           argh
 timeout            18
 use-pull
+pull-max-cnt
 verify             False
 certfile
 keyfile
@@ -384,6 +388,7 @@ user               fred
 password           ******
 timeout            18
 use-pull
+pull-max-cnt
 verify             False
 certfile
 keyfile
@@ -459,8 +464,8 @@ ca-certs
      {'general': ['--output-format', 'plain'],
       'args': ['list', '--full']},
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
-                 'name   server namespace  user  timeout  use_pull  verify  '
-                 'certfile  keyfile  mock-server',
+                 'name   server namespace  user  timeout  use-pull  '
+                 'pull-max-cnt verify  certfile  keyfile  mock-server',
                  '*#test2  http://blahblah  root/cimv2 fred 18 False',
                  'test1  http://blah  root/cimv2 30  True'],
       'test': 'innows'},
@@ -471,10 +476,10 @@ ca-certs
      {'general': ['--output-format', 'plain'],
       'args': ['list', '-f']},
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
-                 'name   server namespace  user  timeout  use_pull  verify  '
-                 'certfile  keyfile  mock-server',
+                 'name   server namespace  user  timeout  use-pull '
+                 'pull-max-cnt verify certfile keyfile mock-server',
                  '*#test2  http://blahblah  root/cimv2 fred 18 False',
-                 'test1  http://blah  root/cimv2 30  True'],
+                 'test1  http://blah  root/cimv2 30 True'],
       'test': 'innows'},
      None, OK],
 

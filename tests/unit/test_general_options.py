@@ -275,11 +275,11 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify valid --use-pull option parameter.',
+    ['Verify valid --use-pull option parameter either.',
      {'general': ['-s', 'http://blah', '--use-pull', 'either'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stdout': ['use-pull verifyTrue'],
+     {'stdout': ['use-pull pull-max-cnt verify'],
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -300,18 +300,18 @@ TEST_CASES = [
       'args': ['show']},
      {'stdout': ['pull-max-cnt 2000'],
       'rc': 0,
-      'test': 'in'},
-     None, SKIP],  # See Issue #694
+      'test': 'innows'},
+     None, OK],
 
     ['Verify invalid --pull-max-cnt option parameter fails.',
      {'general': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Invalid value for "--pull-max-cnt": blah is not a '
-                 'valid integer'],
+     {'stderr': ['Invalid value for', '--pull-max-cnt',
+                 'blah is not a valid integer'],
       'rc': 2,
-      'test': 'in'},
-     None, SKIP],  # See Issue #694
+      'test': 'innows'},
+     None, OK],
 
     ['Verify --version general option.',
      {'general': ['-s', 'http://blah', '--version'],

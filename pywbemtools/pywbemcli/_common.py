@@ -1305,7 +1305,7 @@ def _print_qual_decls_as_table(qual_decls, table_width, table_format):
     """
     rows = []
     headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
-    max_column_width = (table_width / len(headers)) - 4
+    max_column_width = int((table_width / len(headers)) - 4)
     for q in qual_decls:
         scopes = '\n'.join([key for key in q.scopes if q.scopes[key]])
         flavors = []
@@ -1313,7 +1313,7 @@ def _print_qual_decls_as_table(qual_decls, table_width, table_format):
         flavors.append('ToSubclass' if q.tosubclass else 'Restricted')
         if q.translatable:
             flavors.append('Translatable')
-        if sum([len(i) for i in flavors]) > max_column_width:
+        if sum([len(i) for i in flavors]) >= max_column_width:
             sep = "\n"
         else:
             sep = ", "
