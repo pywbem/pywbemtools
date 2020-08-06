@@ -38,6 +38,10 @@ Released: not yet
 * Test: Default connection file does not get restored in some cases during test.
   (See issue #680)
 
+* AssociationShrub produces instancename slightly different table output in
+  some cases for pywbem 1 vs previous versions(inclusion of "/:" prefix).
+  (see issue #704)
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.

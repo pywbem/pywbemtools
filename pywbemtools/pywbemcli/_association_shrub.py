@@ -616,10 +616,16 @@ class AssociationShrub(object):
           TypeError: Invalid type in keybindings
           ValueError: Invalid format
         """
+        # Remove host and namespace if same as source instance
         path = self.simplify_path(path)
-        path_str = "{}".format(path)
+
+        path_str = path.to_wbem_uri(format=format)
         if len(path_str) <= max_len:
             return path_str
+
+        # Otherwise reproduce complete wbemuri method except fold the
+        # keybindings.  TODO, FUTURE: Is there a better way to fold based
+        # on the string output.
 
         ret = []
 
