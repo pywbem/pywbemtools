@@ -369,6 +369,7 @@ def show_connection_information(context, connection,
             ['password', disp_password],
             ['timeout', connection.timeout],
             ['use-pull', connection.use_pull],
+            ['pull-max-cnt', connection.pull_max_cnt],
             ['verify', connection.verify],
             ['certfile', connection.certfile],
             ['keyfile', connection.keyfile],
@@ -726,8 +727,8 @@ def cmd_connection_list(context, options):
         """
         if options['full']:
             return [name, svr.server, svr.default_namespace, svr.user,
-                    svr.timeout, svr.use_pull, svr.verify, svr.certfile,
-                    svr.keyfile, "\n".join(svr.mock_server)]
+                    svr.timeout, svr.use_pull, svr.pull_max_cnt, svr.verify,
+                    svr.certfile, svr.keyfile, "\n".join(svr.mock_server)]
         return [name, svr.server, "\n".join(svr.mock_server)]
 
     connections = context.connections_repo
@@ -763,8 +764,8 @@ def cmd_connection_list(context, options):
     # in particular if you use the default.
     if options['full']:
         headers = ['name', 'server', 'namespace', 'user',
-                   'timeout', 'use_pull', 'verify', 'certfile', 'keyfile',
-                   'mock-server']
+                   'timeout', 'use-pull', 'pull-max-cnt', 'verify',
+                   'certfile', 'keyfile', 'mock-server']
     else:
         headers = ['name', 'server', 'mock-server']
 

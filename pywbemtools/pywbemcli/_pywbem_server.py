@@ -124,7 +124,8 @@ class PywbemServer(object):
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default', user=None, password=None,
                  timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None, use_pull=None,
-                 certfile=None, keyfile=None, ca_certs=None, mock_server=None):
+                 pull_max_cnt=None, certfile=None, keyfile=None,
+                 ca_certs=None, mock_server=None):
         """
         Create  a PywbemServer object. This contains the configuration
         and operation information to create a connection to the server
@@ -143,6 +144,7 @@ class PywbemServer(object):
         self.password = password
         self.timeout = timeout
         self.use_pull = use_pull
+        self.pull_max_cnt = pull_max_cnt
         self.verify = verify
         self.certfile = certfile
         self.keyfile = keyfile
@@ -153,17 +155,16 @@ class PywbemServer(object):
         self._conn = None
 
     def __str__(self):
-        return 'PywbemServer(url={} name={})'.format(self.server, self.name)
+        return 'PywbemServer(url={s.server} name={s.name})'.format(s=self)
 
     def __repr__(self):
-        return 'PywbemServer(server={} name={} ns={} user={} ' \
-               'password={} timeout={} use_pull={} verify={} certfile={} ' \
-               'keyfile={} ca_certs={}  ' \
-               'mock_server={!r} wbem_server {!r})' \
-               .format(self.server, self.name, self.default_namespace,
-                       self.user, self.password, self.timeout, self.use_pull,
-                       self.verify, self.certfile, self.keyfile, self.ca_certs,
-                       self.mock_server, self.wbem_server)
+        return 'PywbemServer(server={s.server} name={s.name} ' \
+               'ns={s.default_namespace} user={s.user} ' \
+               'password={s.password} timeout={s.timeout} ' \
+               'use_pull={s.use_pull} pull_max_cnt={s.pull_max_cnt} ' \
+               'verify={s.verify} certfile={s.certfile} keyfile={s.keyfile} ' \
+               'ca_certs={s.ca_certs} mock_server={s.mock_server!r} ' \
+               'wbem_server={s.wbem_server!r})'.format(s=self)
 
     @property
     def server(self):
@@ -294,7 +295,8 @@ class PywbemServer(object):
     @property
     def use_pull(self):
         """
-        :term:`string`: Connection timeout to be used on requests in seconds
+        :term:`string`: Choice of strings that defines action. The
+        choices are "either", "yes", "no"
         """
         return self._use_pull
 
@@ -307,6 +309,24 @@ class PywbemServer(object):
             self._use_pull = use_pull
         else:
             _raise_typeerror("use-pull", use_pull, 'boolean')
+
+    @property
+    def pull_max_cnt(self):
+        """
+        :term:`int`: Count of number of objects to be retrieved with each
+        pull operation or None if the default value is to be used
+        """
+        return self._pull_max_cnt
+
+    @pull_max_cnt.setter
+    def pull_max_cnt(self, pull_max_cnt):
+        """Setter method; for a description see the getter method."""
+
+        if pull_max_cnt is None or isinstance(pull_max_cnt, six.integer_types):
+            # pylint: disable=attribute-defined-outside-init
+            self._pull_max_cnt = pull_max_cnt
+        else:
+            _raise_typeerror("pull_max_cnt", pull_max_cnt, 'integer')
 
     @property
     def verify(self):
@@ -434,6 +454,7 @@ class PywbemServer(object):
                             "default-namespace": self.default_namespace,
                             "timeout": self.timeout,
                             "use_pull": self.use_pull,
+                            "pull_max_cnt": self.pull_max_cnt,
                             "verify": self.verify,
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,

@@ -38,9 +38,9 @@ from ._context_obj import ContextObj, display_click_context
 from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_NAMESPACE, \
-    PYWBEMCLI_PROMPT, PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, \
-    DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT, USE_AUTOSUGGEST
+from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
+    PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
+    MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository, HOME_CONNECTIONS_PATH
 from ._click_extensions import PywbemcliTopGroup
 from ._utils import deprecation_warning
@@ -361,6 +361,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                                          password=password,
                                          timeout=resolved_timeout,
                                          use_pull=resolved_use_pull,
+                                         pull_max_cnt=resolved_pull_max_cnt,
                                          verify=resolved_verify,
                                          certfile=certfile,
                                          keyfile=keyfile,
@@ -527,8 +528,9 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     use_pull = use_pull or DEFAULT_PULL_CHOICE
     resolved_use_pull = USE_PULL_CHOICE[use_pull]
 
-    resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
-
+    # Resolved is the same as input including None.  Default is set on
+    # request if the value is None
+    resolved_pull_max_cnt = pull_max_cnt
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
     # Command mode (ctx is None). Processes command on comand line and quits
@@ -640,9 +642,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
     # command line.
+    # Set pull_max_cnt to either resolved or default here so we keep default
+    # in persistent file but set working value in context.
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
-                         resolved_pull_max_cnt,
+                         resolved_pull_max_cnt or DEFAULT_MAXPULLCNT,
                          resolved_timestats,
                          log, verbose, pdb,
                          deprecation_warnings,

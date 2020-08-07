@@ -59,6 +59,10 @@ Released: not yet
 
 * Remove unused NocaseList from __common.py
 
+* Moved the general option --pull_max_cnt to become part of the persistent
+  server definition rather than transient.  This means that this
+  parameter is part of the data maintained in the server definitionfile and
+  applies to just the server defined.  (See issue #694)
 
 **Known issues:**
 

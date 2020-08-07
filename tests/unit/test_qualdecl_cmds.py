@@ -289,7 +289,7 @@ TEST_CASES = [
       'general': ['-o', 'grid']},
      {'stdout': QD_TBL_GET_OUT,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command enumerate invalid namespace Fails',
