@@ -92,6 +92,10 @@ Qualifier Override : string,
     Scope(property, reference, method),
     Flavor(EnableOverride, Restricted);
 
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
 """
 
 
@@ -204,19 +208,19 @@ TEST_CASES = [
     ['Verify qualifier command enumerate returns qual decls.',
      ['enumerate'],
      {'stdout': QD_ENUM_MOCK,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command enumerate with namespace returns qual decls.',
      ['enumerate', '--namespace', 'root/cimv2'],
      {'stdout': QD_ENUM_MOCK,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command enumerate summary returns qual decls.',
      ['enumerate', '--summary'],
-     {'stdout': ['9', 'CIMQualifierDeclaration'],
-      'test': 'in'},
+     {'stdout': ['10', 'CIMQualifierDeclaration'],
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command enumerate summary returns qual decls table',
@@ -226,7 +230,7 @@ TEST_CASES = [
 +---------+-------------------------+
 |   Count | CIM Type                |
 |---------+-------------------------|
-|       9 | CIMQualifierDeclaration |
+|      10 | CIMQualifierDeclaration |
 +---------+-------------------------+
 """],
       'test': 'linesnows'},
@@ -281,7 +285,7 @@ TEST_CASES = [
       'general': ['-o', 'grid']},
      {'stdout': QD_TBL_OUT,
       'rc': 0,
-      'test': 'lines'},
+      'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify qualifier command -o grid get Abstract table out',
