@@ -311,6 +311,25 @@ TEST_CASES = [
                  'blah is not a valid integer'],
       'rc': 2,
       'test': 'innows'},
+     None, OK],  # Only tests that the option is accepted
+
+    ['Verify --no-deprecation-warnings general option.',
+     {'general': ['-s', 'http://blah', '--no-deprecation-warnings'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stdout': [''],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],  # Only tests that the option is accepted
+
+
+    ['Verify --deprecation-warnings general option.',
+     {'general': ['-s', 'http://blah', '--deprecation-warnings'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stdout': [''],
+      'rc': 0,
+      'test': 'innows'},
      None, OK],
 
     ['Verify --version general option.',

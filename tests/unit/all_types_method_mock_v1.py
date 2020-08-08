@@ -52,9 +52,10 @@ class CIM_AllTypesMethodProvider(MethodProvider):
                 CIM_ERR_NOT_FOUND,
                 "class {0} does not exist in CIM repository, "
                 "namespace {1}".format(classname, namespace))
-
+        # Map input params to list of params for response.
+        out_params = [p for p in params.values()]
         # Return the input parameters and returnvalue == 0
-        return (0, params)
+        return (0, out_params)
 
 
 # Add the the callback to the mock repository
