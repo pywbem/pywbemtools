@@ -16,6 +16,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Test: Fixed attempt in test_class_cmds.py to invoke a non-static method on a
+  class object. (see issue #707)
+
 **Enhancements:**
 
 **Known issues:**
