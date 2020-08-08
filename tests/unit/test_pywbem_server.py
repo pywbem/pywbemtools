@@ -556,7 +556,7 @@ def test_connect(testcase, init_args, init_kwargs, exp_attrs):
     # called.
     try:
         svr.create_connection(False)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         pass  # pass all exceptions
     finally:
         # remove the PEM file

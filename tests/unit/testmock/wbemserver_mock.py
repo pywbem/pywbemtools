@@ -216,15 +216,18 @@ class WbemServerMock(object):
                 raise
 
         if hasattr(self.conn, 'compile_schema_classes'):
+            # Using pywbem 1.x
             schema = DMTFCIMSchema(self.dmtf_schema_ver, self.schema_dir,
                                    use_experimental=False,
                                    verbose=self.verbose)
+            # pylint: disable=no-member
             self.conn.compile_schema_classes(
                 self.server_mock_data['class_names'],
                 schema.schema_pragma_file,
                 namespace=namespace,
                 verbose=self.verbose)
         else:
+            # Using pywbem 0.x
             self.conn.compile_dmtf_schema(
                 self.dmtf_schema_ver, self.schema_dir,
                 class_names=self.server_mock_data['class_names'],

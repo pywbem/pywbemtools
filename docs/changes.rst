@@ -78,6 +78,9 @@ Released: not yet
 * Move code associated with display_cimobjects() to a separate module. This
   is part of creating table representation of classes (See issue #249)
 
+* Resolved remaining Pylint issues and enforced clean pylint checks.
+  (See issue #668)
+
 **Known issues:**
 
 * See `list of open issues`_.

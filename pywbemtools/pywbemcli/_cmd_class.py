@@ -554,8 +554,8 @@ def _filter_classes_for_qualifiers(classes, qualifier_filters, names_only, iq):
 
         # if property scope, test properties
         if scopes[1]:
-            for property in cls.properties.values():
-                if qname in property.qualifiers:
+            for prop in cls.properties.values():
+                if qname in prop.qualifiers:
                     return True
         # If method scope, test methods and if parameter scope, test parameters
         if scopes[2]:
