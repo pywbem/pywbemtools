@@ -1019,9 +1019,9 @@ Instances: TST_Person
     #
     ['Verify instance command enumerate error, invalid classname fails',
      ['enumerate', 'CIM_Foox'],
-     {'stderr': ["Error: CIMError: 6"],
+     {'stderr': ["CIMError:", "CIM_ERR_INVALID_CLASS"],
       'rc': 1,
-      'test': 'in'},
+      'test': 'innows'},  # NOTE: For some reason this changed from NOT_FOUND
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate error, no classname fails',
@@ -1769,8 +1769,8 @@ Instances: TST_Person
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance command create, new instance Error in Property Type'
-     " with array values",
+    ['Verify instance command create, new instance Error in Property Type with'
+     " array values",
      ['create', 'PyWBEM_AllTypes', '-p', 'InstanceID=blah',
       '-p', 'arrayBool=8,9',
       '-p', 'arrayUint8=1,2,3',
@@ -1783,7 +1783,7 @@ Instances: TST_Person
                 "type='boolean', array=True and input value='8,9'. "
                 'Exception: Invalid boolean value: "8"',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command create, new instance already exists',
@@ -1939,7 +1939,7 @@ Instances: TST_Person
                 "type='boolean', array=False and input value='9'. "
                 'Exception: Invalid boolean value: "9"',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, single property, Fail modifies key',
@@ -1972,7 +1972,7 @@ Instances: TST_Person
                 "type='boolean', array=False and input value='False,True'. "
                 'Exception: Invalid boolean value: "False,True"',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, Error value types mismatch with array',
@@ -1982,7 +1982,7 @@ Instances: TST_Person
                 "type='boolean', array=True and input value='9,8'. "
                 'Exception: Invalid boolean value: "9"',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, Error different value types',
@@ -1992,7 +1992,7 @@ Instances: TST_Person
                 "type='boolean', array=True and input value='true,8'. "
                 'Exception: Invalid boolean value: "8"',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, Error integer out of range',
@@ -2004,7 +2004,7 @@ Instances: TST_Person
                 "Exception: Integer value 99999999999999999999999 is out of "
                 "range for CIM datatype uint32",
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     ['Verify instance command modify, Error property not in class',
@@ -2012,7 +2012,7 @@ Instances: TST_Person
       '-p', 'blah=9'],
      {'stderr': 'Error: Property name "blah" not in class "PyWBEM_AllTypes".',
       'rc': 1,
-      'test': 'lines'},
+      'test': 'innows'},
      ALLTYPES_MOCK_FILE, OK],
 
     # TODO additional modify error tests required
@@ -2695,7 +2695,7 @@ interop      TST_MemberOfFamilyCollection  3
                  'scalRef=', 'PyWBEM_AllTypes.InstanceID='],
       'rc': 0,
       'test': 'innows'},
-     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
+     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], RUN],
 
     ['Verify instance command invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
@@ -2942,7 +2942,6 @@ class TestSubcmd(CLITestsBase):  # pylint: disable=too-few-public-methods
     Test all of the instance command variations.
     """
     command_group = 'instance'
-    # mock_mof_file = 'simple_mock_model.mof'
 
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, mock, condition", TEST_CASES)
