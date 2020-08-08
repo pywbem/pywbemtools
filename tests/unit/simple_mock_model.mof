@@ -39,6 +39,10 @@ Qualifier Override : string = null,
     Scope(property, reference, method),
     Flavor(EnableOverride, Restricted);
 
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
      [Description ("Simple CIM Class")]
 class CIM_Foo {
         [Key, Description ("This is key property.")]
@@ -51,13 +55,21 @@ class CIM_Foo {
     uint32 Fuzzy(
         [IN, OUT, Description("Define data to be returned in output parameter")]
       string TestInOutParameter,
-
         [IN, OUT, Description ( "Test of ref in/out parameter")]
       CIM_Foo REF TestRef,
-
         [IN ( false ), OUT, Description("Rtns method name if exists on input")]
       string OutputParam,
+        [IN , Description("Defines return value if provided.")]
+      uint32 OutputRtnValue);
 
+        [Description ("Static method with in and out parameters"), Static]
+    uint32 FuzzyStatic(
+        [IN, OUT, Description("Define data to be returned in output parameter")]
+      string TestInOutParameter,
+        [IN, OUT, Description ( "Test of ref in/out parameter")]
+      CIM_Foo REF TestRef,
+        [IN ( false ), OUT, Description("Rtns method name if exists on input")]
+      string OutputParam,
         [IN , Description("Defines return value if provided.")]
       uint32 OutputRtnValue);
 

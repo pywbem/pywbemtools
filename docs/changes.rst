@@ -42,6 +42,9 @@ Released: not yet
   some cases for pywbem 1 vs previous versions(inclusion of "/:" prefix).
   (see issue #704)
 
+* Test: Fixed attempt in test_class_cmds.py to invoke a non-static method on a
+  class object. (see issue #707)
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.
