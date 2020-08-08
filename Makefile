@@ -225,6 +225,17 @@ pywbemcli_termwidth := 120
 # PyLint config file
 pylint_rc_file := pylintrc
 
+ifeq ($(PACKAGE_LEVEL),minimum)
+  # Using pywbem 0.x
+  pylint_ignore := all_types_method_mock_v1.py,simple_mock_invokemethod_v1.py,py_err_processatstartup.py
+else
+  # Using pywbem 1.x
+  pylint_ignore := all_types_method_mock_v0.py,simple_mock_invokemethod_v0.py,py_err_processatstartup.py
+endif
+
+# PyLint additional options
+pylint_opts := --disable=fixme --ignore=$(pylint_ignore)
+
 # Flake8 config file
 flake8_rc_file := .flake8
 
@@ -593,7 +604,6 @@ $(bdist_file) $(sdist_file): _check_version setup.py MANIFEST.in $(doc_utility_h
 	$(PYTHON_CMD) setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
 	@echo "makefile: Done creating the distribution archive files: $(bdist_file) $(sdist_file)"
 
-# TODO: Once pylint has no more errors, remove the dash "-"
 # PyLint status codes:
 # * 0 if everything went fine
 # * 1 if fatal messages issued
@@ -605,12 +615,20 @@ $(bdist_file) $(sdist_file): _check_version setup.py MANIFEST.in $(doc_utility_h
 # Status 1 to 16 will be bit-ORed.
 # The make command checks for statuses: 1,2,32
 pylint_$(pymn).done: develop_$(pymn).done Makefile $(pylint_rc_file) $(py_src_files)
+ifeq ($(python_m_version),2)
+	@echo "makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
+else
+ifeq ($(python_mn_version),3.4)
+	@echo "makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
+else
 	@echo "makefile: Running Pylint"
 	-$(call RM_FUNC,$@)
 	pylint --version
-	-pylint --rcfile=$(pylint_rc_file) $(py_src_files)
+	pylint $(pylint_opts) --rcfile=$(pylint_rc_file) $(py_src_files)
 	echo "done" >$@
 	@echo "makefile: Done running Pylint"
+endif
+endif
 
 flake8_$(pymn).done: develop_$(pymn).done Makefile $(flake8_rc_file) $(py_src_files)
 	@echo "makefile: Running Flake8"

@@ -125,10 +125,11 @@ deprecated_filter_option = [              # pylint: disable=invalid-name
 # Since the filters are in a list to allow them to be used individually, the
 # first item of each list must be used for the combined defintion that can
 # be use with add_options
-class_filter_options = [association_filter_option[0],
-                        indication_filter_option[0],
-                        experimental_filter_option[0],
-                        deprecated_filter_option[0]]
+class_filter_options = [              # pylint: disable=invalid-name
+    association_filter_option[0],
+    indication_filter_option[0],
+    experimental_filter_option[0],
+    deprecated_filter_option[0]]
 
 help_option = [              # pylint: disable=invalid-name
     click.help_option('-h', '--help', help=u'Show this help message.')]

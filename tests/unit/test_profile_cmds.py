@@ -27,21 +27,20 @@ from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
-
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
-#
-# The following list define the help for each command in terms of particular
+# The following lists define the help for each command in terms of particular
 # parts of lines that are to be tested.
-# For each test, try to include:
+# For each list, try to include:
 # 1. The usage line and in particular the argument component
 # 2. The first line of the command comment (i.e. the summary sentence)
 # 3. The last line CMD_OPTION_HELP_HELP_LINE
 # 4. Each option including at least the long and short names
+
 PROFILE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] profile COMMAND [ARGS] '
     '[COMMAND-OPTIONS]',
