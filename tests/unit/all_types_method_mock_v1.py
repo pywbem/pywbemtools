@@ -1,10 +1,8 @@
 """
 mock_pywbem test script that installs a method callback to be executed. This is
 based on the CIM_Foo class in the simple_mock_model.mof test file
-
 """
 
-import six
 from pywbem_mock import MethodProvider
 
 from pywbem import CIM_ERR_METHOD_NOT_AVAILABLE, CIMError, CIM_ERR_NOT_FOUND
@@ -31,26 +29,21 @@ class CIM_AllTypesMethodProvider(MethodProvider):
     def __init__(self, cimrepository):
         super(CIM_AllTypesMethodProvider, self).__init__(cimrepository)
 
-    def InvokeMethod(self, namespace, MethodName, ObjectName, Params):
+    def InvokeMethod(self, methodname, localobject, params):
         """
-        Simplistic test method. Validates methodname, objectname, Params
-        and returns rtn value 0 and one parameter
+        Simplistic test method. Validates methodname, localobject,
+        and returns return value 0 and the input parameters.
 
         The parameters and return for Invoke method are defined in
         :meth:`~pywbem_mock.MethodProvider.InvokeMethod`
         """
-        # validate namespace using method in BaseProvider
-        self.validate_namespace(namespace)
+        namespace = localobject.namespace
 
         # get classname and validate. This provider uses only one class
-        if isinstance(ObjectName, six.string_types):
-            classname = ObjectName
-        else:
-            classname = ObjectName.classname
-
+        classname = localobject.classname
         assert classname.lower() == self.provider_classnames.lower()
 
-        if MethodName != 'AllTypesMethod':
+        if methodname != 'AllTypesMethod':
             raise CIMError(CIM_ERR_METHOD_NOT_AVAILABLE)
 
         # Test if class exists.
@@ -61,7 +54,7 @@ class CIM_AllTypesMethodProvider(MethodProvider):
                 "namespace {1}".format(classname, namespace))
 
         # Return the input parameters and returnvalue == 0
-        return (0, Params)
+        return (0, params)
 
 
 # Add the the callback to the mock repository

@@ -168,6 +168,7 @@ CLASS_TREE_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
+# pylint: disable=line-too-long
 CIMFOO_SUB_SUB = """
    [Description ( "Subclass of CIM_Foo_sub" )]
 class CIM_Foo_sub_sub : CIM_Foo_sub {
@@ -208,12 +209,32 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
           Description ( "Defines return value if provided." )]
       uint32 OutputRtnValue);
 
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
       [Description ( "Method with no Parameters" )]
    uint32 DeleteNothing();
 
 };
 
-"""
+"""  # noqa: E501
+# pylint: enable=line-too-long
 
 CIMFOO_SUB_SUB_NO_QUALS = """
 class CIM_Foo_sub_sub : CIM_Foo_sub {
@@ -230,6 +251,12 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       string OutputParam2);
 
    uint32 Fuzzy(
+      string TestInOutParameter,
+      CIM_Foo REF TestRef,
+      string OutputParam,
+      uint32 OutputRtnValue);
+
+   uint32 FuzzyStatic(
       string TestInOutParameter,
       CIM_Foo REF TestRef,
       string OutputParam,
@@ -292,7 +319,6 @@ RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
 
-# pylint: enable=line-too-long
 TEST_CASES = [
 
     # List of testcases.
@@ -563,6 +589,11 @@ TEST_CASES = [
                  'CIM_Foo REF TestRef,',
                  'string OutputParam,',
                  'uint32 OutputRtnValue);',
+                 'uint32 FuzzyStatic(',
+                 'string TestInOutParameter,',
+                 'CIM_Foo REF TestRef,',
+                 'string OutputParam,',
+                 'uint32 OutputRtnValue);',
                  'uint32 DeleteNothing();', '};'],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -725,6 +756,12 @@ TEST_CASES = [
                  '      string OutputParam,',
                  '      uint32 OutputRtnValue);',
                  '',
+                 '   uint32 FuzzyStatic(',
+                 '      string TestInOutParameter,',
+                 '      CIM_Foo REF TestRef,',
+                 '      string OutputParam,',
+                 '      uint32 OutputRtnValue);',
+                 '',
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
@@ -748,6 +785,12 @@ TEST_CASES = [
                  '      string OutputParam,',
                  '      uint32 OutputRtnValue);',
                  '',
+                 '   uint32 FuzzyStatic(',
+                 '      string TestInOutParameter,',
+                 '      CIM_Foo REF TestRef,',
+                 '      string OutputParam,',
+                 '      uint32 OutputRtnValue);',
+                 '',
                  '   uint32 DeleteNothing();',
                  '',
                  '};',
@@ -758,13 +801,33 @@ TEST_CASES = [
     # pylint: disable=line-too-long
     ['Verify class command get with propertylist. Tests whole response',
      ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID'],
-     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
+     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
+                 '',
                  '      [Key ( true ),',
-                 '       Description ( "This is key property." )]', ''
-                 '   string InstanceID;', '',
-                 '      [Description ( "Method with in and out parameters" )'
-                 ']',
+                 '       Description ( "This is key property." )]',
+                 '   string InstanceID;',
+                 '',
+                 '      [Description ( "Method with in and out parameters" )]',
                  '   uint32 Fuzzy(',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
+                 '      string TestInOutParameter,',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Test of ref in/out parameter" )]',
+                 '      CIM_Foo REF TestRef,',
+                 '         [IN ( false ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
+                 '      string OutputParam,',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if provided." )]',  # noqa: E501
+                 '      uint32 OutputRtnValue);',
+                 '',
+                 '      [Description ( "Static method with in and out parameters" ),',  # noqa: E501
+                 '       Static ( true )]',
+                 '   uint32 FuzzyStatic(',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
@@ -792,10 +855,29 @@ TEST_CASES = [
     ['Verify class command get with empty propertylist. Tests whole '
      'response',
      ['get', 'CIM_Foo_sub2', '--pl', '""'],
-     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {', '',
-                 '      [Description ( "Method with in and out parameters" )'
-                 ']',
+     {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
+                 '',
+                 '      [Description ( "Method with in and out parameters" )]',
                  '   uint32 Fuzzy(',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
+                 '      string TestInOutParameter,',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Test of ref in/out parameter" )]',
+                 '      CIM_Foo REF TestRef,',
+                 '         [IN ( false ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
+                 '      string OutputParam,',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if provided." )]',  # noqa: E501
+                 '      uint32 OutputRtnValue);',
+                 '',
+                 '      [Description ( "Static method with in and out parameters" ),',  # noqa: E501
+                 '       Static ( true )]',
+                 '   uint32 FuzzyStatic(',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Define data to be returned in output parameter" )]',  # noqa: E501
@@ -819,6 +901,7 @@ TEST_CASES = [
                  ''],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+    # pylint: enable=line-too-long
 
     ['Verify class command get with xml output format).',
      {'args': ['get', 'CIM_Foo'],
@@ -845,7 +928,6 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    # pylint: enable=line-too-long
     ['Verify class command get with propertylist and classorigin,',
      ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID', '--ico'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -854,6 +936,28 @@ TEST_CASES = [
                  '   string InstanceID;',
                  '      [Description ( "Method with in and out parameters" )]',
                  '   uint32 Fuzzy(',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Define data to be returned in '
+                 'output parameter" )]',
+                 '      string TestInOutParameter,',
+                 '         [IN ( true ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Test of ref in/out parameter" )]',
+                 '      CIM_Foo REF TestRef,',
+                 '         [IN ( false ),',
+                 '          OUT ( true ),',
+                 '          Description ( "Rtns method name if exists on '
+                 'input" )]',
+                 '      string OutputParam,',
+                 '         [IN ( true ),',
+                 '          Description ( "Defines return value if '
+                 'provided." )]',
+                 '      uint32 OutputRtnValue);',
+                 '      [Description ( "Static method with in and out '
+                 'parameters" ),',
+                 '       Static ( true )]',
+                 '   uint32 FuzzyStatic(',
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Define data to be returned in '
@@ -1486,22 +1590,16 @@ TEST_CASES = [
     #
     #  class invokemethod command without parameters
     #
-    ['Verify class command invokemethod. Class CIM_Foo, method Fuzzy',
-     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+    ['Verify class command invokemethod CIM_Foo.FuzzyStatic() - no in parms',
+     ['invokemethod', 'CIM_Foo', 'FuzzyStatic'],
      {'stdout': ["ReturnValue=0"],
       'rc': 0,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-    ['Verify class command invokemethod. Class CIM_Foo, method Fuzzy',
-     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
-     {'stdout': ["ReturnValue=0"],
-      'rc': 0,
-      'test': 'lines'},
-     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
-
-    ['Verify class command invokemethod',
-     ['invokemethod', 'CIM_Foo', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
+    ['Verify class command invokemethod CIM_Foo.FuzzyStatic() - one in parm',
+     ['invokemethod', 'CIM_Foo', 'FuzzyStatic',
+      '-p', 'TestInOutParameter="blah"'],
      {'stdout': ['ReturnValue=0',
                  'TestInOutParameter=', 'blah'],
       'rc': 0,
@@ -1509,15 +1607,22 @@ TEST_CASES = [
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class command invokemethod fails Invalid Class',
-     ['invokemethod', 'CIM_Foox', 'Fuzzy', '-p', 'TestInOutParameter="blah"'],
+     ['invokemethod', 'CIM_Foox', 'FuzzyStatic'],
      {'stderr': ['CIMError', '6'],
       'rc': 1,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class command invokemethod fails Invalid Method',
-     ['invokemethod', 'CIM_Foo', 'Fuzzyx', '-p', 'TestInOutParameter=blah'],
+     ['invokemethod', 'CIM_Foo', 'Fuzzyx'],
      {'stderr': ['Class CIM_Foo does not have a method Fuzzyx'],
+      'rc': 1,
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    ['Verify class command invokemethod fails non-static method',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+     {'stderr': ["Non-static method 'Fuzzy' in class 'CIM_Foo'"],
       'rc': 1,
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
