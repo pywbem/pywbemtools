@@ -663,7 +663,7 @@ class AssociationShrub(object):
 
         ret.append('.\n')
 
-        for key in case_sorted(path.keybindings.iterkeys()):
+        for key in case_sorted(six.iterkeys(path.keybindings)):
             value = path.keybindings[key]
 
             ret.append(key)
