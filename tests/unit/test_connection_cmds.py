@@ -25,6 +25,8 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
+from pywbemtools.pywbemcli._connection_repository import CONNECTIONS_FILENAME
+
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
@@ -946,7 +948,7 @@ ca-certs
       'general': ['--output-format', 'table', '--server', 'http://blah']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
                  'file:',
-                 'pywbemcli_connection_definitions.yaml',
+                 CONNECTIONS_FILENAME,
                  '+------------+-------------+---------------+',
                  '| name       | server      | mock-server   |',
                  '|------------+-------------+---------------|',
@@ -1121,7 +1123,7 @@ class TestSubcmdClass(CLITestsBase):
         "desc, inputs, exp_response, mock, condition",
         TEST_CASES)
     def test_connection(self, desc, inputs, exp_response, mock, condition,
-                        repo_file_path):
+                        connections_file_path):
         """
         Common test method for those commands and options in the
         connection command group that can be tested.  Note the
@@ -1130,24 +1132,24 @@ class TestSubcmdClass(CLITestsBase):
         restore it after the test.
         """
         # Where is this file to be located for tests.
-        pywbemserversfile = repo_file_path
+        connections_file = connections_file_path
 
         def test_file_existence(file_test):
             """
             Local function to execute tests on existence of connections file.
             """
             if file_test == 'exists':
-                assert os.path.isfile(pywbemserversfile) and \
-                    os.path.getsize(pywbemserversfile) > 0, \
-                    'Fail. File {} should exist'.format(pywbemserversfile)
+                assert os.path.isfile(connections_file) and \
+                    os.path.getsize(connections_file) > 0, \
+                    'Fail. File {} should exist'.format(connections_file)
             elif file_test.lower() == 'none':
-                if os.path.isfile(pywbemserversfile):
+                if os.path.isfile(connections_file):
                     print('FILE THAT SHOULD NOT EXIST')
-                    with open(pywbemserversfile, 'r') as fin:
+                    with open(connections_file, 'r') as fin:
                         print(fin.read())
 
-                assert not os.path.isfile(pywbemserversfile), \
-                    'Fail. File {} should not exist'.format(pywbemserversfile)
+                assert not os.path.isfile(connections_file), \
+                    'Fail. File {} should not exist'.format(connections_file)
 
             else:
                 assert False, 'File test option name {} invalid' \
@@ -1165,10 +1167,10 @@ class TestSubcmdClass(CLITestsBase):
                 test_file_existence(exp_response['file']['before'])
         # TODO: Remove this.  This forces all tests to be in test dir
         if 'general' in inputs:
-            inputs['general'].extend(['--connections-file', pywbemserversfile])
+            inputs['general'].extend(['--connections-file', connections_file])
         else:
             inputs = {"args": inputs}
-            inputs['general'] = ['--connections-file', pywbemserversfile]
+            inputs['general'] = ['--connections-file', connections_file]
         assert '--connections-file' in inputs['general']
 
         self.command_test(desc, self.command_group, inputs, exp_response,

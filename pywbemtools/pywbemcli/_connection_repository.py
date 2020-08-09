@@ -34,12 +34,19 @@ from ._pywbem_server import PywbemServer
 if six.PY2:
     import codecs  # pylint: disable=wrong-import-order
 
+# Keep the following connections file definitions in sync with help text of
+# the "--connections-file" option in pywbemcli.py and generaloptions.rst, and
+# with the use of the base file name in several other .rst and .py files.
 
-# Normal definition for location of connection file
-DEFAULT_CONNECTIONS_FILE = 'pywbemcli_connection_definitions.yaml'
+# Base file name of the connections file
+CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
 
-HOME_CONNECTIONS_PATH = os.path.join(os.path.expanduser("~"),
-                                     DEFAULT_CONNECTIONS_FILE)
+# Path name of default connections file directory.
+DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
+
+# Path name of default connections file
+DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                        CONNECTIONS_FILENAME)
 
 BAK_FILE_SUFFIX = 'bak'
 

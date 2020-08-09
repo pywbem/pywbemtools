@@ -27,8 +27,9 @@ import sys
 import pytest
 import pywbem
 
-from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
+from pywbemtools.pywbemcli._connection_repository import CONNECTIONS_FILENAME
 
+from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 SCRIPT_DIR = os.path.dirname(__file__)
@@ -93,9 +94,8 @@ GENERAL_HELP_LINES = [
     "-o, --output-format FORMAT Output format for the command result. The",
     "-l, --log COMP[=DEST[:DETAIL]]",
     "Enable logging of the WBEM operations,",
-    "-C, --connections-file FILE PATH"
-    "File path of a YAML file containing named",
-    "pywbemcli_connection_definitions.yaml",
+    "-C, --connections-file FILE PATH Path name of the connections file",
+    CONNECTIONS_FILENAME,
     "-v, --verbose / --no-verbose Display extra information about the",
     "--deprecation-warnings / --no-deprecation-warnings",
     "--pdb    Pause execution in the built-in pdb debugger",
@@ -627,7 +627,7 @@ TEST_CASES = [
       'args': ['show']},
      {'stderr': ['Connection definition', 'namedoesnotexist',
                  'not found in connections file',
-                 'pywbemcli_connection_definitions.yaml'],
+                 CONNECTIONS_FILENAME],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -653,7 +653,7 @@ TEST_CASES = [
      {'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
      {'stderr': ['Connection repository',
-                 'pywbemcli_connection_definitions.yaml',
+                 CONNECTIONS_FILENAME,
                  'does not exist'],
       'rc': 1,
       'test': 'innows'},
@@ -791,7 +791,7 @@ TEST_CASES = [
      {'args': ['delete', 'test-default'],
       'cmdgrp': 'connection', },
      {'stderr': ['Connection  repository',
-                 'pywbemcli_connection_definitions.yaml',
+                 CONNECTIONS_FILENAME,
                  'does not exist'],
       'rc': 1,
       'test': 'innows'},

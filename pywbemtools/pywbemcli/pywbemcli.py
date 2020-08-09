@@ -41,7 +41,8 @@ from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
     MAX_TIMEOUT, USE_AUTOSUGGEST
-from ._connection_repository import ConnectionRepository, HOME_CONNECTIONS_PATH
+from ._connection_repository import ConnectionRepository, \
+    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from ._click_extensions import PywbemcliTopGroup
 from ._utils import deprecation_warning
 
@@ -53,10 +54,6 @@ DEFAULT_VERIFY = True  # The default is to verify
 DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
-
-DEFAULT_CONNECTIONS_FILE = 'pywbemcli_connection_definitions.yaml'
-DEFAULT_CONNECTIONS_PATH = os.path.join(os.path.expanduser("~"),
-                                        DEFAULT_CONNECTIONS_FILE)
 
 TERMWIDTH_ENVVAR = os.getenv(PywbemServer.termwidth_envvar, None)
 if TERMWIDTH_ENVVAR:
@@ -262,11 +259,14 @@ def validate_connections_file(connections_repo):
               format(ev=PywbemServer.deprecation_warnings_envvar))
 @click.option('-C', '--connections-file', metavar='FILE PATH',
               envvar=PywbemServer.connections_file_envvar,
-              help=u'File path of a YAML file containing named connection '
-                   u'definitions. The default if this option is not specified '
-                   u'is the file "{df}" (in the users home directory). '
-                   u'EnvVar ({ev})'.
-                   format(df=HOME_CONNECTIONS_PATH,
+              # Keep help text in sync with connections file definitions in
+              # _connection_repository.py:
+              help=u'Path name of the connections file to be used. '
+                   u'Default: EnvVar {ev}, or "{cf}" in the user\'s home '
+                   u'directory (as determined using Python\'s '
+                   u'os.path.expanduser("~"). See there for details, '
+                   u'particularly for Windows).'.
+                   format(cf=CONNECTIONS_FILENAME,
                           ev=PywbemServer.connections_file_envvar))
 @click.option('--pdb', is_flag=True,
               # defaulted in code
@@ -436,7 +436,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # context_object. Always use the original connections_file information
     if ctx.obj is None:
         connections_repo = ConnectionRepository(
-            connections_file or DEFAULT_CONNECTIONS_PATH)
+            connections_file or DEFAULT_CONNECTIONS_FILE)
     else:
         if connections_file:
             click.ClickException("--connections-file not allowed in "

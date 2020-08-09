@@ -55,10 +55,18 @@ def connection_group():
     Command group for WBEM connection definitions.
 
     This command group defines commands to manage persistent WBEM connection
-    definitions that have a name. The connection definitions are stored in a
-    connections file named 'pywbemcli_connection_definitions.yaml' in the
-    current directory. The connection definition name can be used as a
-    shorthand for the WBEM server via the '--name' general option.
+    definitions that have a name. The names of these connection definitions
+    can then be used as shorthand for the WBEM server or mock server via the
+    '--name' general option.
+
+    The connection definitions are stored in a connections file. By default,
+    the connections file is 'pywbemcli_connection_definitions.yaml' in the
+    user's home directory. The location of the user's home directory depends on
+    the operating system used. It is determined with Python's
+    'os.path.expanduser("~")', which works on all operating systems including
+    Windows. The default path name of the connections file can be overwritten
+    using the 'PYWBEMCLI_CONNECTIONS_FILE' environment variable, or with the
+    '--connections-file' general option.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
