@@ -643,22 +643,23 @@ command completion.
 """""""""""""""""""""""""""""""""""""
 
 The ``--connections-file``/``-C`` general option allows the user to select
-a file path for the connections file. It is the file path of a YAML file
-that defines server configurations by name.  The default if this option is
-not specified is to use the connections file
-``pywbemcli_connection_definitions.yaml`` in the users home directory.
+a path name for the :term:`connections file`.
 
-The users home directory is OS dependent.  The connection file name is
-displayed in the ``connections list`` command
+By default, the path name of the connections file is the value of the
+``PYWBEMCLI_CONNECTIONS_FILE`` environment variable or if not set, the file
+``pywbemcli_connection_definitions.yaml`` in the user's home directory.
+The user's home directory depends on the operating system used and is
+determined with ``os.path.expanduser("~")``, which works on all operating
+systems including Windows. See :func:`~py3:os.path.expanduser` for details.
 
-When this option is set, the YAML file defined with the option is used
-as the connections file.
+The actually used path name of the connections file is shown in the
+:ref:`connection list command`.
+
+The connection definitions in the connections file are managed with the
+commands in the :ref:`connection command group`.
 
 In the interactive mode, this option may not be modified after the command
 line is processed.
-
-The connections_file is managed with the commands in the
-:ref:`connection command group`
 
 
 .. index:: triple: --pdb; general options; pdb

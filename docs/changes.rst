@@ -71,6 +71,10 @@ Released: not yet
   parameter is part of the data maintained in the server definitionfile and
   applies to just the server defined.  (See issue #694)
 
+* Docs: Improved the description and help texts of the connections file and the
+  --connections-file general option in various places, for consistency.
+  (Related to issue #708)
+
 **Known issues:**
 
 * See `list of open issues`_.

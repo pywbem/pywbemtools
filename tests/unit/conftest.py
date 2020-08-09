@@ -6,35 +6,33 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
-from pywbemtools.pywbemcli._connection_repository \
-    import DEFAULT_CONNECTIONS_FILE
+from pywbemtools.pywbemcli._connection_repository import \
+    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_DIR, DEFAULT_CONNECTIONS_FILE
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
-# Define the paths for the default connection file and its .bak file
-DEFAULT_CONNECTION_FILE_DIR = os.path.expanduser("~")
-REPO_FILE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
-                              DEFAULT_CONNECTIONS_FILE)
-REPO_BAK_FILE = DEFAULT_CONNECTIONS_FILE + '.bak'
-REPO_FILE_BAK_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR, REPO_BAK_FILE)
+# Backup file of the default connections file
+BAK_SUFFIX = '.bak'
+CONNECTIONS_BAK_FILENAME = CONNECTIONS_FILENAME + BAK_SUFFIX
+CONNECTIONS_BAK_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                    CONNECTIONS_BAK_FILENAME)
 
-# Define names and paths for save files for the connection file and backup
-SAVE_FILE_SUFFIX = '.testsavepywbemclitests'
-REPO_SAVE_FILE = DEFAULT_CONNECTIONS_FILE + SAVE_FILE_SUFFIX
-REPO_FILE_SAVE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
-                                   REPO_SAVE_FILE)
-
-REPO_BAK_SAVE_FILE = REPO_BAK_FILE + SAVE_FILE_SUFFIX
-REPO_FILE_BAK_SAVE_PATH = os.path.join(DEFAULT_CONNECTION_FILE_DIR,
-                                       REPO_BAK_SAVE_FILE)
+# Save files for the default connections file and its backup file
+SAVE_SUFFIX = '.testsavepywbemclitests'
+CONNECTIONS_SAVE_FILENAME = CONNECTIONS_FILENAME + SAVE_SUFFIX
+CONNECTIONS_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                     CONNECTIONS_SAVE_FILENAME)
+CONNECTIONS_BAK_SAVE_FILENAME = CONNECTIONS_BAK_FILENAME + SAVE_SUFFIX
+CONNECTIONS_BAK_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                         CONNECTIONS_BAK_SAVE_FILENAME)
 
 
 @pytest.fixture
-def repo_file_path():
+def connections_file_path():
     """
-    Fixture to return the file path to the repository file
+    Fixture to return the path name of the connections file.
     """
-    return REPO_FILE_PATH
+    return DEFAULT_CONNECTIONS_FILE
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -53,28 +51,27 @@ def set_connections_file(request):
     very low.  In case the fixture fails to restore the backed up connections
     files are saved  with with their full names and the suffix `.testsave`.
     """
-    # Save the default connection and bak file with a temporary suffix
-    if os.path.isfile(REPO_FILE_PATH):
-        os.rename(REPO_FILE_PATH, REPO_FILE_SAVE_PATH)
-    if os.path.isfile(REPO_FILE_BAK_PATH):
-        os.rename(REPO_FILE_BAK_PATH, REPO_FILE_BAK_SAVE_PATH)
+    # Save the default connections file and its backup file
+    if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
+        os.rename(DEFAULT_CONNECTIONS_FILE, CONNECTIONS_SAVE_FILE)
+    if os.path.isfile(CONNECTIONS_BAK_FILE):
+        os.rename(CONNECTIONS_BAK_FILE, CONNECTIONS_BAK_SAVE_FILE)
 
     def teardown():
         """
         Remove any created repository file and restore saved file. This
         should occur at session end.
         """
-        # Remove test yaml file
-        if os.path.isfile(REPO_FILE_PATH):
-            os.remove(REPO_FILE_PATH)
-        # Restore saved yaml
-        if os.path.isfile(REPO_FILE_SAVE_PATH):
-            os.rename(REPO_FILE_SAVE_PATH, REPO_FILE_PATH)
+        # Restore the saved default connections file
+        if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
+            os.remove(DEFAULT_CONNECTIONS_FILE)
+        if os.path.isfile(CONNECTIONS_SAVE_FILE):
+            os.rename(CONNECTIONS_SAVE_FILE, DEFAULT_CONNECTIONS_FILE)
 
-        # Repeat for the bak file
-        if os.path.isfile(REPO_FILE_BAK_PATH):
-            os.remove(REPO_FILE_BAK_PATH)
-        if os.path.isfile(REPO_FILE_BAK_SAVE_PATH):
-            os.rename(REPO_FILE_BAK_SAVE_PATH, REPO_FILE_BAK_PATH)
+        # Restore the saved backup file of the default connections file
+        if os.path.isfile(CONNECTIONS_BAK_FILE):
+            os.remove(CONNECTIONS_BAK_FILE)
+        if os.path.isfile(CONNECTIONS_BAK_SAVE_FILE):
+            os.rename(CONNECTIONS_BAK_SAVE_FILE, CONNECTIONS_BAK_FILE)
 
     request.addfinalizer(teardown)

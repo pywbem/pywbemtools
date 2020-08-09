@@ -117,10 +117,10 @@ Help text for ``pywbemcli``:
       --deprecation-warnings / --no-deprecation-warnings
                                       Enable deprecation warnings. Default: EnvVar PYWBEMCLI_DEPRECATION_WARNINGS, or true.
       -C, --connections-file FILE PATH
-                                      File path of a YAML file containing named connection definitions. The default if this
-                                      option is not specified is the file
-                                      "/home/kschopmeyer/pywbemcli_connection_definitions.yaml" (in the users home
-                                      directory). EnvVar (PYWBEMCLI_CONNECTIONS_FILE)
+                                      Path name of the connections file to be used. Default: EnvVar
+                                      PYWBEMCLI_CONNECTIONS_FILE, or "pywbemcli_connection_definitions.yaml" in the user's
+                                      home directory (as determined using Python's os.path.expanduser("~"). See there for
+                                      details, particularly for Windows).
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.
@@ -617,10 +617,15 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
 
       Command group for WBEM connection definitions.
 
-      This command group defines commands to manage persistent WBEM connection definitions that have a name. The
-      connection definitions are stored in a connections file named 'pywbemcli_connection_definitions.yaml' in the current
-      directory. The connection definition name can be used as a shorthand for the WBEM server via the '--name' general
-      option.
+      This command group defines commands to manage persistent WBEM connection definitions that have a name. The names of
+      these connection definitions can then be used as shorthand for the WBEM server or mock server via the '--name'
+      general option.
+
+      The connection definitions are stored in a connections file. By default, the connections file is
+      'pywbemcli_connection_definitions.yaml' in the user's home directory. The location of the user's home directory
+      depends on the operating system used. It is determined with Python's 'os.path.expanduser("~")', which works on all
+      operating systems including Windows. The default path name of the connections file can be overwritten using the
+      'PYWBEMCLI_CONNECTIONS_FILE' environment variable, or with the '--connections-file' general option.
 
       In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
       can also be specified before the 'connection' keyword.
