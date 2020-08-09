@@ -420,8 +420,8 @@ TEST_CASES = [
      {'general': ['-s', 'http://blah', '--pull-max-cnt', 'blah'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Invalid value for "--pull-max-cnt": blah is not a '
-                 'valid integer'],
+     {'stderr': ['Invalid value for', '--pull-max-cnt',
+                 'blah is not a valid integer'],
       'rc': 2,
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
