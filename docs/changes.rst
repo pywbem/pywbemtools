@@ -5,6 +5,26 @@ Change log
 ==========
 
 
+pywbemtools 0.7.2.dev1
+----------------------
+
+Released: not yet
+
+**Incompatible changes:**
+
+**Deprecations:**
+
+**Bug fixes:**
+
+**Enhancements:**
+
+**Known issues:**
+
+* See `list of open issues`_.
+
+.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+
+
 pywbemtools 0.7.1
 -----------------
 
