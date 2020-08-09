@@ -19,7 +19,9 @@ Tests the class command
 from __future__ import absolute_import, print_function
 
 import os
+from packaging.version import parse as parse_version
 import pytest
+from pywbem import __version__ as pywbem_version
 
 from .cli_test_extensions import CLITestsBase, PYWBEM_0, \
     FAKEURL_STR
@@ -32,6 +34,10 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
+
+_PYWBEM_VERSION = parse_version(pywbem_version)
+# pywbem 1.0.0 or later
+PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -46,7 +52,6 @@ INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
 
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
-
 
 #
 # The following list defines the help for each command in terms of particular
@@ -1620,12 +1625,19 @@ TEST_CASES = [
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
-    ['Verify class command invokemethod fails non-static method',
+    ['Verify class command invokemethod fails non-static method, pywbem 1.0',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
      {'stderr': ["Non-static method 'Fuzzy' in class 'CIM_Foo'"],
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], PYWBEM_1_0_0],
+
+    ['Verify class command invokemethod succeeds non-static method, pywbem 0.x',
+     ['invokemethod', 'CIM_Foo', 'Fuzzy'],
+     {'stdout': ['ReturnValue=0'],
+      'rc': 0,
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], not PYWBEM_1_0_0],
 
     ['Verify class command invokemethod fails Method not registered',
      ['invokemethod', 'CIM_Foo', 'Fuzzy'],
