@@ -36,3 +36,4 @@ def fuzzy_callback(conn, object_name, methodname, **params):
 # Add the the callback to the mock repository
 # pylint: disable=undefined-variable
 CONN.add_method_callback('CIM_Foo', 'Fuzzy', fuzzy_callback)  # noqa: F821
+CONN.add_method_callback('CIM_Foo', 'FuzzyStatic', fuzzy_callback)  # noqa: F821

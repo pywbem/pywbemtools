@@ -19,7 +19,9 @@ Tests the commands in the server command group.
 from __future__ import absolute_import, print_function
 
 import os
+from packaging.version import parse as parse_version
 import pytest
+from pywbem import __version__ as pywbem_version
 
 from .cli_test_extensions import CLITestsBase, FAKEURL_STR, PYWBEM_0
 
@@ -39,6 +41,10 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
     CMD_OPTION_HELP_INSTANCENAME_HELP_LINE
+
+_PYWBEM_VERSION = parse_version(pywbem_version)
+# pywbem 1.0.0 or later
+PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -1017,12 +1023,25 @@ Instances: TST_Person
     #
     # instance enumerate error returns
     #
-    ['Verify instance command enumerate error, invalid classname fails',
+
+    # Note: In pywbem 1.0, the returned status for this test changed from
+    #       NOT_FOUND to INVALID_CLASS because that is the correct one for
+    #       instance operations that do not find their class.
+    ['Verify instance command enumerate error, invalid classname fails, '
+     'pywbem 1.0',
      ['enumerate', 'CIM_Foox'],
      {'stderr': ["CIMError:", "CIM_ERR_INVALID_CLASS"],
       'rc': 1,
-      'test': 'innows'},  # NOTE: For some reason this changed from NOT_FOUND
-     SIMPLE_MOCK_FILE, OK],
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, PYWBEM_1_0_0],
+
+    ['Verify instance command enumerate error, invalid classname fails, '
+     'pywbem 0.x',
+     ['enumerate', 'CIM_Foox'],
+     {'stderr': ["CIMError:", "CIM_ERR_NOT_FOUND"],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, not PYWBEM_1_0_0],
 
     ['Verify instance command enumerate error, no classname fails',
      ['enumerate'],
