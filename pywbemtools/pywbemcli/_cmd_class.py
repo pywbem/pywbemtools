@@ -711,9 +711,11 @@ def cmd_class_get(context, classname, options):
     the class. If the class cannot be found, the server returns a CIMError
     exception.
     """
-
-    format_group = get_format_group(context, options)
-    output_format = validate_output_format(context.output_format, format_group)
+    # TODO what is this
+    #format_group = get_format_group(context, options)
+    #output_format = validate_output_format(context.output_format, format_group)
+    output_format = validate_output_format(context.output_format, ['CIM',
+                                                                   'TABLE'])
 
     try:
         result_class = context.conn.GetClass(
@@ -745,7 +747,8 @@ def cmd_class_enumerate(context, classname, options):
         Enumerate the classes returning a list of classes from the WBEM server.
         That match the qualifier filter options
     """
-    format_group = get_format_group(context, options)
+    #format_group = get_format_group(context, options)
+    format_group = ['CIM', 'TABLE', 'TEXT']
     output_format = validate_output_format(context.output_format, format_group)
 
     try:

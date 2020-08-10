@@ -26,6 +26,7 @@ import re
 from pydicti import odicti
 import six
 import click
+from nocaselist import NocaseList
 from nocasedict import NocaseDict
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
@@ -33,9 +34,10 @@ from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMError, CIM_ERR_NOT_SUPPORTED
 
 from ._common import format_table, fold_strings, DEFAULT_MAX_CELL_WIDTH, \
-    output_format_is_table, sort_cimobjects, format_keys
+    output_format_is_table, sort_cimobjects, format_keys, \
+    hide_empty_columns
 
-from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
+from .config import DEFAULT_TABLE_WIDTH, USE_TERMINAL_WIDTH
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
@@ -190,7 +192,8 @@ def _display_objects_as_table(objects, output_format, context=None):
             _display_instances_as_table(objects, table_width, output_format,
                                         context=context)
         elif isinstance(objects[0], CIMClass):
-            _display_classes_as_table(objects, table_width, output_format)
+            _display_classes_as_table(objects, table_width, output_format,
+                                      context=context)
         elif isinstance(objects[0], CIMQualifierDeclaration):
             _display_qual_decls_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
@@ -259,17 +262,387 @@ def display_cim_objects_summary(context, objects, output_format):
         click.echo('0 objects returned')
 
 
-def _display_classes_as_table(classes, table_width, table_format):
+class TableCell(object):
     """
-    TODO: Future extend to display classes as a table, showing the
-    properties for each class. This will display the properties that exist in
-    subclasses. The temp output
-    so we could create the function is to just output as mof
+    Defines a single cell of data for a table. This data may be of any
+    python type.
+    The data can be manipulated including folding it as a string into multiple
+    lines and computing the length and width of the data.
+    """
+    def __init__(self, data, max_width=None, break_long_words=False,
+                 break_on_hyphens=False, fold_list_items=False, separator=', ',
+                 initial_indent='', subsequent_indent=''):
+        """
+        Capture the data for the cell and optionally fold it immediatly if
+        the max_width parameter is defined.
+        """
+        self._data = data
+        # TODO: Handle lists including cvt to strings.
+        # optional. If max_width on constructor fold  immediatly
+        if data and max_width:
+            self.fold(max_width, break_long_words, break_on_hyphens,
+                      fold_list_items, initial_indent, subsequent_indent)
+
+    @property
+    def data(self):
+        """
+        Returns the string representation of the data including any folding
+        """
+        return self._data
+
+    @property
+    def width(self):
+        """
+        Get the maximum length between EOL characters which is the the maximum
+        display width of this cell. That is the cell width. If the cell data is
+        not a string, return the length of the string representation of the
+        cell.
+
+        Parameters:
+          cell (:term:`string` or int or bool or float):
+            String that may contain EOL characters.  The width is defined as the
+            maximum number of characters on a single line in the string
+
+        Returns:
+            Integer defining the width of the cell where width is the maximum
+            number of characters on a single line
+        """
+        if self._data is None:
+            return 0
+        #if isinstance(self._data, (list, tuple))
+        #    return ','.join(str(item) for item in self._data)
+        # The following are all one line per cell.
+        if isinstance(self._data, (six.integer_types, float, bool)):
+            return len(str(self._data))
+
+        assert isinstance(self._data, six.string_types)
+        lines = self._data.split("\n")
+        return len(max(lines, key=len))
+
+    @property
+    def length(self):
+        """
+        Return the length of the string value of the item
+        """
+        if self._data is None:
+            return 0
+        if isinstance(self.data, six.string_types):
+            return len(self._data)
+        else:
+            return len(str(self._data))
+
+    def __str__(self):
+        return self.data
+
+    def __repr__(self):
+        return "TableCell {}".self.format(self.data)
+
+    def fold(self, max_width, break_long_words=False,
+             break_on_hyphens=False, fold_list_items=False, separator=', ',
+             initial_indent='', subsequent_indent=''):
+        """
+        Fold the data based on the max_length attribute.
+        """
+        if isinstance(self._data, (six.string_types, list, tuple)):
+            self._data = fold_strings(self._data, max_width,
+                                      break_long_words=break_long_words,
+                                      break_on_hyphens=break_on_hyphens,
+                                      fold_list_items=fold_list_items,
+                                      separator=separator,
+                                      initial_indent=initial_indent,
+                                      subsequent_indent=subsequent_indent)
+        else:
+            assert False, "Fold failed bad type {}".format(type(self._data))
+
+
+class TableColumn(object):
+    """
+    Represents a single column in a table.  Made up of 0 or more
+    TableCell objects
+    """
+    def __init__(self, cells):
+        """
+        """
+        if isinstance(cells, (tuple, list)):
+            self._column = cells
+        else:
+            self._column = [cells]
+        for item in cells:
+            assert isinstance(item, TableCell)
+
+    #def __str__(self):
+    #    return ", ".format(self._column)
+
+    @property
+    def data(self):
+        """
+        Returns the cells of the row possibly modified by fold, etc.
+        """
+        return [cell.data for cell in self._column]
+
+    def __repr__(self):
+        return ", ".join([str(item) for item in self._column])
+
+    def widths(self):
+        """
+        Returns a list of the width of each cell entry in the column
+        """
+        return [cell.width for cell in self._column]
+
+    def max_width(self):
+        """
+        Return the maximum cell width in a column
+        Parameters:
+            col (list/tuple of ints, floats, strings)
+
+        Returns:
+            integer defining the maximum with of a cell in the column
+        """
+
+        assert isinstance(self._column, (list, tuple))
+
+        return max([cell.width for cell in self._column])
+
+    def fold(self, max_width, break_long_words=False,
+             break_on_hyphens=False, fold_list_items=False, separator=', ',
+             initial_indent='', subsequent_indent=''):
+        """
+        Fold the cells in the column
+        """
+        for cell in self._column:
+            fold_strings(self, max_width, break_long_words=break_long_words,
+                         break_on_hyphens=break_on_hyphens,
+                         fold_list_items=fold_list_items, separator=separator,
+                         initial_indent=initial_indent,
+                         subsequent_indent=subsequent_indent)
+
+
+def _build_class_as_table(klass, table_width, table_format, context):
+    """
+
+    Parameters:
+
+      klass ():
+      table_width
+      table_format
+
+    Returns:
+
+    Raises: TODO
+    """
+    def build_qualifiers_cell(obj, width, exclude=[]):
+        """
+        Build a multiline string for the names and values of the qualifiers
+        defined in qualifiers. Each qualifier name and value is in mof format
+        on one or more lines.
+
+        Parameters:
+
+          obj :
+            The CIM object from which the qualifiers are to be extracted
+
+          width TODO
+
+          exclude (NocaseList)
+        """
+        qualifiers = obj.qualifiers.values()
+        qualifier_entries = []
+        if not qualifiers:
+            return None
+        for qualifier in qualifiers:
+            #if qualifier.name in exclude:
+            #    continue
+            if 'description' == qualifier.name.lower():
+                continue
+            qualifier_entries.append(
+                qualifier.tomof(indent=0, maxline=width))
+
+        return TableCell("\n".join(qualifier_entries))
+
+    def get_classorigin(obj, classname):
+        """
+        Return the class origin classname if class)origin exists
+        """
+        # TODO: We need option to show all classnames
+        if obj.class_origin != classname:
+            return obj.class_origin
+
+        return None
+
+    def build_description_cell(obj, max_width):
+        """
+        Get the description from the qualifiers attached to obj.  Returns
+        the description value or None if there  is no description
+        """
+        if 'Description' in obj.qualifiers:
+            description = TableCell(obj.qualifiers['Description'].value)
+            description.fold(max_width)
+            return description
+        return TableCell(None)
+
+    def build_type_cell(obj):
+        """
+        Build a string that defines the object type, arrayness and if it
+        is a reference type, the Reference class. The object type string is the
+        actual pywbem string for that type except for reference which returns
+        "REF".
+
+        If embedded_data is set, this is added to the type string as
+        EMB(<embedded object type>)
+
+        Returns "<type>", or  "<type>[]" or "<type>[int]" and if reference
+        type "reference_class"
+
+        """
+        if obj.is_array:
+            array_size = str(obj.array_size) if obj.array_size else ""
+            array = "[{0}]".format(array_size)
+        else:
+            array = ''
+        if obj.embedded_object:
+            embed_object = "\nEMB(object.embedded_object)"
+        else:
+            embed_object = ""
+        if obj.type == 'reference':
+            return TableCell("{}{}({}{})".format('REF', array,
+                                                 obj.reference_class,
+                                                 embed_object))
+        return TableCell("{}{}{}".format(obj.type, array, embed_object))
+
+    def build_parameters_subtable(parameters, width, table_format):
+        """
+        Build a subtable of the parameters for a method
+        """
+        qualifier_exclude_list = NocaseList(["Description"])
+        rows = []
+        if not parameters:
+            return None
+        headers = ["Name", "Type", "Value", "Description", "Qualifiers"]
+
+        for param in parameters:
+            name_cell = TableCell(param.name)
+            type_and_array_cell = build_type_cell(param)
+            # TODO format value
+            value_cell = TableCell(param.value)
+            description_cell = build_description_cell(param, 40)
+            param_qualifiers_cell = build_qualifiers_cell(
+                param, width, exclude=qualifier_exclude_list)
+
+            row = [name_cell.data, type_and_array_cell.data,
+                   value_cell.data, description_cell.data,
+                   param_qualifiers_cell.data]
+            rows.append(row)
+
+        hide_empty_columns(headers, rows)
+        return format_table(rows, headers, table_format=table_format)
+    subtable_width = table_width - 12
+
+    # Build class subtable
+    subclasses_cell_width = 30
+    subclasses = context.conn.EnumerateClassNames(ClassName=klass.path)
+    subclasses_cell = TableCell(subclasses,
+                                max_width=subclasses_cell_width,
+                                break_long_words=False,
+                                break_on_hyphens=False,
+                                fold_list_items=True)
+
+    # Create class qualifiers subtable
+    qualifier_exclude_list = NocaseList([])
+    qual_cell_width = subtable_width - 16 if subtable_width > 90 else 12
+    qualifiers_cell = build_qualifiers_cell(klass,
+                                            qual_cell_width,
+                                            exclude=qualifier_exclude_list)
+
+    class_header = ['Superclass', 'Subclasses', 'Description', 'Qualifiers']
+
+    superclass_cell = TableCell(klass.superclass)
+    other_cells_width = superclass_cell.width + qualifiers_cell.width + \
+        subclasses_cell.width + 12
+    description_width = max([subtable_width - other_cells_width, 34])
+    description_cell = build_description_cell(klass, description_width)
+    class_row = [superclass_cell.data, subclasses_cell.data,
+                 description_cell.data, qualifiers_cell.data]
+
+    class_subtable = format_table([class_row], class_header,
+                                  table_format=table_format,
+                                  hide_empty_cols=True)
+
+    # Build property subtable
+    property_rows = []
+    headers = ["Property\nName", "Type", "Default\nValue", "Description",
+               "Class Origin", "Embedded Obj", "Qualifiers"]
+    for property in klass.properties.values():
+        qualifier_width = subtable_width - (8 + 50)
+        qualifiers_cell = build_qualifiers_cell(
+            property, qualifier_width, exclude=qualifier_exclude_list)
+
+        type_and_array_cell = build_type_cell(property)
+
+        class_origin_cell = TableCell(get_classorigin(property,
+                                                      klass.classname))
+        description_cell = build_description_cell(property, 50)
+
+        row = [property.name, type_and_array_cell.data, property.value,
+               description_cell.data, class_origin_cell.data,
+               property.embedded_object, qualifiers_cell.data]
+        property_rows.append(row)
+
+    property_subtable = format_table(property_rows, headers,
+                                     table_format=table_format,
+                                     hide_empty_cols=True)
+
+    # Build method subtable and parameter subtable for each method
+    # Format methods and a subtable for parameters.
+    method_rows = []
+    headers = ["MethodName\nRtnType", "Class\nOrigin", "Description",
+               "Qualifiers", "Parameters"]
+    for method in klass.methods.values():
+        method_name = "{}({})".format(method.name, method.return_type)
+        name_cell = TableCell(method_name)
+
+        method_qualifiers_cell = build_qualifiers_cell(
+            method, 12, exclude=qualifier_exclude_list)
+
+        class_origin_cell = TableCell(get_classorigin(method, klass.classname))
+        description_cell = build_description_cell(method, 30)
+
+        parameters_subtable_width = max(subtable_width - 80, 40)
+        parameters_subtable = build_parameters_subtable(
+            method.parameters.values(), parameters_subtable_width, table_format)
+
+
+
+        row = [name_cell.data, class_origin_cell.data,
+               description_cell.data,
+               method_qualifiers_cell.data,
+               parameters_subtable]
+
+        method_rows.append(row)
+    methods_subtable = format_table(method_rows, headers,
+                                    table_format=table_format,
+                                    hide_empty_cols=True)
+
+    overall_rows = [[class_subtable], [property_subtable], [methods_subtable]]
+
+    overall_headers = [klass.classname]
+    table = format_table(overall_rows, overall_headers,
+                         table_format=table_format,
+                         hide_empty_cols=True)
+    return table
+
+
+# TODO: We are inconsistent with context as optional or required
+def _display_classes_as_table(classes, table_width, table_format, context=None):
+    """
+    Display one or more CIM class objects as a table.
     """
     # pylint: disable=unused-argument
-
-    for class_ in classes:
-        click.echo(class_.tomof())
+    for klass in classes:
+        class_table = _build_class_as_table(klass,
+                                            table_width,
+                                            table_format,
+                                            context)
+        click.echo(class_table)
 
 
 def _display_paths_as_table(objects, table_width, table_format):
