@@ -28,12 +28,13 @@ from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
     CIM_ERR_NOT_FOUND
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, \
-    pick_instance, resolve_propertylist, create_ciminstance, \
+from ._common import pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, format_table, verify_operation, \
     process_invokemethod, raise_pywbem_error_exception, \
     parse_kv_pair, warning_msg, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+
+from ._display_cimobjects import display_cim_objects
 
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_instance_option, namespace_option, \
