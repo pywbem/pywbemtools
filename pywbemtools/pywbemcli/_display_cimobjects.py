@@ -48,7 +48,7 @@ INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
-                        sort=False):
+                        sort=False, property_list=None):
     """
     Display CIM objects in form determined by input parameters.
 
@@ -93,6 +93,14 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
       summary (:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
+
+      sort (:class:`py:bool`):
+        Boolean that defines whether the objects will be sorted.
+
+      property_list (iterable of :term:`string`):
+        List of property names to be displayed, in the desired order, when the
+        output format is a table, or None to use the default of sorting
+        the properties alphabetically within key and non-key groups.
     """
     # Note: In the docstring above, the line for parameter 'objects' was way too
     #       long. Since we are not putting it into docmentation, we folded it.
@@ -117,7 +125,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         # Table format output is processed as a group
         if output_format_is_table(output_format):
             _display_objects_as_table(cim_objects, output_format,
-                                      context=context)
+                                      context=context,
+                                      property_list=property_list)
         else:
             # Call to display each object
             for obj in cim_objects:
@@ -128,7 +137,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format_is_table(output_format):
-        _display_objects_as_table([object_], output_format, context=context)
+        _display_objects_as_table([object_], output_format, context=context,
+                                  property_list=property_list)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -171,7 +181,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
                                    .format(output_format))
 
 
-def _display_objects_as_table(objects, output_format, context=None):
+def _display_objects_as_table(objects, output_format, context=None,
+                              property_list=None):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -186,7 +197,8 @@ def _display_objects_as_table(objects, output_format, context=None):
     if objects:
         if isinstance(objects[0], CIMInstance):
             _display_instances_as_table(objects, table_width, output_format,
-                                        context=context)
+                                        context=context,
+                                        property_list=property_list)
         elif isinstance(objects[0], CIMClass):
             _display_classes_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], CIMQualifierDeclaration):
@@ -445,7 +457,8 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
 
 def _display_instances_as_table(insts, table_width, table_format,
-                                include_classes=False, context=None):
+                                include_classes=False, context=None,
+                                property_list=None):
     """
     Print the properties of the instances defined in insts as a table where
     each row is an instance and each column is a property value.
@@ -466,7 +479,10 @@ def _display_instances_as_table(insts, table_width, table_format,
     for inst in insts:
         assert isinstance(inst, CIMInstance)
 
-    prop_names = sorted_prop_names(insts)
+    if property_list:
+        prop_names = propertylist_prop_names(insts, property_list)
+    else:
+        prop_names = sorted_prop_names(insts)
 
     # Try to estimate max cell width from number of cols
     # This allows folding long data.  However it is incomplete in
@@ -585,3 +601,19 @@ def sorted_prop_names(insts):
     nonkey_prop_list = sorted(nonkey_props.keys(), key=lambda p: p.lower())
     key_prop_list.extend(nonkey_prop_list)
     return key_prop_list
+
+
+def propertylist_prop_names(insts, property_list):
+    """
+    Return the originally cased property list, based on the lexical case
+    in the instances.
+
+    If a property name is not in any instance, it is not returned.
+    """
+    prop_list = []
+    for pname in property_list:
+        for inst in insts:
+            if pname in inst:
+                prop_list.append(inst.properties[pname].name)
+                break
+    return prop_list

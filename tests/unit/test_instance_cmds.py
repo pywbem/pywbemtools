@@ -979,7 +979,7 @@ TEST_CASES = [
      'properties returns instance with all property types',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
-               'instanceid,scalbool,scaluint32,scalsint32'],
+               'instanceid,scalbool,scalsint32,scaluint32'],
       'general': ['--output-format', 'grid']},
      {'stdout': """
 Instances: PyWBEM_AllTypes
@@ -997,7 +997,7 @@ Instances: PyWBEM_AllTypes
      'returns instance with all property types',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
-               'instanceid,arraybool,arrayuint32,arraysint32'],
+               'instanceid,arraybool,arraysint32,arrayuint32'],
       'general': ['--output-format', 'grid']},
      {'stdout': """
 Instances: PyWBEM_AllTypes
@@ -1030,6 +1030,30 @@ Instances: TST_Person
 | "Saarasub" | 1 (female) |                       |
 | "Sofisub"  | 1 (female) |                       |
 +------------+------------+-----------------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command enumerate of TST_Person honors property list '
+     'order in table output',
+     {'args': ['enumerate', 'TST_Person', '--pl', 'Name,Likes,Gender'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """
+Instances: TST_Person
++------------+-----------------------+------------+
+| name       | likes                 | gender     |
+|------------+-----------------------+------------|
+| "Gabi"     | 2 (movies)            | 1 (female) |
+| "Mike"     | 1 (books), 2 (movies) | 2 (male)   |
+| "Saara"    | 1 (books)             | 1 (female) |
+| "Sofi"     |                       | 1 (female) |
+| "Gabisub"  |                       | 1 (female) |
+| "Mikesub"  |                       | 2 (male)   |
+| "Saarasub" |                       | 1 (female) |
+| "Sofisub"  |                       | 1 (female) |
++------------+-----------------------+------------+
 
 """,
       'rc': 0,
@@ -2359,6 +2383,38 @@ Instances: TST_Person
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
 
+    ['Verify instance command references with --pl in sorted order',
+     {'args': ['references', 'TST_Person.name="Mike"',
+               '--rc', 'TST_Lineage', '--pl', 'instanceid,Parent'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: TST_Lineage
++--------------+----------------------------------------+
+| InstanceID   | parent                                 |
+|--------------+----------------------------------------|
+| "MikeGabi"   | "/root/cimv2:TST_Person.name=\\"Mike\\"" |
+| "MikeSofi"   | "/root/cimv2:TST_Person.name=\\"Mike\\"" |
++--------------+----------------------------------------+
+"""],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command references with --pl in unsorted order',
+     {'args': ['references', 'TST_Person.name="Mike"',
+               '--rc', 'TST_Lineage', '--pl', 'Parent,instanceid'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: TST_Lineage
++----------------------------------------+--------------+
+| parent                                 | InstanceID   |
+|----------------------------------------+--------------|
+| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeGabi"   |
+| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeSofi"   |
++----------------------------------------+--------------+
+"""],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance command references, no instance name',
      ['references'],
      {'stderr': ['Usage: pywbemcli [GENERAL-OPTIONS] instance references '
@@ -2483,6 +2539,40 @@ Instances: TST_Person
                  '/root/cimv2:TST_FamilyCollection.name="Family2"',
                  FAKEURL_STR + '/root/cimv2:TST_Person.name="Gabi"',
                  FAKEURL_STR + '/root/cimv2:TST_Person.name="Sofi"'],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command associators with --pl in sorted order',
+     {'args': ['associators', 'TST_Person.name="Mike"',
+               '--pl', 'Name,Gender,Likes'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: TST_FamilyCollection
++-----------+------------+------------+
+| name      | gender     | likes      |
+|-----------+------------+------------|
+| "Family2" |            |            |
+| "Gabi"    | 1 (female) | 2 (movies) |
+| "Sofi"    | 1 (female) |            |
++-----------+------------+------------+
+"""],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command associators with --pl in unsorted order',
+     {'args': ['associators', 'TST_Person.name="Mike"',
+               '--pl', 'Name,Likes,Gender'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: TST_FamilyCollection
++-----------+------------+------------+
+| name      | likes      | gender     |
+|-----------+------------+------------|
+| "Family2" |            |            |
+| "Gabi"    | 2 (movies) | 1 (female) |
+| "Sofi"    |            | 1 (female) |
++-----------+------------+------------+
+"""],
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
