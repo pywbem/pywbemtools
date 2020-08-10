@@ -973,14 +973,16 @@ def cmd_instance_get(context, instancename, options):
     instancepath = get_instancename(context, instancename, options)
 
     try:
+        property_list = resolve_propertylist(options['propertylist'])
         instance = context.conn.GetInstance(
             instancepath,
             LocalOnly=options['local_only'],
             IncludeQualifiers=options['include_qualifiers'],
             IncludeClassOrigin=options['include_classorigin'],
-            PropertyList=resolve_propertylist(options['propertylist']))
+            PropertyList=property_list)
 
-        display_cim_objects(context, instance, output_fmt)
+        display_cim_objects(context, instance, output_fmt,
+                            property_list=property_list)
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -1141,6 +1143,7 @@ def cmd_instance_enumerate(context, classname, options):
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     try:
+        property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
             results = context.conn.PyWbemcliEnumerateInstancePaths(
                 ClassName=classname,
@@ -1159,10 +1162,11 @@ def cmd_instance_enumerate(context, classname, options):
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
-                PropertyList=resolve_propertylist(options['propertylist']))
+                PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'], sort=True,
+                            property_list=property_list)
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -1188,6 +1192,7 @@ def cmd_instance_references(context, instancename, options):
     instancepath = get_instancename(context, instancename, options)
 
     try:
+        property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
             results = context.conn.PyWbemcliReferenceInstancePaths(
                 instancepath,
@@ -1206,10 +1211,11 @@ def cmd_instance_references(context, instancename, options):
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
-                PropertyList=resolve_propertylist(options['propertylist']))
+                PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'], sort=True,
+                            property_list=property_list)
 
     except Error as er:
         raise_pywbem_error_exception(er)
@@ -1232,6 +1238,7 @@ def cmd_instance_associators(context, instancename, options):
     instancepath = get_instancename(context, instancename, options)
 
     try:
+        property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
             results = context.conn.PyWbemcliAssociatorInstancePaths(
                 instancepath,
@@ -1254,10 +1261,11 @@ def cmd_instance_associators(context, instancename, options):
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt,
-                PropertyList=resolve_propertylist(options['propertylist']))
+                PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'], sort=True,
+                            property_list=property_list)
 
     except Error as er:
         raise_pywbem_error_exception(er)

@@ -85,6 +85,10 @@ Released: not yet
   Added the 'mock' package and for Python 2.7, the 'funcsigs' package as new
   dependencies.
 
+* Specifying a property list (--pl option) on instance commands with table
+  output formats now uses the order of properties as specified in the property
+  list in the output table, instead of sorting them. (See issue #702)
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py
