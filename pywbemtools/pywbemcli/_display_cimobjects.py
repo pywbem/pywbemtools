@@ -41,6 +41,7 @@ from ._cimvalueformatter import cimvalue_to_fmtd_string
 
 INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
+
 ####################################################################
 #
 #  Display of CIM objects.
