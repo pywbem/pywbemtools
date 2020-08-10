@@ -1642,9 +1642,13 @@ def format_table(rows, headers, title=None, table_format='simple',
                                    .format(table_format))
 
     result = tabulate.tabulate(rows, headers, tablefmt=table_format)
+
     if title:
         if table_format == 'html':
-            result = '<p>{0}</p>\n{1}'.format(title, result)
+            # Insert caption element immediatly after table
+            assert result.startswith("<table>")
+            replacement = "<table>\n<caption>{0}</caption>".format(title)
+            result = result.replace("<table>", replacement, 1)
         else:
             result = '{0}\n{1}'.format(title, result)
     return result

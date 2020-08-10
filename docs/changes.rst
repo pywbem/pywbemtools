@@ -128,6 +128,11 @@ Released: 2020-07-12
 * Fixed an issue where displaying instances in a table format missed properties
   if the list of instances had different sets of properties. (See issue #650)
 
+* Change the table output for outputformat html to output the title parameter
+  as an html caption entity instead of as a paragraph.  This allows html
+  tables to be subtabled and also presents the table title better.
+  (see issue #721)
+
 **Enhancements:**
 
 * Enabled installation using 'setup.py install' from unpacked source distribution

@@ -181,8 +181,8 @@ class FormatTableTests(BaseTableTests):
             print(actual)
 
         expected = (
-            '<p>test simple table</p>\n'
             '<table>\n'
+            '<caption>test simple table</caption>\n'
             '<thead>\n'
             '<tr><th>col1     </th><th>col2      </th><th>col3       '
             '</th></tr>\n'
