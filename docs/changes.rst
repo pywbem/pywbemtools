@@ -75,6 +75,9 @@ Released: not yet
   --connections-file general option in various places, for consistency.
   (Related to issue #708)
 
+* Move code associated with display_cimobjects() to a separate module. This
+  is part of creating table representation of classes (See issue #249)
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -29,10 +29,13 @@ from pywbem import Error, CIMClassName, CIMError, ModelError, \
     CIM_ERR_NOT_FOUND, CIMClass
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, filter_namelist, \
+from ._common import filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     output_format_is_table, format_table, process_invokemethod, \
     raise_pywbem_error_exception, warning_msg, validate_output_format
+
+from ._display_cimobjects import display_cim_objects
+
 from ._common_options import add_options, propertylist_option, \
     names_only_option, include_classorigin_class_option, namespace_option,  \
     summary_option, multiple_namespaces_option, class_filter_options, \
@@ -708,6 +711,7 @@ def cmd_class_get(context, classname, options):
     the class. If the class cannot be found, the server returns a CIMError
     exception.
     """
+
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
 

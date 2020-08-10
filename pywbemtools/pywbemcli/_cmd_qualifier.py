@@ -27,9 +27,10 @@ import click
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import display_cim_objects, sort_cimobjects, \
+from ._common import sort_cimobjects, \
     raise_pywbem_error_exception, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from ._display_cimobjects import display_cim_objects
 from ._common_options import add_options, namespace_option, summary_option, \
     help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
