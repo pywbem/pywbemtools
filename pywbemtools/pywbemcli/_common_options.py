@@ -116,10 +116,10 @@ experimental_filter_option = [              # pylint: disable=invalid-name
 deprecated_filter_option = [              # pylint: disable=invalid-name
     click.option('--deprecated/--no-deprecated',
                  default=None,
-                 help='Filter the returned classes to return only deprecated '
-                      'classes (--deprecated) or classes that are not '
-                      'deprecated (--no-deprecated). If the option is not '
-                      'defined no filtering occurs')]
+                 help=u'Filter the returned classes to return only deprecated '
+                      u'classes (--deprecated) or classes that are not '
+                      u'deprecated (--no-deprecated). If the option is not '
+                      u'defined no filtering occurs')]
 
 # List of the class filter options that are common to multiple class commands
 # Since the filters are in a list to allow them to be used individually, the

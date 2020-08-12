@@ -33,7 +33,9 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
-    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE
+    CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
+    CMD_OPTION_DEPRECATED_FILTER_HELP_LINE
+
 
 _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
@@ -112,9 +114,12 @@ CLASS_ENUMERATE_HELP_LINES = [
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
+    # NOTE: The FILTER options are a group. Define all of them.
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
+    CMD_OPTION_DEPRECATED_FILTER_HELP_LINE,
+
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -124,9 +129,12 @@ CLASS_FIND_HELP_LINES = [
     'List the classes with matching class names on the server.',
     '-s, --sort                 Sort by namespace. Default is to sort by',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
+    # FILTER OPTIONS
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
+    CMD_OPTION_DEPRECATED_FILTER_HELP_LINE,
+
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -672,6 +680,25 @@ TEST_CASES = [
       '--names-only'],
      {'stdout': ['TST_FamilyCollection',
                  'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --deprecated,'
+     '--no-association',
+     ['enumerate', '--deprecated',
+      '--names-only'],
+     {'stdout': ['TST_IndicationDeprecated',
+                 'TST_MemberOfFamilyCollectionDep'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-deprecated, --association'
+     '--no-association',
+     ['enumerate', '--no-deprecated', '--association',
+      '--names-only'],
+     {'stdout': ['TST_Lineage',
+                 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionExp'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 

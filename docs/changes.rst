@@ -45,6 +45,9 @@ Released: not yet
 * Test: Fixed attempt in test_class_cmds.py to invoke a non-static method on a
   class object. (see issue #707)
 
+* Fix help message for "--deprecated" to be unicode so python 2.7 help does not
+  fail. (see issue #725). This error was added with issue #678
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.

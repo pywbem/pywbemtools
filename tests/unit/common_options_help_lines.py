@@ -82,6 +82,8 @@ CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE = \
 CMD_OPTION_KEYS_HELP_LINE = \
     '-k, --key KEYNAME=VALUE         Value for a key in keybinding of'
 
+# NOTE: The FILTER help lines should exist as a group wherever used.
+
 CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE = \
     '--association / --no-association'
 
@@ -90,6 +92,9 @@ CMD_OPTION_INDICATION_FILTER_HELP_LINE = \
 
 CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE = \
     '--experimental / --no-experimental'
+
+CMD_OPTION_DEPRECATED_FILTER_HELP_LINE = \
+    '--deprecated / --no-deprecated'
 
 CMD_OPTION_HELP_INSTANCENAME_HELP_LINE = \
     '--hi, --help-instancename Show help message for specifying INSTANCENAME'
