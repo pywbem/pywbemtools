@@ -82,7 +82,7 @@ This documentation uses a few special terms to refer to Python types:
       This allows connection definitions to be persisted and referenced by name
       in pywbemcli commands, via the :ref:`--name general option`.
 
-      By default, the connections file is ``pywbemcli_connection_definitions.yaml``
+      By default, the connections file is ``.pywbemcli_connections.yaml``
       in the user's home directory. The user's home directory depends on the
       operating system used. It is determined with ``os.path.expanduser("~")``,
       which works on all operating systems including Windows.

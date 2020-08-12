@@ -60,7 +60,7 @@ def connection_group():
     '--name' general option.
 
     The connection definitions are stored in a connections file. By default,
-    the connections file is 'pywbemcli_connection_definitions.yaml' in the
+    the connections file is '.pywbemcli_connections.yaml' in the
     user's home directory. The location of the user's home directory depends on
     the operating system used. It is determined with Python's
     'os.path.expanduser("~")', which works on all operating systems including

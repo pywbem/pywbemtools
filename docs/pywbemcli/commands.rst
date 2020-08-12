@@ -1389,7 +1389,7 @@ current connections file.
 
     pywbemcli> --server http://blahblah connection list
     WBEM server connections(brief):  (#: default, *: current)
-    file: /home/johndoe/pywbemcli_connection_definitions.yaml
+    file: /home/johndoe/.pywbemcli_connections.yaml
     +--------------+------------------+----------------------------------------+
     | name         | server           | mock-server                            |
     |--------------+------------------+----------------------------------------|

@@ -39,7 +39,7 @@ if six.PY2:
 # with the use of the base file name in several other .rst and .py files.
 
 # Base file name of the connections file
-CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
+CONNECTIONS_FILENAME = '.pywbemcli_connections.yaml'
 
 # Path name of default connections file directory.
 DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
