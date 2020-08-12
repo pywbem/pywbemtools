@@ -84,6 +84,11 @@ Released: not yet
 * Resolved remaining Pylint issues and enforced clean pylint checks.
   (See issue #668)
 
+* Renamed the default connections file in the user's home directory from
+  `pywbemcli_connection_definitions.yaml` to `.pywbemcli_connections.yaml`,
+  because it is really an internal file not meant for being edited.
+  (See issue #716)
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -118,8 +118,8 @@ Help text for ``pywbemcli``:
                                       Enable deprecation warnings. Default: EnvVar PYWBEMCLI_DEPRECATION_WARNINGS, or true.
       -C, --connections-file FILE PATH
                                       Path name of the connections file to be used. Default: EnvVar
-                                      PYWBEMCLI_CONNECTIONS_FILE, or "pywbemcli_connection_definitions.yaml" in the user's
-                                      home directory (as determined using Python's os.path.expanduser("~"). See there for
+                                      PYWBEMCLI_CONNECTIONS_FILE, or ".pywbemcli_connections.yaml" in the user's home
+                                      directory (as determined using Python's os.path.expanduser("~"). See there for
                                       details, particularly for Windows).
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
@@ -622,9 +622,9 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       general option.
 
       The connection definitions are stored in a connections file. By default, the connections file is
-      'pywbemcli_connection_definitions.yaml' in the user's home directory. The location of the user's home directory
-      depends on the operating system used. It is determined with Python's 'os.path.expanduser("~")', which works on all
-      operating systems including Windows. The default path name of the connections file can be overwritten using the
+      '.pywbemcli_connections.yaml' in the user's home directory. The location of the user's home directory depends on the
+      operating system used. It is determined with Python's 'os.path.expanduser("~")', which works on all operating
+      systems including Windows. The default path name of the connections file can be overwritten using the
       'PYWBEMCLI_CONNECTIONS_FILE' environment variable, or with the '--connections-file' general option.
 
       In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')

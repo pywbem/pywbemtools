@@ -647,7 +647,7 @@ a path name for the :term:`connections file`.
 
 By default, the path name of the connections file is the value of the
 ``PYWBEMCLI_CONNECTIONS_FILE`` environment variable or if not set, the file
-``pywbemcli_connection_definitions.yaml`` in the user's home directory.
+``.pywbemcli_connections.yaml`` in the user's home directory.
 The user's home directory depends on the operating system used and is
 determined with ``os.path.expanduser("~")``, which works on all operating
 systems including Windows. See :func:`~py3:os.path.expanduser` for details.
@@ -1352,8 +1352,8 @@ Pywbemcli persisted connection definitions
 
 Pywbemcli can manage persisted connection definitions via the
 :ref:`Connection command group`. These connection definitions are persisted in
-a :term:`connections file` named ``pywbemcli_connection_definitions.yaml`` in
-the current directory. A connection definition has a name
+a :term:`connections file` named ``.pywbemcli_connections.yaml`` in
+the user's home directory. A connection definition has a name
 and defines all parameters necessary to connect to a WBEM server. Once defined
 these connection definitions can be used with the :ref:`--name general option`
 or in the interactive mode by defining a current connection with the
