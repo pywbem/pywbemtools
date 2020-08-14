@@ -28,7 +28,7 @@ CONNECTIONS_BAK_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
 
 
 @pytest.fixture
-def connections_file_path():
+def default_connections_file_path():
     """
     Fixture to return the path name of the connections file.
     """
