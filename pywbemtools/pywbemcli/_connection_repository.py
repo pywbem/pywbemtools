@@ -39,16 +39,28 @@ if six.PY2:
 # with the use of the base file name in several other .rst and .py files.
 
 # Base file name of the connections file
+# The B08_* file name was used before pywbemcli 0.8.
 CONNECTIONS_FILENAME = '.pywbemcli_connections.yaml'
+B08_CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
 
 # Path name of default connections file directory.
 DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
 
 # Path name of default connections file
+# The B08_* path name was used before pywbemcli 0.8.
 DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
                                         CONNECTIONS_FILENAME)
+B08_DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                            B08_CONNECTIONS_FILENAME)
 
 BAK_FILE_SUFFIX = 'bak'
+
+
+class ConnectionsFileNotFoundError(Exception):
+    """
+    Exception indicating that the connections file was not found.
+    """
+    pass
 
 
 class ConnectionRepository(object):
@@ -125,13 +137,20 @@ class ConnectionRepository(object):
 
     def file_exists(self):
         """
-        Test if the connection file exists
+        Test if the connection file exists.
+
+        An old connections file is migrated, if needed.
+        The connections file is loaded as part of the test.
 
         Returns:
             (:class:`py:bool`) True if the connections_file exists and False if
             it does not exist
         """
-        return os.path.isfile(self.connections_file)
+        try:
+            self._load_connections_file()
+            return True
+        except ConnectionsFileNotFoundError:
+            return False
 
     def __str__(self):
         """
@@ -139,8 +158,8 @@ class ConnectionRepository(object):
         connections file
         """
         if self.file_exists():
+            # Has loaded the file
             status = 'exists'
-            self._load_connections_file()
             length = len(self)
         else:
             status = "does not exist"
@@ -210,16 +229,31 @@ class ConnectionRepository(object):
 
     def _load_connections_file(self):
         """
-        If there is a file, read it in and install into the dictionary.
-        This file is read only once.
+        If the connections file exists, read it in and install into the
+        dictionary.
+
+        An old connections file is migrated, if needed.
+        Repeated calls to this method will load the file only once.
 
         Raises:
-          IOError: repository does not exist
-
-          ValueError: Error in reading repository
+          ConnectionsFileNotFoundError: Connections file not found
+          IOError: Cannot rename old connections file
+          ValueError,KeyError,TypeError: Error in connections file
         """
         if self._loaded:
             return
+
+        # Migrate an old connections file
+        if self._connections_file == DEFAULT_CONNECTIONS_FILE and \
+                not os.path.isfile(self._connections_file) and \
+                os.path.isfile(B08_DEFAULT_CONNECTIONS_FILE):
+
+            # May raise IOError:
+            os.rename(B08_DEFAULT_CONNECTIONS_FILE, DEFAULT_CONNECTIONS_FILE)
+
+            click.echo("Migrated old connections file {!r} to {!r}".
+                       format(B08_DEFAULT_CONNECTIONS_FILE,
+                              DEFAULT_CONNECTIONS_FILE))
 
         if os.path.isfile(self._connections_file):
             with self._open_file(self._connections_file, 'r') as _fp:
@@ -252,11 +286,10 @@ class ConnectionRepository(object):
                     raise ValueError("Invalid YAML in connections file {0}. "
                                      "Exception {1}".format
                                      (self._connections_file, ve))
-        # Apply IO error for non-existent file
-        # TODO. IOError can also mean disk full in general
         else:
-            raise IOError("Connections file {} does not exist.".
-                          format(self.connections_file))
+            raise ConnectionsFileNotFoundError(
+                "Connections file does not exist: {0}".
+                format(self.connections_file))
 
     def add(self, name, svr_definition):
         """
@@ -440,6 +473,6 @@ class ConnectionRepository(object):
 
         """
         if self.file_exists():
-            self._load_connections_file()
+            # Has loaded the file
             return self.default_connection_name
         return None

@@ -78,7 +78,7 @@ def validate_connections_file(connections_repo):
     Abort click if file does not exist
     """
     if not connections_repo.file_exists():
-        click.echo('Connections file: "{}" does not exist.'.format(
+        click.echo('Connections file does not exist: {}'.format(
             connections_repo.connections_file), err=True)
         raise click.Abort()
 
