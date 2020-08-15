@@ -87,6 +87,7 @@ Released: not yet
 * Renamed the default connections file in the user's home directory from
   `pywbemcli_connection_definitions.yaml` to `.pywbemcli_connections.yaml`,
   because it is really an internal file not meant for being edited.
+  An existing file with the old name is migrated automatically.
   (See issue #716)
 
 **Known issues:**
