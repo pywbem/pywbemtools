@@ -29,6 +29,9 @@ Qualifier Values : string[],
     Scope(property, method, parameter),
     Flavor(EnableOverride, ToSubclass, Translatable);
 
+Qualifier PUnit : string = null,
+    Scope(property, method, parameter);
+
 class TST_Person{
         [Key, Description ("This is key prop")]
     string name;
@@ -43,6 +46,7 @@ class TST_Person{
 // This is good test of case insensitivity for class names.
 class TST_Personsub : TST_Person{
     string secondProperty = "empty";
+        [PUnit ("byte * 10^3")]
     uint32 counter;
 };
 

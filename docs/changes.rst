@@ -65,6 +65,13 @@ Released: not yet
 * Test: Enabled coveralls to run on all Python versions in the Travis CI,
   resulting in a combined coverage for all Python versions.
 
+* For instance display in table format, added the display of
+  the units of properties to the table headers. If a property
+  in the class has a PUnit or Units qualifier set, the unit
+  is translated to a human readable SI unit using the pywbem.siunit_obj()
+  function, and appended to the property name in square brackets.
+  (See issue #727)
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py

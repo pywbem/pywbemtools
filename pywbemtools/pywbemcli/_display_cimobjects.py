@@ -26,9 +26,11 @@ import re
 from pydicti import odicti
 import six
 import click
+from nocasedict import NocaseDict
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
-    CIMQualifierDeclaration, CIMClassName, ValueMapping
+    CIMQualifierDeclaration, CIMClassName, ValueMapping, siunit_obj, \
+    CIMError, CIM_ERR_NOT_SUPPORTED
 
 from ._common import format_table, fold_strings, DEFAULT_MAX_CELL_WIDTH, \
     output_format_is_table, sort_cimobjects, format_keys
@@ -478,10 +480,60 @@ def _display_instances_as_table(insts, table_width, table_format,
     else:
         max_cell_width = table_width
 
-    header_line = []
+    # TODO: Decide whether and how the showing of units should be controlled.
+    show_units = True
+
+    # Retrieve all creation classes of the instances in order to get
+    # to their PUnit and Units qualifiers.
+    if show_units:
+        class_objs = NocaseDict()  # CIMClass objects, by classname
+        for inst in insts:
+            classname = inst.classname
+            if classname in class_objs:
+                continue
+            if inst.path is None:
+                # The only operation returning instances without a path is
+                # query execution. For now, we simply don't display units in
+                # that case.
+                # TODO: Pass a namespace for query execution to display units
+                show_units = False
+                break
+            namespace = inst.path.namespace
+            try:
+                class_obj = context.conn.GetClass(
+                    classname, namespace=namespace,
+                    IncludeQualifiers=True, LocalOnly=False)
+            except CIMError as exc:
+                if exc.status_code == CIM_ERR_NOT_SUPPORTED:
+                    # The WBEM Server does not support class operations. We
+                    # silently give up showing units in this case.
+                    show_units = False
+                    break
+            class_objs[classname] = class_obj
+
+    # Construct the header line
+    header_line = []  # list of header strings
     if include_classes:
         header_line.append("classname")
-    header_line.extend(prop_names)
+    for pname in prop_names:
+        hdr = pname
+        if show_units:
+            # In theory, two leaf classes from different vendors could have
+            # introduced same-named properties with different unit definitions.
+            # We account for that by showing a list of units in that case.
+            siunits = []
+            for class_obj in class_objs.values():
+                if pname not in class_obj.properties:
+                    # Not all classes may have the property, but one of them
+                    # will.
+                    continue
+                prop_obj = class_obj.properties[pname]
+                siunit = siunit_obj(prop_obj)
+                if siunit is not None and siunit not in siunits:
+                    siunits.append(siunit)
+            for siunit in siunits:
+                hdr += " [{}]".format(siunit)
+        header_line.append(hdr)
 
     # Fold long property names
     new_header_line = []
