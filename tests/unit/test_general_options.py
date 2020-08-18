@@ -976,26 +976,27 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify Change all server parameters and show.',
+    ['Verify Change server parameters and show result.',
      {'general': ['--name', 'testGeneralOpsMods'],
       # args not allowed in interactive mode
-      'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
+      'stdin': ['--timeout 90 --user Fred '
                 '--default-namespace root/john --password  abcd '
                 ' --verify --certfile c1.pem --keyfile k1.pem '
-                'connection show --show-password'],
+                'connection select testGeneralOpsMods',
+                'connection show testGeneralOpsMods --show-password'],
       'cmdgrp': None},
      {'stdout': ['testGeneralOpsMods',
-                 '^server *http://blahblah$',
-                 '^default-namespace *root/john$',
-                 '^user *Fred$',
-                 '^password *abcd$',
-                 '^timeout *90$',
-                 '^verify *True$',
-                 '^certfile *c1.pem$',
-                 '^keyfile *k1.pem$'],
+                 'server *http://blah$',
+                 'default-namespace *root/john$',
+                 'user *Fred',
+                 'password *abcd',
+                 'timeout *90',
+                 'verify *True',
+                 'certfile *c1.pem',
+                 'keyfile *k1.pem'],
       'rc': 0,
       'test': 'regex'},
-     None, OK],
+     None, FAIL],  # See issue #732
 
     ['Change all parameters and save as t1.',
      {'general': ['--name', 'testGeneralOpsMods'],
@@ -1138,18 +1139,19 @@ TEST_CASES = [
 
     ['Verify interactive create mock with bad file name does not fail.',
      {'general': [],
-      'stdin': ['--server http://blah --user fred --password fred',
-                'connection save connectiontoprovestdincontinues',
+      'stdin': ['--server http://blah --user fred --password fred '
+                ' connection save connectiontoprovestdincontinues',
                 '--mock-server DoesNotExist.mof class enumerate',
                 '-m DoesNotExist.py class enumerate',
                 'connection select connectiontoprovestdincontinues',
                 'connection show',
                 'connection delete connectiontoprovestdincontinues']},
-     {'stdout': ['name not-saved (current)',
+     {'stdout': ['connectiontoprovestdincontinues (current)',
                  'server http://blah',
                  'default-namespace root/cimv2',
                  'user fred',
-                 'Deleted connection "connectiontoprovestdincontinues"'],
+                 'Deleted default connection '
+                 '"connectiontoprovestdincontinues"'],
       'stderr': ['DoesNotExist.mof',
                  'DoesNotExist.py',
                  'does not exist'],

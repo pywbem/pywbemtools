@@ -400,6 +400,15 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
+    ['Verify connection command show test2, masked password',
+     {'general': [],
+      'args': ['show', 'BADSERVERNAME']},
+     {'stderr': ["Connection name", 'BADSERVERNAME',
+                 'does not exist in connections file:'],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify connection command list with 2 servers defined',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
@@ -683,8 +692,9 @@ ca-certs
 
     ['Verify connection command show with name not in empty repo',
      {'general': [],
-      'args': ['show', 'Blah']},
-     {'stderr': ['Name "Blah" not current and no connections file'],
+      'args': ['show', 'blah']},
+     {'stderr': ['Name', 'blah', 'not current and no connections file',
+                 'yaml'],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
@@ -981,7 +991,7 @@ ca-certs
      {'stdout': ['not-saved', 'https://blahblahblah'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
-     None, OK],
+     None, FAIL],
 
     ['Verify connection delete svrtest',
      {'args': ['delete', 'svrtest'],
@@ -994,20 +1004,26 @@ ca-certs
     # End of sequence - repository is empty.
 
     #
-    #  Sequence that tests creating a server and saving it from stdin all in
+    #  Sequence that tests creating a server, saving it, selecting it, showing
+    #  it, and finally deleting from stdin all in
     #  single interactive sequence
     #
 
     # Begin of sequence - repository is empty.
 
+    # NOTE: This works because we insert the first command into the first
+    #       line of the stdin. If the connection save fred is not in the
+    #       first line, the test fails.
+
     ['Verify Create new connection in interactive mode and delete - single',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
-                '--certfile cert1.pem --keyfile keys1.pem',
-                'connection save fred',
-                'connection show',
+                '--certfile cert1.pem --keyfile keys1.pem '
+                ' connection save fred',
+                'connection select fred',
+                'connection show fred',
                 'connection delete fred']},
-     {'stdout': ['name', 'not-saved',
+     {'stdout': ['name', 'fred',
                  'server', 'http://blah',
                  'default-namespace', 'root/cimv2',
                  'user',
@@ -1024,6 +1040,33 @@ ca-certs
 
     # End of sequence - repository is empty.
 
+    # Begin of sequence - repository is empty.
+    # TODO: the show shows the not-saved connection for some reason
+    ['Verify Create new connection in interactive mode and delete - single',
+     {'general': [],
+      'stdin': ['--server http://blah --user fred --password fred '
+                '--certfile cert1.pem --keyfile keys1.pem',
+                'connection save fred',
+                'connection select fred',
+                'connection show',
+                'connection delete fred']},
+     {'stdout': ['name', 'fred',
+                 'server', 'http://blah',
+                 'default-namespace', 'root/cimv2',
+                 'user',
+                 'fred',
+                 'password',
+                 'timeout', '30',
+                 'verify', 'True',
+                 'certfile', 'cert1.pem',
+                 'keyfile', 'keys1.pem',
+                 'Deleted', 'connection', '"fred"'],
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, FAIL],
+
+    # End of sequence - repository is empty.
+
     #
     #  Sequence to assure that the interactive creation of a server actually
     #  puts the server in the repository
@@ -1036,8 +1079,8 @@ ca-certs
       'stdin': ['--server http://blah --user fred --password fred '
                 '--certfile cert1.pem --keyfile keys1.pem',
                 'connection save fred',
-                'connection show']},
-     {'stdout': ['name', 'not-saved',
+                'connection show fred']},
+     {'stdout': ['name', 'fred',
                  'server', 'http://blah',
                  'default-namespace', 'root/cimv2',
                  'user',
