@@ -532,15 +532,16 @@ def cmd_connection_show(context, name, options):
     """
     Show the parameters that make up the current connection information if
     name is None. If Name exists, shows connections in connections file.
+    If name is "?" present list of all connections for selection.
     """
 
     connections = context.connections_repo
 
-    cname = get_current_connection_name(context)
+    curr_name = get_current_connection_name(context)
     # If no name arg, fallback to selection unless there is no connections file
     if not name:
-        name = cname or '?'
-        if not cname and not connections.file_exists():
+        name = curr_name or '?'
+        if not curr_name and not connections.file_exists():
             raise click.ClickException('No current connection and no '
                                        'connections file {}.'
                                        .format(connections.connections_file))
@@ -564,19 +565,20 @@ def cmd_connection_show(context, name, options):
     # and that name is not current, use it. If current name is same as
     # name, use the current version.
     if connections.file_exists():
-        # If name in connections same as currrent connection. use current
-        connection = connections[name] if name in connections and \
-            cname != name else context.pywbem_server
-    else:   # nothing in connections file
-        if cname != name:
-            raise click.ClickException('Name "{}" not current and no '
+        # If name in connections use it
+        connection = connections[name] if name in connections else None
+        if connection is None:
+            raise click.ClickException('Connection name: "{0}" does not exist '
+                                       'in connections file: "{1}"'.
+                                       format(name,
+                                              connections.connections_file))
+    else:   # not connections file
+        if curr_name != name:
+            raise click.ClickException('Name: "{}" not current and no '
                                        'connections file {}'
                                        .format(name,
                                                connections.connections_file))
         connection = context.pywbem_server
-
-    if connection is None:
-        raise click.ClickException("No connection definition exists.")
 
     show_connection_information(context,
                                 connection,
