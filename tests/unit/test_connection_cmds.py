@@ -37,13 +37,23 @@ SCRIPT_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ONE_CLASS_MOCK_FILE = 'one_class_mock.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
-MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 
 TEST_DIR = os.path.dirname(__file__)
+TEST_DIR_REL = os.path.relpath(TEST_DIR)
+
+
+def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
+    """
+    Return the string representing the relative path of the file name provided.
+    """
+    return (str(os.path.join(TEST_DIR_REL, filename)))
+
+
+MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
+MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 
 # Get the relative path to the current directory.  This presumes that the
 # test was run from the pywbemtools directory
-TEST_DIR_REL = os.path.relpath(TEST_DIR)
 MOCK_FILE_PATH = os.path.join(TEST_DIR_REL, SIMPLE_MOCK_FILE)
 
 CONNECTION_HELP_LINES = [
@@ -784,29 +794,34 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
+    # The following 3 tests use a file defined to pywbemcli through an
+    # environment variable to mock the select prompt.
     ['Verify connection command select mocktest with prompt',
      {'general': [],
-      'args': ['select']},
+      'args': ['select'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout': "",
       'test': 'in',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_PROMPT_0_FILE, OK],
+     None, OK],
 
     ['Verify connection command show with prompt',
      {'general': [],
-      'args': ['show', '?']},
+      'args': ['show', '?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout': ['name mocktest'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
-     MOCK_PROMPT_0_FILE, OK],
+     None, OK],
 
     ['Verify connection command delete last one that deletes w/o prompt',
      {'general': [],
-      'args': ['delete']},
+      'args': ['delete'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout': ['Deleted connection "mocktest"'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'none'}},
-     MOCK_PROMPT_0_FILE, OK],
+     None, OK],
 
     ['Verify Add mock server to empty connections file.',
      {'general': ['--mock-server', MOCK_FILE_PATH],

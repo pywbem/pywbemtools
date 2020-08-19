@@ -47,6 +47,7 @@ _PYWBEM_VERSION = parse_version(pywbem_version)
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 TEST_DIR = os.path.dirname(__file__)
+TEST_DIR_REL = os.path.relpath(TEST_DIR)
 
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
@@ -60,10 +61,25 @@ INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
 
 
 COMPLEX_ASSOC_MODEL = "complex_assoc_model.mof"
+
+
+#
+# Definition of files that mock selected pywbemcli calls for tests
+# These are installed in pywbemcli through a special env variable set
+# before the test that is NOT one of the externally defined environment
+# variables
+#
+def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
+    """
+    Return the string representing the relative path of the file name provided.
+    """
+    return (str(os.path.join(TEST_DIR_REL, filename)))
+
+
+MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
 MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
-
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
@@ -1398,29 +1414,35 @@ Instances: TST_Person
      SIMPLE_MOCK_FILE, OK],
 
     ['INSTANCENAME with wildcard keybinding, no options',
-     ['get', 'TST_Person.?'],
+     {'general': [],
+      'args': ['get', 'TST_Person.?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout':
       ['Input integer between 0 and 7',
        'root/cimv2:TST_Person',
        'instance of TST_Person'],
       'rc': 0,
       'test': 'regex'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['INSTANCENAME with wildcard keybinding, --key option (error)',
-     ['get', 'TST_Person.?', '--key', 'name=Saara'],
+     {'general': [],
+      'args': ['get', 'TST_Person.?', '--key', 'name=Saara'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stderr': "Using the --key option conflicts with specifying a "
                 "wildcard keybinding",
       'rc': 1,
       'test': 'regex'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['INSTANCENAME with wildcard keybinding, invalid class path (error)',
-     ['get', 'TST_Person.name=1.?'],
+     {'general': [],
+      'args': ['get', 'TST_Person.name=1.?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stderr': "Invalid format for a class path in WBEM URI",
       'rc': 1,
       'test': 'regex'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['INSTANCENAME with namespace and with wildcard keybinding, '
      'option --namespace with same ns (error)',
@@ -1589,14 +1611,16 @@ Instances: TST_Person
     # Cannot insure order of the pick and we are using an integer to
     # pick so result is very general
     ['Verify instance command get with wildcard keybinding',
-     ['get', 'TST_Person.?'],
+     {'general': [],
+      'args': ['get', 'TST_Person.?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout':
       ['Input integer between 0 and 7',
        'root/cimv2:TST_Person',
        'instance of TST_Person'],
       'rc': 0,
       'test': 'regex'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     #
     #  instance get command errors
@@ -1676,7 +1700,9 @@ Instances: TST_Person
 
     ['Verify instance command create, new instance of CIM_Foo one '
      'property and verify yes',
-     ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
+     {'general': [],
+      'args': ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_CONFIRM_Y_FILE)}},
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  '};',
@@ -1684,11 +1710,13 @@ Instances: TST_Person
                  'root/cimv2:CIM_Foo.InstanceID="blah"'],
       'rc': 0,
       'test': 'in'},
-     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_Y_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command create, new instance of CIM_Foo one '
      'property and verify no',
-     ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
+     {'general': [],
+      'args': ['create', 'CIM_Foo', '-p', 'InstanceID=blah', '--verify'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_CONFIRM_N_FILE)}},
      {'stdout': ['instance of CIM_Foo {',
                  'InstanceID = "blah";',
                  '};',
@@ -1696,7 +1724,7 @@ Instances: TST_Person
                  'Request aborted'],
       'rc': 0,
       'test': 'in'},
-     [SIMPLE_MOCK_FILE, MOCK_CONFIRM_N_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command create, new instance of CIM_Foo, '
      'one property, explicit namespace definition',
@@ -1707,14 +1735,16 @@ Instances: TST_Person
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify get and delete with wildcard keybinding with stdin',
-     {'stdin': ['instance get CIM_Foo.?',
+     {'env': {MOCK_DEFINITION_ENVVAR:
+              GET_TEST_PATH_STR(MOCK_PROMPT_PICK_RESPONSE_3_FILE)},
+      'stdin': ['instance get CIM_Foo.?',
                 'instance delete CIM_Foo.?']},
      {'stdout': ['CIM_Foo',
                  'instance of CIM_Foo',
                  'InstanceID = "CIM_Foo30"'],
       'rc': 0,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_3_FILE], OK],
+     SIMPLE_MOCK_FILE, 'pdb'],
 
     ['Verify multiple creates verify with enum summary with stdin',
      {'stdin': ['instance create CIM_Foo -p InstanceID=blah1',
@@ -1746,7 +1776,9 @@ Instances: TST_Person
     #      version. Test marked as failing.
     ['Verify create, get with wildcard keybinding, delete with wildcard '
      'keybinding, with stdin',
-     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
+     {'env': {MOCK_DEFINITION_ENVVAR:
+              GET_TEST_PATH_STR(MOCK_PROMPT_PICK_RESPONSE_11_FILE)},
+      'stdin': ['instance create CIM_Foo -p InstanceID=blah',
                 'instance get CIM_Foo.?',
                 'instance delete CIM_Foo.?']},
      {'stdout': ['CIM_Foo',
@@ -1754,7 +1786,7 @@ Instances: TST_Person
                  'IntegerProp = NULL'],
       'rc': 0,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE, MOCK_PROMPT_PICK_RESPONSE_11_FILE], FAIL],
+     SIMPLE_MOCK_FILE, FAIL],
 
     ['Verify instance command create, new instance of all_types '
      'with scalar types',
@@ -2104,12 +2136,14 @@ Instances: TST_Person
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command delete with wildcard keybinding',
-     ['delete', 'TST_Person.?'],
+     {'general': [],
+      'args': ['delete', 'TST_Person.?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"'],
       'rc': 0,
       'test': 'in'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     #
     # Delete command error tests
@@ -2342,7 +2376,9 @@ Instances: TST_Person
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references with wildcard keybinding',
-     ['references', 'TST_Person.?'],
+     {'general': [],
+      'args': ['references', 'TST_Person.?'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
      {'stdout':
       ['root/cimv2:TST_Person.name="Mike"',
        'instance of TST_Lineage {',
@@ -2350,7 +2386,7 @@ Instances: TST_Person
        'instance of TST_MemberOfFamilyCollection {'],
       'rc': 0,
       'test': 'innows'},
-     [ASSOC_MOCK_FILE, MOCK_PROMPT_0_FILE], OK],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references with query',
      ['references', 'TST_Person.name="Mike"', '--filter-query',

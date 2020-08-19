@@ -32,14 +32,25 @@ from pywbemtools.pywbemcli._connection_repository import CONNECTIONS_FILENAME
 from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
-SCRIPT_DIR = os.path.dirname(__file__)
+TEST_DIR = os.path.dirname(__file__)
 
-SIMPLE_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_mock_model.mof')
-PYTHON_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_python_mock_script.py')
-BAD_MOF_FILE_PATH = os.path.join(SCRIPT_DIR, 'mof_with_error.mof')
-BAD_PY_FILE_PATH = os.path.join(SCRIPT_DIR, 'py_with_error.py')
-BAD_PY_ERR_STRTUP_PATH = os.path.join(SCRIPT_DIR, 'py_err_processatstartup.py')
-MOCK_PW_PROMPT_PATH = os.path.join(SCRIPT_DIR, 'mock_password_prompt.py')
+
+def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
+    """
+    Return the string representing the relative path of the file name provided.
+    """
+    return (str(os.path.join(TEST_DIR, filename)))
+
+
+SIMPLE_MOCK_MODEL_FILE = "simple_mock_model.mof"
+MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
+BAD_PY_ERR_STRTUP_FILE = 'py_err_processatstartup.py'
+MOCK_PW_PROMPT_FILE = 'mock_password_prompt.py'
+
+SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_MODEL_FILE)
+PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
+BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
+BAD_PY_FILE_PATH = os.path.join(TEST_DIR, 'py_with_error.py')
 
 GENERAL_HELP_LINES = [
     """
@@ -453,17 +464,17 @@ TEST_CASES = [
     ['Verify -m option, file with python startup file containing syntax error',
      {'general': ['-m', SIMPLE_MOCK_FILE_PATH],
       'cmdgrp': 'class',
-      'args': ['enumerate']},
-     {'stderr': ['Mock Python process-at-startup',
+      'args': ['enumerate'],
+      'env': {MOCK_DEFINITION_ENVVAR:
+              GET_TEST_PATH_STR(BAD_PY_ERR_STRTUP_FILE)}},
+     {'stderr': ['Python test process-at-startup script',
                  'Traceback (most recent call last)',
-                 'pywbemtools', 'pywbemcli.py',
-                 'line ', 'in cli',
-                 'py_err_processatstartup.py',
+                 'line ',
                  'def mock?prompt(msg):',
                  'SyntaxError: invalid syntax'],
       'rc': 1,
       'test': 'innows'},
-     BAD_PY_ERR_STRTUP_PATH, OK],
+     None, OK],
 
     #
     #  Test errors with --name option, --mock-server option
@@ -682,10 +693,20 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify password prompt with server that requires one',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--user', 'john'],
+      'cmdgrp': 'class',
+      'args': ['enumerate'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+     {'stdout': ['CIM_Foo'],
+      'test': 'innows'},
+     None, OK],
+
     #
     #   Verify password prompt. This is a sequence
     #
-    ['Create a mock serve with user but no password.',
+    ['Create a mock serve with user but no password. Sequence 0,1.',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                   '--user', 'john'],
       'args': ['save', 'mocktestVerifyPWPrompt'],
@@ -694,23 +715,27 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify server in repository',
+    # TODO: This test is worthless the prompt is not called
+    ['Verify server in repository.  Sequence 0,2.',
      {'general': [],
       'cmdgrp': 'connection',
-      'args': ['list']},
-     {'stdout': ['mocktestVerifyPWPrompt'],
+      'args': ['list'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
+     {'stdout': ['mocktestVerifyPWPrompt', 'WBEM server connections(brief)'],
       'test': 'innows'},
-     MOCK_PW_PROMPT_PATH, OK],
+     None, OK],
 
-    ['Verify load of this server and class enumerate triggers password prompt',
+    ['Verify load of this server and class enumerate triggers password prompt. '
+     ' Sequence 0,3.',
      {'general': ['--name', 'mocktestVerifyPWPrompt'],
       'cmdgrp': 'class',
-      'args': ['enumerate']},
+      'args': ['enumerate'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
      {'stdout': ['CIM_Foo'],
       'test': 'innows'},
-     MOCK_PW_PROMPT_PATH, OK],
+     None, RUN],
 
-    ['Delete our test server',
+    ['Delete our test server. Sequence 0,4. Last',
      {'general': ['--name', 'mocktestVerifyPWPrompt'],
       'cmdgrp': 'connection',
       'args': ['delete', 'mocktestVerifyPWPrompt']},
@@ -721,12 +746,13 @@ TEST_CASES = [
     ['Create a mock server with user but no password. stdin to test for prompt',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
                   '--user', 'john'],
-      'stdin': ['class enumerate']},
+      'stdin': ['class enumerate'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
      {'stdout': ['MOCK_CLICK_PROMPT Enter password',
                  '(user john)',
                  'class CIM_Foo {'],
       'test': 'innows'},
-     MOCK_PW_PROMPT_PATH, OK],
+     None, OK],
 
     #
     #  The following is a sequence that tests use of default connection
@@ -736,7 +762,7 @@ TEST_CASES = [
     #  Removes the connection
     #
 
-    ['Create a connection to test default connection.',
+    ['Create a connection to test default connection. sequence:1,1',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'test-default'],
       'cmdgrp': 'connection', },
@@ -744,35 +770,36 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify select of test-default.',
+    ['Verify select of test-default. sequence:1,2',
      {'args': ['select', 'test-default'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify show test-default connection.',
+    ['Verify show test-default connection. sequence:1,3',
      {'args': ['show', 'test-default'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify select of test-default connection.',
+    ['Verify select of test-default connection. sequence:1,4',
      {'args': ['select', 'test-default', '--default'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify show current which is test-default',
+    ['Verify show current which is test-default.  sequence:1,5',
      {'args': ['show'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify show current which is test-default because it loads the default',
+    ['Verify show current which is test-default because it loads the default. '
+     'sequence:1,6',
      {'general': ['--verbose'],
       'args': ['show'],
       'cmdgrp': 'connection', },
@@ -780,14 +807,15 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Delete test-default.',
+    ['Delete test-default.  sequence:1,7',
      {'args': ['delete', 'test-default'],
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
      None, OK],
 
-    ['Verify delete worked by requesting again expecting failure.',
+    ['Verify delete worked by requesting again expecting failure. sequence:1,8 '
+     '. Last',
      {'args': ['delete', 'test-default'],
       'cmdgrp': 'connection', },
      {'stderr': ['Connection  repository',
@@ -802,7 +830,7 @@ TEST_CASES = [
     #
     # Test using environment variables as input
     #
-    ['Verify setting one env var for input.',
+    ['Verify setting one environment variable (PYWBEMCLI_SERVER) for input.',
      {'env': {'PYWBEMCLI_SERVER': 'http://blah'},
       'cmdgrp': 'connection',
       'args': ['show', '--show-password']},
@@ -960,7 +988,8 @@ TEST_CASES = [
     #   The following is a sequence. Creates a server and changes almost all
     #   parameters interactively.
     #
-    ['Verify Create a connection for test of mods through general opts.',
+    ['Verify Create a connection for test of mods through general opts. '
+     'Sequence 2,1',
      {'general': ['--server', 'http://blah',
                   '--timeout', '45',
                   '--default-namespace', 'root/fred',
@@ -975,7 +1004,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify show current which is testGeneralOpsMods',
+    ['Verify show current which is testGeneralOpsMods. Sequence 2,2',
      {'args': ['show', 'testGeneralOpsMods', '--show-password'],
       'cmdgrp': 'connection', },
      {'stdout': ['testGeneralOpsMods',
@@ -990,7 +1019,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify Change server parameters and show result.',
+    ['Verify Change server parameters and show result. Sequence 2,3',
      {'general': ['--name', 'testGeneralOpsMods'],
       # args not allowed in interactive mode
       'stdin': ['--timeout 90 --user Fred '
@@ -1012,7 +1041,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, FAIL],  # See issue #732
 
-    ['Change all parameters and save as t1.',
+    ['Change all parameters and save as t1. Sequence 2,4',
      {'general': ['--name', 'testGeneralOpsMods'],
       # args not allowed in interactive mode
       'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
@@ -1026,7 +1055,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify  load t1 and changed parameters are correct',
+    ['Verify  load t1 and changed parameters are correct. Sequence 2,5',
      {'general': ['--name', 't1'],
       'args': ['show', '--show-password'],
       'cmdgrp': 'connection'},
@@ -1044,7 +1073,7 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Delete testGeneralOpsMods.',
+    ['Delete testGeneralOpsMods.. Sequence 2,6',
      {'args': ['show', 'ServerDoesNotExist'],
       'cmdgrp': 'connection', },
      {'stderr': "",
@@ -1052,7 +1081,7 @@ TEST_CASES = [
       'test': 'innows'},
 
      None, OK],
-    ['Delete testGeneralOpsMods.',
+    ['Delete testGeneralOpsMods.. Sequence 2,7. Last',
      {'args': ['delete', 'testGeneralOpsMods'],
       'cmdgrp': 'connection', },
      {'stdout': "",

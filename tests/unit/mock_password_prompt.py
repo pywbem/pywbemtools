@@ -1,4 +1,3 @@
-# !PROCESS!AT!STARTUP!
 # The previous statement is used by pywbemcli to force this script to be
 # run at pywbemcli startup and not included in the list of --mock-server
 # files that are used to build the repository.  This is a development
@@ -23,6 +22,9 @@ Python code to mock click.click_prompt. Returns the
 value defined in RETURN_VALUE
 
 Used to mock response from commmon_verify_operation
+
+    This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
+    environment variable.
 """
 
 from mock import Mock

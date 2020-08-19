@@ -22,7 +22,8 @@ import pytest
 from .cli_test_extensions import CLITestsBase
 
 SCRIPT_DIR = os.path.dirname(__file__)
-SIMPLE_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, 'simple_mock_model.mof')
+SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+SIMPLE_MOCK_FILE_PATH = os.path.join(SCRIPT_DIR, SIMPLE_MOCK_FILE)
 
 OK = True
 RUN = True
