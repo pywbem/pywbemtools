@@ -113,6 +113,10 @@ Released: not yet
   Connections File and created a unit test and function error test.
   (see issue #661)
 
+* Separate code to execute test files (ex. setup up mock of prompt) from
+  the process of executing files defined by the --mock-server general option.
+  The new capability is controled by an environment variable
+  "PYWBEMCLI_STARTUP_SCRIPT" that is considered intenal to pywbemcli testing.
 
 **Known issues:**
 

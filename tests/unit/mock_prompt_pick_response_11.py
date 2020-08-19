@@ -1,4 +1,3 @@
-# !PROCESS!AT!STARTUP!
 # The previous statement is used by pywbemcli to force this script to be
 # run at pywbemcli startup and not included in the list of --mock-server
 # files that are used to build the repository.  This is a development
@@ -29,6 +28,9 @@
     Add this file to the set of mock options and the prompt for picking
     the instance will be output but the prompt for a response from the
     user will be bypassed and the value defined in RETURN_VALUE returned.
+
+    This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
+    environment variable.
 """
 from mock import Mock
 

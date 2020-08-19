@@ -73,9 +73,6 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     else:
         env = copy(env)
 
-    # TODO should we consider removing all env variables before each
-    # test???
-
     env['PYTHONPATH'] = '.'  # Use local files
     env['PYTHONWARNINGS'] = ''  # Disable for parsing output
 

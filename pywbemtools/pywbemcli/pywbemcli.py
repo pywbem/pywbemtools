@@ -51,6 +51,8 @@ from ._utils import formatwarning
 
 __all__ = ['cli']
 
+PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
+
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify
@@ -73,6 +75,54 @@ CONTEXT_SETTINGS = dict(
     # Default the output width properly:
     terminal_width=TERMWIDTH_ENVVAR or click.get_terminal_size()[0],
 )
+
+
+def validate_connections_file(connections_repo):
+    """
+    Test for existence of a connections file and abort if it does not exist.
+    Abort click if file does not exist
+    """
+    if not connections_repo.file_exists():
+        click.echo('Connections file does not exist: {}'.format(
+            connections_repo.connections_file), err=True)
+        raise click.Abort()
+
+
+def execute_startup_script(file_path, verbose):
+    """
+    Execute the python script. This  executes the script defined in file_path.
+    The purpose of this code is to execute test scripts at startup.
+    """
+
+    ext = os.path.splitext(file_path)[1]
+    if ext not in ['.py']:
+        raise click.ClickException(
+            "File '{}' has invalid suffix '{}' "
+            "- must be '.py'".format(file_path, ext))
+    if not os.path.isfile(file_path):
+        raise click.ClickException(
+            "File '{}' does not exist".format(file_path))
+
+    with open(file_path) as fp:
+        file_source = fp.read()
+        # Only verbose is allowed here
+        globalparams = {'VERBOSE': verbose}
+        try:
+            # Using compile+exec instead of just exec allows
+            # specifying the file name, causing it to appear in
+            # any tracebacks.
+            file_code = compile(file_source, file_path, 'exec')
+            # pylint: disable=exec-used
+            exec(file_code, globalparams, None)
+        except Exception:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            tb = traceback.format_exception(exc_type, exc_value,
+                                            exc_traceback)
+            click.echo(
+                "Python test process-at-startup script '{}' "
+                "failed:\n{}".format(file_path, "\n".join(tb)),
+                err=True)
+            raise click.Abort()
 
 
 # pylint: disable=bad-continuation
@@ -463,6 +513,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             'The --keyfile option "{}" is allowed only if the --certfile '
             'option is also used'.format(keyfile))
 
+    # If this env variable is set, execute the file defined by variable.
+    if os.getenv(PYWBEMCLI_STARTUP_ENVVAR):
+        execute_startup_script(os.getenv('PYWBEMCLI_STARTUP_SCRIPT'),
+                               verbose)
+
     # process mock_server option
     if mock_server:
         assert isinstance(mock_server, tuple)
@@ -474,8 +529,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             else:
                 mock_server_path.append(fn)
 
-        # Test for non-existent mock files
-        # TODO: Future: Create common method with code in build_respository
+        # Test for valid file types and existence for mock_server files.
         for file_path in mock_server_path:
             ext = os.path.splitext(file_path)[1]
             if ext not in ['.py', '.mof']:
@@ -485,38 +539,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             if not os.path.isfile(file_path):
                 raise click.ClickException(
                     "Mock file '{}' does not exist".format(file_path))
-            if ext != '.py':
-                resolved_mock_server.append(file_path)
-                continue
-
-            # The following allows executing selected python scripts at
-            # startup but with only VERBOSE as a known global.  Inserted
-            # primarily to support testing. If the flag exists in the
-            # file, it executes immediatly but does not go into mock_server
-            # variable
-            with open(file_path) as fp:
-                if '!PROCESS!AT!STARTUP!' in fp.readline():
-                    file_source = fp.read()
-                    # Only verbose is allowed here
-                    globalparams = {'VERBOSE': verbose}
-                    try:
-                        # Using compile+exec instead of just exec allows
-                        # specifying the file name, causing it to appear in
-                        # any tracebacks.
-                        file_code = compile(file_source, file_path, 'exec')
-                        # pylint: disable=exec-used
-                        exec(file_code, globalparams, None)
-                    except Exception:
-                        exc_type, exc_value, exc_traceback = sys.exc_info()
-                        tb = traceback.format_exception(exc_type, exc_value,
-                                                        exc_traceback)
-                        click.echo(
-                            "Mock Python process-at-startup script '{}' "
-                            "failed:\n{}".format(file_path, "\n".join(tb)),
-                            err=True)
-                        raise click.Abort()
-                else:  # not processed during startup
-                    resolved_mock_server.append(file_path)
+            resolved_mock_server.append(file_path)
 
     # Simultaneous mock_server and server fails
     if server and resolved_mock_server:
