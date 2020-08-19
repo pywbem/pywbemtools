@@ -28,6 +28,10 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict  # pylint: disable=import-error
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
 import six
 import click
@@ -892,52 +896,86 @@ def process_invokemethod(context, objectname, methodname, options):
 
 def sort_cimobjects(cim_objects):
     """
-    Sort lists of CIMClass, CIMCLassName, CIMQualifierDecl, CIMInstance or
-    CIMInstanceName. Sorts based on name or CIMInstancename. Sorting is based
-    on the name value (name, classname, wbemuri(canonical form)
-    Returns new list with the sorted objects.  This was defined as a common
-    sort mechanism for all of the CIM object responses from WBEM servers.
+    Return a sorted list of the input objects.
 
-    For classes it sorts by classnames. For instances and instancenames, it
-    sorts by instancename. For qualifier declarations it sorts by name
+    The returned list is always a new list and its items are the original input
+    objects.
+
+    The following input object types are supported, and their sort key is:
+
+    * string: Sorted by string value (case sensitively). This case covers the
+      result of 'class enumerate'.
+
+    * CIMClass: Sorted by class name (case sensitively).
+
+    * CIMClassName, CIMInstanceName: Sorted by its canonical WBEM URI string.
+      This makes the sort case insensitive.
+
+    * CIMInstance: Must have the path set. Sorted by the canonical WBEM URI
+      string of its instance path. This makes the sort case insensitive.
+
+    * CIMQualifierDeclaration: Sorted by qualifier name (case sensitively).
+
+    * tuple(CIMClassName, CIMClass): Sorted by the canonical WBEM URI
+      string of the CIMClassName object. This makes the sort case insensitive.
+      This case covers the result of 'class references/associators'.
 
     Parameters:
 
-      cim_objects (list of CIMObjects):
+      cim_objects (Sequence): Objects to be sorted.
 
     Returns:
-        A list of the same types as input but sorted as defined above.
+        A new list of the original input objects, sorted as defined above.
+
+    Raises:
+        TypeError: Invalid type for input parameter 'cim_objects'.
+        ValueError: CIMInstance object in sort list has no 'path' set.
     """
-    if len(cim_objects) < 2:
-        return cim_objects
+    assert isinstance(cim_objects, Sequence)
+
+    if not cim_objects:
+        return []
 
     tst_obj = cim_objects[0]
-    # this covers lists of classnames from class enum -o
+
+    # This case covers result of 'class enumerate':
     if isinstance(tst_obj, six.string_types):
         return sorted(cim_objects)
 
     if isinstance(tst_obj, CIMClass):
-        return sorted(cim_objects, key=lambda class_: class_.classname)
+        return sorted(cim_objects,
+                      key=lambda obj: obj.classname)
 
     if isinstance(tst_obj, (CIMClassName, CIMInstanceName)):
-        sort_dict = {obj.to_wbem_uri(format="canonical"): obj
-                     for obj in cim_objects}
-    elif isinstance(tst_obj, CIMInstance):
-        sort_dict = {obj.path.to_wbem_uri(format="canonical"): obj
-                     for obj in cim_objects}
-    elif isinstance(tst_obj, CIMQualifierDeclaration):
-        sort_dict = {obj.name: obj for obj in cim_objects}
-    # Oddball case. In this case it is a tuple of CIMClassname,
-    # CIMClass from class references/associators
-    elif isinstance(tst_obj, tuple):
-        assert isinstance(tst_obj[0], CIMClassName)
-        assert isinstance(tst_obj[1], CIMClass)
-        sort_dict = {tup[0].to_wbem_uri(format="canonical"): tup for tup in
-                     cim_objects}
-    else:
-        raise TypeError('{} cannot be sorted'.format(type(cim_objects[0])))
+        return sorted(cim_objects,
+                      key=lambda obj: obj.to_wbem_uri(format="canonical"))
 
-    return [sort_dict[key] for key in sorted(sort_dict.keys())]
+    if isinstance(tst_obj, CIMInstance):
+        try:
+            return sorted(
+                cim_objects,
+                key=lambda obj: obj.path.to_wbem_uri(format="canonical"))
+        except AttributeError as exc:
+            new_exc = ValueError(
+                "CIMInstance object in sort list has no 'path' set: {}".
+                format(exc))
+            new_exc.__cause__ = None
+            raise new_exc
+
+    if isinstance(tst_obj, CIMQualifierDeclaration):
+        return sorted(cim_objects,
+                      key=lambda obj: obj.name)
+
+    # This case covers result of 'class references/associators':
+    if isinstance(tst_obj, tuple):
+        if not isinstance(tst_obj[0], CIMClassName) or \
+                not isinstance(tst_obj[1], CIMClass):
+            raise TypeError("Items of type tuple ({}, {}) cannot be sorted".
+                            format(type(tst_obj[0]), type(tst_obj[1])))
+        return sorted(cim_objects,
+                      key=lambda tup: tup[0].to_wbem_uri(format="canonical"))
+
+    raise TypeError("Items of type {} cannot be sorted".format(type(tst_obj)))
 
 
 def display_text(text, output_format=None):  # pylint: disable=unused-argument

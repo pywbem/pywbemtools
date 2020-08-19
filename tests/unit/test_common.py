@@ -29,7 +29,7 @@ from mock import patch
 import pytest
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
-    CIMQualifierDeclaration, CIMInstanceName, Uint8, Uint32, \
+    CIMQualifierDeclaration, CIMInstanceName, Uint8, \
     CIMClassName, __version__
 
 from tests.unit.pytest_extensions import simplified_test_function
@@ -1398,169 +1398,442 @@ def test_parse_kv_pair(testcase, kvpair, exp_name, exp_value):
     assert value == exp_value
 
 
-class SorterTest(unittest.TestCase):
-    """Test the object sort function in _common"""
+TESTCASES_SORT_CIMOBJECTS = [
 
-    def test_sort_classes(self):
-        """Test sorting list of classes"""
+    #  Testcases for sort_cimobjects()
+    #
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * objects: List of input objects to sort.
+    #   * exp_indexes: List of expected indexes of objects in sorted result.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-        classes = []
+    (
+        "Empty list of objects",
+        dict(
+            objects=[],
+            exp_indexes=[]
+        ),
+        None, None, True
+    ),
+    (
+        "string: One object",
+        dict(
+            objects=['abc'],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "string: Two objects, opposite sort order",
+        dict(
+            objects=['xyz', 'abc'],
+            exp_indexes=[1, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClass: One object",
+        dict(
+            objects=[
+                CIMClass(
+                    'CIM_Foo',
+                    properties=[
+                        CIMProperty('InstanceID', None, type='string'),
+                    ]),
+            ],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClass: Verify that equal sort keys are supported and sort is "
+        "stable",
+        dict(
+            objects=[
+                CIMClass(
+                    'CIM_Foo',
+                    properties=[
+                        CIMProperty('InstanceID', None, type='string'),
+                    ]),
+                CIMClass(
+                    'CIM_Boo',
+                    properties=[
+                        CIMProperty('InstanceID', None, type='string'),
+                    ]),
+                CIMClass(
+                    'CIM_Boo',
+                    properties=[
+                        CIMProperty('InstanceID', None, type='string'),
+                    ]),
+            ],
+            exp_indexes=[1, 2, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClass: Verify that sort key is only by class name and does not "
+        "also include the name of properties",
+        dict(
+            objects=[
+                CIMClass(
+                    'CIM_Foo',
+                    properties=[
+                        CIMProperty('InstanceID', None, type='string'),
+                    ]),
+                CIMClass(
+                    'CIM_Boo',
+                    properties=[
+                        CIMProperty('InstanceID2', None, type='string'),
+                    ]),
+                CIMClass(
+                    'CIM_Boo',
+                    properties=[
+                        CIMProperty('InstanceID1', None, type='string'),
+                    ]),
+            ],
+            exp_indexes=[1, 2, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClassName: One object",
+        dict(
+            objects=[
+                CIMClassName(host="fred", namespace="cimv2", classname="foo"),
+            ],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClassName: Verify that equal sort keys are supported and sort is "
+        "stable",
+        dict(
+            objects=[
+                CIMClassName(host="fred", namespace="cimv3", classname="bla"),
+                CIMClassName(host="fred", namespace="cimv2", classname="foo"),
+                CIMClassName(host="fred", namespace="cimv2", classname="foo"),
+            ],
+            exp_indexes=[1, 2, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMClassName: Verify sort precedence of host, namespace, classname",
+        dict(
+            objects=[
+                CIMClassName(host="fred", namespace="cimv2", classname="foo"),
+                CIMClassName(host="fred", namespace="cimv2", classname="bla"),
+                CIMClassName(host="john", namespace="cimv2", classname="bla"),
+                CIMClassName(host="fred", namespace="cimv3", classname="bla"),
+            ],
+            exp_indexes=[1, 0, 3, 2]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstanceName: One object",
+        dict(
+            objects=[
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+            ],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstanceName: Verify that equal sort keys are supported and sort "
+        "is stable",
+        dict(
+            objects=[
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv3',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+            ],
+            exp_indexes=[1, 2, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstanceName: Verify sort precedence of host, namespace, "
+        "classname, keybindings",
+        dict(
+            objects=[
+                CIMInstanceName(
+                    host='john',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv3',
+                    classname='CIM_Boo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'Chicken': 'Ham', 'Beans': 42}),
+                CIMInstanceName(
+                    host='fred',
+                    namespace='root/cimv2',
+                    classname='CIM_Foo',
+                    keybindings={'AChicken': 'Ham', 'Beans': 42}),
+            ],
+            exp_indexes=[3, 2, 1, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstance: One object",
+        dict(
+            objects=[
+                CIMInstance(
+                    'CIM_Foo',
+                    path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
+            ],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstance: Verify that equal sort keys are supported and sort "
+        "is stable",
+        dict(
+            objects=[
+                CIMInstance(
+                    'CIM_Foo',
+                    path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
+                CIMInstance(
+                    'CIM_Foo',
+                    path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
+                CIMInstance(
+                    'CIM_Boo',
+                    path=CIMInstanceName('CIM_Boo', {'Chicken': 'Ham'})),
+            ],
+            exp_indexes=[2, 0, 1]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstance: Verify that sort is by instance path, and does not also"
+        "include class name",
+        dict(
+            objects=[
+                CIMInstance(
+                    'CIM_Foo',
+                    path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
+                CIMInstance(
+                    'CIM_Boo',  # intentionally inconsistent with path
+                    path=CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})),
+                CIMInstance(
+                    'CIM_Foo',  # intentionally inconsistent with path
+                    path=CIMInstanceName('CIM_Boo', {'Chicken': 'Ham'})),
+            ],
+            exp_indexes=[2, 0, 1]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMInstance: Invalid objects without path set",
+        dict(
+            objects=[
+                CIMInstance('CIM_Foo'),
+                CIMInstance('CIM_Boo'),
+            ],
+            exp_indexes=None
+        ),
+        ValueError, None, True
+    ),
+    (
+        "CIMQualifierDeclaration: One object",
+        dict(
+            objects=[
+                CIMQualifierDeclaration('FooQualDecl1', 'uint32'),
+            ],
+            exp_indexes=[0]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMQualifierDeclaration: Verify that equal sort keys are supported "
+        "and sort is stable",
+        dict(
+            objects=[
+                CIMQualifierDeclaration('FooQualDecl2', 'uint32'),
+                CIMQualifierDeclaration('FooQualDecl2', 'uint32'),
+                CIMQualifierDeclaration('FooQualDecl1', 'uint32'),
+            ],
+            exp_indexes=[2, 0, 1]
+        ),
+        None, None, True
+    ),
+    (
+        "CIMQualifierDeclaration: Verify that sort key is by qualifier name, "
+        "and does not also include qualifier value",
+        dict(
+            objects=[
+                CIMQualifierDeclaration('FooQualDecl2', 'string', 'abc'),
+                CIMQualifierDeclaration('FooQualDecl1', 'string', 'xyz'),
+                CIMQualifierDeclaration('FooQualDecl1', 'string', 'abc'),
+            ],
+            exp_indexes=[1, 2, 0]
+        ),
+        None, None, True
+    ),
+    (
+        "tuple(CIMClassName, CIMClass): Three objects in opposite sort order "
+        "(return from class references/associators)",
+        dict(
+            objects=[
+                (
+                    CIMClassName(
+                        'CIM_Foo', host="fred", namespace="root/cimv2"),
+                    CIMClass(
+                        'CIM_Foo',
+                        properties=[
+                            CIMProperty('InstanceID', None, type='string'),
+                        ]),
+                ),
+                (
+                    CIMClassName(
+                        'CIM_Boo', host="fred", namespace="root/cimv1"),
+                    CIMClass(
+                        'CIM_Boo',
+                        properties=[
+                            CIMProperty('InstanceID', None, type='string'),
+                        ]),
+                ),
+                (
+                    CIMClassName(
+                        'CIM_Boo', host="john", namespace="root/cimv2"),
+                    CIMClass(
+                        'CIM_Boo',
+                        properties=[
+                            CIMProperty('InstanceID', None, type='string'),
+                        ]),
+                ),
+            ],
+            exp_indexes=[1, 0, 2]
+        ),
+        None, None, True
+    ),
+    (
+        "Invalid type: single tuple(CIMClass, CIMClassName)",
+        dict(
+            objects=[
+                (
+                    CIMClass(
+                        'CIM_Foo',
+                        properties=[
+                            CIMProperty('InstanceID', None, type='string'),
+                        ]),
+                    CIMClassName(
+                        'CIM_Foo', host="fred", namespace="root/cimv2"),
+                ),
+            ],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+    (
+        "Invalid type: single tuple(CIMInstanceName, CIMClass)",
+        dict(
+            objects=[
+                (
+                    CIMInstanceName(
+                        'CIM_Foo', host="fred", namespace="root/cimv2"),
+                    CIMClass(
+                        'CIM_Foo',
+                        properties=[
+                            CIMProperty('InstanceID', None, type='string'),
+                        ]),
+                ),
+            ],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+    (
+        "Invalid type: single int object",
+        dict(
+            objects=[42],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+    (
+        "Invalid type: two int objects",
+        dict(
+            objects=[42, 43],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+    (
+        "Invalid type: Single CIMQualifier object",
+        dict(
+            objects=[
+                CIMQualifier('Key', value=True),
+            ],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+    (
+        "Invalid type: Two CIMQualifier objects",
+        dict(
+            objects=[
+                CIMQualifier('Key', value=True),
+                CIMQualifier('Units', value='Bytes'),
+            ],
+            exp_indexes=None
+        ),
+        TypeError, None, True
+    ),
+]
 
-        classes.append(CIMClass(
-            'CIM_Foo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        classes.append(CIMClass(
-            'CIM_Boo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        classes.append(CIMClass(
-            'CID_Boo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        sorted_rslt = sort_cimobjects(classes)
-        self.assertEqual(len(classes), len(sorted_rslt))
-        self.assertEqual(sorted_rslt[0].classname, 'CID_Boo')
-        self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
-        self.assertEqual(sorted_rslt[2].classname, 'CIM_Foo')
 
-        classes = []
-        sorted_rslt = sort_cimobjects(classes)
-        self.assertEqual(len(classes), len(sorted_rslt))
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_SORT_CIMOBJECTS)
+@simplified_test_function
+def test_sort_cimobjects(testcase, objects, exp_indexes):
+    # pylint: disable=unused-argument
+    """
+    Test sort_cimobjects() common function
+    """
 
-        classes = []
-        sorted_rslt = sort_cimobjects(classes)
-        classes.append(CIMClass(
-            'CIM_Foo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        self.assertEqual(len(classes), len(sorted_rslt))
-        self.assertEqual(sorted_rslt[0].classname, 'CIM_Foo')
+    # The code to be tested
+    result_objects = sort_cimobjects(objects)
 
-    def test_sort_classnames(self):
-        """Test sorting list of list of CIMClassName"""
+    assert len(result_objects) == len(objects)
 
-        cln1 = CIMClassName("whoops", host="fred", namespace="root/cimv2")
-        cln2 = CIMClassName("blah", host="fred", namespace="root/cimv2")
-        cln3 = CIMClassName("blah", host="john", namespace="root/cimv2")
-        cln4 = CIMClassName("blah", host="fred", namespace="root/cimv3")
-
-        clns_in = [cln1, cln2, cln3, cln4]
-        clns_exp = [cln2, cln1, cln4, cln3]
-
-        sorted_rslt = sort_cimobjects(clns_in)
-
-        self.assertEqual(len(clns_in), len(sorted_rslt))
-        self.assertEqual(sorted_rslt, clns_exp)
-        for obj in sorted_rslt:
-            self.assertEqual(type(obj), CIMClassName)
-
-    def test_sort_class_ref_rtn(self):
-        """
-        Test the return from the class references and class associators
-        commands which is a tuple of CIMCLassName and CIMClass
-        """
-
-        cl1 = (CIMClass(
-            'CIM_Foo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        cl2 = (CIMClass(
-            'CIM_Boo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-        cl3 = (CIMClass(
-            'CID_Boo', properties={'InstanceID':
-                                   CIMProperty('InstanceID', None,
-                                               type='string')}))
-
-        cln1 = CIMClassName("CIM_Foo", host="fred", namespace="root/cimv2")
-        cln2 = CIMClassName("CIM_Boo", host="fred", namespace="root/cimv1")
-        cln3 = CIMClassName("CIM_Boo", host="john", namespace="root/cimv2")
-
-        input_tup = [(cln1, cl1), (cln2, cl2), (cln3, cl3)]
-        sorted_rslt = sort_cimobjects(input_tup)
-        self.assertEqual(len(input_tup), len(sorted_rslt))
-        self.assertEqual(sorted_rslt[0][0], cln2)
-        self.assertEqual(sorted_rslt[1][0], cln1)
-        self.assertEqual(sorted_rslt[2][0], cln3)
-
-    def test_sort_instancenames(self):
-        """Test ability to sort list of instance names"""
-
-        inst_names = []
-
-        kb = {'Chicken': 'Ham', 'Beans': 42}
-        obj = CIMInstanceName('CIM_Foo', kb)
-        inst_names.append(obj)
-
-        kb = {'Chicken': 'Ham', 'Beans': 42}
-        obj = CIMInstanceName('CIM_Boo', kb)
-        inst_names.append(obj)
-
-        kb = {'Chicken': 'Ham', 'Beans': 42}
-        obj = CIMInstanceName('CID_Foo', kb)
-        inst_names.append(obj)
-
-        sorted_rslt = sort_cimobjects(inst_names)
-        self.assertEqual(len(inst_names), len(sorted_rslt))
-        self.assertEqual(sorted_rslt[0].classname, 'CID_Foo')
-        self.assertEqual(sorted_rslt[1].classname, 'CIM_Boo')
-        self.assertEqual(sorted_rslt[2].classname, 'CIM_Foo')
-
-    def test_sort_instances(self):
-        """Test sort of instances"""
-        instances = []
-
-        props = {'Chicken': CIMProperty('Chicken', 'Ham'),
-                 'Number': CIMProperty('Number', Uint32(42))}
-        quals = {'Key': CIMQualifier('Key', True)}
-        path = CIMInstanceName('CIM_Foo', {'Chicken': 'Ham'})
-
-        obj = CIMInstance('CIM_Foo',
-                          properties=props,
-                          qualifiers=quals,
-                          path=path)
-        instances.append(obj)
-        props = {'Chicken': CIMProperty('Chicken', 'Ham'),
-                 'Number': CIMProperty('Number', Uint32(42))}
-        quals = {'Key': CIMQualifier('Key', True)}
-        path = CIMInstanceName('CIM_Boo', {'Chicken': 'Ham'})
-
-        obj = CIMInstance('CIM_Boo',
-                          properties=props,
-                          qualifiers=quals,
-                          path=path)
-        instances.append(obj)
-        instances_sorted = sort_cimobjects(instances)
-        self.assertEqual(len(instances), len(instances_sorted))
-        self.assertEqual(instances_sorted[0].classname, 'CIM_Boo')
-
-    def test_sort_qualifierdecls(self):
-        """Test ability to sort list of qualifier declaractions"""
-
-        qual_decls = []
-
-        obj = CIMQualifierDeclaration('FooQualDecl3', 'uint32')
-        qual_decls.append(obj)
-
-        obj = CIMQualifierDeclaration('FooQualDecl2', 'uint32')
-        qual_decls.append(obj)
-
-        obj = CIMQualifierDeclaration('FooQualDecl1', 'uint32')
-        qual_decls.append(obj)
-
-        sorted_rslt = sort_cimobjects(qual_decls)
-        self.assertEqual(len(qual_decls), len(sorted_rslt))
-        self.assertEqual(sorted_rslt[0].name, 'FooQualDecl1')
-        self.assertEqual(sorted_rslt[1].name, 'FooQualDecl2')
-        self.assertEqual(sorted_rslt[2].name, 'FooQualDecl3')
-
-    def test_sort_stringss(self):
-        """Test ability to sort list of qualifier declaractions"""
-        inputs = ['xyz', 'abc']
-        sorted_rslt = sort_cimobjects(inputs)
-        self.assertEqual(sorted_rslt, ['abc', 'xyz'])
+    # Assert the list of actual vs expected object IDs. This form of assertion
+    # lets pytest show the difference and allows easily recognizing where the
+    # order is incorrect.
+    result_ids = [id(obj) for obj in result_objects]
+    exp_ids = [id(objects[ix]) for ix in exp_indexes]
+    assert result_ids == exp_ids
 
 
 TESTCASES_SPLITARRAYVALUE = [
