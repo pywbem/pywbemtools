@@ -667,7 +667,7 @@ def cmd_connection_select(context, name, options):
                          context.log,
                          context.verbose,
                          context.pdb,
-                         context.deprecation_warnings,
+                         context.warn,
                          context.connections_repo)
 
     # Update the root context making this context the basis for future

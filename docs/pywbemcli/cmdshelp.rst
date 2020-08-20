@@ -114,8 +114,10 @@ Help text for ``pywbemcli``:
                                       [all|paths|summary], default: all. Default: EnvVar PYWBEMCLI_LOG, or all.
 
       -v, --verbose / --no-verbose    Display extra information about the processing.
-      --deprecation-warnings / --no-deprecation-warnings
-                                      Enable deprecation warnings. Default: EnvVar PYWBEMCLI_DEPRECATION_WARNINGS, or true.
+      --warn / --no-warn              Warnings control: True enables display of all Python warnings; False leaves warning
+                                      control to the PYHONWARNINGS env var, which by default displays no warnings. Default:
+                                      False.
+
       -C, --connections-file FILE PATH
                                       Path name of the connections file to be used. Default: EnvVar
                                       PYWBEMCLI_CONNECTIONS_FILE, or ".pywbemcli_connections.yaml" in the user's home

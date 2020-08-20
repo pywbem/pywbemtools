@@ -47,7 +47,7 @@ class ContextObjTests(unittest.TestCase):
         log = 'all'
         verbose = True
         pdb = False
-        deprecation_warnings = False
+        warn = False
         connections_repo = None
 
         ctxobj = ContextObj(
@@ -59,7 +59,7 @@ class ContextObjTests(unittest.TestCase):
             log=log,
             verbose=verbose,
             pdb=pdb,
-            deprecation_warnings=deprecation_warnings,
+            warn=warn,
             connections_repo=connections_repo)
 
         self.assertEqual(ctxobj.pywbem_server, svr)

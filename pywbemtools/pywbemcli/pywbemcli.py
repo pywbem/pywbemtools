@@ -24,6 +24,8 @@ import os
 import sys
 import traceback
 from copy import deepcopy
+import warnings
+from mock import patch
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
@@ -44,7 +46,8 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from ._click_extensions import PywbemcliTopGroup
-from ._utils import deprecation_warning
+from ._utils import formatwarning
+
 
 __all__ = ['cli']
 
@@ -251,12 +254,12 @@ def validate_connections_file(connections_repo):
 @click.option('-v', '--verbose/--no-verbose',
               default=None,
               help=u'Display extra information about the processing.')
-@click.option('--deprecation-warnings/--no-deprecation-warnings', is_flag=True,
-              default=True,
-              envvar=PywbemServer.deprecation_warnings_envvar,
-              help=u'Enable deprecation warnings. '
-              'Default: EnvVar {ev}, or true.'.
-              format(ev=PywbemServer.deprecation_warnings_envvar))
+@click.option('--warn/--no-warn', is_flag=True,
+              default=False,
+              help=u'Warnings control: True enables display of all Python '
+              u'warnings; False leaves warning control to the PYHONWARNINGS '
+              u'env var, which by default displays no warnings. '
+              u'Default: False.')
 @click.option('-C', '--connections-file', metavar='FILE PATH',
               envvar=PywbemServer.connections_file_envvar,
               # Keep help text in sync with connections file definitions in
@@ -281,10 +284,11 @@ def validate_connections_file(connections_repo):
     help=u'Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
+@patch('warnings.formatwarning', formatwarning)
 def cli(ctx, server, connection_name, default_namespace, user, password,
         timeout, verify, certfile, keyfile, ca_certs, output_format, use_pull,
         pull_max_cnt, mock_server, verbose=None, connections_file=None,
-        timestats=None, log=None, pdb=None, deprecation_warnings=None):
+        timestats=None, log=None, pdb=None, warn=None):
     """
     Pywbemcli is a command line WBEM client that uses the DMTF CIM-XML protocol
     to communicate with WBEM servers. Pywbemcli can:
@@ -424,6 +428,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # options with any defaults applied for non None options.
     # Produces new variables resolved... so that later tests can confirm that
     # original variables were None or not None
+
+    if warn:
+        warnings.simplefilter('once')
+    # else: Leave warning control to the PYTHONWARNINGS env var.
+
     pywbem_server = None
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
     resolved_timestats = timestats or DEFAULT_TIMESTATS
@@ -636,8 +645,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             connections_repo = ctx.obj.connections_repo
         if pdb is None:
             pdb = ctx.obj.pdb
-        if deprecation_warnings is None:
-            deprecation_warnings = ctx.obj.deprecation_warnings
+        if warn is None:
+            warn = ctx.obj.warn
 
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
@@ -649,7 +658,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                          resolved_pull_max_cnt or DEFAULT_MAXPULLCNT,
                          resolved_timestats,
                          log, verbose, pdb,
-                         deprecation_warnings,
+                         warn,
                          connections_repo)
     if verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
         print('CONTEXT_OBJ {!r}'.format(ctx.obj))
@@ -659,10 +668,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     _python_nm = sys.version_info[0:2]
     if _python_nm in ((2, 7), (3, 4)):
-        deprecation_warning(
-            "Deprecation: Pywbemcli support for Python {}.{} is deprecated "
-            "and will be removed in a future version".
-            format(_python_nm[0], _python_nm[1]), ctx.obj)
+        warnings.warn(
+            "Pywbemcli support for Python {}.{} is deprecated and will be "
+            "removed in a future version".
+            format(_python_nm[0], _python_nm[1]),
+            DeprecationWarning)
 
     # Invoke command if one exists.
     if ctx.invoked_subcommand is None:
