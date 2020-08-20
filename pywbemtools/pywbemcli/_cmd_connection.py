@@ -401,10 +401,10 @@ def get_current_connection_name(context):
 
 def raise_no_repository_file(connections):
     """
-    Raise exception with message that repo is empty.
+    Raise exception with message that connections file does not exist.
     """
     raise click.ClickException(
-        'Connection repository {} does not exist'.
+        'Connections file "{0}" does not exist'.
         format(connections.connections_file))
 
 
@@ -423,8 +423,8 @@ def select_connection(name, context, connections):
         if name in connections:
             return name
         raise click.ClickException(
-            'Connection name "{}" does not exist in connections file: {}'
-            .format(name, connections.connections_file))
+            'Connection definition "{0}" not found in connections file "{1}"'.
+            format(name, connections.connections_file))
 
     conn_names = sorted(list(six.iterkeys(connections)))
     return pick_one_from_list(context, conn_names,
@@ -569,8 +569,8 @@ def cmd_connection_show(context, name, options):
         # If name in connections use it
         if name not in connections_repo:
             raise click.ClickException(
-                'Connection name: "{0}" does not exist in connections '
-                'file: "{1}"'.format(name, connections_repo.connections_file))
+                'Connection definition "{0}" not found in connections file '
+                '"{1}"'.format(name, connections_repo.connections_file))
         connection = connections_repo[name]
     else:   # not connections file
         if curr_name != name:

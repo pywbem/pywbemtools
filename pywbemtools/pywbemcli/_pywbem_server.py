@@ -129,6 +129,10 @@ class PywbemServer(object):
         Create  a PywbemServer object. This contains the configuration
         and operation information to create a connection to the server
         and execute cim_operations on the server.
+
+        Raises:
+          TypeError: Type error in some input parameter.
+          ValueError: Value error in some input parameter.
         """
 
         if server and mock_server:
@@ -463,8 +467,13 @@ class PywbemServer(object):
 
     @staticmethod
     def create(replace_underscores=False, **kwargs):
-        """Create PywbemServer object from kwargs. If replace_underscore is
+        """
+        Create PywbemServer object from kwargs. If replace_underscore is
         True, replace any -  in names with _
+
+        Raises:
+          TypeError: Type error in some input parameter.
+          ValueError: Value error in some input parameter.
         """
         kwargsout = {}
         if replace_underscores:

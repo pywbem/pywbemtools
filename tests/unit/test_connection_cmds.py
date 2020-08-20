@@ -240,10 +240,10 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command delete, empty repo fails.',
+    ['Verify connection command delete, empty conn file fails.',
      {'general': [],
       'args': ['delete', 'blah']},
-     {'stderr': ["Connection repository", "does not exist"],
+     {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -403,8 +403,9 @@ ca-certs
     ['Verify connection command show test2, masked password',
      {'general': [],
       'args': ['show', 'BADSERVERNAME']},
-     {'stderr': ["Connection name", 'BADSERVERNAME',
-                 'does not exist in connections file:'],
+     {'stderr': ['Connection definition',
+                 'BADSERVERNAME',
+                 'not found in connections file'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -443,7 +444,9 @@ ca-certs
     ['Verify connection command select test3 fails',
      {'general': [],
       'args': ['select', 'test9']},
-     {'stderr': ['Connection name "test9" does not exist'],
+     {'stderr': ['Connection definition',
+                 'test9',
+                 'not found in connections file'],
       'rc': 1,
       'test': 'regex'},
      None, OK],
@@ -688,9 +691,9 @@ ca-certs
     #  delete with no repository
     #
 
-    # Begin of sequence - repository is empty.
+    # Begin of sequence - connections file does not exist.
 
-    ['Verify connection command show with name not in empty repo',
+    ['Verify connection command show with name, non-existing conn file',
      {'general': [],
       'args': ['show', 'blah']},
      {'stderr': ['Name', 'blah', 'not current and no connections file',
@@ -700,7 +703,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command show with no name empty repo',
+    ['Verify connection command show with no name, non-existing conn file',
      {'general': [],
       'args': ['show']},
      {'stderr': ['No current connection and no connections file'],
@@ -709,42 +712,42 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command select, empty repo fails',
+    ['Verify connection command select, non-existing conn file',
      {'general': [],
       'args': ['select']},
-     {'stderr': ["Connection repository", "does not exist"],
+     {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command select blah, empty repo fails',
+    ['Verify connection command select blah, non-existing conn file',
      {'general': [],
       'args': ['select', 'blah']},
-     {'stderr': ["Connection repository", "does not exist"],
+     {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command delete, empty repo fails',
+    ['Verify connection command delete, non-existing conn file',
      ['delete'],
-     {'stderr': ["Connection repository", "does not exist"],
+     {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command delete, empty repo fails',
+    ['Verify connection command delete, non-existing conn file',
      {'general': [],
       'args': ['delete', 'blah']},
-     {'stderr': ["Connection repository", "does not exist"],
+     {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    # End of sequence - repository is empty.
+    # End of sequence - connections file does not exist.
 
     #
     #  Sequence that verifies create and save mock connection
@@ -1244,7 +1247,7 @@ YAML_NO_CONNECTIONS_KEY = u"""tst1:
 default_connection_name: null
 """
 
-YAML_BAD_NAME = u"""connection_definitions:
+YAML_BAD_ATTRIBUTE_NAME = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -1262,7 +1265,7 @@ YAML_BAD_NAME = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_BAD_GROUP_NAME = u"""connection_definitions:
+YAML_BAD_DEFAULT_NAME = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -1326,20 +1329,20 @@ TEST_CASES_ERROR = [
       'yaml': YAML_NO_CONNECTIONS_KEY},
      {'stderr': ['ConnectionsFileLoadError',
                  'tst_connection_cmds.yaml',
-                 'Missing YAML key name:',
+                 'Missing YAML property',
                  'connection_definitions',
                  'Aborted'],
       'rc': 1,
       'test': 'innows', },
      None, OK],
 
-    ['Verify YAML with bad pywbem server element name fails',
+    ['Verify YAML with bad default_connection_name fails',
      {'args': ['show'],
       'general': [],
-      'yaml': YAML_BAD_GROUP_NAME},
+      'yaml': YAML_BAD_DEFAULT_NAME},
      {'stderr': ['ConnectionsFileLoadError',
                  'tst_connection_cmds.yaml',
-                 'Invalid type of item in connection definition',
+                 'Invalid attribute type in connection definition',
                  'tst1',
                  'timeoutx',
                  'Aborted'],
@@ -1348,13 +1351,13 @@ TEST_CASES_ERROR = [
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify YAML with bad group name fails',
+    ['Verify YAML with bad attribute name in definition fails',
      {'args': ['show'],
       'general': [],
-      'yaml': YAML_BAD_NAME},
+      'yaml': YAML_BAD_ATTRIBUTE_NAME},
      {'stderr': ['ConnectionsFileLoadError',
                  'tst_connection_cmds.yaml',
-                 'Invalid type of item in connection definition',
+                 'Invalid attribute type in connection definition',
                  'tst1',
                  'unexpected keyword argument',
                  'timeoutx',
