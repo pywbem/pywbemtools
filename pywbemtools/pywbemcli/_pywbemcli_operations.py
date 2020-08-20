@@ -339,8 +339,9 @@ class BuildRepositoryMixin(object):
                     raise click.Abort()
             else:
                 assert ext == '.py'  # already checked
+                # May raise OSError,IOError:
                 with open(file_path) as fp:
-                    # May raise IOError
+                    # May raise OSError,IOError:
                     file_source = fp.read()
                     # the exec includes CONN and VERBOSE
                     globalparams = {'CONN': conn,

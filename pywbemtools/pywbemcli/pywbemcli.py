@@ -421,9 +421,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
                 if connection_name not in connections_repo:
                     raise click.ClickException(
-                        'Connection name: "{}" not found in connections file: '
-                        '"{}"'.format(connection_name,
-                                      connections_repo.connections_file))
+                        'Connection definition "{}" not found in connections '
+                        'file "{}"'.
+                        format(connection_name,
+                               connections_repo.connections_file))
 
             # No connection name specified, try default connection name
             else:
@@ -589,7 +590,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 pywbem_server = connections_repo[connection_name]
             except KeyError:
                 raise click.ClickException(
-                    "Connection name '{}' not found in connections file '{}'".
+                    'Connection definition "{}" not found in connections '
+                    'file "{}"'.
                     format(connection_name, connections_repo.connections_file))
             except ConnectionsFileError as cfe:
                 click.echo('Fatal error: {0}: {1}'.

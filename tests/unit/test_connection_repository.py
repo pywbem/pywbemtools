@@ -23,6 +23,7 @@ errors in the data.
 
 from __future__ import absolute_import, print_function
 
+import sys
 import os
 from mock import patch
 import pytest
@@ -30,14 +31,21 @@ import pytest
 from tests.unit.pytest_extensions import simplified_test_function
 
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
-    ConnectionsFileError, ConnectionsFileWriteError
+    ConnectionsFileLoadError, ConnectionsFileWriteError, \
+    B08_DEFAULT_CONNECTIONS_FILE, DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
+
+# Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
+# the pytest capsys fixture is used. That happens only on Windows.
+# See Click issue https://github.com/pallets/click/issues/1590. This
+# run condition skips the testcases on Windows.
+CLICK_ISSUE_1590 = sys.platform == 'win32'
 
 SCRIPT_DIR = os.path.dirname(__file__)
 CONNECTION_REPO_TEST_FILE_PATH = os.path.join(SCRIPT_DIR,
                                               'tst_connection_repository.yaml')
 
-TST_YAML_GOOD = u"""connection_definitions:
+YAML_GOOD_TWO_DEFS = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -69,7 +77,11 @@ TST_YAML_GOOD = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_NO_DEFAULT = u"""connection_definitions:
+YAML_GOOD_NO_DEF = u"""connection_definitions: {}
+default_connection_name: null
+"""
+
+YAML_MISSING_DEFAULT = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -86,7 +98,7 @@ YAML_NO_DEFAULT = u"""connection_definitions:
         mock-server: []
 """
 
-YAML_NO_DEFS = u"""tst1:
+YAML_MISSING_CONNDEFS = u"""tst1:
         name: tst1
         server: http://blah
         user: fred
@@ -103,7 +115,7 @@ YAML_NO_DEFS = u"""tst1:
 default_connection_name: null
 """
 
-YAML_BAD_NAME = u"""connection_definitions:
+YAML_INVALID_ATTR_NAME = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -121,31 +133,31 @@ YAML_BAD_NAME = u"""connection_definitions:
 default_connection_name: null
 """
 
-INVALIDYAMLFILE = u"""connection_definitions:;
-    tst1:
-        name: tst1
+YAML_INVALID_SYNTAX = u"""connection_definitions:
+    *+&%:
 default_connection_name: null
 """
 
-INVALID_ITEM_VALUE = u"""connection_definitions:;
+YAML_INVALID_MOCKSERVER_TYPE = u"""connection_definitions:
     tst1:
         name: tst1
-        mock-server: ['blah']
+        mock-server: 42
 default_connection_name: null
 """
 
-INVALID_ITEM_VALUE_TYPE = u"""connection_definitions:;
-    tst1:
-        name: tst1
-        mock-server: 'blah'
-default_connection_name: null
-"""
-
-INVALID_TIMEOUT_VALUE = u"""connection_definitions:;
+YAML_INVALID_TIMEOUT_VALUE = u"""connection_definitions:
     tst1:
         name: tst1
         server: http://blah
         timeout: -100
+default_connection_name: null
+"""
+
+YAML_SERVER_AND_MOCKSERVER = u"""connection_definitions:
+    tst1:
+        name: tst1
+        server: http://blah
+        mock-server: 'blah'
 default_connection_name: null
 """
 
@@ -159,13 +171,85 @@ def remove_file_before_after():
     """
     Remove the connections file at beginning and end of test.
     """
-    if os.path.isfile(CONNECTION_REPO_TEST_FILE_PATH):
-        os.remove(CONNECTION_REPO_TEST_FILE_PATH)
+    file = CONNECTION_REPO_TEST_FILE_PATH
+    if os.path.isfile(file):
+        os.remove(file)
+    file = CONNECTION_REPO_TEST_FILE_PATH + '.bak'
+    if os.path.isfile(file):
+        os.remove(file)
+    file = CONNECTION_REPO_TEST_FILE_PATH + '.tmp'
+    if os.path.isfile(file):
+        os.remove(file)
     # The yield causes the remainder of this fixture to be executed at the
     # end of the test.
     yield
-    if os.path.isfile(CONNECTION_REPO_TEST_FILE_PATH):
-        os.remove(CONNECTION_REPO_TEST_FILE_PATH)
+    file = CONNECTION_REPO_TEST_FILE_PATH
+    if os.path.isfile(file):
+        os.remove(file)
+    file = CONNECTION_REPO_TEST_FILE_PATH + '.bak'
+    if os.path.isfile(file):
+        os.remove(file)
+    file = CONNECTION_REPO_TEST_FILE_PATH + '.tmp'
+    if os.path.isfile(file):
+        os.remove(file)
+
+
+# The real functions before they get patched
+REAL_OS_RENAME = os.rename
+# pylint: disable=protected-access
+REAL_OPEN_FILE = ConnectionRepository._open_file
+
+
+def rename_to_bak_fails(file1, file2):
+    """
+    Patch function replacing os.rename() that raises OSError when the target
+    file ends with '.bak'.
+    """
+    if file2.endswith('.bak'):
+        raise OSError("Mocked failure: Cannot rename {} to {}".
+                      format(file1, file2))
+    REAL_OS_RENAME(file1, file2)
+
+
+def rename_from_tmp_fails(file1, file2):
+    """
+    Patch function replacing os.rename() that raises OSError when the source
+    file ends with '.tmp'.
+    """
+    if file1.endswith('.tmp'):
+        raise OSError("Mocked failure: Cannot rename {} to {}".
+                      format(file1, file2))
+    REAL_OS_RENAME(file1, file2)
+
+
+def rename_fails(file1, file2):
+    """
+    Patch function replacing os.rename() that raises OSError.
+    """
+    raise OSError("Mocked failure: Cannot rename {} to {}".
+                  format(file1, file2))
+
+
+def open_file_write_fails(self, filename, file_mode):
+    """
+    Patch function replacing ConnectionRepository._open_file() that raises
+    OSError when the file is opened in write mode.
+    """
+    if 'w' in file_mode:
+        raise OSError("Mocked failure: Cannot open {} in mode {}".
+                      format(filename, file_mode))
+    return self.REAL_OPEN_FILE(filename, file_mode)
+
+
+def open_file_read_fails(self, filename, file_mode):
+    """
+    Patch function replacing ConnectionRepository._open_file() that raises
+    OSError when the file is opened in read mode.
+    """
+    if 'r' in file_mode:
+        raise OSError("Mocked failure: Cannot open {} in mode {}".
+                      format(filename, file_mode))
+    return self.REAL_OPEN_FILE(filename, file_mode)
 
 
 # Testcases for create ConnectionRepository
@@ -185,7 +269,20 @@ def remove_file_before_after():
 
 TESTCASES_CREATE_CONNECTION_REPOSITORY = [
     (
-        "Verify Creation of good repo with one server",
+        "Verify creation of good repo with no conn def, no default",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[],
+            default=None,
+            exp_rtn=dict(
+                keys=[],
+                default=None
+            ),
+        ),
+        None, None, OK,
+    ),
+    (
+        "Verify creation of good repo with 1 conn def, no default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1")],
@@ -198,7 +295,20 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
         None, None, OK,
     ),
     (
-        "Verify Creation of good repo with 2 servers, no default",
+        "Verify creation of good repo with 1 conn def and 1st as default",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[PywbemServer('http://blah', name="tst1")],
+            default='tst1',
+            exp_rtn=dict(
+                keys=['tst1'],
+                default='tst1'
+            ),
+        ),
+        None, None, OK,
+    ),
+    (
+        "Verify creation of good repo with 2 conn defs, no default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1"),
@@ -212,7 +322,7 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
         None, None, OK,
     ),
     (
-        "Verify Creation of good repo with multiple servers and default",
+        "Verify creation of good repo with 2 conn defs and 1st as default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1"),
@@ -226,22 +336,7 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
         None, None, OK,
     ),
     (
-        "Verify Creation of good repo with multiple servers and 1st as default",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://blah', name="tst1"),
-                  PywbemServer('http://blah2', name="tst2")],
-            default='tst1',
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default='tst1'
-            ),
-        ),
-        None, None, OK,
-    ),
-
-    (
-        "Verify Creation of good repo with multiple servers and 2nd as default",
+        "Verify creation of good repo with 2 conn defs and 2nd as default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1"),
@@ -254,36 +349,39 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
         ),
         None, None, OK,
     ),
-
     (
-        "Verify Creation of good repo with one server but set-default fails",
+        "Verify creation of good repo with no conn def, but setting "
+        "non-existing as default (fails)",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[],
+            default='non_existing',
+            exp_rtn=None
+        ),
+        KeyError, None, OK,
+    ),
+    (
+        "Verify creation of good repo with 1 conn def, but setting "
+        "non-existing as default (fails)",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1")],
-            default='tst2',
-            exp_rtn=dict(
-                keys=['tst1'],
-                default='tst2'
-            ),
+            default='non_existing',
+            exp_rtn=None
         ),
-        ValueError, None, OK,
+        KeyError, None, OK,
     ),
-
     (
-        "Verify Creation of good repo with multiple servers and set-default in"
-        "error. The error is fixed. Note we cannot test the fix because of "
-        "exception.",
+        "Verify creation of good repo with 2 conn defs, but setting "
+        "non-existing as default (fails).",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1"),
                   PywbemServer('http://blah2', name="tst2")],
-            default='tst3',
-            exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default=None
-            ),
+            default='non_existing',
+            exp_rtn=None
         ),
-        ValueError, None, OK,
+        KeyError, None, OK,
     ),
 ]
 
@@ -294,48 +392,85 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
     TESTCASES_CREATE_CONNECTION_REPOSITORY)
 @simplified_test_function
 def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
+    """
+    Test the creation, adding and setting a default for the connection
+    repository, with good data and errors.
+    """
 
-    """
-    Test the creation, loading and save of the connection repository with
-    good data and errors
-    """
+    # The code to be tested
     repo = ConnectionRepository(file)
     for svr in svrs:
         repo.add(svr)
-
     repo.default_connection_name = default
-    repo_default = repo.default_connection_name
 
+    # Since we want to test the creation, addition and default setting, any
+    # expected exceptions must have already been raised, thus if we get to
+    # here, no exception was expected. Verify that.
     assert testcase.exp_exc_types is None
 
-    assert repo_default == exp_rtn['default']
-
-    # Test what is in file by opening second connection to load file
+    # Test what is in file by opening second connection to load same file
     repo_2 = ConnectionRepository(file)
     assert sorted(repo_2.keys()) == sorted(exp_rtn['keys'])
-    assert sorted(repo_2.keys()) == sorted(repo.keys())
-    assert repo.default_connection_name == repo_2.default_connection_name
-
     assert repo_2.default_connection_name == exp_rtn['default']
 
-    # validate basic values in __str__ and __repr__
-    assert file in str(repo_2)
-    assert file in repr(repo_2)
-    for key in repo_2.keys():
-        assert "{}:".format(key) in repr(repo_2)
+    # validate the file name
+    conn_file = repo.connections_file
+    assert conn_file == file
 
+    # validate the default connection
+    repo_default = repo.default_connection_name
+    assert repo_default == exp_rtn['default']
+
+    # validate basic values in __str__()
+    str_repo = str(repo)
+    assert file in str_repo
+
+    # validate basic values in __repr__()
+    repr_repo = repr(repo)
+    assert repr(file) in repr_repo
+    for key in exp_rtn['keys']:
+        assert "{!r}:".format(key) in repr_repo
+
+    # validate __len__()
+    len_repo = len(repo)
+    assert len_repo == len(exp_rtn['keys'])
+
+    # validate __contains__()
+    for key in exp_rtn['keys']:
+        assert key in repo
+
+    # validate __iter__()
     rtn_keys = []
-    rtn_svrs = []
-    for name, svr in repo.items():
+    for name in repo:
         rtn_keys.append(name)
-        rtn_svrs.append(svr)
+    assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
 
-    assert len(rtn_keys) == len(exp_rtn['keys'])
-    assert len(repo) == len(rtn_keys)
-    assert len(repo) == len(rtn_svrs)
+    # validate iterkeys()
+    rtn_keys = []
+    for name in repo.iterkeys():
+        rtn_keys.append(name)
+    assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
+
+    # validate iteritems()
+    rtn_keys = []
+    for name, _ in repo.iteritems():
+        rtn_keys.append(name)
+    assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
+
+    # validate keys()
+    rtn_keys = []
+    for name in repo.keys():
+        rtn_keys.append(name)
+    assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
+
+    # validate items()
+    rtn_keys = []
+    for name, _ in repo.items():
+        rtn_keys.append(name)
+    assert sorted(rtn_keys) == sorted(exp_rtn['keys'])
 
 
-# Testcases for create ConnectionRepository
+# Testcases for connection file load errors
 #       Each list item is a testcase tuple with these items:
 #       * desc: Short testcase description.
 #       * kwargs: Keyword arguments for the test function:
@@ -348,12 +483,12 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
 #       * exp_rtn: Expected warning type(s), or None.
 #       * condition: Boolean condition for testcase to run, 'pdb' for debugger
 
-TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
+TESTCASES_CONNECTION_FILE_LOAD_ERROR = [
     (
-        "Verify Creation of good repo with one server",
+        "Verify good file with 2 conn defs and no default set",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=TST_YAML_GOOD,
+            yaml=YAML_GOOD_TWO_DEFS,
             exp_rtn=dict(
                 keys=['tst1', 'tst2'],
                 default=None
@@ -362,80 +497,76 @@ TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
         None, None, OK,
     ),
     (
-        "Verify load fails when no default section",
+        "Verify load fails when file misses top-level property for default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_NO_DEFAULT,
-            exp_rtn=dict(),
+            yaml=YAML_MISSING_DEFAULT,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
     (
-        "Verify load fails when no connection section",
+        "Verify load fails when file misses top-level property for conn defs",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_NO_DEFS,
-            exp_rtn=dict(),
+            yaml=YAML_MISSING_CONNDEFS,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
     (
-        "Verify load fails when file empty",
+        "Verify load fails when file is completely empty",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             yaml=u'',
-            exp_rtn=dict(),
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
-    ),
-
-    (
-        "Verify load fails when unknown element in file.",
-        dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_BAD_NAME,
-            exp_rtn=dict(),
-        ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
     (
-        "Verify load fails YAML syntax invalid",
+        "Verify load fails when a conn def attribute has unknown name",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=INVALIDYAMLFILE,
-            exp_rtn=dict(),
+            yaml=YAML_INVALID_ATTR_NAME,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
-
     (
-        "Verify load fails invalid type on key value",
+        "Verify load fails when YAML syntax is invalid",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=INVALID_ITEM_VALUE,
-            exp_rtn=dict(),
+            yaml=YAML_INVALID_SYNTAX,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
-
     (
-        "Verify load fails invalid type on key value",
+        "Verify load fails when conn def mock-server attr has invalid type",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=INVALID_ITEM_VALUE_TYPE,
-            exp_rtn=dict(),
+            yaml=YAML_INVALID_MOCKSERVER_TYPE,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
     ),
-
     (
-        "Verify load fails invalid value of timeout (negative integer)",
+        "Verify load fails when conn def timeout attr has invalid value",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=INVALID_TIMEOUT_VALUE,
-            exp_rtn=dict(),
+            yaml=YAML_INVALID_TIMEOUT_VALUE,
+            exp_rtn=None,
         ),
-        ConnectionsFileError, None, OK,
+        ConnectionsFileLoadError, None, OK,
+    ),
+    (
+        "Verify load fails when conn def has both server and mock-server",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml=YAML_SERVER_AND_MOCKSERVER,
+            exp_rtn=None,
+        ),
+        ConnectionsFileLoadError, None, OK,
     ),
 ]
 
@@ -443,9 +574,9 @@ TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
 @pytest.mark.usefixtures("remove_file_before_after")
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_CONNECTION_REPOSITORY_ERRORS)
+    TESTCASES_CONNECTION_FILE_LOAD_ERROR)
 @simplified_test_function
-def test_connection_repository_errors(testcase, file, yaml, exp_rtn):
+def test_connection_file_load_error(testcase, file, yaml, exp_rtn):
     """
     Test the loading of a YAML file that has errors to confirm the
     exceptions generated.
@@ -455,8 +586,10 @@ def test_connection_repository_errors(testcase, file, yaml, exp_rtn):
     repo_file.write(yaml)
     repo_file.close()
 
+    # This does not load the file yet, so it succeeds even for a bad file
     repo = ConnectionRepository(file)
-    # attempt to use file
+
+    # This loads the file and will raise any exceptions during loading
     repo_keys = repo.keys()
 
     assert testcase.exp_exc_types is None
@@ -486,7 +619,7 @@ TESTCASES_CONNECTION_REPOSITORY_ADD = [
         "Verify add with existing name replaces the existing name",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=TST_YAML_GOOD,
+            yaml=YAML_GOOD_TWO_DEFS,
             svrs=[PywbemServer('http://args', name="tst1")],
             default=None,
             exp_rtn=dict(
@@ -500,7 +633,7 @@ TESTCASES_CONNECTION_REPOSITORY_ADD = [
         "Verify add with new name adds the new name",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=TST_YAML_GOOD,
+            yaml=YAML_GOOD_TWO_DEFS,
             svrs=[PywbemServer('http://args', name="tst3")],
             default=None,
             exp_rtn=dict(
@@ -511,20 +644,35 @@ TESTCASES_CONNECTION_REPOSITORY_ADD = [
         None, None, OK,
     ),
     (
-        "Verify load fails when file completly empty but exists. Add fails",
+        "Verify add works to file that has 0 connections",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=YAML_BAD_NAME,
+            yaml=YAML_GOOD_NO_DEF,
             svrs=[PywbemServer('http://blah', name="tst1")],
             default=None,
             exp_rtn=dict(
-                keys=['tst1', 'tst2'],
-                default=None),
+                keys=['tst1'],
+                default=None
+            ),
         ),
-        ConnectionsFileError, None, OK,
+        None, None, OK,
     ),
     (
-        "Add to non-existent server file works",
+        "Verify add works to completely empty file that exists",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml="",
+            svrs=[PywbemServer('http://blah', name="tst1")],
+            default=None,
+            exp_rtn=dict(
+                keys=['tst1'],
+                default=None
+            ),
+        ),
+        None, None, OK,
+    ),
+    (
+        "Verify add works to non-existent file",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             yaml=None,
@@ -569,34 +717,167 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
     for svr in svrs:
         assert repo[svr.name].server == svr.server
 
-# Testcases ConnectionRepository write method
+
+# Testcases for delete from ConnectionRepository
 #       Each list item is a testcase tuple with these items:
 #       * desc: Short testcase description.
 #       * kwargs: Keyword arguments for the test function:
 #           * file: test file path. File to test built into this file path
 #           * svrs: Servers to add to the repository
 #           * default: Default to set
+#           * del_svr: Name of server to be deleted
+#           * exp_rtn: Expected return value of _format_instances_as_rows().
+#             * keys: keys expected in file
+#             * default: Value for default server to test to test
 #       * exp_exc_types: Expected exception type(s), or None.
 #       * exp_rtn: Expected warning type(s), or None.
 #       * condition: Boolean condition for testcase to run, 'pdb' for debugger
 
-
-TESTCASES_CONNECTION_REPOSITORY_WRITE = [
+TESTCASES_CONNECTION_REPOSITORY_DELETE = [
     (
-        "Verify connection file write fail with mock",
+        "Verify deletion of existing conn in repo with 1 conn and no default",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://args', name="tst1")],
-            failure="openfile"
+            default=None,
+            del_svr='tst1',
+            exp_rtn=dict(
+                keys=[],
+                default=None
+            ),
+        ),
+        None, None, OK,
+    ),
+    (
+        "Verify deletion of existing conn in repo with 1 conn and default set",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[PywbemServer('http://args', name="tst1")],
+            default='tst1',
+            del_svr='tst1',
+            exp_rtn=dict(
+                keys=[],
+                default=None
+            ),
+        ),
+        None, None, OK,
+    ),
+]
+
+
+@pytest.mark.usefixtures("remove_file_before_after")
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CONNECTION_REPOSITORY_DELETE)
+@simplified_test_function
+def test_connection_repository_delete(
+        testcase, file, svrs, default, del_svr, exp_rtn):
+    """
+    Test the deletion of conn defs from the connection repository.
+    """
+
+    repo = ConnectionRepository(file)
+    for svr in svrs:
+        repo.add(svr)
+    repo.default_connection_name = default
+
+    # The code to be tested
+    repo.delete(del_svr)
+
+    assert testcase.exp_exc_types is None
+
+    # Validate repo after successful deletion
+    assert sorted(repo.keys()) == sorted(exp_rtn['keys'])
+    assert repo.default_connection_name == exp_rtn['default']
+
+
+# Testcases connection file load errors (mocked)
+#       Each list item is a testcase tuple with these items:
+#       * desc: Short testcase description.
+#       * kwargs: Keyword arguments for the test function:
+#           * orig_func_str: String with pkg.name of original function
+#           * patch_func: Patch function replacing original function
+#       * exp_exc_types: Expected exception type(s), or None.
+#       * exp_rtn: Expected warning type(s), or None.
+#       * condition: Boolean condition for testcase to run, 'pdb' for debugger
+
+TESTCASES_CONNECTION_FILE_LOAD_ERROR_M = [
+    (
+        "Verify connection file open for writing fails",
+        dict(
+            orig_func_str='pywbemtools.pywbemcli.ConnectionRepository.'
+            '_open_file',
+            patch_func=open_file_read_fails,
+        ),
+        ConnectionsFileLoadError, None, OK,
+    ),
+]
+
+
+@pytest.mark.usefixtures("remove_file_before_after")
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CONNECTION_FILE_LOAD_ERROR_M)
+@simplified_test_function
+def test_connection_file_load_error_m(
+        testcase, orig_func_str, patch_func):
+    """
+    Test the loading of a connections file with patched functions injecting
+    errors.
+    """
+
+    # Create the connections file
+    repo = ConnectionRepository(CONNECTION_REPO_TEST_FILE_PATH)
+    repo.add(PywbemServer('http://args', name="tst1"))
+
+    # The second repo has not loaded the file yet
+    repo2 = ConnectionRepository(CONNECTION_REPO_TEST_FILE_PATH)
+
+    with patch(orig_func_str, patch_func):
+
+        # The code to be tested.
+        # This triggers the loading of the file.
+        repo2.keys()
+
+    assert testcase.exp_exc_types is None
+
+
+# Testcases connection file write errors (mocked)
+#       Each list item is a testcase tuple with these items:
+#       * desc: Short testcase description.
+#       * kwargs: Keyword arguments for the test function:
+#           * orig_func_str: String with pkg.name of original function
+#           * patch_func: Patch function replacing original function
+#       * exp_exc_types: Expected exception type(s), or None.
+#       * exp_rtn: Expected warning type(s), or None.
+#       * condition: Boolean condition for testcase to run, 'pdb' for debugger
+
+TESTCASES_CONNECTION_FILE_WRITE_ERROR = [
+    (
+        "Verify connection file open for writing fails",
+        dict(
+            create_file=False,
+            orig_func_str='pywbemtools.pywbemcli.ConnectionRepository.'
+            '_open_file',
+            patch_func=open_file_write_fails,
         ),
         ConnectionsFileWriteError, None, OK,
     ),
     (
-        "Verify connection file rename failure",
+        "Verify connection file rename to .bak fails",
         dict(
-            file=CONNECTION_REPO_TEST_FILE_PATH,
-            svrs=[PywbemServer('http://args', name="tst1")],
-            failure="rename"
+            create_file=True,
+            orig_func_str='os.rename',
+            patch_func=rename_to_bak_fails,
+        ),
+        ConnectionsFileWriteError, None, OK,
+    ),
+    (
+        "Verify connection file rename from .tmp fails",
+        dict(
+            create_file=False,
+            orig_func_str='os.rename',
+            patch_func=rename_from_tmp_fails,
         ),
         ConnectionsFileWriteError, None, OK,
     ),
@@ -606,32 +887,120 @@ TESTCASES_CONNECTION_REPOSITORY_WRITE = [
 @pytest.mark.usefixtures("remove_file_before_after")
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_CONNECTION_REPOSITORY_WRITE)
+    TESTCASES_CONNECTION_FILE_WRITE_ERROR)
 @simplified_test_function
-def test_connection_repository_write_error(testcase, file, svrs, failure):
+def test_connection_file_write_error(
+        testcase, create_file, orig_func_str, patch_func):
     """
-    Test the loading of a YAML file that has errors to confirm the
-    exceptions generated.
+    Test the writing of a connections file with patched functions injecting
+    errors.
     """
-    @patch('pywbemtools.pywbemcli.ConnectionRepository._open_file')
-    def mock_fail_open_file(connections_file, mock_write):
-        mock_write.side_effect = IOError("foo")
-        repo = ConnectionRepository(connections_file)
-        for svr in svrs:
-            repo.add(svr)
 
-    @patch('os.rename')
-    def mock_fail_rename_file(connections_file, mock_rename):
-        mock_rename.side_effect = OSError("foo")
-        repo = ConnectionRepository(connections_file)
-        for svr in svrs:
-            repo.add(svr)
+    # Create a repo, but do not load or create the file yet, so it still does
+    # not exist at this point.
+    repo = ConnectionRepository(CONNECTION_REPO_TEST_FILE_PATH)
+    svr1 = PywbemServer('http://args', name="tst1")
+    svr2 = PywbemServer('http://args', name="tst2")
 
-    if failure == 'openfile':
-        mock_fail_open_file(file)  # pylint: disable=no-value-for-parameter
-    elif failure == 'rename':
-        mock_fail_rename_file(file)  # pylint: disable=no-value-for-parameter
-    else:
-        assert False, "Invalid failure attribute in test"
+    if create_file:
+        repo.add(svr1)
+
+    with patch(orig_func_str, patch_func):
+
+        # The code to be tested.
+        # This triggers the file to be written.
+        repo.add(svr2)
 
     assert testcase.exp_exc_types is None
+
+
+# Testcases for connection file migration
+#       Each list item is a testcase tuple with these items:
+#       * desc: Short testcase description.
+#       * failure: Type of failure to set up for.
+#       * exp_exc_type: Expected exception type, or None.
+
+TESTCASES_CONNECTION_FILE_MIGRATION = [
+    (
+        "Verify successful migration of old file",
+        "none",
+        None,
+    ),
+    (
+        "Verify migration of old file that fails during rename (mocked)",
+        "rename",
+        ConnectionsFileLoadError,
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, failure, exp_exc_type",
+    TESTCASES_CONNECTION_FILE_MIGRATION)
+def test_connection_file_migration(desc, failure, exp_exc_type, capsys):
+    # pylint: disable=unused-argument
+    """
+    Test the migration of an old connections file.
+    """
+
+    # A possibly existing user-owned default connections file has already been
+    # by fixture set_connections_file, so in theory, we can be sure it does not
+    # exist. In case other testcases leave the file as garbage, we still make
+    # sure it does not exist.
+    if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
+        os.remove(DEFAULT_CONNECTIONS_FILE)
+
+    # Create the old default connections file.
+    repo_old = ConnectionRepository(B08_DEFAULT_CONNECTIONS_FILE)
+    repo_old.add(PywbemServer('http://args', name="tst1"))
+    assert os.path.isfile(B08_DEFAULT_CONNECTIONS_FILE)
+
+    # Create a repo that uses the new default connections file, but do not
+    # load or create the file yet, so it still does not exist at this point.
+    repo = ConnectionRepository(DEFAULT_CONNECTIONS_FILE)
+    assert not os.path.isfile(DEFAULT_CONNECTIONS_FILE)
+
+    try:
+
+        if failure == 'none':
+            if CLICK_ISSUE_1590:
+                pytest.skip("Condition for test case not met")
+
+            # The code to be tested.
+            # This triggers a load of the file which performs the migration.
+            # We expect a successful migration.
+            repo.keys()
+
+            captured = capsys.readouterr()
+            assert "Migrated old connections file" in captured.out
+
+        else:
+            assert failure == 'rename'
+            with patch('os.rename', rename_fails):
+                with pytest.raises(exp_exc_type):
+
+                    # The code to be tested.
+                    # This triggers a load which performs the migration.
+                    # We expect an exception.
+                    repo.keys()
+
+    finally:
+
+        # verify that the patching has been undone
+        assert id(os.rename) == id(REAL_OS_RENAME)
+
+        # Cleanup the old default connections file and its backup and temps.
+        file = B08_DEFAULT_CONNECTIONS_FILE
+        if os.path.isfile(file):
+            os.remove(file)
+        file = B08_DEFAULT_CONNECTIONS_FILE + '.bak'
+        if os.path.isfile(file):
+            os.remove(file)
+        file = B08_DEFAULT_CONNECTIONS_FILE + '.tmp'
+        if os.path.isfile(file):
+            os.remove(file)
+        assert not os.path.isfile(B08_DEFAULT_CONNECTIONS_FILE)
+
+        # A successful migration leaves a default connections file. Clean it up.
+        if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
+            os.remove(DEFAULT_CONNECTIONS_FILE)
