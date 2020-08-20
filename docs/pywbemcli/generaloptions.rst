@@ -198,8 +198,7 @@ Other miscellaneous general options
 The :ref:`--verbose general option` displays extra information about the
 pywbemcli internal processing.
 
-The :ref:`--deprecation-warnings general option` controls the display of
-deprecation warnings.
+The :ref:`--warn general option` controls the display of warnings.
 
 The :ref:`--version general option` displays pywbemcli version
 information and the :ref:`--help general option` provides top level help
@@ -661,21 +660,23 @@ commands in the :ref:`connection command group`.
 In the interactive mode, this option may not be modified after the command
 line is processed.
 
-
 .. index:: triple: --pdb; general options; pdb
 
-.. _`--deprecation-warnings general option`:
+.. _`--warn general option`:
 
-``--deprecation-warnings`` general option
-"""""""""""""""""""""""""""""""""""""""""
+``--warn`` general option
+"""""""""""""""""""""""""
 
-The ``--deprecation-warnings``/``--no-deprecation-warnings`` general option is
-a boolean option that controls the display of deprecation warnings on the
-standard error stream.
+The ``--warn``/``--no-warn`` general option is a boolean option that controls
+the display of all Python warnings.
 
-By default, the display of deprecation warnings is enabled.
+If ``--warn`` is used, all Python warnings are shown once. If ``--no-warn`` is
+used (default), the ``PYTHONWARNINGS`` environment variable determines which
+warnings are shown. If that variable is not set, no warnings are shown. See
+`PYTHONWARNINGS <https://docs.python.org/3/using/cmdline.html#envvar-PYTHONWARNINGS>`_
+for details.
 
-.. index:: triple: --deprecation-warnings; --no-deprecation-warnings; general options; deprecation warnings
+.. index:: triple: --warn; --no-warn; general options; warnings
 
 .. _`--pdb general option`:
 
@@ -741,7 +742,6 @@ PYWBEMCLI_STATS_ENABLED            ``--timestats``
 PYWBEMCLI_MOCK_SERVER (1)          ``--mock-server``
 PYWBEMCLI_LOG                      ``--log``
 PYWBEMCLI_PDB                      ``--pdb``
-PYWBEMCLI_DEPRECATION_WARNINGS     ``--deprecation-warnings``
 PYWBEMCLI_CONNECTIONS_FILE         ``--connections-file``
 =================================  =============================
 

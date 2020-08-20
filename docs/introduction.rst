@@ -226,7 +226,8 @@ Python warnings of type ``DeprecationWarning`` (see the Python
 
 Since Python 2.7, ``DeprecationWarning`` messages are suppressed by default.
 They can be shown for example by invoking pywbemcli with the environment
-variable: ``PYTHONWARNINGS=default``
+variable: ``PYTHONWARNINGS=default``, or by using the
+ref:`--warn general option`.
 
 It is recommended that users of the pywbemtools package run their test code with
 ``DeprecationWarning`` messages being shown, so they become aware of any use of

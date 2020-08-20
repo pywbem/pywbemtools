@@ -97,7 +97,7 @@ GENERAL_HELP_LINES = [
     "-C, --connections-file FILE PATH Path name of the connections file",
     CONNECTIONS_FILENAME,
     "-v, --verbose / --no-verbose Display extra information about the",
-    "--deprecation-warnings / --no-deprecation-warnings",
+    "--warn / --no-warn",
     "--pdb    Pause execution in the built-in pdb debugger",
     "--version   Show the version of this command and the",
     """Commands:
@@ -313,8 +313,8 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
 
-    ['Verify --no-deprecation-warnings general option.',
-     {'general': ['-s', 'http://blah', '--no-deprecation-warnings'],
+    ['Verify --no-warn general option.',
+     {'general': ['-s', 'http://blah', '--no-warn'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': [''],
@@ -323,8 +323,8 @@ TEST_CASES = [
      None, OK],  # Only tests that the option is accepted
 
 
-    ['Verify --deprecation-warnings general option.',
-     {'general': ['-s', 'http://blah', '--deprecation-warnings'],
+    ['Verify --warn general option.',
+     {'general': ['-s', 'http://blah', '--warn'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': [''],

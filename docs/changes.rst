@@ -21,6 +21,10 @@ Released: not yet
   "profile centralinsts" added a command group and removed 2 commands
   from the server command group. (See issue #612)
 
+* The `--deprecation-warnings` / `--no-deprecation-warnings` general option
+  has been remamed to `--warn` / `--no-warn`, and it now controls the
+  display of all Python warnings.
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -71,6 +75,13 @@ Released: not yet
   is translated to a human readable SI unit using the pywbem.siunit_obj()
   function, and appended to the property name in square brackets.
   (See issue #727)
+
+* Consolidated the warnings control, such that the deprecation messages were
+  changed to be issued as Python warnings, and the `--warn` / `--no-warn`
+  general options now control the display of all Python warnings. If `--warn`
+  is used, all Python warnings are shown once. If `--no-warn` is used (default),
+  the `PYTHONWARNINGS` environment variable determines which warnings are shown.
+  If that variable is not set, no warnings are shown. (See issue #723)
 
 **Cleanup**
 

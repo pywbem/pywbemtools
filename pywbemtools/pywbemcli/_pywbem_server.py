@@ -117,7 +117,6 @@ class PywbemServer(object):
     log_envvar = 'PYWBEMCLI_LOG'
     # The following exports are not part of the pywbem_server container
     pdb_envvar = 'PYWBEMCLI_PDB'
-    deprecation_warnings_envvar = 'PYWBEMCLI_DEPRECATION_WARNINGS'
     termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
     connections_file_envvar = 'PYWBEMCLI_CONNECTIONS_FILE'
 

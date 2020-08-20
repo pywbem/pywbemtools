@@ -20,7 +20,6 @@ Utility Functions applicable across multiple components of pywbemcli.
 from __future__ import print_function, absolute_import
 
 import six
-import click
 
 
 __all__ = []
@@ -70,10 +69,9 @@ def _eq_name(name1, name2):
     return name1.lower() == name2.lower()
 
 
-def deprecation_warning(msg, ctx_obj):
+def formatwarning(message, category, filename, lineno, line=None):
+    # pylint: disable=unused-argument
     """
-    Display a deprecation warning on stderr, unless disabled via
-    ctx_obj.deprecation_warnings.
+    Replacement for warnings.formatwarning() that is patched in.
     """
-    if ctx_obj.deprecation_warnings:
-        click.echo(msg, err=True)
+    return "{}: {}\n".format(category.__name__, message)

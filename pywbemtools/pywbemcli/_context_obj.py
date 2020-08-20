@@ -44,7 +44,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, log, verbose, pdb,
-                 deprecation_warnings, connections_repo):
+                 warn, connections_repo):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -54,7 +54,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._log = log
         self._verbose = verbose
         self._pdb = pdb
-        self._deprecation_warnings = deprecation_warnings
+        self._warn = warn
         self._connections_repo = connections_repo
 
         self._spinner_enabled = None  # Deferred init in getter
@@ -117,11 +117,11 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return self._pdb
 
     @property
-    def deprecation_warnings(self):
+    def warn(self):
         """
-        bool: Indicates whether to enable deprecation warnings.
+        bool: Indicates whether to enable Python warnings.
         """
-        return self._deprecation_warnings
+        return self._warn
 
     @property
     def connections_repo(self):
