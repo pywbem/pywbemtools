@@ -560,10 +560,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                     "Connection name '{}' not found in connections file '{}'".
                     format(connection_name, connections_repo.connections_file))
             except ConnectionsFileError as cfe:
-                click.echo('Fatal error loading connections file: "{0}". '
-                           "Exception: {1}: {2}".
-                           format(connections_repo.connections_file,
-                                  cfe.__class__.__name__, cfe),
+                click.echo('Fatal error: {0}: {1}'.
+                           format(cfe.__class__.__name__, cfe),
                            err=True)
                 raise click.Abort()
 

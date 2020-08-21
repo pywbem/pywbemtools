@@ -24,12 +24,13 @@ errors in the data.
 from __future__ import absolute_import, print_function
 
 import os
+from mock import patch
 import pytest
 
 from tests.unit.pytest_extensions import simplified_test_function
 
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
-    ConnectionsFileError
+    ConnectionsFileError, ConnectionsFileWriteError
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 SCRIPT_DIR = os.path.dirname(__file__)
@@ -120,12 +121,29 @@ YAML_BAD_NAME = u"""connection_definitions:
 default_connection_name: null
 """
 
+INVALIDYAMLFILE = u"""connection_definitions:;
+    tst1:
+        name: tst1
+default_connection_name: null
+"""
+
+INVALID_ITEM_VALUE = u"""connection_definitions:;
+    tst1:
+        name: tst1
+        mock-server: ['blah']
+default_connection_name: null
+"""
+
+INVALID_ITEM_VALUE_TYPE = u"""connection_definitions:;
+    tst1:
+        name: tst1
+        mock-server: 'blah'
+default_connection_name: null
+"""
+
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
-
-
-# TODO: can we tie this to the file name in the test call?
 
 
 @pytest.fixture()
@@ -296,6 +314,16 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
     for key in repo_2.keys():
         assert "{}:".format(key) in repr(repo_2)
 
+    rtn_keys = []
+    rtn_svrs = []
+    for name, svr in repo.items():
+        rtn_keys.append(name)
+        rtn_svrs.append(svr)
+
+    assert len(rtn_keys) == len(exp_rtn['keys'])
+    assert len(repo) == len(rtn_keys)
+    assert len(repo) == len(rtn_svrs)
+
 
 # Testcases for create ConnectionRepository
 #       Each list item is a testcase tuple with these items:
@@ -342,7 +370,7 @@ TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
         ConnectionsFileError, None, OK,
     ),
     (
-        "Verify load fails when file empty. Note this is TypeError",
+        "Verify load fails when file empty",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             yaml=u'',
@@ -356,6 +384,36 @@ TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             yaml=YAML_BAD_NAME,
+            exp_rtn=dict(),
+        ),
+        ConnectionsFileError, None, OK,
+    ),
+    (
+        "Verify load fails YAML syntax invalid",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml=INVALIDYAMLFILE,
+            exp_rtn=dict(),
+        ),
+        ConnectionsFileError, None, OK,
+    ),
+
+    (
+        "Verify load fails invalid type on key value",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml=INVALID_ITEM_VALUE,
+            exp_rtn=dict(),
+        ),
+        ConnectionsFileError, None, OK,
+    ),
+
+
+    (
+        "Verify load fails invalid type on key value",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml=INVALID_ITEM_VALUE_TYPE,
             exp_rtn=dict(),
         ),
         ConnectionsFileError, None, OK,
@@ -491,3 +549,50 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
     assert repo.default_connection_name == exp_rtn['default']
     for svr in svrs:
         assert repo[svr.name].server == svr.server
+
+# Testcases ConnectionRepository write method
+#       Each list item is a testcase tuple with these items:
+#       * desc: Short testcase description.
+#       * kwargs: Keyword arguments for the test function:
+#           * file: test file path. File to test built into this file path
+#           * svrs: Servers to add to the repository
+#           * default: Default to set
+#       * exp_exc_types: Expected exception type(s), or None.
+#       * exp_rtn: Expected warning type(s), or None.
+#       * condition: Boolean condition for testcase to run, 'pdb' for debugger
+
+
+TESTCASES_CONNECTION_REPOSITORY_WRITE = [
+    (
+        "Verify connection file write fail with mock",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[PywbemServer('http://args', name="tst1")],
+        ),
+        ConnectionsFileWriteError, None, OK,
+    ),
+]
+
+
+@pytest.mark.usefixtures("remove_file_before_after")
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CONNECTION_REPOSITORY_WRITE)
+@simplified_test_function
+def test_connection_repository_write_error(testcase, file, svrs):
+    """
+    Test the loading of a YAML file that has errors to confirm the
+    exceptions generated.
+    """
+    @patch('pywbemtools.pywbemcli.ConnectionRepository._open_file')
+    def run_operation(connections_file, mock_write):
+        repo = ConnectionRepository(connections_file)
+        for svr in svrs:
+            repo.add(svr)
+
+        assert mock_write.called
+        mock_write.side_effect = IOError("foo")
+
+    run_operation(file)  # pylint: disable=no-value-for-parameter
+
+    assert testcase.exp_exc_types is None

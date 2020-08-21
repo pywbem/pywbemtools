@@ -35,6 +35,7 @@ from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
     raise_pywbem_error_exception, validate_output_format, fold_strings, \
     output_format_is_table
+from ._connection_repository import ConnectionsFileError
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
@@ -718,11 +719,8 @@ def cmd_connection_save(context, name):
     context.spinner_stop()
     try:
         connections.add(save_connection)
-    except Exception as exc:
-        click.echo('Fatal error loading connections file: "{0}". '
-                   "Exception: {1}: {2}".
-                   format(connections.connections_file,
-                          exc.__class__.__name__, exc),
+    except ConnectionsFileError as cfe:
+        click.echo('Fatal error: {0}: {1}'.format(cfe.__class__.__name__, cfe),
                    err=True)
         raise click.Abort()
 
