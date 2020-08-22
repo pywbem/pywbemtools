@@ -426,7 +426,8 @@ class PywbemServer(object):
             # pylint: disable=attribute-defined-outside-init
             self.password = password
         else:
-            # TODO: Again we want to isolate the click excpetions in future
+            # TODO Future: Again we want to isolate the click excpetions in
+            # future
             raise click.ClickException("{cmd} requires user/password, but "
                                        "no password provided."
                                        .format(cmd=ctx.invoked_subcommand))
@@ -468,6 +469,8 @@ class PywbemServer(object):
         kwargsout = {}
         if replace_underscores:
             kwargsout = {k.replace('-', '_'): v for k, v in kwargs.items()}
+        # Test for existence of required elements
+        kwargsout['name']   # pylint: disable=pointless-statement
         return PywbemServer(**kwargsout)
 
     def reset(self):

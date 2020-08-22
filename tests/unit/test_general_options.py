@@ -625,7 +625,7 @@ TEST_CASES = [
      {'general': ['-n', 'namedoesnotexist'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Connection definition', 'namedoesnotexist',
+     {'stderr': ['Connection name', 'namedoesnotexist',
                  'not found in connections file',
                  CONNECTIONS_FILENAME],
       'rc': 1,
@@ -797,7 +797,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    # End of sequence
+    # End of sequence - There should be no connections file
 
     #
     # Test using environment variables as input
@@ -929,15 +929,29 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify Change --name in interactive mode, name invalid. command',
+     {'general': ['--name', 'NAMEDOESNOTEXIST'],
+      'args': ['show'],
+      'cmdgrp': 'connection',
+      },
+     {'stderr': ['Connections file does not exist:',
+                 '.pywbemcli_connections.yaml',
+                 'Aborted'],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 
-    ['Verify Change --name in interactive mode, name invalid.',
-     {'general': ['--server', 'http://blah', ],
+    ['Verify Change --name in interactive mode, name invalid stdin.',
+     {'general': ['--server', 'http://blah'],
       # args not allowed in interactive mode
       'stdin': ['--name NAMEDOESNOTEXIST connection show'],
       'cmdgrp': None,
       },
-     {'stderr': ['Connections file',
-                 'does not exist'],
+     {'stderr': ['Fatal error',
+                 'ConnectionsFileNotFoundError:',
+                 '.pywbemcli_connections.yaml',
+                 'does not exist',
+                 'Aborted'],
       'rc': 1,
       'test': 'innows'},
      None, OK],

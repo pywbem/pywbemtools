@@ -108,6 +108,12 @@ Released: not yet
   An existing file with the old name is migrated automatically.
   (See issue #716)
 
+* Refactor error handling for connections file handlingif there are problems
+  with the YAML file or loading the file. Created new exceptions for the
+  Connections File and created a unit test and function error test.
+  (see issue #661)
+
+
 **Known issues:**
 
 * See `list of open issues`_.

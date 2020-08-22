@@ -35,6 +35,7 @@ from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
     raise_pywbem_error_exception, validate_output_format, fold_strings, \
     output_format_is_table
+from ._connection_repository import ConnectionsFileError
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
@@ -312,7 +313,7 @@ def is_default_connection(context, connection):
     default connection is defined in repository.
     """
 
-    default_connection = context.connections_repo.get_default_connection_name()
+    default_connection = context.connections_repo.default_connection_name
     if default_connection and default_connection == connection.name:
         return True
     return False
@@ -535,22 +536,22 @@ def cmd_connection_show(context, name, options):
     If name is "?" present list of all connections for selection.
     """
 
-    connections = context.connections_repo
+    connections_repo = context.connections_repo
 
     curr_name = get_current_connection_name(context)
     # If no name arg, fallback to selection unless there is no connections file
     if not name:
         name = curr_name or '?'
-        if not curr_name and not connections.file_exists():
-            raise click.ClickException('No current connection and no '
-                                       'connections file {}.'
-                                       .format(connections.connections_file))
+        if not curr_name and not connections_repo.file_exists():
+            raise click.ClickException(
+                'No current connection and no connections file {}.'
+                .format(connections_repo.connections_file))
 
     # ? means to ask for connections file. However fallback to current
     # if there is no connections file and fail if no current.
     if name == '?':
         # No connections exit in connections file.
-        if not connections.file_exists():
+        if not connections_repo.file_exists():
             if context.pywbem_server:
                 show_connection_information(
                     context,
@@ -559,25 +560,23 @@ def cmd_connection_show(context, name, options):
                     show_password=options['show_password'])
                 return
 
-        name = select_connection(None, context, connections)
+        name = select_connection(None, context, connections_repo)
 
     # Have a name. If there are connections and this name is in connections
     # and that name is not current, use it. If current name is same as
     # name, use the current version.
-    if connections.file_exists():
+    if connections_repo.file_exists():
         # If name in connections use it
-        connection = connections[name] if name in connections else None
-        if connection is None:
-            raise click.ClickException('Connection name: "{0}" does not exist '
-                                       'in connections file: "{1}"'.
-                                       format(name,
-                                              connections.connections_file))
+        if name not in connections_repo:
+            raise click.ClickException(
+                'Connection name: "{0}" does not exist in connections '
+                'file: "{1}"'.format(name, connections_repo.connections_file))
+        connection = connections_repo[name]
     else:   # not connections file
         if curr_name != name:
-            raise click.ClickException('Name: "{}" not current and no '
-                                       'connections file {}'
-                                       .format(name,
-                                               connections.connections_file))
+            raise click.ClickException(
+                'Name: "{}" not current and no connections file {}'.format(
+                    name, connections_repo.connections_file))
         connection = context.pywbem_server
 
     show_connection_information(context,
@@ -655,11 +654,11 @@ def cmd_connection_select(context, name, options):
     If the --default flag is set, also set this connection as the persistent
     default connection.
     """
-    connections = context.connections_repo
+    connections_repo = context.connections_repo
 
-    name = select_connection(name, context, connections)
+    name = select_connection(name, context, connections_repo)
 
-    new_ctx = ContextObj(connections[name],
+    new_ctx = ContextObj(connections_repo[name],
                          context.output_format,
                          context.use_pull,
                          context.pull_max_cnt,
@@ -675,7 +674,7 @@ def cmd_connection_select(context, name, options):
     ContextObj.update_root_click_context(new_ctx)
     context.spinner_stop()
     if options['default']:
-        connections.set_default_connection(name)
+        connections_repo.default_connection_name = name
         click.echo('"{}" default and current'.format(name))
     else:
         click.echo('"{}" current'.format(name))
@@ -689,14 +688,14 @@ def cmd_connection_delete(context, name):
     is no name provided, a select list will be presented for the user
     to select the connection to be deleted.
     """
-    connections = context.connections_repo
+    connections_repo = context.connections_repo
 
     # Select the connection with prompt if name is None.
     # This also stops the spinner
-    name = select_connection(name, context, connections)
+    name = select_connection(name, context, connections_repo)
 
     cname = get_current_connection_name(context)
-    connections.delete(name)
+    connections_repo.delete(name)
 
     default = 'default ' if cname and cname == name else ''
     click.echo('Deleted {} connection "{}".'.format(default, name))
@@ -718,8 +717,12 @@ def cmd_connection_save(context, name):
     connections = context.connections_repo
 
     context.spinner_stop()
-
-    connections.add(save_connection.name, save_connection)
+    try:
+        connections.add(save_connection)
+    except ConnectionsFileError as cfe:
+        click.echo('Fatal error: {0}: {1}'.format(cfe.__class__.__name__, cfe),
+                   err=True)
+        raise click.Abort()
 
 
 def cmd_connection_list(context, options):
@@ -741,7 +744,7 @@ def cmd_connection_list(context, options):
                     svr.certfile, svr.keyfile, "\n".join(svr.mock_server)]
         return [name, svr.server, "\n".join(svr.mock_server)]
 
-    connections = context.connections_repo
+    connections_repo = context.connections_repo
     output_format = validate_output_format(context.output_format, 'TABLE')
 
     # build the table structure
@@ -749,8 +752,8 @@ def cmd_connection_list(context, options):
     cur_sym = '*'  # single char representing current connection
     dflt_sym = '#'  # single char representing persisted default connection
 
-    if connections.file_exists():
-        for name, svr in connections.items():
+    if connections_repo.file_exists():
+        for name, svr in connections_repo.items():
             cc = cur_sym if is_current_connection(context, svr) else ''
             dc = dflt_sym if is_default_connection(context, svr) else ''
             name = '{}{}{}'.format(cc, dc, name)
@@ -761,9 +764,9 @@ def cmd_connection_list(context, options):
 
     if current_connection:
         cname = current_connection.name
-        if connections.file_exists():
+        if connections_repo.file_exists():
             # Add connection that is current but not in connections repo
-            if cname not in connections:
+            if cname not in connections_repo:
                 cname = '{}{}'.format('*', cname)
                 rows.append(build_row(options, cname, current_connection))
         else:
@@ -786,5 +789,6 @@ def cmd_connection_list(context, options):
         headers,
         title='WBEM server connections({0}): ({1}: default, {2}: '
               'current)\nfile: {3}'.format(
-                  table_type, dflt_sym, cur_sym, connections.connections_file),
+                  table_type, dflt_sym, cur_sym,
+                  connections_repo.connections_file),
         table_format=output_format))

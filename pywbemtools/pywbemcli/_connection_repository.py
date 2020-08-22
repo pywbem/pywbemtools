@@ -56,11 +56,81 @@ B08_DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
 BAK_FILE_SUFFIX = 'bak'
 
 
-class ConnectionsFileNotFoundError(Exception):
+class ConnectionsFileError(Exception):
     """
-    Exception indicating that the connections file was not found.
+    Top level exception for the Connections file errors.  This is not abstact
+    and generally errors can be caught by just catching this error and
+    reporting the class and error message found.
     """
-    pass
+    def __init__(self, message):
+        """
+        Parameters:
+          msg (:term:`string`):
+            Message text for the exception.
+        """
+        # pylint: disable=useless-super-delegation
+        super(ConnectionsFileError, self).__init__(message)
+
+
+class ConnectionsFileWriteError(ConnectionsFileError):
+    """
+    Exception to be used for connection file write errors.
+
+    """
+    def __init__(self, connections_file_name, ioerrtext, message=None):
+        """
+        Parameters:
+          connection_file_name (:term:`string`):
+            Path of the connections file
+
+          ioerrtext (:term:`string`): Text from io error exception.
+
+          message (:term:`string`): Further text for the exception
+        """
+        assert message is None or isinstance(message, six.string_types), \
+            str(type(message))
+
+        msg = 'Cannon write connection file: "{0}" write error. {1}. {2}.'. \
+            format(connections_file_name, ioerrtext, message)
+        super(ConnectionsFileWriteError, self).__init__(msg)
+
+
+class ConnectionsFileLoadError(ConnectionsFileError):
+    """
+    Exception that defines errors in loading the connection file. These
+    errors are due to invalid YAML or YAML key names that are required
+    but missing from the file being loaded.
+    Also, physical IO errors in file load..
+
+    """
+    def __init__(self, connections_file_name, message):
+        """
+        Parameters:
+          connection_file_name (:term:`string`):
+            Path of the connections file
+
+          message (:term:`string`): Error message.
+        """
+        assert message is None or isinstance(message, six.string_types), \
+            str(type(message))
+        msg = 'Cannot load connections file: "{0}"; {1}'.format(
+            connections_file_name, message)
+        super(ConnectionsFileLoadError, self).__init__(msg)
+
+
+class ConnectionsFileNotFoundError(ConnectionsFileError):
+    """
+    Excepton when file not found.
+    """
+    def __init__(self, connections_file_name):
+        """
+        Parameters:
+          connection_file_name (:term:`string`):
+            Path of the connections file
+        """
+        super(ConnectionsFileNotFoundError, self).__init__(
+            'Connections file: "{0}" does not exist'.format(
+                connections_file_name))
 
 
 class ConnectionRepository(object):
@@ -70,15 +140,19 @@ class ConnectionRepository(object):
     connection exists on disk between pywbemcli sessions and within an
     instance of ConnectionRepository while pywbemcli is running.
 
-    ConnectionRepository lazy load  gets the repository from the disk so that
-    the repository is not in memory until one of the access methods is
-    executed or a write is executed.  This also allows creation of new
-    connections files using the connection save command.
+    ConnectionRepository._load_connections_file() is a lazy load when the data
+    is neeeded  rather than when the ConnectionRepository object is created
+    gets the repository from the disk so that the repository is not in memory
+    until one of the access methods is executed or a write is executed.  This
+    also allows creation of new connections files using the connection save
+    command.
     """
     # Class variables
-    # The YAML section names in the connection yaml file
-    # Name of the YAML group that contains named connection definitions.
+    # The YAML section names (YAMO keys) in the connection yaml file
+
+    # YAML group name that contains named connection definitions.
     connections_group_name = 'connection_definitions'
+
     # Name of the YAML group that contains the default connection name
     default_connection_grp_name = 'default_connection_name'
 
@@ -122,29 +196,63 @@ class ConnectionRepository(object):
     @property
     def default_connection_name(self):
         """
-        Return the name of connection defined in the connections file that
-        is the default connection, the connection that is selected on
+        Name of connection defined in the connections file that
+        is the default connection; the connection that is selected on
         pywbemcli startup if no connection name or other connection definition
         is specified.
 
-        If None, there is no current default connection name
+        None, if there is no current default connection name
 
         Returns:
             :term:`string` containing the name of the default connection
             defined in the connections file.
+
+        Raises:
+            Exceptions from _load_connections_file
         """
-        return self._default_connection_name
+        if self.file_exists():
+            self._load_connections_file()
+            return self._default_connection_name
+        return None
+
+    @default_connection_name.setter
+    def default_connection_name(self, connection_name):
+        """
+        Set the connection defined by connection_name to be the current
+        connection in the connections file.
+
+        Parameters:
+
+          connection_name (:term:`string` or None):
+            The name of an existing connection in the connection file that
+            will become the default or None to remove any existing
+            default connection name.
+
+        Raises:
+          ValueError: if connection_name does not exist in the connection file.
+        """
+        self._load_connections_file()
+        if connection_name is None or connection_name in \
+                self._pywbemcli_servers:
+            self._default_connection_name = connection_name
+            self._write_connections_file()
+        else:
+            raise ValueError('Connection name: "{}" does not exist in '
+                             'connection file: "{}:'
+                             .format(connection_name, self.connections_file))
 
     def file_exists(self):
         """
-        Test if the connection file exists.
-
-        An old connections file is migrated, if needed.
-        The connections file is loaded as part of the test.
+        Test if the connection file exists.The connections file is loaded as
+        part of the test.
 
         Returns:
             (:class:`py:bool`) True if the connections_file exists and False if
             it does not exist
+
+        Raises:
+            ConnectionLoadFileError if the file is invalid and cannot be
+            loaded
         """
         try:
             self._load_connections_file()
@@ -179,8 +287,9 @@ class ConnectionRepository(object):
         items = ["{0}: {1}".format(k, v)
                  for k, v in six.iteritems(self._pywbemcli_servers)]
         items_str = ', '.join(items)
-        return "{0.__class__.__name__}({{{1}}}, connections_file {2})]". \
-            format(self, items_str, self._connections_file)
+        return "{0.__class__.__name__}({{{1}}}, connections_file: {2})], " \
+               "loaded={3}". format(self, items_str, self._connections_file,
+                                    self._loaded)
 
     def __contains__(self, key):
         """Load the repository if necessary and return True if key found"""
@@ -237,8 +346,8 @@ class ConnectionRepository(object):
 
         Raises:
           ConnectionsFileNotFoundError: Connections file not found
-          IOError: Cannot rename old connections file
-          ValueError,KeyError,TypeError: Error in connections file
+          ConnectionsFileLoaderror: File in invalid YAML or invalid structure
+          of YAML data.
         """
         if self._loaded:
             return
@@ -255,43 +364,75 @@ class ConnectionRepository(object):
                        format(B08_DEFAULT_CONNECTIONS_FILE,
                               DEFAULT_CONNECTIONS_FILE))
 
-        if os.path.isfile(self._connections_file):
+        # load the existing file
+        if not os.path.isfile(self._connections_file):
+            raise ConnectionsFileNotFoundError(self.connections_file)
+
+        try:
             with self._open_file(self._connections_file, 'r') as _fp:
                 try:
                     dict_ = yaml.safe_load(_fp)
-                    # put all the connection definitions into a group
-                    # in the connection file
+                except (TypeError, yaml.YAMLError) as exc:
+                    raise ConnectionsFileLoadError(
+                        self._connections_file,
+                        'Invalid YAML. Exception: {0}'.format(exc))
+
+                # Try building dictionary of server definitions
+                try:
                     connections_dict = dict_[
                         ConnectionRepository.connections_group_name]
+                except TypeError as te:
+                    raise ConnectionsFileLoadError(
+                        self._connections_file,
+                        'Invalid or no YAML in file. Exception {0}'.format(
+                            str(te)))
+                except KeyError:
+                    raise ConnectionsFileLoadError(
+                        self._connections_file,
+                        'Missing YAML key name: "{0}"'.format(
+                            ConnectionRepository.connections_group_name))
 
+                # Try getting the default_connection name
+                try:
                     self._default_connection_name = dict_[
                         ConnectionRepository.default_connection_grp_name]
-                    try:
-                        for name, svr in six.iteritems(connections_dict):
-                            self._pywbemcli_servers[name] = \
-                                PywbemServer.create(
-                                    replace_underscores=True, **svr)
-                            self._loaded = True
-                    except KeyError as ke:
-                        raise KeyError("Items missing from record {0} in "
-                                       "connections file. Exception {1}".format
-                                       (ke, self._connections_file))
-                    except TypeError as te:
-                        raise TypeError('Invalid object type in connections '
-                                        'file: "{0}"; server name: "{1}". '
-                                        'Item: {2}'.
-                                        format(self._connections_file, name,
-                                               te))
-                except ValueError as ve:
-                    raise ValueError("Invalid YAML in connections file {0}. "
-                                     "Exception {1}".format
-                                     (self._connections_file, ve))
-        else:
-            raise ConnectionsFileNotFoundError(
-                "Connections file does not exist: {0}".
-                format(self.connections_file))
+                except KeyError:
+                    gn = ConnectionRepository.default_connection_grp_name
+                    raise ConnectionsFileLoadError(
+                        self._connections_file,
+                        'Missing YAML key name: "{0}"'.format(gn))
 
-    def add(self, name, svr_definition):
+                # Try to rebuild the PywbemcliServer object for each
+                # server definition
+                for name, svr in six.iteritems(connections_dict):
+                    try:
+                        self._pywbemcli_servers[name] = \
+                            PywbemServer.create(
+                                replace_underscores=True, **svr)
+                    except KeyError as ke:
+                        raise ConnectionsFileLoadError(
+                            self._connections_file,
+                            "Element: {} missing from server named: {}".format(
+                                ke, name))
+                    except TypeError as te:
+                        raise ConnectionsFileLoadError(
+                            self._connections_file,
+                            'Invalid type of item in connection definition '
+                            ': "{0}". Item: "{1}"'.format(name, te))
+                    except ValueError as ve:
+                        raise ConnectionsFileLoadError(
+                            self._connections_file,
+                            'Invalid item value in connection definition '
+                            ': "{0}". Item: "{1}"'.format(name, ve))
+
+                self._loaded = True
+        except IOError as io:
+            raise ConnectionsFileLoadError(
+                self._connections_file,
+                'load failed with IO error'
+                ': "{0}". Item: "{1}"'.format(name, str(io)))
+
+    def add(self, svr_definition):
         """
         Add a new connection to the connections repository or replace an
         existing connection.  Users of this method should check before add if
@@ -299,33 +440,23 @@ class ConnectionRepository(object):
 
         Parameter:
 
-          svr_definition (:class:`ServerDefinition`):
-            An instance of ServerDefinition that contains the data that will be
-            added to the connections file.
+          svr_definition (:class:`PywbemServer`):
+            An instance of PywbemServer that contains the data that will be
+            added to the connections file. The server definition must contain
+            a name attribute.
 
         Raises:
-            click.Abort if the load of the connections file returns an
-            exception
+            ConnectionsFileLoadError: if the file is invalid
+            ConnectionsFileWriteError: if it cannot write the modified file.
         """
+        assert isinstance(svr_definition.name, six.string_types)
 
-        # If the file does exists get it. Otherwise the write will create it
-        # TODO: we process errors here differently than in read mode because
-        # de use click and abort. Should we do this in common.
-        # Also, why not make abort_click a common function with message.
+        # If the file exists load it. Otherwise the write will create it
         if os.path.isfile(self._connections_file):
-            try:
-                self._load_connections_file()
-            # All other errors cases abort.
-            except Exception as e:
-                click.echo("Fatal error loading YAML file {0}. "
-                           "Exception: {1}: {2}".
-                           format(self.connections_file, e.__class__.__name__,
-                                  e),
-                           err=True)
-                raise click.Abort()
+            self._load_connections_file()
 
-        self._pywbemcli_servers[name] = svr_definition
-        self._write_file()
+        self._pywbemcli_servers[svr_definition.name] = svr_definition
+        self._write_connections_file()
 
     def delete(self, name):
         """
@@ -337,12 +468,10 @@ class ConnectionRepository(object):
             Name of the connection to delete
 
         Raises:
-            KeyError: No server definition exists in the connections file
-            with this name
-
-            ValueError: Connection file is not valid YAML
-
-            IOError: The connections file does not exist.
+            ConnectionsFileLoadError: if it loads the file and the file is
+            invalid.
+            KeyError: if name does not exist in the file
+            ConnectionsFileWriteError: If the file cannot be written
 
         """
         self._load_connections_file()
@@ -351,7 +480,7 @@ class ConnectionRepository(object):
         # Remove default_name if it is the name being deleted
         if name == self.default_connection_name:
             self._default_connection_name = None
-        self._write_file()
+        self._write_connections_file()
 
     @staticmethod
     def _open_file(filename, file_mode='w'):
@@ -384,22 +513,23 @@ class ConnectionRepository(object):
 
         return open(filename, file_mode, encoding='utf8')
 
-    def _write_file(self):  # pylint: disable=no-self-use
+    def _write_connections_file(self):  # pylint: disable=no-self-use
         """
         Write the connections file if one has been loaded.
         If the dictionary is empty, it deletes the file.
 
-        If there is an existing file it is moved to filename.bak and a new
-        current file written.
+        If there is an existing file it is moved to the same name with the
+        suffix .bak and a new current file written.
+
+        Raises:
+            ConnectionsFileWriteError: If the file cannot be written.
         """
         conn_dict = {}
         if self._pywbemcli_servers:
-            if self._pywbemcli_servers:
-                conn_dict = \
-                    {name: value.to_dict() for name, value in
-                     self._pywbemcli_servers.items()}
+            conn_dict = {name: value.to_dict() for name, value in
+                         self._pywbemcli_servers.items()}
 
-            # build dictionary for yaml output
+            # build dictionary for YAML output
             yaml_dict = {ConnectionRepository.connections_group_name: conn_dict,
                          ConnectionRepository.default_connection_grp_name:
                              self.default_connection_name}
@@ -408,71 +538,41 @@ class ConnectionRepository(object):
             # move the tmpfile to be the new connections file contents.
             tmpfile = '{}.tmp'.format(self._connections_file)
 
-            with self._open_file(tmpfile, 'w') as _fp:
-                data = yaml.dump(yaml_dict,
-                                 encoding=None,
-                                 allow_unicode=True,
-                                 default_flow_style=False,
-                                 indent=4,
-                                 Dumper=yamlloader.ordereddict.CSafeDumper)
-                data = data.replace('\n\n', '\n')  # YAML dump dups newlines
-                _fp.write(data)
-                _fp.flush()
+            try:
+                with self._open_file(tmpfile, 'w') as _fp:
+                    data = yaml.dump(yaml_dict,
+                                     encoding=None,
+                                     allow_unicode=True,
+                                     default_flow_style=False,
+                                     indent=4,
+                                     Dumper=yamlloader.ordereddict.CSafeDumper)
+                    data = data.replace('\n\n', '\n')  # YAML dump dups newlines
+                    _fp.write(data)
+                    _fp.flush()
+            except IOError as io:
+                raise ConnectionsFileWriteError(tmpfile, str(io),
+                                                message="Error writing tmpfile")
 
-        # create bak file and then rename tmp file
-        if os.path.isfile(self._connections_file):
-            bakfile = '{0}.{1}'.format(self._connections_file, BAK_FILE_SUFFIX)
-            if os.path.isfile(bakfile):
-                os.remove(bakfile)
+        # Create bak file and then rename tmp file
+        try:
             if os.path.isfile(self._connections_file):
-                os.rename(self._connections_file, bakfile)
+                bakfile = '{0}.{1}'.format(self._connections_file,
+                                           BAK_FILE_SUFFIX)
+                if os.path.isfile(bakfile):
+                    os.remove(bakfile)
+                if os.path.isfile(self._connections_file):
+                    os.rename(self._connections_file, bakfile)
+        except OSError as ose:
+            raise ConnectionsFileWriteError(
+                tmpfile, str(ose),
+                message="Error in rename tmpfile{0} to back file{1}".
+                format(tmpfile, bakfile))
 
-        if self._pywbemcli_servers:
-            os.rename(tmpfile, self._connections_file)
-
-    def set_default_connection(self, connection_name):
-        """
-        Set the connection defined by connection_name to be the current
-        connection in the connections file.
-
-        This is accomplished by modifying the "current_connection" entry
-        and rewriting the file.
-
-        Parameters:
-
-          connection_name (:term:`string`):
-            The name of an existing connection in the connection file.
-
-        Raises:
-          ValueError: if connection_name does not exist in the connection file.
-        """
-        self._load_connections_file()
-        if connection_name in self._pywbemcli_servers:
-            self._default_connection_name = connection_name
-            self._write_file()
-
-        else:
-            raise ValueError('Connection name "{}" does not exist in '
-                             'connection repository {}'
-                             .format(connection_name, self.connections_file))
-
-    def get_default_connection_name(self):
-        """
-        Returns the name of the current connection in the connections file.
-        This may be the name of a connection in the connections file or
-        None if no connection is defined as the current connection.
-
-        Returns:
-          :term:`string`: Name of the default connection if one
-          exists in the file; otherwise None
-
-        Raises:
-            ValueError: Connection file is not valid YAML
-
-            IOError: The connections file does not exist.
-
-        """
-        if self.file_exists():
-            # Has loaded the file
-            return self.default_connection_name
-        return None
+        try:
+            if self._pywbemcli_servers:
+                os.rename(tmpfile, self._connections_file)
+        except OSError as ose:
+            raise ConnectionsFileWriteError(
+                tmpfile, str(ose),
+                message="Error in rename tmpfile{0} to {1}".
+                format(tmpfile, self._connections_file))

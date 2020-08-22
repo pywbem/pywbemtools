@@ -44,7 +44,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
     MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository, \
-    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
+    ConnectionsFileError, CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from ._click_extensions import PywbemcliTopGroup
 from ._utils import formatwarning
 
@@ -73,17 +73,6 @@ CONTEXT_SETTINGS = dict(
     # Default the output width properly:
     terminal_width=TERMWIDTH_ENVVAR or click.get_terminal_size()[0],
 )
-
-
-def validate_connections_file(connections_repo):
-    """
-    Test for existence of a connections file and abort if it does not exist.
-    Abort click if file does not exist
-    """
-    if not connections_repo.file_exists():
-        click.echo('Connections file does not exist: {}'.format(
-            connections_repo.connections_file), err=True)
-        raise click.Abort()
 
 
 # pylint: disable=bad-continuation
@@ -375,39 +364,48 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             # If name cmd line option, get get name from the connections
             # repo.
             if connection_name:
-                validate_connections_file(connections_repo)
+                if not connections_repo.file_exists():
+                    click.echo('Connections file does not exist: {}'.format(
+                        connections_repo.connections_file), err=True)
+                    raise click.Abort()
+
                 if connection_name not in connections_repo:
                     raise click.ClickException(
-                        "Connection definition '{}' not found in "
-                        "connections file '{}'".
-                        format(connection_name,
-                               connections_repo.connections_file))
+                        'Connection name: "{}" not found in connections file: '
+                        '"{}"'.format(connection_name,
+                                      connections_repo.connections_file))
 
             # No connection name specified, try default connection name
             else:
                 # get the default_connection definition
-                if connections_repo.file_exists():
-                    connection_name = \
-                        connections_repo.get_default_connection_name()
+                try:
+                    if connections_repo.file_exists():
+                        connection_name = \
+                            connections_repo.default_connection_name
 
-                    # Abort because file modified to clear the bad default.
-                    # This should never happen andif it does, Abort is logical.
-                    if connection_name and connection_name not in \
-                            connections_repo:
-                        connections_repo.set_default_connection(None)
-                        click.echo(
-                            "Default connection definition '{}' not found in "
-                            "connections file '{}'; deleted default connection "
-                            "in connections file".
-                            format(connection_name,
-                                   connections_repo.connections_file),
-                            err=True)
-                        raise click.Abort()
-                    if verbose:
-                        click.echo('Current connection: "{}"'
-                                   .format(connection_name))
+                        # Test if the default connection name is actually
+                        # in the repo.  If not reset the default connection
+                        # name to None and continue.
+                        # This should never occur unless connection file
+                        # is corrupted.
+                        if connection_name and connection_name not in \
+                                connections_repo:
+                            connections_repo.default_connection_name = None
+                            raise click.ClickException(
+                                'Default connection name: "{}" not found in '
+                                'connections file "{}"; default connection '
+                                'name is cleared.'.
+                                format(connection_name,
+                                       connections_repo.connections_file))
+                        if verbose:
+                            click.echo('Current connection: "{}"'
+                                       .format(connection_name))
+                except ConnectionsFileError as cfc:
+                    click.echo("{}, {}". format(cfc.__class__.__name__, cfc),
+                               err=True)
+                    raise click.Abort()
 
-            # Get the named connection from the repo
+            # Get the named connection from the connections repo
             if connection_name:
                 pywbem_server = connections_repo[connection_name]
                 # Test for invalid options with the --name option
@@ -546,7 +544,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # Apply the documented option defaults to create a pywbem_server instance
     # and a ContextObj instance
     if ctx.obj is None:  # No context. This is cmd line mode
-        # Create the PywbemServer object (this contains all of the info
+        # Create the PywbemServer object (contains all of the info
         # for the connection defined by the cmd line input)
         pywbem_server = create_server_instance(connection_name)
 
@@ -563,14 +561,18 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
         # If --name option, get server from connection
         if connection_name:
-            validate_connections_file(connections_repo)
+            # validate_connections_file(connections_repo)
             try:
                 pywbem_server = connections_repo[connection_name]
             except KeyError:
                 raise click.ClickException(
-                    "Connection definition '{}' not found in "
-                    "connections file '{}'".
+                    "Connection name '{}' not found in connections file '{}'".
                     format(connection_name, connections_repo.connections_file))
+            except ConnectionsFileError as cfe:
+                click.echo('Fatal error: {0}: {1}'.
+                           format(cfe.__class__.__name__, cfe),
+                           err=True)
+                raise click.Abort()
 
         # If other parameters, modify the existing connection and reset it.
         # TODO: refactor this code to avoid deepcopy when not needed.
