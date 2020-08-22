@@ -587,6 +587,16 @@ TESTCASES_CONNECTION_REPOSITORY_WRITE = [
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://args', name="tst1")],
+            failure="openfile"
+        ),
+        ConnectionsFileWriteError, None, OK,
+    ),
+    (
+        "Verify connection file rename failure",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            svrs=[PywbemServer('http://args', name="tst1")],
+            failure="rename"
         ),
         ConnectionsFileWriteError, None, OK,
     ),
@@ -598,20 +608,30 @@ TESTCASES_CONNECTION_REPOSITORY_WRITE = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_CONNECTION_REPOSITORY_WRITE)
 @simplified_test_function
-def test_connection_repository_write_error(testcase, file, svrs):
+def test_connection_repository_write_error(testcase, file, svrs, failure):
     """
     Test the loading of a YAML file that has errors to confirm the
     exceptions generated.
     """
     @patch('pywbemtools.pywbemcli.ConnectionRepository._open_file')
-    def run_operation(connections_file, mock_write):
+    def mock_fail_open_file(connections_file, mock_write):
+        mock_write.side_effect = IOError("foo")
         repo = ConnectionRepository(connections_file)
         for svr in svrs:
             repo.add(svr)
 
-        assert mock_write.called
-        mock_write.side_effect = IOError("foo")
+    @patch('os.rename')
+    def mock_fail_rename_file(connections_file, mock_rename):
+        mock_rename.side_effect = OSError("foo")
+        repo = ConnectionRepository(connections_file)
+        for svr in svrs:
+            repo.add(svr)
 
-    run_operation(file)  # pylint: disable=no-value-for-parameter
+    if failure == 'openfile':
+        mock_fail_open_file(file)  # pylint: disable=no-value-for-parameter
+    elif failure == 'rename':
+        mock_fail_rename_file(file)  # pylint: disable=no-value-for-parameter
+    else:
+        assert False, "Invalid failure attribute in test"
 
     assert testcase.exp_exc_types is None

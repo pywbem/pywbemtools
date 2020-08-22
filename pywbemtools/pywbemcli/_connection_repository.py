@@ -562,11 +562,17 @@ class ConnectionRepository(object):
                     os.remove(bakfile)
                 if os.path.isfile(self._connections_file):
                     os.rename(self._connections_file, bakfile)
+        except OSError as ose:
+            raise ConnectionsFileWriteError(
+                tmpfile, str(ose),
+                message="Error in rename tmpfile{0} to back file{1}".
+                format(tmpfile, bakfile))
 
+        try:
             if self._pywbemcli_servers:
                 os.rename(tmpfile, self._connections_file)
         except OSError as ose:
             raise ConnectionsFileWriteError(
                 tmpfile, str(ose),
-                message="Error in rename bakfile{0} to {1}".
+                message="Error in rename tmpfile{0} to {1}".
                 format(tmpfile, self._connections_file))
