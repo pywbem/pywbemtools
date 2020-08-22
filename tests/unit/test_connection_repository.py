@@ -141,6 +141,14 @@ INVALID_ITEM_VALUE_TYPE = u"""connection_definitions:;
 default_connection_name: null
 """
 
+INVALID_TIMEOUT_VALUE = u"""connection_definitions:;
+    tst1:
+        name: tst1
+        server: http://blah
+        timeout: -100
+default_connection_name: null
+"""
+
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
@@ -262,7 +270,9 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
     ),
 
     (
-        "Verify Creation of good repo with multiple servers and set-default er",
+        "Verify Creation of good repo with multiple servers and set-default in"
+        "error. The error is fixed. Note we cannot test the fix because of "
+        "exception.",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             svrs=[PywbemServer('http://blah', name="tst1"),
@@ -270,7 +280,7 @@ TESTCASES_CREATE_CONNECTION_REPOSITORY = [
             default='tst3',
             exp_rtn=dict(
                 keys=['tst1', 'tst2'],
-                default='tst3'
+                default=None
             ),
         ),
         ValueError, None, OK,
@@ -408,12 +418,21 @@ TESTCASES_CONNECTION_REPOSITORY_ERRORS = [
         ConnectionsFileError, None, OK,
     ),
 
-
     (
         "Verify load fails invalid type on key value",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
             yaml=INVALID_ITEM_VALUE_TYPE,
+            exp_rtn=dict(),
+        ),
+        ConnectionsFileError, None, OK,
+    ),
+
+    (
+        "Verify load fails invalid value of timeout (negative integer)",
+        dict(
+            file=CONNECTION_REPO_TEST_FILE_PATH,
+            yaml=INVALID_TIMEOUT_VALUE,
             exp_rtn=dict(),
         ),
         ConnectionsFileError, None, OK,

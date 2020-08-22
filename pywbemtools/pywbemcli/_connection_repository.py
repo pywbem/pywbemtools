@@ -412,7 +412,7 @@ class ConnectionRepository(object):
                     except KeyError as ke:
                         raise ConnectionsFileLoadError(
                             self._connections_file,
-                            "Element: {} missing from svr name: {}".format(
+                            "Element: {} missing from server named: {}".format(
                                 ke, name))
                     except TypeError as te:
                         raise ConnectionsFileLoadError(
@@ -565,8 +565,8 @@ class ConnectionRepository(object):
 
             if self._pywbemcli_servers:
                 os.rename(tmpfile, self._connections_file)
-        except IOError as io:
+        except OSError as ose:
             raise ConnectionsFileWriteError(
-                tmpfile, str(io),
+                tmpfile, str(ose),
                 message="Error in rename bakfile{0} to {1}".
                 format(tmpfile, self._connections_file))
