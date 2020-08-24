@@ -118,6 +118,9 @@ Released: not yet
   The new capability is controled by an environment variable
   "PYWBEMCLI_STARTUP_SCRIPT" that is considered intenal to pywbemcli testing.
 
+* Refactor statistics display to present information consistent with the
+  display in pywbem. (see issue # 724)
+
 **Known issues:**
 
 * See `list of open issues`_.
