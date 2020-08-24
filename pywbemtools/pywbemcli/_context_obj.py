@@ -293,71 +293,79 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             if self.timestats and self._conn:
                 click.echo(self.format_statistics(self.conn.statistics))
 
-    def format_statistics(self, statistics):
+    def format_statistics(self, statistics):  # pylint: disable=no-self-use
         """
-        table formatted output of statistics
+        Table formatted output of statistics
         """
+        click.echo("===============pywbem statistics.formatted=====\n")
+        click.echo(statistics.formatted())
+        click.echo("\n==============pywbemcli statistics output====\n")
+
+        def format_int(avg, min_, max_):
+            """Display float statistics with 0 places"""
+            avg = int(avg)
+            min_ = int(min_)
+            max_ = int(max_)
+            if avg == min_ == max_:
+                return '{0}'.format(avg)
+            return '{0}/{1}/{2}'.format(avg, min_, max_)
 
         def format_float3(avg, min_, max_):
-            """Display float statistics with 3 places"""
+            """Display float statistics with 0 places"""
             if avg == min_ == max_:
                 return '{0:.3f}'.format(avg)
             return '{0:.3f}/{1:.3f}/{2:.3f}'.format(avg, min_, max_)
-
-        def format_float0(avg, min_, max_):
-            """Display float statistics with 0 places"""
-            if avg == min_ == max_:
-                return '{0:.0f}'.format(avg)
-            return '{0:.0f}/{1:.0f}/{2:.0f}'.format(avg, min_, max_)
 
         snapshot = sorted(statistics.snapshot(),
                           key=lambda item: item[1].avg_time,
                           reverse=True)
 
-        # Test to see if any server time is non-zero
-        include_svr = False
+        # Determine of svr_time or lengths should be included.
+        include_svr_time = False
+        include_lengths = False
         for name, stats in snapshot:  # pylint: disable=unused-variable
             # TODO: clean up pywbem stats so this is in pywbem, not here
+            # pylint: disable=protected-access
             if stats._server_time_stored:  # pylint: disable=protected-access
-                include_svr = True
+                include_svr_time = True
+                # pylint: disable=protected-access
+            if stats._request_len_sum > 0 or stats._reply_len_sum > 0:
+                include_lengths = True
 
         # build list of column names
-        hdr = ['Count', 'Exc', 'Time']
-        if include_svr:
-            hdr.append('SvrTime')
-        hdr.extend(['ReqLen', 'ReplyLen', 'Operation'])
+        header = ['Op\nCnt', 'Exec\nCnt', 'Op Time(S)\nAvg/Min/Max']
+        if include_svr_time:
+            header.append("Server Time(S)\nAvg/Min/Max")
+        if include_lengths:
+            header.extend(['RequestLen\nAvg/Min/Max', 'ReplyLen\nAvg/Min/Max'])
 
         # build table rows from snapshot of OperationStatistics
         rows = []
         for name, stats in snapshot:  # pylint: disable=unused-variable
-            time = format_float3(stats.avg_time,
-                                 stats.min_time,
-                                 stats.max_time)
-            req_len = format_float0(stats.avg_request_len,
-                                    stats.min_request_len,
-                                    stats.max_request_len)
-            reply_len = format_float0(stats.avg_reply_len,
-                                      stats.min_reply_len,
-                                      stats.max_reply_len)
-            if include_svr:
-                svrtime = format_float3(stats.avg_server_time,
-                                        stats.min_server_time,
-                                        stats.max_server_time)
-                row = [stats.count, stats.exception_count, time, svrtime,
-                       req_len, reply_len, stats.name]
-            else:
-                row = [stats.count, stats.exception_count, time,
-                       req_len, reply_len, stats.name]
+            row = [stats.count, stats.exception_count,
+                   format_float3(stats.avg_time, stats.min_time,
+                                 stats.max_time)]
+            if include_svr_time:
+                row.append(format_float3(stats.avg_server_time,
+                                         stats.min_server_time,
+                                         stats.max_server_time))
+            if include_lengths:
+                req_len = format_int(stats.avg_request_len,
+                                     stats.min_request_len,
+                                     stats.max_request_len)
+                reply_len = format_int(stats.avg_reply_len,
+                                       stats.min_reply_len,
+                                       stats.max_reply_len)
+                row.extend([req_len, reply_len])
+
+            row.append(name)
+            header.append('Operation')
             rows.append(row)
 
-        # only add table description if verbose on.
-        if self.verbose:
-            title = 'Statistics: Time in sec. Time, ReqLen, etc are single ' \
-                    'value if average/min/max are the same'
-        else:
-            title = None
+        title = 'Statistics: Time in sec. Timeslengths are either 3 values ' \
+                '(Avg/Min/Max)or single value the 3 are the same.'
 
-        click.echo(format_table(rows, hdr, title=title))
+        click.echo(format_table(rows, header, title=title, float_fmt=".3f"))
 
     def connect_wbem_server(self):
         """

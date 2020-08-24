@@ -1144,7 +1144,7 @@ def hide_empty_columns(headers, rows):
 
 
 def format_table(rows, headers, title=None, table_format='simple',
-                 sort_columns=None, hide_empty_cols=None):
+                 sort_columns=None, hide_empty_cols=None, float_fmt=None):
     """
     General print table function.  Prints a list of lists in a
     table format where each inner list is a row.
@@ -1183,6 +1183,14 @@ def format_table(rows, headers, title=None, table_format='simple',
         hiddend and the column header is removed from the headers.
         Uses the function hide_empty_columns
 
+    float_fmt (:term:`string` or list of :term:`string`):
+        String defining the formating of floating point format, either
+        universal for all floating point if a single string or for selected
+        columns if a list is provided.
+        The string defines the number of decimals after the decimal point as
+        ".<number>f". Thus ".4f" tells the formatter to use 4 digits after the
+        decimal point
+
     Returns:
         :term:`string`: Returns the formatted table as a string
 
@@ -1207,7 +1215,13 @@ def format_table(rows, headers, title=None, table_format='simple',
         raise click.ClickException('Invalid table format {}.'
                                    .format(table_format))
 
-    result = tabulate.tabulate(rows, headers, tablefmt=table_format)
+    # Required because tabulate applies an internally defined format
+    # when floatfmt not defined.
+    if float_fmt:
+        result = tabulate.tabulate(rows, headers, tablefmt=table_format,
+                                   floatfmt=float_fmt)
+    else:
+        result = tabulate.tabulate(rows, headers, tablefmt=table_format)
 
     if title:
         if table_format == 'html':
