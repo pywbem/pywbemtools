@@ -100,6 +100,37 @@ def output_format_is_table(output_format):
     return output_format in TABLE_FORMATS
 
 
+def output_format_in_groups(output_format, format_groups):
+    """
+    Return True if output format is in the group defined by format_group
+
+    Parameters:
+
+      output_format (:term:`string`):
+         String containing the output_format keyvalue.
+
+      output_groups (:term:`string` or list of :term:`string`):
+         String containing the format group ot list of strings representing
+         multiple groups. This must be one of the keys in the table
+         OUTPUT_FORMAT_GROUPS.  If the
+
+    Returns:
+      True: if it is in the group or one of the list of groups
+      False: if it is not in any of the the groups.
+
+    Raises:
+        KeyError: If format_group parameter is not a valid group
+    """
+    if isinstance(format_groups, (list, tuple)):
+        for group in format_groups:
+            if output_format_in_groups(output_format, group):
+                return True
+        return False
+
+    # test if output_format string is in a group
+    return output_format in OUTPUT_FORMAT_GROUPS[format_groups]
+
+
 def validate_output_format(output_format, valid_format_groups,
                            default_format=None):
     """

@@ -40,7 +40,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     is_classname, pick_one_from_list, pick_multiple_from_list, \
     hide_empty_columns, verify_operation, split_str_w_esc, format_keys, \
     create_ciminstancename, shorten_path_str, \
-    validate_output_format, fold_strings
+    validate_output_format, output_format_in_groups, fold_strings
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
 # from tests.unit.utils import assert_lines
@@ -256,6 +256,69 @@ def test_valid_output_format(testcase, fmt, default, groups, exp_rtn):
     # The code to be tested
 
     act_rtn = validate_output_format(fmt, groups, default_format=default)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_OUTPUT_FORMAT_IN_GROUPS = [
+    # TESTCASES for output_format_in_group
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function and response:
+    #   * fmt: output_format being tested
+    #   * groups[]: string or list of stringscontaining group names
+    #   * exp_rtn: output_format return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify mof in CIM',
+     dict(fmt='mof',
+          groups='CIM',
+          exp_rtn=True),
+     None, None, True),
+
+    ('Verify mof CIM as a list',
+     dict(fmt='mof',
+          groups=['CIM'],
+          exp_rtn=True),
+     None, None, True),
+
+    ('Verify mof CIM as a tuple',
+     dict(fmt='mof',
+          groups=('CIM'),
+          exp_rtn=True),
+     None, None, True),
+
+    ('Verify table not in CIM',
+     dict(fmt='table',
+          groups=['CIM'],
+          exp_rtn=False),
+     None, None, False),
+
+    ('Verify table not in CIM or TEXT',
+     dict(fmt='table',
+          groups=['CIM', 'TEXT'],
+          exp_rtn=False),
+     None, None, False),
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_OUTPUT_FORMAT_IN_GROUPS)
+@simplified_test_function
+def test_output_format_in_groups(testcase, fmt, groups, exp_rtn):
+    """Test common.valid_output_format function"""
+    # The code to be tested
+
+    act_rtn = output_format_in_groups(fmt, groups)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions

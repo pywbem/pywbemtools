@@ -28,7 +28,7 @@ import os
 import click
 import click_spinner
 
-from ._common import format_table
+from ._common import format_table, output_format_in_groups
 
 
 class ContextObj(object):  # pylint: disable=useless-object-inheritance
@@ -291,15 +291,19 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             # Issue statistics if required. Note that we use _conn in order
             # not to create the connection if not created.
             if self.timestats and self._conn:
-                click.echo(self.format_statistics(self.conn.statistics))
+                context = click.get_current_context()
+                click.echo(self.format_statistics(self.conn.statistics,
+                                                  context.obj))
 
-    def format_statistics(self, statistics):  # pylint: disable=no-self-use
+    def format_statistics(self, statistics, context):
+        # pylint: disable=no-self-use
         """
         Table formatted output of statistics
         """
-        click.echo("===============pywbem statistics.formatted=====\n")
-        click.echo(statistics.formatted())
-        click.echo("\n==============pywbemcli statistics output====\n")
+        if context.output_format:
+            if not output_format_in_groups(context.output_format, 'TEXT'):
+                click.echo(statistics.formatted())
+                return
 
         def format_int(avg, min_, max_):
             """Display float statistics with 0 places"""
@@ -362,8 +366,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             header.append('Operation')
             rows.append(row)
 
-        title = 'Statistics: Time in sec. Timeslengths are either 3 values ' \
-                '(Avg/Min/Max)or single value the 3 are the same.'
+        title = 'Statistics: Time(Seconds); Times/lengths: (Avg/Min/Max), ' \
+                'single value if all same.'
 
         click.echo(format_table(rows, header, title=title, float_fmt=".3f"))
 
