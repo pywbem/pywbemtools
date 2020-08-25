@@ -67,6 +67,9 @@ if TERMWIDTH_ENVVAR:
     except ValueError:
         TERMWIDTH_ENVVAR = None
 
+#
+# Context variables passed to click
+#
 CONTEXT_SETTINGS = dict(
 
     # Enable -h as additional help option:
@@ -75,6 +78,12 @@ CONTEXT_SETTINGS = dict(
     # Default the output width properly:
     terminal_width=TERMWIDTH_ENVVAR or click.get_terminal_size()[0],
 )
+
+###########################################################################
+#
+# Support functions for the the cli(...) function
+#
+###########################################################################
 
 
 def validate_connections_file(connections_repo):
@@ -125,6 +134,51 @@ def execute_startup_script(file_path, verbose):
             raise click.Abort()
 
 
+def _resolve_mock_server(mock_server):
+    """
+    Validate and resolve the mock_server parameter.
+    Validates that all files defined in the server exist and that the
+    types are valid.
+
+    Parameters:
+
+      mock_server (tuple of string):
+        Strings defining all of the files that compromise the mock_server
+        definiton.
+
+    Returns: list of resolved mock server definition components derived
+       from the input parameter mock_server.
+
+    Raises:
+      click.ClickException for any errors.
+    """
+    resolved_mock_server = []
+    assert isinstance(mock_server, tuple)
+    # Normalize paths for different OS's
+    mock_server_path = [os.path.normpath(fn) for fn in mock_server]
+
+    # Test for valid file types and existence for mock_server files.
+    for file_path in mock_server_path:
+        ext = os.path.splitext(file_path)[1]
+        if ext not in ['.py', '.mof']:
+            raise click.ClickException(
+                "Mock file '{}' has invalid suffix '{}' "
+                "- must be '.py' or '.mof'".format(file_path, ext))
+        if not os.path.isfile(file_path):
+            raise click.ClickException(
+                "Mock file '{}' does not exist".format(file_path))
+        resolved_mock_server.append(file_path)
+    return resolved_mock_server
+
+
+############################################################################
+#
+#   cli command (main entry point) and definition of all of the pywbemcli
+#   general options.
+#
+############################################################################
+
+
 # pylint: disable=bad-continuation
 # PywbemcliTopGroup sets order commands listed in help output
 @click.group(invoke_without_command=True, cls=PywbemcliTopGroup,
@@ -145,7 +199,8 @@ def execute_startup_script(file_path, verbose):
               envvar=PywbemServer.mock_server_envvar,
               help=u'Use a mock WBEM server that is automatically created in '
                    u'pywbemcli and populated with CIM objects that are defined '
-                   u'in the specified MOF file or Python script file. '
+                   u'in the specified MOF file or Python script file. The '
+                   u'files may be specified with relative or absolute path.'
                    u'See the pywbemcli documentation for more information. '
                    u'This option may be specified multiple times, and is '
                    u'mutually exclusive with the --server and --name options, '
@@ -364,8 +419,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
-
-    # List of options that are not allowed in some cases:
     # i.e. When -name is used and when in interactive mode.
     resolved_mock_server = []
     conditional_options = ((default_namespace, 'default_namespace'),
@@ -376,8 +429,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                            (keyfile, 'keyfile'),
                            (ca_certs, 'ca_certs'),
                            (server, 'server'),
-                           # Special because we remove some items from the
-                           # list of mocks that define the mock repository
+                           # Special because we resolve the mock-server list
+                           # during initialization.
                            (resolved_mock_server, 'mock-server'))
 
     def create_server_instance(connection_name):
@@ -390,12 +443,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         ClickException treats it as a reference before assignment if using the
         connection_name from the enclosing scopt
         """
-        # test for conflicting server definitions.
         if server or resolved_mock_server:
-            if connection_name:
-                click.ClickException('Option conflict: --name "{}" '
-                                     'conflicts with existence of --server and '
-                                     '--mock-server'.format(connection_name))
             connection_name = 'not-saved'
             pywbem_server = PywbemServer(server,
                                          resolved_default_namespace,
@@ -473,8 +521,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 pywbem_server = None
         return pywbem_server
 
-    # Process cli options to produce resolved options, i.e. the
-    # options with any defaults applied for non None options.
+    # Process cli options to validate options and produce resolved options,
+    # i.e. the options with any defaults applied for non None options.
     # Produces new variables resolved... so that later tests can confirm that
     # original variables were None or not None
 
@@ -504,11 +552,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     if verbose:
         click.echo(str(connections_repo))
 
-    if server and connection_name:
-        raise click.ClickException(
-            'Conflicting server definitions: name: {}, server: {}'.
-            format(connection_name, server))
-
     if keyfile and not certfile:
         raise click.ClickException(
             'The --keyfile option "{}" is allowed only if the --certfile '
@@ -519,28 +562,15 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         execute_startup_script(os.getenv('PYWBEMCLI_STARTUP_SCRIPT'),
                                verbose)
 
-    # process mock_server option
+    # Process mock_server option
     if mock_server:
-        assert isinstance(mock_server, tuple)
-        # resolve relative and absolute paths
-        mock_server_path = []
-        for fn in mock_server:
-            if fn == os.path.basename(fn):
-                mock_server_path.append(os.path.join(os.getcwd(), fn))
-            else:
-                mock_server_path.append(fn)
+        resolved_mock_server = _resolve_mock_server(mock_server)
 
-        # Test for valid file types and existence for mock_server files.
-        for file_path in mock_server_path:
-            ext = os.path.splitext(file_path)[1]
-            if ext not in ['.py', '.mof']:
-                raise click.ClickException(
-                    "Mock file '{}' has invalid suffix '{}' "
-                    "- must be '.py' or '.mof'".format(file_path, ext))
-            if not os.path.isfile(file_path):
-                raise click.ClickException(
-                    "Mock file '{}' does not exist".format(file_path))
-            resolved_mock_server.append(file_path)
+    # Validate that only one of server, mock_server, and connection name exists
+    if server and connection_name:
+        raise click.ClickException(
+            'Conflicting server definitions: name: {}, server: {}'.
+            format(connection_name, server))
 
     # Simultaneous mock_server and server fails
     if server and resolved_mock_server:
@@ -604,6 +634,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         else:
             if pywbem_server is None:
                 # Copy to keep the original clean from any changes
+                # This allows modifications to be made for a single
+                # interactive command but not kept.
                 pywbem_server = deepcopy(ctx.obj.pywbem_server)
             if pywbem_server:
                 modified_server = False
@@ -655,7 +687,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         # The following variables are maintained only in the context_obj and
         # not attached to any particular connection. If the cli argument is
         # None, this argument was not defined as part of this interactive
-        # command
+        # command and the value is set from the existing ctx.obj.
         if output_format is None:
             output_format = ctx.obj.output_format
         if use_pull is None:
