@@ -51,10 +51,11 @@ Help text for ``pywbemcli``:
                                       WBEM server. Default: EnvVar PYWBEMCLI_NAME, or none.
 
       -m, --mock-server FILE          Use a mock WBEM server that is automatically created in pywbemcli and populated with
-                                      CIM objects that are defined in the specified MOF file or Python script file. See the
-                                      pywbemcli documentation for more information. This option may be specified multiple
-                                      times, and is mutually exclusive with the --server and --name options, since each
-                                      defines a WBEM server. Default: EnvVar PYWBEMCLI_MOCK_SERVER, or none.
+                                      CIM objects that are defined in the specified MOF file or Python script file. The
+                                      files may be specified with relative or absolute path.See the pywbemcli documentation
+                                      for more information. This option may be specified multiple times, and is mutually
+                                      exclusive with the --server and --name options, since each defines a WBEM server.
+                                      Default: EnvVar PYWBEMCLI_MOCK_SERVER, or none.
 
       -s, --server URL                Use the WBEM server at the specified URL with format: [SCHEME://]HOST[:PORT]. SCHEME
                                       must be "https" (default) or "http". HOST is a short or long hostname or literal

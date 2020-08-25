@@ -19,6 +19,7 @@ Common Functions applicable across multiple components of pywbemcli
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import os
 import re
 from collections import OrderedDict
 import six
@@ -480,6 +481,12 @@ class PywbemServer(object):
             kwargsout = {k.replace('-', '_'): v for k, v in kwargs.items()}
         # Test for existence of required elements
         kwargsout['name']   # pylint: disable=pointless-statement
+
+        # Normalize file names for the server environment
+        if 'mock_server' in kwargsout:
+            if kwargsout['mock_server']:
+                kwargsout['mock_server'] = [os.path.normpath(fn) for fn in
+                                            kwargsout['mock_server']]
         return PywbemServer(**kwargsout)
 
     def reset(self):
