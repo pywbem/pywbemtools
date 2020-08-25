@@ -277,7 +277,7 @@ TEST_CASES = [
 
     # Begin of sequence - repository is empty.
 
-    ['Verify connection command save creates file.',
+    ['Verify connection command save creates file. SEQ 0.1',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'test1']},
      {'stdout': "",
@@ -285,7 +285,7 @@ TEST_CASES = [
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show of just created test1',
+    ['Verify connection command show of just created test1. SEQ 0.2',
      {'general': [],
       'args': ['show', 'test1']},
      {'stdout': """Connection status:
@@ -309,7 +309,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show of just created test1 as table',
+    ['Verify connection command show of just created test1 as table. SEQ 0.3',
      {'general': ['--output-format', 'plain'],
       'args': ['show', 'test1']},
      {'stdout': """Connection status:
@@ -332,7 +332,8 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command save with complex general options short',
+    ['Verify connection command save with complex general options short. '
+     'SEQ 0.4',
      {'general': ['--server', 'http://blahblah', '-u', 'fred', '-p',
                   'argh', '-t', '18', '--no-verify', '-l', 'api=file,all'],
       'args': ['save', 'test2']},
@@ -341,7 +342,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show named connnection test1',
+    ['Verify connection command show named connnection test1.SEQ 0.5',
      {'general': [],
       'args': ['show', 'test1']},
      {'stdout': """Connection status:
@@ -364,7 +365,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show test2 with --show-password',
+    ['Verify connection command show test2 with --show-password. SEQ 0.6',
      {'general': [],
       'args': ['show', 'test2', '--show-password']},
      {'stdout': """Connection status:
@@ -387,7 +388,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show test2, masked password',
+    ['Verify connection command show test2, masked password. SEQ 0.7',
      {'general': [],
       'args': ['show', 'test2']},
      {'stdout': """Connection status:
@@ -410,7 +411,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show test2, masked password',
+    ['Verify connection command show test2, masked password. SEQ 0.8',
      {'general': [],
       'args': ['show', 'BADSERVERNAME']},
      {'stderr': ['Connection definition',
@@ -420,7 +421,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command list with 2 servers defined',
+    ['Verify connection command list with 2 servers defined. SEQ 0.9',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
@@ -430,28 +431,28 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command select test2',
+    ['Verify connection command select test2.. SEQ 0,9',
      {'general': [],
       'args': ['select', 'test2', '--default']},
      {'stdout': ['test2', 'default'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command show test2 includes "current"',
+    ['Verify connection command show test2 includes "current". SEQ 0.10',
      {'general': [],
       'args': ['show', 'test2']},
      {'stdout': ['test2', 'http://blahblah', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command select test2 shows it is current',
+    ['Verify connection command select test2 shows it is current. SEQ 0.11',
      {'general': [],
       'args': ['select', 'test2']},
      {'stdout': ['test2', 'current'],
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command select test3 fails',
+    ['Verify connection command select test3 fails. . SEQ 0.12',
      {'general': [],
       'args': ['select', 'test9']},
      {'stderr': ['Connection definition',
@@ -462,7 +463,7 @@ ca-certs
      None, OK],
 
     ['Verify connection command list with 2 servers defined, not sel after '
-     'next pywbemcli call',
+     'next pywbemcli call. . SEQ 0.13',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
@@ -472,8 +473,8 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command list with 2 servers defined, not sel after '
-     'next pywbemcli call',
+    ['Verify connection command list with 2 servers defined, not selected '
+     'after next pywbemcli call. SEQ 0.14',
      {'general': ['--output-format', 'plain'],
       'args': ['list']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
@@ -484,7 +485,7 @@ ca-certs
      None, OK],
 
     ['Verify connection command list with 2 servers defined, not sel after '
-     'next pywbemcli call --full',
+     'next pywbemcli call --full. SEQ 0.15',
      {'general': ['--output-format', 'plain'],
       'args': ['list', '--full']},
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
@@ -496,7 +497,7 @@ ca-certs
      None, OK],
 
     ['Verify connection command list with 2 servers defined, not sel after '
-     'next pywbemcli call -f',
+     'next pywbemcli call -f. SEQ 0.16',
      {'general': ['--output-format', 'plain'],
       'args': ['list', '-f']},
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
@@ -507,13 +508,15 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command delete test1',
+    ['Verify connection command delete test1. SEQ 0.17, last',
      {'general': [],
       'args': ['delete', 'test1']},
      {'stdout': ['Deleted', 'test1'],
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
+
+    # End of sequence - repository is empty.
 
     ['Verify connection command test',
      {'general': [],
@@ -563,7 +566,6 @@ ca-certs
       'test': 'innows'},
      ONE_CLASS_MOCK_FILE, OK],
 
-
     # TODO: Future; Add test for --pull-options where the mocker has
     # pull disabled.  Note that this must be a completely new test, not
     # just the existing because there is no external way to turh off
@@ -587,7 +589,16 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    # End of sequence - repository is empty.
+    ['Verify connection command save no current connection.',
+     {'general': [],
+      'args': ['show']},
+     {'stderr': [
+         "No current connection exists"],
+      'test': 'innows',
+      'rc': 1,
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
 
     #
     #  Sequence that creates, shows and deletes a single server definition
@@ -595,7 +606,7 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Verify connection command add with all arguments.',
+    ['Verify connection command add with all arguments. SEQ 1.1',
      {'general': ['--server', 'http://blahblah',
                   '--default-namespace', 'root/blahblah',
                   '--user', 'john',
@@ -610,7 +621,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show addallargs initial version',
+    ['Verify connection command show addallargs initial version. SEQ 1.2',
      {'general': [],
       'args': ['show', 'addallargs']},
      {'stdout': [
@@ -625,7 +636,8 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command with that overwrites existing name works.',
+    ['Verify connection command with that overwrites existing name works.  '
+     'SEQ 1.3',
      {'general': ['--server', 'http://blah',
                   '--default-namespace', 'root/blah',
                   '--user', 'john',
@@ -641,7 +653,8 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show of name addallargs, overwrite changed',
+    ['Verify connection command show of name addallargs, overwrite changed. '
+     'SEQ 1.4',
      {'general': [],
       'args': ['show', 'addallargs', '--show-password']},
      {'stdout': [
@@ -656,7 +669,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command delete addallargs',
+    ['Verify connection command delete addallargs. SEQ 1.5',
      {'general': [],
       'args': ['delete', 'addallargs']},
      {'stdout': "Deleted",
@@ -666,7 +679,7 @@ ca-certs
 
     # uses regex because windows generates set and linux export in statements
     # No file verification required. Does not use file
-    ['Verify connection command export current connection',
+    ['Verify connection command export current connection. SEQ 1.6',
      {'args': ['export'],
       'general': ['-s', 'http://blah', '-u', 'fred', '-p', 'arghh',
                   '--no-verify',
@@ -685,7 +698,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command export no current conection',
+    ['Verify connection command export no current conection. SEQ 1.7',
      {'general': [],
       'args': ['export']},
      {'stderr': ['No server currently defined as current'],
@@ -703,7 +716,8 @@ ca-certs
 
     # Begin of sequence - connections file does not exist.
 
-    ['Verify connection command show with name, non-existing conn file',
+    ['Verify connection command show with name, non-existing conn file. '
+     'SEQ 2.1',
      {'general': [],
       'args': ['show', 'blah']},
      {'stderr': ['Name', 'blah', 'not current and no connections file',
@@ -713,16 +727,17 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command show with no name, non-existing conn file',
+    ['Verify connection command show with no name, non-existing conn file.'
+     'SEQ 2.2',
      {'general': [],
       'args': ['show']},
-     {'stderr': ['No current connection and no connections file'],
+     {'stderr': ['No current connection exists'],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command select, non-existing conn file',
+    ['Verify connection command select, non-existing conn file. SEQ 2.3',
      {'general': [],
       'args': ['select']},
      {'stderr': ["Connections file", "does not exist"],
@@ -731,7 +746,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command select blah, non-existing conn file',
+    ['Verify connection command select blah, non-existing conn file. SEQ 2.4',
      {'general': [],
       'args': ['select', 'blah']},
      {'stderr': ["Connections file", "does not exist"],
@@ -740,7 +755,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command delete, non-existing conn file',
+    ['Verify connection command delete, non-existing conn file. SEQ 2.5',
      ['delete'],
      {'stderr': ["Connections file", "does not exist"],
       'rc': 1,
@@ -748,7 +763,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection command delete, non-existing conn file',
+    ['Verify connection command delete, non-existing conn file. SEQ 2.6',
      {'general': [],
       'args': ['delete', 'blah']},
      {'stderr': ["Connections file", "does not exist"],
@@ -765,7 +780,7 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Verify mock connection exists.',
+    ['Verify mock connection exists. SEQ 3.1',
      {'general': ['--mock-server', MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
@@ -773,7 +788,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command shows mock file ',
+    ['Verify connection command shows mock file. SEQ 3.2',
      {'general': [],
       'args': ['show', 'mocktest']},
      {'stdout': [
@@ -789,7 +804,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command test against existing mock def',
+    ['Verify connection command test against existing mock def. SEQ 3.3',
      {'args': ['test'],
       'general': ['--name', 'mocktest']},
      {'stdout': "Connection OK: FakedUrl",
@@ -799,7 +814,7 @@ ca-certs
 
     # The following 3 tests use a file defined to pywbemcli through an
     # environment variable to mock the select prompt.
-    ['Verify connection command select mocktest with prompt',
+    ['Verify connection command select mocktest with prompt. SEQ 3.4',
      {'general': [],
       'args': ['select'],
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
@@ -808,7 +823,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command show with prompt',
+    ['Verify connection command show with prompt. SEQ 3.5',
      {'general': [],
       'args': ['show', '?'],
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
@@ -817,7 +832,8 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command delete last one that deletes w/o prompt',
+    ['Verify connection command delete last one that deletes w/o prompt. '
+     'SEQ 3.6',
      {'general': [],
       'args': ['delete'],
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
@@ -826,7 +842,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'none'}},
      None, OK],
 
-    ['Verify Add mock server to empty connections file.',
+    ['Verify Add mock server to empty connections file. SEQ 3.7',
      {'general': ['--mock-server', MOCK_FILE_PATH],
       'args': ['save', 'mocktest']},
      {'stdout': "",
@@ -834,7 +850,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command delete, empty repository',
+    ['Verify connection command delete, empty repository. SEQ 3.8',
      {'general': [],
       'args': ['delete', 'mocktest']},
      {'stdout': ['Deleted connection "mocktest"'],
@@ -851,7 +867,8 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Verify save server with cmd line params to empty connections file.',
+    ['Verify save server with cmd line params to empty connections file. '
+     'SEQ 4.1',
      {'args': ['save', 'svrtest2'],
       'general': ['--server', 'http://blah',
                   '--timeout', '45',
@@ -867,7 +884,8 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify save mock server with cmd line params to empty connections file.',
+    ['Verify save mock server with cmd line params to empty connections file. '
+     'SEQ 4.2',
      {'args': ['save', 'mocktest2'],
       'general': ['--mock-server', MOCK_FILE_PATH,
                   '--timeout', '45',
@@ -883,7 +901,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command shows mock file ',
+    ['Verify connection command shows mock file. SEQ 4.3',
      ['show', 'mocktest2'],
      {'stdout': [
          "name mocktest2",
@@ -899,7 +917,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command shows svrtest2 ',
+    ['Verify connection command shows svrtest2. SEQ 4.4',
      ['show', 'svrtest2'],
      {'stdout': [
          "name svrtest2",
@@ -915,14 +933,14 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command delete works',
+    ['Verify connection command delete works. SEQ 4.5',
      ['delete', 'mocktest2'],
      {'stdout': "",
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection command delete works and file empty',
+    ['Verify connection command delete works and file empty. SEQ 4.6 last',
      ['delete', 'svrtest2'],
      {'stderr': "",
       'rc': 0,
@@ -933,12 +951,33 @@ ca-certs
     # End of sequence - repository is empty.
 
     #
-    #  Sequence that tests select variations
+    #  Sequence that tests select/show variations
     #
 
     # Begin of sequence - repository is empty.
 
-    ['Verify connection show with just current server defined by --server',
+    ['Verify connection show with no server definitions file fails. SEQ 6.1',
+     {'general': [],
+      'args': ['show']},
+     {'stderr': "No current connection exists.",
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, OK],
+
+    ['Verify connection show ? with no server definitions file fails. SEQ 6.2',
+     {'general': ['--server', 'http://blah'],
+      'args': ['show', "?"]},
+     {'stderr': ["Connections file ", ".pywbemcli_connections.yaml",
+                 "does not exist"],
+      'rc': 1,
+      'test': 'innows',
+      'file': {'before': 'none', 'after': 'none'}},
+     None, RUN],
+
+
+    ['Verify connection show with just current server defined by --server. '
+     'SEQ 6.3',
      {'args': ['show'],
       'general': ['--server', 'http://blah']},
      {'stdout': ['name', 'not-saved'],
@@ -946,7 +985,8 @@ ca-certs
       'file': {'before': 'none', 'after': 'none'}},
      None, OK],
 
-    ['Verify connection list with current server from general options, plain',
+    ['Verify connection list with current server from general options, plain. '
+     'SEQ 6.4, last',
      {'args': ['list'],
       'general': ['--server', 'http://blah', '--output-format', 'plain']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
@@ -963,7 +1003,7 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Verify Create new connection names svrtest works.',
+    ['Verify Create new connection names svrtest works. SEQ 7.1',
      {'general': ['--server', 'http://blah'],
       'args': ['save', 'svrtest']},
      {'stdout': "",
@@ -971,7 +1011,8 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection list with current server from general options, grid',
+    ['Verify connection list with current server from general options, grid. '
+     'SEQ 7.2',
      {'args': ['list'],
       'general': ['--output-format', 'table', '--server', 'http://blah']},
      {'stdout': ['WBEM server connections(brief): (#: default, *: current)',
@@ -987,7 +1028,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection select of svrtest',
+    ['Verify connection select of svrtest. SEQ 7.3',
      {'args': ['select', 'svrtest', '--default'],
       'general': ['--server', 'http://blah']},
      {'stdout': '"svrtest" default and current',
@@ -995,7 +1036,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection select of svrtest as default',
+    ['Verify connection select of svrtest as default. SEQ 7.4',
      {'args': ['show'],
       'general': []},
      {'stdout': ['svrtest'],
@@ -1003,7 +1044,8 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
 
-    ['Verify current connection set with general opts overrides default',
+    ['Verify current connection set with general opts overrides default. '
+     'SEQ 7.5',
      {'args': ['show'],
       'general': ['--server', 'https://blahblahblah']},
      {'stdout': ['not-saved', 'https://blahblahblah'],
@@ -1011,7 +1053,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'exists'}},
      None, FAIL],
 
-    ['Verify connection delete svrtest',
+    ['Verify connection delete svrtest. SEQ 7.6, last',
      {'args': ['delete', 'svrtest'],
       'general': []},
      {'stdout': "Deleted default connection",
@@ -1033,7 +1075,8 @@ ca-certs
     #       line of the stdin. If the connection save fred is not in the
     #       first line, the test fails.
 
-    ['Verify Create new connection in interactive mode and delete - single',
+    ['Verify Create new connection in interactive mode and delete - single, '
+     'SEQ 8.1',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
                 '--certfile cert1.pem --keyfile keys1.pem '
@@ -1060,7 +1103,8 @@ ca-certs
 
     # Begin of sequence - repository is empty.
     # TODO: the show shows the not-saved connection for some reason
-    ['Verify Create new connection in interactive mode and delete - single',
+    ['Verify Create new connection in interactive mode and delete - single, '
+     'SEQ 8.2, last',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
                 '--certfile cert1.pem --keyfile keys1.pem',
@@ -1092,7 +1136,7 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Verify Create new connection in interactive mode and delete.',
+    ['Verify Create new connection in interactive mode and delete. SEQ 9.1',
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
                 '--certfile cert1.pem --keyfile keys1.pem',
@@ -1112,7 +1156,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify connection delete fred',
+    ['Verify connection delete fred. SEQ 9.2, last',
      {'args': ['delete', 'fred'],
       'general': []},
      {'stdout': 'Deleted connection "fred"',
@@ -1128,7 +1172,7 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    ['Create mock server definition.',
+    ['Create mock server definition. SEQ 10.1',
      {'args': ['save', 'mocktest3'],
       'general': ['--mock-server', MOCK_FILE_PATH]},
      {'stdout': "",
@@ -1136,7 +1180,7 @@ ca-certs
       'file': {'before': 'none', 'after': 'exists'}},
      None, OK],
 
-    ['Verify sequence select, list, create new and save, list works.',
+    ['Verify sequence select, list, create new and save, list works. SEQ 10.2',
      {'general': [],
       'stdin': ['connection select mocktest3',
                 'connection list',
@@ -1151,7 +1195,7 @@ ca-certs
       'file': {'before': 'exists', 'after': 'None'}},
      None, OK],
 
-    ['Verify connection list with mof output format mof fails',
+    ['Verify connection list with mof output format mof fails. SEQ 10.3, last',
      {'args': ['list'],
       'general': ['--output-format', 'mof', '--server', 'http://blah']},
      {'stderr': ['Output format "mof" not allowed'],

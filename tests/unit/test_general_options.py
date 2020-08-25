@@ -737,7 +737,7 @@ TEST_CASES = [
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
      {'stdout': ['CIM_Foo'],
       'test': 'innows'},
-     None, RUN],
+     None, OK],
 
     ['Delete our test server. Sequence 0,4. Last',
      {'general': ['--name', 'mocktestVerifyPWPrompt'],
@@ -953,7 +953,8 @@ TEST_CASES = [
                 'connection show'],
       'cmdgrp': None,
       },
-     {'stderr': ['Conflicting server definitions:',
+     {'stdout': ["name not-saved (current)"],
+      'stderr': ['Conflicting server definitions:',
                  'http://blah',
                  'mock-server: tests/unit/simple_mock_model.mof'],
       'rc': 0,
