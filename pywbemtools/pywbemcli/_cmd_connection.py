@@ -112,14 +112,16 @@ def connection_show(context, name, **options):
     Show the name and attributes of a WBEM connection definition or the
     current connection, as follows:
 
-    * If the NAME argument is specified, the connection definition with that
-      name from the connections file is shown.
+    * If the NAME argument is specified, display the connection information
+      with that name from the connections file or the current connection if it
+      is the same name.
 
     * If the NAME argument is '?', the command presents a list of connection
-      definitions from the connections file and prompts the user for
-      selecting one, which is then shown.
+      definitions from the connections file and prompts the user to
+      select one, which is then displayed.
 
-    * If the NAME argument is omitted, the current connection is shown.
+    * If the NAME argument is omitted, displays the current connection
+      information if there is a current connection.
 
     Example showing a named connection definition:
 
@@ -399,34 +401,47 @@ def get_current_connection_name(context):
     return context.pywbem_server.name if context.pywbem_server else None
 
 
-def raise_no_repository_file(connections):
+def pick_connection(name, context, connections_repo):
     """
-    Raise exception with message that connections file does not exist.
-    """
-    raise click.ClickException(
-        'Connections file "{0}" does not exist'.
-        format(connections.connections_file))
+    If name is None use the interactive mode to select the connection from the
+    list of connections in the connections file. If the name is provided, it is
+    tested against the names in the connections file.  If it is not provided,
 
+    Parameters:
 
-def select_connection(name, context, connections):
-    """
-    Use the interactive mode to select the connection from the list of
-    connections in the connections file. If the name is provided, it is tested
-    against the names in the connections file.  If it is not provided,
+      name (:term:`string):
+        Name that will be validated against repository or Noe if the name
+        is to be picked from a selection presented
+
+      context (:class:`'~pywbemtools.pywbemcli._context_obj.ContextObj`):
+        The current ContextObj instance.
+
+      connections_repo (:class:`'~pywbemtools._context_obj.ContextObj`):
+
+    Returns:
+        name selected from connections  or None if no name selected.
+
+    Raises
+
+      click.ClickException: No connection file exists or if there is a name,
+      parameter, that name does not exist in the connections file
+
     """
     context.spinner_stop()
 
-    if not connections.file_exists():
-        raise_no_repository_file(connections)
+    if not connections_repo.file_exists():
+        raise click.ClickException(
+            'Connections file "{0}" does not exist'.
+            format(connections_repo.connections_file))
 
     if name:
-        if name in connections:
+        if name in connections_repo:
             return name
         raise click.ClickException(
             'Connection definition "{0}" not found in connections file "{1}"'.
-            format(name, connections.connections_file))
+            format(name, connections_repo.connections_file))
 
-    conn_names = sorted(list(six.iterkeys(connections)))
+    conn_names = sorted(list(six.iterkeys(connections_repo)))
     return pick_one_from_list(context, conn_names,
                               "Select a connection or Ctrl-C to abort.")
 
@@ -538,46 +553,38 @@ def cmd_connection_show(context, name, options):
 
     connections_repo = context.connections_repo
 
-    curr_name = get_current_connection_name(context)
-    # If no name arg, fallback to selection unless there is no connections file
+    current_name = get_current_connection_name(context)
+
+    # If no name arg, use the current connection if it exists
     if not name:
-        name = curr_name or '?'
-        if not curr_name and not connections_repo.file_exists():
-            raise click.ClickException(
-                'No current connection and no connections file {}.'
-                .format(connections_repo.connections_file))
+        if not current_name:
+            raise click.ClickException('No current connection exists.')
+        name = current_name
 
-    # ? means to ask for connections file. However fallback to current
-    # if there is no connections file and fail if no current.
+    # ? means ask for connections file. However fallback to current connection
+    # if there is no connections file and fail if no current connection.
     if name == '?':
-        # No connections exit in connections file.
-        if not connections_repo.file_exists():
-            if context.pywbem_server:
-                show_connection_information(
-                    context,
-                    context.pywbem_server,
-                    show_state=True,
-                    show_password=options['show_password'])
-                return
+        name = pick_connection(None, context, connections_repo)
 
-        name = select_connection(None, context, connections_repo)
+    # Name is now defined
+    if name == current_name:
+        show_connection_information(context,
+                                    context.pywbem_server,
+                                    show_state=True,
+                                    show_password=options['show_password'])
+        return
 
-    # Have a name. If there are connections and this name is in connections
-    # and that name is not current, use it. If current name is same as
-    # name, use the current version.
+    # Show a server definition from the connections file
     if connections_repo.file_exists():
-        # If name in connections use it
         if name not in connections_repo:
             raise click.ClickException(
                 'Connection definition "{0}" not found in connections file '
                 '"{1}"'.format(name, connections_repo.connections_file))
         connection = connections_repo[name]
-    else:   # not connections file
-        if curr_name != name:
-            raise click.ClickException(
-                'Name: "{}" not current and no connections file {}'.format(
-                    name, connections_repo.connections_file))
-        connection = context.pywbem_server
+    else:   # no connections file
+        raise click.ClickException(
+            'Name: "{}" not current and no connections file {}'.format(
+                name, connections_repo.connections_file))
 
     show_connection_information(context,
                                 connection,
@@ -656,7 +663,7 @@ def cmd_connection_select(context, name, options):
     """
     connections_repo = context.connections_repo
 
-    name = select_connection(name, context, connections_repo)
+    name = pick_connection(name, context, connections_repo)
 
     new_ctx = ContextObj(connections_repo[name],
                          context.output_format,
@@ -692,18 +699,20 @@ def cmd_connection_delete(context, name):
 
     # Select the connection with prompt if name is None.
     # This also stops the spinner
-    name = select_connection(name, context, connections_repo)
+    name = pick_connection(name, context, connections_repo)
 
-    cname = get_current_connection_name(context)
+    current_name = get_current_connection_name(context)
     connections_repo.delete(name)
 
-    default = 'default ' if cname and cname == name else ''
+    default = 'default ' if current_name and current_name == name else ''
     click.echo('Deleted {} connection "{}".'.format(default, name))
 
 
 def cmd_connection_save(context, name):
     """
-    Saves the connection named name or the current connection of no name
+    Saves the current connection definition with the name provided. A current
+    connection must exist.
+    The save function allows overwriting existing names
     """
 
     current_connection = context.pywbem_server

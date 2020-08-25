@@ -123,6 +123,9 @@ Released: not yet
 * Refactor statistics display to present information consistent with the
   display in pywbem. (see issue # 724)
 
+* Refactor connections show command and clean up its documentation.  (see
+  issue #732)
+
 **Known issues:**
 
 * See `list of open issues`_.
