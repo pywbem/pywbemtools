@@ -31,6 +31,20 @@ __all__ = []
 TERMWIDTH_ENVVAR = 'PYWBEMCLI_TERMWIDTH'
 
 
+def _ensure_bytes(obj):
+    """
+    If the input object is a string, make sure it is returned as a
+    byte string, as follows:
+
+    * If the input object already is a byte string, it is returned unchanged.
+    * If the input string is a unicode string, it is encoded using UTF-8.
+    * Otherwise, the input object was not a string and is returned unchanged.
+    """
+    if isinstance(obj, six.text_type):
+        return obj.encode("utf-8")
+    return obj
+
+
 def _ensure_unicode(obj):
     """
     If the input object is a string, make sure it is returned as a

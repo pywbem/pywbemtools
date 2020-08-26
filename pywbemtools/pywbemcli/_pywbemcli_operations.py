@@ -28,14 +28,16 @@ It also adds a method to FakeWBEMConnection to build the repository.
 from __future__ import absolute_import, print_function
 
 import os
-import sys
-import traceback
+import hashlib
+import pickle
 import click
 import packaging.version
 import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
+from ._utils import _ensure_bytes
+from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
@@ -288,41 +290,240 @@ class PYWBEMCLIConnectionMixin(object):
         return list(result)
 
 
-class BuildRepositoryMixin(object):
+class BuildMockenvMixin(object):
     # pylint: disable=too-few-public-methods
     """
-    Builds the mock repository from the definitions in self._mock_server.
-
-    Each item in the iterable in self._mock_server must be a file path
-    identifying a file to be used to prepare for the mock test.
-
-    Each file path may be:
-
-      a python file if the suffix is 'mof'. A mof file is compiled into the
-      repository with the method
-
-    Returns a variety of errors for file not found, MOF syntax errors, and
-    python syntax errors.
+    Mixin class for pywbem_mock.FakedWBEMConnection that adds the ability to
+    build the mock environment of a connection from a connection definition in
+    a connections file.
     """
 
-    @staticmethod
-    def build_repository(conn, server, file_path_list, verbose):
+    def build_mockenv(self, server, file_path_list, connections_file,
+                      connection_name, verbose):
         """
-        Build the repository from the file_path list
+        Builds the mock environment of the 'self' connection from the input
+        files, or from the mock cache of the connection if it is up to date.
+        If the mock environment was built from the input files, the mock
+        environment of the connection is dumped to its cache.
+
+        The input files for building the mock environment are:
+
+        * MOF files with a suffix of '.mof'.
+
+          These files are compiled into the default namespace of the connection.
+
+        * Python files with a suffix of '.py'.
+
+          These files are mock scripts that are imported and thereby executed.
+          The mock scripts can be used for any kind of setup of the mock
+          environment, for example for creating namespaces, for defining
+          provider classes and registering providers, or for adding CIM objects
+          either directly through add_cimobjects() or by compiling MOF files.
+
+          Mock scripts support two approaches for passing the connection and
+          server objects they should operate on:
+
+          * via a setup() function defined in the mock script. This is the
+            recommended approach, and it supports caching. The setup()
+            function has the following parameters:
+
+              conn (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+              server (pywbem.WBEMServer): The server object for the mock
+                connection.
+
+              verbose (bool): Verbose flag from the command line.
+
+          * via global variables made available to the mock script. This
+            approach prevents caching. The following global variables are
+            made available:
+
+              CONN (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+              SERVER (pywbem.WBEMServer): The server object for the mock
+                connection.
+
+              VERBOSE (bool): Verbose flag from the command line.
+
+        Parameters:
+
+          self (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+          server (pywbem.WBEMServer): The server object for the mock connection.
+
+          file_path_list (list of string): The path names of the input files
+            for building the mock environment, from the connection definition.
+
+          connections_file (string): Path name of the connections file.
+
+          connection_name (string): The name of the connection definition in
+            the connections file.
+
+          verbose (bool): Verbose flag from the command line.
+
+        Raises:
+          MockFileError: Mock file does not exist.
+          MockMOFCompileError: Mock MOF file fails to compile.
+          MockScriptError: Mock script fails to execute.
+          SetupNotSupportedError (py<3.5): New-style setup in mock script not
+            supported.
         """
+
+        # Check that the input files exist. Since we loop through them multiple
+        # times, we check that once.
         for file_path in file_path_list:
             if not os.path.exists(file_path):
-                raise IOError('No such file: {}'.format(file_path))
+                raise mockscripts.MockFileError(
+                    "Mock file does not exist: {}".format(file_path))
 
+        # The connections file is set if a named connection is used, i.e.
+        # when specifying the -n general option. It is not set when the -s or -m
+        # general options were specified. When no connections file is set, no
+        # caching happens because there is no connection definition context
+        # which is required for caching.
+        if connections_file:
+
+            # Construct a (reproducible) cache ID from connections file path and
+            # connection definition name.
+            # Example: 6048a3da1a34a3ec605825a1493c7bb5.simple
+            #
+            # TODO: On Windows, os.path.relpath() raises ValueError when the
+            #       connections file is not on the same drive as the home dir.
+            relfile = os.path.relpath(connections_file, os.path.expanduser('~'))
+            md5 = hashlib.md5()
+            md5.update(relfile.encode("utf-8"))
+            cache_id = "{}.{}".format(md5.hexdigest(), connection_name)
+
+            cache_rootdir = os.path.join(os.path.expanduser('~'),
+                                         '.pywbemcli_mockcache')
+            if not os.path.isdir(cache_rootdir):
+                os.mkdir(cache_rootdir)
+
+            cache_dir = os.path.join(cache_rootdir, cache_id)
+            if not os.path.isdir(cache_dir):
+                os.mkdir(cache_dir)
+
+            # The pickle file contains the pickled state of the mock
+            # environment.
+            pickle_file = os.path.join(cache_dir, 'mockenv.pkl')
+
+            # The md5 file contains the MD5 hash value of the content of the
+            # input files for the mock environment, and is used to determine
+            # whether the cache is up to date w.r.t. the input files.
+            md5_file = os.path.join(cache_dir, 'mockfiles.md5')
+
+            # Calculate the MD5 hash value of the content of the input files
+            md5 = hashlib.md5()
+            for file_path in file_path_list:
+                with open(file_path, 'rb') as fp:
+                    file_source = fp.read()
+                    md5.update(file_source)
+            # Add the cache ID, so that manual tweaks on the cache files
+            # invalidates the cache.
+            md5.update(_ensure_bytes(cache_id))
+            new_md5_value = md5.hexdigest()
+
+            # Flag indicating that the mock environment needs to be built
+            # (or re-built). If False, the mock environment cache can be used.
+            need_rebuild = False
+
+            # Determine whether the mock environment needs to be rebuilt based
+            # on the (non-)existence of the cache files.
+            if not os.path.isfile(pickle_file) or not os.path.isfile(md5_file):
+                if verbose:
+                    click.echo("Mock environment for connection definition "
+                               "'{}' will be built because it was not cached.".
+                               format(connection_name))
+                need_rebuild = True
+
+            # Determine whether the mock environment needs to be rebuilt based
+            # on the MD5 hash value of the input file content.
+            if not need_rebuild:
+                with open(md5_file, 'r') as fp:
+                    cached_md5_value = fp.read()
+                if new_md5_value != cached_md5_value:
+                    if verbose:
+                        click.echo("Mock environment for connection "
+                                   "definition '{}' is cached but will be "
+                                   "rebuilt because the mock files have "
+                                   "changed.".format(connection_name))
+                    need_rebuild = True
+
+        else:
+            # No connections file context.
+
+            if verbose:
+                click.echo("Mock environment for connection definition '{}' "
+                           "will be built because no connections file is "
+                           "known.".format(connection_name))
+            need_rebuild = True
+
+        if need_rebuild:
+            try:
+                self._build_mockenv(server, file_path_list, verbose)
+            except mockscripts.NotCacheable as exc:
+                if verbose:
+                    click.echo("Mock environment for connection definition "
+                               "'{}' will be built because it is not "
+                               "cacheable: {}.".format(connection_name, exc))
+            else:
+                if connections_file:
+                    self._dump_mockenv(pickle_file)
+                    with open(md5_file, 'w') as fp:
+                        fp.write(new_md5_value)
+                    if verbose:
+                        click.echo("Mock environment for connection "
+                                   "definition '{}' has been written to "
+                                   "cache.".format(connection_name))
+        else:
+            # When no rebuild is needed, there must have been a connections
+            # file set.
+            assert connections_file
+            try:
+                self._load_mockenv(pickle_file, file_path_list)
+                if verbose:
+                    click.echo("Mock environment for connection definition "
+                               "'{}' has been loaded from cache.".
+                               format(connection_name))
+            except mockscripts.NotCacheable as exc:
+                if verbose:
+                    click.echo("Mock environment for connection definition "
+                               "'{}' will be rebuilt because it is not "
+                               "cacheable: {}.".format(connection_name, exc))
+                self._build_mockenv(server, file_path_list, verbose)
+
+    def _build_mockenv(self, server, file_path_list, verbose):
+        """
+        Build the mock environment from the input files.
+
+        Parameters:
+
+          self (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+          server (pywbem.WBEMServer): The server object for the mock connection.
+
+          file_path_list (list of string): The path names of the input files
+            for building the mock environment, from the connection definition.
+
+          verbose (bool): Verbose flag from the command line.
+
+        Raises:
+          NotCacheable (py<3.5): Mock environment is not cacheable.
+          MockMOFCompileError: Mock MOF file fails to compile.
+          MockScriptError: Mock script fails to execute.
+          SetupNotSupportedError (py<3.5): New-style setup in mock script not
+            supported.
+        """
+        for file_path in file_path_list:
             ext = os.path.splitext(file_path)[1]
             if ext == '.mof':
                 try:
                     # Displays any MOFParseError already
-                    conn.compile_mof_file(file_path)
+                    self.compile_mof_file(file_path)
                 except pywbem.Error as er:
                     # Abort the entire pywbemcli command because the
-                    # MOF compilation might have caused inconsistencies in the
-                    # mock repository.
+                    # MOF compilation might have caused inconsistencies in
+                    # the mock repository.
 
                     if PYWBEM_VERSION.release >= (1, 0, 0):
                         # display just the exception.
@@ -335,37 +536,86 @@ class BuildRepositoryMixin(object):
                         else:  # not parse error, display exception
                             msg = "MOF compile failed: File: {0} " \
                                 "Error: {1}".format(file_path, er)
-                    click.echo(msg, err=True)
-                    raise click.Abort()
+                    new_exc = mockscripts.MockMOFCompileError(msg)
+                    new_exc.__cause__ = None
+                    raise new_exc
             else:
                 assert ext == '.py'  # already checked
-                # May raise OSError,IOError:
-                with open(file_path) as fp:
-                    # May raise OSError,IOError:
-                    file_source = fp.read()
-                    # the exec includes CONN and VERBOSE
-                    globalparams = {'CONN': conn,
-                                    'SERVER': server,
-                                    'VERBOSE': verbose}
-                    try:
-                        # Using compile+exec instead of just exec allows
-                        # specifying the file name, causing it to appear in
-                        # any tracebacks.
-                        file_code = compile(file_source, file_path, 'exec')
-                        # pylint: disable=exec-used
-                        exec(file_code, globalparams, None)
-                    except Exception:
-                        exc_type, exc_value, exc_traceback = sys.exc_info()
-                        tb = traceback.format_exception(exc_type, exc_value,
-                                                        exc_traceback)
-                        # Abort the entire pywbemcli command because the
-                        # script might have caused inconsistencies in the
-                        # Python namespace and in the mock repository.
-                        click.echo(
-                            "Mock Python script '{}' failed:\n{}".
-                            format(file_path, "\n".join(tb)),
-                            err=True)
-                        raise click.Abort()
+
+                # May raise various mockscripts.MockError exceptions.
+                # NotCacheable will be handled by the caller by building the
+                # mock env.
+                mockscripts.setup_script(file_path, self, server, verbose)
+
+    def _dump_mockenv(self, pickle_file):
+        """
+        Dump the mock environment of the connection to the mockenv cache file.
+
+        Parameters:
+
+          self (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+          pickle_file (pywbem.WBEMServer): Path name of the mockenv cache file.
+        """
+
+        # Save the provider registry and the CIM repository
+
+        # We construct a single object, because the CIM repository is
+        # referenced from each provider, and pickle properly handles
+        # multiple references to the same object.
+        mockenv = dict(
+            cimrepository=self.cimrepository,
+            # pylint: disable=protected-access
+            provider_registry=self._provider_registry,
+        )
+        with open(pickle_file, 'wb') as fp:
+            pickle.dump(mockenv, fp)
+
+    def _load_mockenv(self, pickle_file, file_path_list):
+        """
+        Load the mock environment from the mockenv cache file.
+
+        This method also imports the Python scripts from the input files in
+        order to re-establish any class definitions that may be needed, for
+        example provider classes.
+
+        Parameters:
+
+          self (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+          pickle_file (pywbem.WBEMServer): Path name of the mockenv cache file.
+
+          file_path_list (list of string): The path names of the input files
+            for building the mock environment, from the connection definition.
+
+        Raises:
+          NotCacheable (py<3.5): Mock environment is not cacheable.
+        """
+
+        # Restore the provider classes
+        for file_path in file_path_list:
+            ext = os.path.splitext(file_path)[1]
+            if ext == '.py':
+                # May raise mockscripts.NotCacheable which will be handled by
+                # the caller by building the mock env.
+                mockscripts.import_script(file_path)
+
+        # Restore the provider registry and the CIM repository
+        with open(pickle_file, 'rb') as fp:
+            mockenv = pickle.load(fp)
+
+        # Others have references to the self._cimrepository object, so we are
+        # not replacing that object, but are rather replacing the state of
+        # that object.
+        cimrepository = mockenv['cimrepository']
+        assert isinstance(cimrepository, pywbem_mock.InMemoryRepository)
+        # pylint: disable=protected-access
+        self._cimrepository.load(cimrepository)
+
+        provider_registry = mockenv['provider_registry']
+        assert isinstance(provider_registry, pywbem_mock.ProviderRegistry)
+        # pylint: disable=protected-access
+        self._provider_registry.load(provider_registry)
 
 
 class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
@@ -383,7 +633,7 @@ class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
 
 class PYWBEMCLIFakedConnection(pywbem_mock.FakedWBEMConnection,
                                PYWBEMCLIConnectionMixin,
-                               BuildRepositoryMixin):
+                               BuildMockenvMixin):
     """
     PyWBEMCLIFakedConnection subclass adds the methods added by
     PYWBEMCLIConnectionMixin

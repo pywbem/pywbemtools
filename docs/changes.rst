@@ -56,6 +56,23 @@ Released: not yet
 
 **Enhancements:**
 
+* Introduced caching of the mock environment used by connection definitions in
+  order to speed up the loading of the connection definition. The mock
+  environments are stored in directory ~/.pywbemcli_mockcache and are
+  automatically managed. The pywbemcli --verbose general option can be used
+  to show messages about the cache management. (See issue #689)
+
+* A new approach for the setup of mock scripts has been introduced: The mock
+  script defines a `setup(conn, server, verbose)` function that is called when
+  the mock environment is built. It is not called when the mock environment
+  is reinstantiated from the cache.
+  The old approach with setting global variables CONN, SERVER, VERBOSE is still
+  supported, but the mock environment cannot be cached and will be built every
+  time when mock scripts with that setup approach are used.
+  On Python <3.5, mock scripts with the `setup()` function are rejected, because
+  the functionality to import them is not available, and the compile+exec
+  approach does not allow executing the setup() function. (See issue #689)
+
 * Modify general help to display the full path of the default connections file.
   (See issue #660)
 

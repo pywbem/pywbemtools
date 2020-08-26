@@ -185,6 +185,7 @@ dist_files = $(bdist_file) $(sdist_file)
 package_py_files := \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
+		$(wildcard $(package_name)/*/*/*.py) \
 
 doc_help_source_files := \
     $(wildcard $(pywbemcli_module_path)/_cmd_*.py)
@@ -227,7 +228,7 @@ pylint_rc_file := pylintrc
 
 ifeq ($(PACKAGE_LEVEL),minimum)
   # Using pywbem 0.x
-  pylint_ignore := all_types_method_mock_v1.py,simple_mock_invokemethod_v1.py,py_err_processatstartup.py
+  pylint_ignore := all_types_method_mock_v1old.py,all_types_method_mock_v1new.py,simple_mock_invokemethod_v1old.py,simple_mock_invokemethod_v1new.py,py_err_processatstartup.py
 else
   # Using pywbem 1.x
   pylint_ignore := all_types_method_mock_v0.py,simple_mock_invokemethod_v0.py,py_err_processatstartup.py
@@ -284,6 +285,7 @@ dist_manifest_in_files := \
     *.py \
     $(package_name)/*.py \
     $(package_name)/*/*.py \
+		$(package_name)/*/*/*.py \
 
 # Files that are dependents of the distribution archive.
 # Keep in sync with dist_manifest_in_files.
@@ -295,6 +297,7 @@ dist_dependent_files := \
     $(wildcard *.py) \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
+		$(wildcard $(package_name)/*/*/*.py) \
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
