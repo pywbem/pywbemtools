@@ -347,7 +347,7 @@ logging-modules=logging
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=20
+min-similarity-lines=40
 
 # Ignore comments when computing similarities.
 ignore-comments=yes

@@ -159,7 +159,7 @@ class ConnectionRepository(object):
                 ca-certs: null
                 mock-server:
                 - tests/unit/simple_mock_model.mof
-                - tests/unit/simple_mock_invokemethod_v1.py
+                - tests/unit/simple_mock_invokemethod_v1old.py
             server1:
                 name: server1
                 server: https://woot.com
@@ -494,9 +494,10 @@ class ConnectionRepository(object):
                 # Build the PywbemServer object for each connection definition
                 for name, svr in six.iteritems(connections_dict):
                     try:
-                        self._pywbemcli_servers[name] = \
-                            PywbemServer.create(
-                                replace_underscores=True, **svr)
+                        server = PywbemServer.create(
+                            replace_underscores=True,
+                            connections_file=self._connections_file,
+                            **svr)
                     except TypeError as te:
                         raise ConnectionsFileLoadError(
                             self._connections_file,
@@ -507,7 +508,7 @@ class ConnectionRepository(object):
                             self._connections_file,
                             'Invalid attribute value in connection '
                             'definition "{0}": {1}'.format(name, ve))
-
+                    self._pywbemcli_servers[name] = server
                 self._loaded = True
 
         except (OSError, IOError) as exc:

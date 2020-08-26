@@ -28,6 +28,7 @@ import click
 import pywbem
 from pywbem import WBEMServer, configure_loggers_from_string
 
+from . import mockscripts
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
@@ -124,7 +125,7 @@ class PywbemServer(object):
                  name='default', user=None, password=None,
                  timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None, use_pull=None,
                  pull_max_cnt=None, certfile=None, keyfile=None,
-                 ca_certs=None, mock_server=None):
+                 ca_certs=None, mock_server=None, connections_file=None):
         """
         Create  a PywbemServer object. This contains the configuration
         and operation information to create a connection to the server
@@ -153,9 +154,11 @@ class PywbemServer(object):
         self.keyfile = keyfile
         self.ca_certs = ca_certs
 
+        # May be None in case of not-saved connection (e.g. connection save)
+        self._connections_file = connections_file
+
         # dynamically created in create_connection
         self._wbem_server = None
-        self._conn = None
 
     def __str__(self):
         return 'PywbemServer(url={s.server} name={s.name})'.format(s=self)
@@ -403,16 +406,17 @@ class PywbemServer(object):
     @property
     def conn(self):
         """
-        :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
+        :class:`PYWBEMCLIFakedConnection` or :class:`PYWBEMCLIConnection`
+        (both derived from :class:`pywbem.WBEMConnection`):
+        Connection object to be used for WBEM operation requests.
         """
-        # This is created in wbemserver and retained there.
         return self.wbem_server.conn if self.wbem_server else None
 
     @property
     def wbem_server(self):
         """
-        :class:`~pywbem.WBEMConnection` WBEMServer instance to be used for
-        requests.
+        :class:`~pywbem.WBEMServer`: Server object to be used for higher level
+        WBEM server requests.
         """
         return self._wbem_server
 
@@ -492,7 +496,6 @@ class PywbemServer(object):
         """ Reset the connection attributes of this pywbem server so that the
         connection must be restablished
         """
-        self._conn = None
         self._wbem_server = None
 
     def create_connection(self, log=None, use_pull=None,
@@ -512,27 +515,31 @@ class PywbemServer(object):
             other pywbem cim_operation requests
 
         Raises:
-           ValueError: if server paramer is invalid or other issues with
+           ValueError: if server parameter is invalid or other issues with
            the input values
         """
+
         if self._mock_server:
-            if self.conn is None:
+            if self._wbem_server is None:
                 conn = PYWBEMCLIFakedConnection(
                     default_namespace=self.default_namespace,
                     use_pull_operations=use_pull,
                     stats_enabled=timestats)
+                self._wbem_server = WBEMServer(conn)
                 try:
-                    self._wbem_server = WBEMServer(conn)
-                    conn.build_repository(conn,
-                                          self._wbem_server,
-                                          self._mock_server,
-                                          verbose)
-                except click.Abort:
-                    raise
-                except Exception as exc:  # pylint: disable=broad-except
-                    click.echo(
-                        "Building the mock repository failed: {}".format(exc),
-                        err=True)
+                    conn.build_mockenv(
+                        self._wbem_server, self._mock_server,
+                        self._connections_file, self._name, verbose)
+                except (mockscripts.MockMOFCompileError,
+                        mockscripts.MockScriptError) as exc:
+                    # These errors cause the command to be aborted, because
+                    # partially executed mock scripts or partially compiled MOF
+                    # files might have caused inconsistencies in the Python
+                    # mockscripts namespace and in the CIM repository.
+                    click.echo(str(exc), err=True)
+                    raise click.Abort()
+                except mockscripts.MockError as exc:
+                    raise click.ClickException(str(exc))
 
         else:  # mock_server does not exist
             if not self.server:

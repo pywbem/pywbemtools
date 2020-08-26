@@ -1,20 +1,23 @@
 """
-mock_pywbem test script that installs a method callback to be executed. This is
-based on the CIM_Foo class in the simple_mock_model.mof test file
+Test mock script that installs a test method provider for CIM method
+AllTypesMethod() in CIM class PyWBEM_AllTypes, using the old setup approach
+with global variables.
+
+Note: This script and its method provider perform checks because their purpose
+is to test the provider dispatcher. A real mock script with a real method
+provider would not need to perform any of these checks.
 """
 
-from pywbem_mock import MethodProvider
+import pywbem
+import pywbem_mock
 
-from pywbem import CIM_ERR_METHOD_NOT_AVAILABLE, CIMError, CIM_ERR_NOT_FOUND
-
-# test that GLOBALS exist
 assert "CONN" in globals()
 assert 'SERVER' in globals()
 assert 'VERBOSE' in globals()
 global CONN  # pylint: disable=global-at-module-level
 
 
-class CIM_AllTypesMethodProvider(MethodProvider):
+class CIM_AllTypesMethodProvider(pywbem_mock.MethodProvider):
     """
     User test provider for InvokeMethod using CIM_Foo and method1.
     This is basis for testing passing of input parameters correctly and
@@ -44,12 +47,12 @@ class CIM_AllTypesMethodProvider(MethodProvider):
         assert classname.lower() == self.provider_classnames.lower()
 
         if methodname != 'AllTypesMethod':
-            raise CIMError(CIM_ERR_METHOD_NOT_AVAILABLE)
+            raise pywbem.CIMError(pywbem.CIM_ERR_METHOD_NOT_AVAILABLE)
 
         # Test if class exists.
         if not self.class_exists(namespace, classname):
-            raise CIMError(
-                CIM_ERR_NOT_FOUND,
+            raise pywbem.CIMError(
+                pywbem.CIM_ERR_NOT_FOUND,
                 "class {0} does not exist in CIM repository, "
                 "namespace {1}".format(classname, namespace))
 
@@ -61,9 +64,8 @@ class CIM_AllTypesMethodProvider(MethodProvider):
         return (return_value, out_params)
 
 
-# Add the the callback to the mock repository
+# Register the provider to the mock environment
 # pylint: disable=undefined-variable
-CONN.register_provider(  # noqa: F821
-    CIM_AllTypesMethodProvider(CONN.cimrepository),  # noqa: F821
-    CONN.default_namespace,  # noqa: F821
-    verbose=False)
+_PROV = CIM_AllTypesMethodProvider(CONN.cimrepository)  # noqa: F821
+CONN.register_provider(_PROV, CONN.default_namespace,  # noqa: F821
+                       verbose=VERBOSE)  # noqa: F821

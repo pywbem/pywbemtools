@@ -21,6 +21,7 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
+import io
 import re
 from copy import copy
 from subprocess import Popen, PIPE
@@ -289,3 +290,42 @@ def assert_lines(exp_lines, act_lines, source, desc):
             "{}\n" \
             "------------\n". \
             format(i, source, desc, exp_line, act_line)
+
+
+class captured_output(object):
+    # pylint: disable=invalid-name
+    """
+    Context manager that captures any data written to sys.stdout and sys.stderr
+    during execution of its body. The data can be obtained via the attributes
+    'stdout' and 'stderr'.
+
+    Example:
+
+        with captured_output() as captured:
+            print("Hello stdout")
+            print("Hello stderr", file=sys.stderr)
+        print(captured.stdout)  # Prints 'Hello stdout'
+        print(captured.stderr)  # Prints 'Hello stderr'
+    """
+
+    # pylint: disable=attribute-defined-outside-init
+
+    def __enter__(self):
+        self._saved_stdout = sys.stdout
+        sys.stdout = self._iobuf_stdout = io.BytesIO()
+        self.stdout = None
+        self._saved_stderr = sys.stderr
+        sys.stderr = self._iobuf_stderr = io.BytesIO()
+        self.stderr = None
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stdout = self._iobuf_stdout.getvalue()
+        self._iobuf_stdout.close()
+        sys.stdout = self._saved_stdout
+        self.stderr = self._iobuf_stderr.getvalue()
+        self._iobuf_stderr.close()
+        sys.stderr = self._saved_stderr
+        return False  # re-raise any exceptions
+
+    # pylint: enable=attribute-defined-outside-init
