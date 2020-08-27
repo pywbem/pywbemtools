@@ -81,6 +81,9 @@ wheel==0.33.5; python_version >= '3.8'
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
+git+https://github.com/pywbem/nocaselist.git@andy/add-pickle#egg=nocaselist
+# TODO: Remove again once nocaselist 1.0.2 is released (used by pywbem)
+
 # pywbem==0.17.0
 # Alternative to test against current github master pywbem
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
