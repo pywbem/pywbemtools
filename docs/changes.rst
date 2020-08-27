@@ -82,6 +82,8 @@ Released: not yet
   is used, all Python warnings are shown once. If `--no-warn` is used (default),
   the `PYTHONWARNINGS` environment variable determines which warnings are shown.
   If that variable is not set, no warnings are shown. (See issue #723)
+  Added the 'mock' package and for Python 2.7, the 'funcsigs' package as new
+  dependencies.
 
 **Cleanup**
 

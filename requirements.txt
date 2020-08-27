@@ -43,3 +43,8 @@ PyYAML>=5.1; python_version > '3.4'
 yamlloader>=0.5.5
 packaging>=17.0
 mock>=3.0.0
+
+# Mock requires funcsigs>1;python_version<"3.3" but for unknown reasons
+# Pip 9.0.1 (with minimum package levels) does not install it on MacOs on Python
+# 2.7.17. The same version of Pip does install it on Linux on python 2.7.15.
+funcsigs>=1.0.2; python_version == '2.7'
