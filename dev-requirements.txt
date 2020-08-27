@@ -14,7 +14,8 @@
 # pytest 4.3.1 solves an issue on Python 3 with minimum package levels
 pytest>=4.3.1,<5.0.0; python_version < '3.5'
 pytest>=4.3.1; python_version >= '3.5'
-funcsigs>=1.0.2; python_version == '2'
+# funcsigs is already specified in requirements.txt due to a dependency issue.
+# funcsigs>=1.0.2; python_version == '2.7'
 # Pluggy 0.12.0 has a bug causing pytest plugins to fail loading on py38
 pluggy>=0.13.0
 # colorama 0.4.0 removed support for Python 3.4
