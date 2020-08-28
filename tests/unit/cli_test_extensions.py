@@ -229,6 +229,9 @@ class CLITestsBase(object):
             general_args = [general_args]
 
         cmd_line = []
+        if condition == 'pdb':
+            cmd_line.append('--pdb')
+
         if general_args:
             cmd_line.extend(general_args)
 
@@ -250,9 +253,6 @@ class CLITestsBase(object):
 
         if local_args:
             cmd_line.extend(local_args)
-
-        if condition == 'pdb':
-            cmd_line.append('--pdb')
 
         if not verbose:
             verbose = condition == 'verbose'
