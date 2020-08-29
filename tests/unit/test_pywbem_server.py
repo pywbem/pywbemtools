@@ -40,13 +40,14 @@ FAKE_PEM = 'test.pem'
 FAKE_PEM_PATH = os.path.join(SCRIPT_DIR, FAKE_PEM)
 
 
-TESTCASES_INITIALIZE = [
-    # TESTCASES for pywbem_server intitalize
+TESTCASES_PYSVR_INIT = [
+    # Testcases for PywbemServer.__init__()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function and response:
-    #   * init_kwargs: __init__ kwargs.
+    #   * init_args: __init__() positional args.
+    #   * init_kwargs: __init__() keyword args.
     #   * exp_attrs: Dict of expected attributes of resulting object.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
@@ -446,11 +447,11 @@ TESTCASES_INITIALIZE = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_INITIALIZE)
+    TESTCASES_PYSVR_INIT)
 @simplified_test_function
-def test_initialize(testcase, init_args, init_kwargs, exp_attrs):
+def test_pysvr_init(testcase, init_args, init_kwargs, exp_attrs):
     """
-    Test object construction
+    Test function for PywbemServer.__init__().
     """
     svr = PywbemServer(*init_args, **init_kwargs)
 
@@ -475,13 +476,13 @@ def test_initialize(testcase, init_args, init_kwargs, exp_attrs):
         assert exp_attrs['server'] in repr_str
 
 
-TESTCASES_CONNECT = [
-    # TESTCASES for pywbem_server connect
+TESTCASES_PYSVR_CONNECT_ATTRS = [
+    # Testcases for PywbemServer.create_connection() for testing attrs
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function and response:
-    #   * init_kwargs: __init__ positional args.
+    #   * init_kwargs: __init__() keyword args.
     #   * exp_attrs: Dict of expected attributes of resulting object.
     #   * exp_repr: string
     # * exp_exc_types: Expected exception type(s), or None.
@@ -491,7 +492,6 @@ TESTCASES_CONNECT = [
     (
         "Verify url arg only",
         dict(
-            init_args=[],
             init_kwargs=dict(
                 server='http://localhost',
             ),
@@ -512,7 +512,6 @@ TESTCASES_CONNECT = [
     (
         "Verify with security params",
         dict(
-            init_args=[],
             init_kwargs=dict(
                 server='http://localhost',
                 user='fred',
@@ -540,13 +539,13 @@ TESTCASES_CONNECT = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_CONNECT)
+    TESTCASES_PYSVR_CONNECT_ATTRS)
 @simplified_test_function
-def test_connect(testcase, init_args, init_kwargs, exp_attrs):
+def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
     """
-    Test object connect
+    Test function for PywbemServer.create_connection() for testing attrs.
     """
-    svr = PywbemServer(*init_args, **init_kwargs)
+    svr = PywbemServer(**init_kwargs)
 
     # Create temp fake file.
     # NOTE: We cannot use fixtures because we are using simplified_test_function
