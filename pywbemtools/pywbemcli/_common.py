@@ -1155,11 +1155,15 @@ def hide_empty_columns(headers, rows):
                 return False
         return True
 
-    # Remove empty rows
+    # Validate row lengths are the same as header length
     len_hdr = len(headers)
     for row in rows:
-        assert len(row) == len_hdr, "row: {}\nhdrs: {}". \
-            format(row, headers)
+        if len(row) != len_hdr:
+            import pdb; pdb.set_trace()
+        assert len(row) == len_hdr, "Header len and row len mismatch:" \
+                                    "row_len {} len hdr {}\n" \
+                                    "row: {}\nhdrs: {}". \
+            format(len(row), len_hdr, row, headers)
     for column in range(len(headers) - 1, -1, -1):
         if column_is_empty(rows, column):
             if isinstance(headers, tuple):

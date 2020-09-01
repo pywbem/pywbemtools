@@ -37,7 +37,8 @@ from pywbem import CIMProperty, CIMInstance, CIMInstanceName, Uint32, Uint64, \
 from tests.unit.pytest_extensions import simplified_test_function
 
 from pywbemtools.pywbemcli._display_cimobjects import \
-    _format_instances_as_rows, _display_instances_as_table
+    _format_instances_as_rows, _display_instances_as_table, \
+    TableCell, TableColumn
 
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
@@ -552,3 +553,168 @@ def test_display_instances_as_table(
         "Expected:\n" \
         "{}\n" \
         "End\n".format(desc, stdout, exp_stdout)
+
+
+# Testcases for _cell_width()
+
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * input: Multiline string or integer or float or bool.
+    #   * exp_rtn: width of cell with maximum length.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_rtn: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+
+TESTCASES_CELL_WIDTH = [
+    (
+        "Verify cell width with two line string",
+        dict(
+            input="1\ntwo",
+            exp_rtn=[3, 5],
+        ),
+        None, None, True, ),
+    (
+        "Verify cell width with single string",
+        dict(
+            input="two",
+            exp_rtn=[3, 3],
+        ),
+        None, None, True),
+    (
+        "Verify cell width with multiline string",
+        dict(
+            input="two\nthree\nthis is long string",
+            exp_rtn=[19, 29],
+        ),
+        None, None, True),
+
+    (
+        "Verify cell width with empty string",
+        dict(
+            input="",
+            exp_rtn=[0, 0],
+        ),
+        None, None, True),
+
+    (
+        "Verify cell width with None",
+        dict(
+            input=None,
+            exp_rtn=[0, 0],
+        ),
+        None, None, True),
+
+    (
+        "Verify cell width with integer",
+        dict(
+            input=1,
+            exp_rtn=[1, 1],
+        ),
+        None, None, True),
+
+    (
+        "Verify  cell width with bool",
+        dict(
+            input=False,
+            exp_rtn=[5, 5],
+        ),
+        None, None, True),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CELL_WIDTH)
+@simplified_test_function
+def test_table_cell(testcase, input, exp_rtn):
+    """
+    Test the output of the common _format_instances_as_rows() function
+    """
+    # The code to be tested
+    cell = TableCell(input)
+    cell_width = cell.width
+    cell_length = cell.length
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert cell_width == exp_rtn[0]
+    assert cell_length == exp_rtn[1]
+    assert input == cell.data
+
+# Testcases for _max_cell_width_in_col()
+
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * input: list of multiline items representing cells in column
+    #   * exp_rtn: length of cell with maximum width.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_rtn: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+
+TESTCASES_TABLECOLUMN = [
+    (
+        "Verify maximum line with multiple cells",
+        dict(
+            input=["1\ntwo", "", "blahblah", "this\nis\nme"],
+            exp_rtn=8,
+        ),
+        None, None, True, ),
+    (
+        "Verify maximum list with one cell",
+        dict(
+            input=["two"],
+            exp_rtn=3,
+        ),
+        None, None, True, ),
+    (
+        "Verify maximum cell with one cell in col",
+        dict(
+            input=["two\nthree\nthis is long string"],
+            exp_rtn=19,
+        ),
+        None, None, True, ),
+
+    (
+        "Verify maximum cell size with multiple lines of integers",
+        dict(
+            input=[1, 2, 9999],
+            exp_rtn=4,
+        ),
+        None, None, True, ),
+
+    (
+        "Verify maximum cell size with multiple bools",
+        dict(
+            input=[True, False, None, True],
+            exp_rtn=5,
+        ),
+        None, None, True, ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_TABLECOLUMN)
+@simplified_test_function
+def test_TableColumn(testcase, input, exp_rtn):
+    """
+    Test the output of the common max_col_width functionble
+    """
+
+
+    inputs = [TableCell(item) for item in input]
+    cols = TableColumn(inputs)
+    act_max_width = cols.max_width()
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_max_width == exp_rtn
+    assert input == cols.data
