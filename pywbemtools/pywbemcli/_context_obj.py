@@ -281,7 +281,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             self.spinner_start()
         if self.pdb:
             import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()
+            pdb.set_trace()  # pylint: disable=no-member
         try:
             cmd()
         finally:

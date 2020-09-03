@@ -1265,7 +1265,7 @@ class TestSubcmdClass(CLITestsBase):
 
         if condition == 'pdb':
             import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()
+            pdb.set_trace()  # pylint: disable=no-member
 
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
@@ -1480,7 +1480,7 @@ class TestSubcmdClassError(CLITestsBase):
 
         if condition == 'pdb':
             import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()
+            pdb.set_trace()  # pylint: disable=no-member
 
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
