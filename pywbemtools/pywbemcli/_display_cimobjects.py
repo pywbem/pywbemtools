@@ -23,14 +23,13 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import re
 
-from pydicti import odicti
 import six
 import click
-from nocasedict import NocaseDict
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMClassName, ValueMapping, siunit_obj, \
     CIMError, CIM_ERR_NOT_SUPPORTED
+from pywbem._nocasedict import NocaseDict
 
 from ._common import format_table, fold_strings, DEFAULT_MAX_CELL_WIDTH, \
     output_format_is_table, sort_cimobjects, format_keys
@@ -565,8 +564,8 @@ def sorted_prop_names(insts):
     and if instances of subclasses have additional keys.
     """
 
-    all_props = odicti()  # key: org prop name, value: lower cased prop name
-    key_props = odicti()  # key: org prop name, value: lower cased prop name
+    all_props = NocaseDict()  # key: org prop name, value
+    key_props = NocaseDict()  # key: org prop name, value
     for inst in insts:
         inst_props = inst.keys()
         for pn in inst_props:
@@ -577,7 +576,7 @@ def sorted_prop_names(insts):
                 if pn in key_prop_names:
                     key_props[pn] = pn.lower()
 
-    nonkey_props = odicti()  # key: org prop name, value: lower cased prop name
+    nonkey_props = NocaseDict()  # key: org prop name, value
     for pn in all_props:
         if pn not in key_props:
             nonkey_props[pn] = all_props[pn]
