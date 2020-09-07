@@ -28,6 +28,7 @@ It also adds a method to FakeWBEMConnection to build the repository.
 from __future__ import absolute_import, print_function
 
 import os
+import glob
 import hashlib
 import pickle
 import click
@@ -383,23 +384,12 @@ class BuildMockenvMixin(object):
         # which is required for caching.
         if connections_file:
 
-            # Construct a (reproducible) cache ID from connections file path and
-            # connection definition name.
-            # Example: 6048a3da1a34a3ec605825a1493c7bb5.simple
-            #
-            # TODO: On Windows, os.path.relpath() raises ValueError when the
-            #       connections file is not on the same drive as the home dir.
-            relfile = os.path.relpath(connections_file, os.path.expanduser('~'))
-            md5 = hashlib.md5()
-            md5.update(relfile.encode("utf-8"))
-            cache_id = "{}.{}".format(md5.hexdigest(), connection_name)
-
-            cache_rootdir = os.path.join(os.path.expanduser('~'),
-                                         '.pywbemcli_mockcache')
+            cache_rootdir = mockcache_rootdir()
             if not os.path.isdir(cache_rootdir):
                 os.mkdir(cache_rootdir)
 
-            cache_dir = os.path.join(cache_rootdir, cache_id)
+            cache_dir = mockcache_cachedir(
+                cache_rootdir, connections_file, connection_name)
             if not os.path.isdir(cache_dir):
                 os.mkdir(cache_dir)
 
@@ -418,9 +408,9 @@ class BuildMockenvMixin(object):
                 with open(file_path, 'rb') as fp:
                     file_source = fp.read()
                     md5.update(file_source)
-            # Add the cache ID, so that manual tweaks on the cache files
+            # Add the cache dir, so that manual tweaks on the cache files
             # invalidates the cache.
-            md5.update(_ensure_bytes(cache_id))
+            md5.update(_ensure_bytes(cache_dir))
             new_md5_value = md5.hexdigest()
 
             # Flag indicating that the mock environment needs to be built
@@ -643,3 +633,54 @@ class PYWBEMCLIFakedConnection(pywbem_mock.FakedWBEMConnection,
         ctor passes all input parameters to superclass
         """
         super(PYWBEMCLIFakedConnection, self).__init__(*args, **kwargs)
+
+
+def mockcache_rootdir():
+    """
+    Return the directory path of the mock cache root directory.
+    """
+    dir_path = os.path.join(os.path.expanduser('~'), '.pywbemcli_mockcache')
+    return dir_path
+
+
+def mockcache_cachedir(rootdir, connections_file, connection_name):
+    """
+    Return the directory path of the mock cache directory for a connection.
+    """
+    # Construct a (reproducible) cache ID from connections file path and
+    # connection definition name.
+    # Example: 6048a3da1a34a3ec605825a1493c7bb5.simple
+    #
+    # TODO: On Windows, os.path.relpath() raises ValueError when the
+    #       connections file is not on the same drive as the home dir.
+    relfile = os.path.relpath(connections_file, os.path.expanduser('~'))
+    md5 = hashlib.md5()
+    md5.update(relfile.encode("utf-8"))
+    cache_id = "{}.{}".format(md5.hexdigest(), connection_name)
+    dir_path = os.path.join(rootdir, cache_id)
+    return dir_path
+
+
+def delete_mock_cache(connections_file, connection_name):
+    """
+    Delete the mock cache of the connection, if it exists.
+
+    Parameters:
+
+      self (pywbem_mock.FakedWBEMConnection): The mock connection.
+
+      connections_file (string): Path name of the connections file.
+
+      connection_name (string): The name of the connection definition in
+        the connections file.
+
+    Raises:
+      OSError: Mock cache cannot be deleted.
+    """
+    cache_dir = mockcache_cachedir(
+        mockcache_rootdir(), connections_file, connection_name)
+    if os.path.isdir(cache_dir):
+        file_list = glob.glob(os.path.join(cache_dir, '*'))
+        for _file in file_list:
+            os.remove(_file)
+        os.rmdir(cache_dir)

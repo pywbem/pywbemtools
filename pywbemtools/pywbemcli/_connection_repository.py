@@ -31,6 +31,7 @@ import yamlloader
 import click
 
 from ._pywbem_server import PywbemServer
+from ._pywbemcli_operations import delete_mock_cache
 
 if six.PY2:
     import codecs  # pylint: disable=wrong-import-order
@@ -563,6 +564,10 @@ class ConnectionRepository(object):
         """
         self._load_connections_file()
 
+        # Delete mock cache if it exists
+        delete_mock_cache(self._connections_file, name)
+
+        # Delete connection definition
         del self._pywbemcli_servers[name]
 
         # Unset default connection if it is the one being deleted
