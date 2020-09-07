@@ -126,6 +126,8 @@ Released: not yet
 * Refactor connections show command and clean up its documentation.  (see
   issue #732)
 
+* Remove use of pydicti dictionary package in favor of NocaseDict.
+
 **Known issues:**
 
 * See `list of open issues`_.

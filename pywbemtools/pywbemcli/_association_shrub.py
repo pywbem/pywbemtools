@@ -43,9 +43,9 @@ import six
 import click
 # TODO: Future Could we combine this tree into tree file???
 from asciitree import LeftAligned
-from pydicti import dicti
 from pywbem import CIMInstanceName, CIMClassName, CIMFloat, CIMInt, CIMError, \
     CIMDateTime
+from pywbem._nocasedict import NocaseDict
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg, sort_cimobjects
@@ -432,8 +432,8 @@ class AssociationShrub(object):
         assoctree = OrderedDict()
         # Create dictionary of standard instance keys to potentially hide.
         # For now we always hide the following independent of key value
-        replacements = dicti((("SystemCreationClassName", None),
-                              ("SystemName", None)))
+        replacements = NocaseDict((("SystemCreationClassName", None),
+                                   ("SystemName", None)))
         for role, ref_clns in six.iteritems(self.instance_shrub):
             elementstree = OrderedDict()
             for ref_cln in ref_clns:
@@ -767,7 +767,7 @@ class AssociationShrub(object):
         assert isinstance(inst_names_tuple, list)
         assert isinstance(inst_names_tuple[0], tuple)
         assert len(inst_names_tuple[0]) == 2
-        assert isinstance(replacements, dicti)
+        assert isinstance(replacements, NocaseDict)
 
         # If path shortening specified, determine which keys can be shortened
         # based on keys with the same value in all instance names

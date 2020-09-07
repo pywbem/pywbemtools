@@ -826,13 +826,13 @@ Help text for ``pywbemcli connection show`` (see :ref:`connection show command`)
 
       Show the name and attributes of a WBEM connection definition or the current connection, as follows:
 
-      * If the NAME argument is specified, display the connection information with that   name from the connections file
-      or the current connection   if it is the same name.
+      * If the NAME argument is specified, display the connection information   with that name from the connections file
+      or the current connection if it   is the same name.
 
       * If the NAME argument is '?', the command presents a list of connection   definitions from the connections file and
       prompts the user to   select one, which is then displayed.
 
-      * If the NAME argument is omitted, displays the current connection information   if there is a current connection.
+      * If the NAME argument is omitted, displays the current connection   information if there is a current connection.
 
       Example showing a named connection definition:
 

@@ -26,7 +26,7 @@ import click
 
 # Use an ordered Nocase dictionary for the tree. Ordered dictionary creates
 # tree output that has the same order in multiple versions of python.
-from pydicti import odicti
+from pywbem._nocasedict import NocaseDict
 
 
 def build_tree(class_subclass_dict, top_class):
@@ -58,7 +58,7 @@ def build_tree(class_subclass_dict, top_class):
         Returns:
           Structure of nested dictionaries defining the class/subclass structure
         """
-        node_dict = odicti()
+        node_dict = NocaseDict()
         # If there is no subclass, the class will not exist in this dictionary
         if cln in class_to_subclass_dict:
             cln_list = class_to_subclass_dict[cln]
@@ -68,7 +68,7 @@ def build_tree(class_subclass_dict, top_class):
                     node_dict[key] = _tree_node(class_to_subclass_dict, key)
         return node_dict
 
-    rtn_dict = odicti()
+    rtn_dict = NocaseDict()
     # _tree_node generates dictionary node for elements in class-subclass
     # dictionary and returns complete node structure. This is recursive,
     # with _tree_node recursively calling until there are no subclasses.
@@ -97,7 +97,7 @@ def build_class_tree_dict(classes, top_class=None):
     cln_to_supercln = {cln.classname: cln.superclass for cln in classes}
 
     # Sort so there is a fixed order to the resulting tree.
-    cln_supercln_sorted = odicti()
+    cln_supercln_sorted = NocaseDict()
     for key in sorted(cln_to_supercln.keys()):
         cln_supercln_sorted[key] = cln_to_supercln[key]
     cln_to_supercln = cln_supercln_sorted
@@ -112,7 +112,7 @@ def build_class_tree_dict(classes, top_class=None):
     # Build the class to subclass dictionary from the
     # superclass to class dictionary by reversing the dictionary.
     # Built within a comprehension but comprehension not assigned.
-    subcln_in_cln = odicti()
+    subcln_in_cln = NocaseDict()
     # pylint: disable=bad-continuation, expression-not-assigned
     [subcln_in_cln.setdefault(v, []).append(k) for (k, v) in
         six.iteritems(cln_to_supercln)]  # noqa: F841
