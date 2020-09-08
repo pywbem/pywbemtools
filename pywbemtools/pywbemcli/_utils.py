@@ -19,10 +19,16 @@ Utility Functions applicable across multiple components of pywbemcli.
 
 from __future__ import print_function, absolute_import
 
+import os
 import six
+import click
 
+from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
 
 __all__ = []
+
+# Env var for overriding the terminal width
+TERMWIDTH_ENVVAR = 'PYWBEMCLI_TERMWIDTH'
 
 
 def _ensure_unicode(obj):
@@ -75,3 +81,25 @@ def formatwarning(message, category, filename, lineno, line=None):
     Replacement for warnings.formatwarning() that is patched in.
     """
     return "{}: {}\n".format(category.__name__, message)
+
+
+def get_terminal_width():
+    """
+    Return the terminal width to use.
+
+    Note: On Windows, click.get_terminal_size() results in terminal sizes of 0
+    in some cases.
+    """
+
+    terminal_width = os.getenv(TERMWIDTH_ENVVAR, None)
+    if terminal_width:
+        try:
+            terminal_width = int(terminal_width)
+            return terminal_width
+        except ValueError:
+            pass
+
+    if USE_TERMINAL_WIDTH:
+        return click.get_terminal_size()[0]
+
+    return DEFAULT_TABLE_WIDTH

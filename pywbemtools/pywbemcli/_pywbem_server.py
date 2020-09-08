@@ -118,7 +118,6 @@ class PywbemServer(object):
     log_envvar = 'PYWBEMCLI_LOG'
     # The following exports are not part of the pywbem_server container
     pdb_envvar = 'PYWBEMCLI_PDB'
-    termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
     connections_file_envvar = 'PYWBEMCLI_CONNECTIONS_FILE'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,

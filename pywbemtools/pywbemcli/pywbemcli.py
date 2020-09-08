@@ -46,7 +46,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError, CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from ._click_extensions import PywbemcliTopGroup
-from ._utils import formatwarning
+from ._utils import formatwarning, get_terminal_width
 
 
 __all__ = ['cli']
@@ -60,13 +60,6 @@ DEFAULT_TIMESTATS = False
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
 
-TERMWIDTH_ENVVAR = os.getenv(PywbemServer.termwidth_envvar, None)
-if TERMWIDTH_ENVVAR:
-    try:
-        TERMWIDTH_ENVVAR = int(TERMWIDTH_ENVVAR)
-    except ValueError:
-        TERMWIDTH_ENVVAR = None
-
 #
 # Context variables passed to click
 #
@@ -76,7 +69,7 @@ CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help'],
 
     # Default the output width properly:
-    terminal_width=TERMWIDTH_ENVVAR or click.get_terminal_size()[0],
+    terminal_width=get_terminal_width(),
 )
 
 ###########################################################################

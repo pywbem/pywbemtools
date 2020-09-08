@@ -49,7 +49,7 @@ from pywbem._nocasedict import NocaseDict
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg, sort_cimobjects
-from ._utils import _ensure_unicode, _to_unicode
+from ._utils import _ensure_unicode, _to_unicode, get_terminal_width
 
 # Same as in pwbem.cimtypes.py
 if six.PY2:
@@ -527,7 +527,7 @@ class AssociationShrub(object):
                         # pylint: disable=line-too-long
                         inst_names = self.assoc_instnames[role][ref_cln][rrole][assoc_cln]  # noqa E501
                         # pylint: enable=line-too-long
-                        ml = click.get_terminal_size()[0] - 65
+                        ml = get_terminal_width() - 65
                         # TODO: ks: Create more general width algorithm
                         inst_col = fmt_inst_col(inst_names, ml, summary,
                                                 is_ternary)
