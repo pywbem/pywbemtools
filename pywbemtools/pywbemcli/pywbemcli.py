@@ -719,10 +719,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                          log, verbose, pdb,
                          warn,
                          connections_repo)
-    if verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
-        print('CONTEXT_OBJ {!r}'.format(ctx.obj))
-        print('CLICK CTX {}'.format(ctx))
-        display_click_context(ctx, msg="After adding Context",
+    # Env.var PYWBEMCLI_DIAGNOSTICS turns on disgnostic prints for developer
+    # use and is therefore not documented.
+    if os.getenv('PYWBEMCLI_DIAGNOSTICS'):
+        display_click_context(ctx, msg="DIAGNOSTICS: Initial context:",
                               display_attrs=True)
 
     _python_nm = sys.version_info[0:2]
