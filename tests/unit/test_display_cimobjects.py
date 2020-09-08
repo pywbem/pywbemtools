@@ -468,11 +468,12 @@ TESTCASES_DISPLAY_INSTANCES_AS_TABLE = [
             kwargs=dict(),
             exp_stdout="""\
 Instances: CIM_Foo
-Pbf    Pbt    Pdt                        Pint32    Pint64  Pstr1
------  -----  -----------------------  --------  --------  -------------
-false  true   "20140922104920.524789"        99      9999  "Test String"
-              "+000"
+Pbf    Pbt    Pdt                   Pint32    Pint64  Pstr1
+-----  -----  ------------------  --------  --------  -------------
+false  true   "20140922104920.5"        99      9999  "Test String"
+              "24789+000"
 """,
+
         ),
         None, None, not CLICK_ISSUE_1590
     ),

@@ -3087,6 +3087,16 @@ interop      TST_MemberOfFamilyCollectionExp        1
       'test': 'innows'},
      COMPLEX_ASSOC_MODEL, OK],
 
+    ['Verify instance command shrub, with reduced terminal width to trigger '
+     'path folding',
+     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
+      'general': ['--output-format', 'plain'],
+      'env': {'PYWBEMCLI_TERMWIDTH': '80'}},
+     {'stdout': SIMPLE_SHRUB_TABLE1,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
     # TODO test results if we have keys that get hidden.  This will require
     # a more complex model with CreationClassName, etc. in paths.
 

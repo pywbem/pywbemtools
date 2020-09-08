@@ -33,9 +33,7 @@ from pywbem._nocasedict import NocaseDict
 
 from ._common import format_table, fold_strings, DEFAULT_MAX_CELL_WIDTH, \
     output_format_is_table, sort_cimobjects, format_keys
-
-from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
-
+from ._utils import get_terminal_width
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
 INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
@@ -189,10 +187,7 @@ def _display_objects_as_table(objects, output_format, context=None,
 
     Output format is retrieved from context.
     """
-    if USE_TERMINAL_WIDTH:
-        table_width = click.get_terminal_size()[0]
-    else:
-        table_width = DEFAULT_TABLE_WIDTH
+    table_width = get_terminal_width()
 
     if objects:
         if isinstance(objects[0], CIMInstance):
@@ -474,7 +469,7 @@ def _display_instances_as_table(insts, table_width, table_format,
     """
 
     if table_width is None:
-        table_width = DEFAULT_TABLE_WIDTH
+        table_width = get_terminal_width()
 
     for inst in insts:
         assert isinstance(inst, CIMInstance)
