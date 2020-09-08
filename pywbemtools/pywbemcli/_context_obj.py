@@ -267,14 +267,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
-        # Verbose and env var PYWBEMCLI_DIAGNOSTICS displays the click
-        # interpetation of the command and parameters from click context
-        # This is a diagnostic for developer internal use so the
-        # env variable is not documented.
-        if self.verbose and os.getenv('PYWBEMCLI_DIAGNOSTICS'):
+        # Env.var PYWBEMCLI_DIAGNOSTICS turns on disgnostic prints for developer
+        # use and is therefore not documented.
+        if os.getenv('PYWBEMCLI_DIAGNOSTICS'):
             ctx = click.get_current_context()
-            click.echo('COMMAND="{}", params={!r}'.format(ctx.info_name,
-                                                          ctx.params))
+            click.echo('DIAGNOSTICS: command={!r}, params={!r}'.
+                       format(ctx.info_name, ctx.params))
             display_click_context_parents(display_attrs=True)
 
         if not self.pdb:
@@ -437,9 +435,11 @@ def display_click_context(ctx, msg=None, display_attrs=True):
     if not display_attrs:
         click.echo(ctx.obj)
     else:
-        click.echo('{0} {1}, attrs: {2}'.format(
+        click.echo('{0} {1}, attrs:\n    {2}'.format(
             msg, ctx,
-            '\n    '.join('{0}: {1}'.format(i, v) for (i, v) in attrs.items())))
+            '\n    '.join(
+                '{0}: {1}'.format(i, v)
+                for (i, v) in sorted(attrs.items()))))
 
 
 def display_click_context_parents(display_attrs=False):
@@ -451,7 +451,8 @@ def display_click_context_parents(display_attrs=False):
     ctx = click.get_current_context()
     disp_ctx = ctx.parent
     while disp_ctx is not None:
-        display_click_context(disp_ctx, msg='level {}'.format(level),
-                              display_attrs=display_attrs)
-        level += -1
+        display_click_context(
+            disp_ctx, msg='DIAGNOSTICS: Context at parent level {}:'.
+            format(level), display_attrs=display_attrs)
+        level += 1
         disp_ctx = disp_ctx.parent
