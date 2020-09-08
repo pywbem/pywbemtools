@@ -16,7 +16,8 @@ git+https://github.com/pywbem/nocaselist.git@andy/add-pickle#egg=nocaselist
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 # TODO: Upgrade to pywbem 1.1.0 once released.
 
-six>=1.10.0
+nocasedict>=0.5.0
+six>=1.14.0
 # Click 7.1 has a bug with output capturing
 Click>=7.0,!=7.1
 click-spinner>=0.1.8
