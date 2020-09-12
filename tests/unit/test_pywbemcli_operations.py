@@ -28,7 +28,8 @@ import pytest
 import pywbem
 
 from pywbemtools.pywbemcli._pywbemcli_operations import PYWBEMCLIFakedConnection
-from pywbemtools.pywbemcli._utils import _ensure_unicode
+from pywbemtools.pywbemcli._utils import _ensure_unicode, \
+    DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
     SetupNotSupportedError
 
@@ -46,11 +47,35 @@ PDB = "pdb"
 CLICK_ISSUE_1590 = sys.platform == 'win32'
 
 SCRIPT_DIR = os.path.dirname(__file__)
-TEST_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.test_connections_file.yaml')
+USER_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.test_connections_file.yaml')
+
+# Backup of default connections file
+DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
+    '.test_pywbemcli_operations.bak'
 
 # Flag indicating that the new-style setup approach() with a setup() function
 # is supported.
 NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 5)
+
+
+def save_default_connections_file():
+    """
+    Save the default connections file.
+    """
+    if os.path.exists(DEFAULT_CONNECTIONS_FILE):
+        if os.path.exists(DEFAULT_CONNECTIONS_FILE_BAK):
+            os.remove(DEFAULT_CONNECTIONS_FILE_BAK)
+        os.rename(DEFAULT_CONNECTIONS_FILE, DEFAULT_CONNECTIONS_FILE_BAK)
+
+
+def restore_default_connections_file():
+    """
+    Restore the default connections file.
+    """
+    if os.path.exists(DEFAULT_CONNECTIONS_FILE_BAK):
+        if os.path.exists(DEFAULT_CONNECTIONS_FILE):
+            os.remove(DEFAULT_CONNECTIONS_FILE)
+        os.rename(DEFAULT_CONNECTIONS_FILE_BAK, DEFAULT_CONNECTIONS_FILE)
 
 
 def get_mockcache_dir(connection_name):
@@ -134,6 +159,7 @@ TESTCASES_BUILD_MOCKENV = [
     #     - load_rebuild_changed_pyfile: Test load resulting in rebuild due to
     #       missing mock script
     #   * verbose: verbose flag to be used in test.
+    #   * connections_file: Path name of connections file to use.
     #   * default_namespace: Default namespace for the mock connection.
     #   * mock_files: List of file paths of mock scripts and MOF files.
     #   * exp_classes: List of expected classes in mock environment, as
@@ -155,6 +181,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='build',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -170,6 +197,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -185,6 +213,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_pklfile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -204,6 +233,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_md5file',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -223,6 +253,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_moffile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -238,6 +269,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_pyfile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -253,6 +285,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='build',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -268,6 +301,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -283,6 +317,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_pklfile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -298,6 +333,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_md5file',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -313,6 +349,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_moffile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -328,6 +365,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_pyfile',
             verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -345,6 +383,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='build',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -367,6 +406,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -389,6 +429,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_pklfile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -412,6 +453,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_md5file',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -435,6 +477,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_moffile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -458,6 +501,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_pyfile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
@@ -481,6 +525,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='build',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -501,6 +546,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -519,6 +565,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_pklfile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -538,6 +585,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_missing_md5file',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -557,6 +605,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_moffile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -577,6 +626,7 @@ TESTCASES_BUILD_MOCKENV = [
         dict(
             test_mode='load_rebuild_changed_pyfile',
             verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
@@ -591,6 +641,31 @@ TESTCASES_BUILD_MOCKENV = [
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
         not CLICK_ISSUE_1590
     ),
+
+    # Testcases with non-cacheable user-specified connections file
+    (
+        "Mock env with user-specified connections file",
+        dict(
+            test_mode='build',
+            verbose=True,
+            connections_file=USER_CONNECTIONS_FILE,
+            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
+            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
+            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
+            exp_stdout_lines=[
+                b"Mock environment .* will be built because user-specified "
+                b"connections files are not cached",
+            ] if NEWSTYLE_SUPPORTED else [
+                b"Mock environment .* will be built because user-specified "
+                b"connections files are not cached",
+                b"Mock environment .* will be built because it is not "
+                b"cacheable",
+            ],
+            exp_stderr_lines=[],
+        ),
+        None, None, not CLICK_ISSUE_1590
+    ),
 ]
 
 
@@ -598,20 +673,22 @@ TESTCASES_BUILD_MOCKENV = [
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
     TESTCASES_BUILD_MOCKENV)
 @simplified_test_function
-def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
-                       mock_files, exp_classes, exp_providers,
-                       exp_stdout_lines, exp_stderr_lines):
+def test_build_mockenv(testcase, test_mode, verbose, connections_file,
+                       default_namespace, mock_files, exp_classes,
+                       exp_providers, exp_stdout_lines, exp_stderr_lines):
     """
     Test function for BuildMockenvMixin.build_mockenv().
     """
 
     # The connections file is used by PywbemServer() and its build_mockenv()
     # method only as a file path, and is never actually created or accessed.
-    connections_file = TEST_CONNECTIONS_FILE
     connection_name = 'test_build_mockenv'
 
     # Make sure the mock cache does not exist
     remove_mockcache(connection_name)
+
+    if connections_file == DEFAULT_CONNECTIONS_FILE:
+        save_default_connections_file()
 
     try:
 
@@ -626,11 +703,15 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
                 conn.build_mockenv(server, mock_files, connections_file,
                                    connection_name, verbose)
 
-            if NEWSTYLE_SUPPORTED:
+            if NEWSTYLE_SUPPORTED and \
+                    connections_file == DEFAULT_CONNECTIONS_FILE:
                 mockcache_dir = get_mockcache_dir(connection_name)
                 assert os.path.isdir(mockcache_dir)
 
         elif test_mode == 'load':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -647,6 +728,9 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
                                    connection_name, verbose)
 
         elif test_mode == 'load_rebuild_missing_pklfile':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -668,6 +752,9 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
 
         elif test_mode == 'load_rebuild_missing_md5file':
 
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
+
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
             conn.build_mockenv(server, mock_files, connections_file,
@@ -687,6 +774,9 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
                                    connection_name, verbose)
 
         elif test_mode == 'load_rebuild_changed_moffile':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -714,6 +804,9 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
                     fp.truncate(mof_size)
 
         elif test_mode == 'load_rebuild_changed_pyfile':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -743,6 +836,9 @@ def test_build_mockenv(testcase, test_mode, verbose, default_namespace,
     finally:
         # Clean up the mock cache
         remove_mockcache(connection_name)
+
+        if connections_file == DEFAULT_CONNECTIONS_FILE:
+            restore_default_connections_file()
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions

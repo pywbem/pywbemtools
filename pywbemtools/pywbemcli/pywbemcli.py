@@ -44,9 +44,10 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
     MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository, \
-    ConnectionsFileError, CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
+    ConnectionsFileError
 from ._click_extensions import PywbemcliTopGroup
-from ._utils import formatwarning, get_terminal_width
+from ._utils import formatwarning, get_terminal_width, CONNECTIONS_FILENAME, \
+    DEFAULT_CONNECTIONS_FILE
 
 
 __all__ = ['cli']

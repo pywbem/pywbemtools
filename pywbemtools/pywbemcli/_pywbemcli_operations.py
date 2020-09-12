@@ -20,7 +20,7 @@ pywbemcli usage
 This contains only methods that use the iter<...> operations  but also execute
 the complete iterations so that we can use these as common operations for
 pywbemcli instead of having to execute an algorithm of pull vs non-pull
-everywhere a WBEMConnection possible pull operation is called.
+everywhere xa WBEMConnection possible pull operation is called.
 
 It also adds a method to FakeWBEMConnection to build the repository.
 """
@@ -37,7 +37,7 @@ import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
-from ._utils import _ensure_bytes
+from ._utils import _ensure_bytes, DEFAULT_CONNECTIONS_FILE
 from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
@@ -382,7 +382,7 @@ class BuildMockenvMixin(object):
         # general options were specified. When no connections file is set, no
         # caching happens because there is no connection definition context
         # which is required for caching.
-        if connections_file:
+        if connections_file == DEFAULT_CONNECTIONS_FILE:
 
             cache_rootdir = mockcache_rootdir()
             if not os.path.isdir(cache_rootdir):
@@ -439,6 +439,18 @@ class BuildMockenvMixin(object):
                                    "changed.".format(connection_name))
                     need_rebuild = True
 
+            cache_it = True
+
+        elif connections_file:
+            # User-specified connections file used.
+
+            if verbose:
+                click.echo("Mock environment for connection definition '{}' "
+                           "will be built because user-specified connections "
+                           "files are not cached.".format(connection_name))
+            need_rebuild = True
+            cache_it = False
+
         else:
             # No connections file context.
 
@@ -447,6 +459,7 @@ class BuildMockenvMixin(object):
                            "will be built because no connections file is "
                            "known.".format(connection_name))
             need_rebuild = True
+            cache_it = False
 
         if need_rebuild:
             try:
@@ -457,7 +470,7 @@ class BuildMockenvMixin(object):
                                "'{}' will be built because it is not "
                                "cacheable: {}.".format(connection_name, exc))
             else:
-                if connections_file:
+                if connections_file and cache_it:
                     self._dump_mockenv(pickle_file)
                     with open(md5_file, 'w') as fp:
                         fp.write(new_md5_value)

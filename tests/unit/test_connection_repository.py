@@ -31,8 +31,9 @@ import pytest
 from tests.unit.pytest_extensions import simplified_test_function
 
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
-    ConnectionsFileLoadError, ConnectionsFileWriteError, \
-    B08_DEFAULT_CONNECTIONS_FILE, DEFAULT_CONNECTIONS_FILE
+    ConnectionsFileLoadError, ConnectionsFileWriteError
+from pywbemtools.pywbemcli._utils import B08_DEFAULT_CONNECTIONS_FILE, \
+    DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 # Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when

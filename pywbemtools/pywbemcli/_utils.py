@@ -30,6 +30,25 @@ __all__ = []
 # Env var for overriding the terminal width
 TERMWIDTH_ENVVAR = 'PYWBEMCLI_TERMWIDTH'
 
+# Keep the following connections file definitions in sync with help text of
+# the "--connections-file" option in pywbemcli.py and generaloptions.rst, and
+# with the use of the base file name in several other .rst and .py files.
+
+# Base file name of the connections file
+# The B08_* file name was used before pywbemcli 0.8.
+CONNECTIONS_FILENAME = '.pywbemcli_connections.yaml'
+B08_CONNECTIONS_FILENAME = 'pywbemcli_connection_definitions.yaml'
+
+# Path name of default connections file directory.
+DEFAULT_CONNECTIONS_DIR = os.path.expanduser("~")
+
+# Path name of default connections file
+# The B08_* path name was used before pywbemcli 0.8.
+DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                        CONNECTIONS_FILENAME)
+B08_DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
+                                            B08_CONNECTIONS_FILENAME)
+
 
 def _ensure_bytes(obj):
     """
