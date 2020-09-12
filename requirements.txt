@@ -8,15 +8,13 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-git+https://github.com/pywbem/nocaselist.git@andy/add-pickle#egg=nocaselist
-# TODO: Remove again once nocaselist 1.0.2 is released (used by pywbem)
-
 # pywbem>=0.17.0
 # Alternative to test against current github master pywbem
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 # TODO: Upgrade to pywbem 1.1.0 once released.
 
-nocasedict>=0.5.0
+nocaselist>=1.0.2
+nocasedict>=1.0.0
 six>=1.14.0
 # Click 7.1 has a bug with output capturing
 Click>=7.0,!=7.1
