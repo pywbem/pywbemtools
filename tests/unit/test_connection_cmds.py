@@ -25,7 +25,7 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
-from pywbemtools.pywbemcli._connection_repository import CONNECTIONS_FILENAME
+from pywbemtools.pywbemcli._utils import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE

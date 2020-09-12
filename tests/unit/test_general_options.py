@@ -27,7 +27,7 @@ import sys
 import pytest
 import pywbem
 
-from pywbemtools.pywbemcli._connection_repository import CONNECTIONS_FILENAME
+from pywbemtools.pywbemcli._utils import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
