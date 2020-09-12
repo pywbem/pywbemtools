@@ -52,6 +52,8 @@ Released: not yet
 * Fix help message for "--deprecated" to be unicode so python 2.7 help does not
   fail. (see issue #725). This error was added with issue #678
 
+* Upgraded nocasedict and nocaselist packages to pick up fixes.
+
 **Enhancements:**
 
 * Modify general help to display the full path of the default connections file.
