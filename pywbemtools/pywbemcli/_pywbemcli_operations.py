@@ -28,6 +28,7 @@ It also adds a method to FakeWBEMConnection to build the repository.
 from __future__ import absolute_import, print_function
 
 import os
+import errno
 import glob
 import hashlib
 import pickle
@@ -393,25 +394,23 @@ class BuildMockenvMixin(object):
             if not os.path.isdir(cache_dir):
                 os.mkdir(cache_dir)
 
-            # The pickle file contains the pickled state of the mock
+            # The mockenv pickle file contains the pickled state of the mock
             # environment.
-            pickle_file = os.path.join(cache_dir, 'mockenv.pkl')
+            mockenv_pickle_file = os.path.join(cache_dir, 'mockenv.pkl')
+
+            # The depreg pickle file contains the provider dependents
+            # registry of the connection. It is used to look up the dependent
+            # files of a mock script. The content of these dependent files is
+            # also taken into account when determining whether the cache is up
+            # to date. This needs to go into a separate pickle file because
+            # it needs to be loaded and examined before the mckenv pickle
+            # file is loaded.
+            depreg_pickle_file = os.path.join(cache_dir, 'depreg.pkl')
 
             # The md5 file contains the MD5 hash value of the content of the
-            # input files for the mock environment, and is used to determine
-            # whether the cache is up to date w.r.t. the input files.
+            # input files for the mock environment, and also taken into account
+            # when determining whether the cache is up to date.
             md5_file = os.path.join(cache_dir, 'mockfiles.md5')
-
-            # Calculate the MD5 hash value of the content of the input files
-            md5 = hashlib.md5()
-            for file_path in file_path_list:
-                with open(file_path, 'rb') as fp:
-                    file_source = fp.read()
-                    md5.update(file_source)
-            # Add the cache dir, so that manual tweaks on the cache files
-            # invalidates the cache.
-            md5.update(_ensure_bytes(cache_dir))
-            new_md5_value = md5.hexdigest()
 
             # Flag indicating that the mock environment needs to be built
             # (or re-built). If False, the mock environment cache can be used.
@@ -419,12 +418,43 @@ class BuildMockenvMixin(object):
 
             # Determine whether the mock environment needs to be rebuilt based
             # on the (non-)existence of the cache files.
-            if not os.path.isfile(pickle_file) or not os.path.isfile(md5_file):
+            if not os.path.isfile(mockenv_pickle_file) \
+                    or not os.path.isfile(depreg_pickle_file) \
+                    or not os.path.isfile(md5_file):
                 if verbose:
                     click.echo("Mock environment for connection definition "
                                "'{}' will be built because it was not cached.".
                                format(connection_name))
                 need_rebuild = True
+
+            try:
+                depreg = self._load_depreg(depreg_pickle_file)
+            except (IOError, OSError) as exc:
+                if exc.errno == errno.ENOENT:
+                    depreg = pywbem_mock.ProviderDependentRegistry()
+                else:
+                    raise
+
+            # Calculate the MD5 hash value of the content of the input files
+            md5 = hashlib.md5()
+            for file_path in file_path_list:
+                with open(file_path, 'rb') as fp:
+                    file_source = fp.read()
+                    md5.update(file_source)
+
+                # For mock scripts, take their dependent files into account
+                if file_path.endswith('.py'):
+                    dep_files = depreg.iter_dependents(file_path)
+                    for dep_file in dep_files:
+                        with open(dep_file, 'rb') as fp:
+                            file_source = fp.read()
+                            md5.update(file_source)
+
+            # Add the cache dir, so that manual tweaks on the cache files
+            # invalidates the cache.
+            md5.update(_ensure_bytes(cache_dir))
+
+            new_md5_value = md5.hexdigest()
 
             # Determine whether the mock environment needs to be rebuilt based
             # on the MD5 hash value of the input file content.
@@ -471,7 +501,9 @@ class BuildMockenvMixin(object):
                                "cacheable: {}.".format(connection_name, exc))
             else:
                 if connections_file and cache_it:
-                    self._dump_mockenv(pickle_file)
+                    self._dump_mockenv(mockenv_pickle_file)
+                    self._dump_depreg(
+                        self.provider_dependent_registry, depreg_pickle_file)
                     with open(md5_file, 'w') as fp:
                         fp.write(new_md5_value)
                     if verbose:
@@ -483,7 +515,7 @@ class BuildMockenvMixin(object):
             # file set.
             assert connections_file
             try:
-                self._load_mockenv(pickle_file, file_path_list)
+                self._load_mockenv(mockenv_pickle_file, file_path_list)
                 if verbose:
                     click.echo("Mock environment for connection definition "
                                "'{}' has been loaded from cache.".
@@ -550,15 +582,16 @@ class BuildMockenvMixin(object):
                 # mock env.
                 mockscripts.setup_script(file_path, self, server, verbose)
 
-    def _dump_mockenv(self, pickle_file):
+    def _dump_mockenv(self, mockenv_pickle_file):
         """
-        Dump the mock environment of the connection to the mockenv cache file.
+        Dump the mock environment of the connection to the mockenv pickle file.
 
         Parameters:
 
           self (pywbem_mock.FakedWBEMConnection): The mock connection.
 
-          pickle_file (pywbem.WBEMServer): Path name of the mockenv cache file.
+          mockenv_pickle_file (pywbem.WBEMServer): Path name of the mockenv
+            pickle file.
         """
 
         # Save the provider registry and the CIM repository
@@ -571,12 +604,12 @@ class BuildMockenvMixin(object):
             # pylint: disable=protected-access
             provider_registry=self._provider_registry,
         )
-        with open(pickle_file, 'wb') as fp:
+        with open(mockenv_pickle_file, 'wb') as fp:
             pickle.dump(mockenv, fp)
 
-    def _load_mockenv(self, pickle_file, file_path_list):
+    def _load_mockenv(self, mockenv_pickle_file, file_path_list):
         """
-        Load the mock environment from the mockenv cache file.
+        Load the mock environment from the mockenv pickle file.
 
         This method also imports the Python scripts from the input files in
         order to re-establish any class definitions that may be needed, for
@@ -586,7 +619,8 @@ class BuildMockenvMixin(object):
 
           self (pywbem_mock.FakedWBEMConnection): The mock connection.
 
-          pickle_file (pywbem.WBEMServer): Path name of the mockenv cache file.
+          mockenv_pickle_file (pywbem.WBEMServer): Path name of the mockenv
+            pickle file.
 
           file_path_list (list of string): The path names of the input files
             for building the mock environment, from the connection definition.
@@ -604,7 +638,7 @@ class BuildMockenvMixin(object):
                 mockscripts.import_script(file_path)
 
         # Restore the provider registry and the CIM repository
-        with open(pickle_file, 'rb') as fp:
+        with open(mockenv_pickle_file, 'rb') as fp:
             mockenv = pickle.load(fp)
 
         # Others have references to the self._cimrepository object, so we are
@@ -620,6 +654,38 @@ class BuildMockenvMixin(object):
         # pylint: disable=protected-access
         self._provider_registry.load(provider_registry)
 
+    @staticmethod
+    def _dump_depreg(depreg, depreg_pickle_file):
+        """
+        Dump a provider dependent registry to a pickle file.
+
+        Parameters:
+
+          depreg (pywbem_mock.ProviderDependentRegistry): Provider dependent
+            registry to be dumped.
+
+          depreg_pickle_file (string): Path name of the pickle file.
+        """
+        with open(depreg_pickle_file, 'wb') as fp:
+            pickle.dump(depreg, fp)
+
+    @staticmethod
+    def _load_depreg(depreg_pickle_file):
+        """
+        Load a provider dependent registry from a pickle file and return it.
+
+        Parameters:
+
+          depreg_pickle_file (string): Path name of the pickle file to be
+            loaded.
+
+        Returns:
+          pywbem_mock.ProviderDependentRegistry: Provider dependent registry.
+        """
+        with open(depreg_pickle_file, 'rb') as fp:
+            depreg = pickle.load(fp)
+        return depreg
+
 
 class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
     """
@@ -634,9 +700,9 @@ class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
         super(PYWBEMCLIConnection, self).__init__(*args, **kwargs)
 
 
-class PYWBEMCLIFakedConnection(pywbem_mock.FakedWBEMConnection,
+class PYWBEMCLIFakedConnection(BuildMockenvMixin,
                                PYWBEMCLIConnectionMixin,
-                               BuildMockenvMixin):
+                               pywbem_mock.FakedWBEMConnection):
     """
     PyWBEMCLIFakedConnection subclass adds the methods added by
     PYWBEMCLIConnectionMixin
