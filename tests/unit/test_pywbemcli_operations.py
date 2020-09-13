@@ -47,7 +47,7 @@ PDB = "pdb"
 CLICK_ISSUE_1590 = sys.platform == 'win32'
 
 SCRIPT_DIR = os.path.dirname(__file__)
-USER_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.test_connections_file.yaml')
+USER_CONNECTIONS_FILE = os.path.join(SCRIPT_DIR, '.user_connections_file.yaml')
 
 # Backup of default connections file
 DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
@@ -140,6 +140,21 @@ SIMPLE_V1_NEW_EXP_PROVIDERS = [
     (SIMPLE_V1_NEW_NAMESPACE, 'CIM_Foo', 'method', 'CIM_FooMethodProvider'),
 ]
 
+# Testcase parameters for standalone mock script
+STANDALONE_NAMESPACE = pywbem.DEFAULT_NAMESPACE
+STANDALONE_MOCK_FILES = [
+    'tests/unit/standalone_mock_script.py',
+]
+STANDALONE_EXP_CLASSES = [
+    (STANDALONE_NAMESPACE, 'CIM_Foo'),
+    (STANDALONE_NAMESPACE, 'CIM_Foo_sub'),
+    (STANDALONE_NAMESPACE, 'CIM_Foo_sub_sub'),
+    (STANDALONE_NAMESPACE, 'CIM_Foo_sub2'),
+]
+STANDALONE_EXP_PROVIDERS = [
+    (STANDALONE_NAMESPACE, 'CIM_Foo', 'method', 'CIM_FooMethodProvider'),
+]
+
 
 TESTCASES_BUILD_MOCKENV = [
     # TESTCASES for BuildMockenvMixin.build_mockenv()
@@ -162,6 +177,8 @@ TESTCASES_BUILD_MOCKENV = [
     #   * connections_file: Path name of connections file to use.
     #   * default_namespace: Default namespace for the mock connection.
     #   * mock_files: List of file paths of mock scripts and MOF files.
+    #   * exp_dep_files: List of expected file paths of dependent files
+    #     registered.
     #   * exp_classes: List of expected classes in mock environment, as
     #     tuple(namespace, classname).
     #   * exp_providers: List of expected providers in mock environment, as
@@ -184,6 +201,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -200,6 +218,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -216,6 +235,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -236,6 +256,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -256,6 +277,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -272,6 +294,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -288,6 +311,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -304,6 +328,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -320,6 +345,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -336,6 +362,24 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
+            exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
+            exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
+            exp_stdout_lines=[],
+            exp_stderr_lines=[],
+        ),
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+    ),
+    (
+        "Mock env with MOF file and new-style mock script, "
+        "cache exists, but load results in rebuild due to missing dep file",
+        dict(
+            test_mode='load_rebuild_missing_depfile',
+            verbose=False,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
+            default_namespace=SIMPLE_V1_NEW_NAMESPACE,
+            mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -352,6 +396,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -368,6 +413,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
@@ -386,6 +432,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -409,6 +456,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -432,6 +480,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -456,6 +505,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -473,6 +523,31 @@ TESTCASES_BUILD_MOCKENV = [
     ),
     (
         "Mock env with MOF file and old-style mock script, "
+        "cache exists, but load results in rebuild due to missing dep file",
+        dict(
+            test_mode='load_rebuild_missing_depfile',
+            verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
+            default_namespace=SIMPLE_V1_OLD_NAMESPACE,
+            mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
+            exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
+            exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
+            exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
+                b"Mock environment .* will be built because it was not cached.",
+                b"Mock environment .* has been written to cache.",
+            ],
+            exp_stderr_lines=[],
+        ),
+        # This testcase removes the dep file from the mock cache as a
+        # preparation for executing the code to be tested. If the mock env is
+        # not cached, there is no dep file that can be removed, so this
+        # testcase is skipped when the mock env cannot be cached.
+        None, DeprecatedSetupWarning,
+        NEWSTYLE_SUPPORTED and not CLICK_ISSUE_1590
+    ),
+    (
+        "Mock env with MOF file and old-style mock script, "
         "cache exists, but load results in rebuild due to changed MOF file",
         dict(
             test_mode='load_rebuild_changed_moffile',
@@ -480,6 +555,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -504,6 +580,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -528,6 +605,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -549,6 +627,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -568,6 +647,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -588,6 +668,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -608,6 +689,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -629,6 +711,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_NEW_NAMESPACE,
             mock_files=SIMPLE_V1_NEW_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
@@ -651,6 +734,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=USER_CONNECTIONS_FILE,
             default_namespace=SIMPLE_V1_OLD_NAMESPACE,
             mock_files=SIMPLE_V1_OLD_MOCK_FILES,
+            exp_dep_files=[],
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
@@ -666,6 +750,50 @@ TESTCASES_BUILD_MOCKENV = [
         ),
         None, None, not CLICK_ISSUE_1590
     ),
+
+    # Testcases with standalone mock script that has dependents
+    (
+        "Mock env with standalone mock script with deps; normal build",
+        dict(
+            test_mode='build',
+            verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
+            default_namespace=STANDALONE_NAMESPACE,
+            mock_files=STANDALONE_MOCK_FILES,
+            exp_dep_files=[],
+            exp_classes=STANDALONE_EXP_CLASSES,
+            exp_providers=STANDALONE_EXP_PROVIDERS,
+            exp_stdout_lines=[
+                b"Mock environment .* will be built because it was not cached.",
+                b"Mock environment .* has been written to cache.",
+            ],
+            exp_stderr_lines=[],
+        ),
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        not CLICK_ISSUE_1590
+    ),
+    (
+        "Mock env with standalone mock script with deps; change dependent file",
+        dict(
+            test_mode='load_rebuild_changed_depfile',
+            verbose=True,
+            connections_file=DEFAULT_CONNECTIONS_FILE,
+            default_namespace=STANDALONE_NAMESPACE,
+            mock_files=STANDALONE_MOCK_FILES,
+            exp_dep_files=['tests/unit/simple_mock_model.mof'],
+            exp_classes=STANDALONE_EXP_CLASSES,
+            exp_providers=STANDALONE_EXP_PROVIDERS,
+            exp_stdout_lines=[
+                b"Mock environment .* will be rebuilt because the mock files "
+                b"have changed.",
+                b"Mock environment .* has been written to cache.",
+            ],
+            exp_stderr_lines=[],
+        ),
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        not CLICK_ISSUE_1590
+    ),
+
 ]
 
 
@@ -674,8 +802,9 @@ TESTCASES_BUILD_MOCKENV = [
     TESTCASES_BUILD_MOCKENV)
 @simplified_test_function
 def test_build_mockenv(testcase, test_mode, verbose, connections_file,
-                       default_namespace, mock_files, exp_classes,
-                       exp_providers, exp_stdout_lines, exp_stderr_lines):
+                       default_namespace, mock_files, exp_dep_files,
+                       exp_classes, exp_providers, exp_stdout_lines,
+                       exp_stderr_lines):
     """
     Test function for BuildMockenvMixin.build_mockenv().
     """
@@ -773,6 +902,29 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
                 conn.build_mockenv(server, mock_files, connections_file,
                                    connection_name, verbose)
 
+        elif test_mode == 'load_rebuild_missing_depfile':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
+
+            conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
+            server = pywbem.WBEMServer(conn)
+            conn.build_mockenv(server, mock_files, connections_file,
+                               connection_name, False)
+
+            mockcache_dir = get_mockcache_dir(connection_name)
+            dep_file = os.path.join(mockcache_dir, 'depreg.pkl')
+            os.remove(dep_file)
+
+            conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
+            server = pywbem.WBEMServer(conn)
+
+            with captured_output() as captured:
+
+                # The code to be tested
+                conn.build_mockenv(server, mock_files, connections_file,
+                                   connection_name, verbose)
+
         elif test_mode == 'load_rebuild_changed_moffile':
 
             # This test only makes sense when caching is possible
@@ -832,6 +984,38 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
                 # Undo change to the mock script file
                 with open(py_file, 'ab') as fp:
                     fp.truncate(py_size)
+
+        elif test_mode == 'load_rebuild_changed_depfile':
+
+            # This test only makes sense when caching is possible
+            assert connections_file == DEFAULT_CONNECTIONS_FILE
+
+            conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
+            server = pywbem.WBEMServer(conn)
+            conn.build_mockenv(server, mock_files, connections_file,
+                               connection_name, False)
+
+            # Change the first dependent file (must be a MOF file in this test)
+            assert len(exp_dep_files) > 0
+            dep_file = exp_dep_files[0]
+            assert dep_file.endswith('.mof')
+            dep_size = os.stat(dep_file).st_size
+            with open(dep_file, 'a') as fp:
+                fp.write('\n// test_build_mockenv: Dummy line\n')
+
+            conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
+            server = pywbem.WBEMServer(conn)
+            try:
+                with captured_output() as captured:
+
+                    # The code to be tested
+                    conn.build_mockenv(server, mock_files, connections_file,
+                                       connection_name, verbose)
+
+            finally:
+                # Undo change to the dependent file
+                with open(dep_file, 'ab') as fp:
+                    fp.truncate(dep_size)
 
     finally:
         # Clean up the mock cache
