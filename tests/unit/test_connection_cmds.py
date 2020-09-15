@@ -298,7 +298,7 @@ user
 password
 timeout            30
 use-pull
-pull-max-cnt
+pull-max-cnt       1000
 verify             True
 certfile
 keyfile
@@ -321,7 +321,7 @@ user
 password
 timeout            30
 use-pull
-pull-max-cnt
+pull-max-cnt       1000
 verify             True
 certfile
 keyfile
@@ -355,7 +355,7 @@ user
 password
 timeout            30
 use-pull
-pull-max-cnt
+pull-max-cnt       1000
 verify             True
 certfile
 keyfile
@@ -378,7 +378,7 @@ user               fred
 password           argh
 timeout            18
 use-pull
-pull-max-cnt
+pull-max-cnt       1000
 verify             False
 certfile
 keyfile
@@ -401,7 +401,7 @@ user               fred
 password           ******
 timeout            18
 use-pull
-pull-max-cnt
+pull-max-cnt       1000
 verify             False
 certfile
 keyfile
@@ -491,8 +491,8 @@ ca-certs
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
                  'name   server namespace  user  timeout  use-pull  '
                  'pull-max-cnt verify  certfile  keyfile  mock-server',
-                 '*#test2  http://blahblah  root/cimv2 fred 18 False',
-                 'test1  http://blah  root/cimv2 30  True'],
+                 '*#test2  http://blahblah  root/cimv2 fred 18 1000 False',
+                 'test1  http://blah  root/cimv2 30 1000 True'],
       'test': 'innows'},
      None, OK],
 
@@ -501,10 +501,10 @@ ca-certs
      {'general': ['--output-format', 'plain'],
       'args': ['list', '-f']},
      {'stdout': ['WBEM server connections(full): (#: default, *: current)',
-                 'name   server namespace  user  timeout  use-pull '
+                 'name server namespace  user  timeout  use-pull '
                  'pull-max-cnt verify certfile keyfile mock-server',
-                 '*#test2  http://blahblah  root/cimv2 fred 18 False',
-                 'test1  http://blah  root/cimv2 30 True'],
+                 '*#test2  http://blahblah  root/cimv2 fred 18 1000 False',
+                 'test1  http://blah  root/cimv2 30 1000 True'],
       'test': 'innows'},
      None, OK],
 
