@@ -92,7 +92,7 @@ GENERAL_HELP_LINES = [
     "-n, --name NAME Use the WBEM server defined by the WBEM",
     "-m, --mock-server FILE  Use a mock WBEM server that is automatically",
     "-s, --server URL  Use the WBEM server at the specified URL with",
-    "-u, --user TEXT   User name for the WBEM server. Default: EnvVar",
+    "-u, --user TEXT   User name for the WBEM server.",
     "-p, --password TEXT  Password for the WBEM server. Default: EnvVar",
     "--verify / --no-verify  If --verify, client verifies the X.509 server",
     "--ca-certs CACERTS  Certificates used to validate the certificate",
@@ -290,7 +290,7 @@ TEST_CASES = [
      {'general': ['-s', 'http://blah', '--use-pull', 'either'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stdout': ['use-pull pull-max-cnt verify'],
+     {'stdout': ['use-pull pull-max-cnt 1000 verify'],
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1175,6 +1175,49 @@ TEST_CASES = [
       'cmdgrp': 'connection', },
      {'stdout': "",
       'test': 'innows'},
+     None, OK],
+
+
+    ['Verify  server general options with "" value reset the option to None',
+     {'general': ['--server', 'http://blah',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'fred',
+                  '--password', 'blah',
+                  '--keyfile', 'mykeyfile.pem',
+                  '--certfile', 'mycertfile.pem',
+                  '--use-pull', 'yes'],
+      'stdin': ['--user "" --password ""  --keyfile "" --certfile "" '
+                '--default-namespace ""  --use-pull either connection show'],
+      'cmdgrp': None},
+     # Test for user and password with no values
+     {'stdout': ['default-namespace  root/cimv2',
+                 'user password timeout',
+                 'certfile keyfile mock-server',
+                 'use-pull pull-max-cnt'],
+      'rc': 0,
+      'test': 'innows'},
+
+     None, OK],
+
+
+    ['Verify  misc general options with "" value reset the option to None',
+     {'general': ['--server', 'http://blah',
+                  '--default-namespace', 'root/blah',
+                  '--user', 'fred',
+                  '--password', 'blah',
+                  '--keyfile', 'mykeyfile.pem',
+                  '--certfile', 'mycertfile.pem',
+                  '--use-pull', 'yes',
+                  '--log', 'all',
+                  '--output-format', "table"],
+      'stdin': ['--log "" --output-format "" connection show'],
+      'cmdgrp': None},
+     # Test for user and password with no values
+     # NOTE: We cannot really test --log, --output-format changes
+     {'stdout': ['default-namespace  root/blah'],
+      'rc': 0,
+      'test': 'innows'},
+
      None, OK],
 
     #

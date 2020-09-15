@@ -22,7 +22,6 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
-import six
 import traceback
 from copy import deepcopy
 import warnings
@@ -57,9 +56,9 @@ PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify
-DEFAULT_TIMESTATS = False
+DEFAULT_TIMESTATS = False  # The default is no timestats
 DEFAULT_PULL_CHOICE = 'either'
-USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False}
+USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False, 'default': None}
 
 #
 # Context variables passed to click
@@ -165,17 +164,31 @@ def _resolve_mock_server(mock_server):
     return resolved_mock_server
 
 
+def set_default_if_empty_str(tst_str, default=None):
+    """
+    Return None if str is an empty string or return str. Used to test for
+    general options that reset with value of "" and reset to either None
+    or the default value.
+
+    Parameters:
+      tst_str (:term:1string):
+        the string to test for value of ""
+
+      default (:term:`string`):
+        Optional default string value to return
+
+    Returns:
+        None or the value of the default parameter
+    """
+    return default if tst_str == "" else tst_str
+
+
 ############################################################################
 #
 #   cli command (main entry point) and definition of all of the pywbemcli
 #   general options.
 #
 ############################################################################
-
-
-def or_default(str):
-    """"""
-    return None if str == "" else str
 
 
 # pylint: disable=bad-continuation
@@ -220,17 +233,19 @@ def or_default(str):
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PywbemServer.server_envvar))
 @click.option('-u', '--user', type=str, metavar='TEXT',
-              # defaulted in code
+
+              default=None,  # There is no default value
               envvar=PywbemServer.user_envvar,
-              help=u'User name for the WBEM server. '
+              help=u'User name for the WBEM server.  Use "" to set default in '
+                   u'interactive mode.'
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PywbemServer.user_envvar))
 @click.option('-p', '--password', type=str, metavar='TEXT',
-              # defaulted in code
+              default=None,  # There is not default value
               envvar=PywbemServer.password_envvar,
               help=u'Password for the WBEM server. '
                    u'Default: EnvVar {ev}, or prompted for if --user '
-                   u'specified.'.
+                   u'specified. Use "" to set default in interactive mode.'.
                    format(ev=PywbemServer.password_envvar))
 @click.option('--verify/--no-verify', 'verify', default=None,
               # defaulted in code
@@ -261,7 +276,8 @@ def or_default(str):
               help=u'Path name of a PEM file containing a X.509 client '
                    u'certificate that is used to enable TLS/SSL 2-way '
                    u'authentication by presenting the certificate to the '
-                   u'WBEM server during TLS/SSL handshake. '
+                   u'WBEM server during TLS/SSL handshake.  Use "" to set '
+                   u'default in interactive mode. '
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PywbemServer.certfile_envvar))
 @click.option('-k', '--keyfile', type=str, metavar='FILE',
@@ -270,7 +286,8 @@ def or_default(str):
               help=u'Path name of a PEM file containing a X.509 private key '
                    u'that belongs to the certificate in the --certfile file. '
                    u'Not required if the private key is part of the '
-                   u'--certfile file. '
+                   u'--certfile file. Use "" to set default in interactive '
+                   u'mode.'
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PywbemServer.keyfile_envvar))
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
@@ -297,7 +314,6 @@ def or_default(str):
                    format(ev=PywbemServer.use_pull_envvar))
 @click.option('--pull-max-cnt', type=int, metavar='INT',
               # defaulted in code
-              envvar=PywbemServer.pull_max_cnt_envvar,
               help=u'Maximum number of instances to be returned by the WBEM '
                    u'server in each open or pull response, if pull operations '
                    u'are used. '
@@ -310,32 +326,36 @@ def or_default(str):
               # defaulted in code
               help=u'Show time statistics of WBEM server operations.')
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
-              default=None,
+              default=None,  # default value set in cli function
               envvar=PywbemServer.defaultnamespace_envvar,
               help=u'Default namespace, to be used when commands do not '
-                   u'specify the --namespace command option. '
+                   u'specify the --namespace command option. Use '' to set '
+                   u'default in interactive mode. '
                    u'Default: EnvVar {ev}, or {default}.'.
                    format(ev=PywbemServer.defaultnamespace_envvar,
                           default=DEFAULT_NAMESPACE))
 @click.option('-o', '--output-format', metavar='FORMAT',
+              default=None,  # There is no default value
               help=u'Output format for the command result. '
                    u'The default and allowed output formats are command '
                    u'specific. '
                    u'The default output_format is None so that each command '
-                   u'selects its own default format. '
+                   u'selects its own default format. Use '' to set default '
+                   u'in interactive mode. '
                    u'FORMAT is: table formats: [{tb}]; CIM object '
                    u'formats: [{ob}]]; TEXT formats: [{tx}].'.
                    format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0]),
                           ob='|'.join(OUTPUT_FORMAT_GROUPS['CIM'][0]),
                           tx='|'.join(OUTPUT_FORMAT_GROUPS['TEXT'][0])))
 @click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
-              # defaulted in code
+              default=None,  # There is no default value
               envvar=PywbemServer.log_envvar,
               help=u'Enable logging of the WBEM operations, defined by a list '
                    u'of log configuration strings with: '
                    u'COMP: [{comp_choices}]; '
                    u'DEST: [{dest_choices}], default: {dest_default}; '
                    u'DETAIL: [{detail_choices}], default: {detail_default}. '
+                   u'"" disables in interactive mode. '
                    u'Default: EnvVar {ev}, or {default}.'.
                    format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
                           dest_choices='|'.join(LOG_DESTINATIONS),
@@ -354,6 +374,7 @@ def or_default(str):
               u'env var, which by default displays no warnings. '
               u'Default: False.')
 @click.option('-C', '--connections-file', metavar='FILE PATH',
+              default=None,  # default value set in cli function
               envvar=PywbemServer.connections_file_envvar,
               # Keep help text in sync with connections file definitions in
               # _connection_repository.py:
@@ -361,7 +382,8 @@ def or_default(str):
                    u'Default: EnvVar {ev}, or "{cf}" in the user\'s home '
                    u'directory (as determined using Python\'s '
                    u'os.path.expanduser("~"). See there for details, '
-                   u'particularly for Windows).'.
+                   u'particularly for Windows). Use '' to set default '
+                   u'in interactive mode. '.
                    format(cf=CONNECTIONS_FILENAME,
                           ev=PywbemServer.connections_file_envvar))
 @click.option('--pdb', is_flag=True,
@@ -418,8 +440,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
-    # i.e. When -name is used and when in interactive mode.
     resolved_mock_server = []
+
+    # Options not allowed when -name is used and when
+    # in interactive mode. This disallows modifying values
+    # of servers in interactive mode.
     conditional_options = ((default_namespace, 'default_namespace'),
                            (timeout, 'timeout'),
                            (verify, 'verify'),
@@ -431,8 +456,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                            # Special because we resolve the mock-server list
                            # during initialization.
                            (resolved_mock_server, 'mock-server'))
-    print('certfile=%s keyfile=%s ca_certs=%s log=%s, timeout %s' % (certfile, keyfile,
-                                                         ca_certs, log, timeout))
 
     def create_server_instance(connection_name):
         """
@@ -534,6 +557,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     pywbem_server = None
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
     resolved_timestats = timestats or DEFAULT_TIMESTATS
+    # TODO: Test verify or DEFAULT_VERIFY
     resolved_verify = DEFAULT_VERIFY if verify is None else verify
 
     # There is no default ca_certs
@@ -554,7 +578,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         click.echo(str(connections_repo))
 
     if keyfile and not certfile:
-        # TODO: account for the "" option
         raise click.ClickException(
             'The --keyfile option "{}" is allowed only if the --certfile '
             'option is also used'.format(keyfile))
@@ -587,17 +610,9 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             'Conflicting server definitions: mock-server: {}, name: {}'.
             format(', '.join(resolved_mock_server), connection_name))
 
-	# NOTE WAS: TODO
-	#    # Set pull default if necessary and create the resolved variable
-	#    use_pull = use_pull or DEFAULT_PULL_CHOICE
-	#    resolved_use_pull = USE_PULL_CHOICE[use_pull]
-
-	#    # Resolved is the same as input including None.  Default is set on
-	#    # request if the value is None
-	#    resolved_pull_max_cnt = pull_max_cnt
-
     resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
-        else DEFAULT_PULL_CHOICE
+        else USE_PULL_CHOICE[DEFAULT_PULL_CHOICE]
+
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
@@ -644,6 +659,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 # This allows modifications to be made for a single
                 # interactive command but not kept.
                 pywbem_server = deepcopy(ctx.obj.pywbem_server)
+
+            # In cases where input parameter of "" is allowed to
+            # reset option values, the option is tested for "is not None"
+            # to include empty string in test.
             if pywbem_server:
                 modified_server = False
                 if server:
@@ -656,11 +675,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                         pywbem_server.server = None
                     pywbem_server.mock_server = resolved_mock_server
                     modified_server = True
-                if user:
-                    pywbem_server.user = user
+                if user is not None:
+                    pywbem_server.user = set_default_if_empty_str(user)
                     modified_server = True
-                if isinstance(keyfile, six.string_types):
-                    pywbem_server.password = or_default(password)
+                if password is not None:
+                    pywbem_server.password = set_default_if_empty_str(password)
                     modified_server = True
                 if verify is not None:
                     pywbem_server.verify = resolved_verify
@@ -668,11 +687,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if ca_certs:
                     pywbem_server.ca_certs = ca_certs
                     modified_server = True
-                if isinstance(certfile, six.string_types):
-                    pywbem_server.certfile = or_default(certfile)
+                if certfile is not None:
+                    pywbem_server.certfile = set_default_if_empty_str(certfile)
                     modified_server = True
-                if isinstance(keyfile, six.string_types):
-                    pywbem_server.keyfile = or_default(keyfile)
+                if keyfile is not None:
+                    pywbem_server.keyfile = set_default_if_empty_str(keyfile)
                     modified_server = True
                 if timeout:
                     pywbem_server.timeout = resolved_timeout
@@ -681,8 +700,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if server:
                     pywbem_server.server = server
                     modified_server = True
-                if default_namespace:
-                    pywbem_server.default_namespace = resolved_default_namespace
+                if default_namespace is not None:
+                    pywbem_server.default_namespace = \
+                        set_default_if_empty_str(default_namespace,
+                                                 DEFAULT_NAMESPACE)
                     modified_server = True
                 if modified_server:
                     pywbem_server.reset()
@@ -695,20 +716,39 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         # not attached to any particular connection. If the cli argument is
         # None, this argument was not defined as part of this interactive
         # command and the value is set from the existing ctx.obj.
+
+        # These variables are retrieved from the ctx.obj if the parameter
+        # value is none (not defined for current interactive command). Note
+        # that some of them allow the value "" to be used to reset the
+        # general option to its default value.
+        #
         if output_format is None:
             output_format = ctx.obj.output_format
+        elif output_format == "":
+            output_format = None
+
         if use_pull is None:
             resolved_use_pull = ctx.obj.use_pull
+
         if pull_max_cnt is None:
             resolved_pull_max_cnt = ctx.obj.pull_max_cnt
+
         if not timestats:  # Defaults to False, not None
             resolved_timestats = ctx.obj.timestats
+
         if log is None:
             log = ctx.obj.log
+        elif log == "":
+            log = None
+
         if verbose is None:
             verbose = ctx.obj.verbose
+
         if connections_repo is None:
             connections_repo = ctx.obj.connections_repo
+        elif connections_repo == "":
+            connections_repo = DEFAULT_CONNECTIONS_FILE
+
         if pdb is None:
             pdb = ctx.obj.pdb
         if warn is None:
@@ -721,7 +761,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # in persistent file but set working value in context.
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
-                         resolved_pull_max_cnt or DEFAULT_MAXPULLCNT,
+                         resolved_pull_max_cnt,
                          resolved_timestats,
                          log, verbose, pdb,
                          warn,
