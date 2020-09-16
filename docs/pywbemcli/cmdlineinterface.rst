@@ -383,6 +383,45 @@ starting with the given text, the completion will be shown as gray text behind
 the current input. Pressing the right arrow → or c-e will insert this
 suggestion.
 
+General options can be entered in the interactive mode but they generally only
+apply to the current command defined on the same command input as the general
+option.  Thus, to modify the output format for a particular command, enter the
+--output-format general option before the command.  The following command
+sets the output format to ``table`` before executing the command and then
+restores it to the original value.:
+
+
+.. code-block:: text
+
+    pywbemcli> --output-format table instance enumerate CIM_Foo
+
+A particular difference between general options in the interactive mode and
+the command line mode is the ability to set general options back to their
+default value in the interactive mode.   In the command mode this is not
+required.  However, in the interactive mode, it could be useful to reset a
+general option to its default value for a command.  Thus, if the log was set
+on startup (--log all), it could be disabled for a command or the user name
+(--user) could be set back to None.  However, normally the default value is
+only set by not including that general option with the command line input
+
+To reset selected string type general options in the interactive, the string
+value of ``""`` (an empty string) is provided as the value which causes pywbemcli
+to set the default value of that general option.
+
+The following code defines a server with --user and password in interactive
+mode.  Then it attempts to modify the user and password to their default values
+of None and execute the class enumerate again.  This command would be executed
+without using the user and password because they have been reset for that command.
+
+.. code-block:: text
+
+    pywbemcli -s https:blah --user fred --pasword blah
+    pywbemcli> class enumerate
+    pywbemcli> --user "" --pasword "" class enumerate
+
+
+
+
 .. index:: pair: Error handling; exit codes
 
 .. _`Error handling`:

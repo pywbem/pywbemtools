@@ -329,7 +329,7 @@ def set_default_if_empty_str(tst_str, default=None):
               default=None,  # default value set in cli function
               envvar=PywbemServer.defaultnamespace_envvar,
               help=u'Default namespace, to be used when commands do not '
-                   u'specify the --namespace command option. Use '' to set '
+                   u'specify the --namespace command option. Use "" to set '
                    u'default in interactive mode. '
                    u'Default: EnvVar {ev}, or {default}.'.
                    format(ev=PywbemServer.defaultnamespace_envvar,
@@ -340,7 +340,7 @@ def set_default_if_empty_str(tst_str, default=None):
                    u'The default and allowed output formats are command '
                    u'specific. '
                    u'The default output_format is None so that each command '
-                   u'selects its own default format. Use '' to set default '
+                   u'selects its own default format. Use "" to set default '
                    u'in interactive mode. '
                    u'FORMAT is: table formats: [{tb}]; CIM object '
                    u'formats: [{ob}]]; TEXT formats: [{tx}].'.
@@ -355,7 +355,7 @@ def set_default_if_empty_str(tst_str, default=None):
                    u'COMP: [{comp_choices}]; '
                    u'DEST: [{dest_choices}], default: {dest_default}; '
                    u'DETAIL: [{detail_choices}], default: {detail_default}. '
-                   u'"" disables in interactive mode. '
+                   u' Use "" to set default in interactive mode'
                    u'Default: EnvVar {ev}, or {default}.'.
                    format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
                           dest_choices='|'.join(LOG_DESTINATIONS),
@@ -382,7 +382,7 @@ def set_default_if_empty_str(tst_str, default=None):
                    u'Default: EnvVar {ev}, or "{cf}" in the user\'s home '
                    u'directory (as determined using Python\'s '
                    u'os.path.expanduser("~"). See there for details, '
-                   u'particularly for Windows). Use '' to set default '
+                   u'particularly for Windows). Use "" to set default '
                    u'in interactive mode. '.
                    format(cf=CONNECTIONS_FILENAME,
                           ev=PywbemServer.connections_file_envvar))
