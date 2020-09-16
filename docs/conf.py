@@ -496,6 +496,6 @@ extensions = [
 ]
 # Addintersphinx mappings
 intersphinx_mapping = {
-    'pywbem': ('https://pywbem.readthedocs.io/en/stable', None),
-    'pywbem_mock': ('https://pywbem.readthedocs.io/en/stable', None),
+    'pywbem': ('https://pywbem.readthedocs.io/en/latest', None),
+    # TODO: Go back to using stable once pywbem 1.1.0 is released.
 }
