@@ -570,6 +570,7 @@ def create_cimvalue(cim_type, value_str, is_array):
         ValueError if the value_str cannot be parsed consistent with
         the cim_type and is_array attributes of the call.
     """
+
     def str_2_bool(value):
         """
         Convert the value input to boolean based on text or
@@ -577,7 +578,6 @@ def create_cimvalue(cim_type, value_str, is_array):
         """
         if isinstance(value, bool):
             return value
-
         if isinstance(value, six.string_types):
             if value.lower() == 'true':
                 return True
@@ -585,7 +585,8 @@ def create_cimvalue(cim_type, value_str, is_array):
                 return False
         raise ValueError('Invalid boolean value: "{}"'.format(value))
 
-    cim_value = None
+    if value_str is None:
+        return None
 
     if not is_array:
         # cimvalue does not handle strings for bool
@@ -609,8 +610,11 @@ def create_cimproperty(cim_type, is_array, name, value_str):
 
     Parameters:
 
-      cim_class (:class:`~pywbem.CIMClass`):
-        CIM Class that includes the property defined by name
+      cim_type (:term:`string`):
+        CIM type of the property
+
+      is_array (bool):
+        Boolean indicating that property is an array
 
       name (:term:`string`):
         Name of the property to be constructed
@@ -627,7 +631,7 @@ def create_cimproperty(cim_type, is_array, name, value_str):
     """
     cim_value = create_cimvalue(cim_type, value_str, is_array)
 
-    return CIMProperty(name, cim_value, cim_type)
+    return CIMProperty(name, cim_value, type=cim_type, is_array=is_array)
 
 
 def create_ciminstancename(cim_class, kv_keys):
@@ -643,7 +647,7 @@ def create_ciminstancename(cim_class, kv_keys):
         The provided keys are validated against the properties of that class.
 
       kv_keys (tuple):
-        A tuple of name/value pairs representing the keys and their
+        A tuple of "name=value" strings representing the keys and their
         values that are to be constructed for the instance name. Required
 
     Returns:
@@ -664,8 +668,8 @@ def create_ciminstancename(cim_class, kv_keys):
     # string, then they would be used to turn the value into a string. For
     # example: name=42 -> numeric, name="42" -> string.
     keys = []
-    for kv_property in kv_keys:
-        name, value_str = parse_kv_pair(kv_property)
+    for kv_key in kv_keys:
+        name, value_str = parse_kv_pair(kv_key)
         try:
             cl_prop = cim_class.properties[name]
         except KeyError:
@@ -703,7 +707,7 @@ def create_ciminstance(cim_class, kv_properties):
         The class from which the CIMInstance is to be created
 
       kv_properties (tuple):
-        A tuple of name/value pairs representing the properties and their
+        A tuple of "name=value" strings representing the properties and their
         values that are to be constructed for the instance. Required
 
     Returns:
@@ -789,8 +793,7 @@ def compare_instances(inst1, inst2):
 
 def parse_kv_pair(pair):
     """
-    Parse a single key/value pair string in 'KEY=VALUE' syntax, and return a
-    tuple (key, value).
+    Parse a single "KEY=VALUE" string and return a tuple (key, value).
 
     The parsing assumes that KEY does not include '=', which is always the case
     for CIM names. VALUE may contain '=' characters, which are retained.
