@@ -22,7 +22,6 @@ Tests for _common.py functions.
 from __future__ import absolute_import, print_function
 
 import sys
-import unittest
 from packaging.version import parse as parse_version
 import click
 from mock import patch
@@ -65,11 +64,11 @@ PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 
 TESTCASES_ISCLASSNAME = [
-    # TESTCASES for is_classname
+    # Testcases for _common.is_classname()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * name: string containing classname or instancename
     #   * exp_rtn: expected function return.
     # * exp_exc_types: Expected exception type(s), or None.
@@ -91,9 +90,11 @@ TESTCASES_ISCLASSNAME = [
     TESTCASES_ISCLASSNAME)
 @simplified_test_function
 def test_is_classname(testcase, name, exp_rtn):
-    """Test for is_classname function"""
-    # The code to be tested
+    """
+    Test function for _common.is_classname()
+    """
 
+    # The code to be tested
     act_rtn = is_classname(name)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -104,11 +105,11 @@ def test_is_classname(testcase, name, exp_rtn):
 
 
 TESTCASES_VALID_OUTPUT_FORMAT = [
-    # TESTCASES for valid_output_format
+    # Testcases for _common.valid_output_format()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * fmt: output_format defined for this command execution or None
     #   * default: string containing default format or None
     #   * groups: list of groups allowed for this command
@@ -252,9 +253,11 @@ TESTCASES_VALID_OUTPUT_FORMAT = [
     TESTCASES_VALID_OUTPUT_FORMAT)
 @simplified_test_function
 def test_valid_output_format(testcase, fmt, default, groups, exp_rtn):
-    """Test common.valid_output_format function"""
-    # The code to be tested
+    """
+    Test function for _common.valid_output_format()
+    """
 
+    # The code to be tested
     act_rtn = validate_output_format(fmt, groups, default_format=default)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -265,11 +268,11 @@ def test_valid_output_format(testcase, fmt, default, groups, exp_rtn):
 
 
 TESTCASES_OUTPUT_FORMAT_IN_GROUPS = [
-    # TESTCASES for output_format_in_group
+    # Testcases for _common.output_format_in_groups()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * fmt: output_format being tested
     #   * groups[]: string or list of stringscontaining group names
     #   * exp_rtn: output_format return.
@@ -315,9 +318,11 @@ TESTCASES_OUTPUT_FORMAT_IN_GROUPS = [
     TESTCASES_OUTPUT_FORMAT_IN_GROUPS)
 @simplified_test_function
 def test_output_format_in_groups(testcase, fmt, groups, exp_rtn):
-    """Test common.valid_output_format function"""
-    # The code to be tested
+    """
+    Test function for _common.output_format_in_groups()
+    """
 
+    # The code to be tested
     act_rtn = output_format_in_groups(fmt, groups)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -327,12 +332,12 @@ def test_output_format_in_groups(testcase, fmt, groups, exp_rtn):
     assert act_rtn == exp_rtn
 
 
-TESTCASES_FORMAT_KEYBINDINGS = [
-    # TESTCASES for format_keybindings
+TESTCASES_FORMAT_KEYS = [
+    # Testcases for _common.format_keys()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * kb: keybinding
     #   * width - integer representing width of resulting field
     #   * exp_rtn: expected function return.
@@ -421,13 +426,16 @@ TESTCASES_FORMAT_KEYBINDINGS = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_FORMAT_KEYBINDINGS)
+    TESTCASES_FORMAT_KEYS)
 @simplified_test_function
-def test_format_keybindings(testcase, kb, width, exp_rtn):
-    """Test for format_keys function"""
-    # The code to be tested
+def test_format_keys(testcase, kb, width, exp_rtn):
+    """
+    Test function for _common.format_keys()
+    """
 
     kbs = CIMInstanceName('blah', kb)
+
+    # The code to be tested
     act_rtn = format_keys(kbs, width)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -437,12 +445,12 @@ def test_format_keybindings(testcase, kb, width, exp_rtn):
     assert act_rtn == exp_rtn
 
 
-TESTCASES_SHORT_PATH = [
-    # TESTCASES for shorten_path_str
+TESTCASES_SHORTEN_PATH_STR = [
+    # Testcases for _common.shorten_path_str()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * kb: keybinding
     #   * rpl - definition of replacement parameter
     #   * exp_rtn: expected function return.
@@ -529,13 +537,16 @@ TESTCASES_SHORT_PATH = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_SHORT_PATH)
+    TESTCASES_SHORTEN_PATH_STR)
 @simplified_test_function
-def test_short_path(testcase, kb, rpl, fp, exp_rtn):
-    """Test for shorten_path_str function"""
-    # The code to be tested
+def test_shorten_path_str(testcase, kb, rpl, fp, exp_rtn):
+    """
+    Test function for _common.shorten_path_str()
+    """
 
     inst_name = CIMInstanceName('cln', keybindings=kb)
+
+    # The code to be tested
     act_rtn = shorten_path_str(inst_name, rpl, fp)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -546,11 +557,11 @@ def test_short_path(testcase, kb, rpl, fp, exp_rtn):
 
 
 TESTCASES_HIDE_EMPTY_COLUMNS = [
-    # TESTCASES for hide_empty_column
+    # Testcases for _common.hide_empty_columns()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * rows: Array of strings (columns, rows)
     #   * headrs: list of strings
     #   * exp_rtn: expected function return.
@@ -653,9 +664,11 @@ TESTCASES_HIDE_EMPTY_COLUMNS = [
     TESTCASES_HIDE_EMPTY_COLUMNS)
 @simplified_test_function
 def test_hide_empty_columns(testcase, rows, headers, exp_rtn):
-    """Test for hide_empty_columns function"""
-    # The code to be tested
+    """
+    Test function for _common.hide_empty_columns()
+    """
 
+    # The code to be tested
     act_rtn_headrs, act_rtn_rows = hide_empty_columns(headers, rows)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -666,12 +679,12 @@ def test_hide_empty_columns(testcase, rows, headers, exp_rtn):
     assert act_rtn_headrs == exp_rtn['headers']
 
 
-TESTCASES_SPLIT_STR = [
-    # TESTCASES for split_value_str
+TESTCASES_SPLIT_STR_W_ESC = [
+    # Testcases for _common.split_str_w_esc()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * input_str: string to split
     #   * delimiter: split delimiter
     #   * exp_rtn: expected list of strings returned
@@ -737,10 +750,12 @@ TESTCASES_SPLIT_STR = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_SPLIT_STR)
+    TESTCASES_SPLIT_STR_W_ESC)
 @simplified_test_function
-def test_split_str(testcase, input_str, delimiter, exp_rtn):
-    """Test for split_str function"""
+def test_split_str_w_esc(testcase, input_str, delimiter, exp_rtn):
+    """
+    Test function for _common.split_str_w_esc()
+    """
 
     # The code to be tested
     act_result = list(split_str_w_esc(input_str, delimiter))
@@ -753,11 +768,11 @@ def test_split_str(testcase, input_str, delimiter, exp_rtn):
 
 
 TESTCASES_PICK_ONE_FROM_LIST = [
-    # TESTCASES for pick_one_from_list
+    # Testcases for _common.pick_one_from_list()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * options: tuple of strings defining properties
     #   * choices: list of choices to return from mock
     #   * exp_rtn: expected function return.
@@ -805,16 +820,24 @@ TESTCASES_PICK_ONE_FROM_LIST = [
 @simplified_test_function
 def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     """
-    Test for pick_one_from_list function. Uses mock patch to define return
-    values from the mock.
+    Test function for _common.pick_one_from_list().
+
+    Uses mock patch to define return values from the mock.
     """
+
     title = "Test pick_one_from_list"
 
     # test option with only one choice bypasses user request
     if not choices:
         context = ContextObj(None, None, None, None, None, None, None, None,
                              None, None)
+
+        # The code to be tested
         act_rtn = pick_one_from_list(context, options, title)
+
+        # Ensure that exceptions raised in the remainder of this
+        # function are not mistaken as expected exceptions
+        assert testcase.exp_exc_types is None
     else:
         # Setup mock for this test.
         # Mock the prompt with choices from the testcases as prompt response
@@ -824,27 +847,29 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
             # mock the echo to hide output
             mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
             with patch(mock_echo_func):
-                # The code to be tested
                 # Fake context object
                 context = ContextObj(None, None, None, None, None, None, None,
                                      None, None, None)
+
+                # The code to be tested
                 act_rtn = pick_one_from_list(context, options, title)
+
+                # Ensure that exceptions raised in the remainder of this
+                # function are not mistaken as expected exceptions
+                assert testcase.exp_exc_types is None
+
                 context.spinner_stop()
                 assert mock_prompt.call_count == len(choices)
-
-    # Ensure that exceptions raised in the remainder of this function
-    # are not mistaken as expected exceptions
-    assert testcase.exp_exc_types is None
 
     assert act_rtn == exp_rtn
 
 
 TESTCASES_PICK_MULTIPLE_FROM_LIST = [
-    # TESTCASES for pick_multiple_from_list
+    # Testcases for _common.pick_multiple_from_list()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * options: tuple of strings defining properties
     #   * choices: list of item indexes from options to be chosen rtnd from
     #     prompt. Allows chosing multiple items.
@@ -879,22 +904,27 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
     TESTCASES_PICK_MULTIPLE_FROM_LIST)
 @simplified_test_function
 def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
-    """Test for pick_one_from_list function"""
+    """
+    Test function for _common.pick_multiple_from_list()
+    """
+
     # setup mock for this test
     mock_clickprompt = 'pywbemtools.pywbemcli.click.prompt'
     with patch(mock_clickprompt, side_effect=choices) as mock_prompt:
         # mock the echo to hide output
         mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
         with patch(mock_echo_func):
-            # The code to be tested
             title = "test_pick_multiple_from_list"
+
+            # The code to be tested
             act_rtn = pick_multiple_from_list(None, options, title)
+
+            # Ensure that exceptions raised in the remainder of this function
+            # are not mistaken as expected exceptions
+            assert testcase.exp_exc_types is None
+
             # context.spinner_stop()
             assert mock_prompt.call_count == len(choices)
-
-    # Ensure that exceptions raised in the remainder of this function
-    # are not mistaken as expected exceptions
-    assert testcase.exp_exc_types is None
 
     if act_rtn != exp_rtn:
         print('act {0}\nexp {1}'.format(act_rtn, exp_rtn))
@@ -902,11 +932,11 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
 
 
 TESTCASES_RESOLVE_PROPERTYLIST = [
-    # TESTCASES for resolve_propertylist
+    # Testcases for _common.resolve_propertylist()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * pl_str: tuple of strings defining properties
     #   * exp_pl: expected list return.
     # * exp_exc_types: Expected exception type(s), or None.
@@ -950,9 +980,11 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
     TESTCASES_RESOLVE_PROPERTYLIST)
 @simplified_test_function
 def test_resolve_propertylist(testcase, pl_str, exp_pl):
-    """Test for resolve_propertylist function"""
-    # The code to be tested
+    """
+    Test function for _common.resolve_propertylist()
+    """
 
+    # The code to be tested
     plist = resolve_propertylist(pl_str)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -963,11 +995,11 @@ def test_resolve_propertylist(testcase, pl_str, exp_pl):
 
 
 TESTCASES_COMPARE_INSTANCES = [
-    # TESTCASES for compare_instances
+    # Testcases for _common.compare_instances()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * inst1: first instance for compare
     #   * inst2: second instance for compare
     #   * result: Boolean. Expect result
@@ -1067,9 +1099,13 @@ TESTCASES_COMPARE_INSTANCES = [
     TESTCASES_COMPARE_INSTANCES)
 @simplified_test_function
 def test_compare_instances(testcase, inst1, inst2, result):
-    """Test for _common compare_instances function"""
+    """
+    Test function for _common.compare_instances()
+    """
+
     mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
     with patch(mock_echo_func):
+
         # The code to be tested
         tst_rtn = compare_instances(inst1, inst2)
 
@@ -1081,11 +1117,11 @@ def test_compare_instances(testcase, inst1, inst2, result):
 
 
 TESTCASES_VERIFY_OPERATION = [
-    # TESTCASES for verify_operation
+    # Testcases for _common.verify_operation()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
+    # * kwargs: Keyword arguments for the test function:
     #   * txt: Text that would be displayed
     #   * abort_msg: message that outputs with abort if response is n
     #   * result: True or False
@@ -1122,6 +1158,8 @@ TESTCASES_VERIFY_OPERATION = [
 @simplified_test_function
 def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
     """
+    Test function for _common.verify_operation()
+
     This method mocks the click.confirm and click_echo function to generate a
     response to the verify operation function. Mock Click.confirm returns a
     value defined by the test. Mock click.echo confirms data in call to
@@ -1135,10 +1173,11 @@ def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
            return_value=clickconfirm)
     @patch('pywbemtools.pywbemcli.click.echo', called_with=txt)
     def run_verify_operation(txt, mock_click_confirm, mock_click_echo):
+
+        # The code to be tested
         # pylint: disable=unused-argument
         return verify_operation(txt, abort_msg)
 
-    # The code to be tested
     # pylint: disable=no-value-for-parameter
     rtn = run_verify_operation(txt)
 
@@ -1150,15 +1189,18 @@ def test_verify_operation(testcase, txt, clickconfirm, abort_msg, result):
 
 
 TESTCASES_PARSE_WBEMURI_STR = [
-    # Testcases for CIMClassName.from_wbem_uri().
-    # Each testcase has these items:
-    # * uri: WBEM URI string to be tested.
-    # * exp_result: Dict of all expected attributes of resulting object,
+    # Testcases for _common.parse_wbemuri_str()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * url: WBEM URI string to be tested.
+    #   * exp_result: Dict of all expected attributes of resulting object,
     #     if expected to succeed. Exception type, if expected to fail.
-    # * exp_warn_type: Expected warning type.
-    #     None, if no warning expected.
-    # * condition: If True the test is executed, if 'pdb' the test breaks in
-    #     the debugger, otherwise the test is skipped.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
     (
         "class and keys only case",
         dict(
@@ -1218,10 +1260,11 @@ TESTCASES_PARSE_WBEMURI_STR = [
     TESTCASES_PARSE_WBEMURI_STR)
 @simplified_test_function
 def test_parse_wbemuri_str(testcase, url, exp_result):
-    """Test function for parse_wbemuri_str."""
+    """
+    Test function for _common.parse_wbemuri_str()
+    """
 
-    # Code to be tested
-
+    # The code to be tested
     obj = parse_wbemuri_str(url)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1247,16 +1290,20 @@ def test_parse_wbemuri_str(testcase, url, exp_result):
         assert isinstance(obj.host, type(exp_host))
 
 
-TESTCASES_FILTERNAMELIST = [
-    # Testcases for CIMClassName.from_wbem_uri().
-    # Each testcase has these items:
-    # * nl: List of names to filter
-    # * regex: Filter regex statement
-    # * ign_case: If True, ignore case in the match
-    # * exp: resulting list to match
-    #     None, if no warning expected.
-    # * condition: If True the test is executed, if 'pdb' the test breaks in
-    #     the debugger, otherwise the test is skipped.
+TESTCASES_FILTER_NAMELIST = [
+    # Testcases for _common.filter_namelist()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * nl: List of names to filter
+    #   * regex: Filter regex statement
+    #   * ign_case: If True, ignore case in the match
+    #   * exp_result: resulting list to match
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
     (
         "Verify TST_ case insensitive 1",
         dict(
@@ -1361,12 +1408,14 @@ TESTCASES_FILTERNAMELIST = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_FILTERNAMELIST)
+    TESTCASES_FILTER_NAMELIST)
 @simplified_test_function
-def test_filternamelist(testcase, nl, regex, exp_result, ign_case):
-    """Test the _common.FilterNameList function"""
+def test_filter_namelist(testcase, nl, regex, exp_result, ign_case):
+    """
+    Test function for _common.filter_namelist()
+    """
 
-    # Code to test
+    # The code to be tested
     tst_rslt = filter_namelist(regex, nl, ignore_case=ign_case)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1376,9 +1425,10 @@ def test_filternamelist(testcase, nl, regex, exp_result, ign_case):
     assert tst_rslt == exp_result
 
 
-TESTCASES_KVPAIR = [
-    #  Testcases for parse_kv_pair
+TESTCASES_PARSE_KV_PAIR = [
+    # Testcases for _common.parse_kv_pair()
     #
+    # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
     #   * kvpair: String defining the key=value to be tested.
@@ -1387,6 +1437,7 @@ TESTCASES_KVPAIR = [
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
     ("Verify unquoted text value",
      dict(kvpair='abc=test',
           exp_name='abc',
@@ -1442,15 +1493,14 @@ TESTCASES_KVPAIR = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_KVPAIR)
+    TESTCASES_PARSE_KV_PAIR)
 @simplified_test_function
 def test_parse_kv_pair(testcase, kvpair, exp_name, exp_value):
     """
-    Test parse_kv_pair common function
+    Test function for _common.parse_kv_pair()
     """
 
-    # Code to be tested
-
+    # The code to be tested
     name, value = parse_kv_pair(kvpair)
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1462,9 +1512,9 @@ def test_parse_kv_pair(testcase, kvpair, exp_name, exp_value):
 
 
 TESTCASES_SORT_CIMOBJECTS = [
-
-    #  Testcases for sort_cimobjects()
+    # Testcases for _common.sort_cimobjects()
     #
+    # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
     #   * objects: List of input objects to sort.
@@ -1881,13 +1931,16 @@ TESTCASES_SORT_CIMOBJECTS = [
     TESTCASES_SORT_CIMOBJECTS)
 @simplified_test_function
 def test_sort_cimobjects(testcase, objects, exp_indexes):
-    # pylint: disable=unused-argument
     """
-    Test sort_cimobjects() common function
+    Test function for _common.sort_cimobjects()
     """
 
     # The code to be tested
     result_objects = sort_cimobjects(objects)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
 
     assert len(result_objects) == len(objects)
 
@@ -1899,9 +1952,10 @@ def test_sort_cimobjects(testcase, objects, exp_indexes):
     assert result_ids == exp_ids
 
 
-TESTCASES_SPLITARRAYVALUE = [
-    #  Testcases for split_array_value
+TESTCASES_SPLIT_ARRAY_VALUE = [
+    # Testcases for _common.split_array_value()
     #
+    # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
     #   * in: String defining the key=value to be tested.
@@ -1909,6 +1963,7 @@ TESTCASES_SPLITARRAYVALUE = [
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
     ("Verify simple numeric array",
      dict(input_='0,1,2,3,4,5,6',
           exp_rslt=['0', '1', '2', '3', '4', '5', '6']),
@@ -1943,14 +1998,14 @@ TESTCASES_SPLITARRAYVALUE = [
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_SPLITARRAYVALUE)
+    TESTCASES_SPLIT_ARRAY_VALUE)
 @simplified_test_function
 def test_split_array_value(testcase, input_, exp_rslt):
     """
-    Test split_array_value() common function
+    Test function for _common.split_array_value()
     """
-    # Code to be tested
 
+    # The code to be tested
     act_rslt = split_array_value(input_, ',')
 
     # Ensure that exceptions raised in the remainder of this function
@@ -1961,351 +2016,562 @@ def test_split_array_value(testcase, input_, exp_rslt):
         'Failed split test exp {!r}, act {!r}'.format(exp_rslt, act_rslt)
 
 
-######################################################
-#
-#  Test create_instance
-#
-######################################################
+# Class definitions for _common.create_ciminstance()
 
-# TODO: Convert this test to pytest
-class CreateCIMInstanceTest(unittest.TestCase):
-    """Test the function that creates a CIMInstance from cli args"""
+# A class with scalar properties of all types except embedded instances
+CLASS_SCALAR = CIMClass(
+    classname='CIM_Foo',
+    properties=[
+        CIMProperty('ID', None, type='string'),
+        CIMProperty('Boolp', None, type='boolean'),
+        CIMProperty('Uint8p', None, type='uint8'),
+        CIMProperty('Sint8p', None, type='sint8'),
+        CIMProperty('Uint16p', None, type='uint16'),
+        CIMProperty('Sint16p', None, type='sint16'),
+        CIMProperty('Uint32p', None, type='uint32'),
+        CIMProperty('Sint32p', None, type='sint32'),
+        CIMProperty('Uint64p', None, type='uint64'),
+        CIMProperty('Sint64p', None, type='sint64'),
+        CIMProperty('Real32p', None, type='real32'),
+        CIMProperty('Real64p', None, type='real64'),
+        CIMProperty('Dtp', None, type='datetime'),
+        CIMProperty('Strp', None, type='string'),
+        CIMProperty('Char16p', None, type='char16'),
+    ],
+)
 
-    @staticmethod
-    def create_scalar_class():
-        """
-        Create and return a class of scalar properties of all types
-        except embedded instance and return the class
-        """
-        cls = CIMClass(
-            'CIM_Foo', properties={'ID': CIMProperty('ID', None,
-                                                     type='string'),
-                                   'Boolp': CIMProperty('Boolp', None,
-                                                        type='boolean'),
-                                   'Uint8p': CIMProperty('Uint8p', None,
-                                                         type='uint8'),
-                                   'Sint8p': CIMProperty('Sint8p', None,
-                                                         type='sint8'),
-                                   'Uint16p': CIMProperty('Uint16p', None,
-                                                          type='uint16'),
-                                   'Sint16p': CIMProperty('Sint16p', None,
-                                                          type='sint16'),
-                                   'Uint32p': CIMProperty('Uint32p', None,
-                                                          type='uint32'),
-                                   'Sint32p': CIMProperty('Sint32p', None,
-                                                          type='sint32'),
-                                   'Uint64p': CIMProperty('Uint64p', None,
-                                                          type='uint64'),
-                                   'Sint64p': CIMProperty('Sint64p', None,
-                                                          type='sint64'),
-                                   'Real32p': CIMProperty('Real32p', None,
-                                                          type='real32'),
-                                   'Real64p': CIMProperty('Real64p', None,
-                                                          type='real64'),
-                                   'Dtp': CIMProperty('Dtp', None,
-                                                      type='datetime'),
-                                   'Strp': CIMProperty('Strp', None,
-                                                       type='string')})
-        return cls
-
-    @staticmethod
-    def create_array_class():
-        """
-        Create and return a class of scalar properties of all types
-        except embedded instance and return the class
-        """
-        cls = CIMClass(
-            'CIM_Foo', properties={'ID': CIMProperty('ID', None,
-                                                     type='string'),
-                                   'Boolp': CIMProperty('Boolp', None,
-                                                        is_array=True,
-                                                        type='boolean'),
-                                   'Uint8p': CIMProperty('Uint8p', None,
-                                                         is_array=True,
-                                                         type='uint8'),
-                                   'Sint8p': CIMProperty('Sint8p', None,
-                                                         is_array=True,
-                                                         type='sint8'),
-                                   'Uint16p': CIMProperty('Uint16p', None,
-                                                          is_array=True,
-                                                          type='uint16'),
-                                   'Sint16p': CIMProperty('Sint16p', None,
-                                                          is_array=True,
-                                                          type='sint16'),
-                                   'Uint32p': CIMProperty('Uint32p', None,
-                                                          is_array=True,
-                                                          type='uint32'),
-                                   'Sint32p': CIMProperty('Sint32p', None,
-                                                          is_array=True,
-                                                          type='sint32'),
-                                   'Uint64p': CIMProperty('Uint64p', None,
-                                                          is_array=True,
-                                                          type='uint64'),
-                                   'Sint64p': CIMProperty('Sint64p', None,
-                                                          is_array=True,
-                                                          type='sint64'),
-                                   'Real32p': CIMProperty('Real32p', None,
-                                                          is_array=True,
-                                                          type='real32'),
-                                   'Real64p': CIMProperty('Real64p', None,
-                                                          is_array=True,
-                                                          type='real64'),
-                                   'Dtp': CIMProperty('Dtp', None,
-                                                      is_array=True,
-                                                      type='datetime'),
-                                   'Strp': CIMProperty('Strp', None,
-                                                       is_array=True,
-                                                       type='string')})
-        return cls
-
-    def test_simple_scalar_instance(self):
-        """Test scalar with one property"""
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string')}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=Testid']
-        act_inst = create_ciminstance(cls, kv_properties)
-        self.assertEqual(exp_inst, act_inst)
-
-    def test_scalar_instance(self):
-        """
-        Creates an instance from cmd line parameters and tests against
-        predefined instance
-        """
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string'),
-                          'Boolp': CIMProperty('Boolp', True),
-                          'Uint8p': CIMProperty('Uint8p', 220, type='uint8'),
-                          'Sint8p': CIMProperty('Sint8p', -120, type='sint8'),
-                          'Uint32p': CIMProperty('Uint32p', 999, type='uint32'),
-                          'Sint32p': CIMProperty('Sint32p', -99, type='sint32'),
-                          'Uint64p': CIMProperty('Uint64p', 999, type='uint64'),
-                          'Sint64p': CIMProperty('Sint64p', -99, type='sint64'),
-                          'Dtp': CIMProperty('Dtp',
-                                             "19991224120000.000000+360",
-                                             type='datetime'),
-                          'Strp': CIMProperty('Strp', 'hoho', type='string')}
-
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-
-        kv_properties = ['ID=Testid', 'Boolp=true', 'Uint8p=220', 'Sint8p=-120',
-                         'Uint32p=999', 'Sint32p=-99', 'Uint64p=999',
-                         'Sint64p=-99', 'Strp=hoho',
-                         'Dtp=19991224120000.000000+360']
-        act_inst = create_ciminstance(cls, kv_properties)
-
-        # mock the echo to hide output
-        mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
-        with patch(mock_echo_func):
-            self.assertTrue(compare_instances(exp_inst, act_inst))
-
-        self.assertEqual(exp_inst, act_inst)
-
-    def test_simple_scalar_two_prop(self):
-        """Test scalar with two property"""
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string'),
-                          'Boolp': CIMProperty('Boolp', False)}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=Testid', 'Boolp=false']
-        act_inst = create_ciminstance(cls, kv_properties)
-        self.assertTrue(compare_instances(exp_inst, act_inst))
-        self.assertEqual(exp_inst, act_inst)
-
-    # TODO expand this to test errors for other types
-    def test_simple_scalar_type_err(self):
-        """Test scalar with type error"""
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        try:
-            kv_properties = ['Boolp=123']
-            create_ciminstance(cls, kv_properties)
-            self.fail('Expected exception to create_instance property type err')
-        except click.ClickException:
-            pass
-
-        try:
-            kv_properties = ['uint32p=shouldnotbestring']
-            create_ciminstance(cls, kv_properties)
-            self.fail('Expected exception to create_instance property with '
-                      'value err')
-        except click.ClickException:
-            pass
-
-    def test_simple_scalar_real(self):
-        """Test scalar with two property"""
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string'),
-                          'Real32p': CIMProperty('Real32p', 1.99,
-                                                 type='real32')}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=Testid', 'Real32p=1.99']
-        act_inst = create_ciminstance(cls, kv_properties)
-        self.assertTrue(compare_instances(exp_inst, act_inst))
-        self.assertEqual(exp_inst, act_inst)
-
-    # TODO test no properties, test property with no value
-
-    def test_array_small_instance(self):
-        """
-        Creates an instance from cmd line parameters and tests against
-        predefined instance
-        """
-        cls = CreateCIMInstanceTest.create_array_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string'),
-                          'Boolp': CIMProperty('Boolp', [True, False])}
-
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-
-        kv_properties = ['ID=Testid', 'Boolp=true,false']
-        act_inst = create_ciminstance(cls, kv_properties)
-
-        self.assertEqual(exp_inst, act_inst)
-
-    def test_array_instance(self):
-        """
-        Creates an instance from cmd line parameters and tests against
-        predefined instance
-        """
-        cls = CreateCIMInstanceTest.create_array_class()
-
-        exp_properties = {'ID': CIMProperty('ID', 'Testid', type='string'),
-                          'Boolp': CIMProperty('Boolp', [True, False]),
-                          'Uint8p': CIMProperty('Uint8p',
-                                                [0, 12, 120], type='uint8'),
-                          'Sint8p': CIMProperty('Sint8p',
-                                                [-120, 0, 119], type='sint8'),
-                          'Uint32p': CIMProperty('Uint32p',
-                                                 [0, 999], type='uint32'),
-                          'Sint32p': CIMProperty('Sint32p',
-                                                 [-99, 0, 9999], type='sint32'),
-                          'Uint64p': CIMProperty('Uint64p', [0, 999, 99999],
-                                                 type='uint64'),
-                          'Sint64p': CIMProperty('Sint64p', [-99, 0, 12345],
-                                                 type='sint64'),
-                          'Strp': CIMProperty('Strp', ['hoho', 'haha'],
-                                              type='string')}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=Testid', 'Boolp=true,false', 'Uint8p=0,12,120',
-                         'Sint8p=-120,0,119',
-                         'Uint32p=0,999', 'Sint32p=-99,0,9999',
-                         'Uint64p=0,999,99999',
-                         'Sint64p=-99,0,12345', 'Strp=hoho,haha']
-
-        act_inst = create_ciminstance(cls, kv_properties)
-        # compare_instances(exp_inst, act_inst)
-        self.assertEqual(exp_inst, act_inst,
-                         'test_array_instance failed compare')
-
-    def test_scalar_no_value(self):
-        """Test scalar with one property with no value component"""
-        cls = CreateCIMInstanceTest.create_array_class()
-
-        exp_properties = {'ID': CIMProperty('ID', None, type='string')}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=']
-        act_inst = create_ciminstance(cls, kv_properties)
-        self.assertTrue(compare_instances(exp_inst, act_inst))
-        self.assertEqual(exp_inst, act_inst)
-
-    def test_scalar_empty_str(self):
-        """Test scalar with one property where value is empty string"""
-        cls = CreateCIMInstanceTest.create_array_class()
-
-        exp_properties = {'ID': CIMProperty('ID', '""', type='string')}
-        exp_inst = CIMInstance('CIM_Foo',
-                               properties=exp_properties)
-        kv_properties = ['ID=""']
-        act_inst = create_ciminstance(cls, kv_properties)
-        self.assertTrue(compare_instances(exp_inst, act_inst))
-        self.assertEqual(exp_inst, act_inst)
-
-    def test_invalid_propname(self):
-        """Test scalar where input is property name not in class"""
-        cls = CreateCIMInstanceTest.create_scalar_class()
-
-        try:
-            kv_properties = ['Boolpxxx=True']
-            create_ciminstance(cls, kv_properties)
-            self.fail('Expected exception to create_instance property type err')
-        except click.ClickException:
-            pass
+# A class with array properties of all types except embedded instances
+CLASS_ARRAY = CIMClass(
+    classname='CIM_Foo',
+    properties=[
+        CIMProperty('ID', None, type='string'),
+        CIMProperty('Boolp', None, is_array=True, type='boolean'),
+        CIMProperty('Uint8p', None, is_array=True, type='uint8'),
+        CIMProperty('Sint8p', None, is_array=True, type='sint8'),
+        CIMProperty('Uint16p', None, is_array=True, type='uint16'),
+        CIMProperty('Sint16p', None, is_array=True, type='sint16'),
+        CIMProperty('Uint32p', None, is_array=True, type='uint32'),
+        CIMProperty('Sint32p', None, is_array=True, type='sint32'),
+        CIMProperty('Uint64p', None, is_array=True, type='uint64'),
+        CIMProperty('Sint64p', None, is_array=True, type='sint64'),
+        CIMProperty('Real32p', None, is_array=True, type='real32'),
+        CIMProperty('Real64p', None, is_array=True, type='real64'),
+        CIMProperty('Dtp', None, is_array=True, type='datetime'),
+        CIMProperty('Strp', None, is_array=True, type='string'),
+        CIMProperty('Char16p', None, is_array=True, type='char16'),
+    ],
+)
 
 
-######################################################
-#
-#  Test create_instancename
-#
-######################################################
+TESTCASES_CREATE_CIMINSTANCE = [
+    # Testcases for _common.create_ciminstance()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * cls: Dict with attributes from which test class is constructed
+    #   * kv_properties: List of "name=value" strings for input properties
+    #   * exp_inst - The expected instance name
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-# Class definitions for create_instancename
-CLASS_DICT1 = dict(classname='CIM_Foo',
-                   properties=[
-                       CIMProperty(
-                           'P1', None, type='string',
-                           qualifiers=[
-                               CIMQualifier('Key', value=True)
-                           ]
-                       ),
-                       CIMProperty('P2', value='Cheese'),
-                   ])
+    (
+        "Test instance of scalar class with string property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['ID=Testid'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('ID', 'Testid', type='string'),
+                ]
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with string+bool properties",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['ID=Testid', 'Boolp=false'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('ID', 'Testid', type='string'),
+                    CIMProperty('Boolp', False),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with string+real32 properties",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['ID=Testid', 'Real32p=1.99'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('ID', 'Testid', type='string'),
+                    CIMProperty('Real32p', 1.99, type='real32'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with most properties",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=[
+                'ID=Testid', 'Boolp=true', 'Uint8p=220', 'Sint8p=-120',
+                'Uint32p=999', 'Sint32p=-99', 'Uint64p=999',
+                'Sint64p=-99', 'Strp=hoho',
+                'Dtp=19991224120000.000000+360',
+            ],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('ID', 'Testid', type='string'),
+                    CIMProperty('Boolp', True),
+                    CIMProperty('Uint8p', 220, type='uint8'),
+                    CIMProperty('Sint8p', -120, type='sint8'),
+                    CIMProperty('Uint32p', 999, type='uint32'),
+                    CIMProperty('Sint32p', -99, type='sint32'),
+                    CIMProperty('Uint64p', 999, type='uint64'),
+                    CIMProperty('Sint64p', -99, type='sint64'),
+                    CIMProperty('Dtp', "19991224120000.000000+360",
+                                type='datetime'),
+                    CIMProperty('Strp', 'hoho', type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with empty property list",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=[],
+            exp_inst=CIMInstance(classname='CIM_Foo'),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no value (NULL) for string "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Strp='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Strp', None, type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no =value (NULL) for string "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Strp'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Strp', None, type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no value (NULL) for uint32 "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Uint32p='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Uint32p', None, type='uint32'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no =value (NULL) for uint32 "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Uint32p'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Uint32p', None, type='uint32'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no value (NULL) for bool property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Boolp='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Boolp', None, type='boolean'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with no =value (NULL) for bool property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Boolp'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Boolp', None, type='boolean'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of scalar class with invalid property name",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['DoesNotExist'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of scalar class with incorrect int value for bool "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Boolp=123'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of scalar class with incorrect string value for uint32 "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Uint32p=shouldnotbestring'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of scalar class with incorrect bool value for uint32 "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Uint32p=true'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of scalar class with incorrect bool value for real32 "
+        "property",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Real32p=true'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of scalar class with two-char value for char16 property "
+        "(pywbem.cimvalue() does not reject that)",
+        dict(
+            cls=CLASS_SCALAR,
+            kv_properties=['Char16p=ab'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Char16p', 'ab', type='char16'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with most properties",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=[
+                'ID=Testid', 'Boolp=true,false', 'Uint8p=0,12,120',
+                'Sint8p=-120,0,119', 'Uint32p=0,999', 'Sint32p=-99,0,9999',
+                'Uint64p=0,999,99999', 'Sint64p=-99,0,12345', 'Strp=hoho,haha',
+            ],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('ID', 'Testid', type='string'),
+                    CIMProperty('Boolp', [True, False]),
+                    CIMProperty('Uint8p', [0, 12, 120], type='uint8'),
+                    CIMProperty('Sint8p', [-120, 0, 119], type='sint8'),
+                    CIMProperty('Uint32p', [0, 999], type='uint32'),
+                    CIMProperty('Sint32p', [-99, 0, 9999], type='sint32'),
+                    CIMProperty('Uint64p', [0, 999, 99999], type='uint64'),
+                    CIMProperty('Sint64p', [-99, 0, 12345], type='sint64'),
+                    CIMProperty('Strp', ['hoho', 'haha'], type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with empty property list",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=[],
+            exp_inst=CIMInstance(classname='CIM_Foo'),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no value (NULL) for string "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Strp='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Strp', None, is_array=True, type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no =value (NULL) for string "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Strp'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Strp', None, is_array=True, type='string'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no value (NULL) for uint32 "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Uint32p='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Uint32p', None, is_array=True, type='uint32'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no =value (NULL) for uint32 "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Uint32p'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Uint32p', None, is_array=True, type='uint32'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no value (NULL) for bool property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Boolp='],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Boolp', None, is_array=True, type='boolean'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with no =value (NULL) for bool property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Boolp'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Boolp', None, is_array=True, type='boolean'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+    (
+        "Test instance of array class with invalid property name",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['DoesNotExist'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of array class with incorrect int value for bool "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Boolp=123'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of array class with incorrect string value for uint32 "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Uint32p=shouldnotbestring'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of array class with incorrect bool value for uint32 "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Uint32p=true'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of array class with incorrect bool value for real32 "
+        "property",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Real32p=true'],
+            exp_inst=None,
+        ),
+        click.ClickException, None, True
+    ),
+    (
+        "Test instance of array class with two-char value for char16 property "
+        "(pywbem.cimvalue() does not reject that)",
+        dict(
+            cls=CLASS_ARRAY,
+            kv_properties=['Char16p=ab'],
+            exp_inst=CIMInstance(
+                classname='CIM_Foo',
+                properties=[
+                    CIMProperty('Char16p', ['ab'], type='char16'),
+                ],
+            ),
+        ),
+        None, None, True
+    ),
+]
 
-CLASS_DICT2 = dict(classname='CIM_Foo',
-                   properties=[
-                       CIMProperty(
-                           'P1', None, type='string',
-                           qualifiers=[
-                               CIMQualifier('Key', value=True)
-                           ]
-                       ),
-                       CIMProperty(
-                           'P2', None, type='string',
-                           qualifiers=[
-                               CIMQualifier('Key', value=True)
-                           ]
-                       ),
-                       CIMProperty(
-                           'P3', None, type='uint32',
-                           qualifiers=[
-                               CIMQualifier('Key', value=True)
-                           ]
-                       ),
-                       CIMProperty('P4', value='Cheese',),
-                   ])
 
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_CREATE_CIMINSTANCE)
+@simplified_test_function
+def test_create_ciminstance(testcase, cls, kv_properties, exp_inst):
+    """
+    Test function for _common.create_ciminstance()
+    """
+
+    # The code to be tested
+    inst = create_ciminstance(cls, kv_properties)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert isinstance(inst, CIMInstance)
+    assert inst == exp_inst
+
+
+# Class definitions for _common.create_ciminstancename()
+CLASS_DICT1 = CIMClass(
+    classname='CIM_Foo',
+    properties=[
+        CIMProperty(
+            'P1', None, type='string',
+            qualifiers=[CIMQualifier('Key', value=True)]
+        ),
+        CIMProperty('P2', value='Cheese'),
+    ],
+)
+
+CLASS_DICT2 = CIMClass(
+    classname='CIM_Foo',
+    properties=[
+        CIMProperty(
+            'P1', None, type='string',
+            qualifiers=[CIMQualifier('Key', value=True)]
+        ),
+        CIMProperty(
+            'P2', None, type='string',
+            qualifiers=[CIMQualifier('Key', value=True)]
+        ),
+        CIMProperty(
+            'P3', None, type='uint32',
+            qualifiers=[CIMQualifier('Key', value=True)]
+        ),
+        CIMProperty('P4', value='Cheese',),
+    ],
+)
 
 # TODO: add one class with ref property as key. Is that even allowed?
 
-# Testcases for create_instancename()
 
-# Each list item is a testcase tuple with these items:
-# * desc: Short testcase description.
-# * kwargs: Keyword arguments for the test function:
-#   * cls_kwargs: Dict with attributes from which test class is constructed
-#   * key-kv-pairs: Dict of name/value pairs for input keys.
-#   * exp_instname - The expected instance name
-# * exp_exc_types: Expected exception type(s), or None.
-# * exp_rtn: Expected warning type(s), or None.
-# * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+TESTCASES_CREATE_CIMINSTANCENAME = [
+    # Testcases for _common.create_ciminstancename()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * cls: Dict with attributes from which test class is constructed
+    #   * kv_keys: List of "name=value" strings for input keys.
+    #   * exp_instname - The expected instance name
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
-TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=['P1=Fred'],
+            cls=CLASS_DICT1,
+            kv_keys=['P1=Fred'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', 'Fred')]),
         ),
@@ -2313,8 +2579,8 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key with space",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=['P1="Fred Fred"'],
+            cls=CLASS_DICT1,
+            kv_keys=['P1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
         ),
@@ -2323,8 +2589,8 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with single string key case independent",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=['p1="Fred Fred"'],
+            cls=CLASS_DICT1,
+            kv_keys=['p1="Fred Fred"'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred Fred")]),
         ),
@@ -2332,16 +2598,16 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with invalid key name",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=['Px=Fred'],
+            cls=CLASS_DICT1,
+            kv_keys=['Px=Fred'],
             exp_iname=None
         ),
         click.exceptions.ClickException, None, True),
     (
         "Verify simple key creation with two string keys and one int",
         dict(
-            cls_kwargs=CLASS_DICT2,
-            kv_args=['P1=Fred', 'P2=John', 'P3=1'],
+            cls=CLASS_DICT2,
+            kv_keys=['P1=Fred', 'P2=John', 'P3=1'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
                                                    ('P2', 'John'), ('P3', 1)]),
@@ -2350,8 +2616,8 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with two string keys and one big int",
         dict(
-            cls_kwargs=CLASS_DICT2,
-            kv_args=['P1=Fred', 'P2=John', 'P3=123456'],
+            cls=CLASS_DICT2,
+            kv_keys=['P1=Fred', 'P2=John', 'P3=123456'],
             exp_iname=CIMInstanceName(u'CIM_Foo',
                                       keybindings=[('P1', "Fred"),
                                                    ('P2', 'John'),
@@ -2361,8 +2627,8 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation with unicode char",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=[u'P1=Fred\u0344\u0352'],
+            cls=CLASS_DICT1,
+            kv_keys=[u'P1=Fred\u0344\u0352'],
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
         ),
@@ -2370,75 +2636,51 @@ TESTCASES_CREATE_INSTNAME = [
     (
         "Verify simple key creation no value",
         dict(
-            cls_kwargs=CLASS_DICT1,
-            kv_args=[u'P1='],
+            cls=CLASS_DICT1,
+            kv_keys=[u'P1='],
             exp_iname=CIMInstanceName(
                 u'CIM_Foo', keybindings=[('P1', u'Fred\u0344\u0352')]),
         ),
         click.ClickException, None, True),
+    # TODO: Add test case with reference property key (This is very hard to
+    #       define on cmd line)
 ]
-# TODO reference property key(This is very hard to define on cmd line)
 
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_CREATE_INSTNAME)
+    TESTCASES_CREATE_CIMINSTANCENAME)
 @simplified_test_function
-def test_create_instancename(testcase, cls_kwargs, kv_args, exp_iname):
+def test_create_ciminstancename(testcase, cls, kv_keys, exp_iname):
     """
-    Test the common function create_instancename()
+    Test function for _common.create_ciminstancename()
     """
-    # The code to be tested
 
-    cls = CIMClass(**cls_kwargs)
-    obj = create_ciminstancename(cls, kv_args)
+    # The code to be tested
+    iname = create_ciminstancename(cls, kv_keys)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
     assert testcase.exp_exc_types is None
-    # result is list of lists.  we want to test each item in inner list
 
-    assert isinstance(obj, CIMInstanceName)
-
-    exp_classname = exp_iname.classname
-    assert obj.classname == exp_classname
-    assert isinstance(obj.classname, type(exp_classname))
-
-    exp_keybindings = exp_iname.keybindings
-    assert obj.keybindings == exp_keybindings
-    assert isinstance(obj.keybindings, type(exp_keybindings))
-
-    exp_namespace = exp_iname.namespace
-    assert obj.namespace == exp_namespace
-    assert isinstance(obj.namespace, type(exp_namespace))
-
-    exp_host = exp_iname.host
-    assert obj.host == exp_host
-    assert isinstance(obj.host, type(exp_host))
-
-    assert obj == CIMInstanceName(exp_classname,
-                                  keybindings=exp_keybindings,
-                                  host=exp_host,
-                                  namespace=exp_namespace)
+    assert isinstance(iname, CIMInstanceName)
+    assert iname == exp_iname
 
 
 TESTCASES_FOLD_STRINGS = [
-    # TESTCASES for fold_strings
+    # Testcases for _common.fold_strings()
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
-    # * kwargs: Keyword arguments for the test function and response:
-    #      input_str:  The input string or list of strings to be folded
-    #      max_wdth:  Max width of line in result
-    #      brk_long_words: Boolean flag to request long words be folded
-    #      brk-hyphen: Boolean flag to request that fold occur on hyphens
-    #      fold_list: Sets the fold_list_items argument boolean value
-    #      separator:
-    #      init_indent:
-    #      sub_indent:
-    #   * fmt: output_format defined for this command execution or None
-    #   * default: string containing default format or None
-    #   * groups: list of groups allowed for this command
+    # * kwargs: Keyword arguments for the test function:
+    #   * input_str: The input string or list of strings to be folded
+    #   * max_width: Max width of line in result
+    #   * brk_long_wds: Boolean flag to request long words be folded
+    #   * brk_hyphen: Boolean flag to request that fold occur on hyphens
+    #   * fold_list: Sets the fold_list_items argument boolean value
+    #   * separator:
+    #   * init_indent:
+    #   * sub_indent:
     #   * exp_rtn: String defining expected result
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
@@ -2680,11 +2922,14 @@ TESTCASES_FOLD_STRINGS = [
 @simplified_test_function
 def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
                       fold_list, separator, init_indent, sub_indent, exp_rtn):
-    """Test common.valid_output_format function"""
-    # The code to be tested
+    """
+    Test function for _common.fold_strings()
+    """
+
     initial_indent = init_indent or 0
     subsequent_indent = sub_indent or 0
 
+    # The code to be tested
     act_rtn = fold_strings(input_str, max_width,
                            break_long_words=brk_long_wds,
                            break_on_hyphens=brk_hyphen,
