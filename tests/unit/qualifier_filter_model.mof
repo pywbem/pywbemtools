@@ -21,7 +21,7 @@ Qualifier Experimental : boolean = true,
     Flavor(DisableOverride, ToSubclass);
 
 Qualifier Indication : boolean = true,
-    Scope(class),
+    Scope(class, indication),
     Flavor(DisableOverride, ToSubclass);
 
 Qualifier Key : boolean = false,
