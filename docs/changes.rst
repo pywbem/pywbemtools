@@ -54,6 +54,9 @@ Released: not yet
 
 * Upgraded nocasedict and nocaselist packages to pick up fixes.
 
+* Error in test defintion for qualdecl Indication causes failure with pywbem
+  i.1.0 where mocker validates qualifiers scopes. (see issue #766)
+
 **Enhancements:**
 
 * Introduced caching of the mock environment used by connection definitions in
