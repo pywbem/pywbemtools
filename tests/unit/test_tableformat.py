@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -16,498 +13,613 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-Tests for functions in smipyping/_common.py
+Tests for table formatting.
 """
 
 from __future__ import print_function, absolute_import
 
-import os
-import unittest
 import sys
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+import pytest
 
 from pywbemtools.pywbemcli._common import format_table, fold_strings
 
-VERBOSE = False
 
-# TODO FUTURE: ks rewrite this test for pytest.  Note that the capture IO
-#      may be different in that they have fixtures such as capsys
-#      to capture output that may replace StringIO used below. This should
-#      wait until we conclude that we can use a form of simplified_test
-#      with capsys.
+# A simple table
+TABLE1_HEADERS = ['col1', 'col2', 'col3']
+TABLE1_ROWS = [
+    ['row1col1', 'row1col2', 'row1col3'],
+    ['row2col1', 'row2col2', 'row2col3'],
+    ['row3 col1', 'row3  col2', 'row3   col3'],
+    [0, 999, 9999999],
+    [1.1432, 1.2, 0],
+]
 
+# A table used for sorting tests
+TABLE2_HEADERS = ['col1', 'col2', 'col3']
+TABLE2_ROWS = [
+    ['row1col1', 'row1col2', 1],
+    ['row2col1', 'row2col2', 99],
+    ['row3 col1', 'row3  col2', 0],
+    ['anotherrow', 'middle', 9999999],
+    ['xorerow', 'anuts', 0],
+]
 
-class BaseTableTests(unittest.TestCase):
-    """Base class for testing table output"""
-    @staticmethod
-    def create_simple_table(table_format=None, title=True):
-        """Create a standard table"""
-        headers = ['col1', 'col2', 'col3']
-        rows = [['row1col1', 'row1col2', 'row1col3'],
-                ['row2col1', 'row2col2', 'row2col3'],
-                ['row3 col1', 'row3  col2', 'row3   col3'],
-                [0, 999, 9999999],
-                [1.1432, 1.2, 0]]
-        title_txt = 'test simple table' if title else None
-        table = format_table(rows, headers, title=title_txt,
-                             table_format=table_format)
-        return table
-
-    @staticmethod
-    def create_sortable_table(table_format=None, title=True, sort_columns=None):
-        """Create a standard table"""
-        headers = ['col1', 'col2', 'col3']
-        rows = [['row1col1', 'row1col2', 1],
-                ['row2col1', 'row2col2', 99],
-                ['row3 col1', 'row3  col2', 0],
-                ['anotherrow', 'middle', 9999999],
-                ['xorerow', 'anuts', 0]]
-        title_txt = 'test sortable table' if title else None
-        table = format_table(rows, headers, title=title_txt,
-                             table_format=table_format,
-                             sort_columns=sort_columns)
-        return table
-
-    @staticmethod
-    def create_folded_table(table_format, title=True):
-        """Create a table with folded cells"""
-        headers = ['col1', 'col2', 'col3']
-        folded = fold_strings('this is a folded cell', 10)
-        rows = [['row1col1', 'row2col2', folded],
-                [folded, 'row2col2', 'row2col3']]
-        title_txt = 'test folded table' if title else None
-        table = format_table(rows, headers, title=title_txt,
-                             table_format=table_format)
-        return table
-
-    @staticmethod
-    def compare_results(actual, expected):
-        """Compare two multiline strings to find differences. Helpful to
-           find minor errors in the actual/expected outputs
-        """
-        if actual == expected:
-            return
-        actual_lines = actual.split(os.linesep)
-        expected_lines = expected.split(os.linesep)
-        if len(actual_lines) != len(expected_lines):
-            print('Different number of lines actual {}, expected {}'
-                  .format(len(actual_lines), len(expected_lines)))
-        line = 0
-        for line_a, line_e in zip(actual_lines, expected_lines):
-            if line_a != line_e:
-                print('Line {}: Difference\n{}\n{}'.format(line, line_a,
-                                                           line_e))
-                if len(line_a) != len(line_e):
-                    print('Different lengths act {} exp {}'.format(len(line_a),
-                                                                   len(line_e)))
-            line += 1
+# A table with folded cells
+TABLE3_HEADERS = ['col1', 'col2', 'col3']
+_TABLE3_FOLDED = fold_strings('this is a folded cell', 10)
+TABLE3_ROWS = [
+    ['row1col1', 'row2col2', _TABLE3_FOLDED],
+    [_TABLE3_FOLDED, 'row2col2', 'row2col3'],
+]
 
 
-class FormatTableTests(BaseTableTests):
-    """Tests on the table_format function in _common.py"""
+TESTCASES_FORMAT_TABLE = [
+    # Testcases for format_table().
+    #
+    # Each testcase is a tuple with the following items:
+    # * desc: Description of testcase.
+    # * kwargs: Dict with input keyword arguments for format_table():
+    #     rows, headers, title=None, table_format='simple',
+    #     sort_columns=None, hide_empty_cols=None, float_fmt=None
+    # * exp_table: Expected formatted table as tuple of single line strings.
+    # * exp_exc_type: Expected exception type, or None.
+    # * condition: If True the test is executed, if 'pdb' the test breaks in the
+    #     the debugger, if 'verbose' print verbose messages, if False the test
+    #     is skipped.
 
-    def test_table_table_hdr(self):
-        """Test a table output_format table with header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_simple_table(table_format='table', title=True)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test simple table\n'
-                    '+-----------+------------+-------------+\n'
-                    '| col1      | col2       | col3        |\n'
-                    '|-----------+------------+-------------|\n'
-                    '| row1col1  | row1col2   | row1col3    |\n'
-                    '| row2col1  | row2col2   | row2col3    |\n'
-                    '| row3 col1 | row3  col2 | row3   col3 |\n'
-                    '| 0         | 999        | 9999999     |\n'
-                    '| 1.1432    | 1.2        | 0           |\n'
-                    '+-----------+------------+-------------+\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_tpsql_table_hdr(self):
-        """Test a table output_format table with header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_simple_table(table_format='psql', title=True)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test simple table\n'
-                    '+-----------+------------+-------------+\n'
-                    '| col1      | col2       | col3        |\n'
-                    '|-----------+------------+-------------|\n'
-                    '| row1col1  | row1col2   | row1col3    |\n'
-                    '| row2col1  | row2col2   | row2col3    |\n'
-                    '| row3 col1 | row3  col2 | row3   col3 |\n'
-                    '| 0         | 999        | 9999999     |\n'
-                    '| 1.1432    | 1.2        | 0           |\n'
-                    '+-----------+------------+-------------+\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_html_table_hdr(self):
-        """Test a table output_format table with header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_simple_table(table_format='html', title=True)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = (
-            '<table>\n'
-            '<caption>test simple table</caption>\n'
-            '<thead>\n'
+    (
+        "Table 1 without title, default format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+        ),
+        (
+            'col1       col2        col3',
+            '---------  ----------  -----------',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, default format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+        ),
+        (
+            'simple table',
+            'col1       col2        col3',
+            '---------  ----------  -----------',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, simple format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='simple',
+        ),
+        (
+            'col1       col2        col3',
+            '---------  ----------  -----------',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, simple format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='simple',
+        ),
+        (
+            'simple table',
+            'col1       col2        col3',
+            '---------  ----------  -----------',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, plain format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='plain',
+        ),
+        (
+            'col1       col2        col3',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, plain format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='plain',
+        ),
+        (
+            'simple table',
+            'col1       col2        col3',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, table format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='table',
+        ),
+        (
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '|-----------+------------+-------------|',
+            '| row1col1  | row1col2   | row1col3    |',
+            '| row2col1  | row2col2   | row2col3    |',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '| 0         | 999        | 9999999     |',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, table format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='table',
+        ),
+        (
+            'simple table',
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '|-----------+------------+-------------|',
+            '| row1col1  | row1col2   | row1col3    |',
+            '| row2col1  | row2col2   | row2col3    |',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '| 0         | 999        | 9999999     |',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, psql format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='psql',
+        ),
+        (
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '|-----------+------------+-------------|',
+            '| row1col1  | row1col2   | row1col3    |',
+            '| row2col1  | row2col2   | row2col3    |',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '| 0         | 999        | 9999999     |',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, psql format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='psql',
+        ),
+        (
+            'simple table',
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '|-----------+------------+-------------|',
+            '| row1col1  | row1col2   | row1col3    |',
+            '| row2col1  | row2col2   | row2col3    |',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '| 0         | 999        | 9999999     |',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, grid format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='grid',
+        ),
+        (
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '+===========+============+=============+',
+            '| row1col1  | row1col2   | row1col3    |',
+            '+-----------+------------+-------------+',
+            '| row2col1  | row2col2   | row2col3    |',
+            '+-----------+------------+-------------+',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '+-----------+------------+-------------+',
+            '| 0         | 999        | 9999999     |',
+            '+-----------+------------+-------------+',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, grid format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='grid',
+        ),
+        (
+            'simple table',
+            '+-----------+------------+-------------+',
+            '| col1      | col2       | col3        |',
+            '+===========+============+=============+',
+            '| row1col1  | row1col2   | row1col3    |',
+            '+-----------+------------+-------------+',
+            '| row2col1  | row2col2   | row2col3    |',
+            '+-----------+------------+-------------+',
+            '| row3 col1 | row3  col2 | row3   col3 |',
+            '+-----------+------------+-------------+',
+            '| 0         | 999        | 9999999     |',
+            '+-----------+------------+-------------+',
+            '| 1.1432    | 1.2        | 0           |',
+            '+-----------+------------+-------------+',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, rst format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='rst',
+        ),
+        (
+            '=========  ==========  ===========',
+            'col1       col2        col3',
+            '=========  ==========  ===========',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+            '=========  ==========  ===========',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, rst format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='rst',
+        ),
+        (
+            'simple table',
+            '=========  ==========  ===========',
+            'col1       col2        col3',
+            '=========  ==========  ===========',
+            'row1col1   row1col2    row1col3',
+            'row2col1   row2col2    row2col3',
+            'row3 col1  row3  col2  row3   col3',
+            '0          999         9999999',
+            '1.1432     1.2         0',
+            '=========  ==========  ===========',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 without title, html format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            table_format='html',
+        ),
+        (
+            '<table>',
+            '<thead>',
             '<tr><th>col1     </th><th>col2      </th><th>col3       '
-            '</th></tr>\n'
-            '</thead>\n'
-            '<tbody>\n'
+            '</th></tr>',
+            '</thead>',
+            '<tbody>',
             '<tr><td>row1col1 </td><td>row1col2  </td><td>row1col3   '
-            '</td></tr>\n'
+            '</td></tr>',
             '<tr><td>row2col1 </td><td>row2col2  </td><td>row2col3   '
-            '</td></tr>\n'
-            '<tr><td>row3 col1</td><td>row3  col2</td><td>row3   '
-            'col3</td></tr>\n'
+            '</td></tr>',
+            '<tr><td>row3 col1</td><td>row3  col2</td><td>row3   col3'
+            '</td></tr>',
             '<tr><td>0        </td><td>999       </td><td>9999999    '
-            '</td></tr>\n'
+            '</td></tr>',
             '<tr><td>1.1432   </td><td>1.2       </td><td>0          '
-            '</td></tr>\n'
-            '</tbody>\n'
-            '</table>\n')
+            '</td></tr>',
+            '</tbody>',
+            '</table>',
+        ),
+        None, True
+    ),
+    (
+        "Table 1 with title, html format",
+        dict(
+            rows=TABLE1_ROWS,
+            headers=TABLE1_HEADERS,
+            title='simple table',
+            table_format='html',
+        ),
+        (
+            '<table>',
+            '<caption>simple table</caption>',
+            '<thead>',
+            '<tr><th>col1     </th><th>col2      </th><th>col3       '
+            '</th></tr>',
+            '</thead>',
+            '<tbody>',
+            '<tr><td>row1col1 </td><td>row1col2  </td><td>row1col3   '
+            '</td></tr>',
+            '<tr><td>row2col1 </td><td>row2col2  </td><td>row2col3   '
+            '</td></tr>',
+            '<tr><td>row3 col1</td><td>row3  col2</td><td>row3   col3'
+            '</td></tr>',
+            '<tr><td>0        </td><td>999       </td><td>9999999    '
+            '</td></tr>',
+            '<tr><td>1.1432   </td><td>1.2       </td><td>0          '
+            '</td></tr>',
+            '</tbody>',
+            '</table>',
+        ),
+        None, True
+    ),
 
-        self.compare_results(actual, expected)
+    (
+        "Table 2 with title, simple format, sorted by column 0",
+        dict(
+            rows=TABLE2_ROWS,
+            headers=TABLE2_HEADERS,
+            title='sortable table',
+            table_format='simple',
+            sort_columns=0,
+        ),
+        (
+            'sortable table',
+            'col1        col2           col3',
+            '----------  ----------  -------',
+            'anotherrow  middle      9999999',
+            'row1col1    row1col2          1',
+            'row2col1    row2col2         99',
+            'row3 col1   row3  col2        0',
+            'xorerow     anuts             0',
+        ),
+        None, True
+    ),
+    (
+        "Table 2 with title, simple format, sorted by columns 1,0",
+        dict(
+            rows=TABLE2_ROWS,
+            headers=TABLE2_HEADERS,
+            title='sortable table',
+            table_format='simple',
+            sort_columns=[1, 0],
+        ),
+        (
+            'sortable table',
+            'col1        col2           col3',
+            '----------  ----------  -------',
+            'xorerow     anuts             0',
+            'anotherrow  middle      9999999',
+            'row1col1    row1col2          1',
+            'row2col1    row2col2         99',
+            'row3 col1   row3  col2        0',
+        ),
+        None, True
+    ),
+    (
+        "Table 2 with title, simple format, sorted by column 2",
+        dict(
+            rows=TABLE2_ROWS,
+            headers=TABLE2_HEADERS,
+            title='sortable table',
+            table_format='simple',
+            sort_columns=2,
+        ),
+        (
+            'sortable table',
+            'col1        col2           col3',
+            '----------  ----------  -------',
+            'row3 col1   row3  col2        0',
+            'xorerow     anuts             0',
+            'row1col1    row1col2          1',
+            'row2col1    row2col2         99',
+            'anotherrow  middle      9999999',
+        ),
+        None, True
+    ),
 
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
+    (
+        "Table 3 (folded) with title, plain format",
+        dict(
+            rows=TABLE3_ROWS,
+            headers=TABLE3_HEADERS,
+            title='folded table',
+            table_format='plain',
+        ),
+        (
+            'folded table',
+            'col1       col2      col3',
+            'row1col1   row2col2  this is a',
+            '                     folded',
+            '                     cell',
+            'this is a  row2col2  row2col3',
+            'folded',
+            'cell',
+        ),
+        None, True
+    ),
+    (
+        "Table 3 (folded) with title, simple format",
+        dict(
+            rows=TABLE3_ROWS,
+            headers=TABLE3_HEADERS,
+            title='folded table',
+            table_format='simple',
+        ),
+        (
+            'folded table',
+            'col1       col2      col3',
+            '---------  --------  ---------',
+            'row1col1   row2col2  this is a',
+            '                     folded',
+            '                     cell',
+            'this is a  row2col2  row2col3',
+            'folded',
+            'cell',
+        ),
+        None, True
+    ),
+    (
+        "Table 3 (folded) with title, grid format",
+        dict(
+            rows=TABLE3_ROWS,
+            headers=TABLE3_HEADERS,
+            title='folded table',
+            table_format='grid',
+        ),
+        (
+            'folded table',
+            '+-----------+----------+-----------+',
+            '| col1      | col2     | col3      |',
+            '+===========+==========+===========+',
+            '| row1col1  | row2col2 | this is a |',
+            '|           |          | folded    |',
+            '|           |          | cell      |',
+            '+-----------+----------+-----------+',
+            '| this is a | row2col2 | row2col3  |',
+            '| folded    |          |           |',
+            '| cell      |          |           |',
+            '+-----------+----------+-----------+',
+        ),
+        None, True
+    ),
+]
 
-    def test_table_simple_hdr(self):
-        """Test a simple table with header"""
 
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_simple_table(table_format='simple', title=True)
-        print(table)
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_table, exp_exc_type, condition",
+    TESTCASES_FORMAT_TABLE)
+def test_format_table(desc, kwargs, exp_table, exp_exc_type, condition):
+    # pylint: disable=unused-argument
+    """
+    Test function for format_table() tests, using direct comparison.
+    """
+
+    if not condition:
+        pytest.skip("Condition for test case not met")
+
+    if exp_exc_type:
+        with pytest.raises(exp_exc_type):
+
+            if condition == 'pdb':
+                pytest.set_trace()
+
+            # The code to be tested
+            format_table(**kwargs)
+    else:
+
+        if condition == 'pdb':
+            pytest.set_trace()
+
+        # The code to be tested
+        act_table = format_table(**kwargs)
+
+        exp_table = '\n'.join(exp_table)
+        assert act_table == exp_table
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_table, exp_exc_type, condition",
+    TESTCASES_FORMAT_TABLE)
+def test_format_table_cap(desc, kwargs, exp_table, exp_exc_type, condition):
+    # pylint: disable=unused-argument
+    """
+    Test function for format_table() tests, using IO capturing.
+    """
+
+    if not condition:
+        pytest.skip("Condition for test case not met")
+
+    if exp_exc_type:
+        with pytest.raises(exp_exc_type):
+
+            if condition == 'pdb':
+                pytest.set_trace()
+
+            # The code to be tested
+            format_table(**kwargs)
+    else:
+
+        # Redirect stdout into capture buffer
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        if condition == 'pdb':
+            pytest.set_trace()
+
+        # The code to be tested
+        act_table = format_table(**kwargs)
+
+        # Restore stdout and get captured output
+        print(act_table)
         sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
+        act_table = captured_output.getvalue()
 
-        expected = ('test simple table\n'
-                    'col1       col2        col3\n'
-                    '---------  ----------  -----------\n'
-                    'row1col1   row1col2    row1col3\n'
-                    'row2col1   row2col2    row2col3\n'
-                    'row3 col1  row3  col2  row3   col3\n'
-                    '0          999         9999999\n'
-                    '1.1432     1.2         0\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_simple_hdr_sort1(self):
-        """Test a simple table with header and the sort option"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_sortable_table(table_format='simple', title=True,
-                                           sort_columns=0)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test sortable table\n'
-                    'col1        col2           col3\n'
-                    '----------  ----------  -------\n'
-                    'anotherrow  middle      9999999\n'
-                    'row1col1    row1col2          1\n'
-                    'row2col1    row2col2         99\n'
-                    'row3 col1   row3  col2        0\n'
-                    'xorerow     anuts             0\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_simple_hdr_sort2(self):
-        """Test a simple table with header and the sort option"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_sortable_table(table_format='simple', title=True,
-                                           sort_columns=[1, 0])
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test sortable table\n'
-                    'col1        col2           col3\n'
-                    '----------  ----------  -------\n'
-                    'xorerow     anuts             0\n'
-                    'anotherrow  middle      9999999\n'
-                    'row1col1    row1col2          1\n'
-                    'row2col1    row2col2         99\n'
-                    'row3 col1   row3  col2        0\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_simple_hdr_sort3(self):
-        """Test a simple table with header and the sort option"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_sortable_table(table_format='simple', title=True,
-                                           sort_columns=2)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test sortable table\n'
-                    'col1        col2           col3\n'
-                    '----------  ----------  -------\n'
-                    'row3 col1   row3  col2        0\n'
-                    'xorerow     anuts             0\n'
-                    'row1col1    row1col2          1\n'
-                    'row2col1    row2col2         99\n'
-                    'anotherrow  middle      9999999\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_simple_no_hdr(self):
-        """Test print a simple table no header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-        table = self.create_simple_table(table_format='simple', title=False)
-        print(table)
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('col1       col2        col3\n'
-                    '---------  ----------  -----------\n'
-                    'row1col1   row1col2    row1col3\n'
-                    'row2col1   row2col2    row2col3\n'
-                    'row3 col1  row3  col2  row3   col3\n'
-                    '0          999         9999999\n'
-                    '1.1432     1.2         0\n')
-
-        self.compare_results(actual, expected)
-
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_plain_hdr(self):
-        """Test a none table borders with header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-
-        table = self.create_simple_table(table_format='plain', title=True)
-        print(table)
-
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test simple table\n'
-                    'col1       col2        col3\n'
-                    'row1col1   row1col2    row1col3\n'
-                    'row2col1   row2col2    row2col3\n'
-                    'row3 col1  row3  col2  row3   col3\n'
-                    '0          999         9999999\n'
-                    '1.1432     1.2         0\n')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_grid(self):
-        """Test printing a plain table with borders and header"""
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-
-        table = self.create_simple_table(table_format='grid', title=True)
-        print(table)
-
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test simple table\n'
-                    '+-----------+------------+-------------+\n'
-                    '| col1      | col2       | col3        |\n'
-                    '+===========+============+=============+\n'
-                    '| row1col1  | row1col2   | row1col3    |\n'
-                    '+-----------+------------+-------------+\n'
-                    '| row2col1  | row2col2   | row2col3    |\n'
-                    '+-----------+------------+-------------+\n'
-                    '| row3 col1 | row3  col2 | row3   col3 |\n'
-                    '+-----------+------------+-------------+\n'
-                    '| 0         | 999        | 9999999     |\n'
-                    '+-----------+------------+-------------+\n'
-                    '| 1.1432    | 1.2        | 0           |\n'
-                    '+-----------+------------+-------------+\n')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_table_rst_hdr(self):
-        """Test a none table borders with header"""
-
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-
-        table = self.create_simple_table(table_format='rst', title=True)
-        print(table)
-
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test simple table\n'
-                    '=========  ==========  ===========\n'
-                    'col1       col2        col3\n'
-                    '=========  ==========  ===========\n'
-                    'row1col1   row1col2    row1col3\n'
-                    'row2col1   row2col2    row2col3\n'
-                    'row3 col1  row3  col2  row3   col3\n'
-                    '0          999         9999999\n'
-                    '1.1432     1.2         0\n'
-                    '=========  ==========  ===========\n')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_folded_cell_plain(self):
-        """Test building a folded cell table plain with header"""
-        actual = self.create_folded_table(table_format='plain', title=True)
-
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test folded table\n'
-                    'col1       col2      col3\n'
-                    'row1col1   row2col2  this is a\n'
-                    '                     folded\n'
-                    '                     cell\n'
-                    'this is a  row2col2  row2col3\n'
-                    'folded\n'
-                    'cell')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_folded_cell_simple(self):
-        """Test a folded cell table simplewith header"""
-        captured_output = StringIO()          # Create StringIO object
-        sys.stdout = captured_output                   # and redirect stdout.
-
-        table = self.create_folded_table(table_format='simple', title=True)
-        print(table)
-
-        sys.stdout = sys.__stdout__
-        actual = captured_output.getvalue()
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test folded table\n'
-                    'col1       col2      col3\n'
-                    '---------  --------  ---------\n'
-                    'row1col1   row2col2  this is a\n'
-                    '                     folded\n'
-                    '                     cell\n'
-                    'this is a  row2col2  row2col3\n'
-                    'folded\n'
-                    'cell\n')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-    def test_folded_cell_grid(self):
-        """Test a folded cell table with header"""
-        actual = self.create_folded_table(table_format='grid', title=True)
-
-        if VERBOSE:
-            print(actual)
-
-        expected = ('test folded table\n'
-                    '+-----------+----------+-----------+\n'
-                    '| col1      | col2     | col3      |\n'
-                    '+===========+==========+===========+\n'
-                    '| row1col1  | row2col2 | this is a |\n'
-                    '|           |          | folded    |\n'
-                    '|           |          | cell      |\n'
-                    '+-----------+----------+-----------+\n'
-                    '| this is a | row2col2 | row2col3  |\n'
-                    '| folded    |          |           |\n'
-                    '| cell      |          |           |\n'
-                    '+-----------+----------+-----------+')
-
-        self.compare_results(actual, expected)
-        self.assertEqual(actual, expected,
-                         'Actual:\n{}\nExpected:\n{}\n'.format(actual,
-                                                               expected))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        exp_table = '\n'.join(exp_table) + '\n'  # print() adds NL
+        assert act_table == exp_table
