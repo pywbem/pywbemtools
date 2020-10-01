@@ -6,3 +6,4 @@ include requirements.txt
 include *.py
 include pywbemtools/*.py
 include pywbemtools/*/*.py
+include pywbemtools/*/*/*.py

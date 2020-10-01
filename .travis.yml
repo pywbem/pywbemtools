@@ -267,3 +267,9 @@ after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" && "$PACKAGE_LEVEL" == "latest" && -z $_MANUAL_CI_RUN ]]; then
       coveralls;
     fi
+  # Since some files in the repo are generated (e.g. cmdshelp.rst or MANIFEST.in),
+  # the following intentionally causes the run to fail if they were not up to date.
+  - if [[ -n $(git status --short --untracked-files=no) ]]; then
+      git status;
+      echo "Some files in the repo were not up to date in this PR, see git status above.";
+    fi
