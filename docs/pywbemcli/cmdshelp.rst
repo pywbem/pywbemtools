@@ -63,9 +63,11 @@ Help text for ``pywbemcli``:
                                       mutually exclusive with the --mock-server and --name options, since each defines a
                                       WBEM server. Default: EnvVar PYWBEMCLI_SERVER, or none.
 
-      -u, --user TEXT                 User name for the WBEM server. Default: EnvVar PYWBEMCLI_USER, or none.
+      -u, --user TEXT                 User name for the WBEM server.  Use "" to set default in interactive mode.Default:
+                                      EnvVar PYWBEMCLI_USER, or none.
+
       -p, --password TEXT             Password for the WBEM server. Default: EnvVar PYWBEMCLI_PASSWORD, or prompted for if
-                                      --user specified.
+                                      --user specified. Use "" to set default in interactive mode.
 
       --verify / --no-verify          If --verify, client verifies the X.509 server certificate presented by the WBEM server
                                       during TLS/SSL handshake. If --no-verify client bypasses verification. Default: EnvVar
@@ -80,11 +82,13 @@ Help text for ``pywbemcli``:
 
       -c, --certfile FILE             Path name of a PEM file containing a X.509 client certificate that is used to enable
                                       TLS/SSL 2-way authentication by presenting the certificate to the WBEM server during
-                                      TLS/SSL handshake. Default: EnvVar PYWBEMCLI_CERTFILE, or none.
+                                      TLS/SSL handshake.  Use "" to set default in interactive mode. Default: EnvVar
+                                      PYWBEMCLI_CERTFILE, or none.
 
       -k, --keyfile FILE              Path name of a PEM file containing a X.509 private key that belongs to the certificate
                                       in the --certfile file. Not required if the private key is part of the --certfile
-                                      file. Default: EnvVar PYWBEMCLI_KEYFILE, or none.
+                                      file. Use "" to set default in interactive mode.Default: EnvVar PYWBEMCLI_KEYFILE, or
+                                      none.
 
       -t, --timeout INT               Client-side timeout in seconds for operations with the WBEM server. Default: EnvVar
                                       PYWBEMCLI_TIMEOUT, or 30.
@@ -102,17 +106,20 @@ Help text for ``pywbemcli``:
       -T, --timestats                 Show time statistics of WBEM server operations.
       -d, --default-namespace NAMESPACE
                                       Default namespace, to be used when commands do not specify the --namespace command
-                                      option. Default: EnvVar PYWBEMCLI_DEFAULT_NAMESPACE, or root/cimv2.
+                                      option. Use "" to set default in interactive mode. Default: EnvVar
+                                      PYWBEMCLI_DEFAULT_NAMESPACE, or root/cimv2.
 
       -o, --output-format FORMAT      Output format for the command result. The default and allowed output formats are
                                       command specific. The default output_format is None so that each command selects its
-                                      own default format. FORMAT is: table formats: [table|plain|simple|grid|psql|rst|html];
-                                      CIM object formats: [mof|xml|repr|txt]]; TEXT formats: [text].
+                                      own default format. Use "" to set default in interactive mode. FORMAT is: table
+                                      formats: [table|plain|simple|grid|psql|rst|html]; CIM object formats:
+                                      [mof|xml|repr|txt]]; TEXT formats: [text].
 
       -l, --log COMP[=DEST[:DETAIL]],...
                                       Enable logging of the WBEM operations, defined by a list of log configuration strings
                                       with: COMP: [api|http|all]; DEST: [file|stderr], default: file; DETAIL:
-                                      [all|paths|summary], default: all. Default: EnvVar PYWBEMCLI_LOG, or all.
+                                      [all|paths|summary], default: all.  Use "" to set default in interactive modeDefault:
+                                      EnvVar PYWBEMCLI_LOG, or all.
 
       -v, --verbose / --no-verbose    Display extra information about the processing.
       --warn / --no-warn              Warnings control: True enables display of all Python warnings; False leaves warning
@@ -123,7 +130,7 @@ Help text for ``pywbemcli``:
                                       Path name of the connections file to be used. Default: EnvVar
                                       PYWBEMCLI_CONNECTIONS_FILE, or ".pywbemcli_connections.yaml" in the user's home
                                       directory (as determined using Python's os.path.expanduser("~"). See there for
-                                      details, particularly for Windows).
+                                      details, particularly for Windows). Use "" to set default in interactive mode.
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
                                       pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.

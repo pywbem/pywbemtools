@@ -428,7 +428,7 @@ _show_bitsize:
 	$(PYTHON_CMD) tools/python_bitsize.py
 	@echo "makefile: Done determining bit size of Python executable"
 
-install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirements.txt setup.py
+install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirements.txt setup.py MANIFEST.in
 	@echo "makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
@@ -580,7 +580,6 @@ doccoverage: develop_$(pymn).done
 	@echo "makefile: Done creating the doc coverage results file: $(doc_build_dir)/coverage/python.txt"
 	@echo "makefile: Target $@ done."
 
-testmv:
 # Note: distutils depends on the right files specified in MANIFEST.in, even when
 # they are already specified e.g. in 'package_data' in setup.py.
 # We generate the MANIFEST.in file automatically, to have a single point of
