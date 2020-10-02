@@ -365,6 +365,7 @@ platform:
 	@echo "Python version: $(python_version)"
 	@echo "Pip command name: $(PIP_CMD)"
 	@echo "Pip command location: $(shell $(WHICH) $(PIP_CMD))"
+	@echo "Pip command version: $(shell $(PIP_CMD) --version)"
 	@echo "$(package_name) package version: $(package_version)"
 
 .PHONY: pip_list
