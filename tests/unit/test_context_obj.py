@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -17,53 +15,46 @@
 # limitations under the License.
 
 """
-Tests for _contest_obj functions and classes
+Tests for _context_obj.py module
 """
 
 from __future__ import absolute_import, print_function
-
-import unittest
 
 from pywbemtools.pywbemcli._context_obj import ContextObj
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 
-class ContextObjTests(unittest.TestCase):
-    """Test the click context object class"""
+def test_ContextObj_init():
+    """
+    Test creation of ContextObj object.
+    """
 
-    def simple_test(self):
-        """Test create context object"""
+    server = 'http://localhost'
+    ns = 'root/cimv2'
+    user = 'Fred'
+    pw = 'blah'
+    svr = PywbemServer(server, ns, user=user, password=pw)
 
-        server = 'http://localhost'
-        ns = 'root/cimv2'
-        user = 'Fred'
-        pw = 'blah'
-        svr = PywbemServer(server, ns, user=user, password=pw)
+    output_format = 'mof'
+    use_pull = 'either'
+    pull_max_cnt = 100
+    timestats = False
+    log = 'all'
+    verbose = True
+    pdb = False
+    warn = False
+    connections_repo = None
 
-        output_format = 'mof'
-        use_pull = 'either'
-        pull_max_cnt = 100
-        timestats = False
-        log = 'all'
-        verbose = True
-        pdb = False
-        warn = False
-        connections_repo = None
+    ctxobj = ContextObj(
+        pywbem_server=svr,
+        output_format=output_format,
+        use_pull=use_pull,
+        pull_max_cnt=pull_max_cnt,
+        timestats=timestats,
+        log=log,
+        verbose=verbose,
+        pdb=pdb,
+        warn=warn,
+        connections_repo=connections_repo)
 
-        ctxobj = ContextObj(
-            pywbem_server=svr,
-            output_format=output_format,
-            use_pull=use_pull,
-            pull_max_cnt=pull_max_cnt,
-            timestats=timestats,
-            log=log,
-            verbose=verbose,
-            pdb=pdb,
-            warn=warn,
-            connections_repo=connections_repo)
-
-        self.assertEqual(ctxobj.pywbem_server, svr)
-
-
-if __name__ == '__main__':
-    unittest.main()
+    assert ctxobj.pywbem_server == svr

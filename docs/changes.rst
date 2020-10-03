@@ -119,6 +119,8 @@ Released: not yet
   an alternative that will will set them to the default value. (see issue
   #350)
 
+* Converted remaining unittest testcases to pytest. (See issue #91)
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py

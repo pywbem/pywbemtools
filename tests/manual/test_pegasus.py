@@ -17,29 +17,29 @@
 # limitations under the License.
 
 """
-    Execute and test the validity of the help output from pywbemcli
+Execute and test the validity of the help output from pywbemcli
 """
 
 from __future__ import print_function, absolute_import
 
-import unittest
 import re
 from subprocess import Popen, PIPE
 import six
+import pytest
 
 
-class ClientTest(unittest.TestCase):
-    """Top level container. Performs any setup and teardown"""
+class Base(object):
+    """
+    Base class for all tests.
+    """
 
-    def setUp(self):
-        """Setup the test
+    def setup_method(self):
+        # pylint: disable=attribute-defined-outside-init
+        """
+        Setup the test
         """
         self.host = 'http://localhost'
         self.verbose = False
-
-
-class TestsContainer(ClientTest):
-    """Container class for all tests"""
 
     def execute_cmd(self, cmd_str):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
@@ -69,8 +69,9 @@ class TestsContainer(ClientTest):
         else:
             match = re.search(regex, test_str)
             if match:
-                self.fail('Found in error search regex {}, str {}'
-                          .format(regex, test_str))
+                raise AssertionError(
+                    'Found in error search regex {}, str {}'.
+                    format(regex, test_str))
 
     def assert_found(self, regex, test_str):
         """ Test of find regex on multiline string.
@@ -82,24 +83,19 @@ class TestsContainer(ClientTest):
         else:
             match = re.search(regex, test_str)
             if match is None:
-                self.fail('Failed search regex {}, str {}'
-                          .format(regex, test_str))
+                raise AssertionError(
+                    'Failed search regex {}, str {}'.
+                    format(regex, test_str))
 
-    def assertRegexp(self, regex, test_str):
-        """
-        This function eliminates the issue between the unittest assertRegex
-        and assertRegexpMatches functions between unittiest in python 2 and 3
-        """
-        if six.PY3:
-            # pylint: disable=no-member
-            return self.assertRegex(test_str, regex)
-
-        # pylint: disable=no-member, deprecated-method
-        return self.assertRegexpMatches(test_str,
-                                        regex)  # pylint: disable=no-member
+    @staticmethod
+    def assert_success(exitcode, err):
+        """Assert success"""
+        assert exitcode == 0 and err == '', \
+            "Expected success; got exit code {} and stderr:\n{}". \
+            format(exitcode, err)
 
 
-class ClassTests(TestsContainer):
+class TestClassGroup(Base):
     """Test operations in the class group"""
 
     def class_cmd(self, params):
@@ -110,61 +106,68 @@ class ClassTests(TestsContainer):
 
     def test_get_simple(self):
         """Test a get of CIM_ManagedElement"""
+
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement')
 
-        self.assertEqual(exitcode, 0)
-        self.assertEqual(err, '', 'Expect no std_err. Found {}'.format(err))
+        self.assert_success(exitcode, err)
         self.assert_found('CIM_ManagedElement ', out)
 
     def test_get_localonly(self):
         """Test class get --local-only"""
+
         exitcode, out, err = self.class_cmd('get CIM_ManagedElement -l')
 
-        self.assertEqual(exitcode, 0)
-        self.assertEqual(err, "")
+        self.assert_success(exitcode, err)
         self.assert_found('CIM_ManagedElement', out)
 
         exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement --local-only')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found('CIM_ManagedElement', out)
 
     def test_get_no_includequalifiers(self):
         """Test class get --no-qualifiers"""
-        exitcode, out, _ = self.class_cmd(
+
+        exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement --no-qualifiers')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found('CIM_ManagedElement', out)
 
     def test_propertylist(self):
         """Test property list on the get"""
-        exitcode, out, _ = self.class_cmd(
+
+        exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement -p InstanceID')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
         self.assert_found(['class CIM_ManagedElement', 'InstanceID'], out)
 
-        exitcode, out, _ = self.class_cmd(
+        exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement -p InstanceID -p Caption')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
         self.assert_found('class CIM_ManagedElement', out)
         self.assert_found('InstanceID', out)
         self.assert_found('Caption', out)
 
-        exitcode, out, _ = self.class_cmd(
+        exitcode, out, err = self.class_cmd(
             'get CIM_ManagedElement -p ""')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
         self.assert_found('class CIM_ManagedElement', out)
         self.assert_not_found(['InstanceID', 'Caption'], out)
 
     def test_simple_invoke(self):
         """Execute simple invoke method defined in pegasus"""
-        exitcode, _, _ = self.class_cmd(
+
+        exitcode, _, err = self.class_cmd(
             'invokemethod Test_IndicationProviderClass '
             'SendTestIndicationsCount -p indicationSendCount=0 '
             ' -n test/TestProvider')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
 
 
 # TODO finish this based on the test_ops in the tools directory
@@ -176,7 +179,7 @@ class ClassTests(TestsContainer):
 
 # TODO create tests for qualifier, server
 
-class InstanceTests(TestsContainer):
+class TestInstanceGroup(Base):
     """Test operations in the instance group"""
 
     def instance_cmd(self, params):
@@ -187,26 +190,29 @@ class InstanceTests(TestsContainer):
 
     def test_enumerate_simple(self):
         """Execute simple enumerate"""
-        exitcode, out, _ = self.instance_cmd('enumerate PyWBEM_Person')
 
-        self.assertEqual(exitcode, 0)
+        exitcode, out, err = self.instance_cmd('enumerate PyWBEM_Person')
+
+        self.assert_success(exitcode, err)
         self.assert_found('instance of PyWBEM_Person', out)
 
     def test_enumerate_proplist(self):
         """Execute enumerate with propertylist"""
-        exitcode, out, _ = self.instance_cmd('enumerate PyWBEM_Person '
-                                             '-p Name')
 
-        self.assertEqual(exitcode, 0)
+        exitcode, out, err = self.instance_cmd(
+            'enumerate PyWBEM_Person -p Name')
+
+        self.assert_success(exitcode, err)
         self.assert_found(['instance of PyWBEM_Person', 'Name'], out)
         self.assert_not_found('CreationClassName', out)
 
     def test_get_simple(self):
         """Execute simple get of known instance"""
-        exitcode, out, _ = self.instance_cmd(
+
+        exitcode, out, err = self.instance_cmd(
             'get PyWBEM_Person.CreationClassname=PyWBEM_Person,Name=Bob')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found('PyWBEM_Person', out)
 
     def test_create_simple(self):
@@ -216,33 +222,38 @@ class InstanceTests(TestsContainer):
         test should leave the repository in the same state in which it
         was before the test.
         """
-        exitcode, _, _ = self.instance_cmd(
+
+        exitcode, _, err = self.instance_cmd(
             'create PyWBEM_Person --property name=Fred '
             '--property CreationClassname=PyWBEM_Person')
-        self.assertEqual(exitcode, 0)
 
-        exitcode, out, _ = self.instance_cmd(
+        self.assert_success(exitcode, err)
+
+        exitcode, out, err = self.instance_cmd(
             'delete PyWBEM_Person.Name=Fred,CreationClassName=PyWBEM_Person')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
         self.assert_found(['Deleted', 'Fred'], out)
 
     def test_create_array_prop(self):
         """Create an instance of an array property"""
 
-        exitcode, out, _ = self.instance_cmd(
+        exitcode, out, err = self.instance_cmd(
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property arrayBool=True,False')
 
-        self.assertEqual(exitcode, 0, "Failed create test")
-        exitcode, out, _ = self.instance_cmd(
+        self.assert_success(exitcode, err)
+
+        exitcode, out, err = self.instance_cmd(
             'get pywbem_alltypes.InstanceId=ArrayBool')
 
+        self.assert_success(exitcode, err)
         self.assert_found(["instance of PyWBEM_AllTypes", 'ArrayBool',
                            "{True, False}"], out)
 
-        exitcode, out, _ = self.instance_cmd(
+        exitcode, out, err = self.instance_cmd(
             'delete PyWBEM_AllTypes.InstanceId=ArrayBool')
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found(['Deleted', 'ArrayBool'], out)
 
     def test_create_alltypes(self):
@@ -263,62 +274,67 @@ class InstanceTests(TestsContainer):
             '--property scalReal64=345876.3 '
             '--property scalDateTime="19991224120000.000000+360" '
             '--property scalString="A string value" ')
-        self.assertEqual(exitcode, 0, 'Expected good response. Rcvd '
-                         ' exitcode {}, err {}'.format(exitcode, err))
-        self.assertEqual(exitcode, 0, 'Create instance of Pywbem_AllTypes '
-                         'failed. exitcode {}, err {}'.format(exitcode, err))
 
-        exitcode, out, _ = self.instance_cmd(
+        self.assert_success(exitcode, err)
+
+        exitcode, out, err = self.instance_cmd(
             'delete PyWBEM_AllTypes.InstanceId=ScalarTest1')
-        self.assertEqual(exitcode, 0)
+
+        self.assert_success(exitcode, err)
         self.assert_found(['Deleted', 'ScalarTest1'], out)
 
     def test_property_notexist(self):
         """
         Validate the error when property does not exist in class
         """
+
         exitcode, _, err = self.instance_cmd(
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property BlahBool=True,False')
+
         print('err {}'.format(err))
-        self.assertEqual(exitcode, 1)
+        assert exitcode == 1
 
     def test_references(self):
         """Test simple references"""
-        exitcode, out, _ = self.instance_cmd(
+
+        exitcode, out, err = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found('instance of PyWBEM_MemberOfPersonCollection', out)
 
     def test_reference_paths(self):
         """Test references with -o"""
-        exitcode, out, _ = self.instance_cmd(
+
+        exitcode, out, err = self.instance_cmd(
             'references PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found(':PyWBEM_MemberOfPersonCollection.Member', out)
 
     def test_associators(self):
         """Test simple associators"""
-        exitcode, out, _ = self.instance_cmd(
+
+        exitcode, out, err = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found('instance of PyWBEM_PersonCollection', out)
 
     def test_associator_paths(self):
         """Test simple associators with -o"""
-        exitcode, out, _ = self.instance_cmd(
+
+        exitcode, out, err = self.instance_cmd(
             'associators PyWBEM_Person.CreationClassname=PyWBEM_Person,'
             'Name=Bob -o')
 
-        self.assertEqual(exitcode, 0)
+        self.assert_success(exitcode, err)
         self.assert_found(':PyWBEM_PersonCollection.InstanceID', out)
 
 
 if __name__ == '__main__':
-    unittest.main()
+    pytest.main([__file__])
