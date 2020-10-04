@@ -19,6 +19,9 @@ Released: not yet
 * Test: Fixed attempt in test_class_cmds.py to invoke a non-static method on a
   class object. (see issue #707)
 
+* Test: Preventive fix for potential issue with virtualenv raising
+  AttributeError during installtest on Python 3.4. (see issue #775)
+
 **Enhancements:**
 
 **Known issues:**
