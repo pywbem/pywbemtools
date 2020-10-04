@@ -60,6 +60,8 @@ Released: not yet
 * Test: Preventive fix for potential issue with virtualenv raising
   AttributeError during installtest on Python 3.4. (see issue #775)
 
+* Test: Added checking for no expected warning. (see issue #774)
+
 **Enhancements:**
 
 * Introduced caching of the mock environment used by connection definitions in
