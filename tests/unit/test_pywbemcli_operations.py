@@ -748,7 +748,7 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None, None, not CLICK_ISSUE_1590
+        None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
     ),
 
     # Testcases with standalone mock script that has dependents
