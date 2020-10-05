@@ -130,6 +130,10 @@ Released: not yet
 
 * Converted remaining unittest testcases to pytest. (See issue #91)
 
+* Test: When testing with latest package levels, the package versions of
+  indirect dependencies are now also upgraded to the latest compatible
+  version from Pypi. (see issue #784)
+
 **Cleanup**
 
 * Remove unused NocaseList from __common.py
