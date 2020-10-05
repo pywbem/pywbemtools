@@ -575,25 +575,22 @@ def sorted_prop_names(insts):
     and if instances of subclasses have additional keys.
     """
 
-    all_props = NocaseDict()  # key: org prop name, value
-    key_props = NocaseDict()  # key: org prop name, value
+    all_props = NocaseDict()  # key: org prop name, value: lower prop name
+    key_props = NocaseDict()  # key: org prop name, value: lower prop name
     for inst in insts:
-        inst_props = inst.keys()
-        for pn in inst_props:
+        for pn in inst.properties:
             all_props[pn] = pn.lower()
-        if inst.path:
-            key_prop_names = inst.path.keys()
-            for pn in inst_props:
-                if pn in key_prop_names:
-                    key_props[pn] = pn.lower()
+            if inst.path and pn in inst.path.keybindings:
+                key_props[pn] = pn.lower()
 
-    nonkey_props = NocaseDict()  # key: org prop name, value
+    nonkey_props = NocaseDict()  # key: org prop name, value: lower prop name
     for pn in all_props:
         if pn not in key_props:
             nonkey_props[pn] = all_props[pn]
 
-    key_prop_list = sorted(key_props.keys(), key=lambda p: p.lower())
-    nonkey_prop_list = sorted(nonkey_props.keys(), key=lambda p: p.lower())
+    key_prop_list = sorted(key_props.keys(), key=lambda pn: key_props[pn])
+    nonkey_prop_list = sorted(
+        nonkey_props.keys(), key=lambda pn: nonkey_props[pn])
     key_prop_list.extend(nonkey_prop_list)
     return key_prop_list
 
