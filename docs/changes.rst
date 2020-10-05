@@ -72,6 +72,8 @@ Released: not yet
 * Test: Aligned qualifier definitions in test MOF with CIM Schema.
   (related to issue #788)
 
+* Upgraded pywbem to 1.1.0 to pick up fixes and enhancements. (see issue #749)
+
 **Enhancements:**
 
 * Introduced caching of the mock environment used by connection definitions in
