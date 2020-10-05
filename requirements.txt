@@ -13,8 +13,9 @@
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 # TODO: Upgrade to pywbem 1.1.0 once released.
 
-nocaselist>=1.0.2
-nocasedict>=1.0.0
+# TODO: Temp debug: Use same versions for nocase* as master as of yesterday
+nocaselist==1.0.2
+nocasedict==1.0.0
 six>=1.14.0
 # Click 7.1 has a bug with output capturing
 Click>=7.0,!=7.1
