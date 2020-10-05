@@ -62,6 +62,10 @@ Released: not yet
 
 * Test: Added checking for no expected warning. (see issue #774)
 
+* Fixed incorrect property order in instance table output, where key properties
+  were not ordered before non-key properties but ordered along with them.
+  (see issue #782)
+
 **Enhancements:**
 
 * Introduced caching of the mock environment used by connection definitions in
