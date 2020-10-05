@@ -114,7 +114,7 @@ readme-renderer>=23.0; python_version >= '3.5'
 # PyYAMl is used by python-coveralls, and pip needs explicit versions for this
 # otherwise indirect dependency.
 # PyYAML 5.3 has removed support for Python 3.4
-PyYAML>=5.1; python_version == '2.7'
+PyYAML>=5.3; python_version == '2.7'
 PyYAML>=5.1,<5.3; python_version == '3.4'
 PyYAML>=5.1; python_version > '3.4'
 

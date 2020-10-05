@@ -81,10 +81,9 @@ wheel==0.33.5; python_version >= '3.8'
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
-# pywbem==0.17.0
+pywbem==1.1.0
 # Alternative to test against current github master pywbem
-git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
-# TODO: Upgrade to pywbem 1.1.0 once released.
+# git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 nocaselist==1.0.3
 nocasedict==1.0.1
@@ -96,7 +95,8 @@ asciitree==0.3.3
 tabulate==0.8.2
 prompt-toolkit==1.0.15; python_version == '2.7'
 prompt-toolkit==2.0.1; python_version >= '3.4'
-PyYAML==5.1
+PyYAML==5.3; python_version == '2.7'  # PyYAML 5.3 fixes narrow build error
+PyYAML==5.1; python_version >= '3.4'
 yamlloader==0.5.5
 mock==3.0.0
 
