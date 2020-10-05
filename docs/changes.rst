@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 0.7.2.dev1
-----------------------
+pywbemtools 0.7.2
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-10-05
 
 **Bug fixes:**
 
@@ -21,14 +17,6 @@ Released: not yet
 
 * Test: Preventive fix for potential issue with virtualenv raising
   AttributeError during installtest on Python 3.4. (see issue #775)
-
-**Enhancements:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.7.1
