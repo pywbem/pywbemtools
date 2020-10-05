@@ -109,3 +109,10 @@ readme-renderer>=23.0; python_version >= '3.5'
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
 # TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
+
+# PyYAMl is used by python-coveralls, and pip needs explicit versions for this
+# otherwise indirect dependency.
+# PyYAML 5.3 has removed support for Python 3.4
+PyYAML>=5.1; python_version == '2.7'
+PyYAML>=5.1,<5.3; python_version == '3.4'
+PyYAML>=5.1; python_version > '3.4'
