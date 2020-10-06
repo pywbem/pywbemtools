@@ -19,6 +19,10 @@ Released: not yet
 * Docs/Test: Fixed failing install of Jinja2 on Python 3.4 by adding it
   to dev-requirements.txt and pinning it to <2.11 for Python 3.4.
 
+* Fixed incorrect property order in instance table output, where key properties
+  were not ordered before non-key properties but ordered along with them.
+  (see issue #782)
+
 **Enhancements:**
 
 **Known issues:**
