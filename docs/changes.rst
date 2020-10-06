@@ -66,6 +66,9 @@ Released: not yet
   were not ordered before non-key properties but ordered along with them.
   (see issue #782)
 
+* Docs/Test: Fixed failing install of Jinja2 on Python 3.4 by adding it
+  to dev-requirements.txt and pinning it to <2.11 for Python 3.4.
+
 **Enhancements:**
 
 * Introduced caching of the mock environment used by connection definitions in
