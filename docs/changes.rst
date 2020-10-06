@@ -16,6 +16,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Docs/Test: Fixed failing install of Jinja2 on Python 3.4 by adding it
+  to dev-requirements.txt and pinning it to <2.11 for Python 3.4.
+
 **Enhancements:**
 
 **Known issues:**
