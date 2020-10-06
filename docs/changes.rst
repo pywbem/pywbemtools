@@ -183,6 +183,8 @@ Released: not yet
 * set pylint disable on all uses of pdb.set_trace(). This is an issue between
   the add-on package pdbpp and lint, not pdb.  (see issue # 751)
 
+* Docs: Changed Sphinx theme to sphinx_rtd_theme. (see issue #792)
+
 **Known issues:**
 
 * See `list of open issues`_.
