@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 0.7.3.dev1
-----------------------
+pywbemtools 0.7.3
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2020-10-06
 
 **Bug fixes:**
 
@@ -25,14 +21,6 @@ Released: not yet
 
 * Test: Fixed qualifier definitions in qualifier_filter_model.mof to accomodate
   improved MOF compiler in pywbem 1.1.0. (see issue #788)
-
-**Enhancements:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.7.2
