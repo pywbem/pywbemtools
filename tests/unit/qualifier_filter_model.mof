@@ -17,10 +17,10 @@ Qualifier Deprecated : boolean = true,
     Flavor(DisableOverride, ToSubclass);
 
 Qualifier Experimental : boolean = true,
-    Scope(class, association, indication, property, reference, method, parameter),
-    Flavor(DisableOverride, ToSubclass);
+    Scope(any),
+    Flavor(EnableOverride, Restricted);
 
-Qualifier Indication : boolean = true,
+Qualifier Indication : boolean = false,
     Scope(class, indication),
     Flavor(DisableOverride, ToSubclass);
 
