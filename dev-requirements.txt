@@ -108,3 +108,10 @@ readme-renderer>=23.0; python_version >= '3.5'
 # version to below 5.0 on Python 2.
 # TODO: Follow up on resolution of this issue.
 # TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
+
+# Jinja2 is used by Sphinx, and pip needs explicit versions for this
+# otherwise indirect dependency.
+# Jinja2 2.11 has removed support for Python 3.4
+Jinja2>=2.8; python_version == '2.7'
+Jinja2>=2.8,<2.11; python_version == '3.4'
+Jinja2>=2.8; python_version > '3.4'
