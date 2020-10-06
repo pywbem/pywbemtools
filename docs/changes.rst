@@ -23,6 +23,9 @@ Released: not yet
   were not ordered before non-key properties but ordered along with them.
   (see issue #782)
 
+* Test: Fixed qualifier definitions in qualifier_filter_model.mof to accomodate
+  improved MOF compiler in pywbem 1.1.0. (see issue #788)
+
 **Enhancements:**
 
 **Known issues:**

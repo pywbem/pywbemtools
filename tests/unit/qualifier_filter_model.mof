@@ -1,6 +1,6 @@
 /*
     Model with associations, Indication class, and Experimental
-    qualifier declarations to test the --association, 
+    qualifier declarations to test the --association,
     --indication, and --experimental options
 */
 
@@ -12,13 +12,12 @@ Qualifier Description : string = null,
     Scope(any),
     Flavor(EnableOverride, ToSubclass, Translatable);
 
-Qualifier Experimental : boolean = true,
-    Scope(class),
-    Flavor(DisableOverride, ToSubclass);
+Qualifier Experimental : boolean = false,
+    Scope(any),
+    Flavor(EnableOverride, Restricted);
 
-
-Qualifier Indication : boolean = true,
-    Scope(class),
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
     Flavor(DisableOverride, ToSubclass);
 
 Qualifier Key : boolean = false,
