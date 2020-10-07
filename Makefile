@@ -326,6 +326,7 @@ help:
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
 	@echo "  installtest - Run install tests"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
+	@echo "  todo       - Check for TODOs in Python and docs sources"
 	@echo "  upload     - build + Upload the distribution archive files to PyPI"
 	@echo "  clean      - Remove any temporary files"
 	@echo "  clobber    - Remove everything created to ensure clean start - use after setting git tag"
@@ -499,6 +500,10 @@ check: flake8_$(pymn).done safety_$(pymn).done
 pylint: pylint_$(pymn).done
 	@echo "makefile: Target $@ done."
 
+.PHONY: todo
+todo: todo_$(pymn).done
+	@echo "makefile: Target $@ done."
+
 .PHONY: all
 all: install develop build builddoc check pylint installtest test
 	@echo "makefile: Target $@ done."
@@ -647,6 +652,22 @@ safety_$(pymn).done: develop_$(pymn).done Makefile minimum-constraints.txt
 	-safety check -r minimum-constraints.txt --full-report
 	echo "done" >$@
 	@echo "makefile: Done running pyup.io safety check"
+
+todo_$(pymn).done: develop_$(pymn).done Makefile $(pylint_rc_file) $(py_src_files)
+ifeq ($(python_m_version),2)
+	@echo "makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
+else
+ifeq ($(python_mn_version),3.4)
+	@echo "makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
+else
+	@echo "makefile: Checking for TODOs"
+	-$(call RM_FUNC,$@)
+	pylint --exit-zero --reports=n --disable=all --enable=fixme $(py_src_files)
+	-grep TODO $(doc_conf_dir) -r --include="*.rst"
+	echo "done" >$@
+	@echo "makefile: Done checking for TODOs"
+endif
+endif
 
 .PHONY: test
 test: develop_$(pymn).done $(doc_utility_help_files)
