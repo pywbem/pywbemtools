@@ -1600,10 +1600,10 @@ Help text for ``pywbemcli profile centralinsts`` (see :ref:`profile centralinsts
       -o, --organization ORG-NAME     Filter by the defined organization. (ex. -o DMTF
       -p, --profile PROFILE-NAME      Filter by the profile name. (ex. -p Array
       --cc, --central-class CLASSNAME
-                                      Optional. Required only if profiles supports only scopig methodology
+                                      Optional. Required only if profiles supports only scoping methodology
       --sc, --scoping-class CLASSNAME
-                                      Optional. Required only if profiles supports only scopig methodology
-      --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports only scopig methodology. Multiples
+                                      Optional. Required only if profiles supports only scoping methodology
+      --sp, --scoping-path CLASSLIST  Optional. Required only if profiles supports only scoping methodology. Multiples
                                       allowed
 
       --rd, --reference-direction [snia|dmtf]

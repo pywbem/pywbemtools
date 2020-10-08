@@ -103,15 +103,15 @@ def profile_list(context, **options):
 @click.option('--cc', '--central-class', 'central_class', type=str,
               metavar='CLASSNAME', required=False,
               help=u'Optional. Required only if profiles supports only '
-              u'scopig methodology')
+              u'scoping methodology')
 @click.option('--sc', '--scoping-class', 'scoping_class', type=str,
               metavar='CLASSNAME', required=False,
               help=u'Optional. Required only if profiles supports only '
-              u'scopig methodology')
+              u'scoping methodology')
 @click.option('--sp', '--scoping-path', 'scoping_path', type=str,
               metavar='CLASSLIST', required=False, multiple=True,
               help=u'Optional. Required only if profiles supports only '
-              u'scopig methodology. Multiples allowed')
+              u'scoping methodology. Multiples allowed')
 @click.option('--rd', '--reference-direction', 'reference_direction',
               type=click.Choice(['snia', 'dmtf']),
               default='dmtf',

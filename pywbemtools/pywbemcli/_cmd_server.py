@@ -192,17 +192,14 @@ def cmd_server_info(context):
         # execute the namespaces to force contact with server before
         # turning off the spinner.
         server = context.wbem_server
-        server.namespaces  # pylint: disable=pointless-statement
+        namespaces = sorted(server.namespaces)
         context.spinner_stop()
-
-        server = context.wbem_server
 
         rows = []
         headers = ['Brand', 'Version', 'Interop Namespace', 'Namespaces']
-        if len(server.namespaces) > 3:
-            namespaces = '\n'.join(server.namespaces)
-        else:
-            namespaces = ', '.join(server.namespaces)
+        sep = '\n' if namespaces and len(namespaces) > 3 else ', '
+        namespaces = sep.join(namespaces)
+
         rows.append([server.brand, server.version,
                      server.interop_ns,
                      namespaces])
