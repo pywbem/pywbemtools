@@ -31,6 +31,7 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
+
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
 # The following lists define the help for each command in terms of particular
@@ -135,7 +136,7 @@ TEST_CASES = [
 
     ['Verify server command profiles',
      {'args': ['list'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -153,7 +154,7 @@ TEST_CASES = [
 
     ['Verify server command profiles, filtered by org',
      {'args': ['list', '-o', 'DMTF'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised management profiles: org=DMTF',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -166,7 +167,7 @@ TEST_CASES = [
 
     ['Verify server command profiles, filtered by org, long',
      {'args': ['list', '--organization', 'DMTF'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised management profiles: org=DMTF',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -179,7 +180,7 @@ TEST_CASES = [
 
     ['Verify server command profiles, filtered by org, and name',
      {'args': ['list', '--organization', 'DMTF', '--profile', 'Component'],
-      'general': ['-d', 'interop', '-o', 'plain']},
+      'general': ['-o', 'plain']},
      {'stdout': ['Advertised management profiles: org=DMTF name=Component',
                  'Organization    Registered Name       Version',
                  'DMTF            Component             1.4.0'],
@@ -189,7 +190,7 @@ TEST_CASES = [
 
     ['Verify server command profiles, filtered by name',
      {'args': ['list', '-p', 'Profile Registration'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -200,7 +201,7 @@ TEST_CASES = [
 
     ['Verify server command profiles, filtered by org, long',
      {'args': ['list', '--profile', 'Profile Registration'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised management profiles:',
                  'Organization    Registered Name       Version',
                  '--------------  --------------------  ---------',
@@ -212,13 +213,13 @@ TEST_CASES = [
     ['Verify server command centralinsts based on wbem server mock.',
      {'args': ['centralinsts', '-o', 'SNIA',
                '-p', 'Server'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Advertised Central Instances:',
                  'Profile',
                  'Central Instance paths',
                  'SNIA:Server:1.1.0',
                  'SNIA:Server:1.2.0',
-                 'interop:MCK_StorageComputerSystem'],
+                 'root/cimv2:MCK_StorageComputerSystem'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],

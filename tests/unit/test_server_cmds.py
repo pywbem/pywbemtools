@@ -30,6 +30,7 @@ TEST_DIR = os.path.dirname(__file__)
 # but not tied to the DMTF classes.
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
+
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
 # The following lists define the help for each command in terms of particular
@@ -169,16 +170,15 @@ TEST_CASES = [
     #   Verify the individual commands returning data
     #
     ['Verify server command interop default output',
-     {'args': ['interop'],
-      'general': ['-d', 'interop']},
+     {'args': ['interop'], },
      {'stdout': ['interop'],
       'rc': 0,
       'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
+     MOCK_SERVER_MODEL, RUN],
 
     ['Verify server command interop',
      {'args': ['interop'],
-      'general': ['-d', 'interop', '-o', 'text']},
+      'general': ['-o', 'text']},
      {'stdout': ['interop'],
       'rc': 0,
       'test': 'innows'},
@@ -186,34 +186,33 @@ TEST_CASES = [
 
     ['Verify server command namespaces',
      {'args': ['namespaces'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout': ['Server Namespaces:',
                  'Namespace Name',
                  '----------------',
-                 'interop'],
+                 'interop',
+                 'root/cimv2'],
       'rc': 0,
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command namespaces, text output',
      {'args': ['namespaces'],
-      'general': ['-d', 'interop', '-o', 'text']},
-     {'stdout': ['interop'],
+      'general': ['-o', 'text']},
+     {'stdout': ['interop, root/cimv2'],
       'rc': 0,
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command namespaces with sort option',
-     {'args': ['namespaces'],
-      'general': ['-d', 'interop']},
+     {'args': ['namespaces'], },
      {'stdout': ['interop'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
     ['Verify server command brand',
-     {'args': ['brand'],
-      'general': ['-d', 'interop']},
+     {'args': ['brand'], },
      {'stdout': ['OpenPegasus'],
       'rc': 0,
       'test': 'innows'},
@@ -222,7 +221,7 @@ TEST_CASES = [
 
     ['Verify server command brand with --output table fails',
      {'args': ['brand'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stderr': ['Output format "simple" not allowed for this command'],
       'rc': 1,
       'test': 'innows'},
@@ -230,14 +229,14 @@ TEST_CASES = [
 
     ['Verify server command info with mock server',
      {'args': ['info'],
-      'general': ['-d', 'interop', '-o', 'simple']},
+      'general': ['-o', 'simple']},
      {'stdout':
       ['Server General Information',
        'Brand        Version    Interop Namespace    Namespaces',
-       '-----------  ---------  -------------------  ------------',
-       'OpenPegasus  2.15.0     interop              interop'],
+       '-----------  ---------  -------------------  -------------------',
+       'OpenPegasus  2.15.0     interop              interop, root/cimv2'],
       'rc': 0,
-      'test': 'lines'},
+      'test': 'linesnows'},
      MOCK_SERVER_MODEL, OK],
 
     #

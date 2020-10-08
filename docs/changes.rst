@@ -190,6 +190,11 @@ Released: not yet
 
 * Docs: Changed Sphinx theme to sphinx_rtd_theme. (see issue #792)
 
+* Modified the class WbemServerMock in tests/unit/testmock to define a
+  WBEM server configuration that includes multiple namespaces, a user and
+  an interop namespace to test cross-namespace mock. (see issue #183)
+
+
 **Known issues:**
 
 * See `list of open issues`_.
