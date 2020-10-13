@@ -8,11 +8,9 @@ Change log
 pywbemtools 0.8.0
 -----------------
 
-This version is currently in development and is shown as |version|.
+This version contains all fixes up to pywbemtools 0.7.3.
 
-This version contains all fixes up to pywbemtools 0.7.x.
-
-Released: not yet
+Released: 2020-10-13
 
 **Incompatible changes:**
 
@@ -24,8 +22,6 @@ Released: not yet
 * The `--deprecation-warnings` / `--no-deprecation-warnings` general option
   has been remamed to `--warn` / `--no-warn`, and it now controls the
   display of all Python warnings.
-
-**Deprecations:**
 
 **Bug fixes:**
 
@@ -194,13 +190,6 @@ Released: not yet
 * Modified the class WbemServerMock in tests/unit/testmock to define a
   WBEM server configuration that includes multiple namespaces, a user and
   an interop namespace to test cross-namespace mock. (see issue #183)
-
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.7.0
