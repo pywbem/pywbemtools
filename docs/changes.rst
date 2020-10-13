@@ -5,6 +5,28 @@ Change log
 ==========
 
 
+pywbemtools 0.9.0.dev1
+----------------------
+
+This version contains all fixes up to pywbemtools 0.8.x.
+
+Released: not yet
+
+**Incompatible changes:**
+
+**Deprecations:**
+
+**Bug fixes:**
+
+**Enhancements:**
+
+**Known issues:**
+
+* See `list of open issues`_.
+
+.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
+
+
 pywbemtools 0.8.0
 -----------------
 
