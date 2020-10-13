@@ -8,7 +8,7 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-pywbem>=1.1.0
+pywbem>=1.1.1
 # Alternative to test against current github master pywbem
 # git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 

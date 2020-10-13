@@ -72,7 +72,8 @@ Released: not yet
 * Test: Aligned qualifier definitions in test MOF with CIM Schema.
   (related to issue #788)
 
-* Upgraded pywbem to 1.1.0 to pick up fixes and enhancements. (see issue #749)
+* Upgraded pywbem to 1.1.1 to pick up fixes and enhancements.
+  (see issues #749, #183)
 
 **Enhancements:**
 
