@@ -273,7 +273,7 @@ else
   pytest_end2end_warning_opts := $(pytest_warning_opts)
 endif
 
-ifeq ($(python_mn_version),py34)
+ifeq ($(python_mn_version),3.4)
   pytest_cov_opts :=
 else
   pytest_cov_opts := --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc
