@@ -81,9 +81,9 @@ wheel==0.33.5; python_version >= '3.8'
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
-pywbem==1.1.1
+# pywbem==1.1.1
 # Alternative to test against current github master pywbem
-# git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
+git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 nocaselist==1.0.3
 nocasedict==1.0.1
