@@ -31,10 +31,14 @@ prompt-toolkit>=2.0.1; python_version >= '3.4' and python_version < '3.8'
 prompt-toolkit>=2.0.1; python_version >= '3.8' and sys_platform != 'win32'
 prompt-toolkit>=2.0.1,<3.0.0; python_version >= '3.8' and sys_platform == 'win32'
 
+# PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 5.3 has removed support for Python 3.4
-PyYAML>=5.1; python_version == '2.7'
-PyYAML>=5.1,<5.3; python_version == '3.4'
-PyYAML>=5.1; python_version > '3.4'
+# PyYAML 5.3 fixed narrow build error on Python 2.7
+# PyYAML 5.3.1 addressed issue 38100 reported by safety
+# PyYAML 5.2 addressed issue 38639 reported by safety
+PyYAML>=5.3.1; python_version == '2.7'
+PyYAML>=5.2,<5.3; python_version == '3.4'
+PyYAML>=5.3.1; python_version > '3.4'
 
 yamlloader>=0.5.5
 packaging>=17.0
