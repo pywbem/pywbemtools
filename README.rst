@@ -5,13 +5,9 @@ pywbemtools: Python tools for communicating with WBEM servers
     :target: https://pypi.python.org/pypi/pywbemtools/
     :alt: PyPI version
 
-.. image:: https://travis-ci.org/pywbem/pywbemtools.svg?branch=master
-    :target: https://travis-ci.org/github/pywbem/pywbemtools/builds
-    :alt: Travis status
-
-.. image:: https://ci.appveyor.com/api/projects/status/hc6bbf3so9fw72nx/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/KSchopmeyer/pywbemtools/history
-    :alt: Appveyor status
+.. image:: https://github.com/pywbem/pywbemtools/workflows/test/badge.svg?branch=master
+    :target: https://github.com/pywbem/pywbemtools/actions/
+    :alt: Actions status
 
 .. image:: https://readthedocs.org/projects/pywbemtools/badge/?version=latest
     :target: https://readthedocs.org/projects/pywbemtools/builds/
