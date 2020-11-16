@@ -409,11 +409,11 @@ install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 # Scripts are required to install the OS-level components of pywbem.
 # Makefile gets the required scripts from the pywbem project on GitHub.
 pywbem_os_setup.sh:
-	wget -q -O pywbem_os_setup.sh https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
+	curl -s -o pywbem_os_setup.sh https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
 	chmod 755 pywbem_os_setup.sh
 
 pywbem_os_setup.bat:
-	wget -q -O pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
+	curl -s -o pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
 
 .PHONY: install_os
 install_os: install_os_$(pymn).done
