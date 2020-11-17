@@ -31,6 +31,11 @@ from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, \
     CIMClassName, __version__
 
+try:
+    from pywbem import MissingKeybindingsWarning
+except ImportError:
+    MissingKeybindingsWarning = None
+
 from tests.unit.pytest_extensions import simplified_test_function
 
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
@@ -367,18 +372,22 @@ TESTCASES_FORMAT_KEYS = [
      dict(kb=[('Name', 'Foo'),
               ('Number', Uint8(42)),
               ('Boolean', False),
-              ('Ref', CIMInstanceName('CIM_Bar'))],
+              ('Ref', CIMInstanceName('CIM_Bar',
+                                      keybindings={'Chicken': 'Ham'}))],
           width=100,
-          exp_rtn='Boolean=FALSE,Name="Foo",Number=42,Ref="/:CIM_Bar"'),
+          exp_rtn='Boolean=FALSE,Name="Foo",Number=42,'
+          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
      None, None, PYWBEM_1_0_0),
 
     ('Verify multiple unsorted keys binding multiple key types, pywbem <1.0',
      dict(kb=[('Name', 'Foo'),
               ('Number', Uint8(42)),
               ('Boolean', False),
-              ('Ref', CIMInstanceName('CIM_Bar'))],
+              ('Ref', CIMInstanceName('CIM_Bar',
+                                      keybindings={'Chicken': 'Ham'}))],
           width=100,
-          exp_rtn='Name="Foo",Number=42,Boolean=FALSE,Ref="/:CIM_Bar"'),
+          exp_rtn='Name="Foo",Number=42,Boolean=FALSE,'
+          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
      None, None, not PYWBEM_1_0_0),
 
     ('Verify mutliple keys that fold into multiple lines',
@@ -420,7 +429,7 @@ TESTCASES_FORMAT_KEYS = [
      dict(kb=[],
           width=100,
           exp_rtn=''),
-     None, None, True),
+     None, MissingKeybindingsWarning, True),
 ]
 
 
@@ -527,10 +536,12 @@ TESTCASES_SHORTEN_PATH_STR = [
      dict(kb=[('Boolean', False),
               ('Name', 'Foo'),
               ('Number', Uint8(42)),
-              ('Ref', CIMInstanceName('CIM_Bar'))],
+              ('Ref', CIMInstanceName('CIM_Bar',
+                                      keybindings={'Chicken': 'Ham'}))],
           rpl={},
           fp=False,
-          exp_rtn='/:cln.Boolean=FALSE,Name="Foo",Number=42,Ref="/:CIM_Bar"'),
+          exp_rtn='/:cln.Boolean=FALSE,Name="Foo",Number=42,'
+          'Ref="/:CIM_Bar.Chicken=\\"Ham\\""'),
      None, None, True),
 ]
 
