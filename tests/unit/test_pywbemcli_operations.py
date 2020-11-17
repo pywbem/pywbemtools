@@ -24,6 +24,9 @@ import sys
 import os
 import glob
 import re
+import warnings
+import packaging.version
+import urllib3
 import pytest
 import pywbem
 
@@ -39,6 +42,8 @@ from .utils import captured_output
 OK = True
 FAIL = False
 PDB = "pdb"
+
+PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
 # Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
 # the pytest capsys fixture is used. That happens only on Windows.
@@ -56,6 +61,21 @@ DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
 # Flag indicating that the new-style setup approach() with a setup() function
 # is supported.
 NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 5)
+
+# RETRY_DEPRECATION_ Flag indicating that pywbem raises a DeprecationWarning
+# for urllib3.Retry.
+# urllib3 1.26.0 started issuing a DeprecationWarning for using the
+# 'method_whitelist' init parameter of Retry and announced its removal in
+# version 2.0. The replacement parameter is 'allowed_methods'.
+# pywbem >=1.2.0 avoids the warning, but pywbem <1.2.0 issues it.
+with warnings.catch_warnings():
+    warnings.filterwarnings('error')
+    try:
+        urllib3.Retry(method_whitelist={})
+    except (DeprecationWarning, TypeError):
+        RETRY_DEPRECATION = PYWBEM_VERSION.release <= (1, 2)
+    else:
+        RETRY_DEPRECATION = False
 
 
 def save_default_connections_file():
@@ -317,7 +337,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -334,7 +356,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -351,7 +375,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -368,7 +394,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -385,7 +413,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -402,7 +432,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
     (
         "Mock env with MOF file and new-style mock script, "
@@ -419,7 +451,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_stdout_lines=[],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None, OK
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
+        OK
     ),
 
     # Testcases with verbose enabled.
@@ -614,7 +648,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
 
     ),
@@ -635,7 +670,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
     (
@@ -656,7 +692,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
     (
@@ -677,7 +714,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
     (
@@ -699,7 +737,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
     (
@@ -721,7 +760,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
 
@@ -769,7 +809,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
     (
@@ -790,7 +831,8 @@ TESTCASES_BUILD_MOCKENV = [
             ],
             exp_stderr_lines=[],
         ),
-        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError, None,
+        None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
+        DeprecationWarning if RETRY_DEPRECATION else None,
         not CLICK_ISSUE_1590
     ),
 
