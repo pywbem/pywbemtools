@@ -117,7 +117,7 @@ Help text for ``pywbemcli``:
 
       -l, --log COMP[=DEST[:DETAIL]],...
                                       Enable logging of the WBEM operations, defined by a list of log configuration strings
-                                      with: COMP: [api|http|all]; DEST: [file|stderr], default: file; DETAIL:
+                                      with: COMP: [api|http|all]; DEST: [file|stderr|off], default: file; DETAIL:
                                       [all|paths|summary], default: all.  Use "" to set default in interactive modeDefault:
                                       EnvVar PYWBEMCLI_LOG, or all.
 
