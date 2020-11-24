@@ -55,6 +55,8 @@ INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
+MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
+
 #
 # The following list defines the help for each command in terms of particular
 # parts of lines that are to be tested.//FakedUrl:5988
@@ -127,7 +129,8 @@ CLASS_FIND_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class find CLASSNAME-GLOB '
     '[COMMAND-OPTIONS]',
     'List the classes with matching class names on the server.',
-    '-s, --sort                 Sort by namespace. Default is to sort by',
+    '-s, --sort  Sort by namespace. Default is to sort by',
+    '--summary  Display only a summary count of classes per namespace',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     # FILTER OPTIONS
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
@@ -1055,40 +1058,40 @@ TEST_CASES = [
 
     ['Verify class command find simple name in all namespaces',
      ['find', 'CIM_*'],
-     {'stdout': ["  root/cimv2:CIM_Foo",
-                 "  root/cimv2:CIM_Foo_sub",
-                 "  root/cimv2:CIM_Foo_sub2",
-                 "  root/cimv2:CIM_Foo_sub_sub"],
+     {'stdout': ["  root/cimv2: CIM_Foo",
+                 "  root/cimv2: CIM_Foo_sub",
+                 "  root/cimv2: CIM_Foo_sub2",
+                 "  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command find simple name in all namespaces wo case',
      ['find', 'cim_*'],
-     {'stdout': ["  root/cimv2:CIM_Foo",
-                 "  root/cimv2:CIM_Foo_sub",
-                 "  root/cimv2:CIM_Foo_sub2",
-                 "  root/cimv2:CIM_Foo_sub_sub"],
+     {'stdout': ["  root/cimv2: CIM_Foo",
+                 "  root/cimv2: CIM_Foo_sub",
+                 "  root/cimv2: CIM_Foo_sub2",
+                 "  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command find simple name in all namespaces lead wc',
      ['find', '*sub_sub*'],
-     {'stdout': ["  root/cimv2:CIM_Foo_sub_sub"],
+     {'stdout': ["  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command find simple name in all namespaces wo case',
      ['find', '*sub_su?*'],
-     {'stdout': ["  root/cimv2:CIM_Foo_sub_sub"],
+     {'stdout': ["  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command find simple name in known namespace',
      ['find', 'CIM_*', '-n', 'root/cimv2'],
-     {'stdout': ["  root/cimv2:CIM_Foo",
-                 "  root/cimv2:CIM_Foo_sub",
-                 "  root/cimv2:CIM_Foo_sub2",
-                 "  root/cimv2:CIM_Foo_sub_sub"],
+     {'stdout': ["  root/cimv2: CIM_Foo",
+                 "  root/cimv2: CIM_Foo_sub",
+                 "  root/cimv2: CIM_Foo_sub2",
+                 "  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -1110,6 +1113,54 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
+
+    ['Verify class command find simple name in known namespace',
+     ['find', 'CIM_*', '-n', 'root/cimv2', '--summary'],
+     {'stdout': ["  root/cimv2: 4"],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command find name in known namespace -o grid',
+     {'general': ['-o', 'table'],
+      'args': ['find', 'CIM_*', '-n', 'root/cimv2', '--summary']},
+     {'stdout': ['Find class counts CIM_*',
+                 '+-------------+---------------+',
+                 '| Namespace   |   Class count |',
+                 '|-------------+---------------|',
+                 '| root/cimv2  |             4 |',
+                 '+-------------+---------------+'],
+      'test': 'lines'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class find --summary with multiple namespaces',
+     {'general': ['-o', 'table'],
+      'args': ['find', '*', '--summary']},
+     {'stdout': ['Find class counts *',
+                 '+-------------+---------------+',
+                 '| Namespace   |   Class count |',
+                 '|-------------+---------------|',
+                 '| root/cimv2  |            15 |',
+                 '| interop     |            22 |',
+                 '+-------------+---------------+'],
+      'rc': 0,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL, OK],
+
+
+    ['Verify class find --summary with multiple namespaces and --sort ',
+     {'general': ['-o', 'table'],
+      'args': ['find', '*', '--summary', '--sort']},
+     {'stdout': ['Find class counts *',
+                 '+-------------+---------------+',
+                 '| Namespace   |   Class count |',
+                 '|-------------+---------------|',
+                 '| interop     |            22 |',
+                 '| root/cimv2  |            15 |',
+                 '+-------------+---------------+'],
+      'rc': 0,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL, OK],
+
     ['Verify class command verify nothing found for BLAH_ regex',
      ['find', 'BLAH_*', '-n', 'root/cimv2'],
      {'stdout': "",
@@ -1118,7 +1169,7 @@ TEST_CASES = [
 
     ['Verify class command find simple name in known namespace with wildcard',
      ['find', '*sub2', '-n', 'root/cimv2'],
-     {'stdout': "  root/cimv2:CIM_Foo_sub2",
+     {'stdout': "  root/cimv2: CIM_Foo_sub2",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 

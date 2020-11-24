@@ -174,7 +174,7 @@ TEST_CASES = [
      {'stdout': ['interop'],
       'rc': 0,
       'test': 'innows'},
-     MOCK_SERVER_MODEL, RUN],
+     MOCK_SERVER_MODEL, OK],
 
     ['Verify server command interop',
      {'args': ['interop'],

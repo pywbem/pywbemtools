@@ -402,7 +402,8 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       -n, --namespace NAMESPACE       Add a namespace to the search scope. May be specified multiple times. Default: Search
                                       in all namespaces of the server.
 
-      -s, --sort                      Sort by namespace. Default is to sort by classname
+      -s, --sort                      Sort by namespace. Default is to sort by classname or bycount if --summary set.
+      --summary                       Display only a summary count of classes per namespace
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
                                       classes that are not associations(--no-association). If the option is not defined no

@@ -23,6 +23,11 @@ Released: not yet
 
 **Enhancements:**
 
+* Add new option to class find command (--summary) to display a summary of
+  the counts of classes found instead of the full list of the classes to make
+  the command more useful for real servers that may return many classes for
+  a class find. (see issue #810)
+
 **Known issues:**
 
 * See `list of open issues`_.
