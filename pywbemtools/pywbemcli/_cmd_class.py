@@ -25,6 +25,8 @@ from __future__ import absolute_import, print_function
 
 import click
 
+from pywbem._nocasedict import NocaseDict
+
 from pywbem import Error, CIMClassName, CIMError, ModelError, \
     CIM_ERR_NOT_FOUND, CIMClass
 
@@ -361,7 +363,10 @@ def class_associators(context, classname, **options):
                 required=True)
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help=u'Sort by namespace. Default is to sort by classname')
+              help=u'Sort by namespace. Default is to sort by classname or by'
+                   'count if --summary set.')
+@click.option('--summary', is_flag=True, required=False,
+              help=u'Display only a summary count of classes per namespace')
 @add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
@@ -873,32 +878,54 @@ def cmd_class_find(context, classname_glob, options):
     namespaces = get_namespaces(context, options['namespace'])
 
     try:
-        names_dict = {}
+        # Define sort by namespace name if --sort, or  othersise by count
+        sort_col = 0 if options['sort'] else 1
+
+        # Dictionary key is namespaces, value is list of classes
+        names_dict = NocaseDict()
         if namespaces:
-            for namespace in namespaces:
-                # Set cmd options that are required for this command to get
-                # information on classes in server.
-                # 1. Always use deep_inheritance
-                # 2. Set namespace to each namespace in loop
+            for ns in namespaces:
+                # Uses di True, and names_only. Build options for enumerate
                 options['deep_inheritance'] = True
-                options['namespace'] = namespace
+                options['namespace'] = ns
                 options['names_only'] = True
 
+                # enumerate filtered for classnames and add to namespace in
+                # dictionary
                 classnames = enumerate_classes_filtered(context, None, options)
-                names_dict[namespace] = filter_namelist(classname_glob,
-                                                        classnames)
+                names_dict[ns] = filter_namelist(classname_glob, classnames)
 
-        # build rows of namespace, classname for each namespace, sort if
-        # necessary,  and add to common rows
-        row = 0 if options['sort'] else 1
+        context.spinner_stop()
+
+        # If summary set, generate output of only count of classes for
+        # each namespace
+        if 'summary' in options and options['summary']:
+            rows = [[ns, len(names_dict[ns])] for ns in names_dict]
+            rows.sort(key=lambda x: x[sort_col])
+
+            if output_format_is_table(context.output_format):
+                headers = ['Namespace', 'Class count']
+                click.echo(format_table(rows,
+                                        headers,
+                                        title='Find class counts {}'.
+                                        format(classname_glob),
+                                        table_format=output_format))
+            else:
+                for ns, count in rows:
+                    click.echo('  {}: {}'. format(ns, count))
+            return
+
+        # Not summary. Build rows of namespace, classname for each namespace
+        # and sort by names if --sort set
         rows = []
         for ns_name in names_dict:
             ns_rows = [[ns_name, name] for name in names_dict[ns_name]]
             # sort by classname if sort option defined, else by namespace
-            ns_rows.sort(key=lambda x: x[row])
+            ns_rows.sort(key=lambda x: x[sort_col])
             rows.extend(ns_rows)
 
         context.spinner_stop()
+
         if output_format_is_table(context.output_format):
             headers = ['Namespace', 'Classname']
             click.echo(
@@ -908,9 +935,8 @@ def cmd_class_find(context, classname_glob, options):
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
-            context.spinner_stop()
             for row in rows:
-                click.echo('  {}:{}'.format(row[0], row[1]))
+                click.echo('  {}: {}'.format(row[0], row[1]))
 
     except Error as er:
         raise_pywbem_error_exception(er)
