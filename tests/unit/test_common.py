@@ -425,7 +425,7 @@ TESTCASES_FORMAT_KEYS = [
      None, None, False),
 
     # Test no keys
-    ('Verify no keys',
+    ('Verify no keys. This test may cause MissingKeybindingWarning',
      dict(kb=[],
           width=100,
           exp_rtn=''),

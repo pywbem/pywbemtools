@@ -21,6 +21,10 @@ Released: not yet
 * Fixed a ValueError on Windows that was raised when the connections file was
   not on the home drive.
 
+* Fix issue with new warning message from pywbem about
+  CIMInstanceName with no keybindings in test_class_cmds.py.
+
+
 **Enhancements:**
 
 **Known issues:**
