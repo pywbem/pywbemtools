@@ -16,6 +16,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fixed a ValueError on Windows that was raised when the connections file was
+  not on the home drive.
+
 * Limit click package to < 8.0 because of a) incompatibility with python 2.7,
   b) incompatibility between click 8.0 and clicl-repl.
   (see issues #816 and #817)
