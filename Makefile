@@ -314,6 +314,14 @@ endif
 
 PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
 
+ifeq ($(PLATFORM),Windows_native)
+  home := $(HOMEDRIVE)$(HOMEPATH)
+  cwd := $(shell cd)
+else
+  home := $(HOME)
+  cwd := $(shell pwd)
+endif
+
 .PHONY: help
 help:
 	@echo "Makefile for $(package_name) package"
@@ -363,6 +371,8 @@ help:
 platform:
 	@echo "makefile: Platform related information as seen by make:"
 	@echo "Platform: $(PLATFORM)"
+	@echo "Home directory: $(home)"
+	@echo "Current directory: $(cwd)"
 	@echo "Shell used for commands: $(SHELL)"
 	@echo "Shell flags: $(.SHELLFLAGS)"
 	@echo "Make command location: $(MAKE)"
