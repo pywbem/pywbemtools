@@ -729,12 +729,15 @@ def mockcache_cachedir(rootdir, connections_file, connection_name):
     # Construct a (reproducible) cache ID from connections file path and
     # connection definition name.
     # Example: 6048a3da1a34a3ec605825a1493c7bb5.simple
-    #
-    # TODO: On Windows, os.path.relpath() raises ValueError when the
-    #       connections file is not on the same drive as the home dir.
-    relfile = os.path.relpath(connections_file, os.path.expanduser('~'))
+    try:
+        connections_file = os.path.relpath(
+            connections_file, os.path.expanduser('~'))
+    except ValueError:
+        # On Windows, os.path.relpath() raises ValueError when the paths
+        # are on different drives
+        pass
     md5 = hashlib.md5()
-    md5.update(relfile.encode("utf-8"))
+    md5.update(connections_file.encode("utf-8"))
     cache_id = "{}.{}".format(md5.hexdigest(), connection_name)
     dir_path = os.path.join(rootdir, cache_id)
     return dir_path

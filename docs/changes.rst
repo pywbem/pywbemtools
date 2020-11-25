@@ -18,6 +18,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fixed a ValueError on Windows that was raised when the connections file was
+  not on the home drive.
+
 **Enhancements:**
 
 **Known issues:**
