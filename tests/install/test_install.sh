@@ -410,6 +410,9 @@ function test1()
 
   call "cd $ROOT_DIR; pip install . $PIP_OPTS" "Installing with pip from repo root directory (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
+  verbose "Packages before running pywbemcli:"
+  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+
   assert_run_ok "pywbemcli --version"
   remove_virtualenv "$testcase"
   cleanup_egg_file
@@ -422,6 +425,9 @@ function test2()
   make_virtualenv "$testcase"
 
   call "cd $ROOT_DIR; python setup.py install" "Installing with setup.py from repo root directory (latest package levels)"
+
+  verbose "Packages before running pywbemcli:"
+  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
   assert_run_ok "pywbemcli --version"
   remove_virtualenv "$testcase"
@@ -436,6 +442,9 @@ function test3()
 
   call "cd $TMP_TEST_DIR; pip install $(abspath $WHL_DISTFILE) $PIP_OPTS" "Installing with pip from wheel distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
+  verbose "Packages before running pywbemcli:"
+  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+
   assert_run_ok "pywbemcli --version"
   remove_virtualenv "$testcase"
   cleanup_egg_file
@@ -448,6 +457,9 @@ function test4()
   make_virtualenv "$testcase"
 
   call "cd $TMP_TEST_DIR; pip install $(abspath $SRC_DISTFILE) $PIP_OPTS" "Installing with pip from source distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+
+  verbose "Packages before running pywbemcli:"
+  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
   assert_run_ok "pywbemcli --version"
   remove_virtualenv "$testcase"
@@ -462,6 +474,9 @@ function test5()
   run "tar -x -v -f $SRC_DISTFILE -C $SRC_DISTFILE_UNPACK_DIR" "Unpacking source distribution archive to: $SRC_DISTFILE_UNPACK_DIR"
 
   call "cd $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR; python setup.py install" "Installing with setup.py from unpack directory: $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR (latest package levels)"
+
+  verbose "Packages before running pywbemcli:"
+  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
   assert_run_ok "pywbemcli --version"
   remove_virtualenv "$testcase"
