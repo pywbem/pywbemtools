@@ -10,6 +10,8 @@
 
 # pywbem>=1.1.1
 # Alternative to test against current github master pywbem
+# If this is enabled, some of the install tests need to be disabled by setting
+# the 'pywbem_from_repo' variable in in test_install.sh - keep this in sync.
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 nocaselist>=1.0.3
