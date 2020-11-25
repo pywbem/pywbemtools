@@ -31,6 +31,11 @@ function abspath()
 DEBUG="false"
 VERBOSE="true"
 
+# Indicates that pywbem is installed from a repository. This will disable
+# some install tests because they don't support this. Keep in sync with
+# the installation of pywbem from repo vs package in requirements.txt.
+PYWBEM_FROM_REPO="true"
+
 MYNAME=$(basename "$0")
 MYDIR=$(dirname "$0")    # Directory of this script, as seen by caller
 
@@ -267,6 +272,7 @@ function call()
     sh -c "$cmd"
     rc=$?
   else
+    verbose "$cmd"
     sh -c "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -288,6 +294,7 @@ function assert_run_ok()
     eval "$cmd"
     rc=$?
   else
+    verbose "$cmd"
     eval "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -408,12 +415,17 @@ function test1()
   info "Testcase $testcase: Pip install from repo root directory: $ROOT_DIR"
   make_virtualenv "$testcase"
 
-  call "cd $ROOT_DIR; pip install . $PIP_OPTS" "Installing with pip from repo root directory (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+    call "cd $ROOT_DIR; pip install . $PIP_OPTS" "Installing with pip from repo root directory (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-  verbose "Packages before running pywbemcli:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+    verbose "Packages before running pywbemcli:"
+    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
-  assert_run_ok "pywbemcli --version"
+    assert_run_ok "pywbemcli --version"
+  else
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  fi
+
   remove_virtualenv "$testcase"
   cleanup_egg_file
 }
@@ -424,12 +436,17 @@ function test2()
   info "Testcase $testcase: setup.py install from repo root directory: $ROOT_DIR"
   make_virtualenv "$testcase"
 
-  call "cd $ROOT_DIR; python setup.py install" "Installing with setup.py from repo root directory (latest package levels)"
+  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+    call "cd $ROOT_DIR; python setup.py install" "Installing with setup.py from repo root directory (latest package levels)"
 
-  verbose "Packages before running pywbemcli:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+    verbose "Packages before running pywbemcli:"
+    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
-  assert_run_ok "pywbemcli --version"
+    assert_run_ok "pywbemcli --version"
+  else
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  fi
+
   remove_virtualenv "$testcase"
   cleanup_egg_file
 }
@@ -440,12 +457,17 @@ function test3()
   info "Testcase $testcase: Pip install from wheel distribution archive: $WHL_DISTFILE"
   make_virtualenv "$testcase"
 
-  call "cd $TMP_TEST_DIR; pip install $(abspath $WHL_DISTFILE) $PIP_OPTS" "Installing with pip from wheel distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+    call "cd $TMP_TEST_DIR; pip install $(abspath $WHL_DISTFILE) $PIP_OPTS" "Installing with pip from wheel distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-  verbose "Packages before running pywbemcli:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+    verbose "Packages before running pywbemcli:"
+    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
-  assert_run_ok "pywbemcli --version"
+    assert_run_ok "pywbemcli --version"
+  else
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  fi
+
   remove_virtualenv "$testcase"
   cleanup_egg_file
 }
@@ -456,12 +478,17 @@ function test4()
   info "Testcase $testcase: Pip install from source distribution archive: $SRC_DISTFILE"
   make_virtualenv "$testcase"
 
-  call "cd $TMP_TEST_DIR; pip install $(abspath $SRC_DISTFILE) $PIP_OPTS" "Installing with pip from source distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+    call "cd $TMP_TEST_DIR; pip install $(abspath $SRC_DISTFILE) $PIP_OPTS" "Installing with pip from source distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-  verbose "Packages before running pywbemcli:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+    verbose "Packages before running pywbemcli:"
+    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
-  assert_run_ok "pywbemcli --version"
+    assert_run_ok "pywbemcli --version"
+  else
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  fi
+
   remove_virtualenv "$testcase"
   cleanup_egg_file
 }
@@ -473,12 +500,17 @@ function test5()
   make_virtualenv "$testcase"
   run "tar -x -v -f $SRC_DISTFILE -C $SRC_DISTFILE_UNPACK_DIR" "Unpacking source distribution archive to: $SRC_DISTFILE_UNPACK_DIR"
 
-  call "cd $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR; python setup.py install" "Installing with setup.py from unpack directory: $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR (latest package levels)"
+  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+    call "cd $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR; python setup.py install" "Installing with setup.py from unpack directory: $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR (latest package levels)"
 
-  verbose "Packages before running pywbemcli:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
+    verbose "Packages before running pywbemcli:"
+    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
-  assert_run_ok "pywbemcli --version"
+    assert_run_ok "pywbemcli --version"
+  else
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  fi
+
   remove_virtualenv "$testcase"
   cleanup_egg_file
 }
@@ -512,6 +544,7 @@ test1
 test2
 test3
 test4
+test5
 
 cleanup
 
