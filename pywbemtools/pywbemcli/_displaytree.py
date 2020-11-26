@@ -15,7 +15,9 @@
 # limitations under the License.
 """
 Functions to build a tree dictionary and also a displayable tree in ascii
-from a list of CIM classes.
+from a list of CIM classes.  This code implements the ability to add the
+information on the Association, Indication, Abstract, and Version qualifiers to
+each classname (see show_detail parameter).
 """
 
 from __future__ import absolute_import, print_function
@@ -31,7 +33,9 @@ from pywbem._nocasedict import NocaseDict
 
 def display_class_tree(classes, top_classname=None, show_detail=None):
     """
-    Build and display in ASCII output a tree of classes.
+    Build and display in ASCII output a tree of classes. If show_detail
+    is set, add class qualifier to each classname as part of
+    the display
 
     Parameters:
         classes (list of :class:`~pywbem.CIMClass`)
@@ -81,7 +85,8 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
             v = q.value
             return "{}={}".format(qname, v) if v else None
 
-        # Build the rtn_values string from qualifiers and their values
+        # Build the rtn_values string from the following qualifiers and their
+        # values
         rtn_values = []
         append_if(bool_qualifier_is('Association', True))
         append_if(bool_qualifier_is('Abstract', True))
@@ -119,9 +124,9 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
             new_values.append(extend_name(cln, classes_dict))
         return new_key, new_values
 
-    # Start of method
+    # Start of display_class_tree method
 
-    cln_to_supercln = _build_cln_to_supercln_dict(classes)
+    cln_to_supercln = build_cln_to_supercln_dict(classes)
 
     # If top_class is none, create artifical root as superclassname from
     # entries with value None.
@@ -133,7 +138,7 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
             if not cln_to_supercln[cln]:
                 cln_to_supercln[cln] = top_classname_default
 
-    flat_cln_subclns = _build_subcln_in_cln(cln_to_supercln)
+    flat_cln_subclns = build_subcln_in_cln(cln_to_supercln)
 
     # If the names are to be expanded with additional information, rebuild
     # flat_cln_subclns_dict and change all the names.
@@ -149,16 +154,16 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
 
     tcv = top_classname if top_classname else top_classname_default
     # build nested tree from the flat list of subclasses_lists in classes
-    nested_class_tree = _build_nested_tree(flat_cln_subclns, tcv)
+    nested_class_tree = build_nested_tree(flat_cln_subclns, tcv)
 
     tr = LeftAligned()
     click.echo(tr(nested_class_tree))
 
 
-def _build_cln_to_supercln_dict(classes):
+def build_cln_to_supercln_dict(classes):
     """
     Build a dictionary of classname: superclassname and sort it by
-    to order the keys.
+    to order the keys from a list of CIM classes.
 
       Parameters:
 
@@ -185,7 +190,7 @@ def _build_cln_to_supercln_dict(classes):
     return cln_supercln_sorted
 
 
-def _build_subcln_in_cln(cln_to_supercln):
+def build_subcln_in_cln(cln_to_supercln):
     """
     Build a dictionary of the direct subclasses for each subclass in
     the cln_to_supercln dictionary
@@ -202,7 +207,7 @@ def _build_subcln_in_cln(cln_to_supercln):
     return subcln_in_cln
 
 
-def _build_nested_tree(class_subclass_dict, top_class_name):
+def build_nested_tree(class_subclass_dict, top_class_name):
     """
     Build a dictionary structure based on the class/subclass relationships
     in the classname to subclassname tree dictionary provided.

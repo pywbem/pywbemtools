@@ -723,6 +723,8 @@ Environment variables for general options
 Pywbemcli defines environment variables corresponding to its general options
 as follows:
 
+.. table: Environment variables and general options
+
 =================================  =============================
 Environment variable               Corresponding general option
 =================================  =============================

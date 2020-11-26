@@ -146,17 +146,9 @@ If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
-.. index:: single: qualifier filters; class enumerate command
-
-The ``--association``/``--no-association``,
-``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
-and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
-classnames to include or exclude classes with the corresponding qualifiers.
-Thus the ``--association`` option returns only classes or classnames that are
-association classes.
-
 The following example enumerates the class names of the root classes in the
-default namespace:
+default namespace because there is no classname and the --DeepInheritance
+option is not specified:
 
 .. code-block:: text
 
@@ -165,6 +157,56 @@ default namespace:
     TST_Lineage
     TST_MemberOfFamilyCollection
     TST_FamilyCollection
+
+.. index:: pair: result filters; class enumerate command
+
+The ``class enumerate`` command includes result filter options that filter returned
+classes to display only those classes that have the defined filter option.
+Thus, ``pywbemcli class enumerate --association`` displays only classes that
+have the Association qualifier set. The filters are documented in the `class
+filter options table`_ .
+
+.. index:: single: result filters; class enumerate command
+
+.. _class filter options table:
+
+.. table: Class/qualifier filter options
+
+==========================================  =======================================
+Filter option name                          Component filtered
+==========================================  =======================================
+``--association``/``--no-association``      Association qualifier(class) (see Note 1)
+``--indication``/``--no-indication``        Indications qualifier(class)
+``--experimental``/``--no-experimental``    Experimental qualifier(class)
+``--deprecated``/``--no-deprecated``        Deprecated qualifier (any class element)
+``--since `<CIM_Version_string>``           Version qualifier GE <CIM_Version_string> (see Note 2)
+``--schema `<schema_string>``               Schema component of classname equality(see Note 3)
+``--subclasses `<classname>``               Subclasses of <classname>.
+==========================================  =======================================
+
+1. The filters defined as ``--...``/``--no-...`` allow testing for the existence
+   of the condition (association qualifier exists) or the non-existence(association
+   qualifier does not exist on the class). When neither definition of the option is defined the
+   association qualifier is ignored in the filtering. This applies to boolean
+   qualifier declarations.
+2. The CIM version string value in the Version qualifier is defined as 3 integers
+   separated by periods  (ex. 2.14.0). All 3 integers must exist.
+3. The schema component is True if the schema component of classname (characters
+   before "_" match <schema_string>). Ex --schema "CIM"
+
+If multiple filter options are applied, all of the options must be true for
+the class to be displayed.
+
+The following example displays classnames (``--no``) that are not associations
+(``--no-association``).  The use of ``--deep-inheritance`` returns the complete
+sef of classes in the namespace rather than just direct subclasses (in this case
+the root classes).
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock class enumerate --no --deep-inheritance --no-association
+    TST_Person
+    TST_Lineage
 
 See :ref:`pywbemcli class enumerate --help` for the exact help output of the command.
 
@@ -182,14 +224,13 @@ argument in all namespaces of the connection, or otherwise in the specified
 namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
 
-.. index:: pair: qualifier filters; class find command
+.. index:: pair: result filters; class find command
 
-The ``--association``/``--no-association``,
-``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
-and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
-classnames to include or exclude classes with the corresponding qualifiers.
-Thus the ``--association`` option returns only classes or classnames that are
-association classes.
+The ``class find`` command includes filter options that filter returned classes
+to display only those classes that have the defined filter options.  Thus,
+``pywbemcli class enumerate --association`` displays only classes that have the
+Association qualifier set. The filters are documented in the `class filter
+options table`_ .
 
 The command displays the namespaces and class names of the result using the
 ``txt`` output format (default), or using :term:`Table output formats`.
@@ -528,7 +569,7 @@ match the specified :term:`Unix-style path name pattern` are counted. If the
 ``CLASSNAME-GLOB`` argument is not specified all instances of all classes in
 the target namespaces are counted.
 
-.. index:: pair: qualifier filters; instance count command
+.. index:: pair: result filters; instance count command
 
 The ``--association``/``--no-association``,
 ``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``

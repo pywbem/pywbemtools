@@ -23,7 +23,9 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
+from collections import namedtuple
 import click
+
 
 from pywbem._nocasedict import NocaseDict
 
@@ -34,7 +36,8 @@ from .pywbemcli import cli
 from ._common import filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     output_format_is_table, format_table, process_invokemethod, \
-    raise_pywbem_error_exception, warning_msg, validate_output_format
+    raise_pywbem_error_exception, warning_msg, validate_output_format, \
+    get_subclass_names
 
 from ._display_cimobjects import display_cim_objects
 
@@ -251,10 +254,8 @@ def class_invokemethod(context, classname, methodname, **options):
 
       pywbemcli -n myconn class invokemethod CIM_Foo methodx -p p1=9 -p p2=Fred
     """
-    context.execute_cmd(lambda: cmd_class_invokemethod(context,
-                                                       classname,
-                                                       methodname,
-                                                       options))
+    context.execute_cmd(lambda: cmd_class_invokemethod(context, classname,
+                                                       methodname, options))
 
 
 @class_group.command('references', cls=PywbemcliCommand,
@@ -465,18 +466,48 @@ def class_tree(context, classname, **options):
 #
 ####################################################################
 
-
-def _build_qualifier_filters(conn, ns, options):
+def parse_version_str(version_str):
     """
-    Build a dictionary defining the qualifier filters to be processes from
-    their definitons in the Click options dictionary. There is an entry
-    in the dictionary for each qualifier filter where the key is the
-    association name and the value is True or False depending in the
-    value of the option ('x' or 'no-x' )
+    Parse a string with 3 positive integers seperated by period (CIM version
+    string) into a 3 integer tuple and return the tuole
+
+    Parameters:
+        version_str (:term: str):
+            String defining 3 components of a CIM version
 
     Returns:
-      List of qualifier_filters where the names are the qualifiers
-      themselves and the value for each is a tuple:
+        tuple containing 3 integers
+    """
+    try:
+        version_tuple = [int(x) for x in version_str.split('.')]
+    except ValueError:
+        raise click.ClickException('--since option value invalid. '
+                                   'Must contain 3 integer elements: '
+                                   'int.int.int". {} received'.
+                                   format(version_str))
+    if len(version_tuple) != 3:
+        raise click.ClickException('Version value must contain 3 integer '
+                                   'elements (int.int.int). '
+                                   '{} received'.format(version_str))
+    return version_tuple
+
+
+# Namedtupe defining each entry in the filters dictionary values
+FILTERDEF = namedtuple('FILTERDEF', 'optionvalue qualifiername scopes')
+
+
+def _build_filters_dict(conn, ns, options):
+    """
+    Build a dictionary defining the filters to be processed against list
+    of classes from
+    the filter definitons in the Click options dictionary. There is an entry
+    in the dictionary for each filter to be applied to filter a list of
+    classes.
+
+    Returns:
+      Dict of filters where the names are the  filtersthemselves , the types
+      are the type of test (i.e. qualifier, superclass)
+      and the value for each is a tuple:
       * Name of the qualifier (:term:`string`)
       * The value of the qualifier filter option (True or False which
         determines whether to display the existence or non-existence of the
@@ -485,31 +516,48 @@ def _build_qualifier_filters(conn, ns, options):
         element scopes (class, property, method, parameter) indicating whether
         the qualifier is allowed in that element.
     """
-    qualifier_filters = []
+    filters = {}
 
-    def set_option(qname):
-        option_value = options[qname]
+    def set_qualifier_option(qname, option_value):
         qualdecl = conn.GetQualifier(qname, ns)
-        scopes_map = []
-        # Note that qualdecl.scopes performs the test case-insensitively
-        scopes_map.append('class' in qualdecl.scopes)
-        scopes_map.append('property' in qualdecl.scopes)
-        scopes_map.append('method' in qualdecl.scopes)
-        scopes_map.append('parameter' in qualdecl.scopes)
-        qualifier_filters.append((qname, option_value, tuple(scopes_map)))
+        # Note: qualdecl.scopes performs test case-insensitively
+        if qualdecl.scopes['any']:
+            scopes_map = [True, True, True, True]
+        else:
+            scopes_map = [False, False, False, False]
+            scopes_map[0] = any([qualdecl.scopes['class'],
+                                 qualdecl.scopes['association'],
+                                 qualdecl.scopes['indication']])
+            scopes_map[1] = qualdecl.scopes['property']
+            scopes_map[2] = qualdecl.scopes['method']
+            scopes_map[3] = qualdecl.scopes['parameter']
+        filters['qualifier'] = FILTERDEF(option_value, qname,
+                                         tuple(scopes_map))
 
+    # Qualifier options
     if options['association'] is not None:
-        set_option('association')
+        set_qualifier_option('association', options['association'])
     if options['indication'] is not None:
-        set_option('indication')
+        set_qualifier_option('indication', options['indication'])
     if options['experimental'] is not None:
-        set_option('experimental')
+        set_qualifier_option('experimental', options['experimental'])
+    # If set, the entity is deprecated
     if options['deprecated'] is not None:
-        set_option('deprecated')
-    return qualifier_filters
+        set_qualifier_option('deprecated', options['deprecated'])
+    if options['since'] is not None:
+        version_tuple = parse_version_str(options['since'])
+        set_qualifier_option('version', version_tuple)
+
+    if options['schema'] is not None:
+        test_str = "{}_".format(options['schema'].lower())
+        filters['schema'] = FILTERDEF(test_str, None, None)
+
+    if options['subclass_of'] is not None:
+        filters['subclass_of'] = FILTERDEF(options['subclass_of'], None, None)
+    return filters
 
 
-def _filter_classes_for_qualifiers(classes, qualifier_filters, names_only, iq):
+def _filter_classes(classes, filters, names_only, iq):
     """
     Filter a list of classes for the qualifiers defined by  the
     qualifier_filter parameter where this parameter is a list of tuples.
@@ -526,10 +574,10 @@ def _filter_classes_for_qualifiers(classes, qualifier_filters, names_only, iq):
       classes (list of :class:`~pywbem.CIMClass`):
         list of classes to be filtered
 
-      qualifier_filters (list):
-        List defining the filtering to be performed. It contains an entry for
-        each qualifier filter that is defined. See _build_qualifier_filters for
-        a definition of this list.
+      qualifier_filters (dict):
+        Dictionary defining the filtering to be performed. It contains an entry
+        for each qualifier filter that is defined. See _build_qualifier_filters
+        for a definition of this list.
 
       names_only (:class:`py:bool`):
         If True, return only the classnames. Otherwise returns the filtered
@@ -588,15 +636,48 @@ def _filter_classes_for_qualifiers(classes, qualifier_filters, names_only, iq):
 
     # Test all classes in the input property for the defined filters.
     filtered_classes = []
+    subclass_names = []
+    if 'subclass_of' in filters:
+        try:
+            subclass_names = get_subclass_names(
+                classes,
+                classname=filters['subclass_of'].optionvalue,
+                deep_inheritance=True)
+        except ValueError:
+            raise click.ClickException(
+                'Classname {} for "subclass-of" not found in returned classes.'
+                .format(filters['subclass_of'].optionvalue))
+
     for cls in classes:
         assert isinstance(cls, CIMClass)
         show_class_list = []
-        for qual_name, disp_if_exists, scopes in qualifier_filters:
-            if class_has_qualifier(cls, qual_name, scopes):
-                show_class_list.append(disp_if_exists)
-            else:
-                show_class_list.append(not disp_if_exists)
 
+        for filter_name, filter_ in filters.items():
+            if filter_name == 'qualifier':
+                option_value = filter_.optionvalue
+                if class_has_qualifier(cls, filter_.qualifiername,
+                                       filter_.scopes):
+                    if filter_.qualifiername == 'version':
+                        if filter_.qualifiername in cls.qualifiers:
+                            cls_version = \
+                                cls.qualifiers[filter_.qualifiername].value
+                            version_val = parse_version_str(cls_version)
+                            option_value = version_val >= filter_.optionvalue
+
+                    show_class_list.append(option_value)
+                else:
+                    show_class_list.append(not option_value)
+
+            elif filter_name == 'schema':
+                show_class_list.append(
+                    cls.classname.lower().startswith(filter_.optionvalue))
+            elif filter_name == 'subclass_of':
+                show_class_list.append(cls.classname in subclass_names)
+
+            else:
+                assert False  # Future for other test_types
+
+        # Show if all options are True for this class
         show_this_class = all(show_class_list)
 
         if show_this_class:
@@ -647,10 +728,8 @@ def enumerate_classes_filtered(context, classname, options):
         pywbem Error exceptions generated by EnumerateClassNames and
         enumerateClasses
     """
-
     namespace = options['namespace']
-    qualifier_filters = _build_qualifier_filters(context.conn, namespace,
-                                                 options)
+    filters = _build_filters_dict(context.conn, namespace, options)
 
     names_only = options.get('names_only', False)
 
@@ -658,13 +737,13 @@ def enumerate_classes_filtered(context, classname, options):
 
     # Force IncludeQualifier true if results are to be filtered since
     # the filter requires that qualifiers exist.
-    request_iq = True if qualifier_filters else iq
+    request_iq = True if filters else iq
 
     local_only = options.get('local_only', False)
     deep_inheritance = options.get('deep_inheritance', True)
     include_classorigin = options.get('include_classorigin', True)
 
-    if names_only and not qualifier_filters:
+    if names_only and not filters:
         results = context.conn.EnumerateClassNames(
             ClassName=classname,
             namespace=namespace,
@@ -677,9 +756,9 @@ def enumerate_classes_filtered(context, classname, options):
             DeepInheritance=deep_inheritance,
             IncludeQualifiers=request_iq,
             IncludeClassOrigin=include_classorigin)
-        if qualifier_filters:
-            results = _filter_classes_for_qualifiers(
-                results, qualifier_filters, names_only, iq)
+        if filters:
+            results = _filter_classes(results, filters,
+                                      names_only, iq)
     return results
 
 
@@ -957,7 +1036,7 @@ def cmd_class_find(context, classname_glob, options):
 def get_class_hierarchy(conn, classname, namespace, superclasses=None):
     """
     Get the class hierarchy from the server, either the superclasses
-    associated or subclasseswith classname .  If getting subclasses
+    associated or subclasses with classname .  If getting subclasses
     the classname parameter may be None which requests that the complete
     class hiearchy be retrieved.
 

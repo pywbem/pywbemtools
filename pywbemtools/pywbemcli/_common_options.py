@@ -121,15 +121,46 @@ deprecated_filter_option = [              # pylint: disable=invalid-name
                       u'deprecated (--no-deprecated). If the option is not '
                       u'defined no filtering occurs')]
 
+since_filter_option = [              # pylint: disable=invalid-name
+    click.option('--since',
+                 required=False, metavar='VERSION', type=str,
+                 default=None,
+                 help=u'Filter the returned classes to return only classes  '
+                      u'with a version qualifier ge the supplied string. The '
+                      u'string must define a version of the form TODO '
+                      u'')]
+
+schema_filter_option = [              # pylint: disable=invalid-name
+    click.option('--schema',
+                 required=False, metavar='SCHEMA', type=str,
+                 default=None,
+                 help=u'Filter the returned classes to return only classes '
+                      u'where the classname scheme component (characters '
+                      u'before the "_" match the scheme provided.')]
+
+
+subclassof_filter_option = [              # pylint: disable=invalid-name
+    click.option('--subclass-of',
+                 required=False, metavar='CLASSNAME', type=str,
+                 default=None,
+                 help=u'Filter the returned classes to return only classes '
+                      u'that are a subclass of the option value.')]
+
 # List of the class filter options that are common to multiple class commands
 # Since the filters are in a list to allow them to be used individually, the
 # first item of each list must be used for the combined defintion that can
 # be use with add_options
+# TODO: Since these options are only used as a group then do not each need to be
+# defined as a list above
 class_filter_options = [              # pylint: disable=invalid-name
     association_filter_option[0],
     indication_filter_option[0],
     experimental_filter_option[0],
-    deprecated_filter_option[0]]
+    deprecated_filter_option[0],
+    since_filter_option[0],
+    schema_filter_option[0],
+    subclassof_filter_option[0]
+]
 
 help_option = [              # pylint: disable=invalid-name
     click.help_option('-h', '--help', help=u'Show this help message.')]
