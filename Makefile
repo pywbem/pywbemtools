@@ -409,7 +409,6 @@ pip_upgrade_$(pymn).done: Makefile
 install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
 	@echo "makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
 	-$(call RM_FUNC,$@)
-	$(PYTHON_CMD) remove_duplicate_setuptools.py
 # Keep the condition for the 'wheel' package consistent with the requirements & constraints files.
 # The approach with "python -m pip" is needed for Windows because pip.exe may be locked.
 	$(PIP_INSTALL_CMD) $(pip_level_opts) setuptools wheel
