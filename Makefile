@@ -155,7 +155,7 @@ else
   coverage_report :=
 endif
 
-# Directory for coverage html output. Must be in sync with the one in coveragerc.
+# Directory for coverage html output. Must be in sync with the one in .coveragerc.
 coverage_html_dir := coverage_html
 
 # Package version (full version, including any pre-release suffixes, e.g. "0.1.0-dev1")#
@@ -276,7 +276,7 @@ endif
 ifeq ($(python_mn_version),3.4)
   pytest_cov_opts :=
 else
-  pytest_cov_opts := --cov $(pywbemcli_module_path) $(coverage_report) --cov-config coveragerc
+  pytest_cov_opts := --cov $(pywbemcli_module_path) $(coverage_report) --cov-config .coveragerc
 endif
 
 # Files to be put into distribution archive.
