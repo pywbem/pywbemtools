@@ -12,9 +12,9 @@ Qualifier Description : string = null,
     Scope(any),
     Flavor(EnableOverride, ToSubclass, Translatable);
 
-Qualifier Deprecated : boolean = true,
-    Scope(class, association, indication, property, reference, method, parameter),
-    Flavor(DisableOverride, ToSubclass);
+Qualifier Deprecated : string[],
+    Scope(any),
+    Flavor(EnableOverride, Restricted);
 
 Qualifier Experimental : boolean = true,
     Scope(any),
@@ -24,43 +24,79 @@ Qualifier Indication : boolean = false,
     Scope(class, indication),
     Flavor(DisableOverride, ToSubclass);
 
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
 Qualifier Key : boolean = false,
     Scope(property, reference),
     Flavor(DisableOverride, ToSubclass);
 
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Version : string,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted, Translatable);
+
+[ Version ( "2.5.0" ) ]
 class TST_Person{
-        [Key, Description ("This is key prop") ]
+        [Key, Description ("This is key prop")]
     string name;
     string extraProperty = "defaultvalue";
 };
 
-[Experimental, Description("TST_Person subclass, experimental") ]
+[ Version ( "2.51.0" ), Description("Class with different scheme.") ]
+class BLA_Person{
+        [Key, Description ("This is key prop")]
+    string name;
+    string extraProperty = "defaultvalue";
+};
+
+
+[Experimental, Version ( "2.5.0" ), Description("TST_Person subclass, experimental") ]
 class TST_PersonExp : TST_Person{
     string secondProperty = "empty";
     uint32 counter;
 };
 
-[Description(" TST_Person subclass")]
+[Deprecated, Version ( "2.41.0" ), Description("TST_Person subclass, deprecated") ]
+class TST_PersonClsDep : TST_Person{
+    string secondProperty = "empty";
+    uint32 counter;
+};
+
+[Version ( "2.41.1" ), Description("TST_Person subclass, deprecated") ]
+class TST_PersonPropDep : TST_Person{
+    [Deprecated, Description("DeprecatedProperty")]
+    string secondProperty = "empty";
+    uint32 counter;
+};
+
+[Version ( "2.10.0" ), Description(" TST_Person subclass")]
 class TST_PersonSub : TST_Person{
     string secondProperty = "empty";
     uint32 counter;
     string ExperimentalProperty;
 };
 
-[Deprecated, Description(" TST_Person subclass deprecated ") ]
+[Version ( "2.6.0" ), Deprecated, Description(" TST_Person subclass deprecated ") ]
 class TST_PersonDep : TST_Person{
     string secondProperty = "empty";
     uint32 counter;
 };
 
-[Deprecated, Description(" TST_Person subclass experimental property ") ]
+[Deprecated, Version ( "2.6.0" ),
+ Description(" TST_Person subclass experimental property ") ]
 class TST_PersonExpProperty : TST_Person{
     string secondProperty = "empty";
     [experimental]
     uint32 counter;
 };
 
-[Association, Description(" Lineage defines the relationship "
+[Association, Version ( "2.6.0" ),
+ Description(" Lineage defines the relationship "
     "between parents and children.") ]
 class TST_Lineage {
     [key] string InstanceID;
@@ -68,25 +104,28 @@ class TST_Lineage {
     TST_Person ref child;
 };
 
-[Association, Description(" Family gathers person to family.") ]
+[Association,  Version ( "2.5.0" ),
+ Description(" Family gathers person to family.") ]
 class TST_MemberOfFamilyCollection {
    [key] TST_Person ref family;
    [key] TST_Person ref member;
 };
 
 
-[Association, Experimental, Description(" Family gathers person to family. Experimental") ]
+[Association, Version ( "2.10.0" ), Experimental,
+ Description(" Family gathers person to family. Experimental") ]
 class TST_MemberOfFamilyCollectionExp {
    [key] TST_Person ref family;
    [key] TST_Person ref member;
 };
 
-[Association, Deprecated, Description(" Family gathers person to family. Deprecated") ]
+[Association, Version ( "2.11.0" ), Deprecated,
+ Description(" Family gathers person to family. Deprecated") ]
 class TST_MemberOfFamilyCollectionDep {
    [key] TST_Person ref family;
    [key] TST_Person ref member;
 };
-[ Description("Collection of Persons into a Family") ]
+[ Version ( "2.11.0" ), Description("Collection of Persons into a Family") ]
 class TST_FamilyCollection {
         [Key, Description ("This is key prop and family name")]
     string name;
@@ -97,14 +136,64 @@ class TST_Indication {
     string IndicationName;
 };
 
-[Indication, Experimental, Description("Indication class; experimental")]
+[Indication, Version ( "2.43.0" ), Experimental,
+ Description("Indication class; experimental")]
 class TST_IndicationExperimental {
     string IndicationName;
 };
 
-[Indication, Deprecated, Description("Indication class; deprecated")]
+[ Version ( "2.42.0" ),
+Indication, Deprecated, Description("Indication class; deprecated")]
 class TST_IndicationDeprecated {
     string IndicationName;
+};
+
+// The following have experimental for one entity for each class to test
+// that experimental option tests for all possibilities
+[Version ( "2.3.0" ), Experimental,
+ Description("Experimental Class")]
+class EXP_TestExperimental1 {
+        [Key, Description("Key Property")]
+    string IndicationName;
+        [Description("Other Property")]
+    string IndicationName;
+        [Description ("Method with parameters")]
+    uint32 TestMethod(
+        [IN, OUT, Description("Single Parameter")]
+      string TestInOutParameter);
+};
+[Version ( "2.3.0" ), Description("Experimental Property")]
+class EXP_TestExperimental2 {
+        [Key, Description("Key Property")]
+    string IndicationName;
+        [Experimental, Description("Other Property Experimental")]
+    string IndicationName;
+        [Description ("Method with parameters")]
+    uint32 TestMethod(
+        [IN, OUT, Description("Single Parameter")]
+      string TestInOutParameter);
+};
+[Version ( "2.3.0" ), Description("Method")]
+class EXP_TestExperimental3 {
+        [Key, Description("Key Property")]
+    string IndicationName;
+        [Description("Other Property")]
+    string IndicationName;
+        [Experimental, Description ("Method with parameters, Experimental")]
+    uint32 TestMethod(
+        [IN, OUT, Description("Single Parameter")]
+      string TestInOutParameter);
+};
+[Version ( "2.3.0" ), Description("Experimental Parameter")]
+class EXP_TestExperimental4 {
+        [Key, Description("Key Property")]
+    string IndicationName;
+        [Description("Other Property")]
+    string IndicationName;
+        [Description ("Method with parameters, Experimental")]
+    uint32 TestMethod(
+        [IN, OUT, Experimental,Description("Single Experimental,Parameter")]
+      string TestInOutParameter);
 };
 
 //

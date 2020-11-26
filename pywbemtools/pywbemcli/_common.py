@@ -41,6 +41,9 @@ from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
     cimvalue
 
+from pywbem._nocasedict import NocaseDict
+from nocaselist import NocaseList
+
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
 
@@ -949,6 +952,73 @@ def sort_cimobjects(cim_objects):
                       key=lambda tup: tup[0].to_wbem_uri(format="canonical"))
 
     raise TypeError("Items of type {} cannot be sorted".format(type(tst_obj)))
+
+
+def get_subclass_names(classes, classname=None, deep_inheritance=None):
+    """
+    Get class names that are subclasses of classname, including indirect
+    subclasses of the classname input parameter from a list of CIM Classes.
+
+    The input classname is NOT included in the returned list.
+
+    Note: The classes list MUST include all subclasses to any class
+    that is the list (i.e what is returned by an enumerate classes) but need
+    not include the top level classes(those with with c.superclass == None)
+
+    Parameters:
+      classname (:term:`string`):
+        The name of the CIM class for which subclass names will
+        be retrieved. If None, retrieval starts at the root of
+        the class hierarchy. Classes that have superclass None or have
+        a superclass not in the list of classes
+
+      classes (:class:`~pywbem_mock.BaseObjectStore):
+       A list of CIM classes for which the subclass of a member is to
+       be returned.
+
+      deep_inheritance (:class:`py:bool`):
+        If True, the complete set of subclasses found in the classes list
+        is returned.  If not True, only the direct subclasses list is returned.
+
+    Returns:
+      NocaseList of :term:`unicode string` with the names of all subclasses of
+      `classname`.  returns empty list if classname is not in the list or their
+      are no subclasses.
+
+    Exceptions: ValueError if classname not in classes
+    """
+
+    assert isinstance(classname, six.string_types)
+
+    # Build dictionary of superclassname: classnames
+    classname_dict = NocaseDict()
+    for c in classes:
+        if c.classname not in classname_dict:
+            classname_dict[c.classname] = []
+        if c.superclass:
+            if c.superclass in classname_dict:
+                classname_dict[c.superclass].append(c.classname)
+            else:
+                classname_dict[c.superclass] = [c.classname]
+
+    if classname not in classname_dict:
+        raise ValueError("Classname {} not found in classes".format(classname))
+
+    # Recurse The classname_dict hierarchy to get subclass names
+    rtn_classnames = classname_dict[classname]
+    if deep_inheritance:
+        if rtn_classnames:
+            subclass_names = rtn_classnames
+            while True:
+                subclass_names_rtn = []
+                for cln in subclass_names:
+                    subclass_names_rtn.extend(classname_dict[cln])
+                if subclass_names_rtn:
+                    rtn_classnames.extend(subclass_names_rtn)
+                    subclass_names = subclass_names_rtn
+                else:
+                    break
+    return NocaseList(rtn_classnames)
 
 
 def display_text(text, output_format=None):  # pylint: disable=unused-argument

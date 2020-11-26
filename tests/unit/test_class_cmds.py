@@ -34,7 +34,10 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
-    CMD_OPTION_DEPRECATED_FILTER_HELP_LINE
+    CMD_OPTION_DEPRECATED_FILTER_HELP_LINE, \
+    CMD_OPTION_SINCE_FILTER_HELP_LINE, \
+    CMD_OPTION_SCHEMA_FILTER_HELP_LINE, \
+    CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE
 
 
 _PYWBEM_VERSION = parse_version(pywbem_version)
@@ -123,6 +126,9 @@ CLASS_ENUMERATE_HELP_LINES = [
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
     CMD_OPTION_DEPRECATED_FILTER_HELP_LINE,
+    CMD_OPTION_SINCE_FILTER_HELP_LINE,
+    CMD_OPTION_SCHEMA_FILTER_HELP_LINE,
+    CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE,
 
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -138,6 +144,9 @@ CLASS_FIND_HELP_LINES = [
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
     CMD_OPTION_DEPRECATED_FILTER_HELP_LINE,
+    CMD_OPTION_SINCE_FILTER_HELP_LINE,
+    CMD_OPTION_SCHEMA_FILTER_HELP_LINE,
+    CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE,
 
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -577,11 +586,35 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
+    #
+    # Enumerate commands with the filter options
+    #
+
     ['Verify class command enumerate with --association filter.',
      ['enumerate', '--association', '--names-only'],
      {'stdout': ['TST_Lineage', 'TST_MemberOfFamilyCollection'],
       'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --association filter --summary.',
+     ['enumerate', '--association', '--summary'],
+     {'stdout': ['2 CIMClass(s) returned'],
+      'test': 'innows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --association filter.',
+     ['enumerate', '--association', '--names-only'],
+     {'stdout': ['TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
+                 'TST_MemberOfFamilyCollectionExp'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --association filter --summary.',
+     ['enumerate', '--association', '--summary'],
+     {'stdout': ['4 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify class command enumerate with --association filter and no '
      'qualifiers.',
@@ -616,21 +649,53 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate with --association filter.',
+    ['Verify class command enumerate with --no-association filter, simple mod.',
      ['enumerate', '--no-association', '--names-only'],
      {'stdout': ['TST_FamilyCollection', 'TST_Person'],
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --no-association, --summary.',
+     ['enumerate', '--no-association', '--summary'],
+     {'stdout': ['2 CIMClass(s) returned'],
+      'test': 'innows'},
+     SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command enumerate with --no-association filter qual filt.',
+     ['enumerate', '--no-association', '--names-only'],
+     {'stdout': ['BLA_Person', 'EXP_TestExperimental1',
+                 'EXP_TestExperimental2', 'EXP_TestExperimental3',
+                 'EXP_TestExperimental4', 'TST_FamilyCollection',
+                 'TST_Indication', 'TST_IndicationDeprecated',
+                 'TST_IndicationExperimental', 'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-association, --summary.',
+     ['enumerate', '--no-association', '--summary'],
+     {'stdout': ['10 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify class command enumerate with --indication filter.',
      ['enumerate', '--indication', '--names-only'],
-     {'stdout': ['TST_Indication', 'TST_IndicationExperimental'],
+     {'stdout': ['TST_Indication', 'TST_IndicationDeprecated',
+                 'TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --indication filter --summary.',
+     ['enumerate', '--indication', '--summary'],
+     {'stdout': ['3 CIMClass(s) returned'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify class command enumerate with --no-indication filter.',
      ['enumerate', '--no-indication', '--names-only'],
-     {'stdout': ['TST_FamilyCollection',
+     {'stdout': ['BLA_Person', 'EXP_TestExperimental1',
+                 'EXP_TestExperimental2', 'EXP_TestExperimental3',
+                 'EXP_TestExperimental4', 'TST_FamilyCollection',
+                 'TST_FamilyCollection',
                  'TST_Lineage',
                  'TST_MemberOfFamilyCollection',
                  'TST_MemberOfFamilyCollectionExp',
@@ -638,32 +703,69 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
+    ['Verify class command enumerate with --no-indication filter, --summary.',
+     ['enumerate', '--no-indication', '--summary'],
+     {'stdout': ['11 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
     ['Verify class command enumerate with --experimentat filter.',
      ['enumerate', '--experimental', '--names-only'],
-     {'stdout': ['TST_Indication', 'TST_IndicationExperimental'],
+     {'stdout': ['EXP_TestExperimental1', ' EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4',
+                 'TST_IndicationExperimental',
+                 'TST_MemberOfFamilyCollectionExp'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimentat filter -- summary.',
+     ['enumerate', '--experimental', '--summary'],
+     {'stdout': ['6 CIMClass(s) returned'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     ['Verify class command enumerate with --no-experimental filter.',
      ['enumerate', '--no-experimental', '--names-only'],
-     {'stdout': ['TST_FamilyCollection',
+     {'stdout': ['BLA_Person',
+                 'TST_FamilyCollection',
                  'TST_Indication',
+                 'TST_IndicationDeprecated',
                  'TST_Lineage',
                  'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
                  'TST_Person'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --experimental and --association.',
-     ['enumerate', '--experimental', '--association', '--names-only'],
-     {'stdout': ['TST_MemberOfFamilyCollectionExp'],
+    ['Verify class command enumerate with --no-experimental, --summary.',
+     ['enumerate', '--no-experimental', '--summary'],
+     {'stdout': ['8 CIMClass(s) returned'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --experimental and '
-     '--not-association.',
+    ['Verify class command enumerate with --experimental, --association.',
+     ['enumerate', '--experimental', '--association', '--names-only'],
+     {'stdout': ['EXP_TestExperimental1',
+                 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3',
+                 'EXP_TestExperimental4',
+                 'TST_IndicationExperimental',
+                 'TST_MemberOfFamilyCollectionExp'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental, --association, '
+     '--summary',
+     ['enumerate', '--experimental', '--association', '--summary'],
+     {'stdout': ['6 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental , --no-association.',
      ['enumerate', '--experimental', '--no-association', '--names-only'],
-     {'stdout': ['TST_IndicationExperimental'],
+     {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4',
+                 'TST_IndicationExperimental'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
@@ -673,37 +775,198 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --indication and --no-experimental.',
+    ['Verify class command enumerate with --indication, --no-experimental.',
      ['enumerate', '--no-experimental', '--indication', '--names-only'],
-     {'stdout': ['TST_Indication'],
+     {'stdout': ['TST_Indication', 'TST_IndicationDeprecated'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --noindication, --no-experimental.'
+    ['Verify class command enumerate with --no-indication, --no-experimental, '
      '--no-association',
      ['enumerate', '--no-experimental', '--no-indication', '--no-association',
       '--names-only'],
-     {'stdout': ['TST_FamilyCollection',
+     {'stdout': ['BLA_Person',
+                 'TST_FamilyCollection',
                  'TST_Person'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --deprecated,'
-     '--no-association',
-     ['enumerate', '--deprecated',
-      '--names-only'],
+    ['Verify class command enumerate with --deprecated, --no-association.',
+     ['enumerate', '--deprecated', '--no-association', '--names-only'],
      {'stdout': ['TST_IndicationDeprecated',
                  'TST_MemberOfFamilyCollectionDep'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command enumerate with --no-deprecated, --association'
-     '--no-association',
-     ['enumerate', '--no-deprecated', '--association',
-      '--names-only'],
-     {'stdout': ['TST_Lineage',
-                 'TST_MemberOfFamilyCollection',
-                 'TST_MemberOfFamilyCollectionExp'],
+    ['Verify class command enumerate with --deprecated, --no-association, '
+     '--summary',
+     ['enumerate', '--deprecated', '--no-association', '--summary'],
+     {'stdout': ['2 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-deprecated, --association',
+     ['enumerate', '--no-deprecated', '--association', '--names-only'],
+     {'stdout': ['BLA_Person', 'EXP_TestExperimental1',
+                 'EXP_TestExperimental2', 'EXP_TestExperimental3',
+                 'EXP_TestExperimental4', 'TST_FamilyCollection',
+                 'TST_Indication', 'TST_IndicationExperimental',
+                 'TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionExp', 'TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --no-deprecated, --no-association'
+     '--summary',
+     ['enumerate', '--no-deprecated', '--association', '--summary'],
+     {'stdout': ['12 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental, --since 2.42.0.',
+     ['enumerate', '--experimental', '--since', '2.42.0', '--names-only'],
+     {'stdout': ['TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental and --since 2.42.0'
+     '--summary',
+     ['enumerate', '--experimental', '--since', '2.42.0', '--summary'],
+     {'stdout': ['3 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental and --since 2.45.0.',
+     ['enumerate', '--experimental', '--since', '2.45.0', '--names-only'],
+     {'stdout': [],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --experimental and --since 2.45.x.',
+     ['enumerate', '--experimental', '--since', '2.45.x', '--names-only'],
+     {'stderr': ['--since option value invalid. ',
+                 'Must contain 3 integer elements',
+                 '2.45.x'],
+      'rc': 1,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --indication and --since 2.45.',
+     ['enumerate', '--experimental', '--since', '2.45', '--names-only'],
+     {'stderr': ['Version value must contain 3 integer elements (int.int.int)',
+                 '2.45'],
+      'rc': 1,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "TST".',
+     ['enumerate', '--schema', 'TST', '--names-only'],
+     {'stdout': ['TST_FamilyCollection', 'TST_Indication',
+                 'TST_IndicationDeprecated', 'TST_IndicationExperimental',
+                 'TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
+                 'TST_MemberOfFamilyCollectionExp', 'TST_Person', ],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "BLA".',
+     ['enumerate', '--schema', 'BLA', '--names-only'],
+     {'stdout': ['BLA_Person', ],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP".',
+     ['enumerate', '--schema', 'EXP', '--names-only'],
+     {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP" --summary',
+     ['enumerate', '--schema', 'EXP', '--summary'],
+     {'stdout': ['4 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP" and --experimental.',
+     ['enumerate', '--schema', 'EXP', '--experimental', '--names-only'],
+     {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP" and --experimental.',
+     ['enumerate', '--schema', 'EXP', '--experimental', '--summary'],
+     {'stdout': ['4 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP",--experimental, '
+     '--summary.',
+     ['enumerate', '--schema', 'EXP', '--experimental', '--summary'],
+     {'stdout': ['4 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP" , --no-experimental.',
+     ['enumerate', '--schema', 'EXP', '--no-experimental', '--names-only'],
+     {'stdout': [],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --schema "EXP" , --no-experimental '
+     '--summary',
+     ['enumerate', '--schema', 'EXP', '--no-experimental', '--summary'],
+     {'stdout': ['0 objects returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+
+    ['Verify class command enumerate with --schema "NOT_EXIST".',
+     ['enumerate', '--schema', 'NOT_EXIST', '--names-only'],
+     {'stdout': [],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of TST_Person.',
+     ['enumerate', '--subclass-of', 'TST_Person', '--di', '--names-only'],
+     {'stdout': ['TST_PersonClsDep', 'TST_PersonDep',
+                 'TST_PersonExp', 'TST_PersonExpProperty',
+                 'TST_PersonPropDep', 'TST_PersonSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of TST_Person --summary.',
+     ['enumerate', '--subclass-of', 'TST_Person', '--di', '--summary'],
+     {'stdout': ['6 CIMClass(s) returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of TST_Person '
+     '-- association--summary .',
+     ['enumerate', '--association', '--subclass-of', 'TST_Person', '--di',
+      '--summary'],
+     {'stdout': ['0 objects returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of TST_PersonDep.',
+     ['enumerate', '--subclass-of', 'TST_PersonDep', '--di', '--names-only'],
+     {'stdout': [],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of TST_PersonDep '
+     '--summary.',
+     ['enumerate', '--subclass-of', 'TST_PersonDep', '--di', '--summary'],
+     {'stdout': ['0 objects returned'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --subclass-of NOT_EXIST excepts.',
+     ['enumerate', '--subclass-of', 'NOT_EXIST', '--names-only'],
+     {'stderr': ['Classname NOT_EXIST for "subclass-of" not found'],
+      'rc': 1,
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
@@ -1026,8 +1289,8 @@ TEST_CASES = [
      {'stderr': ['CIMError', 'CIM_ERR_NOT_FOUND', '6'],
       'rc': 1,
       'test': 'regex'},
-
      SIMPLE_MOCK_FILE, OK],
+
     ['Verify class command get invalid namespace',
      ['get', 'CIM_Foo', '--namespace', 'Argh'],
      {'stderr': ['CIMError', 'CIM_ERR_INVALID_NAMESPACE', '3'],
@@ -1135,7 +1398,7 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify class command find with --indicationfilter',
+    ['Verify class command find with --indication filter',
      ['find', '*TST_*', '-n', 'root/cimv2', '--indication'],
      {'stdout': ['TST_Indication', 'root/cimv2:TST_IndicationExperimental'],
       'test': 'innows'},
@@ -1151,6 +1414,82 @@ TEST_CASES = [
     ['Verify class command find with --association & --experimental filters',
      ['find', '*TST_*', '-n', 'root/cimv2', '--association', '--experimental'],
      {'stdout': ['TST_MemberOfFamilyCollectionExp'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --no-association & --no-experimental, '
+     'filters',
+     ['find', 'TST_*', '-n', 'root/cimv2', '--no-association',
+      '--no-experimental', '--no-indication'],
+     {'stdout': ['root/cimv2: TST_FamilyCollection', 'root/cimv2: TST_Person',
+                 'root/cimv2: TST_PersonClsDep', 'root/cimv2: TST_PersonDep',
+                 'root/cimv2: TST_PersonPropDep', 'root/cimv2: TST_PersonSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --no-association & --deprecated, ',
+     ['find', 'TST_*', '-n', 'root/cimv2', '--no-association', '--deprecated'],
+     {'stdout': ['root/cimv2: TST_IndicationDeprecated',
+                 'root/cimv2: TST_PersonClsDep',
+                 'root/cimv2: TST_PersonDep',
+                 'root/cimv2: TST_PersonExpProperty',
+                 'root/cimv2: TST_PersonPropDep'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --experimental and --since 2.42.0.',
+     ['find', "*", '--experimental', '--since', '2.42.0'],
+     {'stdout': ['TST_IndicationExperimental'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --experimental and --since 2.45.0.',
+     ['find', "*", '--experimental', '--since', '2.45.0'],
+     {'stdout': [],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --experimental and --since 2.45.x.',
+     ['find', "*", '--experimental', '--since', '2.45.x'],
+     {'stderr': ['--since option value invalid. ',
+                 'Must contain 3 integer elements',
+                 '2.45.x'],
+      'rc': 1,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --schema "BLA".',
+     ['find', '*', '--schema', 'BLA'],
+     {'stdout': ['BLA_Person', ],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --schema "EXP".',
+     ['find', '*', '--schema', 'EXP'],
+     {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --schema "EXP" and --experimental.',
+     ['find', '*', '--schema', 'EXP', '--experimental'],
+     {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --subclass-of.',
+     ['find', '*', '--subclass-of', 'TST_Person'],
+     {'stdout': ['root/cimv2: TST_PersonClsDep',
+                 'root/cimv2: TST_PersonDep', 'root/cimv2: TST_PersonExp',
+                 'root/cimv2: TST_PersonExpProperty',
+                 'root/cimv2: TST_PersonPropDep', 'root/cimv2: TST_PersonSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command find with --subclass-of.',
+     ['find', '*Sub', '--subclass-of', 'TST_Person'],
+     {'stdout': ['root/cimv2: TST_PersonSub'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 

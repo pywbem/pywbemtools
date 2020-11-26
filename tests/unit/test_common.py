@@ -43,7 +43,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     is_classname, pick_one_from_list, pick_multiple_from_list, \
     hide_empty_columns, verify_operation, split_str_w_esc, format_keys, \
-    shorten_path_str, \
+    shorten_path_str, get_subclass_names, \
     validate_output_format, output_format_in_groups, fold_strings
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
@@ -2809,6 +2809,117 @@ def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
     if act_rtn != exp_rtn:
         print('IN\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(input_str, exp_rtn,
                                                      act_rtn))
+    assert act_rtn == exp_rtn
+
+
+# Simple hierarchy of classes for get_subclass_names test
+SUBCLASS_LIST = [
+    CIMClass('TST_L0', superclass=None),
+    CIMClass('TST_L1', superclass='TST_L0'),
+    CIMClass('TST_L2', superclass='TST_L0'),
+
+    CIMClass('TST_L11', superclass='TST_L1'),
+    CIMClass('TST_L21', superclass='TST_L2'),
+
+    CIMClass('TST_L111', superclass='TST_L11'),
+    CIMClass('TST_L211', superclass='TST_L21'),
+
+    CIMClass('TST_L1111', superclass='TST_L111'),
+    CIMClass('TST_L1112', superclass='TST_L111'),
+    CIMClass('TST_L1113', superclass='TST_L111'),
+
+    CIMClass('TST_L2111', superclass='TST_L211'),
+    CIMClass('TST_L2112', superclass='TST_L211'),
+    CIMClass('TST_L2113', superclass='TST_L211'),
+    CIMClass('TST_L2114', superclass='TST_L211'),
+]
+TESTCASES_GET_SUBCLASS_NAMES = [
+    # Testcases for get_subclasses()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * classes - List of classes for which hiearchy to be generated
+    #   * classname: target classname from which to find subclasses or None,
+    #   * deep_inheritance: flag (True, False, None)
+    #   * exp_rtn: List of classes to be returned
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify list of subclasses for TST_L1',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L1",
+          deep_inheritance=True,
+          exp_rtn=['TST_L11', 'TST_L111', 'TST_L1111', 'TST_L1112',
+                   'TST_L1113']),
+     None, None, OK, ),
+
+    ('Verify list of subclasses for TST_L21',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L21",
+          deep_inheritance=True,
+          exp_rtn=['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
+                   'TST_L2114']),
+     None, None, OK, ),
+    ('Verify list of subclasses for TST_L211',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L21",
+          deep_inheritance=True,
+          exp_rtn=['TST_L211', 'TST_L2111', 'TST_L2112', 'TST_L2113',
+                   'TST_L2114']),
+     None, None, OK, ),
+
+    ('Verify list of subclasses for TST_L2111',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L2111",
+          deep_inheritance=True,
+          exp_rtn=[]),
+     None, None, OK, ),
+
+    ('Verify list of subclasses for TST_L2111',
+     dict(classes=SUBCLASS_LIST,
+          classname="blah",
+          deep_inheritance=True,
+          exp_rtn=[]),
+     ValueError, None, OK, ),
+
+    ('Verify list of subclasses for TST_L1',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L1",
+          deep_inheritance=False,
+          exp_rtn=['TST_L11']),
+     None, None, OK, ),
+
+    ('Verify list of subclasses for TST_L21',
+     dict(classes=SUBCLASS_LIST,
+          classname="TST_L21",
+          deep_inheritance=False,
+          exp_rtn=['TST_L211']),
+     None, None, OK, ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_GET_SUBCLASS_NAMES)
+@simplified_test_function
+def test_get_subclassnames(testcase, classes, classname, deep_inheritance,
+                           exp_rtn):
+    """
+    Test function for _common.fold_strings()
+    """
+    # The code to be tested
+    act_rtn = get_subclass_names(classes, classname,
+                                 deep_inheritance=deep_inheritance)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    if act_rtn != exp_rtn:
+        print('MOF\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(classes, exp_rtn,
+                                                      act_rtn))
     assert act_rtn == exp_rtn
 
 

@@ -2761,18 +2761,20 @@ interop      TST_PersonExp        4
       'test': 'linesnows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-    ['Verify instance command count *TST_* with --indication',
+    ['Verify instance command count *TST_*,--no-indication, --association',
      {'args': ['count', '*TST_*', '--no-indication', '--association'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
-     {'stdout': """Count of instances per class
-Namespace    Class            count
-interop      TST_Lineage          3
-interop      TST_MemberOfFamilyCollection  3
-interop      TST_MemberOfFamilyCollectionExp        1
-""",
+     {'stdout': ['Count of instances per class',
+                 'Namespace    Class            count',
+                 'interop      TST_Lineage          3',
+                 'interop      TST_FamilyCollection  2',
+                 'interop      TST_MemberOfFamilyCollection  3',
+                 'interop      TST_MemberOfFamilyCollectionExp        1',
+                 'interop      TST_Person       4',
+                 'interop      TST_PersonExp    4'],
       'rc': 0,
-      'test': 'linesnows'},
+      'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     #

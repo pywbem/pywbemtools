@@ -359,6 +359,15 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       classes that are not deprecated (--no-deprecated). If the option is not defined no
                                       filtering occurs
 
+      --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
+                                      supplied string. The string must define a version of the form TODO
+
+      --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
+                                      component (characters before the "_" match the scheme provided.
+
+      --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
+                                      value.
+
       -h, --help                      Show this help message.
 
 
@@ -420,6 +429,15 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       --deprecated / --no-deprecated  Filter the returned classes to return only deprecated classes (--deprecated) or
                                       classes that are not deprecated (--no-deprecated). If the option is not defined no
                                       filtering occurs
+
+      --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
+                                      supplied string. The string must define a version of the form TODO
+
+      --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
+                                      component (characters before the "_" match the scheme provided.
+
+      --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
+                                      value.
 
       -h, --help                      Show this help message.
 
@@ -1095,6 +1113,15 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       --deprecated / --no-deprecated  Filter the returned classes to return only deprecated classes (--deprecated) or
                                       classes that are not deprecated (--no-deprecated). If the option is not defined no
                                       filtering occurs
+
+      --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
+                                      supplied string. The string must define a version of the form TODO
+
+      --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
+                                      component (characters before the "_" match the scheme provided.
+
+      --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
+                                      value.
 
       -h, --help                      Show this help message.
 
