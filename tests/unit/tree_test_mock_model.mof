@@ -1,0 +1,108 @@
+// This is an extension of the simple_mock_model.mof to add variations of
+// class version, Abstract, and Association classes so that the optional
+// information display for class tree can be tested with a single call
+// It adds classes with and without each of the specific required qualifiers
+// and removes all instance information.
+
+#pragma locale ("en_US")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Override : string = null,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Version : string,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted, Translatable);
+
+    [Version ( "2.30.0" ), Description ("Simple CIM Class")]
+class CIM_Foo {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+
+        [Description ("This is Uint32 property.")]
+    uint32 IntegerProp;
+};
+
+    [Description ("Simple CIM Class")]
+class CIM_Foo_no_version {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+
+        [Description ("This is Uint32 property.")]
+    uint32 IntegerProp;
+};
+
+
+    [Version ( "2.31.0" ), Description ("Subclass of CIM_Foo")]
+class CIM_Foo_sub : CIM_Foo {
+    string cimfoo_sub;
+};
+
+
+    [Version ( "2.20.1" ), Description ("Subclass of CIM_Foo_sub")]
+class CIM_Foo_sub_sub : CIM_Foo_sub {
+    string cimfoo_sub_sub;
+        [Description("Sample method with input and output parameters")]
+    uint32 Method1(
+        [IN ( false), OUT, Description("Response param 2")]
+      string OutputParam2);
+};
+
+[Indication, Abstract, Version ( "2.24.0" )]
+class CIM_Indication {
+   string IndicationIdentifier;
+};
+
+[Indication, Abstract]
+class CIM_Indication_no_version {
+   string IndicationIdentifier;
+};
+
+[Association, Description("Lineage with version"), Version ( "2.20.1" ) ]
+class TST_Lineage {
+    [key] string InstanceID;
+    CIM_Foo ref parent;
+    CIM_Foo ref child;
+};
+
+[Association, Description(" Lineage with version")]
+class TST_Lineage_no_version {
+    [key] string InstanceID;
+    CIM_Foo ref parent;
+    CIM_Foo ref child;
+};

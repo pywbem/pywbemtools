@@ -57,6 +57,8 @@ QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
+TREE_TEST_MOCK_FILE = 'tree_test_mock_model.mof'
+
 #
 # The following list defines the help for each command in terms of particular
 # parts of lines that are to be tested.//FakedUrl:5988
@@ -130,7 +132,6 @@ CLASS_FIND_HELP_LINES = [
     '[COMMAND-OPTIONS]',
     'List the classes with matching class names on the server.',
     '-s, --sort  Sort by namespace. Default is to sort by',
-    '--summary  Display only a summary count of classes per namespace',
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     # FILTER OPTIONS
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
@@ -180,6 +181,7 @@ CLASS_TREE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class tree CLASSNAME [COMMAND-OPTIONS]',
     'Show the subclass or superclass hierarchy for a class.',
     '-s, --superclasses Show the superclass hierarchy.',
+    ' -d, --detail               Show details about the class: the Version',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -1113,54 +1115,6 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-
-    ['Verify class command find simple name in known namespace',
-     ['find', 'CIM_*', '-n', 'root/cimv2', '--summary'],
-     {'stdout': ["  root/cimv2: 4"],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class command find name in known namespace -o grid',
-     {'general': ['-o', 'table'],
-      'args': ['find', 'CIM_*', '-n', 'root/cimv2', '--summary']},
-     {'stdout': ['Find class counts CIM_*',
-                 '+-------------+---------------+',
-                 '| Namespace   |   Class count |',
-                 '|-------------+---------------|',
-                 '| root/cimv2  |             4 |',
-                 '+-------------+---------------+'],
-      'test': 'lines'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class find --summary with multiple namespaces',
-     {'general': ['-o', 'table'],
-      'args': ['find', '*', '--summary']},
-     {'stdout': ['Find class counts *',
-                 '+-------------+---------------+',
-                 '| Namespace   |   Class count |',
-                 '|-------------+---------------|',
-                 '| root/cimv2  |            15 |',
-                 '| interop     |            22 |',
-                 '+-------------+---------------+'],
-      'rc': 0,
-      'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
-
-
-    ['Verify class find --summary with multiple namespaces and --sort ',
-     {'general': ['-o', 'table'],
-      'args': ['find', '*', '--summary', '--sort']},
-     {'stdout': ['Find class counts *',
-                 '+-------------+---------------+',
-                 '| Namespace   |   Class count |',
-                 '|-------------+---------------|',
-                 '| interop     |            22 |',
-                 '| root/cimv2  |            15 |',
-                 '+-------------+---------------+'],
-      'rc': 0,
-      'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
-
     ['Verify class command verify nothing found for BLAH_ regex',
      ['find', 'BLAH_*', '-n', 'root/cimv2'],
      {'stdout': "",
@@ -1349,6 +1303,23 @@ TEST_CASES = [
 """,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command tree with --detail',
+     ['tree', '--detail'],
+     {'stdout': """root
+ +-- CIM_Foo (Version=2.30.0)
+ |   +-- CIM_Foo_sub (Version=2.31.0)
+ |       +-- CIM_Foo_sub_sub (Version=2.20.1)
+ +-- CIM_Foo_no_version ()
+ +-- CIM_Indication (Abstract,Indication,Version=2.24.0)
+ +-- CIM_Indication_no_version (Abstract,Indication)
+ +-- TST_Lineage (Association,Version=2.20.1)
+ +-- TST_Lineage_no_version (Association)
+
+
+""",
+      'test': 'innows'},
+     TREE_TEST_MOCK_FILE, OK],
 
     # class tree' error tests
     ['Verify class command tree with invalid CLASSNAME fails',
