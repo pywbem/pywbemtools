@@ -35,6 +35,11 @@ Released: not yet
   the command more useful for real servers that may return many classes for
   a class find. (see issue #810)
 
+* Extend the class tree command to optionally provide extra information about
+  each class in the tree including 1) the value of the Version qualifier
+  if it exists and whether the class is Abstract, an Association, or an
+  Indication class. (see. # 817)
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -398,6 +398,42 @@ Example:
      |   +-- CIM_Foo_sub_sub
      +-- CIM_Foo_sub2
 
+
+Options to the `class tree` command allow the following:
+
+1. Display the superclass hierarchy for a given class (``--superclasses``/``-s``)
+   as shown in the following example:
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli -n mock1 class tree CIM_Foo_Sub2 -s
+    root
+     +-- CIM_Foo
+         +-- CIM_Foo_sub2
+
+2. Display additional information about each class (``--detail``/``-d``) including
+   the value of the Version qualifier and the existence of the class the
+   Association, Indication, Abstract qualifiers if they are True as shown in
+   the following example:
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli -m tests/unit/tree_test_model.mof class tree --detail
+    root
+     +-- CIM_Foo (Version=2.30.0)
+     |   +-- CIM_Foo_sub (Version=2.31.0)
+     |       +-- CIM_Foo_sub_sub (Version=2.20.1)
+     +-- CIM_Foo_no_version ()
+     +-- CIM_Indication (Abstract,Indication,Version=2.24.0)
+     +-- CIM_Indication_no_version (Abstract,Indication)
+     +-- TST_Lineage (Association,Version=2.20.1)
+     +-- TST_Lineage_no_version (Association)
+
+
 See :ref:`pywbemcli class tree --help` for the exact help output of the command.
 
 .. index:: pair: command groups; instance commands

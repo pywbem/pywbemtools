@@ -363,10 +363,7 @@ def class_associators(context, classname, **options):
                 required=True)
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help=u'Sort by namespace. Default is to sort by classname or by'
-                   'count if --summary set.')
-@click.option('--summary', is_flag=True, required=False,
-              help=u'Display only a summary count of classes per namespace')
+              help=u'Sort by namespace. Default is to sort by classname')
 @add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
@@ -408,6 +405,9 @@ def class_find(context, classname_glob, **options):
 @click.option('-s', '--superclasses', is_flag=True, default=False,
               help=u'Show the superclass hierarchy. '
                    'Default: Show the subclass hierarchy.')
+@click.option('-d', '--detail', is_flag=True, default=False,
+              help=u'Show details about the class: the Version, '
+                   ' Association, Indication, and Abstact qualifiers.')
 @add_options(namespace_option)
 @add_options(help_option)
 @click.pass_obj
@@ -431,16 +431,28 @@ def class_tree(context, classname, **options):
     If no namespace was specified, the default namespace of the connection is
     used.
 
-    In the output, the classes will formatted as a ASCII graphical tree; the
+    The class hierarchy will formatted as a ASCII graphical tree; the
     --output-format general option is ignored.
+
+    The --detail options to display extra information about each class
+    including:
+
+    -  The Version qualifier value if the class includes a version
+       qualifier. This is normally a string with 3 integers
+
+    -  Information about each class type (Association, Indication, Abstract)
 
     Examples:
 
+      # Display the complete class hierarchy from the interop namespace
       pywbemcli -n myconn class tree -n interop
 
+      # Display CIM_Foo an its subclasses from the namespace interop
       pywbemcli -n myconn class tree CIM_Foo -n interop
 
+      # Display CIM_Foo and its superclasses from interop
       pywbemcli -n myconn class tree CIM_Foo -s -n interop
+
     """
     context.execute_cmd(lambda: cmd_class_tree(context, classname, options))
 
@@ -992,7 +1004,7 @@ def get_class_hierarchy(conn, classname, namespace, superclasses=None):
             classes = conn.EnumerateClasses(ClassName=classname,
                                             namespace=namespace,
                                             LocalOnly=True,
-                                            IncludeQualifiers=False,
+                                            IncludeQualifiers=True,
                                             DeepInheritance=True)
 
     except Error as er:
@@ -1029,7 +1041,7 @@ def cmd_class_tree(context, classname, options):
     # Display the list of classes as a tree. The classname is the top
     # of the tree.
     context.spinner_stop()
-    display_class_tree(classes, classname)
+    display_class_tree(classes, classname, show_detail=options['detail'])
 
 
 def cmd_class_delete(context, classname, options):

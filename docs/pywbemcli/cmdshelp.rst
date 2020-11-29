@@ -402,8 +402,7 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       -n, --namespace NAMESPACE       Add a namespace to the search scope. May be specified multiple times. Default: Search
                                       in all namespaces of the server.
 
-      -s, --sort                      Sort by namespace. Default is to sort by classname or bycount if --summary set.
-      --summary                       Display only a summary count of classes per namespace
+      -s, --sort                      Sort by namespace. Default is to sort by classname
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
                                       classes that are not associations(--no-association). If the option is not defined no
@@ -596,18 +595,28 @@ Help text for ``pywbemcli class tree`` (see :ref:`class tree command`):
 
       If no namespace was specified, the default namespace of the connection is used.
 
-      In the output, the classes will formatted as a ASCII graphical tree; the --output-format general option is ignored.
+      The class hierarchy will formatted as a ASCII graphical tree; the --output-format general option is ignored.
+
+      The --detail options to display extra information about each class including:
+
+      -  The Version qualifier value if the class includes a version    qualifier. This is normally a string with 3
+      integers
+
+      -  Information about each class type (Association, Indication, Abstract)
 
       Examples:
 
-        pywbemcli -n myconn class tree -n interop
+        # Display the complete class hierarchy from the interop namespace   pywbemcli -n myconn class tree -n interop
 
-        pywbemcli -n myconn class tree CIM_Foo -n interop
+        # Display CIM_Foo an its subclasses from the namespace interop   pywbemcli -n myconn class tree CIM_Foo -n interop
 
-        pywbemcli -n myconn class tree CIM_Foo -s -n interop
+        # Display CIM_Foo and its superclasses from interop   pywbemcli -n myconn class tree CIM_Foo -s -n interop
 
     Command Options:
       -s, --superclasses         Show the superclass hierarchy. Default: Show the subclass hierarchy.
+      -d, --detail               Show details about the class: the Version,  Association, Indication, and Abstact
+                                 qualifiers.
+
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       -h, --help                 Show this help message.
 
