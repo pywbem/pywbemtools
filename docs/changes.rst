@@ -16,6 +16,10 @@ Released: not yet
 
 **Bug fixes:**
 
+* Limit click package to < 8.0 because of a) incompatibility with python 2.7,
+  b) incompatibility between click 8.0 and clicl-repl.
+  (see issues #816 and #817)
+
 **Enhancements:**
 
 **Known issues:**
