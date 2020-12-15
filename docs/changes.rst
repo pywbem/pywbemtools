@@ -25,6 +25,9 @@ Released: not yet
   b) incompatibility between click 8.0 and clicl-repl.
   (see issues #816 and #817)
 
+* Limit mock package to lt 4.0.3 to avoid issue issue that causes test failure.
+  (see #822)
+
 **Enhancements:**
 
 * Add new option to class find command (--summary) to display a summary of
