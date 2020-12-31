@@ -8,9 +8,9 @@ on:
   # # minute hour day_of_month month day_of_week
   # - cron:  '10 21 * * 0'  # Every sunday at 21:10 UTC
   push:
-    branches: [ master ]
+    branches: [ master, stable_0.8 ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, stable_0.8 ]
 
 jobs:
 
