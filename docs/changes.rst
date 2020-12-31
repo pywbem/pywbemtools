@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 0.8.1.dev1
-----------------------
+pywbemtools 0.8.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2021-01-02
 
 **Bug fixes:**
 
@@ -32,12 +28,6 @@ Released: not yet
 
 * Migrated from Travis and Appveyor to GitHub Actions. This required several
   changes in package dependencies for development.
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.8.0
