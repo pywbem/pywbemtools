@@ -424,21 +424,6 @@ pywbem_os_setup.sh:
 pywbem_os_setup.bat:
 	curl -s -o pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
 
-.PHONY: install_os
-install_os: install_os_$(pymn).done
-	@echo "makefile: Target $@ done."
-
-install_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done $(pywbem_os_setup_file)
-	@echo "makefile: Installing OS-level installation and runtime requirements"
-	-$(call RM_FUNC,$@)
-ifeq ($(PLATFORM),Windows_native)
-	pywbem_os_setup.bat install
-else
-	./pywbem_os_setup.sh install
-endif
-	echo "done" >$@
-	@echo "makefile: Done installing OS-level installation and runtime requirements"
-
 .PHONY: _show_bitsize
 _show_bitsize:
 	@echo "makefile: Determining bit size of Python executable"
@@ -458,14 +443,10 @@ install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirem
 install: install_$(pymn).done
 	@echo "makefile: Target $@ done."
 
-install_$(pymn).done: Makefile install_os_$(pymn).done install_basic_$(pymn).done install_$(package_name)_$(pymn).done
+install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name)_$(pymn).done
 	-$(call RM_FUNC,$@)
 	$(PYTHON_CMD) -c "import $(pywbemcli_module_import_name)"
 	echo "done" >$@
-
-.PHONY: develop_os
-develop_os: develop_os_$(pymn).done
-	@echo "makefile: Target $@ done."
 
 # The following target is supposed to install any prerequisite OS-level packages
 # needed for development of pywbemtools. Pywbemtools has no such prerequisite
