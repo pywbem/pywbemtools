@@ -62,18 +62,18 @@ DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
 # is supported.
 NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 5)
 
-# RETRY_DEPRECATION_ Flag indicating that pywbem raises a DeprecationWarning
+# RETRY_DEPRECATION: Flag indicating that pywbem raises a DeprecationWarning
 # for urllib3.Retry.
 # urllib3 1.26.0 started issuing a DeprecationWarning for using the
 # 'method_whitelist' init parameter of Retry and announced its removal in
 # version 2.0. The replacement parameter is 'allowed_methods'.
-# pywbem >=1.2.0 avoids the warning, but pywbem <1.2.0 issues it.
+# pywbem >=1.1.0 avoids the warning, but pywbem <1.1.0 issues it.
 with warnings.catch_warnings():
     warnings.filterwarnings('error')
     try:
         urllib3.Retry(method_whitelist={})
     except (DeprecationWarning, TypeError):
-        RETRY_DEPRECATION = PYWBEM_VERSION.release <= (1, 2)
+        RETRY_DEPRECATION = PYWBEM_VERSION.release < (1, 1)
     else:
         RETRY_DEPRECATION = False
 
