@@ -34,6 +34,7 @@ VERBOSE="true"
 # Indicates that pywbem is installed from a repository. This will disable
 # some install tests because they don't support this. Keep in sync with
 # the installation of pywbem from repo vs package in requirements.txt.
+# TODO: Set to false once pywbem 1.1.3 is released.
 PYWBEM_FROM_REPO="true"
 
 MYNAME=$(basename "$0")
