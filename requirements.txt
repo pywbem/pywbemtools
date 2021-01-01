@@ -8,10 +8,12 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-# pywbem>=1.1.1
-# Alternative to test against current github master pywbem
-# If this is enabled, some of the install tests need to be disabled by setting
-# the 'pywbem_from_repo' variable in in test_install.sh - keep this in sync.
+# TODO: Enable the following line and disable the link line once pywbem 1.2.0 is released.
+# pywbem>=1.2.0
+# When using the GitHub master branch of pywbem, comment out the line above,
+# activate the GitHub link based dependency below.
+# In that case, some of the install tests need to be disabled by setting
+# the 'PYWBEM_FROM_REPO' variable in in tests/install/test_install.sh.
 git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 
 nocaselist>=1.0.3
