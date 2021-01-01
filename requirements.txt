@@ -8,13 +8,12 @@
 
 # Direct dependencies (except pip, setuptools, wheel):
 
-# TODO: Enable the following line and disable the link line once pywbem 1.1.3 is released.
-# pywbem>=1.1.3
+pywbem>=1.1.3
 # When using the GitHub master branch of pywbem, comment out the line above,
 # activate the GitHub link based dependency below.
 # In that case, some of the install tests need to be disabled by setting
 # the 'PYWBEM_FROM_REPO' variable in in tests/install/test_install.sh.
-git+https://github.com/pywbem/pywbem.git@stable_1.1#egg=pywbem
+# git+https://github.com/pywbem/pywbem.git@stable_1.1#egg=pywbem
 
 nocaselist>=1.0.3
 nocasedict>=1.0.1
