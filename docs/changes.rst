@@ -26,6 +26,8 @@ Released: not yet
 * Limit mock package to lt 4.0.3 to avoid issue issue that causes test failure.
   (see #822)
 
+* Increased minimum pywbem version from 1.1.1 to 1.1.3 to pick up fixes.
+
 **Enhancements:**
 
 **Known issues:**
