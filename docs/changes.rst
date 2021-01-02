@@ -40,6 +40,9 @@ Released: not yet
   if it exists and whether the class is Abstract, an Association, or an
   Indication class. (see. # 817)
 
+* Migrated from Travis and Appveyor to GitHub Actions. This required several
+  changes in package dependencies for development.
+
 **Known issues:**
 
 * See `list of open issues`_.
