@@ -293,10 +293,10 @@ def pick_one_from_list(context, options, title):
 
     Raises:
       ValueError if Ctrl-c input from console.
-
-    TODO/Future: Possible Future This could be replaced by the python
-    pick library that would use curses for the selection process.
     """
+
+    # TODO: Future: This could be replaced by the Python pick library that
+    #       would use curses for the selection process.
 
     # If there is only a single choice, return that choice.
     if len(options) == 1:
@@ -393,10 +393,11 @@ def pick_multiple_from_list(context, options, title):
 
     Raises:
       ValueError if Ctrl-c input from console.
-
-    TODO: This could be replaced by the python pick library that would use
-    curses for the selection process.
     """
+
+    # TODO: Future: This could be replaced by the Python pick library that
+    #       would use curses for the selection process.
+
     if context:
         context.spinner_stop()
 
@@ -545,6 +546,21 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
                                    .format(wbemuri_str, ve))
 
 
+def str_2_bool(value):
+    """
+    Convert the value input to boolean based on text or
+    raise ValueError if strings are not 'true' or 'false'.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, six.string_types):
+        if value.lower() == 'true':
+            return True
+        if value.lower() == 'false':
+            return False
+    raise ValueError('Invalid boolean value: "{}"'.format(value))
+
+
 def create_cimvalue(cim_type, value_str, is_array):
     """
     Build a cim value of the type in cim_type and the information in value_str
@@ -570,20 +586,6 @@ def create_cimvalue(cim_type, value_str, is_array):
         ValueError if the value_str cannot be parsed consistent with
         the cim_type and is_array attributes of the call.
     """
-
-    def str_2_bool(value):
-        """
-        Convert the value input to boolean based on text or
-        raise ValueError if strings are not 'true' or 'false'.
-        """
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, six.string_types):
-            if value.lower() == 'true':
-                return True
-            if value.lower() == 'false':
-                return False
-        raise ValueError('Invalid boolean value: "{}"'.format(value))
 
     if value_str is None:
         return None
@@ -632,69 +634,6 @@ def create_cimproperty(cim_type, is_array, name, value_str):
     cim_value = create_cimvalue(cim_type, value_str, is_array)
 
     return CIMProperty(name, cim_value, type=cim_type, is_array=is_array)
-
-
-def create_ciminstancename(cim_class, kv_keys):
-    """
-    Create a CIMInstanceName object from the input parameters.
-
-    The provided key values are verified against the properties of the class.
-
-    Parameters:
-
-      cim_class (:class:`~pywbem.CIMClass`):
-        The class from which the CIMInstanceName is to be created.
-        The provided keys are validated against the properties of that class.
-
-      kv_keys (tuple):
-        A tuple of "name=value" strings representing the keys and their
-        values that are to be constructed for the instance name. Required
-
-    Returns:
-        CIMInstanceName: with namespace = None and host = None
-
-    Raises:
-        click.ClickException if Property name not found in class or if mismatch
-          of property type in class vs value component of kv pair
-    """
-    # TODO: Avoid the CIMClass object as input, because GetClass is not
-    # implemented by all WBEM servers. That is not easy however, because the
-    # name=value syntax used in the --key option does not allow distinguishing
-    # the string/numeric/boolean types sufficiently well. For example, one
-    # would need to find a way to resolve the ambiguity between numeric/boolean
-    # values and strings with that same string value. One option might be to
-    # have optional single or double quotes around string values, that normally
-    # would not be needed, but when the string value is a numeric or boolean
-    # string, then they would be used to turn the value into a string. For
-    # example: name=42 -> numeric, name="42" -> string.
-    keys = []
-    for kv_key in kv_keys:
-        name, value_str = parse_kv_pair(kv_key)
-        try:
-            cl_prop = cim_class.properties[name]
-        except KeyError:
-            raise click.ClickException('Property name "{}" not in class "{}".'
-                                       .format(name, cim_class.classname))
-
-        if value_str and value_str.startswith('"') and value_str.endswith('"'):
-            value_str = value_str[1:-1]
-        try:
-            value = create_cimvalue(cl_prop.type, value_str, False)
-            keys.append((name, value))
-        except ValueError as ex:
-            raise click.ClickException("Type mismatch property '{}' between "
-                                       "expected type='{}', array={} and input "
-                                       "value='{}'. Exception: {}"
-                                       .format(name, cl_prop.type,
-                                               cl_prop.is_array,
-                                               value_str, ex))
-
-    try:
-        instance_path = CIMInstanceName(cim_class.classname, keybindings=keys)
-    except ValueError as exc:
-        raise click.ClickException(str(exc))
-
-    return instance_path
 
 
 def create_ciminstance(cim_class, kv_properties):
