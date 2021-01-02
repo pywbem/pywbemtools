@@ -4,6 +4,7 @@
 Change log
 ==========
 
+test run
 
 pywbemtools 0.8.1.dev1
 ----------------------
