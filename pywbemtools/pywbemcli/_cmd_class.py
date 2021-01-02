@@ -491,7 +491,7 @@ def _build_qualifier_filters(conn, ns, options):
         option_value = options[qname]
         qualdecl = conn.GetQualifier(qname, ns)
         scopes_map = []
-        # TODO: Do we have a case test issue here with the scopes?
+        # Note that qualdecl.scopes performs the test case-insensitively
         scopes_map.append('class' in qualdecl.scopes)
         scopes_map.append('property' in qualdecl.scopes)
         scopes_map.append('method' in qualdecl.scopes)
