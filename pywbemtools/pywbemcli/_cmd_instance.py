@@ -686,7 +686,8 @@ def show_help_instancename():
     Show the help message on how to specify an instance using INSTANCENAME
     and the --key and --namespace options.
     """
-    # TODO: Reflow according to target width
+    # Note: This help text has a fixed width since it is too complex to
+    # dynamically render it to a given width.
     click.echo("""
 An instance path is specified using the INSTANCENAME argument and optionally the
 --key and --namespace options. It can be specified in three ways:
