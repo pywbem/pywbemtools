@@ -437,15 +437,17 @@ function test2()
   info "Testcase $testcase: setup.py install from repo root directory: $ROOT_DIR"
   make_virtualenv "$testcase"
 
-  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+  if [[ "$PYWBEM_FROM_REPO" == "true" ]]; then
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  elif [[ $(python --version 2>&1) =~ (2\.7\.) ]]; then
+    warning "Skipping pywbemcli check due to issue with backports.functools-lru-cache on Python 2.7"
+  else
     call "cd $ROOT_DIR; python setup.py install" "Installing with setup.py from repo root directory (latest package levels)"
 
     verbose "Packages before running pywbemcli:"
     pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
     assert_run_ok "pywbemcli --version"
-  else
-    warning "Skipping pywbemcli check because pywbem is installed from repo"
   fi
 
   remove_virtualenv "$testcase"
@@ -501,15 +503,17 @@ function test5()
   make_virtualenv "$testcase"
   run "tar -x -v -f $SRC_DISTFILE -C $SRC_DISTFILE_UNPACK_DIR" "Unpacking source distribution archive to: $SRC_DISTFILE_UNPACK_DIR"
 
-  if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
+  if [[ "$PYWBEM_FROM_REPO" == "true" ]]; then
+    warning "Skipping pywbemcli check because pywbem is installed from repo"
+  elif [[ $(python --version 2>&1) =~ (2\.7\.) ]]; then
+    warning "Skipping pywbemcli check due to issue with backports.functools-lru-cache on Python 2.7"
+  else
     call "cd $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR; python setup.py install" "Installing with setup.py from unpack directory: $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR (latest package levels)"
 
     verbose "Packages before running pywbemcli:"
     pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 
     assert_run_ok "pywbemcli --version"
-  else
-    warning "Skipping pywbemcli check because pywbem is installed from repo"
   fi
 
   remove_virtualenv "$testcase"
