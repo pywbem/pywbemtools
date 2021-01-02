@@ -57,3 +57,7 @@ mock>=3.0.0,<4.0.3; python_version >= '3.6'
 # Pip 9.0.1 (with minimum package levels) does not install it on MacOs on Python
 # 2.7.17. The same version of Pip does install it on Linux on python 2.7.15.
 funcsigs>=1.0.2; python_version == '2.7'
+
+# Address issue that pyparsing 3.0.0b2 gets installed on py27 (used by packaging)
+pyparsing>=2.3.1,<3.0.0; python_version < '3.5'
+pyparsing>=2.3.1; python_version >= '3.5'

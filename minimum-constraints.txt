@@ -180,6 +180,9 @@ readme-renderer==23.0
 # Jupyter Notebook (no imports, invoked via jupyter script):
 #jupyter==1.0.0
 
+# Address issue that pyparsing 3.0.0b2 gets installed on py27 (used by packaging)
+pyparsing==2.3.1
+
 # Indirect dependencies for develop (not in dev-requirements.txt)
 alabaster==0.7.9
 appnope==0.1.0
@@ -235,7 +238,6 @@ pkginfo==1.4.1
 pluggy==0.13.0
 ptyprocess==0.5.1
 py==1.5.1
-pyparsing==2.3.1
 pytz==2016.10
 pyzmq==16.0.4
 qtconsole==4.2.1
