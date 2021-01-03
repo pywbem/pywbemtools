@@ -624,8 +624,8 @@ class AssociationShrub(object):
             return path_str
 
         # Otherwise reproduce complete wbemuri method except fold the
-        # keybindings.  TODO, FUTURE: Is there a better way to fold based
-        # on the string output.
+        # keybindings.
+        # TODO: FUTURE: Is there a better way to fold based on string output?
 
         ret = []
 

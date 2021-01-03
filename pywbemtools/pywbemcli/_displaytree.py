@@ -107,13 +107,11 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
         Modify the names in the key and list of values to the classname
         entity  that will be presented
 
-          Parameters:
+        Parameters:
 
-            classname (:term:`string`):
-                Name of class to be processed
+          classname (:term:`string`): Name of class to be processed
 
-            classes : TODO This is defined in the call
-
+          classes_dict (dict): CIMClass objects by class name
         """
         new_key = extend_name(classname, classes_dict)
         new_values = []
@@ -191,14 +189,6 @@ def _build_subcln_in_cln(cln_to_supercln):
     """
     Build a dictionary of the direct subclasses for each subclass in
     the cln_to_supercln dictionary
-
-        Parameters:
-            TODO
-
-        Returns:
-            TODO
-
-
     """
 
     # Build the class to subclass dictionary from the
