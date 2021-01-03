@@ -266,13 +266,11 @@ def display_cim_objects_summary(context, objects, output_format):
 
 def _display_classes_as_table(classes, table_width, table_format):
     """
-    TODO: Future extend to display classes as a table, showing the
-    properties for each class. This will display the properties that exist in
-    subclasses. The temp output
-    so we could create the function is to just output as mof
+    Display classes as a table.
     """
     # pylint: disable=unused-argument
 
+    # TODO(#249): Display classes as a table, and no longer just as MOF.
     for class_ in classes:
         click.echo(class_.tomof())
 
