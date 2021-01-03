@@ -54,6 +54,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._log = log
         self._verbose = verbose
         self._pdb = pdb
+        # warn included only to insure that original cmd line input flag
+        # maintained through interactive session.
         self._warn = warn
         self._connections_repo = connections_repo
 

@@ -324,7 +324,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
 
-    ['Verify --no-warn general option.',
+    ['Verify --no-warn general option included.',
      {'general': ['-s', 'http://blah', '--no-warn'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -333,15 +333,41 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
 
-
-    ['Verify --warn general option.',
+    ['Verify --warn general option included.',
      {'general': ['-s', 'http://blah', '--warn'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stdout': [''],
       'rc': 0,
       'test': 'innows'},
-     None, OK],
+     None, OK],  # Only tests that the option is accepted
+
+    ['Verify --warn general option where warning is generated. Python 3.4',
+     {'general': ['-s', 'http://blah', '--warn'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ["Pywbemcli support for Python", "is deprecated"],
+      'rc': 0,
+      'test': 'innows'},
+     None, sys.version_info[0:2] <= (3, 4)],
+
+    ['Verify --warn general option where warning is generated with stdin.',
+     {'general': ['-s', 'http://blah'],
+      'stdin': ["--warn connection show"]},
+     {'stderr': ["Pywbemcli support for Python", "is deprecated"],
+      'rc': 0,
+      'test': 'innows'},
+     None, FAIL],  # was sys.version_info[0:2] == (2, 7)
+    # Issue 867,TODO Marked fail because results inconsistent.
+
+    ['Verify --warn general option where warning is NOT generated.',
+     {'general': ['-s', 'http://blah', '--warn'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': [""],
+      'rc': 0,
+      'test': 'innows'},
+     None, sys.version_info[0:2] >= (3, 5)],
 
     ['Verify --version general option.',
      {'general': ['-s', 'http://blah', '--version'],
@@ -1318,4 +1344,4 @@ class TestGeneralOptions(CLITestsBase):
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
 
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition)
+                          mock, condition, verbose=True)

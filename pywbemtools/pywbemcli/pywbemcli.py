@@ -25,7 +25,6 @@ import sys
 import traceback
 from copy import deepcopy
 import warnings
-from mock import patch
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
@@ -46,7 +45,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from ._click_extensions import PywbemcliTopGroup
-from ._utils import formatwarning, get_terminal_width, CONNECTIONS_FILENAME, \
+from ._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
     DEFAULT_CONNECTIONS_FILE
 
 
@@ -366,10 +365,10 @@ def set_default_if_empty_str(tst_str, default=None):
                           ev=PywbemServer.log_envvar,
                           default='all'))
 @click.option('-v', '--verbose/--no-verbose',
-              default=None,
+              default=None,  # None separates no option from --no-verbose
               help=u'Display extra information about the processing.')
 @click.option('--warn/--no-warn', is_flag=True,
-              default=False,
+              default=None,  # None separates no option from --no-warning
               help=u'Warnings control: True enables display of all Python '
               u'warnings; False leaves warning control to the PYHONWARNINGS '
               u'env var, which by default displays no warnings. '
@@ -400,7 +399,6 @@ def set_default_if_empty_str(tst_str, default=None):
     help=u'Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
-@patch('warnings.formatwarning', formatwarning)
 def cli(ctx, server, connection_name, default_namespace, user, password,
         timeout, verify, certfile, keyfile, ca_certs, output_format, use_pull,
         pull_max_cnt, mock_server, verbose=None, connections_file=None,
@@ -696,8 +694,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                     modified_server = True
                 if timeout:
                     pywbem_server.timeout = resolved_timeout
+                    modified_server = True
                 if use_pull:
                     pywbem_server.use_pull = resolved_use_pull
+                    modified_server = True
                 if server:
                     pywbem_server.server = server
                     modified_server = True
@@ -706,6 +706,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                         set_default_if_empty_str(default_namespace,
                                                  DEFAULT_NAMESPACE)
                     modified_server = True
+
                 if modified_server:
                     pywbem_server.reset()
                 else:
@@ -755,6 +756,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if warn is None:
             warn = ctx.obj.warn
 
+    # Conditionally set the flag to enable warnings
+    if warn:
+        warnings.simplefilter('once')
+
     # Create a command context for each command: An interactive command has
     # its own command context as a child of the command context for the
     # command line.
@@ -775,7 +780,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     _python_nm = sys.version_info[0:2]
     if _python_nm in ((2, 7), (3, 4)):
-        warnings.warn(
+        pywbemcliwarn(
             "Pywbemcli support for Python {}.{} is deprecated and will be "
             "removed in a future version".
             format(_python_nm[0], _python_nm[1]),
