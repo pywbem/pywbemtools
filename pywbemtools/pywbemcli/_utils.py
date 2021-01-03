@@ -20,6 +20,7 @@ Utility Functions applicable across multiple components of pywbemcli.
 from __future__ import print_function, absolute_import
 
 import os
+import warnings
 import six
 import click
 
@@ -108,12 +109,30 @@ def _eq_name(name1, name2):
     return name1.lower() == name2.lower()
 
 
-def formatwarning(message, category, filename, lineno, line=None):
+def _formatwarning(message, category, filename, lineno, line=None):
     # pylint: disable=unused-argument
     """
-    Replacement for warnings.formatwarning() that is patched in.
+    Replacement for warnings.formatwarning() that is monkey patched in.
     """
     return "{}: {}\n".format(category.__name__, message)
+
+
+def pywbemcliwarn(*args, **kwargs):
+    """
+    Pywbemcli monkey patch for the warnings.warn function; substitutes our
+    own formatter.
+    """
+    warnings.formatwarning = _formatwarning
+    warnings.warn(*args, **kwargs)
+
+
+def pywbemcliwarn_explicit(*args, **kwargs):
+    """
+    Pywbemcli monkey patch for the warnings.warn_explicit function;
+    substitutes our own formatter
+    """
+    warnings.formatwarning = _formatwarning
+    warnings.warn_explicit(*args, **kwargs)
 
 
 def get_terminal_width():

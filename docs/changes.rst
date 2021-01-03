@@ -28,6 +28,16 @@ Released: not yet
 * Limit mock package to lt 4.0.3 to avoid issue issue that causes test failure.
   (see #822)
 
+* Fix issue caused by mock package version 4.0.3 by creating replacements for
+  warnings.warn and warnings.warn_explicit functions  and removing the use of
+  the patch decorator in pywbemcli.py before the definition of the cli
+  function.  (see issue #822)
+
+* Fixes issue where in pywbemcli the --timeout and --use-pull general
+  options were not always correctly included in the new object context in
+  interactive mode if they were specified on the interactive mode cmd line.
+
+
 **Enhancements:**
 
 * Add new option to class find command (--summary) to display a summary of
