@@ -442,8 +442,8 @@ class PywbemServer(object):
 
     def get_password(self, ctx):
         """
-        Conditional password prompt function  Prompts for password only if
-        there  is a defined user and no password.
+        Conditional password prompt function. Prompts for password only if
+        there is a defined user and no password.
         """
         if self.user and not self.password:
             self.password_prompt(ctx)
@@ -548,8 +548,7 @@ class PywbemServer(object):
             if self.keyfile is not None and self.certfile is None:
                 ValueError('keyfile option requires certfile option')
 
-            creds = (self.user, self.password) if self.user or \
-                self.password else None
+            creds = (self.user, self.password) if self.user else None
 
             # If client cert and key provided, create dictionary for
             # wbem connection certs (WBEMConnection takes dictionary for this

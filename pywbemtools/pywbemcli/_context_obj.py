@@ -60,7 +60,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
         self._conn = None
-        self._wbem_server = None
 
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
@@ -152,40 +151,36 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     @property
     def wbem_server(self):
         """
-        :class:`~pywbem.WBEMServer` WBEMServer instance to be used for
-        requests This is maintained in the pywbem_server object as
-        _pywbem_server. This and/or the conn property are executed before
-        any operation that is to contact the server.  This property enables any
-        server characteristics. This is a passthrough for the wbem_server
-        property maintained in self._pywbem_server
+        :class:`~pywbem.WBEMServer`: WBEMServer instance to be used for
+        requests.
+
+        Using this property will connect to the server if not yet connected,
+        and will raise an exception if no server is specified.
+
+        When connecting to a real WBEM server, a password is prompted for if
+        a user is specified in the current context but no password. The
+        password is saved in the context, so the password is prompted for only
+        once (e.g. in interactive mode).
         """
-        # If no server defined, do not try to connect. This allows
-        # commands like help, connection new, list to execute without
-        # a target server defined.
-        if self._pywbem_server:  # pylint: disable=no-else-return
-            # If wbem_server not initialized, initialize it.
+
+        if self._pywbem_server:
             if self._pywbem_server.wbem_server is None:
-                # get the password if it is required.  This may involve a
-                # prompt.
-                # TODO there are two creates and also, since all the inputs
-                # are self, why do that here
                 self._pywbem_server.get_password(self)
                 self._pywbem_server.create_connection(
                     log=self.log,
                     use_pull=self.use_pull,
                     timestats=self.timestats,
                     verbose=self.verbose)
-                if self._conn and self.timestats:  # Enable stats gathering
+                if self._conn and self.timestats:
                     self.conn.statistics.enable()
-                self._wbem_server = self._pywbem_server.wbem_server
             return self._pywbem_server.wbem_server
-        else:
-            raise click.ClickException(
-                'No server specified for a command that requires a WBEM '
-                'server. To specify a server, use the "--server", '
-                '"--mock-server", or "--name" general options, or set the '
-                'corresponding environment variables, or in interactive mode '
-                'use "connection select"')
+
+        raise click.ClickException(
+            'No server specified for a command that requires a WBEM server. '
+            'To specify a server, use the "--server", '
+            '"--mock-server", or "--name" general options, or set the '
+            'corresponding environment variables, or in interactive mode '
+            'use "connection select"')
 
     @property
     def pywbem_server(self):
@@ -368,41 +363,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 'single value if all same.'
 
         click.echo(format_table(rows, header, title=title, float_fmt=".3f"))
-
-    def connect_wbem_server(self):
-        """
-        If the wbem server has not been connected yet, connect it. The
-        wbemserver object is saved both in the context and as a GLOBAL
-        This GLOBAL is used to determine that the server has been connected.
-        TODO: FUTURE Rather than a global, we should be the wbemserver into the
-        parent probably.
-
-        Both the WBEMConnection and WBEMServer objects are established
-        at this point since the cost of doing the WBEMServer object is low.
-        The existence of the WBEMServer object in the GLOBALS is the flag that
-        this server connection has been established already.
-
-        TODO: FUTURE - We should probably move this logic to the first place a
-        connection is actually established so that if we have not-password
-        commands in the environment they do not force the password request.
-        Logical would be the first time the conn or wbem_server property is
-        used in pywbem_server.
-
-        """
-        # TODO: FUTURE investigate putting this into parent context
-
-        # If no server defined, do not try to connect. This allows
-        # commands like help, connection new, select to execute without
-        # a target server defined.
-        if self._pywbem_server and self._pywbem_server.wbem_server is None:
-            # get the password if it is required.  This may involve a
-            # prompt.
-            self._pywbem_server.get_password(self)
-            self._pywbem_server.create_connection(
-                log=self.log,
-                use_pull=self.use_pull,
-                timestats=self.timestats,
-                verbose=self.verbose)
 
     @staticmethod
     def update_root_click_context(ctx_obj):
