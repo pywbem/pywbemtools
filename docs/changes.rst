@@ -16,6 +16,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Docs: Fixed incorrect removal of 'off' value for the --log option that was
+  done in version 0.8.1.
+
 **Enhancements:**
 
 **Cleanup:**
