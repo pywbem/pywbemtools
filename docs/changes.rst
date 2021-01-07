@@ -37,6 +37,10 @@ Released: not yet
   options were not always correctly included in the new object context in
   interactive mode if they were specified on the interactive mode cmd line.
 
+* Fixed issue in tests with use of stdin and inputting the instance path
+  for instance get and instance delete. This was a test setup issue and not
+  a code issue. (see issue # 387)
+
 
 **Enhancements:**
 
