@@ -79,6 +79,7 @@ def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
 MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
+MOCK_PROMPT_PICK_RESPONSE_5_FILE = 'mock_prompt_pick_response_5.py'
 MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
@@ -531,7 +532,7 @@ SIMPLE_SHRUB_TABLE1 = [
 
 # pylint: enable=line-too-long
 
-OK = True    # mark tests OK when they execute correctly
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -1803,22 +1804,19 @@ Instances: TST_Person
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    # TODO #459: The ordering of
-    #      instance names in the pick list seems to depend on the Python
-    #      version. Test marked as failing.
-    ['Verify create, get with wildcard keybinding, delete with wildcard '
+    ['Verify create, get with wildcard keybindin and delete with wildcard '
      'keybinding, with stdin',
      {'env': {MOCK_DEFINITION_ENVVAR:
-              GET_TEST_PATH_STR(MOCK_PROMPT_PICK_RESPONSE_11_FILE)},
+              GET_TEST_PATH_STR(MOCK_PROMPT_PICK_RESPONSE_5_FILE)},
       'stdin': ['instance create CIM_Foo -p InstanceID=blah',
                 'instance get CIM_Foo.?',
                 'instance delete CIM_Foo.?']},
      {'stdout': ['CIM_Foo',
                  'instance of CIM_Foo',
-                 'IntegerProp = NULL'],
+                 'InstanceID = "blah"'],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, FAIL],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command create, new instance of all_types '
      'with scalar types',
