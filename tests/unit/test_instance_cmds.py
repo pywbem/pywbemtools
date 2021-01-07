@@ -1768,7 +1768,7 @@ Instances: TST_Person
                  'InstanceID = "CIM_Foo30"'],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, 'pdb'],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify multiple creates verify with enum summary with stdin',
      {'stdin': ['instance create CIM_Foo -p InstanceID=blah1',
@@ -1781,21 +1781,29 @@ Instances: TST_Person
       'test': 'innows'},
      [SIMPLE_MOCK_FILE], OK],
 
-    # TODO #387: The commands fail with 'WBEM URI has invalid value format in a
-    #      keybinding'. Test marked as failing.
-    ['Verify create, get, delete works with stdin',
+    ['Verify create, get, delete works with stdin using --key to define path',
      {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
-                'instance get CIM_Foo.InstanceID=blah',
-                'instance delete CIM_Foo.InstanceID=blah']},
+                'instance get CIM_Foo -k InstanceID=blah',
+                'instance delete CIM_Foo -k InstanceID=blah']},
      {'stdout': ['CIM_Foo',
                  'instance of CIM_Foo',
-                 'IntegerProp= NULL'],
+                 'InstanceID ="blah"'],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, FAIL],
+     SIMPLE_MOCK_FILE, OK],
 
-    # TODO #387 #459: The instance create command fails with 'WBEM URI has
-    #      invalid value format in a keybinding'. In addition, the ordering of
+    ['Verify create, get, delete works with stdin using instancepath',
+     {'stdin': ['instance create CIM_Foo -p InstanceID=blah',
+                'instance get CIM_Foo.InstanceID=\\"blah\\"',
+                'instance delete CIM_Foo."InstanceID=\\"blah\\""']},
+     {'stdout': ['CIM_Foo',
+                 'instance of CIM_Foo',
+                 'InstanceID ="blah"'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO #459: The ordering of
     #      instance names in the pick list seems to depend on the Python
     #      version. Test marked as failing.
     ['Verify create, get with wildcard keybinding, delete with wildcard '
@@ -2846,7 +2854,7 @@ interop      TST_MemberOfFamilyCollectionExp        1
                  'scalRef=', 'PyWBEM_AllTypes.InstanceID='],
       'rc': 0,
       'test': 'innows'},
-     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], RUN],
+     [ALLTYPES_MOCK_FILE, ALLTYPES_INVOKEMETHOD_MOCK_FILE], OK],
 
     ['Verify instance command invokemethod fails Invalid Class',
      ['invokemethod', 'CIM_Foox.InstanceID="CIM_Foo1"', 'Fuzzy', '-p',
