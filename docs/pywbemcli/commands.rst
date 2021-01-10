@@ -1317,6 +1317,9 @@ The attributes of each connection definition in the :term:`connections file` are
 
 The commands in this group are:
 
+* :ref:`Connection comment command` - Create/modify a comment for a WBEM connection definition.
+
+* :ref:`Connection comment command` - Edit comment in WBEM connection definition.
 * :ref:`Connection delete command` - Delete a WBEM connection definition.
 * :ref:`Connection export command` - Export the current connection.
 * :ref:`Connection list command` - List the WBEM connection definitions.
@@ -1324,6 +1327,43 @@ The commands in this group are:
 * :ref:`Connection select command` - Select a WBEM connection definition as current or default.
 * :ref:`Connection show command` - Show connection info of a WBEM connection definition.
 * :ref:`Connection test command` - Test the current connection with a predefined WBEM request.
+
+
+.. index:: pair: connection commands; connection comment
+
+.. _`Connection comment command`:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The `connection comment` command adds or modifies comments mainained in the
+connection definition file for each connection.
+
+The comments are created and formatted by the user and created or modified
+by a multiline editor called by this command.
+
+The comments may be viewed with the ``connection list`` command using the
+``--full`` option.
+
+.. code-block:: text
+
+    $ pywbemcli connection comment mock1
+    Edit/create comment. Enter creates new line, arrow keys and mouse move cursor,
+    [Meta+Enter] or [Esc] followed by [Enter] accept edit. Ctrl-C aborts edit.
+
+    > This is first line of comment
+    > Second line of comment
+
+In the edit mode, the arrow keys, [Enter], and other editing keys are honored
+so that the multiline text can be created or modified.
+
+The edit mode is terminated and the changes accepted with either [Meta+Enter]
+or [Esc] keys where the [Meta] is normally the key to the left of the space bar
+[Alt] or by [Esc] followed by [Enter]. The comment will be saved in the
+server definition file.
+
+The edit can be aborted with[Ctrl-C].
+
+``connection delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index:: pair: connection commands; connection delete
 

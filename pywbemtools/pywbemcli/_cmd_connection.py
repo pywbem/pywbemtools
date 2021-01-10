@@ -25,8 +25,10 @@ NOTE: Commands are ordered in help display by their order in this file.
 from __future__ import absolute_import, print_function
 
 from copy import deepcopy
-import click
+from prompt_toolkit import prompt
+from prompt_toolkit.formatted_text import HTML
 import six
+import click
 
 from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 
@@ -286,6 +288,31 @@ def connection_list(context, **options):
     context.execute_cmd(lambda: cmd_connection_list(context, options))
 
 
+@connection_group.command('comment', cls=PywbemcliCommand,
+                          options_metavar=CMD_OPTS_TXT)
+@click.argument('name', type=str, metavar='NAME', required=False)
+@add_options(help_option)
+@click.pass_obj
+def connection_comment(context, name):
+    """
+    Add/edit comment for a connection definition. Opens a multiline editor
+    to add new comment string or current edit a comment string.
+
+    Edit the comment string of a named connection definition from the
+    connections file. If the NAME argument is omitted, prompt for selecting
+    one of the connection definitions in the connections file and updates
+    the comment in the connection file.
+
+    This command allows you to add or edit a comment for a connection defintion.
+    Comments may be multiple lines (\n) defines a line and are reformatted
+    upon creation ioto a maximum number of characters per line.
+
+    Comment width is entirely determined by what the user enters into
+    the comment.
+    """
+    context.execute_cmd(lambda: cmd_connection_comment(context, name))
+
+
 ################################################################
 #
 #   Common methods for The action functions for the connection click group
@@ -373,6 +400,11 @@ def show_connection_information(context, connection,
     else:
         ca_certs = None
 
+    if connection.comment:
+        comment = connection.comment
+    else:
+        comment = None
+
     rows = [['name', "{}{}".format(connection.name, state_str)],
             ['server', connection.server],
             ['default-namespace', connection.default_namespace],
@@ -385,7 +417,8 @@ def show_connection_information(context, connection,
             ['certfile', connection.certfile],
             ['keyfile', connection.keyfile],
             ['mock-server', mock_server],
-            ['ca-certs', ca_certs]]
+            ['ca-certs', ca_certs],
+            ['comment', comment]]
 
     context.spinner_stop()
 
@@ -405,7 +438,7 @@ def pick_connection(name, context, connections_repo):
     """
     If name is None use the interactive mode to select the connection from the
     list of connections in the connections file. If the name is provided, it is
-    tested against the names in the connections file.  If it is not provided,
+    tested against the names in the connections file.
 
     Parameters:
 
@@ -712,7 +745,8 @@ def cmd_connection_save(context, name):
     """
     Saves the current connection definition with the name provided. A current
     connection must exist.
-    The save function allows overwriting existing names
+    The save function overwrites name if a server definition exists with
+    the defined name or creates a new server connection with the provided name.
     """
 
     current_connection = context.pywbem_server
@@ -750,7 +784,8 @@ def cmd_connection_list(context, options):
         if options['full']:
             return [name, svr.server, svr.default_namespace, svr.user,
                     svr.timeout, svr.use_pull, svr.pull_max_cnt, svr.verify,
-                    svr.certfile, svr.keyfile, "\n".join(svr.mock_server)]
+                    svr.certfile, svr.keyfile,
+                    "\n".join(svr.mock_server), svr.comment]
         return [name, svr.server, "\n".join(svr.mock_server)]
 
     connections_repo = context.connections_repo
@@ -787,7 +822,7 @@ def cmd_connection_list(context, options):
     if options['full']:
         headers = ['name', 'server', 'namespace', 'user',
                    'timeout', 'use-pull', 'pull-max-cnt', 'verify',
-                   'certfile', 'keyfile', 'mock-server']
+                   'certfile', 'keyfile', 'mock-server', 'comment']
     else:
         headers = ['name', 'server', 'mock-server']
 
@@ -801,3 +836,88 @@ def cmd_connection_list(context, options):
                   table_type, dflt_sym, cur_sym,
                   connections_repo.connections_file),
         table_format=output_format))
+
+
+def cmd_connection_comment(context, name):
+    """
+    Edit or add the comment  for an existing connection definition, This
+    does a multiline comment and allows the user to edit an existing comment
+    or create one for the server defined by name.
+
+    This command loads the connection definitions, passes control to the
+    user to edit/create a comment and writes the updated connection definition
+    back to the connections file.
+
+    If the name is None it provides a list of names from which the user can
+    select one. If a name is provided, the name is validated against the
+    connections file and the connection definition loaded.
+
+    The command ignoes any current connection.
+
+    The editing is multiline and the normal keys to navigate the lines and
+    columns of the string are active.  Also, the mouse can be used to move
+    the cursor.
+
+    TODO: Currently this method does not recognize the current definition,
+    the one that is active. To allow the use of the default connection we
+    would have to modify the name parameter to separate the concept of None
+    from a concept that forced use of the pick option.  Then None could
+    represent a current connection if one existed and something like ? would
+    represent the pick.
+    """
+
+    def bottom_toolbar():
+        """
+        Define the bottom toolbar for the multiline editor
+        """
+        return HTML('SVR: <b><style bg="ansigreen">{}</style></b>; '
+                    'Ctrls: &#8592;&#8594;&#8593;&#8595;&#8629;; '
+                    'Accept: [Meta+Enter] or [Esc] then [Enter] .' \
+                    .format(name))
+
+    connections_repo = context.connections_repo
+
+    # Select the connection with prompt if name is None.
+
+    name = pick_connection(name, context, connections_repo)
+
+    svr = connections_repo[name]
+
+    comment_str = svr.comment
+    comment_str = u"" if comment_str is None else six.text_type(comment_str)
+
+    context.spinner_stop()
+
+    click.echo(u'Edit/create comment. '
+               u"Enter creates new line, arrow keys and mouse move cursor,\n"
+               u"[Meta(ex. Alt)+Enter] or [Esc] then [Enter] accept edit.\n"
+               u"Ctrl-C abort edit.\n".format(name))
+
+    # Multiline edit/creation of comment.  Starts with any existing comment
+    # from the connection and call the prompt-toolkit prompt specifying
+    # multiline edit. There is no line width and  the keys defined by
+    # propmpt toolkit allow editing individual likes, creating new lines and
+    # removing text or lines.
+    #comment_prompt = u"Comment: "
+    #continuation_width = len(comment_prompt) - 2
+    comment_prompt = u"> "
+    continuation_width = len(comment_prompt) - 2
+
+    try:
+        comment_str = prompt(
+            comment_prompt,
+            multiline=True,
+            #prompt_continuation=u"{}: ".format(" " * continuation_width),
+            bottom_toolbar=bottom_toolbar,
+            default=comment_str,
+
+            mouse_support=True)
+
+    except KeyboardInterrupt:
+        raise click.ClickException("Aborted comment edit.")
+
+    svr.comment = comment_str
+
+    # Modify the connection. Either adds a new connection or updates the
+    # existing connection
+    connections_repo.add(svr)

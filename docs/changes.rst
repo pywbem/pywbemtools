@@ -53,6 +53,10 @@ Released: not yet
 * Migrated from Travis and Appveyor to GitHub Actions. This required several
   changes in package dependencies for development.
 
+* Add comment field to connection definition and command "connection comment"
+  to edit this field for any defined connection definition. (see
+  issue #761)
+
 **Known issues:**
 
 * See `list of open issues`_.

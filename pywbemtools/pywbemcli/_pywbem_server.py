@@ -125,7 +125,8 @@ class PywbemServer(object):
                  name='default', user=None, password=None,
                  timeout=DEFAULT_CONNECTION_TIMEOUT, verify=None, use_pull=None,
                  pull_max_cnt=None, certfile=None, keyfile=None,
-                 ca_certs=None, mock_server=None, connections_file=None):
+                 ca_certs=None, mock_server=None, connections_file=None,
+                 comment=None):
         """
         Create  a PywbemServer object. This contains the configuration
         and operation information to create a connection to the server
@@ -153,6 +154,7 @@ class PywbemServer(object):
         self.certfile = certfile
         self.keyfile = keyfile
         self.ca_certs = ca_certs
+        self.comment = comment
 
         # May be None in case of not-saved connection (e.g. connection save)
         self._connections_file = connections_file
@@ -169,7 +171,8 @@ class PywbemServer(object):
                'password={s.password} timeout={s.timeout} ' \
                'use_pull={s.use_pull} pull_max_cnt={s.pull_max_cnt} ' \
                'verify={s.verify} certfile={s.certfile} keyfile={s.keyfile} ' \
-               'ca_certs={s.ca_certs} mock_server={s.mock_server!r} ' \
+               'ca_certs={s.ca_certs} comment="{s.comment}" ' \
+               'mock_server={s.mock_server!r} ' \
                'wbem_server={s.wbem_server!r})'.format(s=self)
 
     @property
@@ -412,6 +415,22 @@ class PywbemServer(object):
         """
         return self.wbem_server.conn if self.wbem_server else None
 
+    def comment(self):
+        """
+        :term:`string`: String that defines comment for server validation"
+        """
+        if self._comment:
+            assert isinstance(self._comment, six.string_types)
+        return self._comment
+
+    @ca_certs.setter
+    def _comment(self, comment):
+        """Setter method; for a description see the getter method."""
+        if comment and not isinstance(comment, six.string_types):
+            _raise_typeerror("comment", comment, 'string')
+        # pylint: disable=attribute-defined-outside-init
+        self._comment = comment
+
     @property
     def wbem_server(self):
         """
@@ -467,6 +486,7 @@ class PywbemServer(object):
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,
                             "ca-certs": self.ca_certs,
+                            "comment": self.comment,    # added ver 0.9
                             "mock-server": self.mock_server})
 
     @staticmethod

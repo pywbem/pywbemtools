@@ -140,6 +140,7 @@ class ConnectionRepository(object):
                 certfile: null
                 keyfile: null
                 ca-certs: null
+                comment: null
                 mock-server:
                 - tests/unit/simple_mock_model.mof
                 - tests/unit/simple_mock_invokemethod_v1old.py
@@ -156,6 +157,7 @@ class ConnectionRepository(object):
                 certfile: null
                 keyfile: null
                 ca-certs: null
+                comment: null
                 mock-server: []
         default_connection_name: mock1
     """
@@ -317,6 +319,9 @@ class ConnectionRepository(object):
         Parameters:
 
           name (:term:`string`): Name of the connection definition.
+
+        Returns:
+            PywbemcliServer object defined by name
 
         Raises:
           ConnectionsFileLoadError
