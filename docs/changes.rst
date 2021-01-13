@@ -44,6 +44,9 @@ Released: not yet
 * Mitigated the coveralls HTTP status 422 by pinning coveralls-python to
   <3.0.0.
 
+* Fix issue where documentation index disappeared when we changed the
+  documentation theme (see issue #868)
+
 **Enhancements:**
 
 * Add new option to class find command (--summary) to display a summary of
