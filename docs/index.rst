@@ -18,3 +18,5 @@ The pywbemtools github page is: `https://github.com/pywbem/pywbemtools <https://
    development.rst
    appendix.rst
    changes.rst
+   genindex.rst
+.. The genindex.rst and a corresponding file required to include index
