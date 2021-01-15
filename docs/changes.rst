@@ -41,6 +41,8 @@ Released: not yet
   for instance get and instance delete. This was a test setup issue and not
   a code issue. (see issue # 387)
 
+* Mitigated the coveralls HTTP status 422 by pinning coveralls-python to
+  <3.0.0.
 
 **Enhancements:**
 
