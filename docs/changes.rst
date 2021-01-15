@@ -19,6 +19,9 @@ Released: not yet
 * Docs: Fixed incorrect removal of 'off' value for the --log option that was
   done in version 0.8.1.
 
+* Mitigated the coveralls HTTP status 422 by pinning coveralls-python to
+  <3.0.0.
+
 **Enhancements:**
 
 **Cleanup:**
