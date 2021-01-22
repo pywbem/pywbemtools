@@ -1,0 +1,7 @@
+// This is a simple mof model that establishes a minimal Interop namespace
+
+#pragma namespace ("interop")
+#pragma include ("mock_interop.mof")
+
+#pragma namespace ("root/cimv2")
+#pragma include ("simple_mock_model.mof")

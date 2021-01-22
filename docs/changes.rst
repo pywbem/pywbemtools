@@ -16,6 +16,10 @@ Released: not yet
 
 **Deprecations:**
 
+* Deprecated the 'server namespaces' and 'server interop' commands. Use the
+  new commands 'namespace list' and 'namespace interop', respectively.
+  (issue #877)
+
 **Bug fixes:**
 
 * Fixed a ValueError on Windows that was raised when the connections file was
@@ -69,6 +73,11 @@ Released: not yet
 
 * The verbose option ('-v' / '--verbose') now also displays the objects that
   are compiled into a mock environment when setting it up.
+
+* Added a 'namespace' command group that allows listing, creating and deleting
+  CIM namespaces, and showing the Interop namespace. The 'server namespaces'
+  and 'server interop' commands that provide a subset of that functionality
+  have been deprecated. (issue #877)
 
 **Known issues:**
 

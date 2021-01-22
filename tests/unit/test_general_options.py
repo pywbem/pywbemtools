@@ -114,6 +114,7 @@ GENERAL_HELP_LINES = [
     """Commands:
       class       Command group for CIM classes.
       instance    Command group for CIM instances.
+      namespace   Command group for CIM namespaces.
       profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.

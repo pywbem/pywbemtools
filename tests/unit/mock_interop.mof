@@ -1,0 +1,128 @@
+// This is a simple mof model that creates the qualifier declarations,
+// classes, and instances for a very simplistic model of the Interop namespace
+// to be used in the pywbemcli mock test environment.
+// The resulting Interop namespace includes the classes for CIM_Namespace and
+// CIM_ObjectManager and an instance of CIM_ObjectManager so that the needs
+// of the WBEM server functionality of pywbem are satisfied. The instances
+// of CIM_Namespace (including the one for the Interop namespace itself)
+// will be created by the namespace provider.
+
+#pragma locale ("en_US")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Override : string = null,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+   [Description (
+       "A simplified version of the DMTF CIM_Namespace class that is good enough "
+       "for serving as a real namespace in a mock environment." )]
+class CIM_Namespace {
+
+      [Key, Description ( "The scoping System\'s CreationClassName." )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." )]
+   string SystemName;
+
+      [Key, Description (
+          "The scoping ObjectManager\'s CreationClassName." )]
+   string ObjectManagerCreationClassName;
+
+      [Key, Description ( "The scoping ObjectManager\'s Name." )]
+   string ObjectManagerName;
+
+      [Key, Description (
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." )]
+   string CreationClassName;
+
+      [Key, Description (
+          "A string to uniquely identify the Namespace within the "
+          "ObjectManager." )]
+   string Name;
+};
+
+[Description (
+    "A simplified version of the DMTF CIM_ObjectManager class that is good enough "
+    "for serving as a representation of a WBEM server in a mock environment." )]
+class CIM_ObjectManager {
+
+    [Key, Description (
+        "The CreationClassName of the scoping System." )]
+    string SystemCreationClassName;
+
+    [Key, Description (
+        "The Name of the scoping System." )]
+    string SystemName;
+
+    [Key, Description (
+        "CreationClassName indicates the name of the class or the "
+        "subclass that is used in the creation of an instance. "
+        "When used with the other key properties of this class, "
+        "this property allows all instances of this class and its "
+        "subclasses to be uniquely identified." )]
+    string CreationClassName;
+
+    [Key, Description (
+        "The Name property uniquely identifies the Service and "
+        "provides an indication of the functionality that is "
+        "managed. This functionality is described in more detail "
+        "in the Description property of the object." )]
+    string Name;
+
+    [Description (
+        "The ElementName property identifies the brand of the WBEM server." )]
+    string ElementName;
+
+    [Description (
+        "The Description property identifies the brand and version of the "
+        "WBEM server." )]
+    string Description;
+};
+
+instance of CIM_ObjectManager {
+    SystemCreationClassName = "CIM_ComputerSystem";  // pywbem_mock.SYSTEMCREATIONCLASSNAME
+    SystemName = "MockSystem_WBEMServerTest";        // pywbem_mock.SYSTEMNAME
+    CreationClassName = "CIM_ObjectManager";         // pywbem_mock.OBJECTMANAGERCREATIONCLASSNAME
+    Name = "FakeObjectManager";                      // pywbem_mock.OBJECTMANAGERNAME
+    ElementName = "SFCB";              // causes use of CIM_Namespace when creating them
+    Description = "SFCB Version 0.0";
+};
