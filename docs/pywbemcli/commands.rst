@@ -28,6 +28,149 @@ commands, see :ref:`Pywbemcli command line interface`.
 **NOTE:** Many of the examples below use the :ref:`--mock-server general option`
 with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 
+
+.. index:: pair: command groups; namespace commands
+
+.. _`Namespace command group`:
+
+``namespace`` command group
+---------------------------
+
+The ``namespace`` command group has commands that act on CIM namespaces:
+
+* :ref:`Namespace list command` - List the namespaces on the server.
+* :ref:`Namespace create command` - Create a namespace on the server.
+* :ref:`Namespace delete command` - Delete a namespace on the server.
+* :ref:`Namespace interop command` - Get the Interop namespace on the server.
+
+See :ref:`pywbemcli namespace --help`.
+
+
+.. index::
+    pair: namespace commands; namespace list
+
+.. _`Namespace list command`:
+
+``namespace list`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``namespace list`` command lists the namespaces of the WBEM server of
+the :term:`current connection`.
+
+The result is displayed using ``txt`` output format or
+:term:`Table output formats`.
+
+The Interop namespace must exist on the server.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver --output-format plain namespace list
+    Namespace Name
+    root/PG_InterOp
+    root/benchmark
+    root/PG_Internal
+    test/WsmTest
+    test/EmbeddedInstance/Static
+    test/TestProvider
+    test/EmbeddedInstance/Dynamic
+    root/cimv2
+    root
+    test/cimv2
+    test/static
+
+See :ref:`pywbemcli namespace list --help` for the exact help output of the command.
+
+
+.. index::
+    pair: namespace commands; namespace create
+
+.. _`Namespace create command`:
+
+``namespace create`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``namespace create`` command creates a CIM namespace on the WBEM server of
+the :term:`current connection`.
+
+Leading and trailing slash (``/``) characters specified in the NAMESPACE
+argument will be stripped.
+
+The namespace must not yet exist on the server.
+
+The Interop namespace must exist on the server and cannot be created using
+this command.
+
+WBEM servers may not allow this operation or may severely limit the
+conditions under which a namespace can be created on the server.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock namespace create /root/abc
+    Created namespace root/abc
+
+See :ref:`pywbemcli namespace create --help` for the exact help output of the command.
+
+
+.. index::
+    pair: namespace commands; namespace delete
+
+.. _`Namespace delete command`:
+
+``namespace delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``namespace delete`` command deletes a CIM namespace from the WBEM server of
+the :term:`current connection`.
+
+Leading and trailing slash (``/``) characters specified in the NAMESPACE
+argument will be stripped.
+
+The namespace must exist and must be empty. That is, it must not contain
+any objects (qualifiers, classes or instances).
+
+The Interop namespace must exist on the server and cannot be deleted using
+this command.
+
+WBEM servers may not allow this operation or may severely limit the
+conditions under which a namespace can be deleted.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock namespace delete /root/abc
+    Deleted namespace root/abc
+
+See :ref:`pywbemcli namespace delete --help` for the exact help output of the command.
+
+
+.. index::
+    pair: namespace commands; namespace interop
+
+.. _`Namespace interop command`:
+
+``namespace interop`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``namespace interop`` command gets and displays the Interop namespace of
+the WBEM server of the :term:`current connection`.
+
+The Interop namespace must exist on the server.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock namespace interop
+    root/interop
+
+See :ref:`pywbemcli namespace interop --help` for the exact help output of the command.
+
+
 .. index:: pair: command groups; class commands
 
 .. _`Class command group`:
@@ -1325,14 +1468,16 @@ See :ref:`pywbemcli server interop --help` for the exact help output of the comm
 The ``server namespaces`` command lists the namespaces of the WBEM server of
 the :term:`current connection`.
 
-The result is displayed using :term:`Table output formats`.
+The result is displayed using ``txt`` output format or
+:term:`Table output formats`.
+
+The Interop namespace must exist on the server.
 
 Example:
 
 .. code-block:: text
 
     $ pywbemcli --name myserver --output-format plain server namespaces
-    Server Namespaces:
     Namespace Name
     root/PG_InterOp
     root/benchmark

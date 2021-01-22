@@ -30,10 +30,12 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import format_table, raise_pywbem_error_exception, \
-    validate_output_format, display_text, output_format_is_table, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, DEFAULT_TABLE_FORMAT
+    validate_output_format, display_text, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
+from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
+from ._utils import pywbemcliwarn
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -71,10 +73,18 @@ def server_group():
 @click.pass_obj
 def server_namespaces(context):
     """
-    List the namespaces of the server.
+    List the namespaces of the server (deprecated).
+
+    The Interop namespace must exist on the server.
+
+    Deprecated: The 'server namespaces' command is deprecated and will be
+    removed in a future version. Use the 'namespace list' command instead.
     """
-    # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_namespaces(context))
+    pywbemcliwarn(
+        "The 'server namespaces' command is deprecated and will be removed in "
+        "a future version. Use the 'namespace list' command instead.",
+        DeprecationWarning)
+    context.execute_cmd(lambda: cmd_namespace_list(context))
 
 
 @server_group.command('interop', cls=PywbemcliCommand,
@@ -83,10 +93,18 @@ def server_namespaces(context):
 @click.pass_obj
 def server_interop(context):
     """
-    Get the Interop namespace of the server.
+    Get the Interop namespace of the server (deprecated).
+
+    The Interop namespace must exist on the server.
+
+    Deprecated: The 'server interop' command is deprecated and will be removed
+    in a future version. Use the 'namespace interop' command instead.
     """
-    # pylint: disable=too-many-function-args
-    context.execute_cmd(lambda: cmd_server_interop(context))
+    pywbemcliwarn(
+        "The 'server interop' command is deprecated and will be removed in "
+        "a future version. Use the 'namespace interop' command instead.",
+        DeprecationWarning)
+    context.execute_cmd(lambda: cmd_namespace_interop(context))
 
 
 @server_group.command('brand', cls=PywbemcliCommand,
@@ -121,49 +139,6 @@ def server_info(context):
 ###############################################################
 #         Server cmds
 ###############################################################
-
-
-def cmd_server_namespaces(context):
-    """
-    Display namespaces in the current WBEM server
-    """
-    output_format = validate_output_format(
-        context.output_format,
-        ['TABLE', 'TEXT'], default_format=DEFAULT_TABLE_FORMAT)
-
-    try:
-        namespaces = context.wbem_server.namespaces
-        namespaces.sort()
-        context.spinner_stop()
-        if output_format_is_table(output_format):
-            # create list for each row
-            rows = [[ns] for ns in namespaces]
-
-            click.echo(format_table(rows, ['Namespace Name'],
-                                    title='Server Namespaces:',
-                                    table_format=output_format))
-        else:
-            display_text(", ".join(namespaces))
-
-    except Error as er:
-        raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
-
-
-def cmd_server_interop(context):
-    """
-    Display interop namespace in the current WBEM server
-    """
-
-    output_format = validate_output_format(context.output_format, 'TEXT')
-
-    try:
-        interop_ns = context.wbem_server.interop_ns
-        context.spinner_stop()
-
-        display_text(interop_ns, output_format)
-
-    except Error as er:
-        raise_pywbem_error_exception(er)
 
 
 def cmd_server_brand(context):
