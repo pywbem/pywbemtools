@@ -141,6 +141,7 @@ Help text for ``pywbemcli``:
     Commands:
       class       Command group for CIM classes.
       instance    Command group for CIM instances.
+      namespace   Command group for CIM namespaces.
       profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.
@@ -1574,6 +1575,153 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
       -h, --help                      Show this help message.
 
 
+.. _`pywbemcli namespace --help`:
+
+pywbemcli namespace --help
+--------------------------
+
+
+
+Help text for ``pywbemcli namespace`` (see :ref:`namespace command group`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] namespace COMMAND [ARGS] [COMMAND-OPTIONS]
+
+      Command group for CIM namespaces.
+
+      This command group defines commands to create, delete and list namespaces in a WBEM server.
+
+      In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
+      can also be specified before the 'namespace' keyword.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+    Commands:
+      list     List the namespaces of the server.
+      create   Create a namespace on the server.
+      delete   Delete a namespace from the server.
+      interop  Get the Interop namespace of the server.
+
+
+.. _`pywbemcli namespace create --help`:
+
+pywbemcli namespace create --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli namespace create`` (see :ref:`namespace create command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] namespace create NAMESPACE [COMMAND-OPTIONS]
+
+      Create a namespace on the server.
+
+      Leading and trailing slash (``/``) characters specified in the NAMESPACE argument will be stripped.
+
+      The namespace must not yet exist on the server.
+
+      The Interop namespace must exist on the server and cannot be created using this command, because that namespace is
+      required to implement client requests to manage namespaces.
+
+      WBEM servers may not allow this operation or may severely limit the conditions under which a namespace can be
+      created on the server.
+
+      Example:
+
+        pywbemcli -n myconn namespace create root/cimv2
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli namespace delete --help`:
+
+pywbemcli namespace delete --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli namespace delete`` (see :ref:`namespace delete command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] namespace delete NAMESPACE [COMMAND-OPTIONS]
+
+      Delete a namespace from the server.
+
+      Leading and trailing slash (``/``) characters specified in the NAMESPACE argument will be stripped.
+
+      The namespace must exist and must be empty. That is, it must not contain any objects (qualifiers, classes or
+      instances).
+
+      The Interop namespace must exist on the server and cannot be deleted using this command.
+
+      WBEM servers may not allow this operation or may severely limit the conditions under which a namespace can be
+      deleted.
+
+      Example:
+
+        pywbemcli -n myconn namespace delete root/cimv2
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli namespace interop --help`:
+
+pywbemcli namespace interop --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli namespace interop`` (see :ref:`namespace interop command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] namespace interop [COMMAND-OPTIONS]
+
+      Get the Interop namespace of the server.
+
+      The Interop namespace must exist on the server.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli namespace list --help`:
+
+pywbemcli namespace list --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli namespace list`` (see :ref:`namespace list command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] namespace list [COMMAND-OPTIONS]
+
+      List the namespaces of the server.
+
+      The Interop namespace must exist on the server.
+
+      Examples:
+
+        pywbemcli -n myconn namespace list
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
 .. _`pywbemcli profile --help`:
 
 pywbemcli profile --help
@@ -1727,7 +1875,7 @@ Help text for ``pywbemcli qualifier delete`` (see :ref:`qualifier delete command
       Delete a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM namespace (--namespace option). If no namespace
       was specified, the default namespace of the connection is used.
 
-      This command execute the DeleteQualifier operation against the WBEM server and leaves it to the WBEM server to
+      This command executes the DeleteQualifier operation against the WBEM server and leaves it to the WBEM server to
       reject the operation if any classes in the namespace use the qualifier.
 
       In the output, the qualifier declaration will formatted as defined by the --output-format general option.
@@ -1848,8 +1996,8 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       -h, --help  Show this help message.
 
     Commands:
-      namespaces  List the namespaces of the server.
-      interop     Get the Interop namespace of the server.
+      namespaces  List the namespaces of the server (deprecated).
+      interop     Get the Interop namespace of the server (deprecated).
       brand       Get the brand of the server.
       info        Get information about the server.
 
@@ -1913,7 +2061,12 @@ Help text for ``pywbemcli server interop`` (see :ref:`server interop command`):
 
     Usage: pywbemcli [GENERAL-OPTIONS] server interop [COMMAND-OPTIONS]
 
-      Get the Interop namespace of the server.
+      Get the Interop namespace of the server (deprecated).
+
+      The Interop namespace must exist on the server.
+
+      Deprecated: The 'server interop' command is deprecated and will be removed in a future version. Use the 'namespace
+      interop' command instead.
 
     Command Options:
       -h, --help  Show this help message.
@@ -1933,7 +2086,12 @@ Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces comma
 
     Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [COMMAND-OPTIONS]
 
-      List the namespaces of the server.
+      List the namespaces of the server (deprecated).
+
+      The Interop namespace must exist on the server.
+
+      Deprecated: The 'server namespaces' command is deprecated and will be removed in a future version. Use the
+      'namespace list' command instead.
 
     Command Options:
       -h, --help  Show this help message.

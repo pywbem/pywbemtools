@@ -22,6 +22,7 @@ and Python 3.
 
 from __future__ import absolute_import, print_function
 
+from ._cmd_namespace import *       # noqa: F403,F401
 from ._cmd_class import *           # noqa: F403,F401
 from ._cmd_instance import *        # noqa: F403,F401
 from ._cmd_qualifier import *       # noqa: F403,F401

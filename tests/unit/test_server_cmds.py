@@ -48,8 +48,8 @@ SERVER_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
     'brand             Get the brand of the server.',
     'info              Get information about the server.',
-    'interop           Get the Interop namespace of the server.',
-    'namespaces        List the namespaces of the server.',
+    'interop           Get the Interop namespace of the server (deprecated).',
+    'namespaces        List the namespaces of the server (deprecated).',
 ]
 
 SERVER_BRAND_HELP_LINES = [
@@ -66,13 +66,13 @@ SERVER_INFO_HELP_LINES = [
 
 SERVER_INTEROP_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] server interop [COMMAND-OPTIONS]',
-    'Get the Interop namespace of the server.',
+    'Get the Interop namespace of the server (deprecated).',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
 SERVER_NAMESPACES_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [COMMAND-OPTIONS]',
-    'List the namespaces of the server.',
+    'List the namespaces of the server (deprecated)',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -187,8 +187,7 @@ TEST_CASES = [
     ['Verify server command namespaces',
      {'args': ['namespaces'],
       'general': ['-o', 'simple']},
-     {'stdout': ['Server Namespaces:',
-                 'Namespace Name',
+     {'stdout': ['Namespace Name',
                  '----------------',
                  'interop',
                  'root/cimv2'],
@@ -199,7 +198,7 @@ TEST_CASES = [
     ['Verify server command namespaces, text output',
      {'args': ['namespaces'],
       'general': ['-o', 'text']},
-     {'stdout': ['interop, root/cimv2'],
+     {'stdout': ['interop', 'root/cimv2'],
       'rc': 0,
       'test': 'lines'},
      MOCK_SERVER_MODEL, OK],
