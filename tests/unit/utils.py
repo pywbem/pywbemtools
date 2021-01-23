@@ -31,7 +31,7 @@ from subprocess import Popen, PIPE
 import six
 
 
-def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
+def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     """
     Invoke the 'pywbemcli' command as a child process.
 
@@ -52,11 +52,14 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
         :term:`string`; dict value is the variable value as a :term:`string`
         (without any shell escaping needed).
 
-      stdin: (:term:`string` or None):
+      stdin (:term:`string` or None):
         Passed to the executable as stdin.
 
-      verbose: (bool)
+      verbose (bool):
         If True, display args, env, and stdin before executing the command
+
+      condition ('pdb', other values):
+        If 'pdb', the test breaks in the debugger before invoking the command.
 
     Returns:
 
@@ -112,6 +115,15 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     if verbose and stdin:
         print('stdin {}'.format(stdin))
 
+    if condition == 'pdb':
+        stdin_stream = None
+        stdout_stream = None
+        stderr_stream = None
+    else:
+        stdin_stream = PIPE
+        stdout_stream = PIPE
+        stderr_stream = PIPE
+
     # The click package on Windows writes NL at the Python level
     # as '\r\r\n' at the level of the shell under some cases. This is
     # documented in Click issue #1271 for Click 7.0 The Popen universal_newlines
@@ -125,7 +137,8 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None):
     # stout_str, stderr_str = proc.communicate(input=stdin)
     # Temp alternative is the following line with universal_newlines=False
     # and the second change to fix the EOLs ourself.
-    proc = Popen(cmd_args, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+    proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
+                 stdout=stdout_stream, stderr=stderr_stream,
                  universal_newlines=False)
 
     stdout_str, stderr_str = proc.communicate(input=stdin)

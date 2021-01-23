@@ -274,11 +274,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         if not self.pdb:
             self.spinner_start()
-        if self.pdb:
-            import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()  # pylint: disable=no-member
         try:
-            cmd()
+            if self.pdb:
+                import pdb  # pylint: disable=import-outside-toplevel
+                pdb.set_trace()  # pylint: disable=no-member
+
+            cmd()  # The pywbemcli command function
+
         finally:
             if not self.pdb:
                 self.spinner_stop()
