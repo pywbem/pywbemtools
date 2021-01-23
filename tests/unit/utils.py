@@ -21,8 +21,11 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
-import io
 import re
+try:
+    from StringIO import StringIO  # Python 2
+except ImportError:
+    from io import StringIO  # Python 3
 from copy import copy
 from subprocess import Popen, PIPE
 import six
@@ -312,10 +315,10 @@ class captured_output(object):
 
     def __enter__(self):
         self._saved_stdout = sys.stdout
-        sys.stdout = self._iobuf_stdout = io.BytesIO()
+        sys.stdout = self._iobuf_stdout = StringIO()
         self.stdout = None
         self._saved_stderr = sys.stderr
-        sys.stderr = self._iobuf_stderr = io.BytesIO()
+        sys.stderr = self._iobuf_stderr = StringIO()
         self.stderr = None
         return self
 

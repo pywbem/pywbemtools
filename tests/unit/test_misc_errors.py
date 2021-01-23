@@ -96,7 +96,7 @@ class TestConnectionFail(CLITestsBase):
                         'test': 'innows'}
         mock = None
         self.command_test(desc, grp, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition)
 
 
 TEST_CASES_NAMESPACE_ERR = [
@@ -154,4 +154,4 @@ class TestNamespaceError(CLITestsBase):
                         'test': 'innows'}
         mock = SIMPLE_MOCK_FILE_PATH
         self.command_test(desc, grp, inputs, exp_response,
-                          mock, condition, verbose=False)
+                          mock, condition)
