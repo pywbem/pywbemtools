@@ -62,6 +62,9 @@ Released: not yet
 * Migrated from Travis and Appveyor to GitHub Actions. This required several
   changes in package dependencies for development.
 
+* The verbose option ('-v' / '--verbose') now also displays the objects that
+  are compiled into a mock environment when setting it up.
+
 **Known issues:**
 
 * See `list of open issues`_.

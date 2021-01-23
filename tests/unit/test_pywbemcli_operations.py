@@ -205,6 +205,9 @@ TESTCASES_BUILD_MOCKENV = [
     #     tuple(namespace, classname, provider_type, provider_classname).
     #   * exp_stdout_lines: List of lines expected to be written to stdout
     #     during execution of the code to be tested. Each line is a regexp.
+    #   * exp_stdout_lines_all: Boolean indicating that the lines in
+    #     exp_stdout_lines are all expected lines, i.e. any additional lines
+    #     will cause a test failure.
     #   * exp_stderr_lines: List of lines expected to be written to stderr
     #     during execution of the code to be tested. Each line is a regexp.
     # * exp_exc_types: Expected exception type(s), or None.
@@ -225,6 +228,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, OK
@@ -242,6 +246,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, OK
@@ -259,6 +264,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         # This testcase removes the pkl file from the mock cache as a
@@ -280,6 +286,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         # This testcase removes the md5 file from the mock cache as a
@@ -301,6 +308,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, OK
@@ -318,6 +326,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, OK
@@ -335,6 +344,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -354,6 +364,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -373,6 +384,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -392,6 +404,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -411,6 +424,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -430,6 +444,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -449,6 +464,7 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[],
+            exp_stdout_lines_all=True,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -470,13 +486,14 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ] if NEWSTYLE_SUPPORTED else [
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* will be built because it is not "
-                b"cacheable",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* will be built because it is not "
+                "cacheable",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
@@ -494,13 +511,14 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be rebuilt because it is not "
-                b"cacheable",
+                "Mock environment .* will be rebuilt because it is not "
+                "cacheable",
             ] if NEWSTYLE_SUPPORTED else [
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* will be built because it is not "
-                b"cacheable",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* will be built because it is not "
+                "cacheable",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
@@ -518,9 +536,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         # This testcase removes the pkl file from the mock cache as a
@@ -543,9 +562,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         # This testcase removes the md5 file from the mock cache as a
@@ -568,9 +588,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         # This testcase removes the dep file from the mock cache as a
@@ -593,14 +614,15 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be rebuilt because the mock files "
-                b"have changed.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be rebuilt because the mock files "
+                "have changed.",
+                "Mock environment .* has been written to cache.",
             ] if NEWSTYLE_SUPPORTED else [
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* will be built because it is not "
-                b"cacheable",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* will be built because it is not "
+                "cacheable",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
@@ -618,14 +640,15 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be rebuilt because the mock files "
-                b"have changed.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be rebuilt because the mock files "
+                "have changed.",
+                "Mock environment .* has been written to cache.",
             ] if NEWSTYLE_SUPPORTED else [
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* will be built because it is not "
-                b"cacheable",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* will be built because it is not "
+                "cacheable",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
@@ -643,9 +666,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -666,8 +690,9 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* has been loaded from cache.",
+                "Mock environment .* has been loaded from cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -687,9 +712,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -709,9 +735,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -731,10 +758,11 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be rebuilt because the mock files "
-                b"have changed.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be rebuilt because the mock files "
+                "have changed.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -754,10 +782,11 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_NEW_EXP_CLASSES,
             exp_providers=SIMPLE_V1_NEW_EXP_PROVIDERS,
             exp_stdout_lines=[  # Only NEWSTYLE_SUPPORTED
-                b"Mock environment .* will be rebuilt because the mock files "
-                b"have changed.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be rebuilt because the mock files "
+                "have changed.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -778,14 +807,15 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=SIMPLE_V1_OLD_EXP_CLASSES,
             exp_providers=SIMPLE_V1_OLD_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be built because user-specified "
-                b"connections files are not cached",
+                "Mock environment .* will be built because user-specified "
+                "connections files are not cached",
             ] if NEWSTYLE_SUPPORTED else [
-                b"Mock environment .* will be built because user-specified "
-                b"connections files are not cached",
-                b"Mock environment .* will be built because it is not "
-                b"cacheable",
+                "Mock environment .* will be built because user-specified "
+                "connections files are not cached",
+                "Mock environment .* will be built because it is not "
+                "cacheable",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None, DeprecatedSetupWarning, not CLICK_ISSUE_1590
@@ -804,9 +834,10 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=STANDALONE_EXP_CLASSES,
             exp_providers=STANDALONE_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be built because it was not cached.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be built because it was not cached.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -825,10 +856,11 @@ TESTCASES_BUILD_MOCKENV = [
             exp_classes=STANDALONE_EXP_CLASSES,
             exp_providers=STANDALONE_EXP_PROVIDERS,
             exp_stdout_lines=[
-                b"Mock environment .* will be rebuilt because the mock files "
-                b"have changed.",
-                b"Mock environment .* has been written to cache.",
+                "Mock environment .* will be rebuilt because the mock files "
+                "have changed.",
+                "Mock environment .* has been written to cache.",
             ],
+            exp_stdout_lines_all=False,
             exp_stderr_lines=[],
         ),
         None if NEWSTYLE_SUPPORTED else SetupNotSupportedError,
@@ -846,7 +878,7 @@ TESTCASES_BUILD_MOCKENV = [
 def test_build_mockenv(testcase, test_mode, verbose, connections_file,
                        default_namespace, mock_files, exp_dep_files,
                        exp_classes, exp_providers, exp_stdout_lines,
-                       exp_stderr_lines):
+                       exp_stdout_lines_all, exp_stderr_lines):
     """
     Test function for BuildMockenvMixin.build_mockenv().
     """
@@ -1078,39 +1110,51 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
         # pylint: disable=protected-access
         assert conn._provider_registry.get_registered_provider(ns, pt, cln)
 
-    if captured.stdout == b'':
-        stdout_lines = []
-    else:
-        stdout_lines = captured.stdout.strip(b'\n').split(b'\n')
-    assert len(stdout_lines) == len(exp_stdout_lines), \
-        "Unexpected number of lines on stdout:\n" \
-        "Testcase: {}\n" \
-        "---- Actually: {} lines:\n{}" \
-        "---- Expected: {} lines (regexp):\n{}" \
-        "---- End\n". \
-        format(testcase.desc,
-               len(stdout_lines),
-               ''.join([_ensure_unicode(ln) + '\n'
-                        for ln in stdout_lines]),
-               len(exp_stdout_lines),
-               ''.join([_ensure_unicode(ln) + '\n'
-                        for ln in exp_stdout_lines]))
-    for i, regexp in enumerate(exp_stdout_lines):
-        line = stdout_lines[i]
-        assert re.search(regexp, line), \
-            "Unexpected line #{} on stdout:\n" \
+    if exp_stdout_lines_all:
+        if captured.stdout == '':
+            stdout_lines = []
+        else:
+            stdout_lines = captured.stdout.strip('\n').split('\n')
+        assert len(stdout_lines) == len(exp_stdout_lines), \
+            "Unexpected number of lines on stdout:\n" \
             "Testcase: {}\n" \
-            "---- Actually:\n" \
-            "{}\n" \
-            "---- Expected (regexp):\n" \
-            "{}\n" \
+            "---- Actually: {} lines:\n{}" \
+            "---- Expected: {} lines (regexp):\n{}" \
             "---- End\n". \
-            format(i + 1, testcase.desc, line, regexp)
+            format(testcase.desc,
+                   len(stdout_lines),
+                   ''.join([_ensure_unicode(ln) + '\n'
+                            for ln in stdout_lines]),
+                   len(exp_stdout_lines),
+                   ''.join([_ensure_unicode(ln) + '\n'
+                            for ln in exp_stdout_lines]))
+        for i, regexp in enumerate(exp_stdout_lines):
+            line = stdout_lines[i]
+            assert re.search(regexp, line), \
+                "Unexpected line #{} on stdout:\n" \
+                "Testcase: {}\n" \
+                "---- Actually:\n" \
+                "{}\n" \
+                "---- Expected (regexp):\n" \
+                "{}\n" \
+                "---- End\n". \
+                format(i + 1, testcase.desc, line, regexp)
+    else:
+        for regexp in exp_stdout_lines:
+            assert re.search(regexp, captured.stdout), \
+                "Missing line on stdout:\n" \
+                "Testcase: {}\n" \
+                "---- Actual stdout:\n" \
+                "{}\n" \
+                "---- Expected line (regexp):\n" \
+                "{}\n" \
+                "---- End\n". \
+                format(testcase.desc, captured.stdout, regexp)
 
-    if captured.stderr == b'':
+    if captured.stderr == '':
         stderr_lines = []
     else:
-        stderr_lines = captured.stderr.strip(b'\n').split(b'\n')
+        stderr_lines = captured.stderr.strip('\n').split('\n')
     assert len(stderr_lines) == len(exp_stderr_lines), \
         "Unexpected number of lines on stderr:\n" \
         "Testcase: {}\n" \

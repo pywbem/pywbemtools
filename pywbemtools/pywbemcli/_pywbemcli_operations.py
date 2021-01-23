@@ -554,7 +554,7 @@ class BuildMockenvMixin(object):
             if ext == '.mof':
                 try:
                     # Displays any MOFParseError already
-                    self.compile_mof_file(file_path)
+                    self.compile_mof_file(file_path, verbose=verbose)
                 except pywbem.Error as er:
                     # Abort the entire pywbemcli command because the
                     # MOF compilation might have caused inconsistencies in

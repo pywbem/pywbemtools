@@ -22,9 +22,9 @@ from __future__ import print_function, absolute_import
 
 import sys
 try:
-    from StringIO import StringIO
+    from StringIO import StringIO  # Python 2
 except ImportError:
-    from io import StringIO
+    from io import StringIO  # Python 3
 import pytest
 
 from pywbemtools.pywbemcli._common import format_table, fold_strings
