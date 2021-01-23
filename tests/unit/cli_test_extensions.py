@@ -263,8 +263,9 @@ class CLITestsBase(object):
         if verbose and env:
             print('ENV: {}'.format(env))
 
-        rc, stdout, stderr = execute_pywbemcli(cmd_line, env=env, stdin=stdin,
-                                               verbose=verbose)
+        rc, stdout, stderr = execute_pywbemcli(
+            cmd_line, env=env, stdin=stdin, verbose=verbose,
+            condition=condition)
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr, desc)

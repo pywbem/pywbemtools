@@ -47,6 +47,11 @@ Released: not yet
 * Fix issue where documentation index disappeared when we changed the
   documentation theme (see issue #868)
 
+* Test: Fixed behavior of 'pdb' test condition, which is supposed to stop
+  in the pdb debugger before executing the command function, but did immediately
+  leave the debugger again because of redirections of the standard streams.
+  The debugger now properly comes up when 'pdb' is specified as a condition.
+
 **Enhancements:**
 
 * Add new option to class find command (--summary) to display a summary of
