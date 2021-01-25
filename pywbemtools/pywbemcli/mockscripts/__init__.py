@@ -26,6 +26,7 @@ import os
 import warnings
 import importlib
 import traceback
+import pywbem
 
 
 class MockError(Exception):
@@ -111,14 +112,14 @@ def setup_script(file_path, conn, server, verbose):
         sys.modules[modpath] = module
         try:
             spec.loader.exec_module(module)
-        except Exception:
-            raise script_error(file_path)
+        except Exception as exc:
+            raise script_error(file_path, exc)
 
         if hasattr(module, 'setup'):
             try:
                 module.setup(conn=conn, server=server, verbose=verbose)
-            except Exception:
-                raise script_error(file_path)
+            except Exception as exc:
+                raise script_error(file_path, exc)
         else:
             warnings.warn_explicit(
                 "The support of mock scripts without setup() function is "
@@ -133,8 +134,8 @@ def setup_script(file_path, conn, server, verbose):
         # name, causing it to appear in any tracebacks.
         try:
             file_code = compile(file_source, file_path, 'exec')
-        except Exception:
-            raise script_error(file_path)
+        except Exception as exc:
+            raise script_error(file_path, exc)
 
         # Poor man's approach to determining whether the mock script has a
         # setup() function:
@@ -156,8 +157,8 @@ def setup_script(file_path, conn, server, verbose):
         }
         try:
             exec(file_code, globalparams, None)  # pylint: disable=exec-used
-        except Exception:
-            raise script_error(file_path)
+        except Exception as exc:
+            raise script_error(file_path, exc)
         raise NotCacheable(
             "On Python <3.5, mock scripts cannot be cached")
 
@@ -206,15 +207,20 @@ def import_script(file_path):
             "Mock script {} does not have a setup() function".format(file_path))
 
 
-def script_error(file_path):
+def script_error(file_path, exc):
     """
     Return a MockScriptError exception object with the current traceback in its
     exception message, ready to be displayed.
     """
-    tb = traceback.format_exception(*sys.exc_info())
-    new_exc = MockScriptError(
-        "Mock script {} failed:\n{}".
-        format(file_path, "\n".join(tb)))
+    if isinstance(exc, pywbem.Error):
+        new_exc = MockScriptError(
+            "Mock script {} failed: {}".
+            format(file_path, exc))
+    else:
+        tb = traceback.format_exception(*sys.exc_info())
+        new_exc = MockScriptError(
+            "Mock script {} failed:\n{}".
+            format(file_path, "\n".join(tb)))
     new_exc.__cause__ = None
     return new_exc
 
