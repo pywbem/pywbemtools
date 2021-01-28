@@ -102,7 +102,8 @@ DEFAULT_WBEM_SERVER_MOCK_DICT = {
     'object_manager': {'Name': 'FakeObjectManager',
                        'ElementName': 'Pegasus',
                        'Description': 'Pegasus CIM Server Version 2.15.0'
-                                      ' Released', },
+                                      ' Released',
+                       'GatherStatisticalData': False},
 
     # TODO/FUTURE: WbemServerMock currently only builds the pywbem supplied
     # CIM namespace provider.
@@ -413,7 +414,8 @@ class WbemServerMock(object):
                   "SystemName": system_name,
                   "Name": object_manager_name,
                   "ElementName": object_manager_element_name,
-                  "Description": object_manager_description}
+                  "Description": object_manager_description,
+                  "GatherStatisticalData": False}
 
         ominst = self.add_inst_from_def("CIM_ObjectManager",
                                         namespace=self.interop_ns,

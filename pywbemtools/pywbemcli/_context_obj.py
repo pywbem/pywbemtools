@@ -50,7 +50,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         self._output_format = output_format
         self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
-        self._timestats = timestats
+        self.timestats = timestats   # has setter method
         self._log = log
         self._verbose = verbose
         self._pdb = pdb
@@ -86,6 +86,12 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         :term:`string`: Output format to be used.
         """
         return self._timestats
+
+    @timestats.setter
+    def timestats(self, value):
+        """Setter method; for a description see the getter method."""
+        # pylint: disable=attribute-defined-outside-init
+        self._timestats = value
 
     @property
     def use_pull(self):
@@ -171,10 +177,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 self._pywbem_server.create_connection(
                     log=self.log,
                     use_pull=self.use_pull,
-                    timestats=self.timestats,
                     verbose=self.verbose)
-                if self._conn and self.timestats:
-                    self.conn.statistics.enable()
             return self._pywbem_server.wbem_server
 
         raise click.ClickException(
@@ -260,7 +263,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         server can be used for interactive commands.
 
         This method is called by every command execution to setup and
-        execute the command. Thus, each command has the line similar to:
+        execute the command. Thus, each command MUST have the line similar to:
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
@@ -279,13 +282,13 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 import pdb  # pylint: disable=import-outside-toplevel
                 pdb.set_trace()  # pylint: disable=no-member
 
-            cmd()  # The pywbemcli command function
+            cmd()  # The pywbemcli command function call.
 
         finally:
             if not self.pdb:
                 self.spinner_stop()
 
-            # Issue statistics if required. Note that we use _conn in order
+            # Issue statistics if required. Note: uses _conn in order
             # not to create the connection if not created.
             if self.timestats and self._conn:
                 context = click.get_current_context()
@@ -334,7 +337,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 include_lengths = True
 
         # build list of column names
-        header = ['Op\nCnt', 'Exec\nCnt', 'Op Time(S)\nAvg/Min/Max']
+        header = ['Op\nCnt', 'Exc\nCnt', 'Op Time(S)\nAvg/Min/Max']
         if include_svr_time:
             header.append("Server Time(S)\nAvg/Min/Max")
         if include_lengths:

@@ -499,7 +499,7 @@ class PywbemServer(object):
         self._wbem_server = None
 
     def create_connection(self, log=None, use_pull=None,
-                          verbose=None, timestats=None):
+                          verbose=None):
         """
         Initiate a WBEB connection, via PyWBEM api. Arguments for
         the request are the parameters required by the pywbem
@@ -524,7 +524,7 @@ class PywbemServer(object):
                 conn = PYWBEMCLIFakedConnection(
                     default_namespace=self.default_namespace,
                     use_pull_operations=use_pull,
-                    stats_enabled=timestats)
+                    stats_enabled=True)
                 self._wbem_server = WBEMServer(conn)
                 try:
                     conn.build_mockenv(
@@ -584,7 +584,7 @@ class PywbemServer(object):
                     x509=x509_dict, ca_certs=ca_certs,
                     timeout=self.timeout,
                     use_pull_operations=use_pull,
-                    stats_enabled=timestats)
+                    stats_enabled=True)
             except IOError as exc:
                 raise click.ClickException(
                     'Cannot create connection to {}: {}'.

@@ -28,6 +28,21 @@ commands, see :ref:`Pywbemcli command line interface`.
 **NOTE:** Many of the examples below use the :ref:`--mock-server general option`
 with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
 
+The command groups are:
+
+* :ref:`Class command group` - Command group for CIM classes.
+* :ref:`Instance command group` - Command group for CIM instances.
+* :ref:`Namespace command group` - Command group for Namespace management.
+* :ref:`Profile command group` - Command group for WBEM management profiles.
+* :ref:`Qualifier command group` - Command group for CIM qualifier declarations.
+* :ref:`Server command group` - Command group for WBEM servers.
+* :ref:`Statistics command group` - Command group for WBEM server statistics.
+* :ref:`Connection command group` - Command group for WBEM connection definitions.
+
+The individual commands (no command group) are:
+* :ref:`help command` - Show help message for interactive mode.
+* :ref:`repl command` - Enter interactive mode (default).
+
 
 .. index:: pair: command groups; namespace commands
 
@@ -1532,6 +1547,241 @@ Example:
 
 See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
 command.
+
+
+.. index:: pair: command groups;statistics command group
+
+.. _`Statistics command group`:
+
+``statistics`` command group
+----------------------------
+
+The ``statistics`` command group includes commands that display
+statistics maintained  in pywbemcli on the WBEM server operations
+executed by pywbemcli.
+
+.. index:: pair: Operation statistics;statistics commands
+
+.. _Operation statistics:
+
+Statistics on WBEM server operations can be gathered by the pywbemcli client,
+and also separately by some WBEM servers.  There are multiple components to
+statistics gathering and reporting in pywbemcli:
+
+1. Pywbemcli client gathers statistics on CIM/XML operations that can be
+displayed either with the ``statistics show`` command  or afer pywbemcli
+executes each command if the ``--timestats`` / ``-T`` general option is used.
+The statistics gathered includes at least:
+
+a. Number of operations executed by operation type.
+b. Number of exceptions for each operation type.
+c. Operation execution time (minimum, maximum, and average).
+d. Request/response size (minimum, maximum, and average).
+e. Operation name.
+
+In interactive mode, statistics are displayed either after each command
+pywbemcli (``--timestats``) or only only when the command ``statistics show``
+is issued.
+
+In command line mode, use the ``--timestats`` general options display on the
+command execution after the command is executed.
+
+When python_mock is used, statistics on compile time of classes
+and instances inserted into the mock respository are also gathered.
+
+2. WBEM servers may support two capabilities for managing statistics on WBEM
+operations:
+
+    a. If statistics gathering is enabled on the WBEM server, each CIM/XML
+       response may include an extra header field ``WBEMServerResponseTime`` with
+       the server response time for that operation. Those response times are
+       gathered in the statistics kept by pywbemcli. This may have to be enabled by
+       setting a statistics gathering flag in the WBEM server.
+
+    b. Some WBEM servers gather statistical information on operation execution
+       in the WBEM server and report this through instances of a class defined
+       for the WBEM server. This statistics gathering capability is completely
+       independent of pywbemcli. This capability may have to be enabled by setting
+       a statistics gathering flag in the WBEM server. Pywbemcli provides the
+       ``statistics server-show`` command to retrieve  this data into a
+       table.
+
+The mechanisms for gathering and reporting statistics from WBEM servers may
+only exist in some servers and may be optionally enabled and disabled
+differently in servers because while the capabilities were documented in the
+DMTF schemas, they were never included as part of either DMTF or SNIA profile
+requirements so the implementations vary.
+
+Pywbemcli provides a command to activate the WBEM server statistics gathering
+based on the CIM_CIMObjectManager class GatherStatisticalData property.
+
+The pywbemcli statistics report is table based showing all of the currently
+gathered statistics: The following is an example of this report.
+
+.. code-block:: text
+
+    pywbemcli> statistics show
+    Statistics: Time(Seconds); Times/lengths: (Avg/Min/Max), single value if all same.
+       Op    Exc  Op Time(S)         RequestLen     ReplyLen       Operation
+      Cnt    Cnt  Avg/Min/Max        Avg/Min/Max    Avg/Min/Max
+    -----  -----  -----------------  -------------  -------------  ----------------------
+        2      0  0.045/0.041/0.049  332            63309          EnumerateClassNames
+        3      1  0.019/0.005/0.033  551/536/560    1501/298/3838  OpenEnumerateInstances
+        2      0  0.006/0.006/0.006  542            4187           GetClass
+
+If the WBEM server is enabled to gather statistics and each CIM/XML response
+includes server response time, the report includes the extra row ``Server
+Time`` as follows.
+
+.. code-block:: text
+
+    pywbemcli>statistics show
+    Statistics: Time(Seconds); Times/lengths: (Avg/Min/Max), single value if all same.
+       Op    Exc  Op Time(S)         Server Time(S)     RequestLen     ReplyLen        Operation
+      Cnt    Cnt  Avg/Min/Max        Avg/Min/Max        Avg/Min/Max    Avg/Min/Max
+    -----  -----  -----------------  -----------------  -------------  --------------  ----------------------
+        2      0  0.045/0.041/0.049  0.000/inf/0.000    332            63309           EnumerateClassNames
+        2      1  0.026/0.005/0.047  0.000/inf/0.000    333/321/345    6225/298/12152  EnumerateInstanceNames
+        5      2  0.014/0.004/0.033  0.000/0.001/0.001  550/536/560    1728/298/3838   OpenEnumerateInstances
+        1      0  0.013              0.001              3483           224             ModifyInstance
+        2      0  0.010/0.010/0.010  0.000/0.001/0.001  345            3504/3504/3505  EnumerateInstances
+        1      0  0.008              0.001              822            2976            GetInstance
+        2      0  0.006/0.006/0.006  0.000/inf/0.000    542            4187            GetClass
+
+Statistics .maintained in the server are only displayed if the server is
+gathering statistics and only with the pywbemcli command ``statistics
+server-show``. Pywbemcli does not provide any mechanism to reset these
+statistics values and simply reports the statistics based on the data received
+from the WBEM server.
+
+In the interactive mode Pywbemcli statistics are discarded each time a new WBEM
+server is selected but the statistics display mode (--timestats) in maintained.
+
+The statistics commands are:
+
+* :ref:`Statistics reset command` - Reset the counts in the client managed statistics.
+* :ref:`Statistics server-on command` - Enable statistics gathering and return of server response time in a WBEM server.
+* :ref:`Statistics server-off command` - Disable statistics gathering and return of server response time in a WBEM server.
+* :ref:`Statistics server-show command` - Display WBEM server kept statistics counts.
+* :ref:`Statistics show command` - Display statistics counts kept in pywbemcli (interactive mode).
+* :ref:`Statistics status command` - Display status of statistics gathering in pywbemcli and the WBEM server.
+
+.. index:: pair: statistics commands; statistics server-on
+
+.. _`Statistics server-on command`:
+
+``statistics server-on`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics server-on`` command attempts to enable the statistics gathering
+capability of the current WBEM server.  See '_Operation statistics'_ for
+more information on statistics in pywbem/pywbemcli and WBEM servers
+
+Since only some WBEM server implementations actually implement statistics
+gathering, this request may result in an exception from the server because
+the Class CIM_ObjectManager or its property ``GatherStatisticalData`` do not exist
+in the server or the server does not allow a client to modify the property.
+
+Once the WBEM server returns the server response time, an additional column
+``Server Time`` appears in the statistics report.
+
+
+.. index:: pair: statistics commands; statistics server-off
+
+.. _`Statistics server-off command`:
+
+``statistics server-off`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics server-off`` command attempts to disable the gathering of
+server statistics on the current connected WBEM server  and the return of
+server response time by setting the GatherStatisticalData property to False in
+the CIM_ObjectManager instance in the Interop namespace. See '_Operation
+statistics'_ for more information on statistics in pywbem/pywbemcli and WBEM
+servers.
+
+Since only some WBEM servers  actually implement statistics gathering, this
+request may result in an exception from the server because the Class
+CIM_ObjectManager or its property ``GatherStatisticalData`` do not exist in the
+server or the server does not allow a client to modify the property.
+
+Once the WBEM server stops returning the server response time, the  column
+``Server Optimes`` no longer appears in the statistics report.
+
+
+.. index:: pair: statistics commands; statistics status
+
+.. _`Statistics status command`:
+
+``statistics status`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics status`` command displays the status of both the
+statistic gathering in the current WBEM server and in pywbemcli.
+
+See '_Operation statistics'_ for
+more information on statistics in pywbem/pywbemcli and WBEM servers
+
+.. index:: pair: statistics commands; statistics reset
+
+.. _`Statistics reset command`:
+
+``statistics reset`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics reset`` command resets the counters of all statistics
+maintained in pywbemcli and statistics on the WBEM server operation
+times if the CIM/XML header field ``WBEMServerResponseTime`` is part of
+the XML response from the WBEM server
+
+.. index:: pair: statistics commands; statistics show
+
+.. _`Statistics show command`:
+
+``statistics show`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics show`` command displays the current pywbemcli managed
+statistics as a table.
+
+The following example shows the use of --timestats option in
+the interactive mode displayint the statistics after the enumerate command
+is executed.
+
+
+.. code-block:: text
+
+    $ pywbemcli -n mock1 --timestats
+
+    pywbemcli> class enumerate --di --no
+    CIM_Foo
+    CIM_Foo_sub
+    CIM_Foo_sub2
+    CIM_Foo_sub_sub
+
+    Statistics: Time(Seconds); Times/lengths: (Avg/Min/Max), single value if all same.
+       Op    Exc     Op Time(S)  Operation
+      Cnt    Cnt    Avg/Min/Max
+    -----  -----  -------------  -------------------
+        1      0          0.000  EnumerateClassNames
+
+
+.. index:: pair: statistics commands; statistics server-show
+
+.. _`Statistics server-show command`:
+
+``statistics server-show`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``statistics server-show`` command displays the current WBEM server gathered
+statistics. What is returned depends on the implementation of statistics
+gathering in the WBEM server.
+
+This command attempts to display the server statistics. It does that by
+retrieving "CIM_CIMOMStatisticalData" instances associated from the WBEM server
+and organizing them into a report.
+
+This command is not currently enabled.
 
 
 .. index:: pair: command groups;connection commands

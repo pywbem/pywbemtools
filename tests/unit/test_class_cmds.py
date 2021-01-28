@@ -2038,7 +2038,7 @@ TEST_CASES = [
      'time is variable.',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--timestats']},
-     {'stdout': ['Op    Exec  Op Time(S) Operation',
+     {'stdout': ['Op    Exc  Op Time(S) Operation',
                  'Cnt     Cnt  Avg/Min/Max',
                  '1   0',
                  'GetClass'],
