@@ -14,6 +14,10 @@ Released: not yet
 
 **Incompatible changes:**
 
+* Modified the --timestats general option from boolean to choice with 3
+  choices for when statistics are displayed (after each command or via a
+  command). See   issue #588)
+
 **Deprecations:**
 
 * Deprecated the 'server namespaces' and 'server interop' commands. Use the
@@ -93,6 +97,10 @@ Released: not yet
 
 * Test: Added end2end test capability using the OpenPegasus container image
   on Docker Hub.
+
+* Added new command group ('statistics') that contols use of statistics. See
+  issue #588)
+
 
 **Cleanup:**
 

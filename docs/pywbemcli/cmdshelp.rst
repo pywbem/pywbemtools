@@ -103,7 +103,11 @@ Help text for ``pywbemcli``:
                                       response, if pull operations are used. This is a tuning parameter that does not affect
                                       the external behavior of the commands. Default: EnvVar PYWBEMCLI_PULL_MAX_CNT, or 1000
 
-      -T, --timestats                 Show time statistics of WBEM server operations.
+      -T, --timestats / --no-timestats
+                                      Display operation time statistics gathered by pywbemcli after each command. Otherwise
+                                      statistics can be displayed with "statistics display" command. Default: EnvVar
+                                      PYWBEMCLI_TIMESTATS, or no-timestats.
+
       -d, --default-namespace NAMESPACE
                                       Default namespace, to be used when commands do not specify the --namespace command
                                       option. Use "" to set default in interactive mode. Default: EnvVar
@@ -145,6 +149,7 @@ Help text for ``pywbemcli``:
       profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.
+      statistics  Command group for WBEM server statistics.
       connection  Command group for WBEM connection definitions.
       help        Show help message for interactive mode.
       repl        Enter interactive mode (default).
@@ -2172,4 +2177,212 @@ Help text for ``pywbemcli server remove-mof`` (see :ref:`server remove-mof comma
                                  required for reading.
 
       -h, --help                 Show this help message.
+
+
+.. _`pywbemcli statistics --help`:
+
+pywbemcli statistics --help
+---------------------------
+
+
+
+Help text for ``pywbemcli statistics`` (see :ref:`statistics command group`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics COMMAND [ARGS] [COMMAND-OPTIONS]
+
+      Command group for WBEM server statistics.
+
+      This command group defines commands to control the display of statistical data managed by pywbemcli based on the
+      ``--timestats`` general option which enables the gathering and display of statistics in pywbemcli.
+
+      Since there may also be capabilities to manage statistics in WBEM servers, these commands provide for a) enabling
+      statistics gathering in the WBEM server and b) displaying the information gathered.
+
+      One component of the pywbemcli client side statistics depends on the state of statistics gathering enabled in the
+      WBEM server, reporting the server response time. This appears as the column "Server Time" in the report if
+      statistics gathering in the server is enabled.
+
+      Since gathering of statistics in a WBEM server may depend on a server setting, pywbemcli provides commands to enable
+      and disable the statistics gathering in the server by setting the CIM_ObjectManager "GatherStatisticalData"
+      property.
+
+      In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
+      can also be specified before the 'statistics' keyword.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+    Commands:
+      reset        Reset the counts in statistics gathered by pywbemcl.
+      server-on    Enable statistics on current server.
+      server-off   Disable statistics on current server.
+      server-show  Display statistics gathered by server.
+      show         Display statistics managed by pywbemcli.
+      status       Show statistics enabled status for client and server.
+
+
+.. _`pywbemcli statistics reset --help`:
+
+pywbemcli statistics reset --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics reset`` (see :ref:`statistics reset command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics reset [COMMAND-OPTIONS]
+
+      Reset the counts in statistics gathered by pywbemcl.
+
+      This command resets the counts in the statistics gathered by pywbemcli for the current connection including the
+      statistics on the server response times received from the WBEM server in the ``WBEMServerResponseTime`` header .
+
+      It does not reset statistics managed by the WBEM server..
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli statistics server-off --help`:
+
+pywbemcli statistics server-off --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics server-off`` (see :ref:`statistics server-off command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics server-off [COMMAND-OPTIONS]
+
+      Disable statistics on current server.
+
+      This command turns off the gathering of statistics in the WBEM server and the return of server response times for
+      inclusion in pywbemcli maintained statistics. The gathering of server statistics and the returning of server
+      response times may not be implemented by all WBEM servers.
+
+      This may fail if the server does not manage statistics or does not allow a client to modify the state of statistics
+      gathering.
+
+      WBEM server statistics gathering state does not impact pywbemcli client statistics gathering other than whether the
+      'Server Time.s` column is included in the report. See the --timestats general option.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli statistics server-on --help`:
+
+pywbemcli statistics server-on --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics server-on`` (see :ref:`statistics server-on command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics server-on [COMMAND-OPTIONS]
+
+      Enable statistics on current server.
+
+      This command  activates the gathering of statistics in the WBEM server and the return of server response times for
+      inclusion in pywbemcli maintained statistics. The gathering of server statistics and the returning of server
+      response times may not be implemented by all WBEM servers.
+
+      This may fail if the server does not manage statistics or does not allow a client to modify the state of statistics
+      gathering.
+
+      WBEM server statistics gathering state does not impact pywbemcli client statistics gathering other than whether the
+      'Server Time` column is included in the report. See the --timestats general option.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli statistics server-show --help`:
+
+pywbemcli statistics server-show --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics server-show`` (see :ref:`statistics server-show command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics server-show [COMMAND-OPTIONS]
+
+      Display statistics gathered by server.
+
+      Display the current statistics gathered in the WBEM server if statistics gathering is implemented and active (see
+      ```statistics server-on```) for the current WBEM server.
+
+      These statistics are independent of the statistics gathered by the pywbemcli client and displayed for example with
+      the command ``statistics show``.
+
+      Presents a table of the gathered statistical information.
+
+      This command is not implemented. See issue #895
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli statistics show --help`:
+
+pywbemcli statistics show --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics show`` (see :ref:`statistics show command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics show [COMMAND-OPTIONS]
+
+      Display statistics managed by pywbemcli.
+
+      Display the current statistics including client managed statistics on WBEM operations and if WBEM server statistics
+      are implemented and enabled, the statistics on the returned ``WBEMServerResponseTime`` header.
+
+      Statistics are always displayed as a table independent of output-format defined.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli statistics status --help`:
+
+pywbemcli statistics status --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli statistics status`` (see :ref:`statistics status command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] statistics status [COMMAND-OPTIONS]
+
+      Show statistics enabled status for client and server.
+
+      Show enabled status on statistics gathering for pywbemcli and the current WBEM server. Table and text formats are
+      allowed.
+
+    Command Options:
+      -h, --help  Show this help message.
 

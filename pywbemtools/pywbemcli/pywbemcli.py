@@ -56,7 +56,6 @@ PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify
-DEFAULT_TIMESTATS = False  # The default is no timestats
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False, 'default': None}
 
@@ -322,9 +321,14 @@ def set_default_if_empty_str(tst_str, default=None):
                    u'Default: EnvVar {ev}, or {default}'.
                    format(ev=PywbemServer.pull_max_cnt_envvar,
                           default=DEFAULT_MAXPULLCNT))
-@click.option('-T', '--timestats', is_flag=True,
-              # defaulted in code
-              help=u'Show time statistics of WBEM server operations.')
+@click.option('-T', '--timestats/--no-timestats',
+              default=None,
+              envvar=PywbemServer.timestats_envvar,
+              help=u'Display operation time statistics gathered by pywbemcli '
+              u'after each command. Otherwise statistics can be displayed with '
+              u'"statistics display" command. '
+              u'Default: EnvVar {ev}, or no-timestats.'.
+              format(ev=PywbemServer.timestats_envvar))
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
               default=None,  # default value set in cli function
               envvar=PywbemServer.defaultnamespace_envvar,
@@ -464,7 +468,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         no server is created.
         NOTE: connection_name is passed to this function because the
         ClickException treats it as a reference before assignment if using the
-        connection_name from the enclosing scopt
+        connection_name from the enclosing scope.
         """
         if server or resolved_mock_server:
             connection_name = 'not-saved'
@@ -555,7 +559,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     pywbem_server = None
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
-    resolved_timestats = timestats or DEFAULT_TIMESTATS
     # TODO: Test verify or DEFAULT_VERIFY
     resolved_verify = DEFAULT_VERIFY if verify is None else verify
 
@@ -615,10 +618,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
-    # Command mode (ctx is None). Processes command on comand line and quits
+    # Command mode (ctx is None) or initial input in interactive mode.
     # Apply the documented option defaults to create a pywbem_server instance
     # and a ContextObj instance
-    if ctx.obj is None:  # No context. This is cmd line mode
+    if ctx.obj is None:  # No context. This is cmd line mode or initial input
+        # in interactive mode.
         # Create the PywbemServer object (contains all of the info
         # for the connection defined by the cmd line input)
         pywbem_server = create_server_instance(connection_name)
@@ -630,6 +634,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # This requires being able to determine for each option whether it has been
     # specified and is why general options don't define defaults in the
     # decorators that define them.
+
     else:  # ctx.obj exists. Processing an interactive command.
         # Apply the option defaults from the command line options
         # or from the context object.
@@ -735,8 +740,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if pull_max_cnt is None:
             resolved_pull_max_cnt = ctx.obj.pull_max_cnt
 
-        if not timestats:  # Defaults to False, not None
-            resolved_timestats = ctx.obj.timestats
+        if timestats is None:
+            timestats = ctx.obj.timestats
 
         if log is None:
             log = ctx.obj.log
@@ -768,7 +773,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
-                         resolved_timestats,
+                         timestats,
                          log, verbose, pdb,
                          warn,
                          connections_repo)
@@ -786,7 +791,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             format(_python_nm[0], _python_nm[1]),
             DeprecationWarning)
 
-    # Invoke command if one exists.
+    # Invoke command if one exists or start the repl mode
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)
 

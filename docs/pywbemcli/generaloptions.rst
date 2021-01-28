@@ -513,11 +513,20 @@ bypasses client side verification of the WBEM server certificate.
 ``--timestats`` general option
 """"""""""""""""""""""""""""""
 
-The ``--timestats`` general option is a boolean option that enables the
-gathering and display of time
-statistics on the interactions with the WBEM server.  If enabled, the
-time statistics are output after each command is executed including the
-operations executed, the size of the operations, and the execution time.
+The ``--timestats`` / ``--no-timestats`` \ ``-T`` general option is a boolean
+option that enables the display of time statistics on the interactions with the
+WBEM server.
+
+When the option is included on the command line, the display of statistics
+is enabled after each command in the interactive mode and before exit in the
+cmd mode.
+
+Statistics are always gathered in pywbemcli for the curren connection for every
+command executed.
+
+
+For more information on statistics gathered by pywbemcli and WBEM servers see
+section :ref:`Statistics command group` .
 
 .. index:: triple: --use-pull; general options; use-pull
 

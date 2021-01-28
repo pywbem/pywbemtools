@@ -308,7 +308,7 @@ TEST_CASES = [
      {'args': ['get', 'IN'],
       'general': ['--timestats']},
      {'stdout': ['Qualifier In : boolean = true,',
-                 'Op    Exec  Op Time(S) Operation',
+                 'Op    Exc  Op Time(S) Operation',
                  'Cnt     Cnt  Avg/Min/Max',
                  '1      0',
                  'GetQualifier'],
