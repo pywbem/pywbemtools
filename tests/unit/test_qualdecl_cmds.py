@@ -329,6 +329,17 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify qualifier command delete Aggregate (unused qualifier) succeeds',
+     {'args': ['delete', 'Aggregate'],
+      'general': ['-v']},
+     {'stdout': "Deleted qualifier Aggregate",
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    # TODO: Add testcase for qualifier that is used, once usage checking has
+    #       been implemented.
 ]
 
 

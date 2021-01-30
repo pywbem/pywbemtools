@@ -70,6 +70,8 @@ Released: not yet
 * The verbose option ('-v' / '--verbose') now also displays the objects that
   are compiled into a mock environment when setting it up.
 
+* Added 'qualifier delete' command. (see #884)
+
 **Known issues:**
 
 * See `list of open issues`_.

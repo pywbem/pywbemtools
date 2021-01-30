@@ -1007,6 +1007,7 @@ The ``qualifier`` command group has commands that act on CIM qualifier
 declarations:
 
 * :ref:`qualifier get command` - Get a qualifier declaration.
+* :ref:`qualifier delete command` - Delete a qualifier declaration.
 * :ref:`qualifier enumerate command` - List the qualifier declarations in a
   namespace.
 
@@ -1037,6 +1038,33 @@ default namespace:
         Flavor(DisableOverride, ToSubclass);
 
 See :ref:`pywbemcli qualifier get --help` for the exact help output of the command.
+
+.. index:: pair: qualifier commands; qualifier delete
+
+.. _`Qualifier delete command`:
+
+``qualifier delete`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``qualifier delete`` command deletes the specified qualifier declaration.
+
+The qualifier declaration is named with the ``QUALIFIERNAME`` argument and is
+in the namespace specified with the ``-namespace``/``-n`` command option, or
+otherwise in the default namespace of the connection.
+
+The qualifier declaration is deleted using the DeleteQualifier operation.
+It is left to the WBEM server to reject the deletion if the qualifier is used
+anywhere.
+
+The following example deletes the ``Xyz`` qualifier declaration from the
+default namespace:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock qualifier delete Xyz
+    Deleted qualifier Xyz
+
+See :ref:`pywbemcli qualifier delete --help` for the exact help output of the command.
 
 .. index:: pair: qualifier commands; qualifier enumerate
 
