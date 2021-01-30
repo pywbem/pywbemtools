@@ -49,11 +49,8 @@ def qualifier_group():
     """
     Command group for CIM qualifier declarations.
 
-    This command group defines commands to inspect CIM qualifier declarations
-    in the WBEM Server.
-
-    Creation, modification and deletion of qualifier declarations is not
-    currently supported.
+    This command group defines commands to inspect and delete CIM qualifier
+    declarations in the WBEM Server.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -82,6 +79,32 @@ def qualifier_get(context, qualifiername, **options):
     """
     context.execute_cmd(lambda: cmd_qualifier_get(context, qualifiername,
                                                   options))
+
+
+@qualifier_group.command('delete', cls=PywbemcliCommand,
+                         options_metavar=CMD_OPTS_TXT)
+@click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
+                required=True,)
+@add_options(namespace_option)
+@add_options(help_option)
+@click.pass_obj
+def qualifier_delete(context, qualifiername, **options):
+    """
+    Delete a qualifier declaration.
+
+    Delete a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM
+    namespace (--namespace option). If no namespace was specified, the default
+    namespace of the connection is used.
+
+    This command executes the DeleteQualifier operation against the WBEM server
+    and leaves it to the WBEM server to reject the operation if any classes
+    in the namespace use the qualifier.
+
+    In the output, the qualifier declaration will formatted as defined by the
+    --output-format general option.
+    """
+    context.execute_cmd(lambda: cmd_qualifier_delete(
+        context, qualifiername, options))
 
 
 @qualifier_group.command('enumerate', cls=PywbemcliCommand,
@@ -122,6 +145,20 @@ def cmd_qualifier_get(context, qualifiername, options):
 
         display_cim_objects(context, qual_decl, output_format)
 
+    except Error as er:
+        raise_pywbem_error_exception(er)
+
+
+def cmd_qualifier_delete(context, qualifiername, options):
+    """
+    Execute the command for delete qualifier and display result
+    """
+    try:
+        context.conn.DeleteQualifier(qualifiername,
+                                     namespace=options['namespace'])
+        if context.verbose:
+            context.spinner_stop()
+            click.echo('Deleted qualifier {}.'.format(qualifiername))
     except Error as er:
         raise_pywbem_error_exception(er)
 

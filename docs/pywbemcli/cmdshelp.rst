@@ -1694,9 +1694,7 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
 
       Command group for CIM qualifier declarations.
 
-      This command group defines commands to inspect CIM qualifier declarations in the WBEM Server.
-
-      Creation, modification and deletion of qualifier declarations is not currently supported.
+      This command group defines commands to inspect and delete CIM qualifier declarations in the WBEM Server.
 
       In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
       can also be specified before the 'qualifier' keyword.
@@ -1706,7 +1704,37 @@ Help text for ``pywbemcli qualifier`` (see :ref:`qualifier command group`):
 
     Commands:
       get        Get a qualifier declaration.
+      delete     Delete a qualifier declaration.
       enumerate  List the qualifier declarations in a namespace.
+
+
+.. _`pywbemcli qualifier delete --help`:
+
+pywbemcli qualifier delete --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli qualifier delete`` (see :ref:`qualifier delete command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] qualifier delete QUALIFIERNAME [COMMAND-OPTIONS]
+
+      Delete a qualifier declaration.
+
+      Delete a CIM qualifier declaration (QUALIFIERNAME argument) in a CIM namespace (--namespace option). If no namespace
+      was specified, the default namespace of the connection is used.
+
+      This command execute the DeleteQualifier operation against the WBEM server and leaves it to the WBEM server to
+      reject the operation if any classes in the namespace use the qualifier.
+
+      In the output, the qualifier declaration will formatted as defined by the --output-format general option.
+
+    Command Options:
+      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli qualifier enumerate --help`:
