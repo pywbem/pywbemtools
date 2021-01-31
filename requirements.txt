@@ -19,10 +19,14 @@ git+https://github.com/pywbem/pywbem.git@master#egg=pywbem
 nocaselist>=1.0.3
 nocasedict>=1.0.1
 six>=1.14.0
+# Click 7.0 has issue #1231 on Windows which we circumvent in the test code
 # Click 7.1 has a bug with output capturing
+# Click 7.1 removed support for Python 3.4
 # Click 8.0 is incompatible with pywbemcli. See issues #816 (python 2.7 not
 #     supported) and #819 (click-repl incompatible)
-Click>=7.0,!=7.1,<8.0
+Click>=7.1.1,<8.0; python_version == '2.7'
+Click>=7.0,<7.1; python_version == '3.4'
+Click>=7.1.1,<8.0; python_version >= '3.5'
 click-spinner>=0.1.8
 click-repl>=0.1.6
 asciitree>=0.3.3
