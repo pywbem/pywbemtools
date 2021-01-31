@@ -72,6 +72,9 @@ Released: not yet
 
 * Added 'qualifier delete' command. (see #884)
 
+* Added commands 'add-mof' and 'remove-mof' for compiling MOF to the 'server'
+  command group. (issue #886)
+
 **Known issues:**
 
 * See `list of open issues`_.

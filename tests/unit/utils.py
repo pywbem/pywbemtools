@@ -28,7 +28,23 @@ except ImportError:
     from io import StringIO  # Python 3
 from copy import copy
 from subprocess import Popen, PIPE
+import packaging.version
+import click
 import six
+
+# Click issue #1231:
+# The Click package on Windows writes NL at the Python level as '\r\r\n' at the
+# level of the Windows shell under some cases, and Popen() with
+# universal_newlines=True does not handle this case.
+# To circumvent the error, pywbemtools specifies universal_newlines=False and
+# performs the universal newline conversions itself (it does what Popen() does,
+# and in addition replaces the incorrectly created CRCRNL sequence).
+# This error has been fixed in Click 7.1, but Click 7.1 has also removed
+# support for Python 3.4 so pywbemtools now requires Click 7.1 where possible
+# and still needs the circumvention code when below Click 7.1 and on Windows.
+# The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
+CLICK_VERSION = packaging.version.parse(click.__version__)
+CLICK_ISSUE_1231 = CLICK_VERSION.release < (7, 1) and sys.platform == 'win32'
 
 
 def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
@@ -124,22 +140,19 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
         stdout_stream = PIPE
         stderr_stream = PIPE
 
-    # The click package on Windows writes NL at the Python level
-    # as '\r\r\n' at the level of the shell under some cases. This is
-    # documented in Click issue #1271 for Click 7.0 The Popen universal_newlines
-    # does not handle this variation. To fix for now, remove universal_newlines
-    # and replace \r\r\n with \n then \r\n and then \r also with \n in the code
-    # below.
-    #
-    # The original code was:
-    # proc = Popen(cmd_args, shell=True, stdout=PIPE, stderr=PIPE, stdin=PIPE,
-    #             universal_newlines=True)
-    # stout_str, stderr_str = proc.communicate(input=stdin)
-    # Temp alternative is the following line with universal_newlines=False
-    # and the second change to fix the EOLs ourself.
-    proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
+    if CLICK_ISSUE_1231:
+        shell = False
+        universal_newlines = False
+    else:
+        shell = True
+        universal_newlines = True
+
+    if shell:
+        cmd_args = ' '.join(cmd_args)
+
+    proc = Popen(cmd_args, shell=shell, stdin=stdin_stream,
                  stdout=stdout_stream, stderr=stderr_stream,
-                 universal_newlines=False)
+                 universal_newlines=universal_newlines)
 
     stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
@@ -156,10 +169,7 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     if isinstance(stderr_str, six.binary_type):
         stderr_str = stderr_str.decode('utf-8')
 
-    # Replacement for Popen universal_newlines because of Click issue # 1271
-    # Second part of temp patch for CRCRNL. Does what popen does and
-    # CRCRNL replacement.
-    if sys.platform == 'win32':
+    if CLICK_ISSUE_1231:
         stdout_str = stdout_str.replace('\r\r\n', '\n')  \
                                .replace('\r\n', '\n')  \
                                .replace('\r', '')
