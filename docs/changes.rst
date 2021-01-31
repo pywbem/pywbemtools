@@ -84,6 +84,12 @@ Released: not yet
   and 'server interop' commands that provide a subset of that functionality
   have been deprecated. (issue #877)
 
+**Cleanup:**
+
+* Cleaned up the circumvention for Click issue #1231 by upgrading the minimum
+  Click version to 7.1.1, where possible. The circumvention is still required
+  on Python 2.7 and 3.4 on Windows.
+
 **Known issues:**
 
 * See `list of open issues`_.
