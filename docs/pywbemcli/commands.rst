@@ -1493,6 +1493,47 @@ Example:
 
 See :ref:`pywbemcli server namespaces --help` for the exact help output of the command.
 
+.. index:: pair: server commands; server add-mof
+
+.. _`Server add-mof command`:
+
+``server add-mof`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``server add-mof`` command compiles one or more MOF files and adds the
+resulting CIM objects to the target namespace in the WBEM server of the
+:term:`current connection`.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver server add-mof mymodel.mof
+
+See :ref:`pywbemcli server add-mof --help` for the exact help output of the
+command.
+
+.. index:: pair: server commands; server remove-mof
+
+.. _`Server remove-mof command`:
+
+``server remove-mof`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``server remove-mof`` command compiles one or more MOF files and adds the
+resulting CIM objects to the target namespace in the WBEM server of the
+:term:`current connection`.
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver server remove-mof mymodel.mof
+
+See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
+command.
+
+
 .. index:: pair: command groups;connection commands
 
 .. _`Connection command group`:

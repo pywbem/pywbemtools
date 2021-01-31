@@ -33,6 +33,16 @@ INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
+SIMPLE_MOCK_MODEL = 'simple_mock_model.mof'
+SIMPLE_MOCK_MODEL_FILEPATH = os.path.join(
+    os.path.dirname(__file__), SIMPLE_MOCK_MODEL)
+SIMPLE_MOCK_MODEL_FILEPATH_REL = os.path.relpath(SIMPLE_MOCK_MODEL_FILEPATH)
+with open(SIMPLE_MOCK_MODEL_FILEPATH, 'r') as fp:
+    SIMPLE_MOCK_MODEL_CONTENT = fp.read()
+
+MOF_WITH_ERROR_FILEPATH = os.path.join(
+    os.path.dirname(__file__), 'mof_with_error.mof')
+
 # The following lists define the help for each command in terms of particular
 # parts of lines that are to be tested.
 # For each list, try to include:
@@ -50,6 +60,10 @@ SERVER_HELP_LINES = [
     'info              Get information about the server.',
     'interop           Get the Interop namespace of the server (deprecated).',
     'namespaces        List the namespaces of the server (deprecated).',
+    'add-mof           Compile MOF and add/update the resulting CIM objects in '
+    'the server.',
+    'remove-mof        Compile MOF and remove the resulting CIM objects from '
+    'the server.',
 ]
 
 SERVER_BRAND_HELP_LINES = [
@@ -238,11 +252,183 @@ TEST_CASES = [
       'test': 'linesnows'},
      MOCK_SERVER_MODEL, OK],
 
-    #
-    # Error tests
-    #
-    # TODO add error tests.
-    # At this point we do not have any error tests
+    # MOF compile commands
+
+    ['Verify server command add-mof of same mock file with abs path',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with rel path',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH_REL],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --include rel',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include', '.'],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --include abs',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include', os.getcwd()],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --dry-run',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--dry-run'],
+      'general': []},
+     {'stdout':
+      ['Executing in dry-run mode'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --verbose',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
+      'general': ['--verbose']},
+     {'stdout':
+      ['Setting qualifier root/cimv2:Key',
+       'Creating class root/cimv2:CIM_Foo',
+       'Creating instance of class root/cimv2:CIM_Foo'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --dry-run and '
+     '--verbose',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--dry-run'],
+      'general': ['--verbose']},
+     {'stdout':
+      ['Setting qualifier root/cimv2:Key',
+       'Creating class root/cimv2:CIM_Foo',
+       'Creating instance of class root/cimv2:CIM_Foo'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of same mock file with --verbose via stdin',
+     {'args': ['server', 'add-mof', '-'],
+      'general': ['--verbose'],
+      'stdin': SIMPLE_MOCK_MODEL_CONTENT},
+     {'stdout':
+      ['Setting qualifier root/cimv2:Key',
+       'Creating class root/cimv2:CIM_Foo',
+       'Creating instance of class root/cimv2:CIM_Foo'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of invalid MOF file',
+     {'args': ['add-mof', MOF_WITH_ERROR_FILEPATH],
+      'general': ['--verbose']},
+     {'stdout':
+      ['MOF grammar error'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with abs path',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with rel path',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH_REL],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --include rel',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include', '.'],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --include abs',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include',
+               os.getcwd()],
+      'general': []},
+     {'stdout':
+      [],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --dry-run',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--dry-run'],
+      'general': []},
+     {'stdout':
+      ['Executing in dry-run mode'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --verbose',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH],
+      'general': ['--verbose']},
+     {'stdout':
+      ['Deleting instance root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+       'Deleting class root/cimv2:CIM_Foo'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --dry-run and '
+     '--verbose',
+     {'args': ['remove-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--dry-run'],
+      'general': ['--verbose']},
+     {'stdout':
+      ['No deletions will be shown in dry-run mode'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of same mock file with --verbose via '
+     'stdin',
+     {'args': ['server', 'remove-mof', '-'],
+      'general': ['--verbose'],
+      'stdin': SIMPLE_MOCK_MODEL_CONTENT},
+     {'stdout':
+      ['Deleting instance root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+       'Deleting class root/cimv2:CIM_Foo'],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command remove-mof of invalid MOF file',
+     {'args': ['remove-mof', MOF_WITH_ERROR_FILEPATH],
+      'general': ['--verbose']},
+     {'stdout':
+      ['MOF grammar error'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
 ]
 
 
