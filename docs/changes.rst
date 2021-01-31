@@ -56,6 +56,10 @@ Released: not yet
   leave the debugger again because of redirections of the standard streams.
   The debugger now properly comes up when 'pdb' is specified as a condition.
 
+* Test: Fixed restoring of environment variables that are modified by testcases,
+  and displaying of PYWBEMCLI environment variables during testing in verbose
+  mode.
+
 **Enhancements:**
 
 * Add new option to class find command (--summary) to display a summary of

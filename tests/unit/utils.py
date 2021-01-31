@@ -100,6 +100,8 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     env['PYTHONPATH'] = '.'  # Use local files
     env['PYTHONWARNINGS'] = ''  # Disable for parsing output
 
+    saved_env = {}  # Saved env vars that were changed for this test case
+
     # Put the env vars into the environment of the current Python process,
     # from where they will be inherited into its child processes (-> shell ->
     # cli command).
@@ -107,14 +109,17 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
         value = env[name]
         if value is None:
             if name in os.environ:
+                saved_env[name] = os.getenv(name)
                 del os.environ[name]
         else:
+            saved_env[name] = os.getenv(name)  # None if not set
             os.environ[name] = value
 
     if verbose:
         display_envvars = '\n'.join(
-            [var for var in os.environ if 'PYWBCLI' in var])
-        print('OS_ENVIRON {}'.format(display_envvars))
+            ['{}={}'.format(var, os.environ[var])
+             for var in os.environ if 'PYWBEMCLI' in var])
+        print('PYWBEMCLI env vars:\n{}'.format(display_envvars))
 
     assert isinstance(args, (list, tuple))
     cmd_args = [cli_cmd]
@@ -152,8 +157,13 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     stdout_str, stderr_str = proc.communicate(input=stdin)
     rc = proc.returncode
 
-    for name in env:
-        del os.environ[name]
+    # Restore environment of current process
+    for name in saved_env:
+        value = saved_env[name]
+        if value is None:
+            del os.environ[name]
+        else:
+            os.environ[name] = value
 
     if verbose:
         print('output type {}\nstdout:{!r}\nstderr:{!r}'
