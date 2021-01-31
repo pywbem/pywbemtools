@@ -1987,7 +1987,8 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       Command group for WBEM servers.
 
       This command group defines commands to inspect and manage core components of a WBEM server including server
-      attributes, namespaces, the Interop namespace, management profiles, and access to profile central instances.
+      attributes, namespaces, compiling MOF, the Interop namespace, management profiles, and access to profile central
+      instances.
 
       In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
       can also be specified before the 'server' keyword.
@@ -2000,6 +2001,45 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       interop     Get the Interop namespace of the server (deprecated).
       brand       Get the brand of the server.
       info        Get information about the server.
+      add-mof     Compile MOF and add/update the resulting CIM objects in the server.
+      remove-mof  Compile MOF and remove the resulting CIM objects from the server.
+
+
+.. _`pywbemcli server add-mof --help`:
+
+pywbemcli server add-mof --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli server add-mof`` (see :ref:`server add-mof command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] server add-mof MOFFILE [COMMAND-OPTIONS]
+
+      Compile MOF and add/update the resulting CIM objects in the server.
+
+      The MOF files are specified with the MOFFILE argument, which may be specified multiple times. The minus sign ('-')
+      specifies the standard input.
+
+      Initially, the target namespace is the namespace specified with the --namespace option or if not specified the
+      default namespace of the connection. If the MOF contains '#pragma namespace' directives, the target namespace will
+      be changed accordingly.
+
+      MOF include files (specified with the '#pragma include' directive) are searched first in the directory of the
+      including MOF file, and then in the directories specified with the --include option.
+
+      The global --verbose option will show the CIM objects that are added or updated.
+
+    Command Options:
+      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
+      -I, --include INCLUDEDIR   Path name of a MOF include directory. May be specified multiple times.
+      -d, --dry-run              Enable dry-run mode: Don't actually modify the server. Connection to the server is still
+                                 required for reading.
+
+      -h, --help                 Show this help message.
 
 
 .. _`pywbemcli server brand --help`:
@@ -2095,4 +2135,41 @@ Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces comma
 
     Command Options:
       -h, --help  Show this help message.
+
+
+.. _`pywbemcli server remove-mof --help`:
+
+pywbemcli server remove-mof --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli server remove-mof`` (see :ref:`server remove-mof command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] server remove-mof MOFFILE [COMMAND-OPTIONS]
+
+      Compile MOF and remove the resulting CIM objects from the server.
+
+      The MOF files are specified with the MOFFILE argument, which may be specified multiple times. The minus sign ('-')
+      specifies the standard input.
+
+      Initially, the target namespace is the namespace specified with the --namespace option or if not specified the
+      default namespace of the connection. If the MOF contains '#pragma namespace' directives, the target namespace will
+      be changed accordingly.
+
+      MOF include files (specified with the '#pragma include' directive) are searched first in the directory of the
+      including MOF file, and then in the directories specified with the --include option.
+
+      The global --verbose option will show the CIM objects that are removed.
+
+    Command Options:
+      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
+      -I, --include INCLUDEDIR   Path name of a MOF include directory. May be specified multiple times.
+      -d, --dry-run              Enable dry-run mode: Don't actually modify the server. Connection to the server is still
+                                 required for reading.
+
+      -h, --help                 Show this help message.
 

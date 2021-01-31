@@ -88,6 +88,9 @@ Released: not yet
   and 'server interop' commands that provide a subset of that functionality
   have been deprecated. (issue #877)
 
+* Added commands 'add-mof' and 'remove-mof' for compiling MOF to the 'server'
+  command group. (issue #886)
+
 **Cleanup:**
 
 * Cleaned up the circumvention for Click issue #1231 by upgrading the minimum

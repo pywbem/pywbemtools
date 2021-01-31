@@ -24,15 +24,18 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
+import os
+import sys
 import click
 
-from pywbem import Error
+from pywbem import Error, MOFCompiler
+from pywbem._mof_compiler import MOFWBEMConnection
 
 from .pywbemcli import cli
 from ._common import format_table, raise_pywbem_error_exception, \
     validate_output_format, display_text, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from ._common_options import add_options, help_option
+from ._common_options import add_options, help_option, namespace_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
 from ._utils import pywbemcliwarn
@@ -48,6 +51,21 @@ from ._utils import pywbemcliwarn
 # NOTE: Insure that all option help attributes are unicode to get around this
 #       issue
 
+#
+#   Common option definitions for server group
+#
+
+mof_include_option = [              # pylint: disable=invalid-name
+    click.option('--include', '-I', metavar='INCLUDEDIR', multiple=True,
+                 help=u'Path name of a MOF include directory. '
+                 'May be specified multiple times.')]
+
+mof_dry_run_option = [              # pylint: disable=invalid-name
+    click.option('--dry-run', '-d', is_flag=True, default=False,
+                 help=u'Enable dry-run mode: Don\'t actually modify the '
+                 'server. Connection to the server is still required for '
+                 'reading.')]
+
 
 @cli.group('server', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
@@ -57,8 +75,9 @@ def server_group():
     Command group for WBEM servers.
 
     This command group defines commands to inspect and manage core components
-    of a WBEM server including server attributes, namespaces, the Interop
-    namespace, management profiles, and access to profile central instances.
+    of a WBEM server including server attributes, namespaces, compiling MOF,
+    the Interop namespace, management profiles, and access to profile central
+    instances.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -136,6 +155,69 @@ def server_info(context):
     context.execute_cmd(lambda: cmd_server_info(context))
 
 
+@server_group.command('add-mof', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
+@click.argument('moffiles', metavar='MOFFILE', type=click.Path(),
+                nargs=-1, required=True)
+@add_options(namespace_option)
+@add_options(mof_include_option)
+@add_options(mof_dry_run_option)
+@add_options(help_option)
+@click.pass_obj
+def server_add_mof(context, **options):
+    """
+    Compile MOF and add/update the resulting CIM objects in the server.
+
+    The MOF files are specified with the MOFFILE argument, which may be
+    specified multiple times. The minus sign ('-') specifies the standard
+    input.
+
+    Initially, the target namespace is the namespace specified with the
+    --namespace option or if not specified the default namespace of the
+    connection. If the MOF contains '#pragma namespace' directives, the target
+    namespace will be changed accordingly.
+
+    MOF include files (specified with the '#pragma include' directive) are
+    searched first in the directory of the including MOF file, and then in
+    the directories specified with the --include option.
+
+    The global --verbose option will show the CIM objects that are added or
+    updated.
+    """
+    context.execute_cmd(lambda: cmd_server_add_mof(context, options))
+
+
+@server_group.command('remove-mof', cls=PywbemcliCommand,
+                      options_metavar=CMD_OPTS_TXT)
+@click.argument('moffiles', metavar='MOFFILE', type=click.Path(),
+                nargs=-1, required=True)
+@add_options(namespace_option)
+@add_options(mof_include_option)
+@add_options(mof_dry_run_option)
+@add_options(help_option)
+@click.pass_obj
+def server_remove_mof(context, **options):
+    """
+    Compile MOF and remove the resulting CIM objects from the server.
+
+    The MOF files are specified with the MOFFILE argument, which may be
+    specified multiple times. The minus sign ('-') specifies the standard
+    input.
+
+    Initially, the target namespace is the namespace specified with the
+    --namespace option or if not specified the default namespace of the
+    connection. If the MOF contains '#pragma namespace' directives, the target
+    namespace will be changed accordingly.
+
+    MOF include files (specified with the '#pragma include' directive) are
+    searched first in the directory of the including MOF file, and then in
+    the directories specified with the --include option.
+
+    The global --verbose option will show the CIM objects that are removed.
+    """
+    context.execute_cmd(lambda: cmd_server_remove_mof(context, options))
+
+
 ###############################################################
 #         Server cmds
 ###############################################################
@@ -184,3 +266,129 @@ def cmd_server_info(context):
 
     except Error as er:
         raise_pywbem_error_exception(er)
+
+
+def cmd_server_add_mof(context, options):
+    """
+    Compile MOF and add/update the resulting CIM objects in the server.
+    """
+
+    try:
+
+        context.spinner_stop()
+
+        # Define the connection to be used by the MOF compiler.
+        # MOFWBEMConnection writes resulting CIM objects to a local store
+        # but reads from the connection.
+        if options['dry_run']:
+            comp_handle = MOFWBEMConnection(conn=context.conn)
+        else:
+            comp_handle = context.conn
+
+        if options['dry_run']:
+            print('Executing in dry-run mode')
+
+        include_dirs = []
+        for idir in options['include']:
+            if not os.path.isabs(idir):
+                idir = os.path.abspath(idir)
+            include_dirs.append(idir)
+        for moffile in options['moffiles']:
+            if moffile != '-':
+                mofdir = os.path.dirname(moffile)
+                if not os.path.isabs(mofdir):
+                    mofdir = os.path.abspath(mofdir)
+                for idir in include_dirs:
+                    if mofdir.startswith(idir):
+                        break
+                else:
+                    include_dirs.append(mofdir)
+
+        mofcomp = MOFCompiler(handle=comp_handle, search_paths=include_dirs,
+                              verbose=context.verbose)
+
+        for moffile in options['moffiles']:
+            if moffile == '-':
+                mofstr = sys.stdin.read()  # bytes in py2 / text in py3
+                if context.verbose:
+                    print('Compiling MOF from standard input')
+                # The defaulting to the connection default namespace is handled
+                # inside of the MOF compiler.
+                mofcomp.compile_string(mofstr, options['namespace'])
+            else:
+                if not os.path.isabs(moffile):
+                    moffile = os.path.abspath(moffile)
+                if context.verbose:
+                    print('Compiling MOF file {0}'.format(moffile))
+                # The defaulting to the connection default namespace is handled
+                # inside of the MOF compiler.
+                mofcomp.compile_file(moffile, options['namespace'])
+
+    except Error as exc:
+        raise_pywbem_error_exception(exc)
+
+
+def cmd_server_remove_mof(context, options):
+    """
+    Compile MOF and remove the resulting CIM objects from the server.
+    """
+
+    try:
+
+        context.spinner_stop()
+
+        # Define the connection to be used by the MOF compiler.
+        # MOFWBEMConnection writes resulting CIM objects to a local store
+        # but reads from the connection.
+        comp_handle = MOFWBEMConnection(conn=context.conn)
+
+        if options['dry_run']:
+            print('Executing in dry-run mode')
+
+        include_dirs = []
+        for idir in options['include']:
+            if not os.path.isabs(idir):
+                idir = os.path.abspath(idir)
+            include_dirs.append(idir)
+        for moffile in options['moffiles']:
+            if moffile != '-':
+                mofdir = os.path.dirname(moffile)
+                if not os.path.isabs(mofdir):
+                    mofdir = os.path.abspath(mofdir)
+                for idir in include_dirs:
+                    if mofdir.startswith(idir):
+                        break
+                else:
+                    include_dirs.append(mofdir)
+
+        # verbose messages are displayed by rollback()
+        mofcomp = MOFCompiler(handle=comp_handle, search_paths=include_dirs,
+                              verbose=False)
+
+        for moffile in options['moffiles']:
+            if moffile == '-':
+                mofstr = sys.stdin.read()  # bytes in py2 / text in py3
+                if context.verbose:
+                    print('Compiling MOF from standard input into cache')
+                # The defaulting to the connection default namespace is handled
+                # inside of the MOF compiler.
+                mofcomp.compile_string(mofstr, options['namespace'])
+            else:
+                if not os.path.isabs(moffile):
+                    moffile = os.path.abspath(moffile)
+                if context.verbose:
+                    print('Compiling MOF file {0} into cache'.format(moffile))
+                # The defaulting to the connection default namespace is handled
+                # inside of the MOF compiler.
+                mofcomp.compile_file(moffile, options['namespace'])
+
+        if not options['dry_run']:
+            if context.verbose:
+                print('Deleting CIM objects found in MOF...')
+            comp_handle.rollback(verbose=context.verbose)
+        else:
+            if context.verbose:
+                print('No deletions will be shown in dry-run mode')
+
+    except Error as exc:
+        raise_pywbem_error_exception(exc)
