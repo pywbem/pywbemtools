@@ -45,10 +45,12 @@ ifndef PACKAGE_LEVEL
   PACKAGE_LEVEL := latest
 endif
 ifeq ($(PACKAGE_LEVEL),minimum)
-  pip_level_opts := -c minimum-constraints.txt
+  pip_level_opts := -c minimum-constraints.txt -c minimum-constraints-base.txt
+  pip_constraints_deps := minimum-constraints.txt minimum-constraints-base.txt
 else
   ifeq ($(PACKAGE_LEVEL),latest)
     pip_level_opts := --upgrade --upgrade-strategy eager
+    pip_constraints_deps :=
   else
     $(error Error: Invalid value for PACKAGE_LEVEL variable: $(PACKAGE_LEVEL))
   endif
@@ -312,6 +314,9 @@ else
   pywbem_os_setup_file := pywbem_os_setup.sh
 endif
 
+# This approach for the Pip install command is needed for Windows because
+# pip.exe is locked and thus cannot be upgraded. We use this approach also for
+# the other packages.
 PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
 
 ifeq ($(PLATFORM),Windows_native)
@@ -401,17 +406,21 @@ ifeq (,$(package_version))
 	$(error Package version could not be determined)
 endif
 
-pip_upgrade_$(pymn).done: Makefile
+# GitHub Actions has Pip 7.1.2 preinstalled on Python 3.4 on Windows, which does
+# not support python_requires yet, and thus would update Pip beyond the last
+# supported version. This rule ensures we have a minimum version of Pip that
+# supports what this project needs.
+pip_minimum_$(pymn).done: Makefile minimum-constraints-base.txt
+	@echo "makefile: Upgrading/downgrading Pip to minimum version"
 	-$(call RM_FUNC,$@)
-	$(PYTHON_CMD) -m pip install $(pip_level_opts) pip
+	$(PIP_INSTALL_CMD) -c minimum-constraints-base.txt pip
 	echo "done" >$@
+	@echo "makefile: Done upgrading/downgrading Pip to minimum version"
 
-install_basic_$(pymn).done: Makefile pip_upgrade_$(pymn).done
+install_basic_$(pymn).done: Makefile pip_minimum_$(pymn).done $(pip_constraints_deps)
 	@echo "makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
 	-$(call RM_FUNC,$@)
-# Keep the condition for the 'wheel' package consistent with the requirements & constraints files.
-# The approach with "python -m pip" is needed for Windows because pip.exe may be locked.
-	$(PIP_INSTALL_CMD) $(pip_level_opts) setuptools wheel
+	$(PIP_INSTALL_CMD) $(pip_level_opts) pip setuptools wheel
 	echo "done" >$@
 	@echo "makefile: Done installing/upgrading basic Python packages"
 
@@ -430,7 +439,7 @@ _show_bitsize:
 	$(PYTHON_CMD) tools/python_bitsize.py
 	@echo "makefile: Done determining bit size of Python executable"
 
-install_$(package_name)_$(pymn).done: Makefile pip_upgrade_$(pymn).done requirements.txt setup.py MANIFEST.in
+install_$(package_name)_$(pymn).done: Makefile install_basic_$(pymn).done requirements.txt setup.py MANIFEST.in $(pip_constraints_deps)
 	@echo "makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
@@ -454,7 +463,7 @@ install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name
 # 'pylint' needs 'typed-ast' which depends on the OS-level packages
 # 'libcrypt-devel' and 'python3-devel'. These packages happen to also be used
 # by pywbem for development.
-develop_os_$(pymn).done: Makefile pip_upgrade_$(pymn).done $(pywbem_os_setup_file)
+develop_os_$(pymn).done: Makefile install_basic_$(pymn).done $(pywbem_os_setup_file)
 	@echo "makefile: Installing OS-level development requirements"
 	-$(call RM_FUNC,$@)
 ifeq ($(PLATFORM),Windows_native)
@@ -469,7 +478,7 @@ endif
 develop: develop_$(pymn).done
 	@echo "makefile: Target $@ done."
 
-develop_$(pymn).done: Makefile pip_upgrade_$(pymn).done install_$(pymn).done develop_os_$(pymn).done install_basic_$(pymn).done dev-requirements.txt
+develop_$(pymn).done: Makefile install_basic_$(pymn).done install_$(pymn).done develop_os_$(pymn).done dev-requirements.txt $(pip_constraints_deps)
 	@echo "makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	$(PIP_INSTALL_CMD) $(pip_level_opts) -r dev-requirements.txt
