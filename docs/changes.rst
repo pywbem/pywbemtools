@@ -72,6 +72,9 @@ Released: not yet
 
 * Added 'qualifier delete' command. (see #884)
 
+* Enabled the tests for Python 3.4 on Windows again - this required
+  some changes in the Makefile and constraints files.
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -1,0 +1,80 @@
+# Pip constraints file for base packages (pip, setuptools, wheel).
+#
+# This constraints file specifies constraints for the base packages
+# (pip, setuptools, wheel), so that upgrades of very old versions can be done
+# without relying on features this project needs.
+
+# Dependencies for installation with Pip (must be installed in a separate pip call)
+#
+# Info: OS-installed package versions for some Linux distros:
+# * RHEL/CentOS 7.4.1708:
+#   Python      2.7.5     2013-05-15
+#   pip         8.1.2     2016-05-11 (epel)
+#   setuptools  0.9.8     2013-07-25
+#   wheel       0.24.0    2014-07-06 (epel)
+# * Ubuntu 16.04.03:
+#   Python      2.7.12    2016-11-19
+#   pip         8.1.1     2016-03-17
+#   setuptools  20.7.0    2016-04-10
+#   wheel       0.29.0    2016-02-06
+# * Ubuntu 17.04:
+#   Python      2.7.12    2016-11-19
+#   pip         9.0.1     2016-11-06
+#   setuptools  33.1.1    2017-01-16
+#   wheel       0.29.0    2016-02-06
+
+# Info: Python version supported by base packages (added / removed)
+# * Python 2.7 support:
+#   pip         ?
+#   setuptools  ? / 45.0.0
+#   wheel       ?
+# * Python 3.4 support:
+#   pip         ? / 19.2
+#   setuptools  ? / 44.0.0
+#   wheel       ? / 0.34.0
+# * Python 3.5 support:
+#   pip         8.0
+#   setuptools  18.3
+#   wheel       0.30.0
+# * Python 3.6 support:
+#   pip         10.0.0
+#   setuptools  34.0.0
+#   wheel       0.30.0
+# * Python 3.7 support:
+#   pip         18.1
+#   setuptools  40.6.0
+#   wheel       0.32.0
+# * Python 3.8 support:
+#   pip         19.3.1
+#   setuptools  41.5.0
+#   wheel       0.33.5
+
+
+# For the base packages, we use the versions from Ubuntu 17.04 as a general
+# minimum, and then increase it to the first version that introduced support
+# for a particular Python version.
+
+# Additional requirements:
+# * pip>=9.0.0 to support the --upgrade-strategy option
+# * setuptools>=20.5 to support environment markers
+
+# Note that Python 3.4 on Windows on GitHub Actions has Pip 7.1.2 pre-installed,
+# which does not yet support python_requires, so it will upgrade Pip beyond the
+# latest supported version on Python 3.4. Therefore, we initially upgrade the
+# basic packages only to their minimum defined in this file.
+
+pip==9.0.1; python_version <= '3.5'
+pip==10.0.0; python_version == '3.6'
+pip==18.1; python_version == '3.7'
+pip==19.3.1; python_version >= '3.8'
+
+setuptools==33.1.1; python_version <= '3.5'
+setuptools==34.0.0; python_version == '3.6'
+setuptools==40.6.0; python_version == '3.7'
+setuptools==41.5.0; python_version >= '3.8'
+
+wheel==0.29.0; python_version <= '3.4'
+wheel==0.30.0; python_version == '3.5'
+wheel==0.30.0; python_version == '3.6'
+wheel==0.32.0; python_version == '3.7'
+wheel==0.33.5; python_version >= '3.8'
