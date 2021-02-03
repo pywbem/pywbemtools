@@ -64,6 +64,12 @@ ifndef COMSPEC
   endif
 endif
 
+# Docker image for end2end tests.
+# Keep the version in sync with the test.yml workflow.
+ifndef TEST_SERVER_IMAGE
+  TEST_SERVER_IMAGE := keyporttech/smi-server:0.1.2
+endif
+
 # Determine OS platform make runs on.
 #
 # The PLATFORM variable is set to one of:
@@ -266,10 +272,11 @@ ifdef TESTCASES
 else
   pytest_opts := $(TESTOPTS)
 endif
+pytest_end2end_opts := -v --tb=short $(pytest_opts)
 
 ifeq ($(python_m_version),3)
   pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning -W ignore::ResourceWarning
-	pytest_end2end_warning_opts := $(pytest_warning_opts)
+  pytest_end2end_warning_opts := $(pytest_warning_opts)
 else
   pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
   pytest_end2end_warning_opts := $(pytest_warning_opts)
@@ -344,6 +351,8 @@ help:
 	@echo "  test       - Run unit and function tests"
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
 	@echo "  installtest - Run install tests"
+	@echo "  end2endtest - Run end2end tests (in tests/end2endtest)"
+	@echo "               Env.var TEST_SERVER_IMAGE can be used to specify the Docker image with the WBEM server"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
 	@echo "  todo       - Check for TODOs in Python and docs sources"
 	@echo "  upload     - build + Upload the distribution archive files to PyPI"
@@ -362,6 +371,7 @@ help:
 	@echo "      value is used for the -k option of pytest (see 'pytest --help')."
 	@echo "      Optional, defaults to running all tests."
 	@echo "  TESTOPTS - Optional: Additional options for py.tests (see 'pytest --help')."
+	@echo "  TEST_SERVER_IMAGE - Optional: Docker image with target server for end2end tests: $(TEST_SERVER_IMAGE)"
 	@echo "  PACKAGE_LEVEL - Package level to be used for installing dependent Python"
 	@echo "      packages in 'install' and 'develop' targets:"
 	@echo "        latest - Latest package versions available on Pypi"
@@ -693,6 +703,16 @@ else
 	tests/install/test_install.sh $(bdist_file) $(sdist_file) $(PYTHON_CMD)
 endif
 	@echo "makefile: Done running install tests"
+
+.PHONY: end2endtest
+end2endtest: develop_$(pymn).done
+	@echo "makefile: Running end2end tests"
+ifeq ($(PLATFORM),Windows_native)
+	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
+else
+	TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s
+endif
+	@echo "makefile: Done running end2end tests"
 
 # update the pywbemcli/cmdshelp.rst if any file that defines click commands changes.
 $(doc_conf_dir)/pywbemcli/cmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)

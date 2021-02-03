@@ -13,6 +13,15 @@ on:
   pull_request:
     branches: [ master, stable_0.8 ]
 
+env:
+  # WBEM server image on Docker Hub as repository:tag.
+  # Keep the version in sync with the Makefile.
+  TEST_SERVER_IMAGE: keyporttech/smi-server:0.1.2
+  # Base file name of local tarball created from WBEM server image
+  TEST_SERVER_IMAGE_TAR: smi-server-0.1.2.tar.gz
+  # Local Docker image cache directory
+  DOCKER_CACHE_DIR: ~/docker-cache
+
 jobs:
 
   set_matrix:
@@ -94,6 +103,30 @@ jobs:
       matrix: ${{ fromJson(needs.set_matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
+    - name: Create local cache directory for Docker images
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        mkdir -p ${{ env.DOCKER_CACHE_DIR }}
+    - name: Set up caching for local Docker image cache directory
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      uses: actions/cache@v1
+      with:
+        path: ${{ env.DOCKER_CACHE_DIR }}
+        key: docker-cache-{hash}
+        restore-keys: |
+          docker-cache-
+    - name: Get WBEM server image from Docker Hub or local Docker image cache
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        if [[ ! -f ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }} ]]; then \
+          echo "Pulling image from Docker Hub"; \
+          docker pull ${{ env.TEST_SERVER_IMAGE }}; \
+          echo "Saving image in local Docker image cache"; \
+          docker save -o ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }} ${{ env.TEST_SERVER_IMAGE }}; \
+        else \
+          echo "Loading image from local Docker image cache"; \
+          docker load -i ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }}; \
+        fi
     - name: Checkout repo
       uses: actions/checkout@v2
       with:
@@ -151,6 +184,13 @@ jobs:
         # TESTCASES: test_cim_obj.py
       run: |
         make test
+    - name: Run end2end test with WBEM server Docker image
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+        # Uses TEST_SERVER_IMAGE variable
+      run: |
+        make end2endtest
     - name: Send coverage result to coveralls.io
       shell: bash -l {0}
       env:
