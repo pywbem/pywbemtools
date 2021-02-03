@@ -91,6 +91,9 @@ Released: not yet
 * Added commands 'add-mof' and 'remove-mof' for compiling MOF to the 'server'
   command group. (issue #886)
 
+* Test: Added end2end test capability using the OpenPegasus container image
+  on Docker Hub.
+
 **Cleanup:**
 
 * Cleaned up the circumvention for Click issue #1231 by upgrading the minimum
