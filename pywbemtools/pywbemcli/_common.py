@@ -36,13 +36,12 @@ except ImportError:
 import six
 import click
 import tabulate
+from nocaselist import NocaseList
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
     cimvalue
-
 from pywbem._nocasedict import NocaseDict
-from nocaselist import NocaseList
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
