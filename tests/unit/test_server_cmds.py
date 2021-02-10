@@ -60,10 +60,8 @@ SERVER_HELP_LINES = [
     'info              Get information about the server.',
     'interop           Get the Interop namespace of the server (deprecated).',
     'namespaces        List the namespaces of the server (deprecated).',
-    'add-mof           Compile MOF and add/update the resulting CIM objects in '
-    'the server.',
-    'remove-mof        Compile MOF and remove the resulting CIM objects from '
-    'the server.',
+    'add-mof           Compile MOF and add/update CIM objects in the server.',
+    'remove-mof        Compile MOF and remove CIM objects from the server.',
 ]
 
 SERVER_BRAND_HELP_LINES = [

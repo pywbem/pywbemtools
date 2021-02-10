@@ -2001,8 +2001,8 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       interop     Get the Interop namespace of the server (deprecated).
       brand       Get the brand of the server.
       info        Get information about the server.
-      add-mof     Compile MOF and add/update the resulting CIM objects in the server.
-      remove-mof  Compile MOF and remove the resulting CIM objects from the server.
+      add-mof     Compile MOF and add/update CIM objects in the server.
+      remove-mof  Compile MOF and remove CIM objects from the server.
 
 
 .. _`pywbemcli server add-mof --help`:
@@ -2019,7 +2019,7 @@ Help text for ``pywbemcli server add-mof`` (see :ref:`server add-mof command`):
 
     Usage: pywbemcli [GENERAL-OPTIONS] server add-mof MOFFILE [COMMAND-OPTIONS]
 
-      Compile MOF and add/update the resulting CIM objects in the server.
+      Compile MOF and add/update CIM objects in the server.
 
       The MOF files are specified with the MOFFILE argument, which may be specified multiple times. The minus sign ('-')
       specifies the standard input.
@@ -2031,7 +2031,10 @@ Help text for ``pywbemcli server add-mof`` (see :ref:`server add-mof command`):
       MOF include files (specified with the '#pragma include' directive) are searched first in the directory of the
       including MOF file, and then in the directories specified with the --include option.
 
-      The global --verbose option will show the CIM objects that are added or updated.
+      Any CIM objects (instances, classes and qualifiers) specified in the MOF files are created in the server, or
+      modified if they already exist in the server.
+
+      The global --verbose option will show the CIM objects that are created or modified.
 
     Command Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
@@ -2151,7 +2154,7 @@ Help text for ``pywbemcli server remove-mof`` (see :ref:`server remove-mof comma
 
     Usage: pywbemcli [GENERAL-OPTIONS] server remove-mof MOFFILE [COMMAND-OPTIONS]
 
-      Compile MOF and remove the resulting CIM objects from the server.
+      Compile MOF and remove CIM objects from the server.
 
       The MOF files are specified with the MOFFILE argument, which may be specified multiple times. The minus sign ('-')
       specifies the standard input.
@@ -2162,6 +2165,8 @@ Help text for ``pywbemcli server remove-mof`` (see :ref:`server remove-mof comma
 
       MOF include files (specified with the '#pragma include' directive) are searched first in the directory of the
       including MOF file, and then in the directories specified with the --include option.
+
+      Any CIM objects (instances, classes and qualifiers) specified in the MOF files are deleted from the server.
 
       The global --verbose option will show the CIM objects that are removed.
 
