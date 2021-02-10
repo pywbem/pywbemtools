@@ -166,7 +166,7 @@ def server_info(context):
 @click.pass_obj
 def server_add_mof(context, **options):
     """
-    Compile MOF and add/update the resulting CIM objects in the server.
+    Compile MOF and add/update CIM objects in the server.
 
     The MOF files are specified with the MOFFILE argument, which may be
     specified multiple times. The minus sign ('-') specifies the standard
@@ -181,8 +181,12 @@ def server_add_mof(context, **options):
     searched first in the directory of the including MOF file, and then in
     the directories specified with the --include option.
 
-    The global --verbose option will show the CIM objects that are added or
-    updated.
+    Any CIM objects (instances, classes and qualifiers) specified in the MOF
+    files are created in the server, or modified if they already exist in the
+    server.
+
+    The global --verbose option will show the CIM objects that are created or
+    modified.
     """
     context.execute_cmd(lambda: cmd_server_add_mof(context, options))
 
@@ -198,7 +202,7 @@ def server_add_mof(context, **options):
 @click.pass_obj
 def server_remove_mof(context, **options):
     """
-    Compile MOF and remove the resulting CIM objects from the server.
+    Compile MOF and remove CIM objects from the server.
 
     The MOF files are specified with the MOFFILE argument, which may be
     specified multiple times. The minus sign ('-') specifies the standard
@@ -212,6 +216,9 @@ def server_remove_mof(context, **options):
     MOF include files (specified with the '#pragma include' directive) are
     searched first in the directory of the including MOF file, and then in
     the directories specified with the --include option.
+
+    Any CIM objects (instances, classes and qualifiers) specified in the MOF
+    files are deleted from the server.
 
     The global --verbose option will show the CIM objects that are removed.
     """
@@ -270,7 +277,7 @@ def cmd_server_info(context):
 
 def cmd_server_add_mof(context, options):
     """
-    Compile MOF and add/update the resulting CIM objects in the server.
+    Compile MOF and add/update CIM objects in the server.
     """
 
     try:
@@ -330,7 +337,7 @@ def cmd_server_add_mof(context, options):
 
 def cmd_server_remove_mof(context, options):
     """
-    Compile MOF and remove the resulting CIM objects from the server.
+    Compile MOF and remove CIM objects from the server.
     """
 
     try:
