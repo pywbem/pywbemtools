@@ -36,7 +36,7 @@ STATISTICS_HELP_LINES = [
     '[COMMAND-OPTIONS]',
     "Command group for WBEM server statistics.",
     CMD_OPTION_HELP_HELP_LINE,
-    'reset              Reset the counts in statistics gathered by pywbemcl.',
+    'reset              Reset the counts in statistics gathered by pywbemcli.',
     'server-on          Enable statistics on current server.',
     'server-off         Disable statistics on current server.',
     'status             Show statistics enabled status for client and server.',
@@ -62,7 +62,7 @@ STATISTICS_STATUS_HELP_LINES = [
 
 STATISTICS_RESET_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics reset [COMMAND-OPTIONS]',
-    'Reset the counts in statistics gathered by pywbemcl.'
+    'Reset the counts in statistics gathered by pywbemcli.'
 ]
 
 STATISTICS_SHOW_HELP_LINES = [
@@ -76,7 +76,7 @@ STATISTICS_SERVER_SHOW_HELP_LINES = [
     'Display statistics gathered by server.'
 ]
 
-OK = True     # mark tests OK when they execute correctly
+OK = False     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -314,7 +314,7 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify use of statistis reset and statistics not auto.',
+    ['Verify use of statistis reset.',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
       # args not allowed in interactive mode
       'stdin': ['class enumerate --di --no',
@@ -324,10 +324,27 @@ TEST_CASES = [
                 'statistics show', ],
       'cmdgrp': None,
       },
-     {'stdout': [r'1 *0[ 0-9.]*EnumerateClassNames'],
+     {'stdout': [r'1 [ 0-9.]* *EnumerateClassNames'],
       'rc': 0,
       'test': 'regex'},
      None, OK],
+
+    ['Verify use of statistis reset does not disable statistics display.',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
+      # Should show statistics with count of 2 and with count of 1
+      'stdin': ['class enumerate  --di --no',
+                'class enumerate  --di --no',
+                'statistics show',
+                'statistics reset',
+                'class enumerate  --di --no',
+                'statistics show'],
+      'cmdgrp': None,
+      },
+     {'stdout': [r' 2 [ 0-9/.]* *EnumerateClassNames',
+                 r' 1 [ 0-9/.]* *EnumerateClassNames'],
+      'rc': 0,
+      'test': 'regex'},
+     None, RUN],
 
     # NOTE: The following 4 tests do not enable statistics to keep
     # the results simple
@@ -399,7 +416,7 @@ TEST_CASES = [
                  'Statistics status',
                  'statistics source    status',
                  '-------------------  --------',
-                 'client statistics    on',
+                 'client statistics display    on',
                  'server statistics    on'],
       'rc': 0,
       'test': 'innows'},
@@ -407,14 +424,14 @@ TEST_CASES = [
 
 
     ['Verify Statistics status default output format (table)',
-     {'general': ['--output-format', 'table', '-T'],
+     {'general': ['-T'],
       'stdin': ['statistics server-on',
                 'statistics status']},
      {'stdout': ['Server GatherStatisticalData set on',
                  'Statistics status',
                  'statistics source    status',
                  '-------------------  --------',
-                 'client statistics    on',
+                 'client statistics display    on',
                  'server statistics    on'],
       'rc': 0,
       'test': 'innows'},
@@ -448,4 +465,4 @@ class TestSubcmd(CLITestsBase):  # pylint: disable=too-few-public-methods
         """
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition)
+                          mock, condition, verbose=True)

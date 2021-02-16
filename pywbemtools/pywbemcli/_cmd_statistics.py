@@ -84,7 +84,7 @@ def statistics_group():
 @click.pass_obj
 def statistics_reset(context):
     """
-    Reset the counts in statistics gathered by pywbemcl.
+    Reset the counts in statistics gathered by pywbemcli.
 
     This command resets the counts in the statistics gathered by pywbemcli for
     the current connection including the statistics on the server response
@@ -385,7 +385,7 @@ def cmd_statistics_status(context):
     if output_format_is_table(output_format):
         headers = ['statistics source', 'status']
 
-        rows = [["client statistics", pywbemcli_stats_status],
+        rows = [["client statistics display", pywbemcli_stats_status],
                 ['server statistics', svr_status]]
         click.echo(format_table(rows, headers, "Statistics status"))
 
@@ -408,7 +408,7 @@ def cmd_statistics_reset(context):
     context.conn.statistics.reset()
 
     context.spinner_stop()
-    click.echo("Statistics reset")
+    click.echo("Pywbemcli statistics reset")
 
 
 def cmd_statistics_show(context):
@@ -433,4 +433,5 @@ def cmd_statistics_server_show(context):
     """
     context.spinner_stop()
 
-    click.ClickException("This command not implemented. See issue # 895.")
+    raise click.ClickException(
+        "This command not implemented. See issue # 895.")

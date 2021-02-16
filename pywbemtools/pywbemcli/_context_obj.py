@@ -366,8 +366,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             header.append('Operation')
             rows.append(row)
 
-        title = 'Statistics: Time(Seconds); Times/lengths: (Avg/Min/Max), ' \
-                'single value if all same.'
+        title = 'Client Statistics: Time(Seconds); Times/lengths: ' \
+                '(Avg/Min/Max), single value if all same.'
 
         click.echo(format_table(rows, header, title=title, float_fmt=".3f"))
 
