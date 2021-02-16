@@ -33,6 +33,11 @@ from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
+# TODO(PR900): Activate the PR900 flags when continuing the work on PR #900;
+#              Remove the PR900 flags when done.
+PR900_REQUIRE_CORRECT_CONNECTION_STATUS = False
+PR900_DISCONNECT_CALLS_CLOSE = False
+
 WBEM_SERVER_OBJ = None
 
 PYWBEMCLI_LOG = 'pywbemcli.log'
@@ -157,7 +162,7 @@ class PywbemServer(object):
         # May be None in case of not-saved connection (e.g. connection save)
         self._connections_file = connections_file
 
-        # dynamically created in create_connection
+        # WBEMServer object when connected; None when disconnected.
         self._wbem_server = None
 
     def __str__(self):
@@ -408,7 +413,10 @@ class PywbemServer(object):
         """
         :class:`PYWBEMCLIFakedConnection` or :class:`PYWBEMCLIConnection`
         (both derived from :class:`pywbem.WBEMConnection`):
-        Connection object to be used for WBEM operation requests.
+        Connection object to be used for WBEM operation requests, when
+        connected to the server.
+
+        `None` when disconnected from the server.
         """
         return self.wbem_server.conn if self.wbem_server else None
 
@@ -416,7 +424,9 @@ class PywbemServer(object):
     def wbem_server(self):
         """
         :class:`~pywbem.WBEMServer`: Server object to be used for higher level
-        WBEM server requests.
+        WBEM server requests, when connected to the server.
+
+        `None` when disconnected from the server.
         """
         return self._wbem_server
 
@@ -492,55 +502,72 @@ class PywbemServer(object):
                                             kwargsout['mock_server']]
         return PywbemServer(**kwargsout)
 
-    def reset(self):
-        """ Reset the connection attributes of this pywbem server so that the
-        connection must be restablished
+    def disconnect(self):
         """
+        Disconnect from the server, closing the connection.
+
+        Must be connected to the server when calling this method.
+        """
+
+        # TODO(PR900): Remove the PR900 flag test and else path once done.
+        if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:
+            assert self._wbem_server is not None  # Must be connected
+        else:
+            # Old code to be removed once done
+            if self._wbem_server is None:
+                return
+
+        # TODO(PR900): Remove the PR900 flag test and else path once done.
+        if PR900_DISCONNECT_CALLS_CLOSE:
+            self._wbem_server.conn.close()
+
         self._wbem_server = None
 
-    def create_connection(self, log=None, use_pull=None,
-                          verbose=None):
+    def connect(self, log=None, use_pull=None, verbose=None):
         """
-        Initiate a WBEB connection, via PyWBEM api. Arguments for
-        the request are the parameters required by the pywbem
-        WBEMConnection constructor that are not available within this
-        class.
+        Connect to the server, using the current attributes of this object.
 
-        If self.mock_server is set, a mock connection is created instead
-        of a genuine connection to a server.
-        See the pywbem.WBEMConnection class for more details on the parameters.
+        Must be disconnected from the server when calling this method.
 
-        Return:
-            pywbem.WBEMConnection: Connection object that can be used to execute
-            other pywbem cim_operation requests
+        If `self.mock_server` is non-empty, a mock connection is created.
+        Otherwise, `self.server` must be set and a real connection is created.
 
         Raises:
-           ValueError: if server parameter is invalid or other issues with
-           the input values
+          ClickException: Several issues that cause the command (the whole
+            command in command mode, or a single command in interactive mode)
+            to terminate.
+          ValueError: Other issues with server-related attributes of this
+            object that are considered programming errors.
         """
 
-        if self._mock_server:
-            if self._wbem_server is None:
-                conn = PYWBEMCLIFakedConnection(
-                    default_namespace=self.default_namespace,
-                    use_pull_operations=use_pull,
-                    stats_enabled=True)
-                self._wbem_server = WBEMServer(conn)
-                try:
-                    conn.build_mockenv(
-                        self._wbem_server, self._mock_server,
-                        self._connections_file, self._name, verbose)
-                except (mockscripts.MockMOFCompileError,
-                        mockscripts.MockScriptError) as exc:
-                    # These errors cause the command to be aborted, because
-                    # partially executed mock scripts or partially compiled MOF
-                    # files might have caused inconsistencies in the Python
-                    # mockscripts namespace and in the CIM repository.
-                    click.echo(str(exc), err=True)
-                    raise click.Abort()
-                except mockscripts.MockError as exc:
-                    raise click.ClickException(str(exc))
+        # TODO(PR900): Remove the PR900 flag test and else path once done.
+        if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:
+            assert self._wbem_server is None  # Must be disconnected
+        else:
+            # Old code to be removed once done
+            if self._wbem_server is not None:
+                return
 
+        if self._mock_server:
+            conn = PYWBEMCLIFakedConnection(
+                default_namespace=self.default_namespace,
+                use_pull_operations=use_pull,
+                stats_enabled=True)
+            self._wbem_server = WBEMServer(conn)
+            try:
+                conn.build_mockenv(
+                    self._wbem_server, self._mock_server,
+                    self._connections_file, self._name, verbose)
+            except (mockscripts.MockMOFCompileError,
+                    mockscripts.MockScriptError) as exc:
+                # These errors cause the command to be aborted, because
+                # partially executed mock scripts or partially compiled MOF
+                # files might have caused inconsistencies in the Python
+                # mockscripts namespace and in the CIM repository.
+                click.echo(str(exc), err=True)
+                raise click.Abort()
+            except mockscripts.MockError as exc:
+                raise click.ClickException(str(exc))
         else:  # mock_server does not exist
             if not self.server:
                 raise click.ClickException('No server found. Cannot '
