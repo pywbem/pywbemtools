@@ -1,0 +1,434 @@
+//
+//  Test mof from open pegasus defining the return from
+//  CIM_CIMOMStatisticaldata class
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "AssociatorNames15";
+   OperationType = 17;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "Associators14";
+   OperationType = 16;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "CloseEnumeration34";
+   OperationType = 1;
+   OtherOperationType = "CloseEnumeration";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "CreateClass5";
+   OperationType = 7;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "CreateInstance6";
+   OperationType = 8;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "DeleteClass3";
+   OperationType = 5;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "DeleteInstance4";
+   OperationType = 6;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "DeleteQualifier22";
+   OperationType = 24;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "EnumerateClassNames10";
+   OperationType = 12;
+   NumberOfOperations = 34;
+   CimomElapsedTime = "00000000000000.015613:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 12902;
+   ResponseSize = 493181;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "EnumerateClasses9";
+   OperationType = 11;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "EnumerateInstanceNames12";
+   OperationType = 14;
+   NumberOfOperations = 45;
+   CimomElapsedTime = "00000000000000.347375:000";
+   ProviderElapsedTime = "00000000000000.146914:000";
+   RequestSize = 17160;
+   ResponseSize = 168275;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "EnumerateInstances11";
+   OperationType = 13;
+   NumberOfOperations = 62;
+   CimomElapsedTime = "00000000000000.138960:000";
+   ProviderElapsedTime = "00000000000000.004541:000";
+   RequestSize = 23862;
+   ResponseSize = 151842;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "EnumerateQualifiers23";
+   OperationType = 25;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "ExecQuery13";
+   OperationType = 15;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "GetClass0";
+   OperationType = 3;
+   NumberOfOperations = 4;
+   CimomElapsedTime = "00000000000000.000919:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 2328;
+   ResponseSize = 17356;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "GetInstance1";
+   OperationType = 4;
+   NumberOfOperations = 8;
+   CimomElapsedTime = "00000000000000.003771:000";
+   ProviderElapsedTime = "00000000000000.000305:000";
+   RequestSize = 6896;
+   ResponseSize = 25024;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "GetProperty18";
+   OperationType = 20;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "GetQualifier20";
+   OperationType = 22;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "IndicationDelivery2";
+   OperationType = 26;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "InvokeMethod24";
+   OperationType = 1;
+   OtherOperationType = "InvokeMethod";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "ModifyClass7";
+   OperationType = 9;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "ModifyInstance8";
+   OperationType = 10;
+   NumberOfOperations = 8;
+   CimomElapsedTime = "00000000000000.007079:000";
+   ProviderElapsedTime = "00000000000000.000205:000";
+   RequestSize = 28184;
+   ResponseSize = 3011;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenAssociatorPaths28";
+   OperationType = 1;
+   OtherOperationType = "OpenAssociatorPaths";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenAssociators27";
+   OperationType = 1;
+   OtherOperationType = "OpenAssociators";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenEnumerateInstancePaths26";
+   OperationType = 1;
+   OtherOperationType = "OpenEnumerateInstancePaths";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenEnumerateInstances25";
+   OperationType = 1;
+   OtherOperationType = "OpenEnumerateInstances";
+   NumberOfOperations = 5;
+   CimomElapsedTime = "00000000000000.036863:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 2976;
+   ResponseSize = 15960;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenQueryInstances31";
+   OperationType = 1;
+   OtherOperationType = "OpenQueryInstances";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenReferenceNames30";
+   OperationType = 1;
+   OtherOperationType = "OpenReferenceNames";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "OpenReferences29";
+   OperationType = 1;
+   OtherOperationType = "OpenReferences";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "PullInstancePaths33";
+   OperationType = 1;
+   OtherOperationType = "PullInstancePaths";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "PullInstancesWithPath32";
+   OperationType = 1;
+   OtherOperationType = "PullInstancesWithPath";
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "ReferenceNames17";
+   OperationType = 19;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "References16";
+   OperationType = 18;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "SetProperty19";
+   OperationType = 21;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};
+
+instance of CIM_CIMOMStatisticalData {
+   Caption = "CIMOM performance statistics for CIM request";
+   Description = "CIMOM performance statistics for CIM request ";
+   InstanceID = "SetQualifier21";
+   OperationType = 23;
+   NumberOfOperations = 0;
+   CimomElapsedTime = "00000000000000.000000:000";
+   ProviderElapsedTime = "00000000000000.000000:000";
+   RequestSize = 0;
+   ResponseSize = 0;
+};

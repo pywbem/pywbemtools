@@ -101,6 +101,8 @@ Released: not yet
 * Added new command group ('statistics') that contols use of statistics. See
   issue #588)
 
+* Implement command to get statistics from server and present as a table #895)
+
 
 **Cleanup:**
 

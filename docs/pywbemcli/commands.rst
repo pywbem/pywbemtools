@@ -1682,6 +1682,10 @@ gathering, this request may result in an exception from the server because
 the Class CIM_ObjectManager or its property ``GatherStatisticalData`` do not exist
 in the server or the server does not allow a client to modify the property.
 
+The lifecycle of the WBEM server statistics gathering capability and
+corresponding statistics is dependent on the WBEM server and whether it persists
+statistical data and status, not just the client.
+
 Once the WBEM server returns the server response time, an additional column
 ``Server Time`` appears in the statistics report.
 
@@ -1779,9 +1783,34 @@ gathering in the WBEM server.
 
 This command attempts to display the server statistics. It does that by
 retrieving "CIM_CIMOMStatisticalData" instances associated from the WBEM server
-and organizing them into a report.
+and organizing them into a report, only line for the statistical information
+on each WBEM operation on which the WBEM server is keeping statistics.
 
-This command is not currently enabled.
+This report displays the average times and sizes of WBEM operations by operation
+name since the last time the statistics were reset by the server or a client
+(If the server and client support client reset of the server statistics).
+
+The format of the report is shown in the example below:
+
+.. code-block:: text
+
+    $ pywbemcli -s http://localhost
+
+    pywbemcli> statistics server-show
+
+    WBEM server CIM Operation Statistical Data
+    +-------------+--------------+--------------+---------------+---------------+------------------------+
+    |   Operation |       Server |     Provider |       Request |      Response | Operation Name         |
+    |       Count |   time(usec) |   Time(usec) |   size(bytes) |   size(bytes) |                        |
+    |-------------+--------------+--------------+---------------+---------------+------------------------|
+    |          34 |        459.2 |          0   |         379.5 |       14505.3 | EnumerateClassNames    |
+    |          45 |       7719.4 |       3264.8 |         381.3 |        3739.4 | EnumerateInstanceNames |
+    |          62 |       2241.3 |         73.2 |         384.9 |        2449.1 | EnumerateInstances     |
+    |           4 |        229.8 |          0   |         582   |        4339   | GetClass               |
+    |           8 |        471.4 |         38.1 |         862   |        3128   | GetInstance            |
+    |           8 |        884.9 |         25.6 |        3523   |         376.4 | ModifyInstance         |
+    |           5 |       7372.6 |          0   |         595.2 |        3192   | OpenEnumerateInstances |
+    +-------------+--------------+--------------+---------------+---------------+------------------------+
 
 
 .. index:: pair: command groups;connection commands

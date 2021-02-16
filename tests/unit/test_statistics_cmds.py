@@ -76,7 +76,7 @@ STATISTICS_SERVER_SHOW_HELP_LINES = [
     'Display statistics gathered by server.'
 ]
 
-OK = False     # mark tests OK when they execute correctly
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -344,7 +344,7 @@ TEST_CASES = [
                  r' 1 [ 0-9/.]* *EnumerateClassNames'],
       'rc': 0,
       'test': 'regex'},
-     None, RUN],
+     None, OK],
 
     # NOTE: The following 4 tests do not enable statistics to keep
     # the results simple
@@ -408,7 +408,8 @@ TEST_CASES = [
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
-    ['Verify Statistics status table output',
+
+    ['Verify Statistics status default output format (table)',
      {'general': ['--output-format', 'table', '-T'],
       'stdin': ['statistics server-on',
                 'statistics status']},
@@ -422,21 +423,19 @@ TEST_CASES = [
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
-
-    ['Verify Statistics status default output format (table)',
-     {'general': ['-T'],
+    ['Verify Statistics server-show displays table',
+     {'general': ['--output-format', 'simple'],
       'stdin': ['statistics server-on',
-                'statistics status']},
+                'server add-mof '
+                'tests/unit/cimstatisticaldatainstances.mof -n interop',
+                'statistics server-show']},
      {'stdout': ['Server GatherStatisticalData set on',
-                 'Statistics status',
-                 'statistics source    status',
-                 '-------------------  --------',
-                 'client statistics display    on',
-                 'server statistics    on'],
+                 'Operation Server Provider Request Response  Operation Name',
+                 'EnumerateInstances',
+                 'GetClass'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
-
 
 
     # TODO tests not done
@@ -465,4 +464,4 @@ class TestSubcmd(CLITestsBase):  # pylint: disable=too-few-public-methods
         """
         cmd_grp = inputs['cmdgrp'] if 'cmdgrp' in inputs else ''
         self.command_test(desc, cmd_grp, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition)
