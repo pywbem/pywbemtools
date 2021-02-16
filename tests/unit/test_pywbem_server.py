@@ -477,7 +477,7 @@ def test_pysvr_init(testcase, init_args, init_kwargs, exp_attrs):
 
 
 TESTCASES_PYSVR_CONNECT_ATTRS = [
-    # Testcases for PywbemServer.create_connection() for testing attrs
+    # Testcases for PywbemServer.connect() for testing attrs
     #
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
@@ -543,7 +543,7 @@ TESTCASES_PYSVR_CONNECT_ATTRS = [
 @simplified_test_function
 def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
     """
-    Test function for PywbemServer.create_connection() for testing attrs.
+    Test function for PywbemServer.connect() for testing attrs.
     """
     svr = PywbemServer(**init_kwargs)
 
@@ -554,7 +554,7 @@ def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
     # connect and test connection results. Try block insures finally is
     # called.
     try:
-        svr.create_connection(False)
+        svr.connect(False)
     except Exception:  # pylint: disable=broad-except
         pass  # pass all exceptions
     finally:
@@ -573,4 +573,7 @@ def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
     assert svr.certfile == exp_attrs['certfile']
     assert svr.keyfile == exp_attrs['keyfile']
 
-# TODO: Add test for get_password.
+
+# TODO: Add test for PywbemServer.disconnect().
+
+# TODO: Add test for PywbemServer.get_password().

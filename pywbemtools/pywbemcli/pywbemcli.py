@@ -713,7 +713,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                     modified_server = True
 
                 if modified_server:
-                    pywbem_server.reset()
+                    pywbem_server.disconnect()
                 else:
                     pywbem_server = ctx.obj.pywbem_server
             else:

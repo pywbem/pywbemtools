@@ -46,7 +46,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                  pull_max_cnt, timestats, log, verbose, pdb,
                  warn, connections_repo):
 
-        self._pywbem_server = pywbem_server
+        self.pywbem_server = pywbem_server   # has setter method
         self._output_format = output_format
         self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
@@ -61,7 +61,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
-        self._conn = None
 
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
@@ -143,18 +142,31 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def conn(self):
         """
         :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
-        This property uses the wbem_server property to activate the
-        conn and wbem_server. The connection is not activated unless
-        a command requiring the webem server is executed.  This allows other
-        commands like connection to execute without testing whether or not the
-        WBEM server exists.
-        """
-        # The conn property is created in wbem_server and retained here.
-        if self._conn:
-            return self._conn
 
-        self._conn = self.wbem_server.conn
-        return self._conn
+        Using this property will connect to the server if not yet connected,
+        and will raise an exception if no server is specified.
+
+        When connecting to a real WBEM server, a password is prompted for if
+        a user is specified in the current context but no password. The
+        password is saved in the context, so the password is prompted for only
+        once (e.g. in interactive mode).
+
+        Raises:
+          click.ClickException: No server is specified.
+        """
+        srv = self.wbem_server  # Ensures connection and may raise exception
+        return srv.conn
+
+    @property
+    def is_connected(self):
+        """
+        bool: Indicates whether currently contected to a WBEM server.
+
+        That is the case as soon as commands have been executed that
+        communicate with the server.
+        """
+        return self._pywbem_server and \
+            self._pywbem_server.wbem_server is not None
 
     @property
     def wbem_server(self):
@@ -169,31 +181,45 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         a user is specified in the current context but no password. The
         password is saved in the context, so the password is prompted for only
         once (e.g. in interactive mode).
+
+        Raises:
+          click.ClickException: No server is specified.
         """
 
-        if self._pywbem_server:
-            if self._pywbem_server.wbem_server is None:
-                self._pywbem_server.get_password(self)
-                self._pywbem_server.create_connection(
-                    log=self.log,
-                    use_pull=self.use_pull,
-                    verbose=self.verbose)
-            return self._pywbem_server.wbem_server
+        if not self._pywbem_server:
+            raise click.ClickException(
+                'No server specified for a command that requires a WBEM '
+                'server. To specify a server, use the "--server", '
+                '"--mock-server", or "--name" general options, or set the '
+                'corresponding environment variables, or in interactive mode '
+                'use "connection select"')
 
-        raise click.ClickException(
-            'No server specified for a command that requires a WBEM server. '
-            'To specify a server, use the "--server", '
-            '"--mock-server", or "--name" general options, or set the '
-            'corresponding environment variables, or in interactive mode '
-            'use "connection select"')
+        # Ensure server is connected
+        if self._pywbem_server.wbem_server is None:
+            self._pywbem_server.get_password(self)
+            self._pywbem_server.connect(
+                log=self.log,
+                use_pull=self.use_pull,
+                verbose=self.verbose)
+
+        return self._pywbem_server.wbem_server
 
     @property
     def pywbem_server(self):
         """
-        :class:`~pywbem.WBEMServer` WBEMServer instance to be used for
-        requests.
+        :class:`PywbemServer`: Current server of the context.
+
+        If no server is specified, `None` is returned.
+
+        This attribute is settable.
         """
         return self._pywbem_server
+
+    @pywbem_server.setter
+    def pywbem_server(self, value):
+        """Setter method; for a description see the getter method."""
+        # pylint: disable=attribute-defined-outside-init
+        self._pywbem_server = value
 
     @property
     def spinner_enabled(self):
@@ -250,12 +276,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         return self._verbose
 
-    def set_connection(self, connection):
-        """ Set the connection parameter as the current connection object and
-            establish the new connection
-        """
-        self._pywbem_server = connection
-
     def execute_cmd(self, cmd):
         """
         Call the cmd executor defined by cmd with the spinner. If the
@@ -288,9 +308,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             if not self.pdb:
                 self.spinner_stop()
 
-            # Issue statistics if required. Note: uses _conn in order
-            # not to create the connection if not created.
-            if self.timestats and self._conn:
+            # Issue statistics if requested and if the command used a conn.
+            if self.timestats and self.is_connected:
                 context = click.get_current_context()
                 click.echo(self.format_statistics(self.conn.statistics,
                                                   context.obj))
