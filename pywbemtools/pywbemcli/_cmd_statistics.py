@@ -24,8 +24,9 @@ NOTE: Commands are ordered in help display by their order in this file.
 from __future__ import absolute_import, print_function
 
 import click
+import six
 
-from pywbem import Error
+from pywbem import Error, ValueMapping, CIMDateTime
 
 from .pywbemcli import cli
 from ._common import warning_msg, CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
@@ -211,6 +212,7 @@ def statistics_status(context):
 
 OBJMGR_CLN = "CIM_ObjectManager"
 OBJMGR_STAT_PROPERTY_NAME = "GatherStatisticalData"
+CIMOM_STATISTICAL_DATA_CLASS = "CIM_CIMOMStatisticalData"
 
 
 def test_conn_exists(context):
@@ -423,7 +425,6 @@ def cmd_statistics_show(context):
     click.echo(context.format_statistics(context.conn.statistics, context))
 
 
-# pylint: disable=unused-argument
 def cmd_statistics_server_show(context):
     """
     If server statistics are enabled get them from the server and display.
@@ -431,7 +432,162 @@ def cmd_statistics_server_show(context):
     This command may fail if the WBEM server has not implemented the
     management of detailed statistics.
     """
-    context.spinner_stop()
 
-    raise click.ClickException(
-        "This command not implemented. See issue # 895.")
+    def avg_value(value_, num_ops):
+        """
+        Compute the average value from the value_ input and the number of
+        operations.
+        If the number of operations is 0, return 0
+
+        Parameters:
+          value_ (:class:`int` or TODO):
+
+          num_ops (:class:`int`):
+            The number of operations executed
+
+        Returns:
+          Numeric containing the value / num_ops or
+          0 if num_ops is 0.
+        """
+        if num_ops:
+            return value_ / num_ops
+
+        assert value_ == 0
+        return 0
+
+    def avg_time(cimtime, num_ops):
+        """
+        Return the average time in microseconds
+
+        Parameters:
+          cimtime (:class: `CIMDateTime`)
+            The interval form of the CIMDate time
+
+          num_ops (:class:`int`):
+            The number of operations executed
+
+          Returns:
+            The average of cimtime / num_ops
+        """
+
+        assert isinstance(cimtime, CIMDateTime)
+        assert cimtime.is_interval
+        microsec = cimtime.timedelta.microseconds
+        avg = avg_value(microsec, num_ops)
+        return avg
+
+    output_fmt = validate_output_format(context.output_format, 'TABLE')
+
+    objmgr = get_objmgr_inst(context)
+    try:
+        svr_status = objmgr[OBJMGR_STAT_PROPERTY_NAME]
+    except KeyError:
+        svr_status = "No property {}".format(OBJMGR_STAT_PROPERTY_NAME)
+    except Error as er:
+        svr_status = "Not settable {}".format(er)
+
+    if isinstance(svr_status, six.string_types):
+        raise click.ClickException("ObjectManager config setting not found {}".
+                                   format(svr_status))
+
+    if not svr_status:
+        raise click.ClickException("WBEM server CIM_ObjectManager "
+                                   "statatistics off")
+
+    # We must find the
+    # namespace containing statistical data since apparently not clearly
+    # documented in specs. Ex. Pegasus has in in root/cimv2 in test build
+    namespaces = context.wbem_server.namespaces
+    results = None
+    stats_namespace = None
+    for ns in namespaces:
+        try:
+            _ = context.conn.GetClass(CIMOM_STATISTICAL_DATA_CLASS,
+                                      namespace=ns)
+        except Error:
+            continue
+        try:
+            results = context.conn.PyWbemcliEnumerateInstances(
+                ClassName=CIMOM_STATISTICAL_DATA_CLASS,
+                namespace=ns,
+                LocalOnly=False,
+                IncludeQualifiers=False,
+                DeepInheritance=True,
+                IncludeClassOrigin=False)
+            stats_namespace = ns
+            if results:
+                break
+        except Error:
+            continue
+
+    if not results:
+        raise click.ClickException(
+            "No WBEM server class {} or class returns no data on "
+            "WBEM Server".
+            format(CIMOM_STATISTICAL_DATA_CLASS))
+
+    if context.verbose:
+        click.echo("{} returns instances in namespace {}".
+                   format(CIMOM_STATISTICAL_DATA_CLASS, stats_namespace))
+
+    try:
+        op_type_vm = ValueMapping.for_property(
+            context.conn, stats_namespace,
+            CIMOM_STATISTICAL_DATA_CLASS,
+            'OperationType')
+
+        results = context.conn.PyWbemcliEnumerateInstances(
+            ClassName=CIMOM_STATISTICAL_DATA_CLASS,
+            namespace=stats_namespace,
+            LocalOnly=False,
+            IncludeQualifiers=False,
+            DeepInheritance=True,
+            IncludeClassOrigin=False)
+        if not results:
+            raise click.ClickException(
+                "WBEM server Class {} returns no data".
+                format(CIMOM_STATISTICAL_DATA_CLASS))
+
+        rows = []
+        for inst in results:
+            # Only show lines that have a non-zero number of operations
+            if inst['NumberOfOperations'] == 0:
+                continue
+            op_type_name = op_type_vm.tovalues(inst['OperationType'])
+            # If op_type_name is other, get op_type_name from other property
+            if op_type_name.lower() == 'other':
+                op_type_name = inst['OtherOperationType']
+            number_of_operations = inst['NumberOfOperations']
+
+            cimom_avg_elapsesd_time = avg_time(inst['CimomElapsedTime'],
+                                               number_of_operations)
+
+            provider_avg_elapsesd_time = avg_time(inst['ProviderElapsedTime'],
+                                                  number_of_operations)
+
+            avg_request_size = avg_value(inst['RequestSize'],
+                                         number_of_operations)
+            avg_response_size = avg_value(inst['ResponseSize'],
+                                          number_of_operations)
+
+            rows.append([number_of_operations,
+                         "{:.1f}".format(cimom_avg_elapsesd_time),
+                         "{:.1f}".format(provider_avg_elapsesd_time),
+                         "{:.1f}".format(avg_request_size),
+                         "{:.1f}".format(avg_response_size),
+                         op_type_name])
+
+        headers = ['Operation\nCount', 'Server\ntime(usec)',
+                   'Provider\nTime(usec)', 'Request\nsize(bytes)',
+                   'Response\nsize(bytes)',
+                   'Operation Name']
+
+        context.spinner_stop()
+        click.echo(format_table(
+            rows, headers,
+            title='WBEM server CIM Operation Statistical Data',
+            table_format=output_fmt))
+    except Error as er:
+        raise click.ClickException("Statistics retrieval from WBEM server "
+                                   "failed. Exception {}".
+                                   format(er))
