@@ -105,7 +105,7 @@ Help text for ``pywbemcli``:
 
       -T, --timestats / --no-timestats
                                       Display operation time statistics gathered by pywbemcli after each command. Otherwise
-                                      statistics can be displayed with "statistics display" command. Default: EnvVar
+                                      statistics can be displayed with "statistics show" command. Default: EnvVar
                                       PYWBEMCLI_TIMESTATS, or no-timestats.
 
       -d, --default-namespace NAMESPACE
@@ -2221,7 +2221,7 @@ Help text for ``pywbemcli statistics`` (see :ref:`statistics command group`):
       -h, --help  Show this help message.
 
     Commands:
-      reset        Reset the counts in statistics gathered by pywbemcl.
+      reset        Reset the counts in statistics gathered by pywbemcli.
       server-on    Enable statistics on current server.
       server-off   Disable statistics on current server.
       server-show  Display statistics gathered by server.
@@ -2243,7 +2243,7 @@ Help text for ``pywbemcli statistics reset`` (see :ref:`statistics reset command
 
     Usage: pywbemcli [GENERAL-OPTIONS] statistics reset [COMMAND-OPTIONS]
 
-      Reset the counts in statistics gathered by pywbemcl.
+      Reset the counts in statistics gathered by pywbemcli.
 
       This command resets the counts in the statistics gathered by pywbemcli for the current connection including the
       statistics on the server response times received from the WBEM server in the ``WBEMServerResponseTime`` header .

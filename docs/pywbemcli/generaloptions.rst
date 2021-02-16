@@ -519,10 +519,11 @@ WBEM server.
 
 When the option is included on the command line, the display of statistics
 is enabled after each command in the interactive mode and before exit in the
-cmd mode.
+command mode.
 
-Statistics are always gathered in pywbemcli for the curren connection for every
-command executed.
+Statistics are always gathered in pywbemcli for the current connection for every
+command executed. They can be displayed at any time in the interactive mode with
+the command ``statistics show``.
 
 
 For more information on statistics gathered by pywbemcli and WBEM servers see

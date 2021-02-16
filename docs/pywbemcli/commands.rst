@@ -1569,7 +1569,7 @@ and also separately by some WBEM servers.  There are multiple components to
 statistics gathering and reporting in pywbemcli:
 
 1. Pywbemcli client gathers statistics on CIM/XML operations that can be
-displayed either with the ``statistics show`` command  or afer pywbemcli
+displayed either with the ``statistics show`` command  or after pywbemcli
 executes each command if the ``--timestats`` / ``-T`` general option is used.
 The statistics gathered includes at least:
 
@@ -1580,11 +1580,11 @@ d. Request/response size (minimum, maximum, and average).
 e. Operation name.
 
 In interactive mode, statistics are displayed either after each command
-pywbemcli (``--timestats``) or only only when the command ``statistics show``
-is issued.
+pywbemcli (if ``--timestats`` general option was included in the command line)
+or the command  ``statistics show`` to show statistics at any time.
 
-In command line mode, use the ``--timestats`` general options display on the
-command execution after the command is executed.
+In command line mode, use the ``--timestats`` general option to display
+statistics after the command is executed.
 
 When python_mock is used, statistics on compile time of classes
 and instances inserted into the mock respository are also gathered.
@@ -1648,14 +1648,14 @@ Time`` as follows.
         1      0  0.008              0.001              822            2976            GetInstance
         2      0  0.006/0.006/0.006  0.000/inf/0.000    542            4187            GetClass
 
-Statistics .maintained in the server are only displayed if the server is
+Statistics maintained in the server are only displayed if the server is
 gathering statistics and only with the pywbemcli command ``statistics
 server-show``. Pywbemcli does not provide any mechanism to reset these
 statistics values and simply reports the statistics based on the data received
 from the WBEM server.
 
-In the interactive mode Pywbemcli statistics are discarded each time a new WBEM
-server is selected but the statistics display mode (--timestats) in maintained.
+In the interactive mode pywbemcli statistics are discarded each time a new WBEM
+server is selected but the statistics display mode (--timestats) is maintained.
 
 The statistics commands are:
 
@@ -1744,8 +1744,8 @@ the XML response from the WBEM server
 The ``statistics show`` command displays the current pywbemcli managed
 statistics as a table.
 
-The following example shows the use of --timestats option in
-the interactive mode displayint the statistics after the enumerate command
+The following example shows the use of ``--timestats`` option in
+the interactive mode to display statistics after the enumerate command
 is executed.
 
 

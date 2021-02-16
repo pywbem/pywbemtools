@@ -326,7 +326,7 @@ def set_default_if_empty_str(tst_str, default=None):
               envvar=PywbemServer.timestats_envvar,
               help=u'Display operation time statistics gathered by pywbemcli '
               u'after each command. Otherwise statistics can be displayed with '
-              u'"statistics display" command. '
+              u'"statistics show" command. '
               u'Default: EnvVar {ev}, or no-timestats.'.
               format(ev=PywbemServer.timestats_envvar))
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
