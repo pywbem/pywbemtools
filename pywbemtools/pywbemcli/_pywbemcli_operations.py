@@ -38,7 +38,7 @@ import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
-from ._utils import _ensure_bytes, DEFAULT_CONNECTIONS_FILE
+from ._utils import ensure_bytes, DEFAULT_CONNECTIONS_FILE
 from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
@@ -452,7 +452,7 @@ class BuildMockenvMixin(object):
 
             # Add the cache dir, so that manual tweaks on the cache files
             # invalidates the cache.
-            md5.update(_ensure_bytes(cache_dir))
+            md5.update(ensure_bytes(cache_dir))
 
             new_md5_value = md5.hexdigest()
 

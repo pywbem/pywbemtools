@@ -31,7 +31,7 @@ import pytest
 import pywbem
 
 from pywbemtools.pywbemcli._pywbemcli_operations import PYWBEMCLIFakedConnection
-from pywbemtools.pywbemcli._utils import _ensure_unicode, \
+from pywbemtools.pywbemcli._utils import ensure_unicode, \
     DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
     SetupNotSupportedError
@@ -1123,10 +1123,10 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
             "---- End\n". \
             format(testcase.desc,
                    len(stdout_lines),
-                   ''.join([_ensure_unicode(ln) + '\n'
+                   ''.join([ensure_unicode(ln) + '\n'
                             for ln in stdout_lines]),
                    len(exp_stdout_lines),
-                   ''.join([_ensure_unicode(ln) + '\n'
+                   ''.join([ensure_unicode(ln) + '\n'
                             for ln in exp_stdout_lines]))
         for i, regexp in enumerate(exp_stdout_lines):
             line = stdout_lines[i]
@@ -1163,10 +1163,10 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
         "---- End\n". \
         format(testcase.desc,
                len(stderr_lines),
-               ''.join([_ensure_unicode(ln) + '\n'
+               ''.join([ensure_unicode(ln) + '\n'
                         for ln in stderr_lines]),
                len(exp_stderr_lines),
-               ''.join([_ensure_unicode(ln) + '\n'
+               ''.join([ensure_unicode(ln) + '\n'
                         for ln in exp_stderr_lines]))
     for i, regexp in enumerate(exp_stderr_lines):
         line = stderr_lines[i]

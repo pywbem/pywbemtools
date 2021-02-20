@@ -23,10 +23,11 @@ in a module namespace for pickle to be able to load the corresponding objects.
 
 import sys
 import os
-import warnings
 import importlib
 import traceback
 import pywbem
+
+from .._utils import pywbemcliwarn_explicit
 
 
 class MockError(Exception):
@@ -121,7 +122,7 @@ def setup_script(file_path, conn, server, verbose):
             except Exception as exc:
                 raise script_error(file_path, exc)
         else:
-            warnings.warn_explicit(
+            pywbemcliwarn_explicit(
                 "The support of mock scripts without setup() function is "
                 "deprecated and will be removed in a future version.",
                 DeprecatedSetupWarning, file_path, 0)
@@ -144,7 +145,7 @@ def setup_script(file_path, conn, server, verbose):
                 "On Python <3.5, mock scripts with setup() function are not "
                 "supported")
 
-        warnings.warn_explicit(
+        pywbemcliwarn_explicit(
             "The support of mock scripts without setup() function is "
             "deprecated and will be removed in a future version.",
             DeprecatedSetupWarning, file_path, 0)
