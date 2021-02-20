@@ -42,6 +42,16 @@ jobs:
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"exclude\": [ \
               { \
+                \"os\": \"ubuntu-latest\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"ubuntu-latest\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"3.4\", \
                 \"package_level\": \"minimum\" \
@@ -51,14 +61,36 @@ jobs:
                 \"python-version\": \"3.4\", \
                 \"package_level\": \"latest\" \
               } \
+            ], \
+            \"include\": [ \
+              { \
+                \"os\": \"ubuntu-18.04\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"ubuntu-18.04\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"latest\" \
+              } \
             ] \
           }"; \
         else \
           echo "::set-output name=matrix::{ \
             \"os\": [ \"ubuntu-latest\" ], \
-            \"python-version\": [ \"2.7\", \"3.4\", \"3.9\" ], \
+            \"python-version\": [ \"2.7\", \"3.9\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"include\": [ \
+              { \
+                \"os\": \"ubuntu-18.04\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"ubuntu-18.04\", \
+                \"python-version\": \"3.4\", \
+                \"package_level\": \"latest\" \
+              }, \
               { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"2.7\", \
