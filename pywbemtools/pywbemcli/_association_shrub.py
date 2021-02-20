@@ -49,7 +49,7 @@ from pywbem._nocasedict import NocaseDict
 
 from ._common import output_format_is_table, format_table, shorten_path_str, \
     warning_msg, sort_cimobjects
-from ._utils import _ensure_unicode, _to_unicode, get_terminal_width
+from ._utils import ensure_unicode, to_unicode, get_terminal_width
 
 # Same as in pwbem.cimtypes.py
 if six.PY2:
@@ -670,7 +670,7 @@ class AssociationShrub(object):
             ret.append('=')
 
             if isinstance(value, six.binary_type):
-                value = _to_unicode(value)
+                value = to_unicode(value)
 
             if isinstance(value, six.text_type):
                 # string, char16
@@ -715,7 +715,7 @@ class AssociationShrub(object):
 
         del ret[-1]
 
-        return _ensure_unicode(''.join(ret))
+        return ensure_unicode(''.join(ret))
 
     def build_inst_names(self, inst_names_tuple, ref_cln, replacements,
                          fullpath=None):

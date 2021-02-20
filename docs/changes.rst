@@ -103,6 +103,7 @@ Released: not yet
 
 * Implement command to get statistics from server and present as a table #895)
 
+* Test: Added a unit test module for _utils.py.
 
 **Cleanup:**
 

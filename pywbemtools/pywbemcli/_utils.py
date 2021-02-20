@@ -21,10 +21,11 @@ from __future__ import print_function, absolute_import
 
 import os
 import warnings
+import mock
 import six
 import click
 
-from .config import USE_TERMINAL_WIDTH, DEFAULT_TABLE_WIDTH
+from . import config
 
 __all__ = []
 
@@ -51,13 +52,14 @@ B08_DEFAULT_CONNECTIONS_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
                                             B08_CONNECTIONS_FILENAME)
 
 
-def _ensure_bytes(obj):
+def ensure_bytes(obj):
     """
-    If the input object is a string, make sure it is returned as a
-    byte string, as follows:
+    If the input object is a string, make sure it is returned as a Byte string,
+    as follows:
 
-    * If the input object already is a byte string, it is returned unchanged.
-    * If the input string is a unicode string, it is encoded using UTF-8.
+    * If the input object already is a Byte string, it is returned unchanged.
+    * If the input object is a Unicode string, it is converted to a Byte string
+      using the UTF-8 encoding.
     * Otherwise, the input object was not a string and is returned unchanged.
     """
     if isinstance(obj, six.text_type):
@@ -65,48 +67,28 @@ def _ensure_bytes(obj):
     return obj
 
 
-def _ensure_unicode(obj):
+def ensure_unicode(obj):
     """
-    If the input object is a string, make sure it is returned as a
-    :term:`unicode string`, as follows:
+    If the input object is a string, make sure it is returned as a Unicode
+    string, as follows:
 
-    * If the input object already is a :term:`unicode string`, it is returned
-      unchanged.
-    * If the input string is a :term:`byte string`, it is decoded using UTF-8.
+    * If the input object already is a Unicode string, it is returned unchanged.
+    * If the input object is a Byte string, it is converted to a Unicode string
+      using the UTF-8 encoding.
     * Otherwise, the input object was not a string and is returned unchanged.
-
-    Copied from pywbem
     """
     if isinstance(obj, six.binary_type):
         return obj.decode("utf-8")
     return obj
 
 
-def _to_unicode(obj):
+def to_unicode(obj):
     """
-    Convert the input binary string to a :term:`unicode string`.
-    The input object must be a byte string.
-    Use this if there is a previous test about the string type.
+    Convert the input Byte string to a Unicode string.
 
-    Copies from pywbem
+    The input object must be a Byte string.
     """
     return obj.decode("utf-8")
-
-
-def _eq_name(name1, name2):
-    """
-    Test two CIM names for equality.
-
-    The comparison is performed case-insensitively.
-
-    One or both of the names may be `None`; Two names that are `None` are
-    considered equal.
-    """
-    if name1 is None:
-        return name2 is None
-    if name2 is None:
-        return False
-    return name1.lower() == name2.lower()
 
 
 def _formatwarning(message, category, filename, lineno, line=None):
@@ -122,8 +104,8 @@ def pywbemcliwarn(*args, **kwargs):
     Pywbemcli monkey patch for the warnings.warn function; substitutes our
     own formatter.
     """
-    warnings.formatwarning = _formatwarning
-    warnings.warn(*args, **kwargs)
+    with mock.patch.object(warnings, 'formatwarning', _formatwarning):
+        warnings.warn(*args, **kwargs)
 
 
 def pywbemcliwarn_explicit(*args, **kwargs):
@@ -131,8 +113,8 @@ def pywbemcliwarn_explicit(*args, **kwargs):
     Pywbemcli monkey patch for the warnings.warn_explicit function;
     substitutes our own formatter
     """
-    warnings.formatwarning = _formatwarning
-    warnings.warn_explicit(*args, **kwargs)
+    with mock.patch.object(warnings, 'formatwarning', _formatwarning):
+        warnings.warn_explicit(*args, **kwargs)
 
 
 def get_terminal_width():
@@ -151,7 +133,7 @@ def get_terminal_width():
         except ValueError:
             pass
 
-    if USE_TERMINAL_WIDTH:
+    if config.USE_TERMINAL_WIDTH:
         return click.get_terminal_size()[0]
 
-    return DEFAULT_TABLE_WIDTH
+    return config.DEFAULT_TABLE_WIDTH
