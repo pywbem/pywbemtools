@@ -28,7 +28,7 @@ import os
 import click
 import click_spinner
 
-from ._common import format_table, output_format_in_groups
+from ._common import format_table, validate_output_format
 
 
 class ContextObj(object):  # pylint: disable=useless-object-inheritance
@@ -61,7 +61,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
-        self._conn = None
 
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
@@ -149,12 +148,19 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         commands like connection to execute without testing whether or not the
         WBEM server exists.
         """
-        # The conn property is created in wbem_server and retained here.
-        if self._conn:
-            return self._conn
+        srv = self.wbem_server  # Ensures connection and may raise exception
+        return srv.conn
 
-        self._conn = self.wbem_server.conn
-        return self._conn
+    @property
+    def is_connected(self):
+        """
+        bool: Indicates whether currently contected to a WBEM server.
+
+        That is the case as soon as commands have been executed that
+        communicate with the server.
+        """
+        return self._pywbem_server and \
+            self._pywbem_server.wbem_server is not None
 
     @property
     def wbem_server(self):
@@ -288,9 +294,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             if not self.pdb:
                 self.spinner_stop()
 
-            # Issue statistics if required. Note: uses _conn in order
-            # not to create the connection if not created.
-            if self.timestats and self._conn:
+            # Issue statistics if requested and if the command used a conn.
+            if self.timestats and self.is_connected:
                 context = click.get_current_context()
                 click.echo(self.format_statistics(self.conn.statistics,
                                                   context.obj))
@@ -298,78 +303,32 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def format_statistics(self, statistics, context):
         # pylint: disable=no-self-use
         """
-        Table formatted output of statistics
+        Table formatted output of client statistics
         """
-        if context.output_format:
-            if not output_format_in_groups(context.output_format, 'TEXT'):
-                click.echo(statistics.formatted())
-                return
-
-        def format_int(avg, min_, max_):
-            """Display float statistics with 0 places"""
-            avg = int(avg)
-            min_ = int(min_)
-            max_ = int(max_)
-            if avg == min_ == max_:
-                return '{0}'.format(avg)
-            return '{0}/{1}/{2}'.format(avg, min_, max_)
-
-        def format_float3(avg, min_, max_):
-            """Display float statistics with 0 places"""
-            if avg == min_ == max_:
-                return '{0:.3f}'.format(avg)
-            return '{0:.3f}/{1:.3f}/{2:.3f}'.format(avg, min_, max_)
+        output_fmt = validate_output_format(context.output_format, 'TABLE')
 
         snapshot = sorted(statistics.snapshot(),
                           key=lambda item: item[1].avg_time,
                           reverse=True)
 
-        # Determine of svr_time or lengths should be included.
-        include_svr_time = False
-        include_lengths = False
-        for name, stats in snapshot:  # pylint: disable=unused-variable
-            # TODO: clean up pywbem stats so this is in pywbem, not here
-            # pylint: disable=protected-access
-            if stats._server_time_stored:  # pylint: disable=protected-access
-                include_svr_time = True
-                # pylint: disable=protected-access
-            if stats._request_len_sum > 0 or stats._reply_len_sum > 0:
-                include_lengths = True
+        header = ['Operation', 'Count', 'Errors',
+                  'Client Time\n[ms]',
+                  'Server Time\n[ms]',
+                  'Request Size\n[B]',
+                  'Response Size\n[B]']
 
-        # build list of column names
-        header = ['Op\nCnt', 'Exc\nCnt', 'Op Time(S)\nAvg/Min/Max']
-        if include_svr_time:
-            header.append("Server Time(S)\nAvg/Min/Max")
-        if include_lengths:
-            header.extend(['RequestLen\nAvg/Min/Max', 'ReplyLen\nAvg/Min/Max'])
-
-        # build table rows from snapshot of OperationStatistics
         rows = []
-        for name, stats in snapshot:  # pylint: disable=unused-variable
-            row = [stats.count, stats.exception_count,
-                   format_float3(stats.avg_time, stats.min_time,
-                                 stats.max_time)]
-            if include_svr_time:
-                row.append(format_float3(stats.avg_server_time,
-                                         stats.min_server_time,
-                                         stats.max_server_time))
-            if include_lengths:
-                req_len = format_int(stats.avg_request_len,
-                                     stats.min_request_len,
-                                     stats.max_request_len)
-                reply_len = format_int(stats.avg_reply_len,
-                                       stats.min_reply_len,
-                                       stats.max_reply_len)
-                row.extend([req_len, reply_len])
-
-            row.append(name)
-            header.append('Operation')
+        for name, stats in snapshot:
+            row = [name, stats.count, stats.exception_count,
+                   '{:.3f}'.format(stats.avg_time * 1000),
+                   '{:.3f}'.format(stats.avg_server_time * 1000),
+                   '{:.0f}'.format(stats.avg_request_len),
+                   '{:.0f}'.format(stats.avg_reply_len)]
             rows.append(row)
 
-        title = 'Client Statistics: Time(Seconds); Times/lengths: ' \
-                '(Avg/Min/Max), single value if all same.'
-
-        click.echo(format_table(rows, header, title=title, float_fmt=".3f"))
+        click.echo(format_table(
+            rows, header, title='Client statistics',
+            table_format=output_fmt))
 
     @staticmethod
     def update_root_click_context(ctx_obj):
