@@ -455,25 +455,25 @@ def cmd_statistics_server_show(context):
         assert value_ == 0
         return 0
 
-    def avg_time(cimtime, num_ops):
+    def avg_time_ms(total_time, num_ops):
         """
-        Return the average time in microseconds
+        Return the average elapsed time of the operations in milliseconds.
 
         Parameters:
-          cimtime (:class: `CIMDateTime`)
-            The interval form of the CIMDate time
+          total_time (:class:`CIMDateTime`):
+            The total elapsed time of the operations, as an interval.
 
           num_ops (:class:`int`):
-            The number of operations executed
+            The number of operations executed.
 
           Returns:
-            The average of cimtime / num_ops
+            :class:`int`: The average elapsed time of the operations in
+            milliseconds.
         """
-
-        assert isinstance(cimtime, CIMDateTime)
-        assert cimtime.is_interval
-        microsec = cimtime.timedelta.microseconds
-        avg = avg_value(microsec, num_ops)
+        assert isinstance(total_time, CIMDateTime)
+        assert total_time.is_interval
+        milliseconds = total_time.timedelta.total_seconds() * 1000
+        avg = avg_value(milliseconds, num_ops)
         return avg
 
     output_fmt = validate_output_format(context.output_format, 'TABLE')
@@ -492,7 +492,7 @@ def cmd_statistics_server_show(context):
 
     if not svr_status:
         raise click.ClickException("WBEM server CIM_ObjectManager "
-                                   "statatistics off")
+                                   "statistics off")
 
     # We must find the
     # namespace containing statistical data since apparently not clearly
@@ -548,7 +548,7 @@ def cmd_statistics_server_show(context):
                 "WBEM server Class {} returns no data".
                 format(CIMOM_STATISTICAL_DATA_CLASS))
 
-        rows = []
+        row_tuples = []
         for inst in results:
             # Only show lines that have a non-zero number of operations
             if inst['NumberOfOperations'] == 0:
@@ -559,33 +559,60 @@ def cmd_statistics_server_show(context):
                 op_type_name = inst['OtherOperationType']
             number_of_operations = inst['NumberOfOperations']
 
-            cimom_avg_elapsesd_time = avg_time(inst['CimomElapsedTime'],
-                                               number_of_operations)
-
-            provider_avg_elapsesd_time = avg_time(inst['ProviderElapsedTime'],
-                                                  number_of_operations)
+            avg_provider_time_ms = avg_time_ms(
+                inst['ProviderElapsedTime'], number_of_operations)
+            avg_cimom_time_ms = avg_time_ms(
+                inst['CimomElapsedTime'], number_of_operations)
+            # Note: The CimomElapsedTime property is explicitly described
+            #       to be the time just in the CIMOM without provider time.
+            #       Since we want to be able to relate that to the server time
+            #       in the client statistics, we calculate the server time
+            #       as CIMOM time plus provider time.
+            # TODO: Clarify for OpenPegasus whether CimomElapsedTime is just
+            #       CIMOM time as described, or is already the total server
+            #       time.
+            avg_server_time_ms = avg_cimom_time_ms + avg_provider_time_ms
 
             avg_request_size = avg_value(inst['RequestSize'],
                                          number_of_operations)
             avg_response_size = avg_value(inst['ResponseSize'],
                                           number_of_operations)
 
-            rows.append([number_of_operations,
-                         "{:.1f}".format(cimom_avg_elapsesd_time),
-                         "{:.1f}".format(provider_avg_elapsesd_time),
-                         "{:.1f}".format(avg_request_size),
-                         "{:.1f}".format(avg_response_size),
-                         op_type_name])
+            row_tuples.append(
+                (op_type_name, number_of_operations, avg_server_time_ms,
+                 avg_provider_time_ms, avg_request_size, avg_response_size))
 
-        headers = ['Operation\nCount', 'Server\ntime(usec)',
-                   'Provider\nTime(usec)', 'Request\nsize(bytes)',
-                   'Response\nsize(bytes)',
-                   'Operation Name']
+        # Index of the items in the row tuples
+        operation_idx = 0
+        count_idx = 1
+        server_time_idx = 2
+        provider_time_idx = 3
+        request_size_idx = 4
+        response_size_idx = 5
+
+        # Sort the rows by descending server time.
+        # Note: Because the server time first needs to be calculated which may
+        #       be WBEM server dependent, the sorting is performed as a
+        #       separate step.
+        rows = []
+        for row_tuple in sorted(row_tuples,
+                                key=lambda tup: tup[server_time_idx],
+                                reverse=True):
+            rows.append(
+                (row_tuple[operation_idx], row_tuple[count_idx],
+                 "{:.3f}".format(row_tuple[server_time_idx]),
+                 "{:.3f}".format(row_tuple[provider_time_idx]),
+                 "{:.0f}".format(row_tuple[request_size_idx]),
+                 "{:.0f}".format(row_tuple[response_size_idx])))
+
+        headers = ['Operation', 'Count', 'Server Time\n[ms]',
+                   'Provider Time\n[ms]', 'Request Size\n[B]',
+                   'Response Size\n[B]']
 
         context.spinner_stop()
         click.echo(format_table(
             rows, headers,
-            title='WBEM server CIM Operation Statistical Data',
+            title='Server statistics',
             table_format=output_fmt))
     except Error as er:
         raise click.ClickException("Statistics retrieval from WBEM server "

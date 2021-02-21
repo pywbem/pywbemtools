@@ -246,63 +246,68 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    # Test the local statistics commands against a mock.  The mock
-    # returns some data. Note that the Opt Time in responses masked out in
-    # result because there are not fixed values.
-    ['Verify Statistics auto option against mock executes op and displays',
+    # Test client statistics options against a mock environment.
+
+    ['Verify statistics option -T against mock executes op and displays client '
+     'statistics',
      {'general': ['-T'],
       'cmdgrp': 'qualifier',
       'args': ['get', 'Key']},
      {'stdout': ['Qualifier Key : boolean = false',
-                 'Op    Exc     Op Time(S)  Operation',
-                 '1      0 ', 'GetQualifier',
-                 '10  0', 'SetQualifier'],
+                 'Client statistics',
+                 'Operation Count Errors',
+                 'GetQualifier 1 0'],
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify Statistics auto option statistics reset command',
+    ['Verify statistics option --timestats with statistics reset command '
+     'displays empty client statistics',
      {'general': ['--timestats'],
       'cmdgrp': 'statistics',
       'args': ['reset']},
-     {'stdout': ['Op     Exc    Op Time(S)'],
+     {'stdout': ['Client statistics',
+                 'Operation Count Errors'],  # Not perfect: Not verifying empty
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify Statistics auto option against mock executes op and displays',
+    ['Verify statistics option --timestats against mock executes op and '
+     'displays client statistics',
      {'general': ['--timestats'],
       'cmdgrp': 'qualifier',
       'args': ['get', 'Key']},
      {'stdout': ['Qualifier Key : boolean = false',
-                 'Op    Exc     Op Time(S)  Operation',
-                 '1      0 ', ' GetQualifier'],
+                 'Client statistics',
+                 'Operation Count Errors',
+                 'GetQualifier 1 0'],
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-
-    ['Verify Statistics auto option against mock executes op and displays',
+    ['Verify statistics option --no-timestats against mock executes op and '
+     'displays no statistics',
      {'general': ['--no-timestats'],
       'cmdgrp': 'qualifier',
       'args': ['get', 'Key']},
-     {'stdout': ['1      0 ', ' GetQualifier'],
+     {'stdout': ['GetQualifier 1 0'],
       'rc': 0,
       'test': 'not-innows'},
      SIMPLE_MOCK_FILE, OK],
 
 
-    ['Verify Statistics auto option against mock executes op and displays',
+    ['Verify statistics option -T against mock executes op and displays '
+     'client statistics',
      {'general': ['-T'],
       'cmdgrp': 'qualifier',
       'args': ['get', 'Key']},
      {'stdout': ['Qualifier Key : boolean = false',
-                 'Op    Exc     Op Time(S)  Operation',
-                 '1      0 ', 'GetQualifier'],
+                 'Client statistics',
+                 'Operation Count Errors',
+                 'GetQualifier 1 0'],
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
-
 
     ['Verify Statistics status statistics off',
      {'general': [],
@@ -324,7 +329,7 @@ TEST_CASES = [
                 'statistics show', ],
       'cmdgrp': None,
       },
-     {'stdout': [r'1 [ 0-9.]* *EnumerateClassNames'],
+     {'stdout': [r'EnumerateClassNames +1 '],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -340,8 +345,8 @@ TEST_CASES = [
                 'statistics show'],
       'cmdgrp': None,
       },
-     {'stdout': [r' 2 [ 0-9/.]* *EnumerateClassNames',
-                 r' 1 [ 0-9/.]* *EnumerateClassNames'],
+     {'stdout': [r'EnumerateClassNames +2 ',
+                 r'EnumerateClassNames +1 '],
       'rc': 0,
       'test': 'regex'},
      None, OK],
@@ -429,8 +434,8 @@ TEST_CASES = [
                 'server add-mof '
                 'tests/unit/cimstatisticaldatainstances.mof -n interop',
                 'statistics server-show']},
-     {'stdout': ['Server GatherStatisticalData set on',
-                 'Operation Server Provider Request Response  Operation Name',
+     {'stdout': ['Server statistics',
+                 'Operation Count',
                  'EnumerateInstances',
                  'GetClass'],
       'rc': 0,
