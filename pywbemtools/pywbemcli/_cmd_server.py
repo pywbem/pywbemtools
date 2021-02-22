@@ -32,7 +32,7 @@ from pywbem import Error, MOFCompiler
 from pywbem._mof_compiler import MOFWBEMConnection
 
 from .pywbemcli import cli
-from ._common import format_table, raise_pywbem_error_exception, \
+from ._common import format_table, pywbem_error_exception, \
     validate_output_format, display_text, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._common_options import add_options, help_option, namespace_option
@@ -243,7 +243,7 @@ def cmd_server_brand(context):
         display_text(brand, output_format)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_server_info(context):
@@ -272,7 +272,7 @@ def cmd_server_info(context):
                                 table_format=output_format))
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_server_add_mof(context, options):
@@ -332,7 +332,7 @@ def cmd_server_add_mof(context, options):
                 mofcomp.compile_file(moffile, options['namespace'])
 
     except Error as exc:
-        raise_pywbem_error_exception(exc)
+        raise pywbem_error_exception(exc)
 
 
 def cmd_server_remove_mof(context, options):
@@ -398,4 +398,4 @@ def cmd_server_remove_mof(context, options):
                 print('No deletions will be shown in dry-run mode')
 
     except Error as exc:
-        raise_pywbem_error_exception(exc)
+        raise pywbem_error_exception(exc)

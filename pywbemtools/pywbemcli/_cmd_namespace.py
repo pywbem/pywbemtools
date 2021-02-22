@@ -29,7 +29,7 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     DEFAULT_TABLE_FORMAT, output_format_is_table, format_table, display_text, \
-    raise_pywbem_error_exception, validate_output_format
+    pywbem_error_exception, validate_output_format
 from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -183,7 +183,7 @@ def cmd_namespace_create(context, namespace):
         context.spinner_stop()
         click.echo('Created namespace {}'.format(namespace))
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_namespace_delete(context, namespace):
@@ -195,7 +195,7 @@ def cmd_namespace_delete(context, namespace):
         context.spinner_stop()
         click.echo('Deleted namespace {}'.format(namespace))
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_namespace_interop(context):
@@ -208,4 +208,4 @@ def cmd_namespace_interop(context):
         context.spinner_stop()
         display_text(interop_ns, output_format)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)

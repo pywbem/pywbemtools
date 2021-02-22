@@ -29,7 +29,7 @@ import click
 from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
-from ._common import format_table, raise_pywbem_error_exception, \
+from ._common import format_table, pywbem_error_exception, \
     validate_output_format, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
@@ -218,7 +218,7 @@ def cmd_profile_list(context, options):
                                 table_format=output_format))
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_profile_centralinsts(context, options):
@@ -269,4 +269,4 @@ def cmd_profile_centralinsts(context, options):
                                 title='Advertised Central Instances:',
                                 table_format=output_format))
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)

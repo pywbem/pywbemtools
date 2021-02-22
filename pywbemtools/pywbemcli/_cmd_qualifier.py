@@ -28,7 +28,7 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import sort_cimobjects, \
-    raise_pywbem_error_exception, validate_output_format, \
+    pywbem_error_exception, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._display_cimobjects import display_cim_objects
 from ._common_options import add_options, namespace_option, summary_option, \
@@ -146,7 +146,7 @@ def cmd_qualifier_get(context, qualifiername, options):
         display_cim_objects(context, qual_decl, output_format)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_qualifier_delete(context, qualifiername, options):
@@ -160,7 +160,7 @@ def cmd_qualifier_delete(context, qualifiername, options):
             context.spinner_stop()
             click.echo('Deleted qualifier {}.'.format(qualifiername))
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_qualifier_enumerate(context, options):
@@ -178,4 +178,4 @@ def cmd_qualifier_enumerate(context, options):
                             summary=options['summary'])
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)

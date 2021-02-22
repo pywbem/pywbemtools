@@ -36,7 +36,7 @@ from .pywbemcli import cli
 from ._common import filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     output_format_is_table, format_table, process_invokemethod, \
-    raise_pywbem_error_exception, warning_msg, validate_output_format, \
+    pywbem_error_exception, warning_msg, validate_output_format, \
     get_subclass_names
 
 from ._display_cimobjects import display_cim_objects
@@ -823,7 +823,7 @@ def cmd_class_get(context, classname, options):
         display_cim_objects(context, result_class,
                             output_format=output_format)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_class_invokemethod(context, classname, methodname, options):
@@ -833,7 +833,7 @@ def cmd_class_invokemethod(context, classname, methodname, options):
     try:
         process_invokemethod(context, classname, methodname, options)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_class_enumerate(context, classname, options):
@@ -851,7 +851,7 @@ def cmd_class_enumerate(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_class_references(context, classname, options):
@@ -884,7 +884,7 @@ def cmd_class_references(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_class_associators(context, classname, options):
@@ -921,7 +921,7 @@ def cmd_class_associators(context, classname, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def get_namespaces(context, namespaces):
@@ -954,7 +954,7 @@ def get_namespaces(context, namespaces):
             ns_names = [context.conn.default_namespace]
         return ns_names
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_class_find(context, classname_glob, options):
@@ -1030,7 +1030,7 @@ def cmd_class_find(context, classname_glob, options):
                 click.echo('  {}: {}'.format(row[0], row[1]))
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def get_class_hierarchy(conn, classname, namespace, superclasses=None):
@@ -1087,7 +1087,7 @@ def get_class_hierarchy(conn, classname, namespace, superclasses=None):
                                             DeepInheritance=True)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
     return classes
 
@@ -1133,7 +1133,7 @@ def cmd_class_delete(context, classname, options):
         subclassnames = context.conn.EnumerateClassNames(ClassName=classname,
                                                          DeepInheritance=True)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
     if subclassnames:
         raise click.ClickException('Delete rejected; subclasses exist')
@@ -1155,4 +1155,4 @@ def cmd_class_delete(context, classname, options):
             context.spinner_stop()
             click.echo('Deleted class {}.'.format(classname))
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
