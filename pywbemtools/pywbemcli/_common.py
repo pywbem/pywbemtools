@@ -1381,10 +1381,10 @@ def fold_strings(input_strings, max_width, break_long_words=False,
     return folded_string
 
 
-def raise_pywbem_error_exception(er):
+def pywbem_error_exception(er):
     """
-    Raise the standard click exception for a pywbem Error exception.  These
+    Return the standard click exception for a pywbem Error exception.  These
     exceptions do not cause interactive mode failure but display the exception
     class and its str value and return to the repl mode.
     """
-    raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
+    return click.ClickException('{}: {}'.format(er.__class__.__name__, er))

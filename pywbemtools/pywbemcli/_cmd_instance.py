@@ -30,7 +30,7 @@ from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
 from .pywbemcli import cli
 from ._common import pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, format_table, verify_operation, \
-    process_invokemethod, raise_pywbem_error_exception, \
+    process_invokemethod, pywbem_error_exception, \
     parse_kv_pair, warning_msg, validate_output_format, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
@@ -986,7 +986,7 @@ def cmd_instance_get(context, instancename, options):
                             property_list=property_list)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_instance_delete(context, instancename, options):
@@ -1006,7 +1006,7 @@ def cmd_instance_delete(context, instancename, options):
             click.echo('Deleted instance {}'.format(instancepath))
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_instance_create(context, classname, options):
@@ -1025,10 +1025,10 @@ def cmd_instance_create(context, classname, options):
                                        'namespace "{}" in WEB '
                                        'server: {}.'.format(classname, ns,
                                                             context.conn))
-        raise_pywbem_error_exception(ce)
+        raise pywbem_error_exception(ce)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
     properties = options['property']
 
@@ -1078,9 +1078,9 @@ def cmd_instance_modify(context, instancename, options):
                 'CIMClass: {!r} does not exist in WEB server: {}'
                 .format(instancepath.classname, context.conn.url))
 
-        raise_pywbem_error_exception(ce)
+        raise pywbem_error_exception(ce)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
     property_list = resolve_propertylist(options['propertylist'])
 
@@ -1118,7 +1118,7 @@ def cmd_instance_invokemethod(context, instancename, methodname,
     try:
         process_invokemethod(context, instancepath, methodname, options)
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def get_filterquerylanguage(options):
@@ -1170,7 +1170,7 @@ def cmd_instance_enumerate(context, classname, options):
                             property_list=property_list)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
     except ValueError as ve:
         raise click.ClickException('instance enumerate failed because '
                                    'FilterQuery not allowed with traditional '
@@ -1219,7 +1219,7 @@ def cmd_instance_references(context, instancename, options):
                             property_list=property_list)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
     except ValueError as ve:
         raise click.ClickException('instance references failed because '
                                    'FilterQuery not allowed with traditional '
@@ -1269,7 +1269,7 @@ def cmd_instance_associators(context, instancename, options):
                             property_list=property_list)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
     except ValueError as ve:
         raise click.ClickException('instance associators failed because '
@@ -1307,7 +1307,7 @@ def cmd_instance_count(context, classname, options):
 
             classnames = enumerate_classes_filtered(context, None, options)
         except Error as er:
-            raise_pywbem_error_exception(er)
+            raise pywbem_error_exception(er)
 
         if classnames:
             classlist = filter_namelist(classname, classnames, ignore_case=True)
@@ -1374,7 +1374,7 @@ def cmd_instance_query(context, query, options):
                             summary=options['summary'], sort=True)
 
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
 
 
 def cmd_instance_shrub(context, instancename, options):
@@ -1399,4 +1399,4 @@ def cmd_instance_shrub(context, instancename, options):
         context.spinner_stop()
         shrub.display_shrub(context.output_format, options['summary'])
     except Error as er:
-        raise_pywbem_error_exception(er)
+        raise pywbem_error_exception(er)
