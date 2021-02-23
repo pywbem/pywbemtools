@@ -47,7 +47,7 @@ from ._common_options import add_options, propertylist_option, \
     help_option
 from ._displaytree import display_class_tree
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
-
+from ._utils import pywbemcliwarn
 
 #
 #   Common option definitions for class group
@@ -186,8 +186,13 @@ def class_get(context, classname, **options):
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.option('-f', '--force', is_flag=True, default=False,
+              help=u'Same as --include-instances. The -f / --force option has '
+                   'been deprecated and will be removed in a future version.')
+@click.option('--include-instances', is_flag=True, default=False,
               help=u'Delete any instances of the class as well. '
-                   'Some servers may still reject the class deletion. '
+                   'WARNING: Deletion of instances will cause all implemented '
+                   'side-effects to happen, such as the removal of resources '
+                   'in the managed environment. '
                    'Default: Reject command if the class has any instances.')
 @add_options(namespace_option)
 @add_options(help_option)
@@ -202,8 +207,13 @@ def class_delete(context, classname, **options):
 
     If the class has subclasses, the command is rejected.
 
-    If the class has instances, the command is rejected, unless the --force
-    option was specified, in which case the instances are also deleted.
+    If the class has instances, the command is rejected, unless the
+    --include-instances option is specified, in which case the instances
+    are also deleted.
+
+    WARNING: Deletion of instances will cause the removal of corresponding
+    resources in the managed environment (i.e. in the real world). Some
+    instances may not be deletable.
 
     WARNING: Deleting classes can cause damage to the server: It can impact
     instance providers and other components in the server. Use this
@@ -1125,6 +1135,14 @@ def cmd_class_tree(context, classname, options):
 
 def cmd_class_delete(context, classname, options):
     """Delete a class from the WBEM server repository"""
+
+    include_instances = options['include_instances']
+    if options['force']:
+        include_instances = options['force']
+        pywbemcliwarn("The --force / -f option has been deprecated and "
+                      "will be removed in a future version. Use "
+                      "--include-instances instead.", DeprecationWarning)
+
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
 
@@ -1138,7 +1156,7 @@ def cmd_class_delete(context, classname, options):
     if subclassnames:
         raise click.ClickException('Delete rejected; subclasses exist')
 
-    if not options['force']:
+    if not include_instances:
         if instnames:
             raise click.ClickException('Delete rejected; instances exist')
     else:

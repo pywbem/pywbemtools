@@ -105,7 +105,8 @@ CLASS_DELETE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class delete CLASSNAME '
     '[COMMAND-OPTIONS]',
     'Delete a class.',
-    '-f, --force Delete any instances of the class as well.',
+    '-f, --force Same as --include-instances.',
+    '--include-instances Delete any instances of the class as well.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -1509,21 +1510,42 @@ TEST_CASES = [
      None, OK],
 
     # Class delete successful
-    ['Verify class command delete successful with no subclasses, --force',
-     ['delete', 'CIM_Foo_sub_sub', '--force'],
-     {'stdout': '',
-      'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
-
-    ['Verify class command delete successful with no subclasses and --n option',
-     ['delete', 'CIM_Foo_sub_sub', '--namespace', 'root/cimv2', '--force'],
-     {'stdout': '',
-      'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
-
-    # Class delete successful
-    ['Verify class command delete successful with no subclasses, --verbose',
+    ['Verify class command delete successful with no subclasses, '
+     '--force (deprecated)',
      {'args': ['delete', 'CIM_Foo_sub_sub', '--force'],
+      'general': ['--warn']},
+     {'stderr': ['DeprecationWarning: The --force / -f option has been '
+                 'deprecated'],
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
+    ['Verify class command delete successful with no subclasses, '
+     '-f (deprecated)',
+     {'args': ['delete', 'CIM_Foo_sub_sub', '-f'],
+      'general': ['--warn']},
+     {'stderr': ['DeprecationWarning: The --force / -f option has been '
+                 'deprecated'],
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
+    ['Verify class command delete successful with no subclasses, '
+     '--include-instances',
+     ['delete', 'CIM_Foo_sub_sub', '--include-instances'],
+     {'stdout': '',
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
+    ['Verify class command delete successful with no subclasses, --namespace '
+     'and --include-instances',
+     ['delete', 'CIM_Foo_sub_sub', '--namespace', 'root/cimv2',
+      '--include-instances'],
+     {'stdout': '',
+      'test': 'in'},
+     [SIMPLE_MOCK_FILE], OK],
+
+    ['Verify class command delete successful with no subclasses, --verbose'
+     'and --include-instances',
+     {'args': ['delete', 'CIM_Foo_sub_sub', '--include-instances'],
       'general': ['--verbose']},
      {'stdout': ['Deleted class', 'CIM_Foo_sub_sub'],
       'test': 'innows'},
@@ -1545,9 +1567,8 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # class delete error tests
-
-    ['Verify class command delete fail subclasses exist',
-     ['delete', 'CIM_Foo', '--force'],
+    ['Verify class command delete fail subclasses exist, --include-instances',
+     ['delete', 'CIM_Foo', '--include-instances'],
      {'stderr': 'Delete rejected; subclasses exist',
       'rc': 1,
       'test': 'innows'},

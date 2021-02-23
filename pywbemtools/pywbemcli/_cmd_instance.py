@@ -276,6 +276,10 @@ def instance_delete(context, instancename, **options):
     """
     Delete an instance of a class.
 
+    WARNING: Deletion of instances will cause the removal of corresponding
+    resources in the managed environment (i.e. in the real world). Some
+    instances may not be deletable.
+
     For information on how to specify the instance using INSTANCENAME and the
     --key and --namespace options, invoke with --help-instancename.
     """

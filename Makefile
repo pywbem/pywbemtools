@@ -688,9 +688,9 @@ endif
 test: develop_$(pymn).done $(doc_utility_help_files)
 	@echo "makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & set PYWBEMCLI_DEPRECATION_WARNINGS=false& py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
+	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
-	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) PYWBEMCLI_DEPRECATION_WARNINGS=false py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
 	@echo "makefile: Done running tests"
 
