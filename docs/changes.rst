@@ -24,6 +24,12 @@ Released: not yet
   new commands 'namespace list' and 'namespace interop', respectively.
   (issue #877)
 
+* The '--force' / '-f' option of the 'class delete' command has been deprecated
+  because its name does not sufficiently make it clear that other inhibitors
+  than existing instances of the class (such as existing subclasses, or
+  referencing classes) will still cause rejection of the command.
+  Use the new '--include-instances' option instead. (issue #885)
+
 **Bug fixes:**
 
 * Fixed a ValueError on Windows that was raised when the connections file was
@@ -104,6 +110,9 @@ Released: not yet
 * Implement command to get statistics from server and present as a table #895)
 
 * Test: Added a unit test module for _utils.py.
+
+* Added an '--include-instances' option to the 'class delete' command that
+  replaces the deprecated '--force' / '-f' option. (issue #885)
 
 **Cleanup:**
 

@@ -274,8 +274,11 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
 
       If the class has subclasses, the command is rejected.
 
-      If the class has instances, the command is rejected, unless the --force option was specified, in which case the
-      instances are also deleted.
+      If the class has instances, the command is rejected, unless the --include-instances option is specified, in which
+      case the instances are also deleted.
+
+      WARNING: Deletion of instances will cause the removal of corresponding resources in the managed environment (i.e. in
+      the real world). Some instances may not be deletable.
 
       WARNING: Deleting classes can cause damage to the server: It can impact instance providers and other components in
       the server. Use this command with caution.
@@ -288,8 +291,12 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
         pywbemcli -n myconn class delete CIM_Foo -n interop
 
     Command Options:
-      -f, --force                Delete any instances of the class as well. Some servers may still reject the class
-                                 deletion. Default: Reject command if the class has any instances.
+      -f, --force                Same as --include-instances. The -f / --force option has been deprecated and will be
+                                 removed in a future version.
+
+      --include-instances        Delete any instances of the class as well. WARNING: Deletion of instances will cause all
+                                 implemented side-effects to happen, such as the removal of resources in the managed
+                                 environment. Default: Reject command if the class has any instances.
 
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       -h, --help                 Show this help message.
@@ -1190,6 +1197,9 @@ Help text for ``pywbemcli instance delete`` (see :ref:`instance delete command`)
     Usage: pywbemcli [GENERAL-OPTIONS] instance delete INSTANCENAME [COMMAND-OPTIONS]
 
       Delete an instance of a class.
+
+      WARNING: Deletion of instances will cause the removal of corresponding resources in the managed environment (i.e. in
+      the real world). Some instances may not be deletable.
 
       For information on how to specify the instance using INSTANCENAME and the --key and --namespace options, invoke with
       --help-instancename.
