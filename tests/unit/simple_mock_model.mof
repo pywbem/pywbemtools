@@ -19,6 +19,13 @@ Qualifier Aggregate : boolean = false,
     Scope(reference),
     Flavor(DisableOverride, ToSubclass);
 
+Qualifier EmbeddedInstance : string = null,
+    Scope(property, method, parameter);
+
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
 Qualifier Description : string = null,
     Scope(any),
     Flavor(EnableOverride, ToSubclass, Translatable);
@@ -43,6 +50,40 @@ Qualifier Static : boolean = false,
     Scope(property, method),
     Flavor(DisableOverride, ToSubclass);
 
+     [Abstract, Description ("Base class for classes that are referenced")]
+class CIM_BaseRef {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+};
+
+     [Description ("Class 1 that is referenced")]
+class CIM_FooRef1 : CIM_BaseRef {};
+
+     [Description ("Class 2 that is referenced")]
+class CIM_FooRef2 : CIM_BaseRef {};
+
+     [Association, Description ("Simple CIM Association")]
+class CIM_FooAssoc {
+
+        [Key, Description ("This is key property.")]
+    CIM_FooRef1 REF Ref1;
+
+        [Key, Description ("This is key property.")]
+    CIM_FooRef2 REF Ref2;
+};
+
+     [Abstract, Description ("Base class for classes having embedded instances")]
+class CIM_BaseEmb {};
+
+     [Description ("Class 1 that has embedded instances")]
+class CIM_FooEmb1 : CIM_BaseEmb {};
+
+     [Description ("Class 2 that has embedded instances")]
+class CIM_FooEmb2 : CIM_BaseEmb {};
+
+     [Description ("Class 3 that has embedded instances")]
+class CIM_FooEmb3 : CIM_BaseEmb {};
+
      [Description ("Simple CIM Class")]
 class CIM_Foo {
         [Key, Description ("This is key property.")]
@@ -51,12 +92,15 @@ class CIM_Foo {
         [Description ("This is Uint32 property.")]
     uint32 IntegerProp;
 
+        [Description("Embedded instance property"), EmbeddedInstance("CIM_FooEmb3")]
+    string cimfoo_emb3;
+
         [Description ("Method with in and out parameters")]
     uint32 Fuzzy(
         [IN, OUT, Description("Define data to be returned in output parameter")]
       string TestInOutParameter,
         [IN, OUT, Description ( "Test of ref in/out parameter")]
-      CIM_Foo REF TestRef,
+      CIM_FooRef1 REF TestRef,
         [IN ( false ), OUT, Description("Rtns method name if exists on input")]
       string OutputParam,
         [IN , Description("Defines return value if provided.")]
@@ -71,10 +115,13 @@ class CIM_Foo {
         [IN ( false ), OUT, Description("Rtns method name if exists on input")]
       string OutputParam,
         [IN , Description("Defines return value if provided.")]
-      uint32 OutputRtnValue);
+      uint32 OutputRtnValue,
+        [IN, Description("Embedded instance parameter"), EmbeddedInstance("CIM_FooEmb1")]
+      string cimfoo_emb1);
 
-        [ Description("Method with no Parameters") ]
-    uint32 DeleteNothing();
+        [ Description("Method with no parameters but embedded instance return"),
+          EmbeddedInstance("CIM_FooEmb2") ]
+    string DeleteNothing();
 };
 
     [Description ("Subclass of CIM_Foo")]
@@ -91,11 +138,31 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       string OutputParam2);
 };
 
-// 5 instances of CIM_Foo class
-
 class CIM_Foo_sub2 : CIM_Foo {
     string cimfoo_sub2;
 };
+
+
+// 1 instance of each CIM_FooRef* class
+
+instance of CIM_FooRef1 as $fooref11 {
+    InstanceID = "CIM_FooRef11";
+};
+
+instance of CIM_FooRef2 as $fooref21 {
+    InstanceID = "CIM_FooRef21";
+};
+
+
+// 1 instance of CIM_FooAssoc
+
+instance of CIM_FooAssoc as $fooassoc1 {
+    Ref1 = $fooref11;
+    Ref2 = $fooref21;
+};
+
+
+// 5 instances of CIM_Foo class
 
 instance of CIM_Foo as $foo1 {
     InstanceID = "CIM_Foo1";

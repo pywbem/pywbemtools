@@ -18,6 +18,7 @@ Tests the class command
 
 from __future__ import absolute_import, print_function
 
+import sys
 import os
 from packaging.version import parse as parse_version
 import pytest
@@ -43,6 +44,9 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
 _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
+
+# Mock scripts with setup() function are supported
+MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -212,6 +216,10 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       [Description ( "This is Uint32 property." )]
    uint32 IntegerProp;
 
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
       [Description ( "Sample method with input and output parameters" )]
    uint32 Method1(
          [IN ( false ),
@@ -228,7 +236,7 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
          [IN ( true ),
           OUT ( true ),
           Description ( "Test of ref in/out parameter" )]
-      CIM_Foo REF TestRef,
+      CIM_FooRef1 REF TestRef,
          [IN ( false ),
           OUT ( true ),
           Description ( "Rtns method name if exists on input" )]
@@ -254,11 +262,15 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       string OutputParam,
          [IN ( true ),
           Description ( "Defines return value if provided." )]
-      uint32 OutputRtnValue);
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
 
-      [Description ( "Method with no Parameters" )]
-   uint32 DeleteNothing();
-
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
 };
 
 """  # noqa: E501
@@ -275,12 +287,14 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
 
    uint32 IntegerProp;
 
+   string cimfoo_emb3;
+
    uint32 Method1(
       string OutputParam2);
 
    uint32 Fuzzy(
       string TestInOutParameter,
-      CIM_Foo REF TestRef,
+      CIM_FooRef1 REF TestRef,
       string OutputParam,
       uint32 OutputRtnValue);
 
@@ -288,10 +302,10 @@ class CIM_Foo_sub_sub : CIM_Foo_sub {
       string TestInOutParameter,
       CIM_Foo REF TestRef,
       string OutputParam,
-      uint32 OutputRtnValue);
+      uint32 OutputRtnValue,
+      string cimfoo_emb1);
 
-   uint32 DeleteNothing();
-
+   string DeleteNothing();
 };
 """
 # TODO: This never referenced
@@ -492,7 +506,10 @@ TEST_CASES = [
 +--------------+
 | Class Name   |
 |--------------|
+| CIM_BaseEmb  |
+| CIM_BaseRef  |
 | CIM_Foo      |
+| CIM_FooAssoc |
 +--------------+
 """,
       'test': 'in'},
@@ -573,7 +590,10 @@ TEST_CASES = [
     ['Verify class command get with repr output format).',
      {'args': ['enumerate'],
       'general': ['--output-format', 'txt']},
-     {'stdout': ["CIMClass(classname='CIM_Foo', ...)"],
+     {'stdout': ["CIMClass(classname='CIM_BaseEmb', ...)",
+                 "CIMClass(classname='CIM_BaseRef', ...)",
+                 "CIMClass(classname='CIM_Foo', ...)",
+                 "CIMClass(classname='CIM_FooAssoc', ...)"],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -636,17 +656,20 @@ TEST_CASES = [
      {'stdout': ['class CIM_Foo {',
                  'string InstanceID;',
                  'uint32 IntegerProp;',
+                 'string cimfoo_emb3;',
                  'uint32 Fuzzy(',
                  'string TestInOutParameter,',
-                 'CIM_Foo REF TestRef,',
+                 'CIM_FooRef1 REF TestRef,',
                  'string OutputParam,',
                  'uint32 OutputRtnValue);',
                  'uint32 FuzzyStatic(',
                  'string TestInOutParameter,',
                  'CIM_Foo REF TestRef,',
                  'string OutputParam,',
-                 'uint32 OutputRtnValue);',
-                 'uint32 DeleteNothing();', '};'],
+                 'uint32 OutputRtnValue,',
+                 'string cimfoo_emb1);',
+                 'string DeleteNothing();',
+                 '};'],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -1051,9 +1074,11 @@ TEST_CASES = [
                  '',
                  '   uint32 IntegerProp;',
                  '',
+                 '   string cimfoo_emb3;',
+                 '',
                  '   uint32 Fuzzy(',
                  '      string TestInOutParameter,',
-                 '      CIM_Foo REF TestRef,',
+                 '      CIM_FooRef1 REF TestRef,',
                  '      string OutputParam,',
                  '      uint32 OutputRtnValue);',
                  '',
@@ -1061,9 +1086,10 @@ TEST_CASES = [
                  '      string TestInOutParameter,',
                  '      CIM_Foo REF TestRef,',
                  '      string OutputParam,',
-                 '      uint32 OutputRtnValue);',
+                 '      uint32 OutputRtnValue,',
+                 '      string cimfoo_emb1);',
                  '',
-                 '   uint32 DeleteNothing();',
+                 '   string DeleteNothing();',
                  '',
                  '};',
                  ''],
@@ -1080,9 +1106,11 @@ TEST_CASES = [
                  '',
                  '   uint32 IntegerProp;',
                  '',
+                 '   string cimfoo_emb3;',
+                 '',
                  '   uint32 Fuzzy(',
                  '      string TestInOutParameter,',
-                 '      CIM_Foo REF TestRef,',
+                 '      CIM_FooRef1 REF TestRef,',
                  '      string OutputParam,',
                  '      uint32 OutputRtnValue);',
                  '',
@@ -1090,9 +1118,10 @@ TEST_CASES = [
                  '      string TestInOutParameter,',
                  '      CIM_Foo REF TestRef,',
                  '      string OutputParam,',
-                 '      uint32 OutputRtnValue);',
+                 '      uint32 OutputRtnValue,',
+                 '      string cimfoo_emb1);',
                  '',
-                 '   uint32 DeleteNothing();',
+                 '   string DeleteNothing();',
                  '',
                  '};',
                  ''],
@@ -1117,7 +1146,7 @@ TEST_CASES = [
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF TestRef,',
+                 '      CIM_FooRef1 REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
                  '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
@@ -1143,10 +1172,15 @@ TEST_CASES = [
                  '      string OutputParam,',
                  '         [IN ( true ),',
                  '          Description ( "Defines return value if provided." )]',  # noqa: E501
-                 '      uint32 OutputRtnValue);',
+                 '      uint32 OutputRtnValue,',
+                 '         [IN ( true ),',
+                 '          Description ( "Embedded instance parameter" ),',
+                 '          EmbeddedInstance ( "CIM_FooEmb1" )]',
+                 '      string cimfoo_emb1);',
                  '',
-                 '      [Description ( "Method with no Parameters" )]',
-                 '   uint32 DeleteNothing();',
+                 '      [Description ( "Method with no parameters but embedded instance return" ),',  # noqa: E501
+                 '       EmbeddedInstance ( "CIM_FooEmb2" )]',
+                 '   string DeleteNothing();',
                  '',
                  '};',
                  ''],
@@ -1167,7 +1201,7 @@ TEST_CASES = [
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF TestRef,',
+                 '      CIM_FooRef1 REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
                  '          Description ( "Rtns method name if exists on input" )]',  # noqa: E501
@@ -1193,10 +1227,15 @@ TEST_CASES = [
                  '      string OutputParam,',
                  '         [IN ( true ),',
                  '          Description ( "Defines return value if provided." )]',  # noqa: E501
-                 '      uint32 OutputRtnValue);',
+                 '      uint32 OutputRtnValue,',
+                 '         [IN ( true ),',
+                 '          Description ( "Embedded instance parameter" ),',
+                 '          EmbeddedInstance ( "CIM_FooEmb1" )]',
+                 '      string cimfoo_emb1);',
                  '',
-                 '      [Description ( "Method with no Parameters" )]',
-                 '   uint32 DeleteNothing();',
+                 '      [Description ( "Method with no parameters but embedded instance return" ),',  # noqa: E501
+                 '       EmbeddedInstance ( "CIM_FooEmb2" )]',
+                 '   string DeleteNothing();',
                  '',
                  '};',
                  ''],
@@ -1229,6 +1268,7 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
+    # pylint: disable=line-too-long
     ['Verify class command get with propertylist and classorigin,',
      ['get', 'CIM_Foo_sub2', '--pl', 'InstanceID', '--ico'],
      {'stdout': ['class CIM_Foo_sub2 : CIM_Foo {',
@@ -1245,7 +1285,7 @@ TEST_CASES = [
                  '         [IN ( true ),',
                  '          OUT ( true ),',
                  '          Description ( "Test of ref in/out parameter" )]',
-                 '      CIM_Foo REF TestRef,',
+                 '      CIM_FooRef1 REF TestRef,',
                  '         [IN ( false ),',
                  '          OUT ( true ),',
                  '          Description ( "Rtns method name if exists on '
@@ -1276,12 +1316,18 @@ TEST_CASES = [
                  '         [IN ( true ),',
                  '          Description ( "Defines return value if '
                  'provided." )]',
-                 '      uint32 OutputRtnValue);',
-                 '      [Description ( "Method with no Parameters" )]',
-                 '   uint32 DeleteNothing();',
+                 '      uint32 OutputRtnValue,',
+                 '         [IN ( true ),',
+                 '          Description ( "Embedded instance parameter" ),',
+                 '          EmbeddedInstance ( "CIM_FooEmb1" )]',
+                 '      string cimfoo_emb1);',
+                 '      [Description ( "Method with no parameters but embedded instance return" ),',  # noqa: E501
+                 '       EmbeddedInstance ( "CIM_FooEmb2" )]',
+                 '   string DeleteNothing();',
                  '};', ''],
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
+    # pylint: enable=line-too-long
 
     # get command errors
 
@@ -1354,7 +1400,15 @@ TEST_CASES = [
 
     ['Verify class command find simple name in known namespace',
      ['find', 'CIM_*', '-n', 'root/cimv2'],
-     {'stdout': ["  root/cimv2: CIM_Foo",
+     {'stdout': ["  root/cimv2: CIM_BaseEmb",
+                 "  root/cimv2: CIM_BaseRef",
+                 "  root/cimv2: CIM_Foo",
+                 "  root/cimv2: CIM_FooAssoc",
+                 "  root/cimv2: CIM_FooEmb1",
+                 "  root/cimv2: CIM_FooEmb2",
+                 "  root/cimv2: CIM_FooEmb3",
+                 "  root/cimv2: CIM_FooRef1",
+                 "  root/cimv2: CIM_FooRef2",
                  "  root/cimv2: CIM_Foo_sub",
                  "  root/cimv2: CIM_Foo_sub2",
                  "  root/cimv2: CIM_Foo_sub_sub"],
@@ -1368,7 +1422,23 @@ TEST_CASES = [
                  '+-------------+-----------------+',
                  '| Namespace   | Classname       |',
                  '+=============+=================+',
+                 '| root/cimv2  | CIM_BaseEmb     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_BaseRef     |',
+                 '+-------------+-----------------+',
                  '| root/cimv2  | CIM_Foo         |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooAssoc    |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooEmb1     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooEmb2     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooEmb3     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooRef1     |',
+                 '+-------------+-----------------+',
+                 '| root/cimv2  | CIM_FooRef2     |',
                  '+-------------+-----------------+',
                  '| root/cimv2  | CIM_Foo_sub     |',
                  '+-------------+-----------------+',
@@ -1517,7 +1587,7 @@ TEST_CASES = [
      {'stderr': ['DeprecationWarning: The --force / -f option has been '
                  'deprecated'],
       'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete successful with no subclasses, '
      '-f (deprecated)',
@@ -1526,55 +1596,27 @@ TEST_CASES = [
      {'stderr': ['DeprecationWarning: The --force / -f option has been '
                  'deprecated'],
       'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete successful with no subclasses, '
      '--include-instances',
      ['delete', 'CIM_Foo_sub_sub', '--include-instances'],
-     {'stdout': '',
-      'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
+     {'stdout': ['Deleted instance root/cimv2:CIM_Foo_sub_sub.',
+                 'Deleted class CIM_Foo_sub_sub'],
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete successful with no subclasses, --namespace '
      'and --include-instances',
      ['delete', 'CIM_Foo_sub_sub', '--namespace', 'root/cimv2',
       '--include-instances'],
-     {'stdout': '',
-      'test': 'in'},
-     [SIMPLE_MOCK_FILE], OK],
-
-    ['Verify class command delete successful with no subclasses, --verbose'
-     'and --include-instances',
-     {'args': ['delete', 'CIM_Foo_sub_sub', '--include-instances'],
-      'general': ['--verbose']},
-     {'stdout': ['Deleted class', 'CIM_Foo_sub_sub'],
-      'test': 'innows'},
-     [SIMPLE_MOCK_FILE], OK],
-
-    ['Verify class command delete fail instances exist',
-     ['delete', 'CIM_Foo_sub_sub'],
-     {'stderr': 'Delete rejected; instances exist',
-      'rc': 1,
+     {'stdout': ['Deleted instance root/cimv2:CIM_Foo_sub_sub.',
+                 'Deleted class CIM_Foo_sub_sub'],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
     # Class delete errors
     ['Verify class command delete no classname',
-     ['delete'],
-     {'stderr': ['Error: Missing argument .CLASSNAME.'],
-      'rc': 2,
-      'test': 'regex'},
-     SIMPLE_MOCK_FILE, OK],
-
-    # class delete error tests
-    ['Verify class command delete fail subclasses exist, --include-instances',
-     ['delete', 'CIM_Foo', '--include-instances'],
-     {'stderr': 'Delete rejected; subclasses exist',
-      'rc': 1,
-      'test': 'innows'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class command delete no classname fails',
      ['delete'],
      {'stderr': ['Error: Missing argument .CLASSNAME.'],
       'rc': 2,
@@ -1588,12 +1630,134 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command delete fails, instances exist',
+    ['Verify class command delete fail instances exist',
      ['delete', 'CIM_Foo_sub_sub'],
-     {'stderr': 'Delete rejected; instances exist',
+     {'stderr': 'Cannot delete class CIM_Foo_sub_sub because it has '
+                '3 instances',
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail subclasses exist',
+     ['delete', 'CIM_Foo'],
+     {'stderr': 'Cannot delete class CIM_Foo because it has 12 instances',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail subclasses exist, --include-instances',
+     ['delete', 'CIM_Foo', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_Foo because these classes depend on '
+                'it: CIM_Foo_sub, CIM_Foo_sub2',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail referencing class CIM_FooRef1 exist',
+     ['delete', 'CIM_FooRef1'],
+     {'stderr': 'Cannot delete class CIM_FooRef1 because it has 1 instances',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail referencing class CIM_FooRef1 exist, '
+     '--include-instances',
+     ['delete', 'CIM_FooRef1', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_FooRef1 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail referencing class CIM_FooRef2 exist',
+     ['delete', 'CIM_FooRef2'],
+     {'stderr': 'Cannot delete class CIM_FooRef2 because it has 1 instances',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail referencing class CIM_FooRef2 exist, '
+     '--include-instances',
+     ['delete', 'CIM_FooRef2', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_FooRef2 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail referencing class CIM_FooAssoc exist',
+     ['delete', 'CIM_FooAssoc'],
+     {'stderr': 'Cannot delete class CIM_FooAssoc because it has 1 instances',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete succesd for referencing class CIM_FooAssoc, '
+     '--include-instances',
+     ['delete', 'CIM_FooAssoc', '--include-instances'],
+     {'stdout': '',
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb1 exist',
+     ['delete', 'CIM_FooEmb1'],
+     {'stderr': 'Cannot delete class CIM_FooEmb1 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb1 exist, '
+     '--include-instances',
+     ['delete', 'CIM_FooEmb1', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_FooEmb1 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb2 exist',
+     ['delete', 'CIM_FooEmb2'],
+     {'stderr': 'Cannot delete class CIM_FooEmb2 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb2 exist, '
+     '--include-instances',
+     ['delete', 'CIM_FooEmb2', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_FooEmb2 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb3 exist',
+     ['delete', 'CIM_FooEmb3'],
+     {'stderr': 'Cannot delete class CIM_FooEmb3 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fail embedding class CIM_FooEmb3 exist, '
+     '--include-instances',
+     ['delete', 'CIM_FooEmb3', '--include-instances'],
+     {'stderr': 'Cannot delete class CIM_FooEmb3 because these classes depend '
+                'on it: CIM_Foo',
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command delete fails if instance provider rejects delete',
+     {'args': ['delete', 'CIM_Foo_sub_sub', '--include-instances']},
+     {'stderr': ['CIM_ERR_FAILED',
+                 'Deletion of CIM_Foo_sub_sub instances is rejected'],
+      'rc': 1,
+      'test': 'innows'},
+     [SIMPLE_MOCK_FILE, 'reject_deleteinstance_provider.py'],
+     MOCK_SETUP_SUPPORTED],
 
     #
     # command "class tree"
@@ -1613,10 +1777,18 @@ TEST_CASES = [
     ['Verify class command tree top down. Uses simple mock, no argument',
      ['tree'],
      {'stdout': """root
+ +-- CIM_BaseEmb
+ |   +-- CIM_FooEmb1
+ |   +-- CIM_FooEmb2
+ |   +-- CIM_FooEmb3
+ +-- CIM_BaseRef
+ |   +-- CIM_FooRef1
+ |   +-- CIM_FooRef2
  +-- CIM_Foo
-     +-- CIM_Foo_sub
-     |   +-- CIM_Foo_sub_sub
-     +-- CIM_Foo_sub2
+ |   +-- CIM_Foo_sub
+ |   |   +-- CIM_Foo_sub_sub
+ |   +-- CIM_Foo_sub2
+ +-- CIM_FooAssoc
 """,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -2053,7 +2225,7 @@ TEST_CASES = [
      {'stderr': ['CIMError'],
       'rc': 1,
       'test': 'innows'},
-     [SIMPLE_MOCK_FILE], OK],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify  --timestats gets stats output. Cannot test with lines,execution '
      'time is variable.',

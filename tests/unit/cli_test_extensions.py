@@ -13,6 +13,7 @@ import six
 # import pkgs to determine pywbem version
 import packaging.version
 import pywbem
+from pywbem_mock import FakedWBEMConnection
 
 from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
 
@@ -449,3 +450,36 @@ def remove_ws(inputs, join=False):
     if join:
         ret_lines = ''.join(ret_lines)
     return ret_lines
+
+
+def setup_mock_connection(mock_items, namespace):
+    """
+    Return FakedWBEMConnection with the specified mock items in the specified
+    namespace.
+
+    Parameters:
+
+      mock_items (iterable of mock items): List of mock items to be added
+        to the mock environment.
+
+        A mock item can be:
+        * string: path name of MOF file to be compiled
+        * string: MOF string to be compiled
+        * list/tuple: List of CIM objects to be added
+
+      namespace (string): CIM namespace
+
+    Returns:
+      FakedWBEMConnection: Mock environment that has been set up.
+    """
+    conn = FakedWBEMConnection()
+    conn.add_namespace(namespace)
+    for mock_item in mock_items:
+        if isinstance(mock_item, six.string_types):
+            if mock_item.endswith('.mof'):
+                conn.compile_mof_file(mock_item, namespace=namespace)
+            else:
+                conn.compile_mof_string(mock_item, namespace=namespace)
+        elif isinstance(mock_item, (list, tuple)):
+            conn.add_cimobjects(mock_item, namespace=namespace)
+    return conn

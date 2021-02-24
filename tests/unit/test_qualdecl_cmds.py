@@ -72,6 +72,13 @@ Qualifier Description : string,
     Scope(any),
     Flavor(EnableOverride, ToSubclass, Translatable);
 
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter);
+
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
 Qualifier In : boolean = true,
     Scope(parameter),
     Flavor(DisableOverride, ToSubclass);
@@ -99,41 +106,54 @@ Qualifier Static : boolean = false,
 """
 
 
+# pylint: disable=line-too-long
 QD_TBL_OUT = """Qualifier Declarations
-+-------------+---------+---------+---------+-------------+-----------------+
-| Name        | Type    | Value   | Array   | Scopes      | Flavors         |
-+=============+=========+=========+=========+=============+=================+
-| Abstract    | boolean | False   | False   | CLASS       | EnableOverride  |
-|             |         |         |         | ASSOCIATION | Restricted      |
-|             |         |         |         | INDICATION  |                 |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Aggregate   | boolean | False   | False   | REFERENCE   | DisableOverride |
-|             |         |         |         |             | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Association | boolean | False   | False   | ASSOCIATION | DisableOverride |
-|             |         |         |         |             | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Description | string  |         | False   | ANY         | EnableOverride  |
-|             |         |         |         |             | ToSubclass      |
-|             |         |         |         |             | Translatable    |
-+-------------+---------+---------+---------+-------------+-----------------+
-| In          | boolean | True    | False   | PARAMETER   | DisableOverride |
-|             |         |         |         |             | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Indication  | boolean | False   | False   | CLASS       | DisableOverride |
-|             |         |         |         | INDICATION  | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Key         | boolean | False   | False   | PROPERTY    | DisableOverride |
-|             |         |         |         | REFERENCE   | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Out         | boolean | False   | False   | PARAMETER   | DisableOverride |
-|             |         |         |         |             | ToSubclass      |
-+-------------+---------+---------+---------+-------------+-----------------+
-| Override    | string  |         | False   | PROPERTY    | EnableOverride  |
-|             |         |         |         | REFERENCE   | Restricted      |
-|             |         |         |         | METHOD      |                 |
-+-------------+---------+---------+---------+-------------+-----------------+
-"""
++------------------+---------+---------+---------+-------------+-----------------+
+| Name             | Type    | Value   | Array   | Scopes      | Flavors         |
++==================+=========+=========+=========+=============+=================+
+| Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
+|                  |         |         |         | ASSOCIATION | Restricted      |
+|                  |         |         |         | INDICATION  |                 |
++------------------+---------+---------+---------+-------------+-----------------+
+| Aggregate        | boolean | False   | False   | REFERENCE   | DisableOverride |
+|                  |         |         |         |             | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Association      | boolean | False   | False   | ASSOCIATION | DisableOverride |
+|                  |         |         |         |             | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Description      | string  |         | False   | ANY         | EnableOverride  |
+|                  |         |         |         |             | ToSubclass      |
+|                  |         |         |         |             | Translatable    |
++------------------+---------+---------+---------+-------------+-----------------+
+| EmbeddedInstance | string  |         | False   | PROPERTY    | DisableOverride |
+|                  |         |         |         | METHOD      | Restricted      |
+|                  |         |         |         | PARAMETER   |                 |
++------------------+---------+---------+---------+-------------+-----------------+
+| EmbeddedObject   | boolean | False   | False   | PROPERTY    | DisableOverride |
+|                  |         |         |         | METHOD      | ToSubclass      |
+|                  |         |         |         | PARAMETER   |                 |
++------------------+---------+---------+---------+-------------+-----------------+
+| In               | boolean | True    | False   | PARAMETER   | DisableOverride |
+|                  |         |         |         |             | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Indication       | boolean | False   | False   | CLASS       | DisableOverride |
+|                  |         |         |         | INDICATION  | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Key              | boolean | False   | False   | PROPERTY    | DisableOverride |
+|                  |         |         |         | REFERENCE   | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Out              | boolean | False   | False   | PARAMETER   | DisableOverride |
+|                  |         |         |         |             | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+| Override         | string  |         | False   | PROPERTY    | EnableOverride  |
+|                  |         |         |         | REFERENCE   | Restricted      |
+|                  |         |         |         | METHOD      |                 |
++------------------+---------+---------+---------+-------------+-----------------+
+| Static           | boolean | False   | False   | PROPERTY    | DisableOverride |
+|                  |         |         |         | METHOD      | ToSubclass      |
++------------------+---------+---------+---------+-------------+-----------------+
+"""  # noqa: E501
+# pylint: enable=line-too-long
 
 QD_TBL_GET_OUT = """Qualifier Declarations
 +----------+---------+---------+---------+-------------+----------------+
@@ -219,7 +239,7 @@ TEST_CASES = [
 
     ['Verify qualifier command enumerate summary returns qual decls.',
      ['enumerate', '--summary'],
-     {'stdout': ['10', 'CIMQualifierDeclaration'],
+     {'stdout': ['12', 'CIMQualifierDeclaration'],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -230,7 +250,7 @@ TEST_CASES = [
 +---------+-------------------------+
 |   Count | CIM Type                |
 |---------+-------------------------|
-|      10 | CIMQualifierDeclaration |
+|      12 | CIMQualifierDeclaration |
 +---------+-------------------------+
 """],
       'test': 'linesnows'},

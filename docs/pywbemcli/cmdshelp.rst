@@ -272,10 +272,12 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
       Delete a CIM class (CLASSNAME argument) in a CIM namespace (--namespace option). If no namespace was specified, the
       default namespace of the connection is used.
 
-      If the class has subclasses, the command is rejected.
-
       If the class has instances, the command is rejected, unless the --include-instances option is specified, in which
       case the instances are also deleted.
+
+      If other classes in that namespace depend on the class to be deleted, the command is rejected. Dependencies that are
+      considered for this purpose are subclasses, referencing classes and embedding classes (EmbeddedInstance qualifier
+      only).
 
       WARNING: Deletion of instances will cause the removal of corresponding resources in the managed environment (i.e. in
       the real world). Some instances may not be deletable.
@@ -294,9 +296,9 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
       -f, --force                Same as --include-instances. The -f / --force option has been deprecated and will be
                                  removed in a future version.
 
-      --include-instances        Delete any instances of the class as well. WARNING: Deletion of instances will cause all
-                                 implemented side-effects to happen, such as the removal of resources in the managed
-                                 environment. Default: Reject command if the class has any instances.
+      --include-instances        Delete any instances of the class as well. WARNING: Deletion of instances will cause the
+                                 removal of corresponding resources in the managed environment (i.e. in the real
+                                 world).Default: Reject command if the class has any instances.
 
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       -h, --help                 Show this help message.

@@ -22,21 +22,23 @@ Tests for _common.py functions.
 from __future__ import absolute_import, print_function
 
 import sys
+import os
 from packaging.version import parse as parse_version
 import click
 from mock import patch
+from nocaselist import NocaseList
 import pytest
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, \
-    CIMClassName, __version__
-
+    CIMClassName, CIMMethod, CIMParameter, __version__
 try:
     from pywbem import MissingKeybindingsWarning
 except ImportError:
     MissingKeybindingsWarning = None
 
 from tests.unit.pytest_extensions import simplified_test_function
+from tests.unit.cli_test_extensions import setup_mock_connection
 
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
@@ -44,7 +46,8 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     is_classname, pick_one_from_list, pick_multiple_from_list, \
     hide_empty_columns, verify_operation, split_str_w_esc, format_keys, \
     shorten_path_str, get_subclass_names, \
-    validate_output_format, output_format_in_groups, fold_strings
+    validate_output_format, output_format_in_groups, fold_strings, \
+    dependent_classnames, depending_classnames, all_classnames_depsorted
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
 # from tests.unit.utils import assert_lines
@@ -67,6 +70,10 @@ PYWBEM_1_0_0B1 = _PYWBEM_VERSION.release >= (1, 0, 0) and \
 # pywbem 1.0.0 (dev, beta, final) or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
+# A mof file that defines basic qualifier decls, classes, and instances
+# but not tied to the DMTF classes.
+SIMPLE_MOCK_FILE = os.path.join(
+    os.path.dirname(__file__), 'simple_mock_model.mof')
 
 TESTCASES_ISCLASSNAME = [
     # Testcases for _common.is_classname()
@@ -2921,6 +2928,502 @@ def test_get_subclassnames(testcase, classes, classname, deep_inheritance,
         print('MOF\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(classes, exp_rtn,
                                                       act_rtn))
     assert act_rtn == exp_rtn
+
+
+TESTCASES_DEPENDENT_CLASSNAMES = [
+    # Testcases for _common.dependent_classnames()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * cls_obj: CIMClass object used as input
+    #   * exp_rtn: Expected return value: NocaseList with class names of
+    #     dependent classes.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    (
+        'Verify class with no dependent classes',
+        dict(
+            cls_obj=CIMClass('Foo'),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a superclass',
+        dict(
+            cls_obj=CIMClass('Foo', superclass='Super'),
+            exp_rtn=NocaseList(['Super']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a reference property to another class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                properties=[
+                    CIMProperty('P1', value=None, type='reference',
+                                reference_class='Ref'),
+                ],
+            ),
+            exp_rtn=NocaseList(['Ref']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a reference property to the same class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                properties=[
+                    CIMProperty('P1', value=None, type='reference',
+                                reference_class='Foo'),
+                ],
+            ),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method with a reference parameter to another '
+        'class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1', return_type='string',
+                        parameters=[
+                            CIMParameter('P1', value=None, type='reference',
+                                         reference_class='Ref'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Ref']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method with a reference parameter to same class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1', return_type='string',
+                        parameters=[
+                            CIMParameter('P1', value=None, type='reference',
+                                         reference_class='Foo'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a embedded instance property to another class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                properties=[
+                    CIMProperty(
+                        'P1', value=None, type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'Emb'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Emb']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a embedded instance property to same class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                properties=[
+                    CIMProperty(
+                        'P1', value=None, type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'Foo'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method that returns an embedded instance to '
+        'another class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1', return_type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'Emb'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Emb']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method that returns an embedded instance to '
+        'same class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1', return_type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'Foo'),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method with a embedded instance parameter to '
+        'another class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1',
+                        return_type='string',
+                        parameters=[
+                            CIMParameter(
+                                'P1', value=None, type='string',
+                                qualifiers=[
+                                    CIMQualifier('EmbeddedInstance', 'Emb'),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Emb']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with a method with a embedded instance parameter to '
+        'same class',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                methods=[
+                    CIMMethod(
+                        'M1',
+                        return_type='string',
+                        parameters=[
+                            CIMParameter(
+                                'P1', value=None, type='string',
+                                qualifiers=[
+                                    CIMQualifier('EmbeddedInstance', 'Foo'),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with all possible dependent classes to different classes',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                superclass='Super',
+                properties=[
+                    CIMProperty(
+                        'P1', value=None, type='reference',
+                        reference_class='RefP1',
+                    ),
+                    CIMProperty(
+                        'P2', value=None, type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'EmbP2'),
+                        ],
+                    ),
+                ],
+                methods=[
+                    CIMMethod(
+                        'M1',
+                        return_type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'EmbM1'),
+                        ],
+                        parameters=[
+                            CIMParameter(
+                                'Pa1', value=None, type='reference',
+                                reference_class='RefM1Pa1',
+                            ),
+                            CIMParameter(
+                                'Pa2', value=None, type='string',
+                                qualifiers=[
+                                    CIMQualifier(
+                                        'EmbeddedInstance', 'EmbM1Pa2'),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Super', 'RefP1', 'EmbP2', 'EmbM1',
+                                'RefM1Pa1', 'EmbM1Pa2']),
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class with all possible dependent classes to partly the same '
+        'classes, also referencing itself',
+        dict(
+            cls_obj=CIMClass(
+                'Foo',
+                superclass='Super',
+                properties=[
+                    CIMProperty(
+                        'P1', value=None, type='reference',
+                        reference_class='Ref',
+                    ),
+                    CIMProperty(
+                        'P2', value=None, type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'EmbP2'),
+                        ],
+                    ),
+                    CIMProperty(
+                        'P3', value=None, type='reference',
+                        reference_class='Foo',
+                    ),
+                ],
+                methods=[
+                    CIMMethod(
+                        'M1',
+                        return_type='string',
+                        qualifiers=[
+                            CIMQualifier('EmbeddedInstance', 'EmbM1'),
+                        ],
+                        parameters=[
+                            CIMParameter(
+                                'Pa1', value=None, type='reference',
+                                reference_class='Ref',
+                            ),
+                            CIMParameter(
+                                'Pa2', value=None, type='string',
+                                qualifiers=[
+                                    CIMQualifier(
+                                        'EmbeddedInstance', 'EmbM1'),
+                                ],
+                            ),
+                            CIMParameter(
+                                'Pa3', value=None, type='reference',
+                                reference_class='Foo',
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            exp_rtn=NocaseList(['Super', 'Ref', 'EmbP2', 'EmbM1']),
+        ),
+        None, None, True
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_DEPENDENT_CLASSNAMES)
+@simplified_test_function
+def test_dependent_classnames(testcase, cls_obj, exp_rtn):
+    """
+    Test function for _common.dependent_classnames()
+    """
+
+    # The code to be tested
+    act_rtn = dependent_classnames(cls_obj)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert isinstance(act_rtn, NocaseList)
+    assert set(act_rtn) == set(exp_rtn)
+
+
+TESTCASES_DEPENDING_CLASSNAMES = [
+    # Testcases for _common.depending_classnames()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * mock_items: List of mock items to be set up in mock environment
+    #   * classname: Class name used as input
+    #   * exp_rtn: Expected return value: List of class names of depending
+    #     classes.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    (
+        'Verify class CIM_Foo in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_Foo',
+            exp_rtn=['CIM_Foo_sub', 'CIM_Foo_sub2'],
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class CIM_Foo_sub in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_Foo_sub',
+            exp_rtn=['CIM_Foo_sub_sub'],
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class CIM_Foo_sub2 in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_Foo_sub2',
+            exp_rtn=[],
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class CIM_FooRef1 in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_FooRef1',
+            exp_rtn=['CIM_Foo', 'CIM_FooAssoc'],
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class CIM_FooEmb1 in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_FooEmb1',
+            exp_rtn=['CIM_Foo'],
+        ),
+        None, None, True
+    ),
+    (
+        'Verify class CIM_FooAssoc in simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            classname='CIM_FooAssoc',
+            exp_rtn=[],
+        ),
+        None, None, True
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_DEPENDING_CLASSNAMES)
+@simplified_test_function
+def test_depending_classnames(testcase, mock_items, classname, exp_rtn):
+    """
+    Test function for _common.depending_classnames()
+    """
+    namespace = 'root/foo'
+
+    conn = setup_mock_connection(mock_items, namespace)
+
+    # The code to be tested
+    act_rtn = depending_classnames(classname, namespace, conn)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert isinstance(act_rtn, NocaseList)
+    assert set(act_rtn) == set(exp_rtn)
+
+
+TESTCASES_ALL_CLASSNAMES_DEPSORTED = [
+    # Testcases for _common.all_classnames_depsorted()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * mock_items: List of mock items to be set up in mock environment
+    #   * exp_rtn: Expected return value: List of all class names in dependency
+    #     order.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    (
+        'Verify simple mock model',
+        dict(
+            mock_items=[SIMPLE_MOCK_FILE],
+            exp_rtn=[
+                'CIM_Foo_sub_sub',
+                'CIM_Foo_sub2',
+                'CIM_Foo_sub',
+                'CIM_FooAssoc',
+                'CIM_Foo',
+                'CIM_FooRef2',
+                'CIM_FooRef1',
+                'CIM_FooEmb3',
+                'CIM_FooEmb2',
+                'CIM_FooEmb1',
+                'CIM_BaseRef',
+                'CIM_BaseEmb',
+            ],
+        ),
+        None, None, True
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_ALL_CLASSNAMES_DEPSORTED)
+@simplified_test_function
+def test_all_classnames_depsorted(testcase, mock_items, exp_rtn):
+    """
+    Test function for _common.all_classnames_depsorted()
+    """
+    namespace = 'root/foo'
+
+    conn = setup_mock_connection(mock_items, namespace)
+
+    # The code to be tested
+    act_rtn = all_classnames_depsorted(namespace, conn)
+
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert list(act_rtn) == list(exp_rtn)
 
 
 # TODO Test compare and failure in compare_obj and with errors.
