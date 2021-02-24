@@ -2679,6 +2679,9 @@ Instances: TST_Person
 +-------------+-----------------+---------+
 | Namespace   | Class           |   count |
 |-------------+-----------------+---------|
+| interop     | CIM_FooAssoc    |       1 |
+| interop     | CIM_FooRef1     |       1 |
+| interop     | CIM_FooRef2     |       1 |
 | interop     | CIM_Foo_sub_sub |       3 |
 | interop     | CIM_Foo_sub     |       4 |
 | interop     | CIM_Foo         |       5 |
@@ -2697,6 +2700,9 @@ Instances: TST_Person
 | Namespace   | Class           |   count |
 |-------------+-----------------+---------|
 | interop     | CIM_Foo         |       5 |
+| interop     | CIM_FooAssoc    |       1 |
+| interop     | CIM_FooRef1     |       1 |
+| interop     | CIM_FooRef2     |       1 |
 | interop     | CIM_Foo_sub     |       4 |
 | interop     | CIM_Foo_sub_sub |       3 |
 +-------------+-----------------+---------+

@@ -44,6 +44,7 @@ PyYAML==5.2; python_version == '3.4'
 PyYAML==5.3.1; python_version >= '3.5'
 yamlloader==0.5.5
 mock==3.0.0
+toposort==1.6
 
 # Virtualenv
 virtualenv==14.0.0; python_version < '3.5'

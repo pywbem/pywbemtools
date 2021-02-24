@@ -37,7 +37,7 @@ from ._common import filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     output_format_is_table, format_table, process_invokemethod, \
     pywbem_error_exception, warning_msg, validate_output_format, \
-    get_subclass_names
+    get_subclass_names, depending_classnames
 
 from ._display_cimobjects import display_cim_objects
 
@@ -190,9 +190,9 @@ def class_get(context, classname, **options):
                    'been deprecated and will be removed in a future version.')
 @click.option('--include-instances', is_flag=True, default=False,
               help=u'Delete any instances of the class as well. '
-                   'WARNING: Deletion of instances will cause all implemented '
-                   'side-effects to happen, such as the removal of resources '
-                   'in the managed environment. '
+                   'WARNING: Deletion of instances will cause the removal '
+                   'of corresponding resources in the managed environment '
+                   '(i.e. in the real world).'
                    'Default: Reject command if the class has any instances.')
 @add_options(namespace_option)
 @add_options(help_option)
@@ -205,11 +205,14 @@ def class_delete(context, classname, **options):
     option). If no namespace was specified, the default namespace of the
     connection is used.
 
-    If the class has subclasses, the command is rejected.
-
     If the class has instances, the command is rejected, unless the
     --include-instances option is specified, in which case the instances
     are also deleted.
+
+    If other classes in that namespace depend on the class to be deleted, the
+    command is rejected. Dependencies considered for this purpose are
+    subclasses, referencing classes and embedding classes (EmbeddedInstance
+    qualifier only).
 
     WARNING: Deletion of instances will cause the removal of corresponding
     resources in the managed environment (i.e. in the real world). Some
@@ -1143,34 +1146,42 @@ def cmd_class_delete(context, classname, options):
                       "will be removed in a future version. Use "
                       "--include-instances instead.", DeprecationWarning)
 
-    if options['namespace']:
-        classname = CIMClassName(classname, namespace=options['namespace'])
+    namespace = options['namespace'] or context.conn.default_namespace
 
     try:
-        instnames = context.conn.EnumerateInstanceNames(classname)
-        subclassnames = context.conn.EnumerateClassNames(ClassName=classname,
-                                                         DeepInheritance=True)
-    except Error as er:
-        raise pywbem_error_exception(er)
+        instnames = context.conn.EnumerateInstanceNames(
+            ClassName=classname, namespace=namespace)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot enumerate instance names of class {} in "
+            "namespace {}".format(classname, namespace))
 
-    if subclassnames:
-        raise click.ClickException('Delete rejected; subclasses exist')
+    if instnames and not include_instances:
+        raise click.ClickException(
+            "Cannot delete class {} because it has {} instances".
+            format(classname, len(instnames)))
 
-    if not include_instances:
-        if instnames:
-            raise click.ClickException('Delete rejected; instances exist')
-    else:
+    depending_cln_list = depending_classnames(
+        classname, namespace, context.conn)
+
+    if depending_cln_list:
+        raise click.ClickException(
+            "Cannot delete class {} because these classes depend on it: {}".
+            format(classname, ', '.join(depending_cln_list)))
+
+    context.spinner_stop()
+    if include_instances:
         for instname in instnames:
-            context.conn.DeleteInstance(instname)
-
-    instnames = context.conn.EnumerateInstanceNames(classname)
-    if instnames:
-        raise click.ClickException('Delete rejected; instance delete failed')
-
+            try:
+                context.conn.DeleteInstance(instname)
+            except Error as exc:
+                raise pywbem_error_exception(
+                    exc, "Cannot delete instance {}".format(instname))
+            click.echo('Deleted instance {}'.format(instname))
     try:
         context.conn.DeleteClass(classname)
-        if context.verbose:
-            context.spinner_stop()
-            click.echo('Deleted class {}.'.format(classname))
-    except Error as er:
-        raise pywbem_error_exception(er)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot delete class {} in namespace {}".
+            format(classname, namespace))
+    click.echo('Deleted class {}'.format(classname))

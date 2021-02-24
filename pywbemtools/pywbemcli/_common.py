@@ -37,10 +37,11 @@ import six
 import click
 import tabulate
 from nocaselist import NocaseList
+from toposort import toposort_flatten
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue
+    cimvalue, Error
 from pywbem._nocasedict import NocaseDict
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
@@ -1381,10 +1382,191 @@ def fold_strings(input_strings, max_width, break_long_words=False,
     return folded_string
 
 
-def pywbem_error_exception(er):
+def pywbem_error_exception(exc, intro=None):
     """
     Return the standard click exception for a pywbem Error exception.  These
     exceptions do not cause interactive mode failure but display the exception
     class and its str value and return to the repl mode.
+
+    Parameters:
+
+      exc (Exception): The pywbem Error exception.
+
+      intro (string): An additional message used as introduction for the
+        resulting click exception message. This message usually states what
+        cannot be done due to the error.
+
+    Returns:
+        click.ClickException: Click exception for the pywbem Error exception.
     """
-    return click.ClickException('{}: {}'.format(er.__class__.__name__, er))
+    if intro:
+        msg = "{}: {}: {}".format(intro, exc.__class__.__name__, exc)
+    else:
+        msg = "{}: {}".format(exc.__class__.__name__, exc)
+    return click.ClickException(msg)
+
+
+def dependent_classnames(cls_obj):
+    """
+    Determine the CIM classes the specified CIM class depends upon, based uopn
+    the class declaration in the CIMClass object. This function operates solely
+    on the provided CIMClass object and does not communicate with the WBEM
+    server.
+
+    The following types of dependencies are considered:
+    * Superclass
+    * Referenced classes (in properties and method parameters)
+    * Embedded classes specified with the EmbeddedInstance qualifier (in
+      properties, method return values and method parameters)
+
+    The following types of dependencies are not considered:
+    * Embedded classes specified with the EmbeddedObject qualifier (in
+      properties, method return values and method parameters)
+    * Classes specified in the Deprecated qualifier
+    * Classes specified in the ModelCorrespondence qualifier
+
+    Note that method return types cannot be references even though this is
+    permitted in DSP0004 because DSP0200 does not support the representation of
+    such method declarations. Therefore, pywbemtools does not check for them.
+
+    Parameters:
+
+      cls_obj (CIMClass): The specified CIM class.
+
+    Returns:
+
+      NocaseList of string: The unique list of class names of the dependent
+      classes, in no particular order. It is guaranteed that the specified class
+      itself will not be contained in this list (e.g. when it references itself
+      in a method parameter).
+    """
+
+    def _add(classnames, new_classname):
+        """
+        Append new_classname to classnames if not yet contained.
+
+        This provides the add() functionality of a case-insensitive set.
+        """
+        if new_classname not in classnames:
+            classnames.append(new_classname)
+
+    dependent_cln_list = NocaseList()
+    if cls_obj.superclass:
+        _add(dependent_cln_list, cls_obj.superclass)
+    for prop in cls_obj.properties.values():
+        embinst_qual = prop.qualifiers.get('EmbeddedInstance', None)
+        if embinst_qual:
+            _add(dependent_cln_list, embinst_qual.value)
+        if prop.reference_class:
+            _add(dependent_cln_list, prop.reference_class)
+    for meth in cls_obj.methods.values():
+        embinst_qual = meth.qualifiers.get('EmbeddedInstance', None)
+        if embinst_qual:
+            _add(dependent_cln_list, embinst_qual.value)
+        # No check for method return values that are references, because that
+        # cannot be represented in CIM-XML, even though allowed in DSP0004.
+        for parm in meth.parameters.values():
+            embinst_qual = parm.qualifiers.get('EmbeddedInstance', None)
+            if embinst_qual:
+                _add(dependent_cln_list, embinst_qual.value)
+            if parm.reference_class:
+                _add(dependent_cln_list, parm.reference_class)
+
+    try:
+        dependent_cln_list.remove(cls_obj.classname)
+    except ValueError:
+        pass
+
+    return dependent_cln_list
+
+
+def depending_classnames(classname, namespace, conn):
+    """
+    Enumerate all CIM classes in the namespace, determine the classes that
+    depend on the specified CIM class and return these depending classes as a
+    list of class names.
+
+    This function basically inverts the dependencies determined by
+    dependent_classnames(). See there for a description of the class
+    dependencies that are considered.
+
+    Parameters:
+
+      classname (string): Class name of the specified CIM class.
+
+      namespace (string): Namespace of the specified CIM class.
+
+      conn (WBEMConnection): WBEM server connection to be used.
+
+    Returns:
+
+      NocaseList of string: The class names of the classes that depend on the
+      specified class. It is guaranteed that the specified class itself will
+      not be contained in this list (e.g. when it references itself in a method
+      parameter).
+
+    Raises:
+        click.ClickException: For any WBEM operation errors.
+    """
+    try:
+        all_classes = conn.EnumerateClasses(
+            namespace=namespace, ClassName=None,
+            IncludeQualifiers=True, DeepInheritance=True, LocalOnly=True)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot enumerate classes in namespace {}".format(namespace))
+
+    depending_cln_list = NocaseList()
+    for cls in all_classes:
+        dep_classnames = dependent_classnames(cls)
+        if classname in dep_classnames:
+            if cls.classname not in depending_cln_list:
+                depending_cln_list.append(cls.classname)
+
+    return depending_cln_list
+
+
+def all_classnames_depsorted(namespace, conn):
+    """
+    Enumerate all CIM classes in the namespace and return them in a
+    dependency-sorted order where the classes that depend on other classes are
+    placed before the classes they depend upon.
+
+    This allows for example deleting the classes in the order of the returned
+    list without creating or failing due to dangling dependencies.
+
+    The class dependencies that are considered for this purpose are described
+    in dependent_classnames().
+
+    Parameters:
+
+      namespace (string): CIM namespace to be used.
+
+      conn (WBEMConnection): WBEM server connection to be used.
+
+    Returns:
+
+      Iterable of string: The class names of all classes in the namespace
+        in dependency-sorted order.
+
+    Raises:
+        click.ClickException: For any WBEM operation errors.
+    """
+
+    try:
+        all_classes = conn.EnumerateClasses(
+            namespace=namespace, ClassName=None,
+            IncludeQualifiers=True, DeepInheritance=True, LocalOnly=True)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot enumerate classes in namespace {}".format(namespace))
+
+    all_deps = dict()
+    for cls in all_classes:
+        dep_classnames = dependent_classnames(cls)
+        all_deps[cls.classname] = set(dep_classnames)
+
+    # TODO: Add support for case insensitive sorting.
+    flat_cln_iterable = toposort_flatten(all_deps)
+
+    return reversed(flat_cln_iterable)
