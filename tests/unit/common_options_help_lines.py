@@ -105,5 +105,8 @@ CMD_OPTION_SCHEMA_FILTER_HELP_LINE = \
 CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE = \
     "Filter the returned classes to return only"
 
+CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE = \
+    "Filter the returned classes to return only"
+
 CMD_OPTION_HELP_INSTANCENAME_HELP_LINE = \
     '--hi, --help-instancename Show help message for specifying INSTANCENAME'
