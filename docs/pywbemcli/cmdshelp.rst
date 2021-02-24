@@ -384,6 +384,7 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
       --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
                                       value.
 
+      --leaf-classes                  Filter the returned classes to return only leaf (classes; classes with no subclass.
       -h, --help                      Show this help message.
 
 
@@ -455,6 +456,7 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
       --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
                                       value.
 
+      --leaf-classes                  Filter the returned classes to return only leaf (classes; classes with no subclass.
       -h, --help                      Show this help message.
 
 
@@ -1139,6 +1141,7 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
                                       value.
 
+      --leaf-classes                  Filter the returned classes to return only leaf (classes; classes with no subclass.
       -h, --help                      Show this help message.
 
 

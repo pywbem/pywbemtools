@@ -38,8 +38,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_DEPRECATED_FILTER_HELP_LINE, \
     CMD_OPTION_SINCE_FILTER_HELP_LINE, \
     CMD_OPTION_SCHEMA_FILTER_HELP_LINE, \
-    CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE
-
+    CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE, \
+    CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE
 
 _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
@@ -134,6 +134,7 @@ CLASS_ENUMERATE_HELP_LINES = [
     CMD_OPTION_SINCE_FILTER_HELP_LINE,
     CMD_OPTION_SCHEMA_FILTER_HELP_LINE,
     CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE,
+    CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE,
 
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -152,6 +153,7 @@ CLASS_FIND_HELP_LINES = [
     CMD_OPTION_SINCE_FILTER_HELP_LINE,
     CMD_OPTION_SCHEMA_FILTER_HELP_LINE,
     CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE,
+    CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE,
 
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -1542,6 +1544,19 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
+    ['Verify class command find with --schema "EXP". test not-innows',
+     ['find', '*', '--schema', 'EXP'],
+     {'stdout': ['BLA_Person', 'TST_FamilyCollection', 'TST_Indication',
+                 'TST_IndicationDeprecated', 'TST_IndicationExperimental',
+                 'TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
+                 'TST_MemberOfFamilyCollectionExp',
+                 'TST_Person', 'TST_PersonClsDep', 'TST_PersonDep',
+                 'TST_PersonExp', 'TST_PersonExpProperty',
+                 'TST_PersonPropDep', 'TST_PersonSub'],
+      'test': 'not-innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
     ['Verify class command find with --schema "EXP" and --experimental.',
      ['find', '*', '--schema', 'EXP', '--experimental'],
      {'stdout': ['EXP_TestExperimental1', 'EXP_TestExperimental2',
@@ -1562,6 +1577,49 @@ TEST_CASES = [
      ['find', '*Sub', '--subclass-of', 'TST_Person'],
      {'stdout': ['root/cimv2: TST_PersonSub'],
       'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    # Tests with --leaf-classes
+    ['Verify class command enumerate with --leaf-classes. test innows',
+     ['enumerate', '--di', '--no', '--leaf-classes'],
+     {'stdout': ['BLA_Person', 'EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4',
+                 'TST_FamilyCollection', 'TST_Indication',
+                 'TST_IndicationDeprecated', 'TST_IndicationExperimental',
+                 'TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
+                 'TST_MemberOfFamilyCollectionExp', 'TST_PersonClsDep',
+                 'TST_PersonDep', 'TST_PersonExp', 'TST_PersonExpProperty',
+                 'TST_PersonPropDep', 'TST_PersonSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --leaf-classes. test not-innows',
+     ['enumerate', '--di', '--no', '--leaf-classes'],
+     {'stdout': ['TST_Person'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --leaf-classes & --subclass-of',
+     ['enumerate', '--di', '--no', '--leaf-classes', '--subclass-of',
+      'TST_Person'],
+     {'stdout': ['TST_PersonClsDep', 'TST_PersonDep', 'TST_PersonExp'
+                 'TST_PersonExpProperty', 'TST_PersonPropDep', 'TST_PersonSub'],
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify class command enumerate with --leaf-classes & --subclass-of, '
+     'not-innows',
+     ['enumerate', '--di', '--no', '--leaf-classes', '--subclass-of',
+      'TST_Person'],
+     {'stdout': ['BLA_Person', 'EXP_TestExperimental1', 'EXP_TestExperimental2',
+                 'EXP_TestExperimental3', 'EXP_TestExperimental4',
+                 'TST_FamilyCollection', 'TST_Indication',
+                 'TST_IndicationDeprecated', 'TST_IndicationExperimental',
+                 'TST_Lineage', 'TST_MemberOfFamilyCollection',
+                 'TST_MemberOfFamilyCollectionDep',
+                 'TST_MemberOfFamilyCollectionExp'],
+      'test': 'not-innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
     #

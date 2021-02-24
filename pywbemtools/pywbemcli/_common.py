@@ -956,6 +956,37 @@ def sort_cimobjects(cim_objects):
     raise TypeError("Items of type {} cannot be sorted".format(type(tst_obj)))
 
 
+def get_leafclass_names(classes):
+    """
+    Get the leaf classes of the classes that are present in the
+    input list classes
+
+      Parameters:
+        classes: list of :class:`pywbem:CIMClass`
+
+      Returns
+        NocaseList of :term:`unicode string` with the names of all classes
+        that do not have a subclass
+
+    """
+    # Build dictionary of superclassname: classnames. This can be used to
+    # find subclasses of any class in the dictionary.
+    classname_dict = {}
+    for c in classes:
+        if c.classname not in classname_dict:
+            classname_dict[c.classname] = []
+        if c.superclass:
+            if c.superclass in classname_dict:
+                classname_dict[c.superclass].append(c.classname)
+            else:
+                classname_dict[c.superclass] = [c.classname]
+
+    # get list of all classnames with no value (i.e. no subclasses)
+    rtn_list = [key for key, value in six.iteritems(classname_dict)
+                if not value]
+    return NocaseList(rtn_list)
+
+
 def get_subclass_names(classes, classname=None, deep_inheritance=None):
     """
     Get class names that are subclasses of classname, including indirect

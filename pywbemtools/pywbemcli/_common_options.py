@@ -146,6 +146,13 @@ subclassof_filter_option = [              # pylint: disable=invalid-name
                  help=u'Filter the returned classes to return only classes '
                       u'that are a subclass of the option value.')]
 
+
+leafclass_filter_option = [              # pylint: disable=invalid-name
+    click.option('--leaf-classes', is_flag=True,
+                 default=None,
+                 help=u'Filter the returned classes to return only leaf '
+                      u'(classes; classes with no subclass.')]
+
 # List of the class filter options that are common to multiple class commands
 # Since the filters are in a list to allow them to be used individually, the
 # first item of each list must be used for the combined defintion that can
@@ -159,7 +166,8 @@ class_filter_options = [              # pylint: disable=invalid-name
     deprecated_filter_option[0],
     since_filter_option[0],
     schema_filter_option[0],
-    subclassof_filter_option[0]
+    subclassof_filter_option[0],
+    leafclass_filter_option[0]
 ]
 
 help_option = [              # pylint: disable=invalid-name

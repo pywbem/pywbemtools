@@ -26,18 +26,16 @@ from __future__ import absolute_import, print_function
 from collections import namedtuple
 import click
 
-
 from pywbem._nocasedict import NocaseDict
 
-from pywbem import Error, CIMClassName, CIMError, ModelError, \
-    CIM_ERR_NOT_FOUND, CIMClass
+from pywbem import Error, CIMClassName, CIMError, ModelError, CIM_ERR_NOT_FOUND
 
 from .pywbemcli import cli
 from ._common import filter_namelist, \
     resolve_propertylist, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     output_format_is_table, format_table, process_invokemethod, \
     pywbem_error_exception, warning_msg, validate_output_format, \
-    get_subclass_names, depending_classnames
+    get_subclass_names, depending_classnames, get_leafclass_names
 
 from ._display_cimobjects import display_cim_objects
 
@@ -570,6 +568,8 @@ def _build_filters_dict(conn, ns, options):
 
     if options['subclass_of'] is not None:
         filters['subclass_of'] = FILTERDEF(options['subclass_of'], None, None)
+    if options['leaf_classes'] is not None:
+        filters['leaf_classes'] = FILTERDEF(options['leaf_classes'], None, None)
     return filters
 
 
@@ -653,6 +653,8 @@ def _filter_classes(classes, filters, names_only, iq):
     # Test all classes in the input property for the defined filters.
     filtered_classes = []
     subclass_names = []
+    # Build list of subclass names that will be used later as a filter on the
+    # classes to be returned
     if 'subclass_of' in filters:
         try:
             subclass_names = get_subclass_names(
@@ -664,10 +666,24 @@ def _filter_classes(classes, filters, names_only, iq):
                 'Classname {} for "subclass-of" not found in returned classes.'
                 .format(filters['subclass_of'].optionvalue))
 
-    for cls in classes:
-        assert isinstance(cls, CIMClass)
-        show_class_list = []
+    # Build a list of leaf class names that will be used later as a filter on
+    # the classes to be returned.
+    if 'leaf_classes' in filters:
+        try:
+            if subclass_names:
+                clsx = [cls for cls in classes if cls.classname in
+                        subclass_names]
+                leafclass_names = get_leafclass_names(clsx)
+            else:
+                leafclass_names = get_leafclass_names(classes)
 
+        except ValueError:
+            raise click.ClickException(
+                'Classname {} for "leaf_classes-of" not found in returned '
+                'classes.'.format(filters['leaf_classes'].optionvalue))
+
+    for cls in classes:
+        show_class_list = []
         for filter_name, filter_ in filters.items():
             if filter_name == 'qualifier':
                 option_value = filter_.optionvalue
@@ -689,6 +705,8 @@ def _filter_classes(classes, filters, names_only, iq):
                     cls.classname.lower().startswith(filter_.optionvalue))
             elif filter_name == 'subclass_of':
                 show_class_list.append(cls.classname in subclass_names)
+            elif filter_name == 'leaf_classes':
+                show_class_list.append(cls.classname in leafclass_names)
 
             else:
                 assert False  # Future for other test_types

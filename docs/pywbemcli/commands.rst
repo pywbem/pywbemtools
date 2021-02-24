@@ -337,27 +337,38 @@ Filter option name                          Component filtered
 ``--indication``/``--no-indication``        Indications qualifier(class)
 ``--experimental``/``--no-experimental``    Experimental qualifier(class)
 ``--deprecated``/``--no-deprecated``        Deprecated qualifier (any class element)
-``--since `<CIM_Version_string>``           Version qualifier GE <CIM_Version_string> (see Note 2)
-``--schema `<schema_string>``               Schema component of classname equality(see Note 3)
-``--subclasses `<classname>``               Subclasses of <classname>.
+``--since <CIM_Version_string>``            Version qualifier GE <CIM_Version_string> (see Note 2)
+``--schema <schema_string>``                Schema component of classname equality(see Note 3)
+``--subclasses <classname>``                Subclasses of <classname>.
+``--leaf-classes``                          Classes with no subclass.
 ==========================================  =======================================
 
 1. The filters defined as ``--...``/``--no-...`` allow testing for the existence
    of the condition (association qualifier exists) or the non-existence(association
-   qualifier does not exist on the class). When neither definition of the option is defined the
-   association qualifier is ignored in the filtering. This applies to boolean
-   qualifier declarations.
+   qualifier does not exist on the class). When neither definition of the
+   option is defined the association qualifier is ignored in the filtering.
+   This applies to boolean qualifier declarations.
 2. The CIM version string value in the Version qualifier is defined as 3 integers
    separated by periods  (ex. 2.14.0). All 3 integers must exist.
 3. The schema component is True if the schema component of classname (characters
    before "_" match <schema_string>). Ex --schema "CIM"
+4. The ``--leaf-classes`` filter can be important because the pywbem MOF compiler
+   can compile all dependent classes given only the leaf classes.
 
-If multiple filter options are applied, all of the options must be true for
-the class to be displayed.
+If multiple filter options are applied, all of the boolean options must be true for
+the class to be displayed and only the classes that pass non-boolean filters
+(ex. ``--schema CIM``) for the classes to be displayed.
+
+Thus, for example:
+
+* the combination of ``--subclass-of CIM_blah`` and
+  ``--leaf-classes`` will return all leaf classes that are a subclass of ``CIM_Blah``.
+* ``--association`` and ``no-experimental`` will display only classes that have
+  the Association qualifier set and the Experimental qualifier not set.
 
 The following example displays classnames (``--no``) that are not associations
 (``--no-association``).  The use of ``--deep-inheritance`` returns the complete
-sef of classes in the namespace rather than just direct subclasses (in this case
+set of classes in the namespace rather than just direct subclasses (in this case
 the root classes).
 
 .. code-block:: text
