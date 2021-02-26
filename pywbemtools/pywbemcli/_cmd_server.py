@@ -234,10 +234,11 @@ def cmd_server_brand(context):
     """
     Display product and version info of the current WBEM server
     """
+    wbem_server = context.pywbem_server.wbem_server
     output_format = validate_output_format(context.output_format, 'TEXT')
 
     try:
-        brand = context.wbem_server.brand
+        brand = wbem_server.brand
         context.spinner_stop()
 
         display_text(brand, output_format)
@@ -250,13 +251,13 @@ def cmd_server_info(context):
     """
     Display general overview of info from current WBEM server
     """
+    wbem_server = context.pywbem_server.wbem_server
     output_format = validate_output_format(context.output_format, 'TABLE')
 
     try:
-        # execute the namespaces to force contact with server before
+        # Execute the namespaces to force contact with server before
         # turning off the spinner.
-        server = context.wbem_server
-        namespaces = sorted(server.namespaces)
+        namespaces = sorted(wbem_server.namespaces)
         context.spinner_stop()
 
         rows = []
@@ -264,8 +265,8 @@ def cmd_server_info(context):
         sep = '\n' if namespaces and len(namespaces) > 3 else ', '
         namespaces = sep.join(namespaces)
 
-        rows.append([server.brand, server.version,
-                     server.interop_ns,
+        rows.append([wbem_server.brand, wbem_server.version,
+                     wbem_server.interop_ns,
                      namespaces])
         click.echo(format_table(rows, headers,
                                 title='Server General Information',
@@ -279,6 +280,7 @@ def cmd_server_add_mof(context, options):
     """
     Compile MOF and add/update CIM objects in the server.
     """
+    conn = context.pywbem_server.conn
 
     try:
 
@@ -288,9 +290,9 @@ def cmd_server_add_mof(context, options):
         # MOFWBEMConnection writes resulting CIM objects to a local store
         # but reads from the connection.
         if options['dry_run']:
-            comp_handle = MOFWBEMConnection(conn=context.conn)
+            comp_handle = MOFWBEMConnection(conn=conn)
         else:
-            comp_handle = context.conn
+            comp_handle = conn
 
         if options['dry_run']:
             print('Executing in dry-run mode')
@@ -339,6 +341,7 @@ def cmd_server_remove_mof(context, options):
     """
     Compile MOF and remove CIM objects from the server.
     """
+    conn = context.pywbem_server.conn
 
     try:
 
@@ -347,7 +350,7 @@ def cmd_server_remove_mof(context, options):
         # Define the connection to be used by the MOF compiler.
         # MOFWBEMConnection writes resulting CIM objects to a local store
         # but reads from the connection.
-        comp_handle = MOFWBEMConnection(conn=context.conn)
+        comp_handle = MOFWBEMConnection(conn=conn)
 
         if options['dry_run']:
             print('Executing in dry-run mode')

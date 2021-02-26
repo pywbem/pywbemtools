@@ -186,17 +186,17 @@ def cmd_profile_list(context, options):
     """
     output_format = validate_output_format(context.output_format, 'TABLE')
 
-    server = context.wbem_server
+    wbem_server = context.pywbem_server.wbem_server
 
     organization = options['organization']
     profile_name = options['profile']
     try:
-        found_server_profiles = server.get_selected_profiles(
+        found_server_profiles = wbem_server.get_selected_profiles(
             registered_org=organization,
             registered_name=profile_name)
 
-        org_vm = ValueMapping.for_property(server,
-                                           server.interop_ns,
+        org_vm = ValueMapping.for_property(wbem_server,
+                                           wbem_server.interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
         rows = []
@@ -229,16 +229,16 @@ def cmd_profile_centralinsts(context, options):
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
 
-    server = context.wbem_server
+    wbem_server = context.pywbem_server.wbem_server
     organization = options['organization']
     profile_name = options['profile']
     try:
-        found_server_profiles = server.get_selected_profiles(
+        found_server_profiles = wbem_server.get_selected_profiles(
             registered_org=organization,
             registered_name=profile_name)
 
-        org_vm = ValueMapping.for_property(server,
-                                           server.interop_ns,
+        org_vm = ValueMapping.for_property(wbem_server,
+                                           wbem_server.interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
         rows = []
@@ -246,7 +246,7 @@ def cmd_profile_centralinsts(context, options):
             pi = get_profile_info(org_vm, inst)
             row = [":".join(pi)]
             try:
-                ci = server.get_central_instances(
+                ci = wbem_server.get_central_instances(
                     inst.path,
                     central_class=options['central_class'],
                     scoping_class=options['scoping_class'],

@@ -324,7 +324,10 @@ def is_default_connection(context, connection):
 def is_current_connection(context, connection):
     """Returns True if connection named name is the default connection"""
 
-    current_connection = context.pywbem_server or None
+    if context.pywbem_server_exists():
+        current_connection = context.pywbem_server
+    else:
+        current_connection = None
     if current_connection and current_connection.name == connection.name:
         return True
     return False
@@ -398,7 +401,8 @@ def get_current_connection_name(context):
     Return the name of the current connection or None if there is no
     current connection
     """
-    return context.pywbem_server.name if context.pywbem_server else None
+    return context.pywbem_server.name if context.pywbem_server_exists() \
+        else None
 
 
 def pick_connection(name, context, connections_repo):
@@ -465,6 +469,7 @@ def test_pull_operations(context, test_class):
         'NOT SUPPORTED, or the exception if any exception other than
         CIMError(CIM_ERR_NOT_SUPPORTED)
     """
+
     def cimcall(request, *pargs, **kwargs):
         try:
             request(*pargs, **kwargs)
@@ -476,8 +481,10 @@ def test_pull_operations(context, test_class):
 
             return er
 
+    conn = context.pywbem_server.conn
+
     # Find a valid instance to use in tests.
-    test_instances = context.conn.EnumerateInstanceNames(test_class)
+    test_instances = conn.EnumerateInstanceNames(test_class)
     if not test_instances:
         raise click.ClickException("No instances found for test class {}".
                                    format(test_class))
@@ -485,25 +492,25 @@ def test_pull_operations(context, test_class):
 
     # execute each command and append the results to rows as a tuple
     rows = []
-    result = cimcall(context.conn.OpenEnumerateInstances, test_class)
+    result = cimcall(conn.OpenEnumerateInstances, test_class)
     rows.append(('OpenEnumerateInstances', result))
 
-    result = cimcall(context.conn.OpenEnumerateInstancePaths, test_class)
+    result = cimcall(conn.OpenEnumerateInstancePaths, test_class)
     rows.append(('OpenEnumerateInstancePaths', result))
 
-    result = cimcall(context.conn.OpenAssociatorInstances, test_instance)
+    result = cimcall(conn.OpenAssociatorInstances, test_instance)
     rows.append(('OpenAssociatorInstances', result))
 
-    result = cimcall(context.conn.OpenAssociatorInstancePaths, test_instance)
+    result = cimcall(conn.OpenAssociatorInstancePaths, test_instance)
     rows.append(('OpenAssociatorInstancePaths', result))
 
-    result = cimcall(context.conn.OpenReferenceInstances, test_instance)
+    result = cimcall(conn.OpenReferenceInstances, test_instance)
     rows.append(('OpenReferenceInstances', result))
 
-    result = cimcall(context.conn.OpenReferenceInstancePaths, test_instance)
+    result = cimcall(conn.OpenReferenceInstancePaths, test_instance)
     rows.append(('OpenReferenceInstancePaths', result))
 
-    result = cimcall(context.conn.OpenQueryInstances, "DMTF:CQL",
+    result = cimcall(conn.OpenQueryInstances, "DMTF:CQL",
                      "SELECT * FROM CIM_ManagedElement")
     rows.append(('OpenQueryInstances', result))
 
@@ -600,24 +607,24 @@ def cmd_connection_test(context, options):
     operation. Even if class operations are not supported, a return from the
     server such as "unsupported" indicates the server exists.
     """
-
+    conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['TABLE',
                                                                    'TEXT'])
 
     try:
-        classnames = context.conn.EnumerateClassNames()
+        classnames = conn.EnumerateClassNames()
         context.spinner_stop()
     except CIMError as ce:
         # class request failed, try instance request
         try:
             test_classname = 'CIM_ManagedElement'
             if ce.status_code == 'CIM_ERR_NOT_SUPPORTED':
-                context.conn.EnumerateInstances(test_classname)
+                conn.EnumerateInstances(test_classname)
         except Error as er:
             raise click.ClickException('Cannot interact with WBEM Server '
                                        '{}. EnumerateInstanceNames exception '
                                        '{} and EnumerateInstances {} exception '
-                                       ' {} '.format(context.conn.url,
+                                       ' {} '.format(conn.url,
                                                      ce.status_code,
                                                      test_classname,
                                                      er))
@@ -631,7 +638,7 @@ def cmd_connection_test(context, options):
             test_class = classnames[0]
     else:
         raise click.ClickException('No classes found to test in namespace {}.'.
-                                   format(context.conn.defaultnamespace))
+                                   format(conn.defaultnamespace))
 
     if options['test_pull']:
         result = test_pull_operations(context, test_class)
@@ -641,16 +648,16 @@ def cmd_connection_test(context, options):
             click.echo(format_table(
                 result, headers,
                 title='Pull Operation test results (Connection OK): {}'.
-                format(context.conn.host),
+                format(conn.host),
                 table_format=output_format))
         else:
-            click.echo('Connection OK: {}'.format(context.conn.host))
+            click.echo('Connection OK: {}'.format(conn.host))
 
             for row in result:
                 click.echo("{}: {}".format(row[0], row[1]))
 
     else:
-        click.echo('Connection OK: {}'.format(context.conn.host))
+        click.echo('Connection OK: {}'.format(conn.host))
 
 
 def cmd_connection_select(context, name, options):
@@ -679,6 +686,12 @@ def cmd_connection_select(context, name, options):
     # Update the root context making this context the basis for future
     # commands in the current interactive session
     ContextObj.update_root_click_context(new_ctx)
+
+    # close any existing connection.
+    # TODO/KS: Validate that the first test is required.
+    if context.pywbem_server_exists():
+        if context.is_connected:
+            context.pywbem_server.disconnect()
     context.spinner_stop()
     if options['default']:
         connections_repo.default_connection_name = name
@@ -769,7 +782,10 @@ def cmd_connection_list(context, options):
             rows.append(build_row(options, name, svr))
 
     # add current connection if not in persistent connections
-    current_connection = context.pywbem_server or None
+    if context.pywbem_server_exists():
+        current_connection = context.pywbem_server
+    else:
+        current_connection = None
 
     if current_connection:
         cname = current_connection.name

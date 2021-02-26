@@ -224,7 +224,10 @@ def test_conn_exists(context):
     Exception:
        click.Exception if no current server.
     """
-    if not context.conn:
+    # TODO/KS: Is this necessary since we should be protecting with classes
+    #          or does the pywbem_server access provide same protection??
+    conn = context.pywbem_server.conn
+    if not conn:
         raise click.ClickException(
             'No server defined in current context.')
 
@@ -233,9 +236,10 @@ def get_objmgr_inst(context):
     """
     Return the state of statistics gathering on the server.
     """
-    conn = context.conn
+    conn = context.pywbem_server.conn
+    wbem_server = context.pywbem_server.wbem_server
     try:
-        interop_ns = context.wbem_server.interop_ns
+        interop_ns = wbem_server.interop_ns
     except Error as er:
         raise click.ClickException(
             'Cannot access interop namespace. Exception: {}'.format(er))
@@ -284,9 +288,10 @@ def set_server_statistics(context, desired_state):
       desired_state (:class": `boolean)
         Value desired for the GatherStatisticalData property
     """
-    conn = context.conn
+    conn = context.pywbem_server.conn
+    wbem_server = context.pywbem_server.wbem_server
 
-    interop_ns = context.wbem_server.interop_ns
+    interop_ns = wbem_server.interop_ns
 
     objmgr = get_objmgr_inst(context)
 
@@ -407,7 +412,8 @@ def cmd_statistics_reset(context):
     """
     test_conn_exists(context)
 
-    context.conn.statistics.reset()
+    conn = context.pywbem_server.conn
+    conn.statistics.reset()
 
     context.spinner_stop()
     click.echo("Pywbemcli statistics reset")
@@ -419,10 +425,11 @@ def cmd_statistics_show(context):
     display the statistics
     """
     test_conn_exists(context)
+    conn = context.pywbem_server.conn
 
     context.spinner_stop()
 
-    click.echo(context.format_statistics(context.conn.statistics, context))
+    click.echo(context.format_statistics(conn.statistics, context))
 
 
 def cmd_statistics_server_show(context):
@@ -432,6 +439,7 @@ def cmd_statistics_server_show(context):
     This command may fail if the WBEM server has not implemented the
     management of detailed statistics.
     """
+    conn = context.pywbem_server.conn
 
     def avg_value(value_, num_ops):
         """
@@ -476,6 +484,8 @@ def cmd_statistics_server_show(context):
         avg = avg_value(milliseconds, num_ops)
         return avg
 
+    conn = context.pywbem_server.conn
+    wbem_server = context.pywbem_server.wbem_server
     output_fmt = validate_output_format(context.output_format, 'TABLE')
 
     objmgr = get_objmgr_inst(context)
@@ -497,17 +507,16 @@ def cmd_statistics_server_show(context):
     # We must find the
     # namespace containing statistical data since apparently not clearly
     # documented in specs. Ex. Pegasus has in in root/cimv2 in test build
-    namespaces = context.wbem_server.namespaces
+    namespaces = wbem_server.namespaces
     results = None
     stats_namespace = None
     for ns in namespaces:
         try:
-            _ = context.conn.GetClass(CIMOM_STATISTICAL_DATA_CLASS,
-                                      namespace=ns)
+            _ = conn.GetClass(CIMOM_STATISTICAL_DATA_CLASS, namespace=ns)
         except Error:
             continue
         try:
-            results = context.conn.PyWbemcliEnumerateInstances(
+            results = conn.PyWbemcliEnumerateInstances(
                 ClassName=CIMOM_STATISTICAL_DATA_CLASS,
                 namespace=ns,
                 LocalOnly=False,
@@ -531,12 +540,11 @@ def cmd_statistics_server_show(context):
                    format(CIMOM_STATISTICAL_DATA_CLASS, stats_namespace))
 
     try:
-        op_type_vm = ValueMapping.for_property(
-            context.conn, stats_namespace,
-            CIMOM_STATISTICAL_DATA_CLASS,
-            'OperationType')
+        op_type_vm = ValueMapping.for_property(conn, stats_namespace,
+                                               CIMOM_STATISTICAL_DATA_CLASS,
+                                               'OperationType')
 
-        results = context.conn.PyWbemcliEnumerateInstances(
+        results = conn.PyWbemcliEnumerateInstances(
             ClassName=CIMOM_STATISTICAL_DATA_CLASS,
             namespace=stats_namespace,
             LocalOnly=False,

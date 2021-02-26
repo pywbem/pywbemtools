@@ -229,7 +229,7 @@ TEST_CASES = [
      {'general': ['-s', 'httpx://blah'],
       'cmdgrp': 'class',
       'args': ['get', 'blah']},
-     {'stderr': ['Error: Invalid scheme on server argument. httpx://blah Use '
+     {'stderr': ['Error: Invalid scheme on server argument: httpx://blah. Use '
                  '"http" or "https"'],
       'rc': 1,
       'test': 'in'},
@@ -686,15 +686,12 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection without server definition and command that '
-     ' requires a connection actually fails.',
+    ['Verify connection without server definition and command that requires a '
+     'connection actually fails.',
      {'cmdgrp': 'class',
       'args': ['enumerate']},
-     {'stderr': ['No server specified for a command that requires a WBEM '
-                 'server. To specify a server, use the "--server", '
-                 '"--mock-server", or "--name" general options, or set the '
-                 'corresponding environment variables, or in interactive mode '
-                 'use "connection select"'],
+     {'stderr': ['No current server for command "class enumerate" that '
+                 'requires a WBEM server.'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
@@ -973,7 +970,8 @@ TEST_CASES = [
       'test': 'innows'},
      None, FAIL],  # TODO: this test fails on windows. Outputs don't compare'
 
-    ['Verify Change --name in interactive mode, name invalid. command',
+    ['Verify Change --name invalid in interactive mode. command no connections '
+     'file',
      {'general': ['--name', 'NAMEDOESNOTEXIST'],
       'args': ['show'],
       'cmdgrp': 'connection',
@@ -985,10 +983,13 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify Change --name in interactive mode, name invalid. stdin',
+    ['Verify Change --name invalid in interactive mode . stdin. Connection '
+     'file exists and we delete',
      {'general': ['--server', 'http://blah'],
       # args not allowed in interactive mode
-      'stdin': ['--name NAMEDOESNOTEXIST connection show'],
+      'stdin': ['connection save argh',
+                '--name NAMEDOESNOTEXIST connection show',
+                'connection delete argh'],
       'cmdgrp': None,
       },
      {'stderr': ['Connection definition',
@@ -1236,11 +1237,11 @@ TEST_CASES = [
     #  Test that bad mock_error file names do not cause Abort but bad MOF
     #  or python script do cause Abort
     #
-
+    # TODO: This may leave connection file behind or use existing one
     ['Verify interactive create mock with bad file name does not fail.',
-     {'general': [],
-      'stdin': ['--server http://blah --user fred --password fred '
-                ' connection save connectiontoprovestdincontinues',
+     {'general': ['--server', 'http://blah', '--user', 'fred', '--password',
+                  'fred', '-C', 'tmpconfig.yaml'],
+      'stdin': ['connection save connectiontoprovestdincontinues',
                 '--mock-server DoesNotExist.mof class enumerate',
                 '-m DoesNotExist.py class enumerate',
                 'connection select connectiontoprovestdincontinues',
@@ -1262,9 +1263,9 @@ TEST_CASES = [
     # --mock-server ... class enumerate inserts the filepath without
     # the backslashes. This is a windows issue, and problem occurs for both
     # python 2 and 3
-    ['Verify interactive MOF or PY failures causes Abort.',
+    ['Verify interactive MOF or PY failures don"t cause Abort.',
      {'general': [],
-      'stdin': ['--server http://blah --user fred --password fred ',
+      'stdin': ['--server http://blah --user fred --password fred '
                 'connection save fred',
                 '--mock-server {} class enumerate'.format(BAD_MOF_FILE_PATH),
                 'connection select fred',
@@ -1272,7 +1273,7 @@ TEST_CASES = [
                 'connection delete fred'],
       'platform': 'win32'},  # ignore this platform.  See comments above
      {'stdout': ['Deleted connection "fred"'],
-      'rc': 1,
+      'rc': 0,
       'test': 'not-innows'},
      None, OK],
 
@@ -1290,7 +1291,7 @@ TEST_CASES = [
     ['Verify operation that makes request to WBEM server fails with no server.',
      {'args': ['enumerate'],
       'cmdgrp': 'class', },
-     {'stderr': "No server specified for a command that requires a WBEM server",
+     {'stderr': "No current server for command ",
       'rc': 1,
       'test': 'innows'},
      None, OK],
