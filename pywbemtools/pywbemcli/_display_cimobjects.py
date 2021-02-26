@@ -382,6 +382,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
         list of strings where each string is a row in the table and each
         item in a row is a cell entry
     """
+    conn = context.pywbem_server.conn if context else None
     # Avoid crash deeper in code if max_cell_width is None.
     if max_cell_width is None:
         max_cell_width = DEFAULT_MAX_CELL_WIDTH
@@ -424,8 +425,8 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                     except KeyError:
                         try:
                             valuemapping = ValueMapping.for_property(
-                                context.conn,
-                                context.conn.default_namespace,
+                                conn,
+                                conn.default_namespace,
                                 inst.classname,
                                 name)
                         except ValueError:
@@ -465,6 +466,7 @@ def _display_instances_as_table(insts, table_width, table_format,
     instance) are shown with both the actual property value and the mapped
     value in parenthesis.
     """
+    conn = context.pywbem_server.conn if context else None
 
     if table_width is None:
         table_width = get_terminal_width()
@@ -488,7 +490,8 @@ def _display_instances_as_table(insts, table_width, table_format,
     else:
         max_cell_width = table_width
 
-    # TODO: Decide whether and how the showing of units should be controlled.
+    # TODO Future: Decide whether and how the showing of units should be
+    #              controlled.
     show_units = True
 
     # Retrieve all creation classes of the instances in order to get
@@ -508,7 +511,7 @@ def _display_instances_as_table(insts, table_width, table_format,
                 break
             namespace = inst.path.namespace
             try:
-                class_obj = context.conn.GetClass(
+                class_obj = conn.GetClass(
                     classname, namespace=namespace,
                     IncludeQualifiers=True, LocalOnly=False)
             except CIMError as exc:

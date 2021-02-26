@@ -187,11 +187,12 @@ def cmd_namespace_list(context):
     """
     List the namespaces on the WBEM server.
     """
+    wbem_server = context.pywbem_server.wbem_server
     output_format = validate_output_format(
         context.output_format,
         ['TABLE', 'TEXT'], default_format=DEFAULT_TABLE_FORMAT)
     try:
-        namespaces = context.wbem_server.namespaces
+        namespaces = wbem_server.namespaces
         namespaces.sort()
         context.spinner_stop()
         if output_format_is_table(output_format):
@@ -209,8 +210,9 @@ def cmd_namespace_create(context, namespace):
     """
     Create a namespace on the WBEM server.
     """
+    wbem_server = context.pywbem_server.wbem_server
     try:
-        context.wbem_server.create_namespace(namespace)
+        wbem_server.create_namespace(namespace)
         context.spinner_stop()
         click.echo('Created namespace {}'.format(namespace))
     except Error as er:
@@ -225,7 +227,10 @@ def cmd_namespace_delete(context, namespace, options):
     dry_run = options['dry_run']
     dry_run_prefix = "Dry run: " if dry_run else ""
 
-    if namespace == context.wbem_server.interop_ns:
+    wbem_server = context.pywbem_server.wbem_server
+    conn = context.pywbem_server.conn
+
+    if namespace == wbem_server.interop_ns:
         raise click.ClickException(
             "Cannot delete namespace {} because it is the Interop "
             "namespace".format(namespace))
@@ -236,14 +241,14 @@ def cmd_namespace_delete(context, namespace, options):
     # WBEM servers that do not support class operations (e.g. SFCB) will
     # raise a CIMError with status CIM_ERR_NOT_SUPPORTED.
     try:
-        top_class_paths = context.conn.EnumerateClassNames(
+        top_class_paths = conn.EnumerateClassNames(
             namespace=namespace, ClassName=None, DeepInheritance=False)
     except Error as exc:
         raise pywbem_error_exception(
             exc, "Cannot enumerate top-level class names in namespace {}".
             format(namespace))
     try:
-        qualifiers = context.conn.EnumerateQualifiers(namespace=namespace)
+        qualifiers = conn.EnumerateQualifiers(namespace=namespace)
     except Error as exc:
         raise pywbem_error_exception(
             exc, "Cannot enumerate qualifier types in namespace {}".
@@ -261,12 +266,12 @@ def cmd_namespace_delete(context, namespace, options):
         # The following is rather long-running, so we do not want it to be used
         # before the previous checks, and we want the spinner to be running
         # while it is being executed.
-        classnames_depsorted = all_classnames_depsorted(namespace, context.conn)
+        classnames_depsorted = all_classnames_depsorted(namespace, conn)
 
         context.spinner_stop()
         for classname in classnames_depsorted:
             try:
-                inst_paths = context.conn.EnumerateInstanceNames(
+                inst_paths = conn.EnumerateInstanceNames(
                     namespace=namespace, ClassName=classname)
             except Error as exc:
                 raise pywbem_error_exception(
@@ -281,7 +286,7 @@ def cmd_namespace_delete(context, namespace, options):
                     continue
                 if not dry_run:
                     try:
-                        context.conn.DeleteInstance(inst_path)
+                        conn.DeleteInstance(inst_path)
                     except Error as exc:
                         raise pywbem_error_exception(
                             exc, "Cannot delete instance {}".format(inst_path))
@@ -290,7 +295,7 @@ def cmd_namespace_delete(context, namespace, options):
         for classname in classnames_depsorted:
             if not dry_run:
                 try:
-                    context.conn.DeleteClass(
+                    conn.DeleteClass(
                         namespace=namespace, ClassName=classname)
                 except Error as exc:
                     raise pywbem_error_exception(
@@ -305,7 +310,7 @@ def cmd_namespace_delete(context, namespace, options):
             qualifiername = qualifier.name
             if not dry_run:
                 try:
-                    context.conn.DeleteQualifier(
+                    conn.DeleteQualifier(
                         namespace=namespace, QualifierName=qualifiername)
                 except Error as exc:
                     raise pywbem_error_exception(
@@ -317,7 +322,7 @@ def cmd_namespace_delete(context, namespace, options):
     context.spinner_stop()
     if not dry_run:
         try:
-            context.wbem_server.delete_namespace(namespace)
+            wbem_server.delete_namespace(namespace)
         except Error as exc:
             raise pywbem_error_exception(
                 exc, "Cannot delete namespace {}".format(namespace))
@@ -328,9 +333,10 @@ def cmd_namespace_interop(context):
     """
     Display the Interop namespace on the WBEM server.
     """
+    wbem_server = context.pywbem_server.wbem_server
     output_format = validate_output_format(context.output_format, 'TEXT')
     try:
-        interop_ns = context.wbem_server.interop_ns
+        interop_ns = wbem_server.interop_ns
         context.spinner_stop()
         display_text(interop_ns, output_format)
     except Error as er:

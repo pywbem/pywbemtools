@@ -136,12 +136,13 @@ def cmd_qualifier_get(context, qualifiername, options):
     """
     Execute the command for get qualifier and display result
     """
+    conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
 
     try:
-        qual_decl = context.conn.GetQualifier(qualifiername,
-                                              namespace=options['namespace'])
+        qual_decl = conn.GetQualifier(qualifiername,
+                                      namespace=options['namespace'])
 
         display_cim_objects(context, qual_decl, output_format)
 
@@ -153,9 +154,9 @@ def cmd_qualifier_delete(context, qualifiername, options):
     """
     Execute the command for delete qualifier and display result
     """
+    conn = context.pywbem_server.conn
     try:
-        context.conn.DeleteQualifier(qualifiername,
-                                     namespace=options['namespace'])
+        conn.DeleteQualifier(qualifiername, namespace=options['namespace'])
         if context.verbose:
             context.spinner_stop()
             click.echo('Deleted qualifier type {}.'.format(qualifiername))
@@ -167,11 +168,12 @@ def cmd_qualifier_enumerate(context, options):
     """
     Execute the command for enumerate qualifiers and desplay the result.
     """
+    conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
 
     try:
-        qual_decls = sort_cimobjects(context.conn.EnumerateQualifiers(
+        qual_decls = sort_cimobjects(conn.EnumerateQualifiers(
             namespace=options['namespace']))
 
         display_cim_objects(context, qual_decls, output_format,

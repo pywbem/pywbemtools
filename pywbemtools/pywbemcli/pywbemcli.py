@@ -78,18 +78,43 @@ CONTEXT_SETTINGS = dict(
 ###########################################################################
 
 
-def validate_connections_file(connections_repo):
+def _validate_connection_name(connections_repo, connection_name):
     """
-    Test for existence of a connections file and abort if it does not exist.
-    Abort click if file does not exist
+    Validate that connection name exists in the connection_repo and that
+    the connection name can be retrieved.
     """
-    if not connections_repo.file_exists():
-        click.echo('Connections file does not exist: {}'.format(
-            connections_repo.connections_file), err=True)
+    try:
+        _ = connections_repo[connection_name]
+    except KeyError:
+        raise click.ClickException(
+            'Connection definition "{}" not found in connections '
+            'file "{}"'.
+            format(connection_name, connections_repo.connections_file))
+    except ConnectionsFileError as cfe:
+        click.echo('Fatal error: {0}: {1}'.
+                   format(cfe.__class__.__name__, cfe),
+                   err=True)
         raise click.Abort()
 
 
-def execute_startup_script(file_path, verbose):
+def _validate_connections_file(connections_repo, abort=False):
+    """
+    Test for existence of a connections file.
+    Abort click if file does not exist and abort is True.  If it does not exist
+    and abort is False, execute ClickException
+    """
+    if not connections_repo.file_exists():
+        if abort:
+            click.echo('Connections file does not exist: {}'.format(
+                connections_repo.connections_file), err=True)
+            raise click.Abort()
+
+        raise click.ClickException(
+            'Connections file does not exist: {}'.format(
+                connections_repo.connections_file))
+
+
+def _execute_startup_script(file_path, verbose):
     """
     Execute the python script. This  executes the script defined in file_path.
     The purpose of this code is to execute test scripts at startup.
@@ -163,7 +188,7 @@ def _resolve_mock_server(mock_server):
     return resolved_mock_server
 
 
-def set_default_if_empty_str(tst_str, default=None):
+def _set_default_if_empty_str(tst_str, default=None):
     """
     Return None if str is an empty string or return str. Used to test for
     general options that reset with value of "" and reset to either None
@@ -180,6 +205,127 @@ def set_default_if_empty_str(tst_str, default=None):
         None or the value of the default parameter
     """
     return default if tst_str == "" else tst_str
+
+
+def _validate_no_server_option_conficts(server, connection_name, mock_server):
+    """
+    Validate that only one of the general options server, connection_name,
+    or resolved_mock_server contains data since only one is allowed as the
+    means to define a server.
+
+    Raises:
+      click.ClickException if more that one of the defined parameters is not
+      None.
+    """
+    if server and connection_name:
+        raise click.ClickException(
+            'Conflicting server definitions: name: {}, server: {}'.
+            format(connection_name, server))
+
+    # Simultaneous mock_server and server fails
+    if server and mock_server:
+        raise click.ClickException(
+            'Conflicting server definitions: server: {}, mock-server: {}'.
+            format(server, ', '.join(mock_server)))
+
+    # Simultaneous mock_server and connection_name: Generate Exception.
+    if mock_server and connection_name:
+        raise click.ClickException(
+            'Conflicting server definitions: mock-server: {}, name: {}'.
+            format(', '.join(mock_server), connection_name))
+
+
+def _create_server_instance(server, connection_name, resolved_default_namespace,
+                            user, password, resolved_timeout,
+                            resolved_use_pull, resolved_pull_max_cnt,
+                            resolved_verify,
+                            certfile, keyfile, resolved_ca_certs,
+                            resolved_mock_server, connections_repo,
+                            conditional_options,
+                            verbose):
+    """
+    Create a PywbemServer instance from the cli arguments and return
+    that object.  This method depends on using variables from the
+    enclosing function. If the arguments to create a server do not exist
+    no server is created.
+
+    This method used only during pywbemcli statup to process initial
+    general options and when interactive mode sets new server from the
+    --name option.
+
+    NOTE: connection_name is passed to this function because the
+    ClickException treats it as a reference before assignment if using the
+    connection_name from the enclosing scope.
+    """
+    if server or resolved_mock_server:
+        connection_name = 'not-saved'
+        pywbem_server = PywbemServer(server,
+                                     resolved_default_namespace,
+                                     name=connection_name,
+                                     user=user,
+                                     password=password,
+                                     timeout=resolved_timeout,
+                                     use_pull=resolved_use_pull,
+                                     pull_max_cnt=resolved_pull_max_cnt,
+                                     verify=resolved_verify,
+                                     certfile=certfile,
+                                     keyfile=keyfile,
+                                     ca_certs=resolved_ca_certs,
+                                     mock_server=resolved_mock_server)
+    else:  # Server and mock_server were not specified
+        # If name cmd line option, get get name from the connections
+        # repo or use default name if it exists.
+        if connection_name:
+            _validate_connections_file(connections_repo, abort=True)
+            _validate_connection_name(connections_repo, connection_name)
+
+        # No connection name specified, try default connection name from
+        # connections file
+        else:
+            # Get the default_connection definition
+            try:
+                if connections_repo.file_exists():
+                    connection_name = \
+                        connections_repo.default_connection_name
+
+                    # Test if the default connection name is actually
+                    # in the repo.  If not reset the default connection
+                    # name to None and continue.
+                    # This should never occur unless connection file
+                    # is corrupted.
+                    if connection_name and connection_name not in \
+                            connections_repo:
+                        connections_repo.default_connection_name = None
+                        raise click.ClickException(
+                            'Default connection name: "{}" not found in '
+                            'connections file "{}"; default connection '
+                            'name is cleared.'.
+                            format(connection_name,
+                                   connections_repo.connections_file))
+                    if verbose:
+                        click.echo('Current connection: "{}"'
+                                   .format(connection_name))
+            except ConnectionsFileError as cfc:
+                click.echo("{}, {}". format(cfc.__class__.__name__, cfc),
+                           err=True)
+                raise click.Abort()
+
+        # Get the named connection from the connections repo
+        if connection_name:
+            pywbem_server = connections_repo[connection_name]
+            # Test for invalid options with the --name option
+            for option in conditional_options:
+                if option[0]:
+                    raise click.ClickException(
+                        '"--{} {}" option invalid when --name exists or '
+                        'default name set.'.format(option[1], option[0]))
+
+        else:
+            # If no server defined, set None to allow commands that
+            # do not require a server to be executed with no server
+            # defined.
+            pywbem_server = None
+    return pywbem_server
 
 
 ############################################################################
@@ -460,94 +606,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                            # during initialization.
                            (resolved_mock_server, 'mock-server'))
 
-    def create_server_instance(connection_name):
-        """
-        Create a PywbemServer instance from the cli arguments and return
-        that object.  This method depends on using variables from the
-        enclosing function. If the arguments to create a server do not exist
-        no server is created.
-        NOTE: connection_name is passed to this function because the
-        ClickException treats it as a reference before assignment if using the
-        connection_name from the enclosing scope.
-        """
-        if server or resolved_mock_server:
-            connection_name = 'not-saved'
-            pywbem_server = PywbemServer(server,
-                                         resolved_default_namespace,
-                                         name=connection_name,
-                                         user=user,
-                                         password=password,
-                                         timeout=resolved_timeout,
-                                         use_pull=resolved_use_pull,
-                                         pull_max_cnt=resolved_pull_max_cnt,
-                                         verify=resolved_verify,
-                                         certfile=certfile,
-                                         keyfile=keyfile,
-                                         ca_certs=resolved_ca_certs,
-                                         mock_server=resolved_mock_server)
-        else:  # Server and mock_server were not specified
-            # If name cmd line option, get get name from the connections
-            # repo.
-            if connection_name:
-                if not connections_repo.file_exists():
-                    click.echo('Connections file does not exist: {}'.format(
-                        connections_repo.connections_file), err=True)
-                    raise click.Abort()
-
-                if connection_name not in connections_repo:
-                    raise click.ClickException(
-                        'Connection definition "{}" not found in connections '
-                        'file "{}"'.
-                        format(connection_name,
-                               connections_repo.connections_file))
-
-            # No connection name specified, try default connection name
-            else:
-                # get the default_connection definition
-                try:
-                    if connections_repo.file_exists():
-                        connection_name = \
-                            connections_repo.default_connection_name
-
-                        # Test if the default connection name is actually
-                        # in the repo.  If not reset the default connection
-                        # name to None and continue.
-                        # This should never occur unless connection file
-                        # is corrupted.
-                        if connection_name and connection_name not in \
-                                connections_repo:
-                            connections_repo.default_connection_name = None
-                            raise click.ClickException(
-                                'Default connection name: "{}" not found in '
-                                'connections file "{}"; default connection '
-                                'name is cleared.'.
-                                format(connection_name,
-                                       connections_repo.connections_file))
-                        if verbose:
-                            click.echo('Current connection: "{}"'
-                                       .format(connection_name))
-                except ConnectionsFileError as cfc:
-                    click.echo("{}, {}". format(cfc.__class__.__name__, cfc),
-                               err=True)
-                    raise click.Abort()
-
-            # Get the named connection from the connections repo
-            if connection_name:
-                pywbem_server = connections_repo[connection_name]
-                # Test for invalid options with the --name option
-                for option in conditional_options:
-                    if option[0]:
-                        raise click.ClickException(
-                            '"--{} {}" option invalid when --name exists or '
-                            'default name set.'.format(option[1], option[0]))
-
-            else:
-                # If no server defined, set None to allow commands that
-                # do not require a server to be executed with no server
-                # defined.
-                pywbem_server = None
-        return pywbem_server
-
     # Process cli options to validate options and produce resolved options,
     # i.e. the options with any defaults applied for non None options.
     # Produces new variables resolved... so that later tests can confirm that
@@ -559,25 +617,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     pywbem_server = None
     resolved_default_namespace = default_namespace or DEFAULT_NAMESPACE
-    # TODO: Test verify or DEFAULT_VERIFY
+    # Resolved accounts for True, False, None
     resolved_verify = DEFAULT_VERIFY if verify is None else verify
 
     # There is no default ca_certs
     resolved_ca_certs = ca_certs  # None should be passed on
-
-    # Create the connections repository object that will be included in the
-    # context_object. Always use the original connections_file information
-    if ctx.obj is None:
-        connections_repo = ConnectionRepository(
-            connections_file or DEFAULT_CONNECTIONS_FILE)
-    else:
-        if connections_file:
-            click.ClickException("--connections-file not allowed in "
-                                 "interactive mode.")
-        connections_repo = ctx.obj.connections_repo
-
-    if verbose:
-        click.echo(str(connections_repo))
 
     if keyfile and not certfile:
         raise click.ClickException(
@@ -585,37 +629,26 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             'option is also used'.format(keyfile))
 
     # If this env variable is set, execute the file defined by variable.
-    if os.getenv(PYWBEMCLI_STARTUP_ENVVAR):
-        execute_startup_script(os.getenv('PYWBEMCLI_STARTUP_SCRIPT'),
-                               verbose)
+    # This is private and to be used to preload test scripts for pywbemcli
+    # testing.
+    if os.getenv(PYWBEMCLI_STARTUP_ENVVAR) and ctx.obj is None:
+        _execute_startup_script(os.getenv('PYWBEMCLI_STARTUP_SCRIPT'), verbose)
 
     # Process mock_server option
     if mock_server:
         resolved_mock_server = _resolve_mock_server(mock_server)
 
     # Validate that only one of server, mock_server, and connection name exists
-    if server and connection_name:
-        raise click.ClickException(
-            'Conflicting server definitions: name: {}, server: {}'.
-            format(connection_name, server))
-
-    # Simultaneous mock_server and server fails
-    if server and resolved_mock_server:
-        raise click.ClickException(
-            'Conflicting server definitions: server: {}, mock-server: {}'.
-            format(server, ', '.join(resolved_mock_server)))
-
-    # Simultaneous mock_server and connection_name: Generate Exception.
-    # Note: resolve mock_server does not include any mocks processedatstartup
-    if resolved_mock_server and connection_name:
-        raise click.ClickException(
-            'Conflicting server definitions: mock-server: {}, name: {}'.
-            format(', '.join(resolved_mock_server), connection_name))
+    # We this manually because click does not have way to do mutual exclusion
+    # on options.
+    _validate_no_server_option_conficts(server, connection_name,
+                                        resolved_mock_server)
 
     resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
         else USE_PULL_CHOICE[DEFAULT_PULL_CHOICE]
 
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
+
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
 
     # Command mode (ctx is None) or initial input in interactive mode.
@@ -625,7 +658,25 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         # in interactive mode.
         # Create the PywbemServer object (contains all of the info
         # for the connection defined by the cmd line input)
-        pywbem_server = create_server_instance(connection_name)
+
+        connections_repo = ConnectionRepository(
+            connections_file or DEFAULT_CONNECTIONS_FILE)
+        if verbose:
+            click.echo(str(connections_repo))
+
+        pywbem_server = _create_server_instance(server, connection_name,
+                                                resolved_default_namespace,
+                                                user, password,
+                                                resolved_timeout,
+                                                resolved_use_pull,
+                                                resolved_pull_max_cnt,
+                                                resolved_verify,
+                                                certfile, keyfile,
+                                                resolved_ca_certs,
+                                                resolved_mock_server,
+                                                connections_repo,
+                                                conditional_options,
+                                                verbose)
 
     # Interactive mode cmd line processing (ctx not None)
     # In interactive mode, general options specified in cmd line are used
@@ -636,34 +687,40 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # decorators that define them.
 
     else:  # ctx.obj exists. Processing an interactive command.
-        # Apply the option defaults from the command line options
-        # or from the context object.
+        # Issue # 920Imposed this limit to avoid confusion at least for current
+        # release of pywbemcli.  Consider relaxing this in the future.
+        if connections_file:
+            click.ClickException("--connections-file general option not "
+                                 "allowed in interactive mode.")
+        connections_repo = ctx.obj.connections_repo
+        # Apply the general options from the command line options
+        # or from the context object to modify the PywbemServer object and
+        # for a new ContextObj for the command
 
         # If --name option, get server from connection
         if connection_name:
-            # validate_connections_file(connections_repo)
-            try:
-                pywbem_server = connections_repo[connection_name]
-            except KeyError:
-                raise click.ClickException(
-                    'Connection definition "{}" not found in connections '
-                    'file "{}"'.
-                    format(connection_name, connections_repo.connections_file))
-            except ConnectionsFileError as cfe:
-                click.echo('Fatal error: {0}: {1}'.
-                           format(cfe.__class__.__name__, cfe),
-                           err=True)
-                raise click.Abort()
+            # validate_connections_file(connections_repo). In interactive mode
+            # raise ClickException but do not abort unless connections
+            # file does not exist or is bad.
+            _validate_connections_file(connections_repo)
+            _validate_connection_name(connections_repo, connection_name)
 
         # If other parameters, modify the existing connection and reset it.
-        # TODO: refactor this code to avoid deepcopy when not needed.
+        # Issue 912, part 3, TODO: refactor this code to avoid deepcopy when not
+        # needed.
         else:
             if pywbem_server is None:
                 # Copy to keep the original clean from any changes
                 # This allows modifications to be made for a single
-                # interactive command but not kept.
-                pywbem_server = deepcopy(ctx.obj.pywbem_server)
+                # interactive command but not kept beyond the life of
+                # that command.
+                if ctx.obj.pywbem_server_exists():
+                    pywbem_server = deepcopy(ctx.obj.pywbem_server)
 
+            # Modify the currently defined pywbem_server if it is defined
+            # with any general options including resetting options and if
+            # there are any modifications to pywbem_server, set that modified
+            # server into the current context object.
             # In cases where input parameter of "" is allowed to
             # reset option values, the option is tested for "is not None"
             # to include empty string in test.
@@ -680,10 +737,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                     pywbem_server.mock_server = resolved_mock_server
                     modified_server = True
                 if user is not None:
-                    pywbem_server.user = set_default_if_empty_str(user)
+                    pywbem_server.user = _set_default_if_empty_str(user)
                     modified_server = True
                 if password is not None:
-                    pywbem_server.password = set_default_if_empty_str(password)
+                    pywbem_server.password = _set_default_if_empty_str(password)
                     modified_server = True
                 if verify is not None:
                     pywbem_server.verify = resolved_verify
@@ -692,10 +749,10 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                     pywbem_server.ca_certs = ca_certs
                     modified_server = True
                 if certfile is not None:
-                    pywbem_server.certfile = set_default_if_empty_str(certfile)
+                    pywbem_server.certfile = _set_default_if_empty_str(certfile)
                     modified_server = True
                 if keyfile is not None:
-                    pywbem_server.keyfile = set_default_if_empty_str(keyfile)
+                    pywbem_server.keyfile = _set_default_if_empty_str(keyfile)
                     modified_server = True
                 if timeout:
                     pywbem_server.timeout = resolved_timeout
@@ -703,21 +760,38 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if use_pull:
                     pywbem_server.use_pull = resolved_use_pull
                     modified_server = True
-                if server:
-                    pywbem_server.server = server
-                    modified_server = True
                 if default_namespace is not None:
                     pywbem_server.default_namespace = \
-                        set_default_if_empty_str(default_namespace,
-                                                 DEFAULT_NAMESPACE)
+                        _set_default_if_empty_str(default_namespace,
+                                                  DEFAULT_NAMESPACE)
                     modified_server = True
 
+                # If modified, disconnect existing connection
                 if modified_server:
                     pywbem_server.disconnect()
                 else:
                     pywbem_server = ctx.obj.pywbem_server
+            elif connection_name:
+                # TODO/KS: Explore source of all of the following. Do they need
+                # to come from cli or can they come from previous object?
+                # They all need to come from either the object itself
+                # or cli parameters. Issue #912 part3
+                pywbem_server = _create_server_instance(
+                    server, connection_name,
+                    resolved_default_namespace,
+                    user, password,
+                    timeout,
+                    resolved_use_pull,
+                    resolved_pull_max_cnt,
+                    resolved_verify,
+                    certfile, keyfile,
+                    resolved_ca_certs,
+                    resolved_mock_server,
+                    connections_repo,
+                    conditional_options,
+                    verbose)
             else:
-                pywbem_server = create_server_instance(connection_name)
+                pywbem_server = None
 
         # The following variables are maintained only in the context_obj and
         # not attached to any particular connection. If the cli argument is
@@ -751,10 +825,14 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if verbose is None:
             verbose = ctx.obj.verbose
 
-        if connections_repo is None:
-            connections_repo = ctx.obj.connections_repo
-        elif connections_repo == "":
-            connections_repo = DEFAULT_CONNECTIONS_FILE
+        # Commented out because we do not allow modification of the
+        # connection file and have already set connections_repo in line
+        # above. This code would have allowed resetting to default.
+        # See issue #920
+        # if connections_repo is None:
+        #    connections_repo = ctx.obj.connections_repo
+        # elif connections_repo == "":
+        #    connections_repo = DEFAULT_CONNECTIONS_FILE
 
         if pdb is None:
             pdb = ctx.obj.pdb
@@ -780,7 +858,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # Env.var PYWBEMCLI_DIAGNOSTICS turns on disgnostic prints for developer
     # use and is therefore not documented.
     if os.getenv('PYWBEMCLI_DIAGNOSTICS'):
-        display_click_context(ctx, msg="DIAGNOSTICS: Initial context:",
+        display_click_context(ctx, msg="DIAGNOSTICS-NEWCTX: Initial context:",
                               display_attrs=True)
 
     _python_nm = sys.version_info[0:2]

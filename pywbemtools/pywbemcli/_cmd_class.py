@@ -745,7 +745,8 @@ def enumerate_classes_filtered(context, classname, options):
         enumerateClasses
     """
     namespace = options['namespace']
-    filters = _build_filters_dict(context.conn, namespace, options)
+    conn = context.pywbem_server.conn
+    filters = _build_filters_dict(conn, namespace, options)
 
     names_only = options.get('names_only', False)
 
@@ -760,12 +761,12 @@ def enumerate_classes_filtered(context, classname, options):
     include_classorigin = options.get('include_classorigin', True)
 
     if names_only and not filters:
-        results = context.conn.EnumerateClassNames(
+        results = conn.EnumerateClassNames(
             ClassName=classname,
             namespace=namespace,
             DeepInheritance=deep_inheritance)
     else:
-        results = context.conn.EnumerateClasses(
+        results = conn.EnumerateClasses(
             ClassName=classname,
             namespace=namespace,
             LocalOnly=local_only,
@@ -823,12 +824,12 @@ def cmd_class_get(context, classname, options):
     the class. If the class cannot be found, the server returns a CIMError
     exception.
     """
-
+    conn = context.pywbem_server.conn
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
 
     try:
-        result_class = context.conn.GetClass(
+        result_class = conn.GetClass(
             classname,
             namespace=options['namespace'],
             LocalOnly=options['local_only'],
@@ -875,6 +876,7 @@ def cmd_class_references(context, classname, options):
     Execute the references request operation to get references for
     the classname defined
     """
+    conn = context.pywbem_server.conn
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
 
@@ -883,12 +885,12 @@ def cmd_class_references(context, classname, options):
 
     try:
         if options['names_only']:
-            results = context.conn.ReferenceNames(
+            results = conn.ReferenceNames(
                 classname,
                 ResultClass=options['result_class'],
                 Role=options['role'])
         else:
-            results = context.conn.References(
+            results = conn.References(
                 classname,
                 ResultClass=options['result_class'],
                 Role=options['role'],
@@ -908,6 +910,8 @@ def cmd_class_associators(context, classname, options):
     Execute the references request operation to get references for
     the classname defined
     """
+    conn = context.pywbem_server.conn
+
     if options['namespace']:
         classname = CIMClassName(classname, namespace=options['namespace'])
 
@@ -916,14 +920,14 @@ def cmd_class_associators(context, classname, options):
 
     try:
         if options['names_only']:
-            results = context.conn.AssociatorNames(
+            results = conn.AssociatorNames(
                 classname,
                 AssocClass=options['assoc_class'],
                 Role=options['role'],
                 ResultClass=options['result_class'],
                 ResultRole=options['result_role'])
         else:
-            results = context.conn.Associators(
+            results = conn.Associators(
                 classname,
                 AssocClass=options['assoc_class'],
                 Role=options['role'],
@@ -948,6 +952,9 @@ def get_namespaces(context, namespaces):
     Raises:
         CIMError if status code not CIM_ERR_NOT_FOUND
     """
+    conn = context.pywbem_server.conn
+    wbem_server = context.pywbem_server.wbem_server
+
     ns_names = []
 
     # Return the provided namespace(s)
@@ -956,18 +963,18 @@ def get_namespaces(context, namespaces):
 
     # Otherwise get all namespaces from server
     try:
-        ns_names = context.wbem_server.namespaces
+        ns_names = wbem_server.namespaces
         ns_names.sort()
         return ns_names
 
     except ModelError:
-        return [context.conn.default_namespace]
+        return [conn.default_namespace]
     except CIMError as ce:
         # allow processing to continue if no interop namespace
         if ce.status_code == CIM_ERR_NOT_FOUND:
             warning_msg('{}. Using default_namespace {}.'
-                        .format(ce, context.conn.default_namespace))
-            ns_names = [context.conn.default_namespace]
+                        .format(ce, conn.default_namespace))
+            ns_names = [conn.default_namespace]
         return ns_names
     except Error as er:
         raise pywbem_error_exception(er)
@@ -1118,6 +1125,8 @@ def cmd_class_tree(context, classname, options):
     The --superclasses option determines if the superclass tree or the
     subclass tree is displayed.
     """
+    conn = context.pywbem_server.conn
+
     superclasses = options['superclasses']
 
     # Classname must exist as starting point for superclass tree.
@@ -1125,7 +1134,7 @@ def cmd_class_tree(context, classname, options):
         raise click.ClickException('CLASSNAME argument required for '
                                    '--superclasses option')
 
-    classes = get_class_hierarchy(context.conn, classname, options['namespace'],
+    classes = get_class_hierarchy(conn, classname, options['namespace'],
                                   superclasses)
 
     # If showing superclasses, set classname to None for the display
@@ -1141,6 +1150,7 @@ def cmd_class_tree(context, classname, options):
 
 def cmd_class_delete(context, classname, options):
     """Delete a class from the WBEM server repository"""
+    conn = context.pywbem_server.conn
 
     include_instances = options['include_instances']
     if options['force']:
@@ -1151,10 +1161,10 @@ def cmd_class_delete(context, classname, options):
     dry_run = options['dry_run']
     dry_run_prefix = "Dry run: " if dry_run else ""
 
-    namespace = options['namespace'] or context.conn.default_namespace
+    namespace = options['namespace'] or conn.default_namespace
 
     try:
-        instnames = context.conn.EnumerateInstanceNames(
+        instnames = conn.EnumerateInstanceNames(
             ClassName=classname, namespace=namespace)
     except Error as exc:
         raise pywbem_error_exception(
@@ -1167,7 +1177,7 @@ def cmd_class_delete(context, classname, options):
             format(classname, len(instnames)))
 
     depending_cln_list = depending_classnames(
-        classname, namespace, context.conn)
+        classname, namespace, conn)
 
     if depending_cln_list:
         raise click.ClickException(
@@ -1179,7 +1189,7 @@ def cmd_class_delete(context, classname, options):
         for instname in instnames:
             if not dry_run:
                 try:
-                    context.conn.DeleteInstance(instname)
+                    conn.DeleteInstance(instname)
                 except Error as exc:
                     raise pywbem_error_exception(
                         exc, "Cannot delete instance {}".format(instname))
@@ -1187,7 +1197,7 @@ def cmd_class_delete(context, classname, options):
 
     if not dry_run:
         try:
-            context.conn.DeleteClass(classname)
+            conn.DeleteClass(classname)
         except Error as exc:
             raise pywbem_error_exception(
                 exc, "Cannot delete class {} in namespace {}".

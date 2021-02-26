@@ -431,7 +431,7 @@ ca-certs
       'test': 'innows'},
      None, OK],
 
-    ['Verify connection command select test2.. SEQ 0,9',
+    ['Verify connection command select test2 and set default.. SEQ 0.9.1',
      {'general': [],
       'args': ['select', 'test2', '--default']},
      {'stdout': ['test2', 'default'],
@@ -701,7 +701,8 @@ ca-certs
     ['Verify connection command export no current conection. SEQ 1.7',
      {'general': [],
       'args': ['export']},
-     {'stderr': ['No server currently defined as current'],
+     {'stderr': ['No current server for command "connection export" that '
+                 'requires a WBEM server'],
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
@@ -973,7 +974,7 @@ ca-certs
       'rc': 1,
       'test': 'innows',
       'file': {'before': 'none', 'after': 'none'}},
-     None, RUN],
+     None, OK],
 
 
     ['Verify connection show with just current server defined by --server. '
@@ -1071,24 +1072,19 @@ ca-certs
 
     # Begin of sequence - repository is empty.
 
-    # NOTE: This works because we insert the first command into the first
-    #       line of the stdin. If the connection save fred is not in the
-    #       first line, the test fails.
-
     ['Verify Create new connection in interactive mode and delete - single, '
      'SEQ 8.1',
-     {'general': [],
-      'stdin': ['--server http://blah --user fred --password fred '
-                '--certfile cert1.pem --keyfile keys1.pem '
-                ' connection save fred',
+     {'general': ['--server', 'http://blah', '--user', 'fred',
+                  '--password', 'fred',
+                  '--certfile', 'cert1.pem', '--keyfile', 'keys1.pem'],
+      'stdin': ['connection save fred',
                 'connection select fred',
                 'connection show fred',
                 'connection delete fred']},
      {'stdout': ['name', 'fred',
                  'server', 'http://blah',
                  'default-namespace', 'root/cimv2',
-                 'user',
-                 'fred',
+                 'user', 'fred',
                  'password',
                  'timeout', '30',
                  'verify', 'True',
@@ -1137,10 +1133,9 @@ ca-certs
     # Begin of sequence - repository is empty.
 
     ['Verify Create new connection in interactive mode and delete. SEQ 9.1',
-     {'general': [],
-      'stdin': ['--server http://blah --user fred --password fred '
-                '--certfile cert1.pem --keyfile keys1.pem',
-                'connection save fred',
+     {'general': ['--server', 'http://blah', '--user', 'fred', '--password',
+                  'fred', '--certfile', 'cert1.pem', '--keyfile', 'keys1.pem'],
+      'stdin': ['connection save fred',
                 'connection show fred']},
      {'stdout': ['name', 'fred',
                  'server', 'http://blah',
@@ -1270,6 +1265,8 @@ class TestSubcmdClass(CLITestsBase):
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
                 test_file_existence(exp_response['file']['before'])
+
+        # add connections file if the general list exists.
         if 'general' in inputs:
             inputs['general'].extend(['--connections-file', connections_file])
         else:

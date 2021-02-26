@@ -75,10 +75,8 @@ def _validate_server_url(server):
     elif re.match(r"^https{0,1}://", server) is not None:
         url = server
 
-    # TODO Future: We are trying to make exceptions in these support classes
-    # independent of click so this should become ValueError
     elif re.match(r"^[a-zA-Z0-9]+://", server) is not None:
-        raise click.ClickException('Invalid scheme on server argument. {}'
+        raise click.ClickException('Invalid scheme on server argument: {}.'
                                    ' Use "http" or "https"'.format(server))
     else:
         url = "{scheme}://{host}".format(
@@ -166,16 +164,16 @@ class PywbemServer(object):
         self._wbem_server = None
 
     def __str__(self):
-        return 'PywbemServer(url={s.server} name={s.name})'.format(s=self)
+        return 'PywbemServer(url={s._server} name={s.name})'.format(s=self)
 
     def __repr__(self):
-        return 'PywbemServer(server={s.server} name={s.name} ' \
+        return 'PywbemServer(server={s._server} name={s.name} ' \
                'ns={s.default_namespace} user={s.user} ' \
                'password={s.password} timeout={s.timeout} ' \
                'use_pull={s.use_pull} pull_max_cnt={s.pull_max_cnt} ' \
                'verify={s.verify} certfile={s.certfile} keyfile={s.keyfile} ' \
                'ca_certs={s.ca_certs} mock_server={s.mock_server!r} ' \
-               'wbem_server={s.wbem_server!r})'.format(s=self)
+               'wbem_server={s._wbem_server!r})'.format(s=self)
 
     @property
     def server(self):
@@ -418,16 +416,31 @@ class PywbemServer(object):
 
         `None` when disconnected from the server.
         """
-        return self.wbem_server.conn if self.wbem_server else None
+        return self.wbem_server.conn
 
     @property
     def wbem_server(self):
         """
-        :class:`~pywbem.WBEMServer`: Server object to be used for higher level
-        WBEM server requests, when connected to the server.
+        :class:`~pywbem.WBEMServer`: WBEMServer instance to be used for
+        higher level WBEM server requests, when connected to the server.
 
         `None` when disconnected from the server.
+
+        Using this property will connect to the server if not yet connected,
+        and will raise an exception if no server is specified.
+
+        When connecting to a real WBEM server, a password is prompted for if
+        a user is specified in the current context but no password. The
+        password is saved in the context, so the password is prompted for only
+        once (e.g. in interactive mode).
         """
+        ctx = click.get_current_context()
+        if self._wbem_server is None:
+            self.get_password(ctx.obj)
+            self.connect(
+                log=ctx.obj.log,
+                use_pull=ctx.obj.use_pull,
+                verbose=ctx.obj.verbose)
         return self._wbem_server
 
     def password_prompt(self, ctx):
@@ -444,8 +457,6 @@ class PywbemServer(object):
             # pylint: disable=attribute-defined-outside-init
             self.password = password
         else:
-            # TODO Future: Again we want to isolate the click excpetions in
-            # future
             raise click.ClickException("{cmd} requires user/password, but "
                                        "no password provided."
                                        .format(cmd=ctx.invoked_subcommand))
@@ -508,6 +519,7 @@ class PywbemServer(object):
 
         Must be connected to the server when calling this method.
         """
+        # print("Debug: PywbemServer disconnect")
 
         # TODO(PR900): Remove the PR900 flag test and else path once done.
         if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:
@@ -539,6 +551,7 @@ class PywbemServer(object):
           ValueError: Other issues with server-related attributes of this
             object that are considered programming errors.
         """
+        # print("Debug: PywbemServer connect")
 
         # TODO(PR900): Remove the PR900 flag test and else path once done.
         if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:

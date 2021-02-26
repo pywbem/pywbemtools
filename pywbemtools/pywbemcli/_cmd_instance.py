@@ -841,6 +841,7 @@ def get_instancename(context, instancename, options):
 
       ClickException: Various reasons.
     """
+    conn = context.pywbem_server.conn
 
     if instancename.endswith(".?"):
 
@@ -863,7 +864,7 @@ def get_instancename(context, instancename, options):
                     "namespace in INSTANCENAME: {}".format(instancename))
         else:
             class_path.namespace = options.get('namespace') or \
-                context.conn.default_namespace
+                conn.default_namespace
 
         try:
             instance_path = pick_instance(
@@ -932,7 +933,7 @@ def get_instancename(context, instancename, options):
                     "namespace in INSTANCENAME: {}".format(instancename))
         else:
             instance_path.namespace = options.get('namespace') or \
-                context.conn.default_namespace
+                conn.default_namespace
 
     else:
 
@@ -950,7 +951,7 @@ def get_instancename(context, instancename, options):
                     "namespace in INSTANCENAME: {}".format(instancename))
         else:
             instance_path.namespace = options.get('namespace') or \
-                context.conn.default_namespace
+                conn.default_namespace
 
     return instance_path
 
@@ -973,13 +974,14 @@ def cmd_instance_get(context, instancename, options):
     instances to the console from which one can be picked to get from the
     server and display.
     """
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
 
     try:
         property_list = resolve_propertylist(options['propertylist'])
-        instance = context.conn.GetInstance(
+        instance = conn.GetInstance(
             instancepath,
             LocalOnly=options['local_only'],
             IncludeQualifiers=options['include_qualifiers'],
@@ -1000,10 +1002,11 @@ def cmd_instance_delete(context, instancename, options):
         delete.
         Otherwise attempt to delete the instance defined by instancename
     """
+    conn = context.pywbem_server.conn
     instancepath = get_instancename(context, instancename, options)
 
     try:
-        context.conn.DeleteInstance(instancepath)
+        conn.DeleteInstance(instancepath)
 
         if context.verbose:
             context.spinner_stop()
@@ -1019,16 +1022,17 @@ def cmd_instance_create(context, classname, options):
        If successful, this operation returns the new instance name. Otherwise
        it raises an exception
     """
-    ns = options['namespace'] or context.conn.default_namespace
+    conn = context.pywbem_server.conn
+    ns = options['namespace'] or conn.default_namespace
     try:
-        class_ = context.conn.GetClass(
+        class_ = conn.GetClass(
             classname, namespace=ns, LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException('CIMClass: "{}" does not exist in '
                                        'namespace "{}" in WEB '
                                        'server: {}.'.format(classname, ns,
-                                                            context.conn))
+                                                            conn))
         raise pywbem_error_exception(ce)
 
     except Error as er:
@@ -1045,8 +1049,7 @@ def cmd_instance_create(context, classname, options):
         if not verify_operation("Execute CreateInstance", msg=True):
             return
     try:
-        name = context.conn.CreateInstance(new_inst,
-                                           namespace=ns)
+        name = conn.CreateInstance(new_inst, namespace=ns)
 
         context.spinner_stop()
         click.echo('{}'.format(name))
@@ -1069,18 +1072,19 @@ def cmd_instance_modify(context, instancename, options):
 
     If successful, this operation returns nothing.
     """
+    conn = context.pywbem_server.conn
     instancepath = get_instancename(context, instancename, options)
 
-    ns = options['namespace'] or context.conn.default_namespace
+    ns = options['namespace'] or conn.default_namespace
 
     try:
-        class_ = context.conn.GetClass(
+        class_ = conn.GetClass(
             instancepath.classname, namespace=ns, LocalOnly=False)
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException(
                 'CIMClass: {!r} does not exist in WEB server: {}'
-                .format(instancepath.classname, context.conn.url))
+                .format(instancepath.classname, conn.url))
 
         raise pywbem_error_exception(ce)
     except Error as er:
@@ -1100,8 +1104,7 @@ def cmd_instance_modify(context, instancename, options):
             return
 
     try:
-        context.conn.ModifyInstance(modified_inst,
-                                    PropertyList=property_list)
+        conn.ModifyInstance(modified_inst, PropertyList=property_list)
         if context.verbose:
             context.spinner_stop()
             click.echo('Modified instance {}'.format(instancepath))
@@ -1145,19 +1148,20 @@ def cmd_instance_enumerate(context, classname, options):
     Enumerate CIM instances or CIM instance names
 
     """
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     try:
         property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
-            results = context.conn.PyWbemcliEnumerateInstancePaths(
+            results = conn.PyWbemcliEnumerateInstancePaths(
                 ClassName=classname,
                 namespace=options['namespace'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt)
         else:
-            results = context.conn.PyWbemcliEnumerateInstances(
+            results = conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
                 namespace=options['namespace'],
                 LocalOnly=options['local_only'],
@@ -1192,6 +1196,7 @@ def cmd_instance_references(context, instancename, options):
        If the interactive option is selected, the instancename MUST BE
        a classname.
     """
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
@@ -1199,7 +1204,7 @@ def cmd_instance_references(context, instancename, options):
     try:
         property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
-            results = context.conn.PyWbemcliReferenceInstancePaths(
+            results = conn.PyWbemcliReferenceInstancePaths(
                 instancepath,
                 ResultClass=options['result_class'],
                 Role=options['role'],
@@ -1207,7 +1212,7 @@ def cmd_instance_references(context, instancename, options):
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt)
         else:
-            results = context.conn.PyWbemcliReferenceInstances(
+            results = conn.PyWbemcliReferenceInstances(
                 instancepath,
                 ResultClass=options['result_class'],
                 Role=options['role'],
@@ -1238,6 +1243,7 @@ def cmd_instance_associators(context, instancename, options):
     Execute the references request operation to get references for
     the classname defined
     """
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     instancepath = get_instancename(context, instancename, options)
@@ -1245,7 +1251,7 @@ def cmd_instance_associators(context, instancename, options):
     try:
         property_list = resolve_propertylist(options['propertylist'])
         if options['names_only']:
-            results = context.conn.PyWbemcliAssociatorInstancePaths(
+            results = conn.PyWbemcliAssociatorInstancePaths(
                 instancepath,
                 AssocClass=options['assoc_class'],
                 Role=options['role'],
@@ -1255,7 +1261,7 @@ def cmd_instance_associators(context, instancename, options):
                 FilterQueryLanguage=get_filterquerylanguage(options),
                 MaxObjectCount=context.pull_max_cnt)
         else:
-            results = context.conn.PyWbemcliAssociatorInstances(
+            results = conn.PyWbemcliAssociatorInstances(
                 instancepath,
                 AssocClass=options['assoc_class'],
                 Role=options['role'],
@@ -1288,6 +1294,7 @@ def cmd_instance_count(context, classname, options):
     """
     Get the number of instances of each class in the namespace
     """
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, 'TABLE')
 
     # Differs from class find because it classname is optional.
@@ -1331,7 +1338,7 @@ def cmd_instance_count(context, classname, options):
         # This accounts for issues with some servers where there
         # are providers that return errors from the enumerate.
         try:
-            inst_names = context.conn.EnumerateInstanceNames(cln, namespace=ns)
+            inst_names = conn.EnumerateInstanceNames(cln, namespace=ns)
         except CIMError as ce:
             warning_msg('Server Error {} with {}:{}. Continuing.'
                         .format(ce, ns, cln))
@@ -1365,10 +1372,11 @@ def cmd_instance_count(context, classname, options):
 
 def cmd_instance_query(context, query, options):
     """Execute the query defined by the inputs"""
+    conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
     try:
-        results = context.conn.PyWbemcliQueryInstances(
+        results = conn.PyWbemcliQueryInstances(
             options['query_language'],
             query,
             namespace=options['namespace'],
@@ -1387,11 +1395,12 @@ def cmd_instance_shrub(context, instancename, options):
     showing the various steps to get through the roles, references, etc. to
     return the names of associated instances.
     """
+    conn = context.pywbem_server.conn
     try:
         instancepath = get_instancename(context, instancename, options)
 
         # Collect the data for the shrub
-        shrub = AssociationShrub(context.conn, instancepath,
+        shrub = AssociationShrub(conn, instancepath,
                                  Role=options['role'],
                                  AssocClass=options['assoc_class'],
                                  ResultRole=options['result_role'],

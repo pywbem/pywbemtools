@@ -46,7 +46,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                  pull_max_cnt, timestats, log, verbose, pdb,
                  warn, connections_repo):
 
-        self.pywbem_server = pywbem_server   # has setter method
+        self._pywbem_server = pywbem_server
         self._output_format = output_format
         self._use_pull = use_pull
         self._pull_max_cnt = pull_max_cnt
@@ -66,7 +66,7 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
                'use_pull={}, pull_max_cnt={}, timestats={}, verbose={}, ' \
                'spinner_enabled={}' \
-               .format(id(self), self.pywbem_server, self.output_format,
+               .format(id(self), self._pywbem_server, self.output_format,
                        self.use_pull, self.pull_max_cnt, self.timestats,
                        self.verbose, self.spinner_enabled)
 
@@ -139,25 +139,6 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         return self._connections_repo
 
     @property
-    def conn(self):
-        """
-        :class:`~pywbem.WBEMConnection` WBEMConnection to be used for requests.
-
-        Using this property will connect to the server if not yet connected,
-        and will raise an exception if no server is specified.
-
-        When connecting to a real WBEM server, a password is prompted for if
-        a user is specified in the current context but no password. The
-        password is saved in the context, so the password is prompted for only
-        once (e.g. in interactive mode).
-
-        Raises:
-          click.ClickException: No server is specified.
-        """
-        srv = self.wbem_server  # Ensures connection and may raise exception
-        return srv.conn
-
-    @property
     def is_connected(self):
         """
         bool: Indicates whether currently contected to a WBEM server.
@@ -169,51 +150,32 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             self._pywbem_server.wbem_server is not None
 
     @property
-    def wbem_server(self):
-        """
-        :class:`~pywbem.WBEMServer`: WBEMServer instance to be used for
-        requests.
-
-        Using this property will connect to the server if not yet connected,
-        and will raise an exception if no server is specified.
-
-        When connecting to a real WBEM server, a password is prompted for if
-        a user is specified in the current context but no password. The
-        password is saved in the context, so the password is prompted for only
-        once (e.g. in interactive mode).
-
-        Raises:
-          click.ClickException: No server is specified.
-        """
-
-        if not self._pywbem_server:
-            raise click.ClickException(
-                'No server specified for a command that requires a WBEM '
-                'server. To specify a server, use the "--server", '
-                '"--mock-server", or "--name" general options, or set the '
-                'corresponding environment variables, or in interactive mode '
-                'use "connection select"')
-
-        # Ensure server is connected
-        if self._pywbem_server.wbem_server is None:
-            self._pywbem_server.get_password(self)
-            self._pywbem_server.connect(
-                log=self.log,
-                use_pull=self.use_pull,
-                verbose=self.verbose)
-
-        return self._pywbem_server.wbem_server
-
-    @property
     def pywbem_server(self):
         """
-        :class:`PywbemServer`: Current server of the context.
+        :class:`PywbemServer`: Current PywbemServer object for this context.
 
-        If no server is specified, `None` is returned.
+        Return the PywbemServer object if it already exists.
+
+        If the pywbem_server attribute does not exist, generate a click
+        exception. If no server is specified, `None` is returned.
 
         This attribute is settable.
         """
-        return self._pywbem_server
+        if self._pywbem_server:
+            return self._pywbem_server
+
+        ctx = click.get_current_context()
+        if ctx.parent:
+            ctx = ctx.parent
+        cmd = "{} {}".format(ctx.info_name or "",
+                             ctx.invoked_subcommand or "")
+        raise click.ClickException(
+            'No  current server for command "{}" that requires a WBEM server. '
+            'Specify a server with the "--server", "--mock-server", or"--name" '
+            'general option, by setting the corresponding environment '
+            'variables, or in interactive mode '
+            'use "connection select" to define a target server'.
+            format(cmd))
 
     @pywbem_server.setter
     def pywbem_server(self, value):
@@ -276,23 +238,39 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         return self._verbose
 
+    def pywbem_server_exists(self):
+        """
+        Return True if a pywbem_server is defined.  This method allows testing
+        for the existence of a PywbemServer object without causing an exception.
+        The normal method is to simply access the property. In that case,
+        an exception will be generated if there is no PywbemServer defined.
+
+        Returns:
+            :class": `boolean True if an instance of PywbemServer is defined.
+        """
+        return self._pywbem_server is not None
+
     def execute_cmd(self, cmd):
         """
         Call the cmd executor defined by cmd with the spinner. If the
-        WBEM server object has not been created it is created so that this wbem
+        WBEM server object has not been created it is created so that this WBEM
         server can be used for interactive commands.
 
         This method is called by every command execution to setup and
-        execute the command. Thus, each command MUST have the line similar to:
+        execute the command. Thus, each command definition MUST have the line
+        similar to:
 
         context.execute_cmd(lambda: cmd_instance_query(context, query, options))
         """
-        # Env.var PYWBEMCLI_DIAGNOSTICS turns on disgnostic prints for developer
+        # Env.var PYWBEMCLI_DIAGNOSTICS turns on diagnostic prints for developer
         # use and is therefore not documented.
         if os.getenv('PYWBEMCLI_DIAGNOSTICS'):
             ctx = click.get_current_context()
-            click.echo('DIAGNOSTICS: command={!r}, params={!r}'.
-                       format(ctx.info_name, ctx.params))
+            click.echo('DIAGNOSTICS-CMD: info_name={!r}, subcommand={!r}, '
+                       'command={!r}, params={!r}'.
+                       format(ctx.info_name, ctx.invoked_subcommand,
+                              ctx.command,
+                              ctx.params))
             display_click_context_parents(display_attrs=True)
 
         if not self.pdb:
@@ -311,8 +289,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
             # Issue statistics if requested and if the command used a conn.
             if self.timestats and self.is_connected:
                 context = click.get_current_context()
-                click.echo(self.format_statistics(self.conn.statistics,
-                                                  context.obj))
+                click.echo(self.format_statistics(
+                    self.pywbem_server.conn.statistics, context.obj))
 
     def format_statistics(self, statistics, context):
         # pylint: disable=no-self-use
@@ -359,9 +337,9 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
 
 
 #
-#   Debug tools to help understandingthe click context.  These are only
+#   Debug tools to help understanding the click context.  These are only
 #   to help analyzing the click_context (ctx) and primarily in the
-#   interactive mode whene several levels of click context can exist
+#   interactive mode when several levels of click context can exist
 #
 def display_click_context(ctx, msg=None, display_attrs=True):
     """
@@ -387,12 +365,20 @@ def display_click_context_parents(display_attrs=False):
     Display the current click context and its all of its parents.
     This is a diagnostic for developer use
     """
-    level = 0
     ctx = click.get_current_context()
-    disp_ctx = ctx.parent
+    disp_ctx = ctx
+    # display in context top-down order
+    stack = []
+    # Create list of ctx parents
     while disp_ctx is not None:
+        stack.append(disp_ctx)
+        disp_ctx = disp_ctx.parent
+
+    # pop off of stack to get reverse order
+    level = 0
+    while stack:
+        disp_ctx = stack.pop()
         display_click_context(
-            disp_ctx, msg='DIAGNOSTICS: Context at parent level {}:'.
+            disp_ctx, msg='DIAGNOSTICS-CTX: Context at parent level {}:'.
             format(level), display_attrs=display_attrs)
         level += 1
-        disp_ctx = disp_ctx.parent

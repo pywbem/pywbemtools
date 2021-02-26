@@ -356,10 +356,11 @@ def pick_instance(context, objectname, namespace=None):
     Raises:
         ClickException if user choses to terminate the selection process
     """
+    conn = context.pywbem_server.conn
     if not is_classname(objectname):
         raise click.ClickException('{} must be a classname'.format(objectname))
-    instance_names = context.conn.PyWbemcliEnumerateInstancePaths(objectname,
-                                                                  namespace)
+    instance_names = conn.PyWbemcliEnumerateInstancePaths(objectname,
+                                                          namespace)
 
     if not instance_names:
         click.echo('No instance paths found for {}'.format(objectname))
@@ -837,11 +838,12 @@ def process_invokemethod(context, objectname, methodname, options):
             params.append((name, cim_value))
         return params
 
+    conn = context.pywbem_server.conn
     classname = objectname.classname \
         if isinstance(objectname, (CIMClassName, CIMInstanceName)) \
         else objectname
 
-    cim_class = context.conn.GetClass(
+    cim_class = conn.GetClass(
         classname,
         namespace=options['namespace'], LocalOnly=False)
 
@@ -854,7 +856,7 @@ def process_invokemethod(context, objectname, methodname, options):
 
     params = create_params(classname, cim_method, options['parameter'])
 
-    rtn = context.conn.InvokeMethod(methodname, objectname, params)
+    rtn = conn.InvokeMethod(methodname, objectname, params)
 
     # Output results, both ReturnValue and all output parameters
     click.echo('ReturnValue={}'.format(rtn[0]))
