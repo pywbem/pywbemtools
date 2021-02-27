@@ -29,7 +29,7 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, \
     DEFAULT_TABLE_FORMAT, output_format_is_table, format_table, display_text, \
-    pywbem_error_exception, validate_output_format
+    pywbem_error_exception, validate_output_format, all_classnames_depsorted
 from ._common_options import add_options, help_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 
@@ -107,29 +107,57 @@ def namespace_create(context, namespace):
 @namespace_group.command('delete', cls=PywbemcliCommand,
                          options_metavar=CMD_OPTS_TXT)
 @click.argument('namespace', type=str, metavar='NAMESPACE', required=True,)
+@click.option('--include-objects', is_flag=True, default=False,
+              help=u'Delete any objects in the namespace as well. '
+                   'WARNING: Deletion of instances will cause the removal of '
+                   'corresponding resources in the managed environment (i.e. '
+                   'in the real world). '
+                   'Default: Reject command if the namespace has any objects.')
 @add_options(help_option)
 @click.pass_obj
-def namespace_delete(context, namespace):
+def namespace_delete(context, namespace, **options):
     """
     Delete a namespace from the server.
 
     Leading and trailing slash (``/``) characters specified in the NAMESPACE
     argument will be stripped.
 
-    The namespace must exist and must be empty. That is, it must not contain
-    any objects (qualifiers, classes or instances).
-
     The Interop namespace must exist on the server and cannot be deleted using
     this command.
 
-    WBEM servers may not allow this operation or may severely limit the
+    The targeted namespace must exist on the server. If the namespace contains
+    any objects (qualifier types, classes or instances), the command is
+    rejected unless the --include-objects option is specified.
+
+    If the --include-objects option is specified, the dependency order of
+    classes is determined, and the instances are deleted first in that order,
+    then the classes in that order, and at last the qualifier types.
+    This ensures that no dangling dependencies remain at any point in the
+    operation. Dependencies that are considered for this purpose are subclasses,
+    referencing classes and embedding classes (EmbeddedInstance qualifier
+    only). Cross-namespace associations are deleted in the targeted namespace
+    and are assumed to be properly handled by the server in the other namespace.
+    (i.e. to be cleaned up there as well without requiring a deletion by the
+    client).
+
+    WARNING: Deletion of instances will cause the removal of corresponding
+    resources in the managed environment (i.e. in the real world). Some
+    instances may not be deletable.
+
+    WARNING: Deletion of classes or qualifier types can cause damage to
+    the server: It can impact instance providers and other components in the
+    server. WBEM servers may not allow the deletion of classes or qualifier
+    declarations.
+
+    WBEM servers may not allow deletion of namespaces or may severely limit the
     conditions under which a namespace can be deleted.
 
     Example:
 
       pywbemcli -n myconn namespace delete root/cimv2
     """
-    context.execute_cmd(lambda: cmd_namespace_delete(context, namespace))
+    context.execute_cmd(
+        lambda: cmd_namespace_delete(context, namespace, options))
 
 
 @namespace_group.command('interop', cls=PywbemcliCommand,
@@ -186,16 +214,96 @@ def cmd_namespace_create(context, namespace):
         raise pywbem_error_exception(er)
 
 
-def cmd_namespace_delete(context, namespace):
+def cmd_namespace_delete(context, namespace, options):
     """
     Delete a namespace on the WBEM server.
     """
+    include_objects = options['include_objects']
+
+    if namespace == context.wbem_server.interop_ns:
+        raise click.ClickException(
+            "Cannot delete namespace {} because it is the Interop "
+            "namespace".format(namespace))
+
+    # Check whether the namespace is empty.
+    # We do not check for instances, because classes are a prerequisite for
+    # instances, so if no classes exist, no instances will exist.
+    # WBEM servers that do not support class operations (e.g. SFCB) will
+    # raise a CIMError with status CIM_ERR_NOT_SUPPORTED.
+    try:
+        top_class_paths = context.conn.EnumerateClassNames(
+            namespace=namespace, ClassName=None, DeepInheritance=False)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot enumerate top-level class names in namespace {}".
+            format(namespace))
+    try:
+        qualifiers = context.conn.EnumerateQualifiers(namespace=namespace)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot enumerate qualifier types in namespace {}".
+            format(namespace))
+    non_empty = top_class_paths or qualifiers
+
+    if non_empty and not include_objects:
+        raise click.ClickException(
+            "Cannot delete namespace {} because it has {} qualifier types "
+            "and {} top-level classes (and possibly instances)".
+            format(namespace, len(top_class_paths), len(qualifiers)))
+
+    if top_class_paths:
+
+        # The following is rather long-running, so we do not want it to be used
+        # before the previous checks, and we want the spinner to be running
+        # while it is being executed.
+        classnames_depsorted = all_classnames_depsorted(namespace, context.conn)
+
+        context.spinner_stop()
+        for classname in classnames_depsorted:
+            try:
+                inst_paths = context.conn.EnumerateInstanceNames(
+                    namespace=namespace, ClassName=classname)
+            except Error as exc:
+                raise pywbem_error_exception(
+                    exc, "Cannot enumerate instance names of class {} in "
+                    "namespace {}".format(classname, namespace))
+            for inst_path in inst_paths:
+                try:
+                    context.conn.DeleteInstance(inst_path)
+                except Error as exc:
+                    raise pywbem_error_exception(
+                        exc, "Cannot delete instance {}".format(inst_path))
+                click.echo('Deleted instance {}'.format(inst_path))
+        for classname in classnames_depsorted:
+            try:
+                context.conn.DeleteClass(
+                    namespace=namespace, ClassName=classname)
+            except Error as exc:
+                raise pywbem_error_exception(
+                    exc, "Cannot delete class {} in namespace {}".
+                    format(classname, namespace))
+            click.echo('Deleted class {}'.format(classname))
+
+    if qualifiers:
+        context.spinner_stop()
+        for qualifier in qualifiers:
+            qualifiername = qualifier.name
+            try:
+                context.conn.DeleteQualifier(
+                    namespace=namespace, QualifierName=qualifiername)
+            except Error as exc:
+                raise pywbem_error_exception(
+                    exc, "Cannot delete qualifier type {} in namespace {}".
+                    format(qualifiername, namespace))
+            click.echo('Deleted qualifier type {}'.format(qualifiername))
+
+    context.spinner_stop()
     try:
         context.wbem_server.delete_namespace(namespace)
-        context.spinner_stop()
-        click.echo('Deleted namespace {}'.format(namespace))
-    except Error as er:
-        raise pywbem_error_exception(er)
+    except Error as exc:
+        raise pywbem_error_exception(
+            exc, "Cannot delete namespace {}".format(namespace))
+    click.echo('Deleted namespace {}'.format(namespace))
 
 
 def cmd_namespace_interop(context):

@@ -114,6 +114,12 @@ Released: not yet
 * Added an '--include-instances' option to the 'class delete' command that
   replaces the deprecated '--force' / '-f' option. (issue #885)
 
+* Added an '--include-objects' option to the 'namespace delete' command that
+  causes the deletion of instances, classes and qualifier types in the targeted
+  namespace before the namespace itself is deleted. The objects in the namespace
+  are deleted in the correct order of dependencies so that no dangling
+  dependencies exist at any point in the operation. (issue #885)
+
 **Cleanup:**
 
 * Cleaned up the circumvention for Click issue #1231 by upgrading the minimum
