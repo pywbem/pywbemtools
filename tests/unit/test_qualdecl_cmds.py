@@ -352,7 +352,7 @@ TEST_CASES = [
     ['Verify qualifier command delete Aggregate (unused qualifier) succeeds',
      {'args': ['delete', 'Aggregate'],
       'general': ['-v']},
-     {'stdout': "Deleted qualifier Aggregate",
+     {'stdout': "Deleted qualifier type Aggregate",
       'rc': 0,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],

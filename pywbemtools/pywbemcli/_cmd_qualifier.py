@@ -158,7 +158,7 @@ def cmd_qualifier_delete(context, qualifiername, options):
                                      namespace=options['namespace'])
         if context.verbose:
             context.spinner_stop()
-            click.echo('Deleted qualifier {}.'.format(qualifiername))
+            click.echo('Deleted qualifier type {}.'.format(qualifiername))
     except Error as er:
         raise pywbem_error_exception(er)
 

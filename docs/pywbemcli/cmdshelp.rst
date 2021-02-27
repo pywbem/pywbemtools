@@ -1675,20 +1675,37 @@ Help text for ``pywbemcli namespace delete`` (see :ref:`namespace delete command
 
       Leading and trailing slash (``/``) characters specified in the NAMESPACE argument will be stripped.
 
-      The namespace must exist and must be empty. That is, it must not contain any objects (qualifiers, classes or
-      instances).
-
       The Interop namespace must exist on the server and cannot be deleted using this command.
 
-      WBEM servers may not allow this operation or may severely limit the conditions under which a namespace can be
-      deleted.
+      The targeted namespace must exist on the server. If the namespace contains any objects (qualifier types, classes or
+      instances), the command is rejected unless the --include-objects option is specified.
+
+      If the --include-objects option is specified, the dependency order of classes is determined, and the instances are
+      deleted first in that order, then the classes in that order, and at last the qualifier types. This ensures that no
+      dangling dependencies remain at any point in the operation. Dependencies that are considered for this purpose are
+      subclasses, referencing classes and embedding classes (EmbeddedInstance qualifier only). Cross-namespace
+      associations are deleted in the targeted namespace and are assumed to be properly handled by the server in the other
+      namespace. (i.e. to be cleaned up there as well without requiring a deletion by the client).
+
+      WARNING: Deletion of instances will cause the removal of corresponding resources in the managed environment (i.e. in
+      the real world). Some instances may not be deletable.
+
+      WARNING: Deletion of classes or qualifier types can cause damage to the server: It can impact instance providers and
+      other components in the server. WBEM servers may not allow the deletion of classes or qualifier declarations.
+
+      WBEM servers may not allow deletion of namespaces or may severely limit the conditions under which a namespace can
+      be deleted.
 
       Example:
 
         pywbemcli -n myconn namespace delete root/cimv2
 
     Command Options:
-      -h, --help  Show this help message.
+      --include-objects  Delete any objects in the namespace as well. WARNING: Deletion of instances will cause the removal
+                         of corresponding resources in the managed environment (i.e. in the real world). Default: Reject
+                         command if the namespace has any objects.
+
+      -h, --help         Show this help message.
 
 
 .. _`pywbemcli namespace interop --help`:

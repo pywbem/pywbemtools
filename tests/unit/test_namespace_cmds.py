@@ -280,7 +280,8 @@ TEST_CASES = [
         ['delete', 'foo'],
         dict(
             rc=1,
-            stderr=['CIMError.*CIM_ERR_NOT_FOUND.*namespace does not exist'],
+            stderr=['CIMError.*CIM_ERR_INVALID_NAMESPACE.*Namespace does not '
+                    'exist'],
             test='regex'
         ),
         TEST_INTEROP_MOCK_FILE, True
@@ -291,15 +292,15 @@ TEST_CASES = [
         ['delete', 'root/cimv2'],
         dict(
             rc=1,
-            stderr=['CIMError.*CIM_ERR_NAMESPACE_NOT_EMPTY.*namespace.*is not '
-                    'empty'],
+            stderr=['Cannot delete namespace .* because it has .* qualifier '
+                    'types and .* top-level classes'],
             test='regex'
         ),
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
-        "Verify that command 'namespace delete foo' succeeds when foo exists "
-        "(using interactive mode)",
+        "Verify that command 'namespace delete foo' succeeds when empty "
+        "namespace foo exists (using interactive mode)",
         dict(stdin=[
             'namespace create foo',
             'namespace delete foo',
@@ -314,6 +315,39 @@ TEST_CASES = [
                 'interop',
             ],
             test='innows'
+        ),
+        TEST_INTEROP_MOCK_FILE, True
+    ),
+    (
+        "Verify that command 'namespace delete' succeeds for non-empty "
+        "namespace with --include-objects",
+        dict(stdin=[
+            'namespace delete root/cimv2 --include-objects',
+            'namespace list'
+        ]),
+        dict(
+            rc=0,
+            stdout=[
+                # Only a subset of output lines is verified
+                'Deleted instance root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                'Deleted class CIM_Foo',
+                'Deleted qualifier type Description',
+                'Deleted namespace root/cimv2',
+                'interop',
+            ],
+            test='innows'
+        ),
+        TEST_INTEROP_MOCK_FILE, True
+    ),
+    (
+        "Verify that command 'namespace delete' fails when deleting the "
+        "Interop namespace",
+        ['delete', 'interop'],
+        dict(
+            rc=1,
+            stderr=['Cannot delete namespace .* because it is the Interop '
+                    'namespace'],
+            test='regex'
         ),
         TEST_INTEROP_MOCK_FILE, True
     ),

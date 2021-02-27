@@ -1546,7 +1546,7 @@ def all_classnames_depsorted(namespace, conn):
 
     Returns:
 
-      Iterable of string: The class names of all classes in the namespace
+      NocaseList of string: The class names of all classes in the namespace
         in dependency-sorted order.
 
     Raises:
@@ -1569,4 +1569,4 @@ def all_classnames_depsorted(namespace, conn):
     # TODO: Add support for case insensitive sorting.
     flat_cln_iterable = toposort_flatten(all_deps)
 
-    return reversed(flat_cln_iterable)
+    return NocaseList(reversed(flat_cln_iterable))
