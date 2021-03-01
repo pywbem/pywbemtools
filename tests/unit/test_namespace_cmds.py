@@ -18,15 +18,11 @@ Tests the 'namespace' command group.
 
 from __future__ import absolute_import, print_function
 
-import sys
 import pytest
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
-
-# Condition to run testcases with mock scripts that have the new setup() func
-PY_MOCK = sys.version_info[0:2] >= (3, 5)
 
 # The mock files used for testing
 TEST_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
@@ -166,7 +162,7 @@ TEST_CASES = [
             ],
             test='innows'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace list' fails when there is no "
@@ -211,7 +207,7 @@ TEST_CASES = [
             stdout=['Created namespace foo'],
             test='innows'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create foo' creates the namespace "
@@ -230,7 +226,7 @@ TEST_CASES = [
             ],
             test='innows'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create root/cimv2' fails because it "
@@ -241,7 +237,7 @@ TEST_CASES = [
             stderr=['CIMError.*CIM_ERR_ALREADY_EXISTS.*already exists'],
             test='regex'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace create interop' fails when there is no "
@@ -287,7 +283,7 @@ TEST_CASES = [
             stderr=['CIMError.*CIM_ERR_NOT_FOUND.*namespace does not exist'],
             test='regex'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete root/cimv2' fails because it "
@@ -299,7 +295,7 @@ TEST_CASES = [
                     'empty'],
             test='regex'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace delete foo' succeeds when foo exists "
@@ -319,7 +315,7 @@ TEST_CASES = [
             ],
             test='innows'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
 
     #
@@ -355,7 +351,7 @@ TEST_CASES = [
             ],
             test='innows'
         ),
-        TEST_INTEROP_MOCK_FILE, PY_MOCK
+        TEST_INTEROP_MOCK_FILE, True
     ),
     (
         "Verify that command 'namespace interop' fails when there is no "
