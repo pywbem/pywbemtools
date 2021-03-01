@@ -194,6 +194,9 @@ def class_get(context, classname, **options):
                    'of corresponding resources in the managed environment '
                    '(i.e. in the real world).'
                    'Default: Reject command if the class has any instances.')
+@click.option('--dry-run', is_flag=True, required=False,
+              help=u'Enable dry-run mode: Do not actually delete the objects, '
+                   'but display what would be done.')
 @add_options(namespace_option)
 @add_options(help_option)
 @click.pass_obj
@@ -1145,6 +1148,8 @@ def cmd_class_delete(context, classname, options):
         pywbemcliwarn("The --force / -f option has been deprecated and "
                       "will be removed in a future version. Use "
                       "--include-instances instead.", DeprecationWarning)
+    dry_run = options['dry_run']
+    dry_run_prefix = "Dry run: " if dry_run else ""
 
     namespace = options['namespace'] or context.conn.default_namespace
 
@@ -1172,16 +1177,19 @@ def cmd_class_delete(context, classname, options):
     context.spinner_stop()
     if include_instances:
         for instname in instnames:
-            try:
-                context.conn.DeleteInstance(instname)
-            except Error as exc:
-                raise pywbem_error_exception(
-                    exc, "Cannot delete instance {}".format(instname))
-            click.echo('Deleted instance {}'.format(instname))
-    try:
-        context.conn.DeleteClass(classname)
-    except Error as exc:
-        raise pywbem_error_exception(
-            exc, "Cannot delete class {} in namespace {}".
-            format(classname, namespace))
-    click.echo('Deleted class {}'.format(classname))
+            if not dry_run:
+                try:
+                    context.conn.DeleteInstance(instname)
+                except Error as exc:
+                    raise pywbem_error_exception(
+                        exc, "Cannot delete instance {}".format(instname))
+            click.echo('{}Deleted instance {}'.format(dry_run_prefix, instname))
+
+    if not dry_run:
+        try:
+            context.conn.DeleteClass(classname)
+        except Error as exc:
+            raise pywbem_error_exception(
+                exc, "Cannot delete class {} in namespace {}".
+                format(classname, namespace))
+    click.echo('{}Deleted class {}'.format(dry_run_prefix, classname))

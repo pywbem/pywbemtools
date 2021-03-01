@@ -120,6 +120,10 @@ Released: not yet
   are deleted in the correct order of dependencies so that no dangling
   dependencies exist at any point in the operation. (issue #885)
 
+* Added a ''--dry-run' option to the 'class delete' and 'namespace delete'
+  commands. If used, it displays the message about each deletion with a
+  'Dry run:' prefix and does not perform the actual deletion. (issue #911)
+
 **Cleanup:**
 
 * Cleaned up the circumvention for Click issue #1231 by upgrading the minimum

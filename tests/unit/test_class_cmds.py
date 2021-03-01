@@ -1615,6 +1615,19 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Verify class command delete (interactive) successful with no subclasses, '
+     '--include-instances, --dry-run',
+     {'stdin': ['class delete CIM_Foo_sub_sub --include-instances --dry-run',
+                'class get CIM_Foo_sub_sub',
+                'instance count CIM_Foo_sub_sub']},
+     {'stdout': ['Dry run: Deleted instance root/cimv2:CIM_Foo_sub_sub.'
+                 'InstanceID="CIM_Foo_sub_sub1"',
+                 'Dry run: Deleted class CIM_Foo_sub_sub',
+                 'class CIM_Foo_sub_sub : CIM_Foo_sub {',
+                 'root/cimv2 CIM_Foo_sub_sub 3'],
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
     # Class delete errors
     ['Verify class command delete no classname',
      ['delete'],

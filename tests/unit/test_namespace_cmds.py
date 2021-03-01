@@ -340,6 +340,32 @@ TEST_CASES = [
         TEST_INTEROP_MOCK_FILE, True
     ),
     (
+        "Verify that command 'namespace delete' succeeds for non-empty "
+        "namespace with --include-objects and --dry-run",
+        dict(stdin=[
+            'namespace delete root/cimv2 --include-objects --dry-run',
+            'namespace list',
+            'class get CIM_Foo',
+            'instance count CIM_Foo',
+        ]),
+        dict(
+            rc=0,
+            stdout=[
+                # Only a subset of output lines is verified
+                'Dry run: Deleted instance root/cimv2:CIM_Foo.InstanceID='
+                '"CIM_Foo1"',
+                'Dry run: Deleted class CIM_Foo',
+                'Dry run: Deleted qualifier type Description',
+                'Dry run: Deleted namespace root/cimv2',
+                'interop',
+                'class CIM_Foo {',
+                'root/cimv2 CIM_Foo 5',
+            ],
+            test='innows'
+        ),
+        TEST_INTEROP_MOCK_FILE, True
+    ),
+    (
         "Verify that command 'namespace delete' fails when deleting the "
         "Interop namespace",
         ['delete', 'interop'],
