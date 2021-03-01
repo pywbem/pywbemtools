@@ -300,6 +300,7 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
                                  removal of corresponding resources in the managed environment (i.e. in the real
                                  world).Default: Reject command if the class has any instances.
 
+      --dry-run                  Enable dry-run mode: Do not actually delete the objects, but display what would be done.
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
       -h, --help                 Show this help message.
 
@@ -1705,6 +1706,7 @@ Help text for ``pywbemcli namespace delete`` (see :ref:`namespace delete command
                          of corresponding resources in the managed environment (i.e. in the real world). Default: Reject
                          command if the namespace has any objects.
 
+      --dry-run          Enable dry-run mode: Do not actually delete the objects, but display what would be done.
       -h, --help         Show this help message.
 
 
