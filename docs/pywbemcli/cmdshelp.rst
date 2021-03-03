@@ -275,7 +275,7 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
       If the class has instances, the command is rejected, unless the --include-instances option is specified, in which
       case the instances are also deleted.
 
-      If other classes in that namespace depend on the class to be deleted, the command is rejected. Dependencies that are
+      If other classes in that namespace depend on the class to be deleted, the command is rejected. Dependencies
       considered for this purpose are subclasses, referencing classes and embedding classes (EmbeddedInstance qualifier
       only).
 
