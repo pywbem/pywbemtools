@@ -33,11 +33,6 @@ from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
     DEFAULT_NAMESPACE, MAX_TIMEOUT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
-# TODO(PR900): Activate the PR900 flags when continuing the work on PR #900;
-#              Remove the PR900 flags when done.
-PR900_REQUIRE_CORRECT_CONNECTION_STATUS = False
-PR900_DISCONNECT_CALLS_CLOSE = False
-
 WBEM_SERVER_OBJ = None
 
 PYWBEMCLI_LOG = 'pywbemcli.log'
@@ -443,6 +438,14 @@ class PywbemServer(object):
                 verbose=ctx.obj.verbose)
         return self._wbem_server
 
+    @property
+    def connected(self):
+        """
+        Current connected state. Returns True if connected and
+        False if not connected.
+        """
+        return bool(self._wbem_server)
+
     def password_prompt(self, ctx):
         """
         Request password from console.
@@ -519,20 +522,18 @@ class PywbemServer(object):
 
         Must be connected to the server when calling this method.
         """
-        # print("Debug: PywbemServer disconnect")
+        assert self._wbem_server is not None  # Must be connected
 
-        # TODO(PR900): Remove the PR900 flag test and else path once done.
-        if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:
-            assert self._wbem_server is not None  # Must be connected
-        else:
-            # Old code to be removed once done
-            if self._wbem_server is None:
-                return
+        ctx = click.get_current_context()
+        if ctx.obj:
+            if ctx.obj.verbose:
+                if self._mock_server:
+                    server_txt = "mock environment {}".format(self._mock_server)
+                else:
+                    server_txt = "WBEM server {}".format(self._server)
+                click.echo("Disconnecting from {}".format(server_txt))
 
-        # TODO(PR900): Remove the PR900 flag test and else path once done.
-        if PR900_DISCONNECT_CALLS_CLOSE:
-            self._wbem_server.conn.close()
-
+        self._wbem_server.conn.close()
         self._wbem_server = None
 
     def connect(self, log=None, use_pull=None, verbose=None):
@@ -551,15 +552,17 @@ class PywbemServer(object):
           ValueError: Other issues with server-related attributes of this
             object that are considered programming errors.
         """
-        # print("Debug: PywbemServer connect")
 
-        # TODO(PR900): Remove the PR900 flag test and else path once done.
-        if PR900_REQUIRE_CORRECT_CONNECTION_STATUS:
-            assert self._wbem_server is None  # Must be disconnected
-        else:
-            # Old code to be removed once done
-            if self._wbem_server is not None:
-                return
+        assert self._wbem_server is None  # Must be disconnected
+
+        ctx = click.get_current_context()
+        if ctx.obj:
+            if ctx.obj.verbose:
+                if self._mock_server:
+                    server_txt = "mock environment {}".format(self._mock_server)
+                else:
+                    server_txt = "WBEM server {}".format(self._server)
+                click.echo("Connecting to {}".format(server_txt))
 
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(

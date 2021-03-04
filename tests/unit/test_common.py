@@ -848,7 +848,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
     # test option with only one choice bypasses user request
     if not choices:
         context = ContextObj(None, None, None, None, None, None, None, None,
-                             None, None)
+                             None, None, False, False)
 
         # The code to be tested
         act_rtn = pick_one_from_list(context, options, title)
@@ -867,7 +867,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
             with patch(mock_echo_func):
                 # Fake context object
                 context = ContextObj(None, None, None, None, None, None, None,
-                                     None, None, None)
+                                     None, None, None, False, False)
 
                 # The code to be tested
                 act_rtn = pick_one_from_list(context, options, title)

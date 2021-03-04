@@ -82,14 +82,24 @@ def _validate_connection_name(connections_repo, connection_name):
     """
     Validate that connection name exists in the connection_repo and that
     the connection name can be retrieved.
+
+    Returns:
+        PywbemServer object that defines connection if found in connections_file
+
+    Raises:
+        click.ClickException - connection not found
+        ConnectionsFileError - Connections file invalid
     """
     try:
-        _ = connections_repo[connection_name]
+        pywbem_server = connections_repo[connection_name]
+        return pywbem_server
+
     except KeyError:
         raise click.ClickException(
             'Connection definition "{}" not found in connections '
             'file "{}"'.
             format(connection_name, connections_repo.connections_file))
+
     except ConnectionsFileError as cfe:
         click.echo('Fatal error: {0}: {1}'.
                    format(cfe.__class__.__name__, cfe),
@@ -589,6 +599,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
+
     resolved_mock_server = []
 
     # Options not allowed when -name is used and when
@@ -637,6 +648,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # Process mock_server option
     if mock_server:
         resolved_mock_server = _resolve_mock_server(mock_server)
+    else:
+        resolved_mock_server = None
 
     # Validate that only one of server, mock_server, and connection name exists
     # We this manually because click does not have way to do mutual exclusion
@@ -650,6 +663,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
+
+    # Set flag that will be used to indicate server change in
+    # in interactive mode so the server can be disconnected after
+    # use.
+    close_interactive_server = False
 
     # Command mode (ctx is None) or initial input in interactive mode.
     # Apply the documented option defaults to create a pywbem_server instance
@@ -696,18 +714,18 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         # Apply the general options from the command line options
         # or from the context object to modify the PywbemServer object and
         # for a new ContextObj for the command
+        modified_server = False
 
-        # If --name option, get server from connection
+        # If --name option, get pywbem_server object from connection
         if connection_name:
-            # validate_connections_file(connections_repo). In interactive mode
-            # raise ClickException but do not abort unless connections
-            # file does not exist or is bad.
             _validate_connections_file(connections_repo)
-            _validate_connection_name(connections_repo, connection_name)
+            pywbem_server = _validate_connection_name(connections_repo,
+                                                      connection_name)
+            modified_server = True
+            close_interactive_server = True
 
         # If other parameters, modify the existing connection and reset it.
-        # Issue 912, part 3, TODO: refactor this code to avoid deepcopy when not
-        # needed.
+        # TODO: refactor this code to avoid deepcopy when not needed.
         else:
             if pywbem_server is None:
                 # Copy to keep the original clean from any changes
@@ -717,81 +735,66 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 if ctx.obj.pywbem_server_exists():
                     pywbem_server = deepcopy(ctx.obj.pywbem_server)
 
-            # Modify the currently defined pywbem_server if it is defined
-            # with any general options including resetting options and if
-            # there are any modifications to pywbem_server, set that modified
-            # server into the current context object.
-            # In cases where input parameter of "" is allowed to
-            # reset option values, the option is tested for "is not None"
-            # to include empty string in test.
-            if pywbem_server:
-                modified_server = False
-                if server:
-                    if pywbem_server.mock_server:
-                        pywbem_server.mock_server = []
-                    pywbem_server.server = server
-                    modified_server = True
-                if mock_server:
-                    if pywbem_server.server:
-                        pywbem_server.server = None
-                    pywbem_server.mock_server = resolved_mock_server
-                    modified_server = True
-                if user is not None:
-                    pywbem_server.user = _set_default_if_empty_str(user)
-                    modified_server = True
-                if password is not None:
-                    pywbem_server.password = _set_default_if_empty_str(password)
-                    modified_server = True
-                if verify is not None:
-                    pywbem_server.verify = resolved_verify
-                    modified_server = True
-                if ca_certs:
-                    pywbem_server.ca_certs = ca_certs
-                    modified_server = True
-                if certfile is not None:
-                    pywbem_server.certfile = _set_default_if_empty_str(certfile)
-                    modified_server = True
-                if keyfile is not None:
-                    pywbem_server.keyfile = _set_default_if_empty_str(keyfile)
-                    modified_server = True
-                if timeout:
-                    pywbem_server.timeout = resolved_timeout
-                    modified_server = True
-                if use_pull:
-                    pywbem_server.use_pull = resolved_use_pull
-                    modified_server = True
-                if default_namespace is not None:
-                    pywbem_server.default_namespace = \
-                        _set_default_if_empty_str(default_namespace,
-                                                  DEFAULT_NAMESPACE)
-                    modified_server = True
+        # Modify the currently defined pywbem_server if it is defined
+        # with any general options including resetting options and if
+        # there are any modifications to pywbem_server, set that modified
+        # server into the current context object.
+        # In cases where input parameter of "" is allowed to
+        # reset option values, the option is tested for "is not None"
+        # to include empty string in test.
 
-                # If modified, disconnect existing connection
-                if modified_server:
+        if pywbem_server:
+            if server:
+                if pywbem_server.mock_server:
+                    pywbem_server.mock_server = []
+                pywbem_server.server = server
+                modified_server = True
+                close_interactive_server = True
+            if mock_server:
+                if pywbem_server.server:
+                    pywbem_server.server = None
+                pywbem_server.mock_server = resolved_mock_server
+                modified_server = True
+            if user is not None:
+                pywbem_server.user = _set_default_if_empty_str(user)
+                modified_server = True
+            if password is not None:
+                pywbem_server.password = _set_default_if_empty_str(password)
+                modified_server = True
+            if verify is not None:
+                pywbem_server.verify = resolved_verify
+                modified_server = True
+            if ca_certs:
+                pywbem_server.ca_certs = ca_certs
+                modified_server = True
+            if certfile is not None:
+                pywbem_server.certfile = _set_default_if_empty_str(certfile)
+                modified_server = True
+            if keyfile is not None:
+                pywbem_server.keyfile = _set_default_if_empty_str(keyfile)
+                modified_server = True
+            if timeout:
+                pywbem_server.timeout = resolved_timeout
+                modified_server = True
+            if use_pull:
+                pywbem_server.use_pull = resolved_use_pull
+                modified_server = True
+            if default_namespace is not None:
+                pywbem_server.default_namespace = \
+                    _set_default_if_empty_str(default_namespace,
+                                              DEFAULT_NAMESPACE)
+                modified_server = True
+
+            # If modified, disconnect existing connection
+            # This MUST BE two if statements to work.
+            if modified_server:
+                if pywbem_server.connected:
                     pywbem_server.disconnect()
-                else:
-                    pywbem_server = ctx.obj.pywbem_server
-            elif connection_name:
-                # TODO/KS: Explore source of all of the following. Do they need
-                # to come from cli or can they come from previous object?
-                # They all need to come from either the object itself
-                # or cli parameters. Issue #912 part3
-                pywbem_server = _create_server_instance(
-                    server, connection_name,
-                    resolved_default_namespace,
-                    user, password,
-                    timeout,
-                    resolved_use_pull,
-                    resolved_pull_max_cnt,
-                    resolved_verify,
-                    certfile, keyfile,
-                    resolved_ca_certs,
-                    resolved_mock_server,
-                    connections_repo,
-                    conditional_options,
-                    verbose)
             else:
-                pywbem_server = None
+                pywbem_server = ctx.obj.pywbem_server
+
+        else:
+            pywbem_server = None
 
         # The following variables are maintained only in the context_obj and
         # not attached to any particular connection. If the cli argument is
@@ -848,14 +851,19 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # command line.
     # Set pull_max_cnt to either resolved or default here so we keep default
     # in persistent file but set working value in context.
+
+    interactive_mode = ctx.obj.interactive_mode if ctx.obj else False
     ctx.obj = ContextObj(pywbem_server, output_format,
                          resolved_use_pull,
                          resolved_pull_max_cnt,
                          timestats,
                          log, verbose, pdb,
                          warn,
-                         connections_repo)
-    # Env.var PYWBEMCLI_DIAGNOSTICS turns on disgnostic prints for developer
+                         connections_repo,
+                         interactive_mode,
+                         close_interactive_server)
+
+    # Env.var PYWBEMCLI_DIAGNOSTICS turns on diagnostic prints for developer
     # use and is therefore not documented.
     if os.getenv('PYWBEMCLI_DIAGNOSTICS'):
         display_click_context(ctx, msg="DIAGNOSTICS-NEWCTX: Initial context:",
@@ -869,9 +877,16 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             format(_python_nm[0], _python_nm[1]),
             DeprecationWarning)
 
-    # Invoke command if one exists or start the repl mode
+    # If no invoked_subcommand, there is no command to execute this flag
+    # causes us to start interactive mode
     if ctx.invoked_subcommand is None:
+        ctx.obj.interactive_mode = True
         ctx.invoke(repl)
+
+        # Exit interactive mode and exit Pywbemcli. Disconnect any connected
+        # server.
+        if ctx.obj.is_connected():
+            ctx.obj.pywbem_server.disconnect()
 
 
 @cli.command('help', options_metavar=GENERAL_OPTS_TXT)

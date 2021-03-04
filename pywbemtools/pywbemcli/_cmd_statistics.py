@@ -215,23 +215,6 @@ OBJMGR_STAT_PROPERTY_NAME = "GatherStatisticalData"
 CIMOM_STATISTICAL_DATA_CLASS = "CIM_CIMOMStatisticalData"
 
 
-def test_conn_exists(context):
-    """
-    Test if server defined.
-
-    Returns if server defined
-
-    Exception:
-       click.Exception if no current server.
-    """
-    # TODO/KS: Is this necessary since we should be protecting with classes
-    #          or does the pywbem_server access provide same protection??
-    conn = context.pywbem_server.conn
-    if not conn:
-        raise click.ClickException(
-            'No server defined in current context.')
-
-
 def get_objmgr_inst(context):
     """
     Return the state of statistics gathering on the server.
@@ -342,7 +325,6 @@ def cmd_statistics_server_on(context):
     Attempt to enable the statistics gathering on the current server if there
     is a current server defined.
     """
-    test_conn_exists(context)
     set_server_statistics(context, True)
 
 
@@ -351,7 +333,6 @@ def cmd_statistics_server_off(context):
     Attempt to disable the statistics gathering on the current server if there
     is a current server defined.
     """
-    test_conn_exists(context)
     set_server_statistics(context, False)
 
 
@@ -370,10 +351,8 @@ def cmd_statistics_status(context):
     """
 
     # validate output format with default of table
-    output_format = validate_output_format(context.output_format, ['TABLE',
-                                                                   'TEXT'])
-
-    test_conn_exists(context)
+    output_format = validate_output_format(context.output_format,
+                                           ['TABLE', 'TEXT'])
 
     # Display server status as on/off
     try:
@@ -410,7 +389,6 @@ def cmd_statistics_reset(context):
     It does reset the statistics kept in the pywbem client for server
     response time.
     """
-    test_conn_exists(context)
 
     conn = context.pywbem_server.conn
     conn.statistics.reset()
@@ -424,11 +402,10 @@ def cmd_statistics_show(context):
     If the statistics are enabled for the client and the connection exits,
     display the statistics
     """
-    test_conn_exists(context)
+
     conn = context.pywbem_server.conn
 
     context.spinner_stop()
-
     click.echo(context.format_statistics(conn.statistics, context))
 
 
@@ -576,9 +553,6 @@ def cmd_statistics_server_show(context):
             #       Since we want to be able to relate that to the server time
             #       in the client statistics, we calculate the server time
             #       as CIMOM time plus provider time.
-            # TODO: Clarify for OpenPegasus whether CimomElapsedTime is just
-            #       CIMOM time as described, or is already the total server
-            #       time.
             avg_server_time_ms = avg_cimom_time_ms + avg_provider_time_ms
 
             avg_request_size = avg_value(inst['RequestSize'],
