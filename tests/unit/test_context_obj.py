@@ -44,6 +44,8 @@ def test_ContextObj_init():
     pdb = False
     warn = False
     connections_repo = None
+    interactive_mode = True
+    close_interactive_server = True
 
     ctxobj = ContextObj(
         pywbem_server=svr,
@@ -55,6 +57,9 @@ def test_ContextObj_init():
         verbose=verbose,
         pdb=pdb,
         warn=warn,
-        connections_repo=connections_repo)
+        connections_repo=connections_repo,
+        interactive_mode=interactive_mode,
+        close_interactive_server=close_interactive_server)
 
     assert ctxobj.pywbem_server == svr
+    assert ctxobj.interactive_mode is True

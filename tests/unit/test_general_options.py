@@ -33,6 +33,9 @@ from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
+CONNECTION_REPO_TEST_FILE_PATH = os.path.join(TEST_DIR,
+                                              'tst_general_options.yaml')
+CONN_REPO_FP_STR = str(CONNECTION_REPO_TEST_FILE_PATH)
 
 
 def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
@@ -51,6 +54,8 @@ SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_MODEL_FILE)
 PYTHON_MOCK_FILE_PATH = os.path.join(TEST_DIR, 'simple_python_mock_script.py')
 BAD_MOF_FILE_PATH = os.path.join(TEST_DIR, 'mof_with_error.mof')
 BAD_PY_FILE_PATH = os.path.join(TEST_DIR, 'py_with_error.py')
+
+MOCK_SERVER_MODEL = os.path.join(TEST_DIR, 'testmock', 'wbemserver_mock.py')
 
 GENERAL_HELP_LINES = [
     """
@@ -1287,7 +1292,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, FAIL],
 
-
     ['Verify operation that makes request to WBEM server fails with no server.',
      {'args': ['enumerate'],
       'cmdgrp': 'class', },
@@ -1298,7 +1302,7 @@ TEST_CASES = [
 
     #
     #  Verify operation that tries interactive general options for name
-    #  and server/mock server fails
+    #  and server/mock server fails.
     #
 
     ['Test conflicting server defintions interactive mode.',
@@ -1307,6 +1311,57 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
+
+    #
+    # Test of 3 ways to execute same simple command. Creates a mock
+    # and tests combination of single comman. Uses -v to test for
+    # Connect and disconnect
+
+    ['Verify new config file with defined data is created and saved.',
+     {'general': ['-v', '-C', CONN_REPO_FP_STR],
+      'stdin': ['connection save blah',
+                'connection show']},
+     {'stdout': ['default-namespace root/cimv2'],
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL_FILE, OK],
+
+    ['Verify simple pywbem command against file works and verbose connect and '
+     'disconnect work.',
+     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+      'args': ['enumerate', '--di', '--no', '--subclass-of', 'CIM_Foo_sub'],
+      'cmdgrp': 'class'},
+     {'stdout': ["Connecting to mock environment",
+                 'CIM_Foo_sub_sub',
+                 "Disconnecting from mock environment"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify simple pywbem command with stdin on same connection name.',
+     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+      'stdin': ['class enumerate --di --no --subclass-of CIM_Foo_sub']},
+     {'stdout': ["Connecting to mock environment",
+                 'CIM_Foo_sub_sub',
+                 "Disconnecting from mock environment"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify cmd with -n option in stdin.',
+     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+      'stdin': ['-n blah -v class enumerate --di --no '
+                '--subclass-of CIM_Foo_sub']},
+     {'stdout': ["Connecting to mock environment",
+                 'CIM_Foo_sub_sub',
+                 "Disconnecting from mock environment"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify interactive create mock with bad file name does not fail.',
+     {'general': ['-v', '-C', CONN_REPO_FP_STR],
+      'stdin': ['connection delete blah']},
+     {'stdout': ['Deleted connection "blah"'],
+      'test': 'innows', },
+     None, OK],
+
 ]
 
 # TODO add test for pull operations with pull ops max size variations

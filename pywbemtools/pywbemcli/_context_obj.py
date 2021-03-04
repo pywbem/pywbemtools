@@ -31,7 +31,8 @@ import click_spinner
 from ._common import format_table, validate_output_format
 
 
-class ContextObj(object):  # pylint: disable=useless-object-inheritance
+class ContextObj(object):
+    # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
         Manage the pywbemcli context that is carried within the Click
         context object in the obj parameter. This is the object that
@@ -44,7 +45,52 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     # pylint: disable=unused-argument
     def __init__(self, pywbem_server, output_format, use_pull,
                  pull_max_cnt, timestats, log, verbose, pdb,
-                 warn, connections_repo):
+                 warn, connections_repo, interactive_mode,
+                 close_interactive_server):
+        """
+        Parameters:
+
+          pywbem_server :class:`PywbemServer`):
+            PywbemServer instance to be used for connection
+
+          output_format (:term:`string or None):
+            String representing the type of output from the --output-format
+            general option or None if the default is to be used.
+
+          use_pull (:class:`py:bool` or None):
+            If boolean defines whether pull operations are to be used.  If
+            None, the pywbem client will decide.           `
+
+          pull_max_cnt(:term:`integer`):
+            Positive integer represenging the max size of each pull
+            operation response
+
+          timestats (:class:`py:bool`):
+            See timestats general option
+
+          log (:term:`string or None):
+            String defining the characteristics of log output for each
+            WBEM operation or None if logging is disabled.
+
+          verbose (:class:`py:bool`):
+            See verbose general option
+
+          pdb (:class:`py:bool`):
+            See pdb general option
+
+          warn (:class:`py:bool`):
+            See warn general option
+
+          connections_repo:
+
+          interactive_mode (:class:`py:bool`):
+            If True, pywbemcli is in interactive mode.
+
+          close_interactive_server (:class:`py:bool`):
+            Flag that defines interactive command with a server definition
+            that must be disconnected after the command
+
+        """
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
@@ -58,6 +104,8 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         # maintained through interactive session.
         self._warn = warn
         self._connections_repo = connections_repo
+        self.interactive_mode = interactive_mode
+        self._close_interactive_server = close_interactive_server
 
         self._spinner_enabled = None  # Deferred init in getter
         self._spinner_obj = click_spinner.Spinner()
@@ -65,10 +113,11 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
                'use_pull={}, pull_max_cnt={}, timestats={}, verbose={}, ' \
-               'spinner_enabled={}' \
+               'spinner_enabled={}, interactive_mode={}' \
                .format(id(self), self._pywbem_server, self.output_format,
                        self.use_pull, self.pull_max_cnt, self.timestats,
-                       self.verbose, self.spinner_enabled)
+                       self.verbose, self.spinner_enabled,
+                       self._interactive_mode)
 
     @property
     def output_format(self):
@@ -91,6 +140,21 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """Setter method; for a description see the getter method."""
         # pylint: disable=attribute-defined-outside-init
         self._timestats = value
+
+    @property
+    def interactive_mode(self):
+        """
+        :class:`py:bool`: 'True' if in interactive mode and 'False' if
+        in the command mode.
+        """
+        return self._interactive_mode
+
+    @interactive_mode.setter
+    def interactive_mode(self, mode):
+        """Setter method; for a description see the getter method."""
+        assert isinstance(mode, bool)
+        # pylint: disable=attribute-defined-outside-init
+        self._interactive_mode = mode
 
     @property
     def use_pull(self):
@@ -138,16 +202,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
         """
         return self._connections_repo
 
-    @property
     def is_connected(self):
         """
-        bool: Indicates whether currently contected to a WBEM server.
+        bool: Indicates whether currently connected to a WBEM server. Where
+        connected implies both the existence of the PywbemServer instance
+        and that the connection to a server has been made.
 
         That is the case as soon as commands have been executed that
         communicate with the server.
         """
-        return self._pywbem_server and \
-            self._pywbem_server.wbem_server is not None
+        return self._pywbem_server and self._pywbem_server.connected
 
     @property
     def pywbem_server(self):
@@ -287,10 +351,16 @@ class ContextObj(object):  # pylint: disable=useless-object-inheritance
                 self.spinner_stop()
 
             # Issue statistics if requested and if the command used a conn.
-            if self.timestats and self.is_connected:
+            if self.timestats and self.is_connected():
                 context = click.get_current_context()
                 click.echo(self.format_statistics(
                     self.pywbem_server.conn.statistics, context.obj))
+
+            # Close any existing connection if in command mode or if the
+            # close_interactive_server flag is set
+            if not self.interactive_mode or self._close_interactive_server:
+                if self.is_connected():
+                    self.pywbem_server.disconnect()
 
     def format_statistics(self, statistics, context):
         # pylint: disable=no-self-use

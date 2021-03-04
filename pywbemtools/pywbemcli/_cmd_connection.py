@@ -681,17 +681,18 @@ def cmd_connection_select(context, name, options):
                          context.verbose,
                          context.pdb,
                          context.warn,
-                         context.connections_repo)
+                         context.connections_repo,
+                         context.interactive_mode,
+                         False)
 
     # Update the root context making this context the basis for future
     # commands in the current interactive session
     ContextObj.update_root_click_context(new_ctx)
 
-    # close any existing connection.
-    # TODO/KS: Validate that the first test is required.
-    if context.pywbem_server_exists():
-        if context.is_connected:
-            context.pywbem_server.disconnect()
+    # Close any existing connection.
+    if context.is_connected():
+        context.pywbem_server.disconnect()
+
     context.spinner_stop()
     if options['default']:
         connections_repo.default_connection_name = name
