@@ -34,46 +34,47 @@ MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 STATISTICS_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics COMMAND [ARGS] '
     '[COMMAND-OPTIONS]',
-    "Command group for WBEM server statistics.",
+    "Command group for WBEM operation statistics.",
     CMD_OPTION_HELP_HELP_LINE,
-    'reset              Reset the counts in statistics gathered by pywbemcli.',
-    'server-on          Enable statistics on current server.',
-    'server-off         Disable statistics on current server.',
-    'status             Show statistics enabled status for client and server.',
-    'server-show        Display statistics gathered by server.',
-    'show               Display statistics managed by pywbemcli.',
+    'reset              Reset client maintained statistics.',
+    'server-on          Enable server maintained statistics.',
+    'server-off         Disable server maintained statistics.',
+    'status             Show enabled status of client and server maintained '
+    'statistics.',
+    'server-show        Display server maintained statistics.',
+    'show               Display client maintained statistics.',
 ]
 
 STATISTICS_SERVER_ON_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics server-on [COMMAND-OPTIONS]',
-    'Enable statistics on current server.'
+    'Enable server maintained statistics.'
 ]
 
 STATISTICS_SERVER_OFF_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics server-off '
     '[COMMAND-OPTIONS]',
-    'Disable statistics on current server.'
+    'Disable server maintained statistics.'
 ]
 
 STATISTICS_STATUS_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics status [COMMAND-OPTIONS]',
-    'Show statistics enabled status for client and server.'
+    'Show enabled status of client and server maintained statistics.'
 ]
 
 STATISTICS_RESET_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics reset [COMMAND-OPTIONS]',
-    'Reset the counts in statistics gathered by pywbemcli.'
+    'Reset client maintained statistics.'
 ]
 
 STATISTICS_SHOW_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics show [COMMAND-OPTIONS]',
-    'Display statistics managed by pywbemcli.'
+    'Display client maintained statistics.'
 ]
 
 STATISTICS_SERVER_SHOW_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] statistics server-show '
     '[COMMAND-OPTIONS]',
-    'Display statistics gathered by server.'
+    'Display server maintained statistics.'
 ]
 
 OK = True     # mark tests OK when they execute correctly
@@ -357,7 +358,7 @@ TEST_CASES = [
      {'general': [],
       'cmdgrp': 'statistics',
       'args': ['server-on']},
-     {'stdout': ['Server GatherStatisticalData set on'],
+     {'stdout': ['Server statistics gathering set to on'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
@@ -366,7 +367,7 @@ TEST_CASES = [
      {'general': [],
       'cmdgrp': 'statistics',
       'args': ['server-on']},
-     {'stdout': ['Server GatherStatisticalData set on'],
+     {'stdout': ['Server statistics gathering set to on'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
@@ -375,8 +376,7 @@ TEST_CASES = [
      {'general': ['--output-format', 'text'],
       'cmdgrp': 'statistics',
       'args': ['status']},
-     {'stdout': ['Statistics status: client statistics=off; '
-                 'Server statistics=off'],
+     {'stdout': ['Statistics status: client=off; server=off'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
@@ -385,8 +385,7 @@ TEST_CASES = [
      {'general': ['--output-format', 'text'],
       'cmdgrp': 'statistics',
       'args': ['status']},
-     {'stdout': ['Statistics status: client statistics=off; '
-                 'Server statistics=off'],
+     {'stdout': ['Statistics status: client=off; server=off'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
@@ -399,16 +398,12 @@ TEST_CASES = [
                 'statistics server-off',
                 'statistics status',
                 '-T statistics status']},
-     {'stdout': ['Server GatherStatisticalData set on',
-                 'Statistics status: client statistics=off; '
-                 'Server statistics=on',
-                 'Server GatherStatisticalData set off',
-                 'Statistics status: client statistics=off; '
-                 'Server statistics=off',
-                 'Statistics status: client statistics=off; '
-                 'Server statistics=off',
-                 'Statistics status: client statistics=on; '
-                 'Server statistics=off'],
+     {'stdout': ['Server statistics gathering set to on',
+                 'Statistics status: client=off; server=on',
+                 'Server statistics gathering set to off',
+                 'Statistics status: client=off; server=off',
+                 'Statistics status: client=off; server=off',
+                 'Statistics status: client=on; server=off'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
@@ -418,12 +413,12 @@ TEST_CASES = [
      {'general': ['--output-format', 'table', '-T'],
       'stdin': ['statistics server-on',
                 'statistics status']},
-     {'stdout': ['Server GatherStatisticalData set on',
+     {'stdout': ['Server statistics gathering set to on',
                  'Statistics status',
-                 'statistics source    status',
-                 '-------------------  --------',
+                 'Item                         Status',
+                 '---------------------------  --------',
                  'client statistics display    on',
-                 'server statistics    on'],
+                 'server statistics gathering  on'],
       'rc': 0,
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],

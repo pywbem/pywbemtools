@@ -52,25 +52,23 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 @add_options(help_option)
 def statistics_group():
     """
-    Command group for WBEM server statistics.
+    Command group for WBEM operation statistics.
 
-    This command group defines commands to control the display of statistical
-    data managed by pywbemcli based on the ``--timestats`` general
-    option which enables the gathering and display of statistics in pywbemcli.
+    This command group defines commands to control the gathering and display of
+    statistical data about the WBEM operations issued by pywbemcli or processed
+    by a WBEM server.
 
-    Since there may also be capabilities to manage statistics in WBEM servers,
-    these commands provide for a) enabling statistics gathering in the WBEM
-    server and b) displaying the information gathered.
+    Pywbemcli maintains statistics about the WBEM operations it has issued. This
+    includes the Client Time measured on the client side and the Server Time
+    measured by the WBEM server and reported in the 'WBEMServerResponseTime'
+    header field in the CIM-XML response (if supported by the WBEM server).
 
-    One component of the pywbemcli client side statistics depends on the state
-    of statistics gathering enabled in the WBEM server, reporting the server
-    response time. This appears as the column "Server Time" in the report if
-    statistics gathering in the server is enabled.
-
-    Since gathering of statistics in a WBEM server may depend on a server
-    setting, pywbemcli provides commands to enable and disable the statistics
-    gathering in the server by setting the CIM_ObjectManager
-    "GatherStatisticalData" property.
+    The WBEM server may also support maintaining statistics about the WBEM
+    operations it has processed (possibly by multiple clients). Pywbemcli
+    supports enabling or disabling the statistics gathering on the WBEM server
+    via the 'GatherStatisticalData' property in the 'CIM_ObjectManager'
+    instance for the WBEM server and supports retrieving and displaying the
+    server maintained statistics.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -85,14 +83,14 @@ def statistics_group():
 @click.pass_obj
 def statistics_reset(context):
     """
-    Reset the counts in statistics gathered by pywbemcli.
+    Reset client maintained statistics.
 
-    This command resets the counts in the statistics gathered by pywbemcli for
-    the current connection including the statistics on the server response
-    times received from the WBEM server in the ``WBEMServerResponseTime``
-    header .
+    This command resets the counts in the statistics maintained by pywbemcli.
+    This includes the server response times received from the WBEM server in
+    the 'WBEMServerResponseTime' header field of the CIM-XML response,
+    if supported and enabled.
 
-    It does not reset statistics managed by the WBEM server..
+    This command does not reset the server maintained statistics.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_statistics_reset(context))
@@ -104,20 +102,21 @@ def statistics_reset(context):
 @click.pass_obj
 def statistics_server_on(context):
     """
-    Enable statistics on current server.
+    Enable server maintained statistics.
 
-    This command  activates the gathering of statistics in the WBEM
-    server and the return of server response times for inclusion in
-    pywbemcli maintained statistics. The gathering of server statistics and the
-    returning of server response times may not be implemented by all WBEM
-    servers.
+    This command activates the gathering of statistics in the current
+    WBEM server and also activates the returning of server response times in
+    the CIM-XML response for inclusion in the client maintained statistics,
+    by setting the 'GatherStatisticalData' property to True in the
+    'CIM_ObjectManager' instance for the WBEM server.
 
-    This may fail if the server does not manage statistics or does not allow
-    a client to modify the state of statistics gathering.
+    This command fails if the server does not support gathering statistics
+    or does not allow a client to modify the state of statistics gathering.
 
-    WBEM server statistics gathering state does not impact pywbemcli client
-    statistics gathering other than whether the 'Server Time` column is
-    included in the report. See the --timestats general option.
+    This command does not affect the state of the client maintained statistics
+    other than whether the server response times are included. See the
+    '--timestats' general option for controlling the displaying of client
+    maintained statistics.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_statistics_server_on(context))
@@ -129,20 +128,21 @@ def statistics_server_on(context):
 @click.pass_obj
 def statistics_server_off(context):
     """
-    Disable statistics on current server.
+    Disable server maintained statistics.
 
-    This command turns off the gathering of statistics in the WBEM
-    server and the return of server response times for inclusion in
-    pywbemcli maintained statistics. The gathering of server statistics and the
-    returning of server response times may not be implemented by all WBEM
-    servers.
+    This command deactivates the gathering of statistics in the current
+    WBEM server and also deactivates the returning of server response times in
+    the CIM-XML response for inclusion in the client maintained statistics,
+    by setting the 'GatherStatisticalData' property to False in the
+    'CIM_ObjectManager' instance for the WBEM server.
 
-    This may fail if the server does not manage statistics or does not allow
-    a client to modify the state of statistics gathering.
+    This command fails if the server does not support gathering statistics
+    or does not allow a client to modify the state of statistics gathering.
 
-    WBEM server statistics gathering state does not impact pywbemcli client
-    statistics gathering other than whether the 'Server Time.s` column is
-    included in the report. See the --timestats general option.
+    This command does not affect the state of the client maintained statistics
+    other than whether the server response times are included. See the
+    '--timestats' general option for controlling the displaying of client
+    maintained statistics.
     """
     # pylint: disable=too-many-function-args
 
@@ -155,18 +155,16 @@ def statistics_server_off(context):
 @click.pass_obj
 def statistics_server_show(context):
     """
-    Display statistics gathered by server.
+    Display server maintained statistics.
 
-    Display the current statistics gathered in the WBEM server if statistics
-    gathering is implemented and active (see ```statistics server-on```) for
-    the current WBEM server.
+    Retrieve and display the statistics gathered by the current WBEM server.
+    This requires statistics gathering to be enabled on the server (see
+    'statistics server-on' command).
 
-    These statistics are independent of the statistics gathered by the pywbemcli
-    client and displayed for example with the command ``statistics show``.
+    This command fails if the server does not support gathering statistics.
 
-    Presents a table of the gathered statistical information.
-
-    This command is not implemented. See issue #895
+    These statistics are independent of the client maintained statistics which
+    can be displayed with the command 'statistics show'.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_statistics_server_show(context))
@@ -178,14 +176,15 @@ def statistics_server_show(context):
 @click.pass_obj
 def statistics_show(context):
     """
-    Display statistics managed by pywbemcli.
+    Display client maintained statistics.
 
-    Display the current statistics including client managed statistics on WBEM
-    operations and if WBEM server statistics are implemented and enabled, the
-    statistics on the returned ``WBEMServerResponseTime`` header.
+    Display the statistics gathered by pywbemcli.
+    This includes the server response times received from the WBEM server in
+    the 'WBEMServerResponseTime' header field of the CIM-XML response,
+    if supported and enabled.
 
-    Statistics are always displayed as a table independent of output-format
-    defined.
+    These statistics are independent of the server maintained statistics which
+    can be displayed with the command 'statistics server-show'.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_statistics_show(context))
@@ -197,10 +196,10 @@ def statistics_show(context):
 @click.pass_obj
 def statistics_status(context):
     """
-    Show statistics enabled status for client and server.
+    Show enabled status of client and server maintained statistics.
 
-    Show enabled status on statistics gathering for pywbemcli and the
-    current WBEM server. Table and text formats are allowed.
+    Show the enabled status for displaying the statistics gathered by
+    pywbemcli, and for gathering the statistics on the current WBEM server.
     """
     # pylint: disable=too-many-function-args
     context.execute_cmd(lambda: cmd_statistics_status(context))
@@ -288,8 +287,8 @@ def set_server_statistics(context, desired_state):
             format(OBJMGR_CLN, OBJMGR_STAT_PROPERTY_NAME, interop_ns, ke))
 
     if cur_state == desired_state:
-        click.echo("Server already in state {}".format(
-            to_on_off(desired_state)))
+        click.echo("Server statistics gathering was already {}".
+                   format(to_on_off(desired_state)))
         return
 
     objmgr[OBJMGR_STAT_PROPERTY_NAME] = desired_state
@@ -311,7 +310,7 @@ def set_server_statistics(context, desired_state):
             'in its {} instance to {} but did not actually change it.'.
             format(OBJMGR_STAT_PROPERTY_NAME, OBJMGR_CLN, interop_ns))
 
-    click.echo("Server GatherStatisticalData set {}".
+    click.echo("Server statistics gathering set to {}".
                format(to_on_off(desired_state)))
 
 
@@ -338,10 +337,10 @@ def cmd_statistics_server_off(context):
 
 def cmd_statistics_status(context):
     """
-    Show current status of both client and WBEM server statistics if there
+    Show current status of both client and server statistics if there
     is a connection.
 
-    It gets the status of the WBEM server statistics from the WBEM server
+    It gets the status of the server statistics from the WBEM server
     and the client statistics from the context and displays either a
     table or text representation of the status.
 
@@ -369,22 +368,18 @@ def cmd_statistics_status(context):
 
     pywbemcli_stats_status = to_on_off(context.timestats)
     if output_format_is_table(output_format):
-        headers = ['statistics source', 'status']
-
-        rows = [["client statistics display", pywbemcli_stats_status],
-                ['server statistics', svr_status]]
+        headers = ['Item', 'Status']
+        rows = [['client statistics display', pywbemcli_stats_status],
+                ['server statistics gathering', svr_status]]
         click.echo(format_table(rows, headers, "Statistics status"))
-
     else:
-        click.echo("Statistics status: client statistics={}; Server "
-                   "statistics={}".format(pywbemcli_stats_status,
-                                          svr_status))
+        click.echo("Statistics status: client={}; server={}".
+                   format(pywbemcli_stats_status, svr_status))
 
 
 def cmd_statistics_reset(context):
     """
     Reset the client statistics. This command does not impact the
-
     statistics retrieved from the server with ``statistics server-show``.
     It does reset the statistics kept in the pywbem client for server
     response time.
