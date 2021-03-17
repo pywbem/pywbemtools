@@ -94,8 +94,8 @@ class ConnectionsFileLoadError(ConnectionsFileError):
           message (:term:`string`): Text describing just the error
             (without text like 'Cannot load connection file {file}').
         """
-        msg = 'Cannot load connections file "{0}": {1}'. \
-            format(connections_file, message)
+        msg = 'Cannot load connections file "{0}": {1}'.format(connections_file,
+                                                               message)
         super(ConnectionsFileLoadError, self).__init__(msg)
 
 
@@ -124,7 +124,7 @@ class ConnectionRepository(object):
     example that defines a mock connection named 'mock1', a server connection
     named 'server1', and defines 'mock1' as the default connection. The
     properties of each connection definition are the attributes of PywbemServer
-    objects::
+    objects:
 
         connection_definitions:
             mock1:
@@ -168,7 +168,7 @@ class ConnectionRepository(object):
     # default connection name
     default_connection_grp_name = 'default_connection_name'
 
-    def __init__(self, connections_file):
+    def __init__(self, connections_file, verbose=None):
         """
         Initialize the object. The connections file is not yet loaded.
 
@@ -176,6 +176,9 @@ class ConnectionRepository(object):
 
           connections_file (:term:`string`):
             Path name of the connections file. Must not be `None`.
+
+          verbose (:class:`py:bool`):
+            If `True` enables progress console displays.
         """
 
         # Dictionary of connection definitions.
@@ -192,6 +195,7 @@ class ConnectionRepository(object):
         # Name of the default connection definition.
         # `None`, if there is no default connection definition.
         self._default_connection_name = None
+        self._verbose = verbose
 
     @property
     def connections_file(self):
@@ -493,6 +497,9 @@ class ConnectionRepository(object):
                             'definition "{0}": {1}'.format(name, ve))
                     self._pywbemcli_servers[name] = server
                 self._loaded = True
+                if self._verbose:
+                    click.echo("Connections file loaded: {}".
+                               format(self._connections_file))
 
         except (OSError, IOError) as exc:
             raise ConnectionsFileLoadError(
@@ -659,3 +666,6 @@ class ConnectionRepository(object):
                 self._connections_file,
                 'Error renaming temporary file "{0}" to connections file '
                 '"{1}": {2}'.format(tmpfile, self._connections_file, exc))
+        if self._verbose:
+            click.echo("Connections file saved: {}".
+                       format(self._connections_file))
