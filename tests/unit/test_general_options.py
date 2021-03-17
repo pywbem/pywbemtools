@@ -919,6 +919,22 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+    ['Verify --connection-file general option not allowed in interactive mode.',
+     {'general': ['--server', 'http://blah', ],
+      'stdin': ['--connections-file blah.yaml connection list']},
+     {'stderr': ['General option "--connections-file" not allowed in '
+                 'interactive mode'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify -C general option not allowed in interactive mode.',
+     {'general': ['--server', 'http://blah', ],
+      'stdin': ['-C blah.yaml connection list']},
+     {'stderr': ['General option "--connections-file" not allowed in '
+                 'interactive mode'],
+      'test': 'innows'},
+     None, OK],
+
     #
     #  Test setting general options in interactive mode
     #

@@ -678,9 +678,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         # for the connection defined by the cmd line input)
 
         connections_repo = ConnectionRepository(
-            connections_file or DEFAULT_CONNECTIONS_FILE)
-        if verbose:
-            click.echo(str(connections_repo))
+            connections_file or DEFAULT_CONNECTIONS_FILE, verbose)
 
         pywbem_server = _create_server_instance(server, connection_name,
                                                 resolved_default_namespace,
@@ -705,11 +703,11 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # decorators that define them.
 
     else:  # ctx.obj exists. Processing an interactive command.
-        # Issue # 920Imposed this limit to avoid confusion at least for current
-        # release of pywbemcli.  Consider relaxing this in the future.
+        # Issue # 920Imposed this limit to avoid confusion of changing
+        # connections file in interactive mode
         if connections_file:
-            click.ClickException("--connections-file general option not "
-                                 "allowed in interactive mode.")
+            raise click.ClickException('General option "--connections-file" '
+                                       'not allowed in interactive mode.')
         connections_repo = ctx.obj.connections_repo
         # Apply the general options from the command line options
         # or from the context object to modify the PywbemServer object and
