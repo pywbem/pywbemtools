@@ -158,7 +158,7 @@ ipython==5.1.0
 ipython_genutils==0.1.0
 ipywidgets==5.2.2
 isort==4.2.15
-Jinja2==2.8
+Jinja2==2.11.3
 jsonschema==2.5.1
 jupyter_client==4.4.0
 jupyter_console==5.0.0
