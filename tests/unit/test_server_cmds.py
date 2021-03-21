@@ -33,6 +33,10 @@ INVOKE_METHOD_MOCK_FILE = 'simple_mock_invokemethod.py'
 
 MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
+# The empty mock model is used to ensure that the new model that is added does
+# not modify any existing elements in the repository.
+EMPTY_MOCK_MODEL = 'empty_mock_model.mof'
+
 SIMPLE_MOCK_MODEL = 'simple_mock_model.mof'
 SIMPLE_MOCK_MODEL_FILEPATH = os.path.join(
     os.path.dirname(__file__), SIMPLE_MOCK_MODEL)
@@ -252,41 +256,50 @@ TEST_CASES = [
 
     # MOF compile commands
 
-    ['Verify server command add-mof of same mock file with abs path',
+    ['Verify server command add-mof of same mock file fails',
+     {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
+      'general': []},
+     {'stdout': ['Error modifying class root/cimv2:CIM_BaseRef:.* cannot be '
+                 'modified because it has subclasses'],
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command add-mof of new mock file with abs path',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
       'general': []},
      {'stdout':
       [],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
-    ['Verify server command add-mof of same mock file with rel path',
+    ['Verify server command add-mof of new mock file with rel path',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH_REL],
       'general': []},
      {'stdout':
       [],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
-    ['Verify server command add-mof of same mock file with --include rel',
+    ['Verify server command add-mof of new mock file with --include rel',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include', '.'],
       'general': []},
      {'stdout':
       [],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
-    ['Verify server command add-mof of same mock file with --include abs',
+    ['Verify server command add-mof of new mock file with --include abs',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--include', os.getcwd()],
       'general': []},
      {'stdout':
       [],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
     ['Verify server command add-mof of same mock file with --dry-run',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH, '--dry-run'],
@@ -297,7 +310,7 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_MODEL, OK],
 
-    ['Verify server command add-mof of same mock file with --verbose',
+    ['Verify server command add-mof of new mock file with --verbose',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
       'general': ['--verbose']},
      {'stdout':
@@ -306,7 +319,7 @@ TEST_CASES = [
        'Creating instance of class root/cimv2:CIM_Foo'],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
     ['Verify server command add-mof of same mock file with --dry-run and '
      '--verbose',
@@ -320,7 +333,8 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_MODEL, OK],
 
-    ['Verify server command add-mof of same mock file with --verbose via stdin',
+    ['Verify server command add-mof of new mock file with --verbose via '
+     'stdin',
      {'args': ['server', 'add-mof', '-'],
       'general': ['--verbose'],
       'stdin': SIMPLE_MOCK_MODEL_CONTENT},
@@ -330,7 +344,7 @@ TEST_CASES = [
        'Creating instance of class root/cimv2:CIM_Foo'],
       'rc': 0,
       'test': 'innows'},
-     SIMPLE_MOCK_MODEL, OK],
+     EMPTY_MOCK_MODEL, OK],
 
     ['Verify server command add-mof of invalid MOF file',
      {'args': ['add-mof', MOF_WITH_ERROR_FILEPATH],
