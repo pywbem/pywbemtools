@@ -130,6 +130,13 @@ Released: not yet
   Click version to 7.1.1, where possible. The circumvention is still required
   on Python 2.7 and 3.4 on Windows.
 
+* Clarified in the help text of general option '--pdb' that it will be ignored
+  in interactive mode but can be specified on each interactive command.
+
+* Test: Added a check that rejects the use of the 'pdb' test condition when the
+  test specifies stdin for the test, because the 'pdb' test condition disables
+  the stdin/stdout/stderr redirection.
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -221,6 +221,10 @@ class CLITestsBase(object):
             assert False, 'Invalid inputs param to test {!r}. Allowed types ' \
                 'are dict, string, list, tuple.'.format(inputs)
 
+        if stdin and condition == 'pdb':
+            assert False, "Condition 'pdb' cannot be used on testcases that " \
+                "specify stdin"
+
         if isinstance(local_args, six.string_types):
             # Is not split into words anymore
             local_args = [local_args]

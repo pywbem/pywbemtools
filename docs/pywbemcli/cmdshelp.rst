@@ -137,7 +137,8 @@ Help text for ``pywbemcli``:
                                       details, particularly for Windows). Use "" to set default in interactive mode.
 
       --pdb                           Pause execution in the built-in pdb debugger just before executing the command within
-                                      pywbemcli. Default: EnvVar PYWBEMCLI_PDB, or false.
+                                      pywbemcli. Ignored in interactive mode, but can be specified on each interactive
+                                      command. Default: EnvVar PYWBEMCLI_PDB, or false.
 
       --version                       Show the version of this command and the pywbem package.
       -h, --help                      Show this help message.
