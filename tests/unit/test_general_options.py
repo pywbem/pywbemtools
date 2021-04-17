@@ -1258,9 +1258,9 @@ TEST_CASES = [
     #  Test that bad mock_error file names do not cause Abort but bad MOF
     #  or python script do cause Abort
     #
-    # TODO: This may leave connection file behind or use existing one
     ['Verify interactive create mock with bad file name does not fail.',
-     {'general': ['--server', 'http://blah', '--user', 'fred', '--password',
+     {'connections_file_args': ('tmpconfig.yaml', None),
+      'general': ['--server', 'http://blah', '--user', 'fred', '--password',
                   'fred', '-C', 'tmpconfig.yaml'],
       'stdin': ['connection save connectiontoprovestdincontinues',
                 '--mock-server DoesNotExist.mof class enumerate',
