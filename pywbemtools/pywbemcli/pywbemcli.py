@@ -550,7 +550,9 @@ def _create_server_instance(server, connection_name, resolved_default_namespace,
               # defaulted in code
               envvar=PywbemServer.pdb_envvar,
               help=u'Pause execution in the built-in pdb debugger just before '
-                   u'executing the command within pywbemcli. '
+                   u'executing the command within pywbemcli. Ignored in '
+                   u'interactive mode, but can be specified on each '
+                   u'interactive command. '
                    u'Default: EnvVar {ev}, or false.'.
                    format(ev=PywbemServer.pdb_envvar))
 @click.version_option(
