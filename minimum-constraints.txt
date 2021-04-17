@@ -128,6 +128,7 @@ functools32==3.2.3.post2; python_version == '2.7'  # technically: python_version
 twine==1.15.0; python_version <= '3.5'
 twine==2.0.0; python_version >= '3.6'
 readme-renderer==23.0
+pkginfo==1.4.2
 
 # Jupyter Notebook (no imports, invoked via jupyter script):
 #jupyter==1.0.0
@@ -185,7 +186,6 @@ pathlib2==2.2.1
 pbr==1.8.0
 pexpect==4.2.1
 pickleshare==0.7.4
-pkginfo==1.4.1
 ptyprocess==0.5.1
 py==1.5.1
 pytz==2016.10
