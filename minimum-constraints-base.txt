@@ -22,10 +22,16 @@
 #   pip         9.0.1     2016-11-06
 #   setuptools  33.1.1    2017-01-16
 #   wheel       0.29.0    2016-02-06
+# * Ubuntu 18.04:
+#   Python      2.7.15
+#   Python3     3.6.5
+#   pip         9.0.1     (py2+py3)
+#   setuptools  39.0.1    (py2+py3)
+#   wheel       0.30.0    (py2+py3)
 
 # Info: Python version supported by base packages (added / removed)
 # * Python 2.7 support:
-#   pip         ?
+#   pip         ? / 21.0
 #   setuptools  ? / 45.0.0
 #   wheel       ?
 # * Python 3.4 support:
@@ -50,31 +56,32 @@
 #   wheel       0.33.5
 
 
-# For the base packages, we use the versions from Ubuntu 17.04 as a general
+# For the base packages, we use the versions from Ubuntu 18.04 as a general
 # minimum, and then increase it to the first version that introduced support
 # for a particular Python version.
 
 # Additional requirements:
 # * pip>=9.0.0 to support the --upgrade-strategy option
 # * setuptools>=20.5 to support environment markers
+# * Python 3.4 on Windows on GitHub Actions has Pip 7.1.2 pre-installed,
+#   which does not yet support python_requires, so it will upgrade Pip beyond the
+#   latest supported version on Python 3.4. Therefore, we initially upgrade the
+#   basic packages only to their minimum defined in this file.
+# * pip 10.0.0 introduced the --exclude-editable option.
+# * pip before 21.0 cannot install cryptography on py39
 
-# Note that Python 3.4 on Windows on GitHub Actions has Pip 7.1.2 pre-installed,
-# which does not yet support python_requires, so it will upgrade Pip beyond the
-# latest supported version on Python 3.4. Therefore, we initially upgrade the
-# basic packages only to their minimum defined in this file.
-
-pip==9.0.1; python_version <= '3.5'
-pip==10.0.0; python_version == '3.6'
+pip==10.0.1; python_version <= '3.5'
+pip==18.0; python_version == '3.6'
 pip==18.1; python_version == '3.7'
-pip==19.3.1; python_version >= '3.8'
+pip==19.3.1; python_version == '3.8'
+pip==21.0; python_version >= '3.9'
 
-setuptools==33.1.1; python_version <= '3.5'
-setuptools==34.0.0; python_version == '3.6'
+setuptools==39.0.1; python_version <= '3.6'
 setuptools==40.6.0; python_version == '3.7'
-setuptools==41.5.0; python_version >= '3.8'
+setuptools==41.5.0; python_version == '3.8'
+setuptools==51.0.0; python_version >= '3.9'
 
-wheel==0.29.0; python_version <= '3.4'
-wheel==0.30.0; python_version == '3.5'
-wheel==0.30.0; python_version == '3.6'
+wheel==0.30.0; python_version <= '3.6'
 wheel==0.32.0; python_version == '3.7'
-wheel==0.33.5; python_version >= '3.8'
+wheel==0.33.5; python_version == '3.8'
+wheel==0.36.0; python_version >= '3.9'
