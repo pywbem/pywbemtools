@@ -7,6 +7,8 @@ through pywbemcli execution
 from __future__ import absolute_import, print_function
 import re
 import os
+from contextlib import contextmanager
+import yaml
 import pytest
 import six
 
@@ -72,6 +74,11 @@ class CLITestsBase(object):
               strings.
 
             * If inputs is a dict it can contain the following optional items:
+
+              - 'connections_file_args': tuple(conn_file, conn_content) that can
+                specify a connections file to be prepared for the test.
+                The tuple items are passed as arguments to the
+                'connections_file()' context manager. See there for details.
 
               - 'args': String or tuple/list of strings with local
                 (command-level) options that will be added to the command
@@ -205,7 +212,10 @@ class CLITestsBase(object):
         env = None
         stdin = None
         general_args = None
+        connections_file_args = (None, None)
         if isinstance(inputs, dict):
+            connections_file_args = inputs.get(
+                "connections_file_args", (None, None))
             general_args = inputs.get("general", None)
             local_args = inputs.get("args", None)
             env = inputs.get("env", None)
@@ -268,9 +278,10 @@ class CLITestsBase(object):
         if verbose and env:
             print('ENV: {}'.format(env))
 
-        rc, stdout, stderr = execute_pywbemcli(
-            cmd_line, env=env, stdin=stdin, verbose=verbose,
-            condition=condition)
+        with connections_file(*connections_file_args):
+            rc, stdout, stderr = execute_pywbemcli(
+                cmd_line, env=env, stdin=stdin, verbose=verbose,
+                condition=condition)
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr, desc)
@@ -487,3 +498,75 @@ def setup_mock_connection(mock_items, namespace):
         elif isinstance(mock_item, (list, tuple)):
             conn.add_cimobjects(mock_item, namespace=namespace)
     return conn
+
+
+@contextmanager
+def connections_file(conn_file, conn_content):
+    """
+    Context mannager that creates a connections file upon entry and removes
+    it again, and also its backup file, upon exit.
+
+    A previously existing connections file with the same name and its backup
+    file will be saved away and restored.
+
+    Parameters:
+
+      conn_file (string or None): Path name of connections file. If None,
+        the context manager does nothing on entry or exit.
+
+      content_dict (dict or string or None): Connections file conn_content,
+        either as a dictionary that will be converted to a YAML string before
+        writing it, or as a YAML string that will be written directly, or None
+        which will cause no connections file with the specified name to exist.
+
+    Returns:
+      None
+    """
+
+    if conn_file is not None:
+
+        bak_suffix = '.bak'
+        saved_suffix = '.saved'
+
+        # The backup file of the connections file
+        bak_file = conn_file + bak_suffix
+
+        # File names for saving the connections file and its backup file
+        saved_conn_file = conn_file + saved_suffix
+        saved_bak_file = bak_file + saved_suffix
+
+        # Save the original connections file and its backup file
+        if os.path.isfile(conn_file):
+            if os.path.isfile(saved_conn_file):
+                os.remove(saved_conn_file)
+            os.rename(conn_file, saved_conn_file)
+        if os.path.isfile(bak_file):
+            if os.path.isfile(saved_bak_file):
+                os.remove(saved_bak_file)
+            os.rename(bak_file, saved_bak_file)
+
+        # Create the new connections file.
+        if conn_content is not None:
+            with open(conn_file, 'w') as fp:
+                if isinstance(conn_content, dict):
+                    conn_content = yaml.dump(conn_content)
+                if isinstance(conn_content, six.string_types):
+                    conn_content = conn_content.encode('utf-8')
+                fp.write(conn_content)
+                fp.write(b'\n')
+
+    yield None
+
+    if conn_file is not None:
+
+        # Clean up the new connections file and its backup file
+        if os.path.isfile(conn_file):
+            os.remove(conn_file)
+        if os.path.isfile(bak_file):
+            os.remove(bak_file)
+
+        # Restore the original connections file and its backup file
+        if os.path.isfile(saved_conn_file):
+            os.rename(saved_conn_file, conn_file)
+        if os.path.isfile(saved_bak_file):
+            os.rename(saved_bak_file, bak_file)
