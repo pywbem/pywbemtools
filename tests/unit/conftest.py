@@ -30,27 +30,22 @@ CONNECTIONS_BAK_SAVE_FILE = os.path.join(DEFAULT_CONNECTIONS_DIR,
 @pytest.fixture
 def default_connections_file_path():
     """
-    Fixture to return the path name of the connections file.
+    Fixture to return the path name of the default connections file.
     """
     return DEFAULT_CONNECTIONS_FILE
 
 
 @pytest.fixture(scope='session', autouse=True)
-def set_connections_file(request):
+def save_default_connections_file(request):
     """
-    Fixture to hide any existing connection repository at the beginning of a
-    session and restore it at the end of the session.  This assumes that the
-    connection repository is in the root directory of pywbemcli which is
-    logical since that file is defined by the call to pywbemcli in tests.
+    Fixture that saves away an existing default connections file and its backup
+    file at the begin of a test session and restores them at the end of the
+    test session.
 
-    This saves and restores any connections file and backup connections file
-    in the home directory.
-
-    This fixture should execute once per session (execution of one of the
-    test_*.py files) so the load of creating backups and restoring them is
-    very low.  In case the fixture fails to restore the backed up connections
-    files are saved  with with their full names and the suffix `.testsave`.
+    This function is called once per test session (i.e. execution of the pytest
+    command) before the first test is executed.
     """
+
     # Save the default connections file and its backup file
     if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
         os.rename(DEFAULT_CONNECTIONS_FILE, CONNECTIONS_SAVE_FILE)
@@ -59,9 +54,13 @@ def set_connections_file(request):
 
     def teardown():
         """
-        Remove any created repository file and restore saved file. This
-        should occur at session end.
+        Restore the saved default connections file and its saved backup
+        file.
+
+        This function is called once per test session (i.e. execution of the
+        pytest command) after the last test has been executed.
         """
+
         # Restore the saved default connections file
         if os.path.isfile(DEFAULT_CONNECTIONS_FILE):
             os.remove(DEFAULT_CONNECTIONS_FILE)
