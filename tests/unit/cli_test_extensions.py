@@ -550,10 +550,10 @@ def connections_file(conn_file, conn_content):
             with open(conn_file, 'w') as fp:
                 if isinstance(conn_content, dict):
                     conn_content = yaml.dump(conn_content)
-                if isinstance(conn_content, six.string_types):
-                    conn_content = conn_content.encode('utf-8')
+                if isinstance(conn_content, six.binary_type):
+                    conn_content = conn_content.decode('utf-8')
                 fp.write(conn_content)
-                fp.write(b'\n')
+                fp.write('\n')
 
     yield None
 
