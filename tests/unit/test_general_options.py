@@ -33,9 +33,31 @@ from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
-CONNECTION_REPO_TEST_FILE_PATH = os.path.join(TEST_DIR,
-                                              'tst_general_options.yaml')
-CONN_REPO_FP_STR = str(CONNECTION_REPO_TEST_FILE_PATH)
+
+# Test connections file used in some testcases
+TEST_CONNECTIONS_FILE_PATH = 'tmp_general_options.yaml'
+TEST_CONNECTIONS_FILE_DICT = {
+    'connection_definitions': {
+        'blah': {
+            'name': 'blah',
+            'server': None,
+            'user': None,
+            'password': None,
+            'default-namespace': 'root/cimv2',
+            'timeout': 30,
+            'use_pull': None,
+            'pull_max_cnt': 1000,
+            'verify': True,
+            'certfile': None,
+            'keyfile': None,
+            'ca-certs': None,
+            'mock-server': [
+                os.path.join(TEST_DIR, 'simple_mock_model.mof'),
+            ],
+        },
+    },
+    'default_connection_name': None,
+}
 
 
 def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
@@ -1330,11 +1352,12 @@ TEST_CASES = [
 
     #
     # Test of 3 ways to execute same simple command. Creates a mock
-    # and tests combination of single comman. Uses -v to test for
+    # and tests combination of single command. Uses -v to test for
     # Connect and disconnect
 
     ['Verify new config file with defined data is created and saved.',
-     {'general': ['-v', '-C', CONN_REPO_FP_STR],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH, None),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'stdin': ['connection save blah',
                 'connection show']},
      {'stdout': ['default-namespace root/cimv2'],
@@ -1343,7 +1366,9 @@ TEST_CASES = [
 
     ['Verify simple pywbem command against file works and verbose connect and '
      'disconnect work.',
-     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'args': ['enumerate', '--di', '--no', '--subclass-of', 'CIM_Foo_sub'],
       'cmdgrp': 'class'},
      {'stdout': ["Connecting to mock environment",
@@ -1353,7 +1378,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify simple pywbem command with stdin on same connection name.',
-     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'stdin': ['class enumerate --di --no --subclass-of CIM_Foo_sub']},
      {'stdout': ["Connecting to mock environment",
                  'CIM_Foo_sub_sub',
@@ -1362,7 +1389,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify cmd with -n option in stdin.',
-     {'general': ['-n', 'blah', '-v', '-C', CONN_REPO_FP_STR],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'stdin': ['-n blah -v class enumerate --di --no '
                 '--subclass-of CIM_Foo_sub']},
      {'stdout': ["Connecting to mock environment",
@@ -1372,7 +1401,9 @@ TEST_CASES = [
      None, OK],
 
     ['Verify interactive create mock with bad file name does not fail.',
-     {'general': ['-v', '-C', CONN_REPO_FP_STR],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'stdin': ['connection delete blah']},
      {'stdout': ['Deleted connection "blah"'],
       'test': 'innows', },
