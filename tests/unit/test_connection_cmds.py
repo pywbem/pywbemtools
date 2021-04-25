@@ -1445,9 +1445,8 @@ class TestSubcmdClassError(CLITestsBase):
         restore it after the test.
         """
         # Create the connection file from the yaml
-        repo_file = open(CONNECTION_REPO_TEST_FILE_PATH, "wt")
-        repo_file.write(inputs['yaml'])
-        repo_file.close()
+        with open(CONNECTION_REPO_TEST_FILE_PATH, "wt") as repo_file:
+            repo_file.write(inputs['yaml'])
 
         connections_file = CONNECTION_REPO_TEST_FILE_PATH
 

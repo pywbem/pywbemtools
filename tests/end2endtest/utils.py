@@ -23,7 +23,7 @@ from subprocess import call, check_call
 try:
     from subprocess import DEVNULL  # Python 3
 except ImportError:
-    DEVNULL = open(os.devnull, 'wb')
+    DEVNULL = open(os.devnull, 'wb')  # pylint: disable=consider-using-with
 
 import pytest
 
