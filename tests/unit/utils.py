@@ -150,6 +150,7 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     else:
         universal_newlines = True
 
+    # pylint: disable=consider-using-with
     proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
                  stdout=stdout_stream, stderr=stderr_stream,
                  universal_newlines=universal_newlines)

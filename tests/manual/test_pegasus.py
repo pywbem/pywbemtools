@@ -47,6 +47,7 @@ class Base(object):
             print('cmd {}'.format(cmd_str))
         # Disable python warnings for pywbemcli call.See issue #42
         command = 'export PYTHONWARNINGS="" && {}'.format(cmd_str)
+        # pylint: disable=consider-using-with
         proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
         std_out, std_err = proc.communicate()
         exitcode = proc.returncode

@@ -25,6 +25,7 @@ allows setting the current active connection into the repository.
 from __future__ import absolute_import, print_function
 
 import os
+from contextlib import contextmanager
 import yaml
 import six
 import yamlloader
@@ -97,6 +98,45 @@ class ConnectionsFileLoadError(ConnectionsFileError):
         msg = 'Cannot load connections file "{0}": {1}'.format(connections_file,
                                                                message)
         super(ConnectionsFileLoadError, self).__init__(msg)
+
+
+@contextmanager
+def open_text_file(filename, file_mode):
+    """
+    Context manager that opens the specified file in text mode with UTF-8
+    encoding and closes it upon exit.
+
+    This method encapsulates a difference between Python 2 and Python 3
+    when opening files in text mode with UTF-8 encoding.
+
+    Parameters:
+
+      filename (:term:`string`):
+        Path name of the file to be opened.
+
+      file_mode (:term:`string`):
+        File mode, for example:
+        - 'r' opens the file for reading.
+        - 'w' opens the file for writing and truncates an existing file.
+        Must be a text mode, i.e. 'b' is not permitted in the file mode.
+
+    Returns:
+
+      File-like object.
+
+    Raises:
+      OSError
+      IOError (on Python 2, and possibly for lower level errors)
+    """
+    assert 'b' not in file_mode
+    if six.PY2:
+        # pylint: disable=consider-using-with
+        fp = codecs.open(filename, mode=file_mode, encoding='utf-8')
+    else:
+        # pylint: disable=consider-using-with
+        fp = open(filename, file_mode, encoding='utf8')
+    yield fp
+    fp.close()
 
 
 class ConnectionRepository(object):
@@ -444,7 +484,7 @@ class ConnectionRepository(object):
 
         # Load the existing file.
         try:
-            with self._open_file(self._connections_file, 'r') as _fp:
+            with open_text_file(self._connections_file, 'r') as _fp:
                 try:
                     dict_ = yaml.safe_load(_fp)
                 except (TypeError, yaml.YAMLError) as exc:
@@ -565,40 +605,6 @@ class ConnectionRepository(object):
 
         self._write_connections_file()
 
-    @staticmethod
-    def _open_file(filename, file_mode):
-        """
-        Open the specified file in text mode with UTF-8 encoding.
-
-        This method encapsulates a difference between Python 2 and Python 3
-        when opening files in text mode with UTF-8 encoding.
-
-        The returned file-like object must be closed by the caller.
-
-        Parameters:
-
-          filename (:term:`string`):
-            Path name of the file to be opened.
-
-          file_mode (:term:`string`):
-            File mode, for example:
-            - 'r' opens the file for reading.
-            - 'w' opens the file for writing and truncates an existing file.
-            Must be a text mode, i.e. 'b' is not permitted in the file mode.
-
-        Returns:
-
-          File-like object.
-
-        Raises:
-          OSError
-          IOError (on Python 2, and possibly for lower level errors)
-        """
-        assert 'b' not in file_mode
-        if six.PY2:
-            return codecs.open(filename, mode=file_mode, encoding='utf-8')
-        return open(filename, file_mode, encoding='utf8')
-
     def _write_connections_file(self):
         """
         Write the connection repository state to the connections file.
@@ -626,7 +632,7 @@ class ConnectionRepository(object):
             tmpfile = '{}.tmp'.format(self._connections_file)
 
             try:
-                with self._open_file(tmpfile, 'w') as _fp:
+                with open_text_file(tmpfile, 'w') as _fp:
                     data = yaml.dump(yaml_dict,
                                      encoding=None,
                                      allow_unicode=True,

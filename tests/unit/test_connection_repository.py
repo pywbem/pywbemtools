@@ -25,11 +25,13 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+from contextlib import contextmanager
 from mock import patch
 import pytest
 
 from tests.unit.pytest_extensions import simplified_test_function
 
+import pywbemtools.pywbemcli._connection_repository
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
     ConnectionsFileLoadError, ConnectionsFileWriteError
 from pywbemtools.pywbemcli._utils import B08_DEFAULT_CONNECTIONS_FILE, \
@@ -197,8 +199,12 @@ def remove_file_before_after():
 
 # The real functions before they get patched
 REAL_OS_RENAME = os.rename
+REAL_OS_RENAME_STR = 'os.rename'
 # pylint: disable=protected-access
-REAL_OPEN_FILE = ConnectionRepository._open_file
+REAL_OPEN_TEXT_FILE = \
+    pywbemtools.pywbemcli._connection_repository.open_text_file
+REAL_OPEN_TEXT_FILE_STR = \
+    'pywbemtools.pywbemcli._connection_repository.open_text_file'
 
 
 def rename_to_bak_fails(file1, file2):
@@ -231,26 +237,30 @@ def rename_fails(file1, file2):
                   format(file1, file2))
 
 
-def open_file_write_fails(self, filename, file_mode):
+@contextmanager
+def open_text_file_write_fails(filename, file_mode):
     """
-    Patch function replacing ConnectionRepository._open_file() that raises
+    Patch function replacing open_text_file() that raises
     OSError when the file is opened in write mode.
     """
     if 'w' in file_mode:
         raise OSError("Mocked failure: Cannot open {} in mode {}".
                       format(filename, file_mode))
-    return self.REAL_OPEN_FILE(filename, file_mode)
+    # Delegate the context manager yield to REAL_OPEN_TEXT_FILE()
+    return REAL_OPEN_TEXT_FILE(filename, file_mode)
 
 
-def open_file_read_fails(self, filename, file_mode):
+@contextmanager
+def open_text_file_read_fails(filename, file_mode):
     """
-    Patch function replacing ConnectionRepository._open_file() that raises
+    Patch function replacing open_text_file() that raises
     OSError when the file is opened in read mode.
     """
     if 'r' in file_mode:
         raise OSError("Mocked failure: Cannot open {} in mode {}".
                       format(filename, file_mode))
-    return self.REAL_OPEN_FILE(filename, file_mode)
+    # Delegate the context manager yield to REAL_OPEN_TEXT_FILE()
+    return REAL_OPEN_TEXT_FILE(filename, file_mode)
 
 
 # Testcases for create ConnectionRepository
@@ -583,9 +593,8 @@ def test_connection_file_load_error(testcase, file, yaml, exp_rtn):
     exceptions generated.
     """
     # Write the YAML text to the file
-    repo_file = open(file, "wt")
-    repo_file.write(yaml)
-    repo_file.close()
+    with open(file, "wt") as repo_file:
+        repo_file.write(yaml)
 
     # This does not load the file yet, so it succeeds even for a bad file
     repo = ConnectionRepository(file)
@@ -701,9 +710,8 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
     """
     # Write the YAML text to the file
     if yaml:
-        repo_file = open(file, "wt")
-        repo_file.write(yaml)
-        repo_file.close()
+        with open(file, "wt") as repo_file:
+            repo_file.write(yaml)
 
     repo = ConnectionRepository(file)
     for svr in svrs:
@@ -806,9 +814,8 @@ TESTCASES_CONNECTION_FILE_LOAD_ERROR_M = [
     (
         "Verify connection file open for writing fails",
         dict(
-            orig_func_str='pywbemtools.pywbemcli.ConnectionRepository.'
-            '_open_file',
-            patch_func=open_file_read_fails,
+            orig_func_str=REAL_OPEN_TEXT_FILE_STR,
+            patch_func=open_text_file_read_fails,
         ),
         ConnectionsFileLoadError, None, OK,
     ),
@@ -858,9 +865,8 @@ TESTCASES_CONNECTION_FILE_WRITE_ERROR = [
         "Verify connection file open for writing fails",
         dict(
             create_file=False,
-            orig_func_str='pywbemtools.pywbemcli.ConnectionRepository.'
-            '_open_file',
-            patch_func=open_file_write_fails,
+            orig_func_str=REAL_OPEN_TEXT_FILE_STR,
+            patch_func=open_text_file_write_fails,
         ),
         ConnectionsFileWriteError, None, OK,
     ),
@@ -868,7 +874,7 @@ TESTCASES_CONNECTION_FILE_WRITE_ERROR = [
         "Verify connection file rename to .bak fails",
         dict(
             create_file=True,
-            orig_func_str='os.rename',
+            orig_func_str=REAL_OS_RENAME_STR,
             patch_func=rename_to_bak_fails,
         ),
         ConnectionsFileWriteError, None, OK,
@@ -877,7 +883,7 @@ TESTCASES_CONNECTION_FILE_WRITE_ERROR = [
         "Verify connection file rename from .tmp fails",
         dict(
             create_file=False,
-            orig_func_str='os.rename',
+            orig_func_str=REAL_OS_RENAME_STR,
             patch_func=rename_from_tmp_fails,
         ),
         ConnectionsFileWriteError, None, OK,
@@ -977,7 +983,7 @@ def test_connection_file_migration(desc, failure, exp_exc_type, capsys):
 
         else:
             assert failure == 'rename'
-            with patch('os.rename', rename_fails):
+            with patch(REAL_OS_RENAME_STR, rename_fails):
                 with pytest.raises(exp_exc_type):
 
                     # The code to be tested.
