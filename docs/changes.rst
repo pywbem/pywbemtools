@@ -72,6 +72,8 @@ Released: not yet
 
 **Enhancements:**
 
+* Increased the minimum pywbem version to 1.2.0.
+
 * Add new option to class find command (--summary) to display a summary of
   the counts of classes found instead of the full list of the classes to make
   the command more useful for real servers that may return many classes for
