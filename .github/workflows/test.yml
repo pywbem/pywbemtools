@@ -9,9 +9,9 @@ on:
     - # cron (in UTC): minute hour day_of_month month day_of_week
       cron: '30 03 * * SUN'
   push:
-    branches: [ master, stable_0.8 ]
+    branches: [ master, stable_0.9 ]
   pull_request:
-    branches: [ master, stable_0.8 ]
+    branches: [ master, stable_0.9 ]
 
 env:
   # WBEM server image on Docker Hub as repository:tag.

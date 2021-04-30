@@ -5,12 +5,12 @@ Change log
 ==========
 
 
-pywbemtools 0.9.0.dev1
-----------------------
+pywbemtools 0.9.0
+-----------------
 
-This version contains all fixes up to pywbemtools 0.8.x.
+This version contains all fixes up to pywbemtools 0.8.1.
 
-Released: not yet
+Released: 2021-05-03
 
 **Incompatible changes:**
 
@@ -70,8 +70,9 @@ Released: not yet
   and displaying of PYWBEMCLI environment variables during testing in verbose
   mode.
 
-* Change add_mof() to only display exceptions received if not MOFCompileError
-  since the MOF compiler logs all MOFCompileError exceptions. (see issue #395)
+* Change MOFCompiler.add_mof/remove_mof() to only display exceptions received
+  if not MOFCompileError since the MOF compiler logs all MOFCompileError
+  exceptions. (see issue #395)
 
 **Enhancements:**
 
@@ -141,12 +142,6 @@ Released: not yet
 * Test: Added a check that rejects the use of the 'pdb' test condition when the
   test specifies stdin for the test, because the 'pdb' test condition disables
   the stdin/stdout/stderr redirection.
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.8.0
