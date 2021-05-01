@@ -130,8 +130,6 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
 
     # If top_class is none, create artifical root as superclassname from
     # entries with value None.
-    # TODO: cls_to_supercls_dict[cln] should always exist if topclass is a value
-    # We can simplify this but that costs more time.
     top_classname_default = 'root'
     if top_classname is None:
         for cln in cln_to_supercln:

@@ -298,9 +298,6 @@ def pick_one_from_list(context, options, title):
       ValueError if Ctrl-c input from console.
     """
 
-    # TODO: Future: This could be replaced by the Python pick library that
-    #       would use curses for the selection process.
-
     # If there is only a single choice, return that choice.
     if len(options) == 1:
         return options[0]
@@ -398,9 +395,6 @@ def pick_multiple_from_list(context, options, title):
     Raises:
       ValueError if Ctrl-c input from console.
     """
-
-    # TODO: Future: This could be replaced by the Python pick library that
-    #       would use curses for the selection process.
 
     if context:
         context.spinner_stop()
@@ -1599,7 +1593,7 @@ def all_classnames_depsorted(namespace, conn):
         dep_classnames = dependent_classnames(cls)
         all_deps[cls.classname] = set(dep_classnames)
 
-    # TODO: Add support for case insensitive sorting.
+    # ISSUE #954: Add support for case insensitive sorting.
     flat_cln_iterable = toposort_flatten(all_deps)
 
     return NocaseList(reversed(flat_cln_iterable))

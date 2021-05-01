@@ -377,7 +377,8 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       filtering occurs
 
       --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
-                                      supplied string. The string must define a version of the form TODO
+                                      supplied string. The string must define a version of the form M.N.V consistent the
+                                      definitions of the VERSION qualifier.
 
       --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
                                       component (characters before the "_" match the scheme provided.
@@ -449,7 +450,8 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
                                       filtering occurs
 
       --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
-                                      supplied string. The string must define a version of the form TODO
+                                      supplied string. The string must define a version of the form M.N.V consistent the
+                                      definitions of the VERSION qualifier.
 
       --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
                                       component (characters before the "_" match the scheme provided.
@@ -1134,7 +1136,8 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
                                       filtering occurs
 
       --since VERSION                 Filter the returned classes to return only classes  with a version qualifier ge the
-                                      supplied string. The string must define a version of the form TODO
+                                      supplied string. The string must define a version of the form M.N.V consistent the
+                                      definitions of the VERSION qualifier.
 
       --schema SCHEMA                 Filter the returned classes to return only classes where the classname scheme
                                       component (characters before the "_" match the scheme provided.
