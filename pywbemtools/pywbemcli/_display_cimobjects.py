@@ -270,7 +270,7 @@ def _display_classes_as_table(classes, table_width, table_format):
     """
     # pylint: disable=unused-argument
 
-    # TODO(#249): Display classes as a table, and no longer just as MOF.
+    # ISSUE #249: Display classes as a table or mof rather than just as MOF.
     for class_ in classes:
         click.echo(class_.tomof())
 
@@ -490,8 +490,8 @@ def _display_instances_as_table(insts, table_width, table_format,
     else:
         max_cell_width = table_width
 
-    # TODO Future: Decide whether and how the showing of units should be
-    #              controlled.
+    # ISSUE #953 Future: Decide whether and how the showing of units should be
+    #            controlled. Or are we satisfied with always showing them?
     show_units = True
 
     # Retrieve all creation classes of the instances in order to get
@@ -505,8 +505,9 @@ def _display_instances_as_table(insts, table_width, table_format,
             if inst.path is None:
                 # The only operation returning instances without a path is
                 # query execution. For now, we simply don't display units in
-                # that case.
-                # TODO: Pass a namespace for query execution to display units
+                # case the inst.path is None.
+                # ISSUE #953: Pass the namespace for query execution to allow
+                # class retrieval as part of getting  units information.
                 show_units = False
                 break
             namespace = inst.path.namespace

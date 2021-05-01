@@ -420,7 +420,7 @@ def cmd_statistics_server_show(context):
         If the number of operations is 0, return 0
 
         Parameters:
-          value_ (:class:`int` or TODO):
+          value_ (:class:`int` or :class:`py:float`):
 
           num_ops (:class:`int`):
             The number of operations executed

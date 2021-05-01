@@ -725,10 +725,9 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             close_interactive_server = True
 
         # If other parameters, modify the existing connection and reset it.
-        # TODO: refactor this code to avoid deepcopy when not needed.
         else:
             if pywbem_server is None:
-                # Copy to keep the original clean from any changes
+                # Copy to keep the original clean from any changes.
                 # This allows modifications to be made for a single
                 # interactive command but not kept beyond the life of
                 # that command.

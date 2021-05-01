@@ -41,7 +41,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from collections import defaultdict, OrderedDict, namedtuple
 import six
 import click
-# TODO: Future Could we combine this tree into tree file???
+
 from asciitree import LeftAligned
 from pywbem import CIMInstanceName, CIMClassName, CIMFloat, CIMInt, CIMError, \
     CIMDateTime
@@ -528,7 +528,6 @@ class AssociationShrub(object):
                         inst_names = self.assoc_instnames[role][ref_cln][rrole][assoc_cln]  # noqa E501
                         # pylint: enable=line-too-long
                         ml = get_terminal_width() - 65
-                        # TODO: ks: Create more general width algorithm
                         inst_col = fmt_inst_col(inst_names, ml, summary,
                                                 is_ternary)
 
@@ -623,9 +622,10 @@ class AssociationShrub(object):
         if len(path_str) <= max_len:
             return path_str
 
-        # Otherwise reproduce complete wbemuri method except fold the
-        # keybindings.
-        # TODO: FUTURE: Is there a better way to fold based on string output?
+        # Otherwise recreate the wbem uri and  fold the
+        # keybindings. This folds the keybindings as they are mapped back to
+        # strings. Note that this recreates the much of the wbemuri method
+        # except that it folds keybindings.
 
         ret = []
 

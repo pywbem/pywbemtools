@@ -23,6 +23,11 @@ from __future__ import absolute_import, print_function
 
 import click
 
+# Generally we define common options each as a list to encorage using the
+# add_options for each option specified in a command definition rather than
+# gathering them together in in the @add_options specification. The only
+# exception is the qualifier_filters that are ONLY used as a group.
+
 #
 # property_list option - Defined here because the option is used in
 # multiple places in the command structure.
@@ -87,87 +92,93 @@ multiple_namespaces_option = [              # pylint: disable=invalid-name
 
 #
 #  The following options are implement the filtering of class request
-#  operations to filter by selected class qualifiers
+#  operations to filter by selected class qualifiers. Note that these
+#  options are NOT defined within a list since they are intended to be
+#  used only as a list of all of the items
 #
-association_filter_option = [              # pylint: disable=invalid-name
+# pylint: disable=invalid-name
+association_filter_option = \
     click.option('--association/--no-association',
                  default=None,
                  help=u'Filter the returned classes to return only indication '
                       u'classes (--association) or classes that are not '
                       u'associations(--no-association). If the option is not '
-                      u'defined no filtering occurs')]
+                      u'defined no filtering occurs')
 
-indication_filter_option = [              # pylint: disable=invalid-name
+indication_filter_option = \
     click.option('--indication/--no-indication',
                  default=None,
                  help=u'Filter the returned classes to return only indication '
                       u'classes (--indication) or classes that are not '
                       u'indications (--no-indication). If the option is not '
-                      u'defined no filtering occurs')]
+                      u'defined no filtering occurs')
 
-experimental_filter_option = [              # pylint: disable=invalid-name
+experimental_filter_option = \
     click.option('--experimental/--no-experimental',
                  default=None,
                  help=u'Filter the returned classes to return only '
                       u'experimental classes (--experimental) or classes that '
                       u'are not experimental (--no-iexperimental). If the '
-                      u'option is not defined no filtering occurs')]
+                      u'option is not defined no filtering occurs')
 
-deprecated_filter_option = [              # pylint: disable=invalid-name
+deprecated_filter_option = \
     click.option('--deprecated/--no-deprecated',
                  default=None,
                  help=u'Filter the returned classes to return only deprecated '
                       u'classes (--deprecated) or classes that are not '
                       u'deprecated (--no-deprecated). If the option is not '
-                      u'defined no filtering occurs')]
+                      u'defined no filtering occurs')
 
-since_filter_option = [              # pylint: disable=invalid-name
+since_filter_option = \
     click.option('--since',
                  required=False, metavar='VERSION', type=str,
                  default=None,
                  help=u'Filter the returned classes to return only classes  '
                       u'with a version qualifier ge the supplied string. The '
-                      u'string must define a version of the form TODO '
-                      u'')]
+                      u'string must define a version of the form M.N.V '
+                      u'consistent the definitions of the VERSION qualifier.')
 
-schema_filter_option = [              # pylint: disable=invalid-name
+schema_filter_option = \
     click.option('--schema',
                  required=False, metavar='SCHEMA', type=str,
                  default=None,
                  help=u'Filter the returned classes to return only classes '
                       u'where the classname scheme component (characters '
-                      u'before the "_" match the scheme provided.')]
+                      u'before the "_" match the scheme provided.')
 
 
-subclassof_filter_option = [              # pylint: disable=invalid-name
+subclassof_filter_option = \
     click.option('--subclass-of',
                  required=False, metavar='CLASSNAME', type=str,
                  default=None,
                  help=u'Filter the returned classes to return only classes '
-                      u'that are a subclass of the option value.')]
+                      u'that are a subclass of the option value.')
 
 
-leafclass_filter_option = [              # pylint: disable=invalid-name
+leafclass_filter_option = \
     click.option('--leaf-classes', is_flag=True,
                  default=None,
                  help=u'Filter the returned classes to return only leaf '
-                      u'(classes; classes with no subclass.')]
+                      u'(classes; classes with no subclass.')
+
+# pylint: enable=invalid-name
 
 # List of the class filter options that are common to multiple class commands
 # Since the filters are in a list to allow them to be used individually, the
 # first item of each list must be used for the combined defintion that can
 # be use with add_options
-# TODO: Since these options are only used as a group then do not each need to be
-# defined as a list above
+# NOTE: Since these options are only used as a group then do not each need to be
+# defined as a list above. However, we are trying to define all individual
+# common options the same way (in a list).
 class_filter_options = [              # pylint: disable=invalid-name
-    association_filter_option[0],
-    indication_filter_option[0],
-    experimental_filter_option[0],
-    deprecated_filter_option[0],
-    since_filter_option[0],
-    schema_filter_option[0],
-    subclassof_filter_option[0],
-    leafclass_filter_option[0]
+    association_filter_option,
+    indication_filter_option,
+    experimental_filter_option,
+    deprecated_filter_option,
+    since_filter_option,
+    schema_filter_option,
+    subclassof_filter_option,
+    leafclass_filter_option
 ]
 
 help_option = [              # pylint: disable=invalid-name
@@ -176,24 +187,34 @@ help_option = [              # pylint: disable=invalid-name
 
 def add_options(options):
     """
-    Accumulate multiple options into a list. This list can be referenced as
-    a click decorator @add_options(name_of_list)
+    Accumulate single or multiple options into a list. This list can be
+    referenced as a click decorator @add_options(name_of_list)
 
     The list is reversed because of the way click processes options
 
+    Since this is used with the click decorator add_options and subject to
+    future variations of that decorator implementation.
+
+    This is used by pywbemcli to implement common option definitions outside
+    of each command definition and include them with the click decorator.
+
     Parameters:
 
-      options: list of click.option definitions
+      options: List of click.option definitions
 
     Returns:
-        Reversed list
+        the callable _add_options which used by the decorator to do the
+        reversal.
 
     """
     def _add_options(func):
-        """ Reverse options list"""
-        # TODO: Future.  This should account for a single option not
-        # in a list.
+        """
+        Reverse options list, else if single item,
+        make into a list.
+        """
         for option in reversed(options):
             func = option(func)
         return func
+
+    # Return the callable _add_options
     return _add_options
