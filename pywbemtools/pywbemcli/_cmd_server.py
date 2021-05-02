@@ -29,7 +29,7 @@ import sys
 import click
 
 from pywbem import Error, MOFCompiler
-from pywbem._mof_compiler import MOFWBEMConnection
+from pywbem._mof_compiler import MOFWBEMConnection, MOFCompileError
 
 from .pywbemcli import cli
 from ._common import format_table, pywbem_error_exception, \
@@ -333,6 +333,11 @@ def cmd_server_add_mof(context, options):
                 # inside of the MOF compiler.
                 mofcomp.compile_file(moffile, options['namespace'])
 
+    # If MOFCompileError, exception already logged by compile_string().
+    except MOFCompileError:
+        raise click.ClickException("Compile failed.")
+
+    # Otherwise display the exception itself
     except Error as exc:
         raise pywbem_error_exception(exc)
 
@@ -392,6 +397,7 @@ def cmd_server_remove_mof(context, options):
                 # inside of the MOF compiler.
                 mofcomp.compile_file(moffile, options['namespace'])
 
+        # rollback the compiled objects to remove them from the target.
         if not options['dry_run']:
             if context.verbose:
                 print('Deleting CIM objects found in MOF...')
@@ -399,6 +405,8 @@ def cmd_server_remove_mof(context, options):
         else:
             if context.verbose:
                 print('No deletions will be shown in dry-run mode')
-
+    # If MOFCompileError, exception already logged by compile_string().
+    except MOFCompileError:
+        raise click.ClickException("Compile failed.")
     except Error as exc:
         raise pywbem_error_exception(exc)

@@ -259,8 +259,8 @@ TEST_CASES = [
     ['Verify server command add-mof of same mock file fails',
      {'args': ['add-mof', SIMPLE_MOCK_MODEL_FILEPATH],
       'general': []},
-     {'stdout': ['Error modifying class root/cimv2:CIM_BaseRef:.* cannot be '
-                 'modified because it has subclasses'],
+     {'stdout': ["Class 'CIM_BaseRef' namespace 'root/cimv2' cannot be "
+                 "modified because it has subclasses"],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_MODEL, OK],

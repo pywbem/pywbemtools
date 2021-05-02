@@ -70,6 +70,9 @@ Released: not yet
   and displaying of PYWBEMCLI environment variables during testing in verbose
   mode.
 
+* Change add_mof() to only display exceptions received if not MOFCompileError
+  since the MOF compiler logs all MOFCompileError exceptions. (see issue #395)
+
 **Enhancements:**
 
 * Increased the minimum pywbem version to 1.2.0.
