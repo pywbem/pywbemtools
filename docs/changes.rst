@@ -20,6 +20,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Added support for managing WBEM indication listeners by adding a command
+  group 'listener'. (issue #430)
+
 **Cleanup:**
 
 **Known issues:**

@@ -146,6 +146,7 @@ Help text for ``pywbemcli``:
     Commands:
       class       Command group for CIM classes.
       instance    Command group for CIM instances.
+      listener    Command group for WBEM indication listeners.
       namespace   Command group for CIM namespaces.
       profile     Command group for WBEM management profiles.
       qualifier   Command group for CIM qualifier declarations.
@@ -1598,6 +1599,201 @@ Help text for ``pywbemcli instance shrub`` (see :ref:`instance shrub command`):
                                       --namespace options.
 
       -h, --help                      Show this help message.
+
+
+.. _`pywbemcli listener --help`:
+
+pywbemcli listener --help
+-------------------------
+
+
+
+Help text for ``pywbemcli listener`` (see :ref:`listener command group`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener COMMAND [ARGS] [COMMAND-OPTIONS]
+
+      Command group for WBEM indication listeners.
+
+      This command group defines commands to manage WBEM indication listeners. Each listener is a process that executes
+      the `pywbemcli listener run` command to receive WBEM indications sent from a WBEM server.
+
+      A listener process can be started with the `pywbemcli listener start` command and stopped with the `pywbemcli
+      listener stop` command.
+
+      There is no central registration of the currently running listeners. Instead, the currently running processes
+      executing the `pywbemcli listener run` command are by definition the currently running listeners. Because of this,
+      there is no notion of a stopped listener nor does a listener have an operational status.
+
+      In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
+      can also be specified before the 'connection' keyword.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+    Commands:
+      run    Run as a named WBEM indication listener.
+      start  Start a named WBEM indication listener in the background.
+      stop   Stop a named WBEM indication listener.
+      show   Show a named WBEM indication listener.
+      list   List the currently running named WBEM indication listeners.
+
+
+.. _`pywbemcli listener list --help`:
+
+pywbemcli listener list --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli listener list`` (see :ref:`listener list command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener list [COMMAND-OPTIONS]
+
+      List the currently running named WBEM indication listeners.
+
+      This is done by listing the currently running `pywbemcli listener run` commands.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli listener run --help`:
+
+pywbemcli listener run --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli listener run`` (see :ref:`listener run command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener run NAME [COMMAND-OPTIONS]
+
+      Run as a named WBEM indication listener.
+
+      Run this command as a named WBEM indication listener until it gets terminated, e.g. by a keyboard interrupt, break
+      signal (e.g. kill), or the `pywbemcli listener stop` command.
+
+      A listener with that name must not be running, otherwise the command fails.
+
+      Examples:
+
+        pywbemcli listener run lis1
+
+    Command Options:
+      --port PORT          The port number the listener will open to receive indications. This can be any available port.
+                           Default: 25989
+
+      --protocol PROTOCOL  The protocol used by the listener (http, https). Default: https
+      --certfile FILE      Path name of a PEM file containing the certificate that will be presented as a server certificate
+                           during SSL/TLS handshake. Required when using https. The file may in addition contain the private
+                           key of the certificate.
+
+      --keyfile FILE       Path name of a PEM file containing the private key of the server certificate. Required when using
+                           https and when the certificate file does not contain the private key. Default: Certificate file.
+
+      -h, --help           Show this help message.
+
+
+.. _`pywbemcli listener show --help`:
+
+pywbemcli listener show --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli listener show`` (see :ref:`listener show command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener show NAME [COMMAND-OPTIONS]
+
+      Show a named WBEM indication listener.
+
+      A listener with that name must be running, otherwise the command fails.
+
+      Examples:
+
+        pywbemcli listener stop lis1
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemcli listener start --help`:
+
+pywbemcli listener start --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli listener start`` (see :ref:`listener start command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener start NAME [COMMAND-OPTIONS]
+
+      Start a named WBEM indication listener in the background.
+
+      A listener with that name must not be running, otherwise the command fails.
+
+      A listener is identified by its hostname or IP address and a port number. It can be started with any free port.
+
+      Examples:
+
+        pywbemcli listener start lis1
+
+    Command Options:
+      --port PORT          The port number the listener will open to receive indications. This can be any available port.
+                           Default: 25989
+
+      --protocol PROTOCOL  The protocol used by the listener (http, https). Default: https
+      --certfile FILE      Path name of a PEM file containing the certificate that will be presented as a server certificate
+                           during SSL/TLS handshake. Required when using https. The file may in addition contain the private
+                           key of the certificate.
+
+      --keyfile FILE       Path name of a PEM file containing the private key of the server certificate. Required when using
+                           https and when the certificate file does not contain the private key. Default: Certificate file.
+
+      -h, --help           Show this help message.
+
+
+.. _`pywbemcli listener stop --help`:
+
+pywbemcli listener stop --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli listener stop`` (see :ref:`listener stop command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] listener stop NAME [COMMAND-OPTIONS]
+
+      Stop a named WBEM indication listener.
+
+      The listener will shut down gracefully.
+
+      A listener with that name must be running, otherwise the command fails.
+
+      Examples:
+
+        pywbemcli listener stop lis1
+
+    Command Options:
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli namespace --help`:
