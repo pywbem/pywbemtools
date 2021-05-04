@@ -34,10 +34,10 @@ except ImportError:
 from pywbem import CIMProperty, CIMInstance, CIMInstanceName, Uint32, Uint64, \
     Sint32, CIMDateTime, __version__
 
-from tests.unit.pytest_extensions import simplified_test_function
-
 from pywbemtools.pywbemcli._display_cimobjects import \
     _format_instances_as_rows, _display_instances_as_table
+
+from ..pytest_extensions import simplified_test_function
 
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN

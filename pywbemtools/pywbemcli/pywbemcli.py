@@ -45,7 +45,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from ._click_extensions import PywbemcliTopGroup
-from ._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
+from .._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
     DEFAULT_CONNECTIONS_FILE
 
 
@@ -595,7 +595,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     commands, positioned right after the 'pywbemcli' command name.
 
     The width of help texts of this command can be set with the
-    PYWBEMCLI_TERMWIDTH environment variable.
+    PYWBEMTOOLS_TERMWIDTH environment variable.
 
     For more detailed documentation, see:
 

@@ -6,7 +6,7 @@ from __future__ import absolute_import, print_function
 import os
 import pytest
 
-from pywbemtools.pywbemcli._utils import CONNECTIONS_FILENAME, \
+from pywbemtools._utils import CONNECTIONS_FILENAME, \
     DEFAULT_CONNECTIONS_DIR, DEFAULT_CONNECTIONS_FILE
 
 SCRIPT_DIR = os.path.dirname(__file__)

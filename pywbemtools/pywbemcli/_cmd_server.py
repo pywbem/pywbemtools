@@ -38,7 +38,7 @@ from ._common import format_table, pywbem_error_exception, \
 from ._common_options import add_options, help_option, namespace_option
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
-from ._utils import pywbemcliwarn
+from .._utils import pywbemcliwarn
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines

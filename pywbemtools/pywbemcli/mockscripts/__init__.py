@@ -27,7 +27,7 @@ import importlib
 import traceback
 import pywbem
 
-from .._utils import pywbemcliwarn_explicit
+from ..._utils import pywbemcliwarn_explicit
 
 
 class MockError(Exception):

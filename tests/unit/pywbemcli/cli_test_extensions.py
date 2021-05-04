@@ -17,7 +17,7 @@ import packaging.version
 import pywbem
 from pywbem_mock import FakedWBEMConnection
 
-from .utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
+from ..utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
 
 TEST_DIR = os.path.dirname(__file__)
 

@@ -37,9 +37,6 @@ try:
 except ImportError:
     MissingKeybindingsWarning = None
 
-from tests.unit.pytest_extensions import simplified_test_function
-from tests.unit.cli_test_extensions import setup_mock_connection
-
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
@@ -49,6 +46,9 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     validate_output_format, output_format_in_groups, fold_strings, \
     dependent_classnames, depending_classnames, all_classnames_depsorted
 from pywbemtools.pywbemcli._context_obj import ContextObj
+
+from .cli_test_extensions import setup_mock_connection
+from ..pytest_extensions import simplified_test_function
 
 # from tests.unit.utils import assert_lines
 

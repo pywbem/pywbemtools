@@ -10,25 +10,14 @@ every group/command in the script.
 
 All output is to stdout.
 
-It will generate either restructured text or pure text output depending on
+It will generate either restructured text (RST) or pure text output depending on
 the variable USE_RST.
 
-the rst output set a section name for each help subject.
+The RST output sets a section name for each help subject.
 
-This should be usable with different click generated apps by simply changing
-the variable  SCRIPT_NAME to the name of the target scripere t.
-
-There are no executeion inputs since the primary use is to generate information
-for review and documentation in a fixed environmet.  The two variables:
-
-SCRIPT_NAME - Name of the click script that will be executed to generate
-help information
-
-USE_RST - Boolean. If true, generates .rst output. Otherwise it generates
-pure formatted text.
-
+This tool is useable with different click generated apps by passing the script
+name as a command line parameter.
 """
-
 
 from __future__ import print_function, absolute_import
 
@@ -49,11 +38,15 @@ else:
 
 import six
 
-# Flag that allows displaying the data as pure text rather than markdown
-# format
+# Flag that controls the output format. If True, generates .rst output.
+# Otherwise it generates pure formatted text.
 USE_RST = True
 
-SCRIPT_NAME = 'pywbemcli'
+if len(sys.argv) != 2:
+    print("Usage: {} SCRIPT_NAME".format(sys.argv[0]))
+    sys.exit(2)
+
+SCRIPT_NAME = sys.argv[1]
 SCRIPT_CMD = SCRIPT_NAME
 
 ERRORS = 0

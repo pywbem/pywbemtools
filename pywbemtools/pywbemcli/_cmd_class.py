@@ -45,7 +45,7 @@ from ._common_options import add_options, propertylist_option, \
     help_option
 from ._displaytree import display_class_tree
 from ._click_extensions import PywbemcliGroup, PywbemcliCommand
-from ._utils import pywbemcliwarn
+from .._utils import pywbemcliwarn
 
 #
 #   Common option definitions for class group

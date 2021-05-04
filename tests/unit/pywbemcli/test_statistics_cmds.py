@@ -427,7 +427,8 @@ TEST_CASES = [
      {'general': ['--output-format', 'simple'],
       'stdin': ['statistics server-on',
                 'server add-mof '
-                'tests/unit/cimstatisticaldatainstances.mof -n interop',
+                'tests/unit/pywbemcli/cimstatisticaldatainstances.mof '
+                '-n interop',
                 'statistics server-show']},
      {'stdout': ['Server statistics',
                  'Operation Count',

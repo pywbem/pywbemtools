@@ -14,8 +14,8 @@
 # limitations under the License.
 """
 pywbemcli mock script that calls the WBEMServerMock class in
-tests/unit/testmock and creates an instance of a WBEM server using the default
-dictionary definition of the server defined in the same file as the
+tests/unit/pywbemcli/testmock and creates an instance of a WBEM server using the
+default dictionary definition of the server defined in the same file as the
 WBEMServerMock class.  This just separates the class from the script initiator
 in pywbemcli so that other dictionary definitions of the mock can be created.
 """
@@ -23,7 +23,7 @@ in pywbemcli so that other dictionary definitions of the mock can be created.
 from __future__ import absolute_import, print_function
 
 
-from tests.unit.testmock.wbemserver_mock_class import *  # noqa: F403
+from tests.unit.pywbemcli.testmock.wbemserver_mock_class import *  # noqa: F403
 
 # TODO: Future. switch to this mock script setup
 # def setup(conn, server, verbose):
