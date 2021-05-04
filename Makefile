@@ -141,17 +141,9 @@ endif
 # Name of this Python package on Pypi
 package_name := pywbemtools
 
-# Name of a specific module within the package_name.  This should be a
-# subdirectory of the package in git.
-# TODO: Future: expand so that multiple modules can reside in the package
-module_name := pywbemcli
-
-# Name of the Python package modules
-# TODO future: expand so multiple modules are allowed. Right now we have
-# one module and directly reference it in the Makefile
-pywbemcli_module_path := $(package_name)/$(module_name)
-
-pywbemcli_module_import_name := $(package_name).$(module_name)
+# Names of the commands in the package. The command names are used in
+# certain directory names.
+command1 := pywbemcli
 
 # Determine if coverage details report generated
 # The variable can be passed in as either an environment variable or
@@ -189,14 +181,14 @@ sdist_file = $(dist_dir)/$(package_name)-$(package_version).tar.gz
 
 dist_files = $(bdist_file) $(sdist_file)
 
-# Source files in the packages
+# Source files in the package
 package_py_files := \
     $(wildcard $(package_name)/*.py) \
     $(wildcard $(package_name)/*/*.py) \
 		$(wildcard $(package_name)/*/*/*.py) \
 
 doc_help_source_files := \
-    $(wildcard $(pywbemcli_module_path)/_cmd_*.py)
+    $(wildcard $(package_name)/*/_cmd_*.py)
 
 # Directory for generated API documentation
 doc_build_dir := build_doc
@@ -214,7 +206,7 @@ doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_elements
 
 # File names of automatically generated utility help message text output
 doc_utility_help_files := \
-    $(doc_conf_dir)/pywbemcli/cmdshelp.rst \
+    $(doc_conf_dir)/$(command1)/cmdshelp.rst \
 
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
@@ -226,10 +218,9 @@ doc_dependent_files := \
     $(package_py_files) \
 
 # Width for help text display.
-# Used for generating docs/pywbemcli/cmdshelp.rst and for creating the help in
-# test cases. The expected help in test cases does not exactly need to match
-# this width because the comparison removes whitespace.
-pywbemcli_termwidth := 120
+# Used for generating the cmdshelp.rst file for each command and for creating
+# the help in test cases.
+pywbemtools_termwidth := 120
 
 # PyLint config file
 pylint_rc_file := pylintrc
@@ -261,12 +252,6 @@ py_src_files := \
 # Test log
 test_log_file := test_$(python_version_fn).log
 
-# Python source files for test (unit test and function test)
-test_src_files := \
-    $(wildcard tests/unit/*.py) \
-    $(wildcard tests/unit/*/*.py) \
-    $(wildcard tests/function/*.py) \
-
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
 else
@@ -285,7 +270,7 @@ endif
 ifeq ($(python_mn_version),3.4)
   pytest_cov_opts :=
 else
-  pytest_cov_opts := --cov $(pywbemcli_module_path) $(coverage_report) --cov-config .coveragerc
+  pytest_cov_opts := --cov $(package_name) $(coverage_report) --cov-config .coveragerc
 endif
 
 # Files to be put into distribution archive.
@@ -464,7 +449,7 @@ install: install_$(pymn).done
 
 install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name)_$(pymn).done
 	-$(call RM_FUNC,$@)
-	$(PYTHON_CMD) -c "import $(pywbemcli_module_import_name)"
+	$(PYTHON_CMD) -c "import $(package_name).$(command1)"
 	echo "done" >$@
 
 # The following target is supposed to install any prerequisite OS-level packages
@@ -526,8 +511,9 @@ all: install develop build builddoc check pylint installtest test
 .PHONY: clobber
 clobber: clean
 	@echo "makefile: Removing everything for a fresh start"
-	-$(call RM_FUNC,*.done epydoc.log $(dist_files) $(pywbemcli_module_path)/*cover pywbem_os_setup.*)
+	-$(call RM_FUNC,*.done epydoc.log $(dist_files) pywbem_os_setup.*)
 	-$(call RMDIR_FUNC,$(doc_build_dir) .tox $(coverage_html_dir))
+	-$(call RM_R_FUNC,*cover)
 	@echo "makefile: Done removing everything for a fresh start"
 	@echo "makefile: Target $@ done."
 
@@ -688,9 +674,9 @@ endif
 test: develop_$(pymn).done $(doc_utility_help_files)
 	@echo "makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
+	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
-	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
 	@echo "makefile: Done running tests"
 
@@ -714,15 +700,11 @@ else
 endif
 	@echo "makefile: Done running end2end tests"
 
-# update the pywbemcli/cmdshelp.rst if any file that defines click commands changes.
-$(doc_conf_dir)/pywbemcli/cmdshelp.rst: install_$(pymn).done tools/click_help_capture.py $(pywbemcli_module_path)/pywbemcli.py $(doc_help_source_files)
+$(doc_conf_dir)/$(command1)/cmdshelp.rst: $(package_name)/$(command1)/$(command1).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
 	@echo 'makefile: Creating $@ for documentation'
 ifeq ($(PLATFORM),Windows_native)
-	cmd /c "set PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp"
+	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@"
 else
-	PYWBEMCLI_TERMWIDTH=$(pywbemcli_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py >$@.tmp
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@
 endif
-	-$(call RM_FUNC,$@)
-	-$(call CP_FUNC,$@.tmp,$@)
-	-$(call RM_FUNC,$@.tmp)
 	@echo 'Done: Created help command info for cmds: $@'

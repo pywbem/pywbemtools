@@ -3108,7 +3108,7 @@ interop      TST_PersonExp        4
      'path folding',
      {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
       'general': ['--output-format', 'plain'],
-      'env': {'PYWBEMCLI_TERMWIDTH': '80'}},
+      'env': {'PYWBEMTOOLS_TERMWIDTH': '80'}},
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},

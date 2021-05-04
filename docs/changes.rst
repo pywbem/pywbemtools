@@ -14,6 +14,9 @@ Released: not yet
 
 **Incompatible changes:**
 
+* The PYWBEMCLI_TERMWIDTH environment variable was renamed to
+  PYWBEMTOOLS_TERMWIDTH since it is common to all pywbemtools commands.
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -23,7 +26,12 @@ Released: not yet
 
 **Enhancements:**
 
+* Added support for managing WBEM indication listeners by adding a command
+  group 'listener'. (issue #430)
+
 **Cleanup:**
+
+* Prepared development environment for second pywbemtools command.
 
 **Known issues:**
 

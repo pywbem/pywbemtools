@@ -24,9 +24,9 @@ import mock
 import click
 import six
 import pytest
-from pywbemtools.pywbemcli._utils import ensure_bytes, ensure_unicode, \
+from pywbemtools._utils import ensure_bytes, ensure_unicode, \
     to_unicode, get_terminal_width
-from pywbemtools.pywbemcli import config
+import pywbemtools._utils
 
 from .pytest_extensions import simplified_test_function
 
@@ -449,7 +449,7 @@ def test_get_terminal_width(
     Test function for get_terminal_width().
     """
 
-    termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
+    termwidth_envvar = 'PYWBEMTOOLS_TERMWIDTH'
 
     # Save the environment variable
     saved_termwidth = os.environ.get(termwidth_envvar, None)
@@ -471,14 +471,14 @@ def test_get_terminal_width(
         # but use the original value if the testcase does not intend to change
         # it.
         if use_terminal_width_conf is None:
-            use_terminal_width_conf = config.USE_TERMINAL_WIDTH
+            use_terminal_width_conf = pywbemtools._utils.USE_TERMINAL_WIDTH
         use_terminal_width_mock = mock.patch.object(
-            config, 'USE_TERMINAL_WIDTH', use_terminal_width_conf
+            pywbemtools._utils, 'USE_TERMINAL_WIDTH', use_terminal_width_conf
         )
         if default_table_width_conf is None:
-            default_table_width_conf = config.DEFAULT_TABLE_WIDTH
+            default_table_width_conf = pywbemtools._utils.DEFAULT_TABLE_WIDTH
         default_table_width_mock = mock.patch.object(
-            config, 'DEFAULT_TABLE_WIDTH', default_table_width_conf
+            pywbemtools._utils, 'DEFAULT_TABLE_WIDTH', default_table_width_conf
         )
 
         # pylint: enable=protected-access

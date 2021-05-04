@@ -27,7 +27,7 @@ import sys
 import pytest
 import pywbem
 
-from pywbemtools.pywbemcli._utils import CONNECTIONS_FILENAME
+from pywbemtools._utils import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
@@ -109,7 +109,7 @@ GENERAL_HELP_LINES = [
       commands, positioned right after the 'pywbemcli' command name.
 
       The width of help texts of this command can be set with the
-      PYWBEMCLI_TERMWIDTH environment variable.
+      PYWBEMTOOLS_TERMWIDTH environment variable.
 
       For more detailed documentation, see:
 
@@ -983,7 +983,7 @@ TEST_CASES = [
       # args not allowed in interactive mode
       'stdin': ['connection show',
                 '--server  http://blah connection show',
-                '--mock-server tests/unit/simple_mock_model.mof '
+                '--mock-server tests/unit/pywbemcli/simple_mock_model.mof '
                 'connection show',
                 'connection show'],
       'cmdgrp': None,
@@ -999,7 +999,7 @@ TEST_CASES = [
      {'general': ['--server', 'http://blah', ],
       # args not allowed in interactive mode
       'stdin': ['connection show',
-                '--mock-server tests/unit/simple_mock_model.mof '
+                '--mock-server tests/unit/pywbemcli/simple_mock_model.mof '
                 '--server  http://blah connection show',
                 'connection show',
                 'connection show'],
@@ -1008,7 +1008,7 @@ TEST_CASES = [
      {'stdout': ["name not-saved (current)"],
       'stderr': ['Conflicting server definitions:',
                  'http://blah',
-                 'mock-server: tests/unit/simple_mock_model.mof'],
+                 'mock-server: tests/unit/pywbemcli/simple_mock_model.mof'],
       'rc': 0,
       'test': 'innows'},
      None, FAIL],  # TODO: this test fails on windows. Outputs don't compare'

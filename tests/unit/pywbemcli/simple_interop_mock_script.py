@@ -38,7 +38,7 @@ def _setup(conn, server, verbose):
         # of the current script when it is executed using exec(), so we hard
         # code the file path. This requires that the tests are run from the
         # repo main directory.
-        this_file_path = 'tests/unit/simple_interop_mock_script.py'
+        this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
         assert os.path.exists(this_file_path)
 
     mof_file = os.path.join(os.path.dirname(this_file_path),

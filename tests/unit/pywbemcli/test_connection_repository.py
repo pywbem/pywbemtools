@@ -29,14 +29,14 @@ from contextlib import contextmanager
 from mock import patch
 import pytest
 
-from tests.unit.pytest_extensions import simplified_test_function
-
 import pywbemtools.pywbemcli._connection_repository
 from pywbemtools.pywbemcli._connection_repository import ConnectionRepository, \
     ConnectionsFileLoadError, ConnectionsFileWriteError
-from pywbemtools.pywbemcli._utils import B08_DEFAULT_CONNECTIONS_FILE, \
+from pywbemtools._utils import B08_DEFAULT_CONNECTIONS_FILE, \
     DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
+
+from ..pytest_extensions import simplified_test_function
 
 # Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
 # the pytest capsys fixture is used. That happens only on Windows.

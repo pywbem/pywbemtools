@@ -13,8 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-Utility Functions applicable across multiple components of pywbemcli.
+Utility functions applicable across multiple pywbemtools commands.
 """
 
 from __future__ import print_function, absolute_import
@@ -27,12 +28,21 @@ import mock
 import six
 import click
 
-from . import config
-
 __all__ = []
 
 # Env var for overriding the terminal width
-TERMWIDTH_ENVVAR = 'PYWBEMCLI_TERMWIDTH'
+TERMWIDTH_ENVVAR = 'PYWBEMTOOLS_TERMWIDTH'
+
+# If True, the table formatter uses the terminal width as the maximum width
+# of a table. If False it uses the DEFAULT_TABLE_WIDTH config variable. This
+# sets the maximum width of table output. The table formatter tries to
+# build any table output within this character width.
+USE_TERMINAL_WIDTH = True
+
+# Default maximum character width of tables if USE_TERMINAL_WIDTH is NOT set.
+# If this variable is an integer, that is the maximum width. If None, tables
+# are output with no limit on width.
+DEFAULT_TABLE_WIDTH = 150
 
 # Keep the following connections file definitions in sync with help text of
 # the "--connections-file" option in pywbemcli.py and generaloptions.rst, and
@@ -135,10 +145,10 @@ def get_terminal_width():
         except ValueError:
             pass
 
-    if config.USE_TERMINAL_WIDTH:
+    if USE_TERMINAL_WIDTH:
         return click.get_terminal_size()[0]
 
-    return config.DEFAULT_TABLE_WIDTH
+    return DEFAULT_TABLE_WIDTH
 
 
 def debug_log(msg):

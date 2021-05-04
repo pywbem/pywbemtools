@@ -33,8 +33,8 @@ from pywbem._nocasedict import NocaseDict
 
 from ._common import format_table, fold_strings, DEFAULT_MAX_CELL_WIDTH, \
     output_format_is_table, sort_cimobjects, format_keys
-from ._utils import get_terminal_width
 from ._cimvalueformatter import cimvalue_to_fmtd_string
+from .._utils import get_terminal_width
 
 INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 

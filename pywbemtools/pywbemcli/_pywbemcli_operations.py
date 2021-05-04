@@ -38,7 +38,7 @@ import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
-from ._utils import ensure_bytes, DEFAULT_CONNECTIONS_FILE
+from .._utils import ensure_bytes, DEFAULT_CONNECTIONS_FILE
 from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)

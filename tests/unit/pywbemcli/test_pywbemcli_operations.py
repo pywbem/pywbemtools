@@ -31,13 +31,13 @@ import pytest
 import pywbem
 
 from pywbemtools.pywbemcli._pywbemcli_operations import PYWBEMCLIFakedConnection
-from pywbemtools.pywbemcli._utils import ensure_unicode, \
+from pywbemtools._utils import ensure_unicode, \
     DEFAULT_CONNECTIONS_FILE
 from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
     SetupNotSupportedError
 
-from .pytest_extensions import simplified_test_function
-from .utils import captured_output
+from ..pytest_extensions import simplified_test_function
+from ..utils import captured_output
 
 OK = True
 FAIL = False
@@ -131,8 +131,8 @@ def remove_mockcache(connection_name):
 # Testcase parameters for simple model with old-style method provider
 SIMPLE_V1_OLD_NAMESPACE = pywbem.DEFAULT_NAMESPACE
 SIMPLE_V1_OLD_MOCK_FILES = [
-    'tests/unit/simple_mock_model.mof',
-    'tests/unit/simple_mock_invokemethod_v1old.py',
+    'tests/unit/pywbemcli/simple_mock_model.mof',
+    'tests/unit/pywbemcli/simple_mock_invokemethod_v1old.py',
 ]
 SIMPLE_V1_OLD_EXP_CLASSES = [
     (SIMPLE_V1_OLD_NAMESPACE, 'CIM_Foo'),
@@ -147,8 +147,8 @@ SIMPLE_V1_OLD_EXP_PROVIDERS = [
 # Testcase parameters for simple model with new-style method provider
 SIMPLE_V1_NEW_NAMESPACE = pywbem.DEFAULT_NAMESPACE
 SIMPLE_V1_NEW_MOCK_FILES = [
-    'tests/unit/simple_mock_model.mof',
-    'tests/unit/simple_mock_invokemethod_v1new.py',
+    'tests/unit/pywbemcli/simple_mock_model.mof',
+    'tests/unit/pywbemcli/simple_mock_invokemethod_v1new.py',
 ]
 SIMPLE_V1_NEW_EXP_CLASSES = [
     (SIMPLE_V1_NEW_NAMESPACE, 'CIM_Foo'),
@@ -163,7 +163,7 @@ SIMPLE_V1_NEW_EXP_PROVIDERS = [
 # Testcase parameters for standalone mock script
 STANDALONE_NAMESPACE = pywbem.DEFAULT_NAMESPACE
 STANDALONE_MOCK_FILES = [
-    'tests/unit/standalone_mock_script.py',
+    'tests/unit/pywbemcli/standalone_mock_script.py',
 ]
 STANDALONE_EXP_CLASSES = [
     (STANDALONE_NAMESPACE, 'CIM_Foo'),
@@ -852,7 +852,7 @@ TESTCASES_BUILD_MOCKENV = [
             connections_file=DEFAULT_CONNECTIONS_FILE,
             default_namespace=STANDALONE_NAMESPACE,
             mock_files=STANDALONE_MOCK_FILES,
-            exp_dep_files=['tests/unit/simple_mock_model.mof'],
+            exp_dep_files=['tests/unit/pywbemcli/simple_mock_model.mof'],
             exp_classes=STANDALONE_EXP_CLASSES,
             exp_providers=STANDALONE_EXP_PROVIDERS,
             exp_stdout_lines=[

@@ -33,7 +33,7 @@ import click
 
 from ._pywbem_server import PywbemServer
 from ._pywbemcli_operations import delete_mock_cache
-from ._utils import DEFAULT_CONNECTIONS_FILE, B08_DEFAULT_CONNECTIONS_FILE
+from .._utils import DEFAULT_CONNECTIONS_FILE, B08_DEFAULT_CONNECTIONS_FILE
 
 if six.PY2:
     import codecs  # pylint: disable=wrong-import-order
