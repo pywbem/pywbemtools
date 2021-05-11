@@ -21,6 +21,8 @@ from __future__ import print_function, absolute_import
 
 import os
 import warnings
+import inspect
+from datetime import datetime
 import mock
 import six
 import click
@@ -137,3 +139,17 @@ def get_terminal_width():
         return click.get_terminal_size()[0]
 
     return config.DEFAULT_TABLE_WIDTH
+
+
+def debug_log(msg):
+    """
+    Write a debug log entry for debugging test functions to a file named
+    "debug.log".
+
+    The timestamp and name of the calling function are automatically added
+    to the message.
+    """
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    caller = inspect.stack()[1][3]
+    with open("debug.log", "a") as fp:
+        fp.write("{} {}: {}\n".format(timestamp, caller, msg))
