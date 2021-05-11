@@ -449,44 +449,62 @@ def test_get_terminal_width(
     Test function for get_terminal_width().
     """
 
-    # Set the environment variable, if needed
     termwidth_envvar = 'PYWBEMCLI_TERMWIDTH'
-    if termwidth_env is None:
-        try:
+
+    # Save the environment variable
+    saved_termwidth = os.environ.get(termwidth_envvar, None)
+
+    try:
+        # Set the environment variable as needed by the testcase
+        if termwidth_env is None:
+            try:
+                del os.environ[termwidth_envvar]
+            except KeyError:
+                pass
+        else:
+            os.environ[termwidth_envvar] = termwidth_env
+
+        # pylint: disable=protected-access
+
+        # Prepare the patching of the config parameters. Because this is done
+        # using the context manager ability of the mock object, we always patch
+        # but use the original value if the testcase does not intend to change
+        # it.
+        if use_terminal_width_conf is None:
+            use_terminal_width_conf = config.USE_TERMINAL_WIDTH
+        use_terminal_width_mock = mock.patch.object(
+            config, 'USE_TERMINAL_WIDTH', use_terminal_width_conf
+        )
+        if default_table_width_conf is None:
+            default_table_width_conf = config.DEFAULT_TABLE_WIDTH
+        default_table_width_mock = mock.patch.object(
+            config, 'DEFAULT_TABLE_WIDTH', default_table_width_conf
+        )
+
+        # pylint: enable=protected-access
+
+        with use_terminal_width_mock:
+            with default_table_width_mock:
+
+                # The code to be tested
+                act_result = get_terminal_width()
+
+        # Ensure that exceptions raised in the remainder of this function
+        # are not mistaken as expected exceptions
+        assert testcase.exp_exc_types is None
+
+        if exp_result == CLICK_TERMINAL_WIDTH:
+            exp_result = click.get_terminal_size()[0]
+
+        assert act_result == exp_result
+
+    finally:
+
+        # Restore the environment variable
+        if saved_termwidth is None:
             del os.environ[termwidth_envvar]
-        except KeyError:
-            pass
-    else:
-        os.environ[termwidth_envvar] = termwidth_env
-
-    # Prepare the patching of the config parameters. Because this is done
-    # using the context manager ability of the mock object, we always patch
-    # but use the original value if the testcase does not intend to change it.
-    if use_terminal_width_conf is None:
-        use_terminal_width_conf = config.USE_TERMINAL_WIDTH
-    use_terminal_width_mock = mock.patch.object(
-        config, 'USE_TERMINAL_WIDTH', use_terminal_width_conf
-    )
-    if default_table_width_conf is None:
-        default_table_width_conf = config.DEFAULT_TABLE_WIDTH
-    default_table_width_mock = mock.patch.object(
-        config, 'DEFAULT_TABLE_WIDTH', default_table_width_conf
-    )
-
-    with use_terminal_width_mock:
-        with default_table_width_mock:
-
-            # The code to be tested
-            act_result = get_terminal_width()
-
-    # Ensure that exceptions raised in the remainder of this function
-    # are not mistaken as expected exceptions
-    assert testcase.exp_exc_types is None
-
-    if exp_result == CLICK_TERMINAL_WIDTH:
-        exp_result = click.get_terminal_size()[0]
-
-    assert act_result == exp_result
+        else:
+            os.environ[termwidth_envvar] = saved_termwidth
 
 
 # The pywbemcliwarn() and pywbemcliwarn_explicit() functions are not tested
