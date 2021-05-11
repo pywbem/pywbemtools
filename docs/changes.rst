@@ -18,6 +18,9 @@ Released: not yet
 
 **Bug fixes:**
 
+* Test: Fixed that test_utils.py changed the PYWBEMCLI_TERMWIDTH env var
+  for testing purposes without restoring it.
+
 **Enhancements:**
 
 **Cleanup:**
