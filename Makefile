@@ -144,6 +144,7 @@ package_name := pywbemtools
 # Names of the commands in the package. The command names are used in
 # certain directory names.
 command1 := pywbemcli
+command2 := pywbemlistener
 
 # Determine if coverage details report generated
 # The variable can be passed in as either an environment variable or
@@ -207,6 +208,7 @@ doc_opts := -v -d $(doc_build_dir)/doctrees -c $(doc_conf_dir) -D latex_elements
 # File names of automatically generated utility help message text output
 doc_utility_help_files := \
     $(doc_conf_dir)/$(command1)/cmdshelp.rst \
+    $(doc_conf_dir)/$(command2)/cmdshelp.rst \
 
 # Dependents for Sphinx documentation build
 doc_dependent_files := \
@@ -450,6 +452,7 @@ install: install_$(pymn).done
 install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name)_$(pymn).done
 	-$(call RM_FUNC,$@)
 	$(PYTHON_CMD) -c "import $(package_name).$(command1)"
+	$(PYTHON_CMD) -c "import $(package_name).$(command2)"
 	echo "done" >$@
 
 # The following target is supposed to install any prerequisite OS-level packages
@@ -706,5 +709,14 @@ ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@"
 else
 	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@
+endif
+	@echo 'Done: Created help command info for cmds: $@'
+
+$(doc_conf_dir)/$(command2)/cmdshelp.rst: $(package_name)/$(command2)/$(command2).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
+	@echo 'makefile: Creating $@ for documentation'
+ifeq ($(PLATFORM),Windows_native)
+	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command2) >$@"
+else
+	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py $(command2) >$@
 endif
 	@echo 'Done: Created help command info for cmds: $@'
