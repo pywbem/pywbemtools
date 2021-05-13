@@ -20,7 +20,9 @@
 
 # Direct dependencies for install (must be consistent with requirements.txt)
 
-pywbem==1.2.0
+
+# TODO: Enable pywbem 1.3.0 once released, before releasing pywbemtools
+# pywbem==1.3.0
 # When using the GitHub master branch of pywbem, simply comment out the line
 # above, since links are not allowed in constraint files - the minimum will be
 # ensured by requirements.txt then.
@@ -44,6 +46,7 @@ PyYAML==5.3.1; python_version >= '3.5'
 yamlloader==0.5.5
 mock==3.0.0
 toposort==1.6
+psutil==5.5.0
 
 # Virtualenv
 virtualenv==14.0.0; python_version < '3.5'

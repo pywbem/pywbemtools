@@ -88,6 +88,7 @@ setuptools.setup(
     entry_points={
         'console_scripts': [
             'pywbemcli = pywbemtools.pywbemcli.pywbemcli:cli',
+            'pywbemlistener = pywbemtools.pywbemlistener.pywbemlistener:cli',
         ],
     },
     include_package_data=True,  # as specified in MANIFEST.in
