@@ -28,12 +28,12 @@ from pywbem import Error
 
 from .pywbemcli import cli
 from ._common import sort_cimobjects, \
-    pywbem_error_exception, validate_output_format, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    pywbem_error_exception, validate_output_format
 from ._display_cimobjects import display_cim_objects
 from ._common_options import add_options, namespace_option, summary_option, \
     help_option
-from ._click_extensions import PywbemcliGroup, PywbemcliCommand
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 # Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
 # with prompt-toolkit 2 + the completer requires unicode and click_repl not
@@ -42,7 +42,7 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 #       issue
 
 
-@cli.group('qualifier', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+@cli.group('qualifier', cls=PywbemtoolsGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
 @add_options(help_option)
 def qualifier_group():
@@ -59,7 +59,7 @@ def qualifier_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@qualifier_group.command('get', cls=PywbemcliCommand,
+@qualifier_group.command('get', cls=PywbemtoolsCommand,
                          options_metavar=CMD_OPTS_TXT)
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
@@ -81,7 +81,7 @@ def qualifier_get(context, qualifiername, **options):
                                                   options))
 
 
-@qualifier_group.command('delete', cls=PywbemcliCommand,
+@qualifier_group.command('delete', cls=PywbemtoolsCommand,
                          options_metavar=CMD_OPTS_TXT)
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
@@ -107,7 +107,7 @@ def qualifier_delete(context, qualifiername, **options):
         context, qualifiername, options))
 
 
-@qualifier_group.command('enumerate', cls=PywbemcliCommand,
+@qualifier_group.command('enumerate', cls=PywbemtoolsCommand,
                          options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @add_options(summary_option)

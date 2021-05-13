@@ -23,6 +23,7 @@ and Python 3.
 from __future__ import absolute_import, print_function
 
 from .._utils import *              # noqa: F403,F401
+from .._click_extensions import *   # noqa: F403,F401
 from ._cmd_namespace import *       # noqa: F403,F401
 from ._common import *              # noqa: F403,F401
 from ._pywbem_server import *       # noqa: F403,F401
@@ -38,7 +39,6 @@ from ._connection_repository import *   # noqa: F403,F401
 from .pywbemcli import *            # noqa: F403,F401
 from .config import *               # noqa: F403,F401
 from ._pywbemcli_operations import *  # noqa: F403,F401
-from ._click_extensions import *    # noqa: F403,F401
 from ._association_shrub import *   # noqa: F403,F401
 from ._cimvalueformatter import *   # noqa: F403,F401
 from ._display_cimobjects import *   # noqa: F403,F401

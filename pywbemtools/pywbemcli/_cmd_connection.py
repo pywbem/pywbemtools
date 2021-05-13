@@ -31,15 +31,15 @@ import six
 from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 
 from .pywbemcli import cli
-from ._common import CMD_OPTS_TXT, GENERAL_OPTS_TXT, \
-    SUBCMD_HELP_TXT, pick_one_from_list, format_table, \
+from ._common import pick_one_from_list, format_table, \
     pywbem_error_exception, validate_output_format, fold_strings, \
     output_format_is_table
 from ._connection_repository import ConnectionsFileError
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
-from ._click_extensions import PywbemcliGroup, PywbemcliCommand
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 # Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
 # with prompt-toolkit 2 + the completer requires unicode and click_repl not
@@ -48,7 +48,7 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 #       issue
 
 
-@cli.group('connection', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+@cli.group('connection', cls=PywbemtoolsGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
 @add_options(help_option)
 def connection_group():
@@ -76,7 +76,7 @@ def connection_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@connection_group.command('export', cls=PywbemcliCommand,
+@connection_group.command('export', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
@@ -96,7 +96,7 @@ def connection_export(context):
     context.execute_cmd(lambda: cmd_connection_export(context))
 
 
-@connection_group.command('show', cls=PywbemcliCommand,
+@connection_group.command('show', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--show-password', is_flag=True,
@@ -143,7 +143,7 @@ def connection_show(context, name, **options):
     context.execute_cmd(lambda: cmd_connection_show(context, name, options))
 
 
-@connection_group.command('delete', cls=PywbemcliCommand,
+@connection_group.command('delete', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @add_options(help_option)
@@ -163,7 +163,7 @@ def connection_delete(context, name):
     context.execute_cmd(lambda: cmd_connection_delete(context, name))
 
 
-@connection_group.command('select', cls=PywbemcliCommand,
+@connection_group.command('select', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('-d', '--default', is_flag=True,
@@ -213,7 +213,7 @@ def connection_select(context, name, **options):
     context.execute_cmd(lambda: cmd_connection_select(context, name, options))
 
 
-@connection_group.command('test', cls=PywbemcliCommand,
+@connection_group.command('test', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.option('--test-pull', is_flag=True,
               default=False,
@@ -237,7 +237,7 @@ def connection_test(context, **options):
     context.execute_cmd(lambda: cmd_connection_test(context, options))
 
 
-@connection_group.command('save', cls=PywbemcliCommand,
+@connection_group.command('save', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True)
 @add_options(help_option)
@@ -261,7 +261,7 @@ def connection_save(context, name):
     context.execute_cmd(lambda: cmd_connection_save(context, name))
 
 
-@connection_group.command('list', cls=PywbemcliCommand,
+@connection_group.command('list', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.option('-f', '--full', is_flag=True,
               default=False,

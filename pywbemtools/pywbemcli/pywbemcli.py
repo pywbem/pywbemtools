@@ -36,7 +36,7 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
 from pywbem import __version__ as pywbem_version
 
 from ._context_obj import ContextObj, display_click_context
-from ._common import GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, OUTPUT_FORMAT_GROUPS
+from ._common import OUTPUT_FORMAT_GROUPS
 from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
@@ -44,7 +44,8 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     MAX_TIMEOUT, USE_AUTOSUGGEST
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
-from ._click_extensions import PywbemcliTopGroup
+from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
+    SUBCMD_HELP_TXT
 from .._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
     DEFAULT_CONNECTIONS_FILE
 
@@ -347,8 +348,9 @@ def _create_server_instance(server, connection_name, resolved_default_namespace,
 
 
 # pylint: disable=bad-continuation
-# PywbemcliTopGroup sets order commands listed in help output
-@click.group(invoke_without_command=True, cls=PywbemcliTopGroup,
+# PywbemtoolsTopGroup sets order commands listed in help output
+@click.group(invoke_without_command=True, cls=PywbemtoolsTopGroup,
+             move_to_end=('connection', 'help', 'repl'),
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTS_TXT,
              subcommand_metavar=SUBCMD_HELP_TXT)
