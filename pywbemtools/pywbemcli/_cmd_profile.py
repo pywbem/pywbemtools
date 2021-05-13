@@ -30,9 +30,10 @@ from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
 from ._common import format_table, pywbem_error_exception, \
-    validate_output_format, CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    validate_output_format
 from ._common_options import add_options, help_option
-from ._click_extensions import PywbemcliGroup, PywbemcliCommand
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -46,7 +47,7 @@ from ._click_extensions import PywbemcliGroup, PywbemcliCommand
 #       issue
 
 
-@cli.group('profile', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+@cli.group('profile', cls=PywbemtoolsGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
 @add_options(help_option)
 def profile_group():
@@ -63,7 +64,7 @@ def profile_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@profile_group.command('list', cls=PywbemcliCommand,
+@profile_group.command('list', cls=PywbemtoolsCommand,
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
@@ -92,7 +93,7 @@ def profile_list(context, **options):
     context.execute_cmd(lambda: cmd_profile_list(context, options))
 
 
-@profile_group.command('centralinsts', cls=PywbemcliCommand,
+@profile_group.command('centralinsts', cls=PywbemtoolsCommand,
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,

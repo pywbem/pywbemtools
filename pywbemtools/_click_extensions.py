@@ -1,32 +1,35 @@
 """
-This file contains extensions to Click specifically for pywbemcli
+This file contains extensions to Click for pywbemtools.
 """
+
 import sys
 from collections import OrderedDict
 
 import click
 
-from ._common import GENERAL_OPTS_TXT, CMD_OPTS_TXT
+# Definitions of the components of the help usage line
+GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
+CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
+SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
 
 
-class PywbemcliGroup(click.Group):
+class PywbemtoolsGroup(click.Group):
     """
     Extend Click Group class to:
+
     1.  Order the display of commands within the help.
         The commands are ordered in the order that their definitions
         appears in the source code for each command group.
-    This extension has a general name because it may be used for more than
-    one extension to the Click.Group class.
 
-    2. Force use of our method pywbemcli_format_usage rather than
+    2. Force use of our method pywbemtools_format_usage rather than
        the click define Command.format_usage()
 
-    It is used on all group decorators (@click.group(...)) except for the
-    top level in pywbemcli which uses the PywbemcliTopGroup class.
+    This class is used by specifying it for the 'cls' argument on those
+    groups that are not the top level group, for example:
+
+        @cli.group('class', cls=PywbemtoolsGroup, ...)
     """
 
-    # Use ordered dictionary to sort commands by their order defined in the
-    # _cmd_... source file.
     def __init__(self, name=None, commands=None, **attrs):
         """
         Use OrderedDict to keep order commands inserted into command dict.
@@ -34,14 +37,14 @@ class PywbemcliGroup(click.Group):
         Must be set after calling superclass __inits_ because click forces
         {} for this variable even if user were to set commands to OrderedDict
         """
-        super(PywbemcliGroup, self).__init__(name, commands, **attrs)
+        super(PywbemtoolsGroup, self).__init__(name, commands, **attrs)
 
         if sys.version_info < (3, 6):
             self.commands = commands or OrderedDict()
 
         # Replace Click.Command.format_usage with local version
-        click.core.Command.format_usage = pywbemcli_format_usage
-        click.core.Command.format_options = pywbemcli_format_options
+        click.core.Command.format_usage = pywbemtools_format_usage
+        click.core.Command.format_options = pywbemtools_format_options
 
     def list_commands(self, ctx):
         """
@@ -50,60 +53,71 @@ class PywbemcliGroup(click.Group):
         return self.commands.keys()
 
 
-class PywbemcliTopGroup(click.Group):
+class PywbemtoolsTopGroup(click.Group):
     """
-    Extensions to be used with the top level help (pywbemcli --help)
+    Extensions to be used with the top level help.
 
     Extend Click Group class to:
+
     1.  Order the display of the commands and command groups in the top level
         help output to sort and then put names defined in the predefined_list
         at the end of the list of commands/groups. Since ordering of the top
         level cannot be tied to order commands are inserted in list, we elected
         to just move the generic ones to the end of the list.
 
-    This extension has a general name because it may be used for more than
-    one extension to the Click.Group class.
+    This class is used by specifying it for the 'cls' argument on the top
+    level group, for example:
+
+        @click.group(cls=PywbemtoolsTopGroup, ...)
     """
 
-    def __init__(self, name=None, commands=None, **attrs):
+    def __init__(self, name=None, commands=None, move_to_end=None, **attrs):
         """
         Use OrderedDict to keep order commands inserted into command dict.
         Only required for Python versions that do not order dictionaries.
         Must be set after calling superclass __inits_ because click forces
-        {} for this variable even if user were to set commands to OrderedDict
+        {} for this variable even if user were to set commands to OrderedDict.
+
+        Parameters:
+
+          move_to_end (list): List of to level command/group names that will be
+            moved to the end of the list after sorting it, or `None` for not
+            moving any.
         """
-        super(PywbemcliTopGroup, self).__init__(name, commands, **attrs)
+        self.move_to_end = move_to_end or []
+        super(PywbemtoolsTopGroup, self).__init__(name, commands, **attrs)
 
         # Replace Click.Command.format_options with local version
-        click.core.Command.format_options = pywbemcli_format_options
+        click.core.Command.format_options = pywbemtools_format_options
 
     def list_commands(self, ctx):
         """
-        Order The top level commands by sorting and then moving any commands
-        defined in  move_to_end list to the end of the list.  This is
-        the class override for click.Group ONLY with the top group, the
-        click startup group in pywbemcli because in reorders the commands
-        display specifically as we want them for pywbemcli.
-        """
-        # tuple of commands to move to bottom after sort
-        move_to_end = ('connection', 'help', 'repl')
+        Order the top level commands by sorting and then moving any commands
+        defined in move_to_end list to the end of the list.
 
+        This happens only for the top level commands/groups because this is the
+        class override for click.Group ONLY with the top group.
+        """
         # Sort because thier is no particular order for the groups
         cmd_list = sorted(self.commands.keys())
         pop_count = 0
         # reorder list so the move_to_end list commands are at bottom
         for i in range(len(cmd_list)):
-            if cmd_list[i - pop_count] in move_to_end:
+            if cmd_list[i - pop_count] in self.move_to_end:
                 cmd_list.append(cmd_list.pop(i - pop_count))
                 pop_count += 1
         return cmd_list
 
 
-class PywbemcliCommand(click.Command):
+class PywbemtoolsCommand(click.Command):
     """
     Modify the command usage formatter to show the commands in a format
-    that fits how we use the tool. This should be the cls= argument
-    for all pywbemcli command decorators (i.e. `@class_group.command(`).
+    that fits how we use the tool.
+
+    This class is used by specifying it for the 'cls' argument on all command
+    decorators, for example:
+
+        @class_group.command('enumerate', cls=PywbemtoolsCommand, ...)
     """
 
     def format_usage(self, ctx, formatter):
@@ -118,7 +132,7 @@ class PywbemcliCommand(click.Command):
         formatter.write_usage(cmd_paths[0], " ".join(new_pieces))
 
 
-def pywbemcli_format_usage(self, ctx, formatter):
+def pywbemtools_format_usage(self, ctx, formatter):
     """
     Replaces click.Command.format_usage in the fixes for click.Group
     """
@@ -136,7 +150,7 @@ def pywbemcli_format_usage(self, ctx, formatter):
         formatter.write_usage(ctx.command_path, " ".join(pieces))
 
 
-def pywbemcli_format_options(self, ctx, formatter):
+def pywbemtools_format_options(self, ctx, formatter):
     """
     Writes all the options into the formatter if they exist.
     """

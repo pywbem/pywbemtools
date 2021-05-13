@@ -33,10 +33,10 @@ from pywbem._mof_compiler import MOFWBEMConnection, MOFCompileError
 
 from .pywbemcli import cli
 from ._common import format_table, pywbem_error_exception, \
-    validate_output_format, display_text, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    validate_output_format, display_text
 from ._common_options import add_options, help_option, namespace_option
-from ._click_extensions import PywbemcliGroup, PywbemcliCommand
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
 from .._utils import pywbemcliwarn
 
@@ -67,7 +67,7 @@ mof_dry_run_option = [              # pylint: disable=invalid-name
                  'reading.')]
 
 
-@cli.group('server', cls=PywbemcliGroup, options_metavar=GENERAL_OPTS_TXT,
+@cli.group('server', cls=PywbemtoolsGroup, options_metavar=GENERAL_OPTS_TXT,
            subcommand_metavar=SUBCMD_HELP_TXT)
 @add_options(help_option)
 def server_group():
@@ -86,7 +86,7 @@ def server_group():
     pass  # pylint: disable=unnecessary-pass
 
 
-@server_group.command('namespaces', cls=PywbemcliCommand,
+@server_group.command('namespaces', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
@@ -106,7 +106,7 @@ def server_namespaces(context):
     context.execute_cmd(lambda: cmd_namespace_list(context))
 
 
-@server_group.command('interop', cls=PywbemcliCommand,
+@server_group.command('interop', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
@@ -126,7 +126,7 @@ def server_interop(context):
     context.execute_cmd(lambda: cmd_namespace_interop(context))
 
 
-@server_group.command('brand', cls=PywbemcliCommand,
+@server_group.command('brand', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
@@ -142,7 +142,7 @@ def server_brand(context):
     context.execute_cmd(lambda: cmd_server_brand(context))
 
 
-@server_group.command('info', cls=PywbemcliCommand,
+@server_group.command('info', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @add_options(help_option)
 @click.pass_obj
@@ -155,7 +155,7 @@ def server_info(context):
     context.execute_cmd(lambda: cmd_server_info(context))
 
 
-@server_group.command('add-mof', cls=PywbemcliCommand,
+@server_group.command('add-mof', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @click.argument('moffiles', metavar='MOFFILE', type=click.Path(),
                 nargs=-1, required=True)
@@ -191,7 +191,7 @@ def server_add_mof(context, **options):
     context.execute_cmd(lambda: cmd_server_add_mof(context, options))
 
 
-@server_group.command('remove-mof', cls=PywbemcliCommand,
+@server_group.command('remove-mof', cls=PywbemtoolsCommand,
                       options_metavar=CMD_OPTS_TXT)
 @click.argument('moffiles', metavar='MOFFILE', type=click.Path(),
                 nargs=-1, required=True)

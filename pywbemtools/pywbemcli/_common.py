@@ -47,12 +47,6 @@ from pywbem._nocasedict import NocaseDict
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 
 
-# Definitions of the components of the help Usage line used
-# by pywbemcli
-GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
-CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
-SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
-
 DEFAULT_MAX_CELL_WIDTH = 100
 
 
