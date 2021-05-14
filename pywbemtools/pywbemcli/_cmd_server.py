@@ -35,7 +35,7 @@ from .pywbemcli import cli
 from ._common import pywbem_error_exception
 from ._common_options import namespace_option
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
-from .._utils import pywbemcliwarn
+from .._utils import pywbemtools_warn
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option
@@ -101,7 +101,7 @@ def server_namespaces(context):
     Deprecated: The 'server namespaces' command is deprecated and will be
     removed in a future version. Use the 'namespace list' command instead.
     """
-    pywbemcliwarn(
+    pywbemtools_warn(
         "The 'server namespaces' command is deprecated and will be removed in "
         "a future version. Use the 'namespace list' command instead.",
         DeprecationWarning)
@@ -121,7 +121,7 @@ def server_interop(context):
     Deprecated: The 'server interop' command is deprecated and will be removed
     in a future version. Use the 'namespace interop' command instead.
     """
-    pywbemcliwarn(
+    pywbemtools_warn(
         "The 'server interop' command is deprecated and will be removed in "
         "a future version. Use the 'namespace interop' command instead.",
         DeprecationWarning)

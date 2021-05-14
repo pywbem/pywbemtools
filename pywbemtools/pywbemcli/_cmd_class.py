@@ -43,7 +43,7 @@ from ._common_options import propertylist_option, names_only_option, \
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from .._utils import pywbemcliwarn
+from .._utils import pywbemtools_warn
 from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
     validate_output_format, format_table, warning_msg
@@ -1177,9 +1177,10 @@ def cmd_class_delete(context, classname, options):
     include_instances = options['include_instances']
     if options['force']:
         include_instances = options['force']
-        pywbemcliwarn("The --force / -f option has been deprecated and "
-                      "will be removed in a future version. Use "
-                      "--include-instances instead.", DeprecationWarning)
+        pywbemtools_warn(
+            "The --force / -f option has been deprecated and will be removed "
+            "in a future version. Use --include-instances instead.",
+            DeprecationWarning)
     dry_run = options['dry_run']
     dry_run_prefix = "Dry run: " if dry_run else ""
 
