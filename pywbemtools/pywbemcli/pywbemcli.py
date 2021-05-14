@@ -44,8 +44,8 @@ from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT
-from .._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
-    DEFAULT_CONNECTIONS_FILE
+from .._utils import pywbemtools_warn, get_terminal_width, \
+    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS
 
@@ -872,7 +872,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     _python_nm = sys.version_info[0:2]
     if _python_nm in ((2, 7), (3, 4)):
-        pywbemcliwarn(
+        pywbemtools_warn(
             "Pywbemcli support for Python {}.{} is deprecated and will be "
             "removed in a future version".
             format(_python_nm[0], _python_nm[1]),

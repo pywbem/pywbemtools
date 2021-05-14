@@ -111,19 +111,19 @@ def _formatwarning(message, category, filename, lineno, line=None):
     return "{}: {}\n".format(category.__name__, message)
 
 
-def pywbemcliwarn(*args, **kwargs):
+def pywbemtools_warn(*args, **kwargs):
     """
-    Pywbemcli monkey patch for the warnings.warn function; substitutes our
-    own formatter.
+    Pywbemtools version of the warnings.warn() function,
+    with replaced formatting.
     """
     with mock.patch.object(warnings, 'formatwarning', _formatwarning):
         warnings.warn(*args, **kwargs)
 
 
-def pywbemcliwarn_explicit(*args, **kwargs):
+def pywbemtools_warn_explicit(*args, **kwargs):
     """
-    Pywbemcli monkey patch for the warnings.warn_explicit function;
-    substitutes our own formatter
+    Pywbemtools version of the warnings.warn_explicit() function,
+    with replaced formatting.
     """
     with mock.patch.object(warnings, 'formatwarning', _formatwarning):
         warnings.warn_explicit(*args, **kwargs)

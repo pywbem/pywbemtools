@@ -507,7 +507,7 @@ def test_get_terminal_width(
             os.environ[termwidth_envvar] = saved_termwidth
 
 
-# The pywbemcliwarn() and pywbemcliwarn_explicit() functions are not tested
-# directly because the pytest capturing of warnings nullifies their patching of
-# warnings.formatwarning(). These functions are tested indirectly though, by
-# the tests that invoke the pywbemcli command.
+# The pywbemtools_warn() and pywbemtools_warn_explicit() functions are not
+# tested directly because the pytest capturing of warnings nullifies their
+# patching of warnings.formatwarning(). These functions are tested indirectly
+# though, by the tests that invoke the pywbemtools commands.
