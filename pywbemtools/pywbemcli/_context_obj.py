@@ -28,7 +28,7 @@ import os
 import click
 import click_spinner
 
-from ._common import format_table, validate_output_format
+from .._output_formatting import format_table, validate_output_format
 
 
 class ContextObj(object):

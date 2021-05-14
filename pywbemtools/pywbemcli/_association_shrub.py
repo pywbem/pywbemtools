@@ -47,9 +47,10 @@ from pywbem import CIMInstanceName, CIMClassName, CIMFloat, CIMInt, CIMError, \
     CIMDateTime
 from pywbem._nocasedict import NocaseDict
 
-from ._common import output_format_is_table, format_table, shorten_path_str, \
-    warning_msg, sort_cimobjects
+from ._common import shorten_path_str, sort_cimobjects
 from .._utils import ensure_unicode, to_unicode, get_terminal_width
+from .._output_formatting import output_format_is_table, format_table, \
+    warning_msg
 
 # Same as in pwbem.cimtypes.py
 if six.PY2:

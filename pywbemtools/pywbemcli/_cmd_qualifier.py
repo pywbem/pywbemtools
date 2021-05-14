@@ -27,13 +27,13 @@ import click
 from pywbem import Error
 
 from .pywbemcli import cli
-from ._common import sort_cimobjects, \
-    pywbem_error_exception, validate_output_format
+from ._common import sort_cimobjects, pywbem_error_exception
 from ._display_cimobjects import display_cim_objects
 from ._common_options import add_options, namespace_option, summary_option, \
     help_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._output_formatting import validate_output_format
 
 # Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
 # with prompt-toolkit 2 + the completer requires unicode and click_repl not
