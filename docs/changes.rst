@@ -26,12 +26,11 @@ Released: not yet
 
 **Enhancements:**
 
-* Added support for managing WBEM indication listeners by adding a command
-  group 'listener'. (issue #430)
-
 **Cleanup:**
 
-* Prepared development environment for second pywbemtools command.
+* Prepared the development environment for having more than one pywbemtools
+  command. As part of that, moved a number of utility functions from the
+  'pywbemtools/pywbemcli' subdirectory to the common 'pywbemtools' directory.
 
 **Known issues:**
 
