@@ -32,6 +32,9 @@ Released: not yet
   command. As part of that, moved a number of utility functions from the
   'pywbemtools/pywbemcli' subdirectory to the common 'pywbemtools' directory.
 
+* Moved the environment variable names from being class attributes on the
+  PywbemServer class to become constants in the config module. (issue #658)
+
 **Known issues:**
 
 * See `list of open issues`_.
