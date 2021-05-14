@@ -34,19 +34,19 @@ from ._common import pick_instance, resolve_propertylist, create_ciminstance, \
 
 from ._display_cimobjects import display_cim_objects
 
-from ._common_options import add_options, propertylist_option, \
-    names_only_option, include_classorigin_instance_option, namespace_option, \
-    summary_option, verify_option, multiple_namespaces_option, \
-    class_filter_options, help_option
+from ._common_options import propertylist_option, names_only_option, \
+    include_classorigin_instance_option, namespace_option, summary_option, \
+    verify_option, multiple_namespaces_option, class_filter_options
 
 from ._cimvalueformatter import mof_escaped
 
 from ._association_shrub import AssociationShrub
 
 from .config import DEFAULT_QUERY_LANGUAGE
+from ._cmd_class import get_namespaces, enumerate_classes_filtered
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from ._cmd_class import get_namespaces, enumerate_classes_filtered
+from .._options import add_options, help_option
 from .._output_formatting import validate_output_format, format_table, \
     warning_msg
 

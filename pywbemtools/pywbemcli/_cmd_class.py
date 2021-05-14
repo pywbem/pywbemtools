@@ -37,14 +37,14 @@ from ._common import filter_namelist, resolve_propertylist, \
 
 from ._display_cimobjects import display_cim_objects
 
-from ._common_options import add_options, propertylist_option, \
-    names_only_option, include_classorigin_class_option, namespace_option,  \
-    summary_option, multiple_namespaces_option, class_filter_options, \
-    help_option
+from ._common_options import propertylist_option, names_only_option, \
+    include_classorigin_class_option, namespace_option, summary_option, \
+    multiple_namespaces_option, class_filter_options
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._utils import pywbemcliwarn
+from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
     validate_output_format, format_table, warning_msg
 

@@ -33,11 +33,12 @@ from pywbem._mof_compiler import MOFWBEMConnection, MOFCompileError
 
 from .pywbemcli import cli
 from ._common import pywbem_error_exception
-from ._common_options import add_options, help_option, namespace_option
-from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from ._common_options import namespace_option
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
 from .._utils import pywbemcliwarn
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._options import add_options, help_option
 from .._output_formatting import validate_output_format, format_table, \
     display_text
 
