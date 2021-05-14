@@ -32,8 +32,7 @@ from pywbem import Error, CIMClassName, CIMError, ModelError, CIM_ERR_NOT_FOUND
 
 from .pywbemcli import cli
 from ._common import filter_namelist, resolve_propertylist, \
-    output_format_is_table, format_table, process_invokemethod, \
-    pywbem_error_exception, warning_msg, validate_output_format, \
+    process_invokemethod, pywbem_error_exception,  \
     get_subclass_names, depending_classnames, get_leafclass_names
 
 from ._display_cimobjects import display_cim_objects
@@ -46,6 +45,8 @@ from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._utils import pywbemcliwarn
+from .._output_formatting import output_format_is_table, \
+    validate_output_format, format_table, warning_msg
 
 #
 #   Common option definitions for class group

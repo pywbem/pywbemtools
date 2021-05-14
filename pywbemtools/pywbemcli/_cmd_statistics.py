@@ -29,11 +29,11 @@ import six
 from pywbem import Error, ValueMapping, CIMDateTime
 
 from .pywbemcli import cli
-from ._common import warning_msg, validate_output_format, \
-    output_format_is_table, format_table
 from ._common_options import add_options, help_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._output_formatting import output_format_is_table, \
+    validate_output_format, format_table, warning_msg
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines

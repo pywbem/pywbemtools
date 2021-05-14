@@ -29,9 +29,8 @@ from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
 
 from .pywbemcli import cli
 from ._common import pick_instance, resolve_propertylist, create_ciminstance, \
-    filter_namelist, format_table, verify_operation, \
-    process_invokemethod, pywbem_error_exception, \
-    parse_kv_pair, warning_msg, validate_output_format
+    filter_namelist, verify_operation, process_invokemethod, \
+    pywbem_error_exception, parse_kv_pair
 
 from ._display_cimobjects import display_cim_objects
 
@@ -48,6 +47,8 @@ from .config import DEFAULT_QUERY_LANGUAGE
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from ._cmd_class import get_namespaces, enumerate_classes_filtered
+from .._output_formatting import validate_output_format, format_table, \
+    warning_msg
 
 #
 #   Common option definitions for instance group

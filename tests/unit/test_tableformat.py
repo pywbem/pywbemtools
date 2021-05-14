@@ -27,7 +27,7 @@ except ImportError:
     from io import StringIO  # Python 3
 import pytest
 
-from pywbemtools.pywbemcli._common import format_table, fold_strings
+from pywbemtools._output_formatting import format_table, fold_strings
 
 
 # A simple table
