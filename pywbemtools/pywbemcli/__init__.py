@@ -24,6 +24,7 @@ from __future__ import absolute_import, print_function
 
 from .._utils import *              # noqa: F403,F401
 from .._click_extensions import *   # noqa: F403,F401
+from .._options import *            # noqa: F403,F401
 from .._output_formatting import *  # noqa: F403,F401
 from ._cmd_namespace import *       # noqa: F403,F401
 from ._common import *              # noqa: F403,F401

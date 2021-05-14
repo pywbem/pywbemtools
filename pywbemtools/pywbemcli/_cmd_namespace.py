@@ -28,9 +28,9 @@ import click
 from pywbem import Error
 from .pywbemcli import cli
 from ._common import pywbem_error_exception, all_classnames_depsorted
-from ._common_options import add_options, help_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._options import add_options, help_option
 from .._output_formatting import DEFAULT_TABLE_FORMAT, output_format_is_table, \
     validate_output_format, format_table, display_text
 

@@ -30,7 +30,7 @@ from pywbem import ValueMapping, Error
 
 from .pywbemcli import cli
 from ._common import pywbem_error_exception
-from ._common_options import add_options, help_option
+from .._options import add_options, help_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._output_formatting import validate_output_format, format_table

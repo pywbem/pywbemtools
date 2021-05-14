@@ -36,7 +36,6 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
 from pywbem import __version__ as pywbem_version
 
 from ._context_obj import ContextObj, display_click_context
-from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
     PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
@@ -47,6 +46,7 @@ from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT
 from .._utils import pywbemcliwarn, get_terminal_width, CONNECTIONS_FILENAME, \
     DEFAULT_CONNECTIONS_FILE
+from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS
 
 

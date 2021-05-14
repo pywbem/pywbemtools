@@ -29,10 +29,10 @@ from pywbem import Error
 from .pywbemcli import cli
 from ._common import sort_cimobjects, pywbem_error_exception
 from ._display_cimobjects import display_cim_objects
-from ._common_options import add_options, namespace_option, summary_option, \
-    help_option
+from ._common_options import namespace_option, summary_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._options import add_options, help_option
 from .._output_formatting import validate_output_format
 
 # Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because

@@ -33,11 +33,11 @@ from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 from .pywbemcli import cli
 from ._common import pick_one_from_list, pywbem_error_exception
 from ._connection_repository import ConnectionsFileError
-from ._common_options import add_options, help_option
 from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
     validate_output_format, format_table, fold_strings
 
