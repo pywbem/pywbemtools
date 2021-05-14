@@ -95,29 +95,6 @@ class PywbemServer(object):
     This class also holds the variables that determine whether the connection
     will use the pull operations or traditional operations
     """
-    # ISSUE: #658 - Reorganize the location for these variable names separate
-    # from the PywbemServer class.
-    # The following class level variables are the names for the env variables
-    # where server connection information are be saved and used as alternate
-    # input sources for pywbemcli arguments and options.
-    server_envvar = 'PYWBEMCLI_SERVER'
-    name_envvar = 'PYWBEMCLI_NAME'
-    user_envvar = 'PYWBEMCLI_USER'
-    password_envvar = 'PYWBEMCLI_PASSWORD'
-    defaultnamespace_envvar = 'PYWBEMCLI_DEFAULT_NAMESPACE'
-    timeout_envvar = 'PYWBEMCLI_TIMEOUT'
-    keyfile_envvar = 'PYWBEMCLI_KEYFILE'
-    certfile_envvar = 'PYWBEMCLI_CERTFILE'
-    verify_envvar = 'PYWBEMCLI_VERIFY'
-    ca_certs_envvar = 'PYWBEMCLI_CA_CERTS'
-    timestats_envvar = 'PYWBEMCLI_TIMESTATS'
-    use_pull_envvar = 'PYWBEMCLI_USE_PULL'
-    pull_max_cnt_envvar = 'PYWBEMCLI_PULL_MAX_CNT'
-    mock_server_envvar = 'PYWBEMCLI_MOCK_SERVER'
-    log_envvar = 'PYWBEMCLI_LOG'
-    # The following exports are not part of the pywbem_server container
-    pdb_envvar = 'PYWBEMCLI_PDB'
-    connections_file_envvar = 'PYWBEMCLI_CONNECTIONS_FILE'
 
     def __init__(self, server=None, default_namespace=DEFAULT_NAMESPACE,
                  name='default', user=None, password=None,

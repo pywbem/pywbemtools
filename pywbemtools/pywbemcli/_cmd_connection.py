@@ -31,9 +31,14 @@ import six
 from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 
 from .pywbemcli import cli
+from .config import PYWBEMCLI_SERVER_ENVVAR, \
+    PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR, PYWBEMCLI_USER_ENVVAR, \
+    PYWBEMCLI_PASSWORD_ENVVAR, PYWBEMCLI_VERIFY_ENVVAR, \
+    PYWBEMCLI_CERTFILE_ENVVAR, PYWBEMCLI_KEYFILE_ENVVAR, \
+    PYWBEMCLI_CA_CERTS_ENVVAR, PYWBEMCLI_TIMEOUT_ENVVAR, \
+    PYWBEMCLI_USE_PULL_ENVVAR, PYWBEMCLI_CONNECTIONS_FILE_ENVVAR
 from ._common import pick_one_from_list, pywbem_error_exception
 from ._connection_repository import ConnectionsFileError
-from ._pywbem_server import PywbemServer
 from ._context_obj import ContextObj
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
@@ -534,20 +539,20 @@ def cmd_connection_export(context):
     if not svr:
         raise click.ClickException("No server currently defined as current")
 
-    export_statement(PywbemServer.server_envvar, svr.server)
+    export_statement(PYWBEMCLI_SERVER_ENVVAR, svr.server)
 
-    if_export_statement(PywbemServer.defaultnamespace_envvar,
+    if_export_statement(PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR,
                         svr.default_namespace)
-    if_export_statement(PywbemServer.user_envvar, svr.user)
-    if_export_statement(PywbemServer.password_envvar, svr.password)
-    if_export_statement(PywbemServer.verify_envvar, svr.verify)
-    if_export_statement(PywbemServer.certfile_envvar, svr.certfile)
-    if_export_statement(PywbemServer.keyfile_envvar, svr.keyfile)
-    if_export_statement(PywbemServer.ca_certs_envvar, svr.ca_certs)
-    if_export_statement(PywbemServer.timeout_envvar, svr.timeout)
-    if_export_statement(PywbemServer.use_pull_envvar, svr.use_pull)
+    if_export_statement(PYWBEMCLI_USER_ENVVAR, svr.user)
+    if_export_statement(PYWBEMCLI_PASSWORD_ENVVAR, svr.password)
+    if_export_statement(PYWBEMCLI_VERIFY_ENVVAR, svr.verify)
+    if_export_statement(PYWBEMCLI_CERTFILE_ENVVAR, svr.certfile)
+    if_export_statement(PYWBEMCLI_KEYFILE_ENVVAR, svr.keyfile)
+    if_export_statement(PYWBEMCLI_CA_CERTS_ENVVAR, svr.ca_certs)
+    if_export_statement(PYWBEMCLI_TIMEOUT_ENVVAR, svr.timeout)
+    if_export_statement(PYWBEMCLI_USE_PULL_ENVVAR, svr.use_pull)
     # Additional exports available connections_file
-    if_export_statement(PywbemServer.connections_file_envvar,
+    if_export_statement(PYWBEMCLI_CONNECTIONS_FILE_ENVVAR,
                         context.connections_repo.connections_file)
 
 
