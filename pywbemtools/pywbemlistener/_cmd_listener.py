@@ -449,7 +449,7 @@ def is_parent_start():
     Returns:
       int: PID of parent process, if it is 'start', otherwise None.
     """
-    ppid = os.getppid()
+    ppid = psutil.Process(os.getpid()).ppid()
     pps = psutil.Process(ppid)
 
     try:
