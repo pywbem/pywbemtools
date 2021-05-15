@@ -23,7 +23,7 @@ import re
 # pylint: disable=unused-import
 from .utils import server_url  # noqa: F401
 # pylint: enable=unused-import
-from ..unit.utils import execute_pywbemcli
+from ..unit.utils import execute_command
 
 
 def test_server_is_pegasus(server_url):
@@ -40,7 +40,8 @@ def test_server_is_pegasus(server_url):
     """
 
     # Check the server brand
-    rc, stdout, stderr = execute_pywbemcli(
+    rc, stdout, stderr = execute_command(
+        'pywbemcli',
         ['-s', server_url, '--no-verify', 'server', 'brand'])
     assert rc == 0
     assert stderr == ''
@@ -48,7 +49,8 @@ def test_server_is_pegasus(server_url):
     assert brand == 'OpenPegasus'
 
     # Check the expected Interop namespace
-    rc, stdout, stderr = execute_pywbemcli(
+    rc, stdout, stderr = execute_command(
+        'pywbemcli',
         ['-s', server_url, '--no-verify', 'namespace', 'interop'])
     assert rc == 0
     assert stderr == ''
@@ -56,7 +58,8 @@ def test_server_is_pegasus(server_url):
     assert interop == 'root/interop'
 
     # Check the namespaces our tests will use
-    rc, stdout, stderr = execute_pywbemcli(
+    rc, stdout, stderr = execute_command(
+        'pywbemcli',
         ['-s', server_url, '--no-verify', 'namespace', 'list'])
     assert rc == 0
     assert stderr == ''
@@ -65,7 +68,8 @@ def test_server_is_pegasus(server_url):
     assert 'test/TestProvider' in namespaces
 
     # Check the profiles our tests will use
-    rc, stdout, stderr = execute_pywbemcli(
+    rc, stdout, stderr = execute_command(
+        'pywbemcli',
         ['-s', server_url, '--no-verify', 'profile', 'list'])
     assert rc == 0
     assert stderr == ''
