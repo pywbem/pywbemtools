@@ -22,7 +22,7 @@ import re
 # pylint: disable=unused-import
 from .utils import server_url  # noqa: F401
 # pylint: enable=unused-import
-from ..unit.utils import execute_pywbemcli
+from ..unit.utils import execute_command
 
 
 def test_resourcewarning_interactive(server_url):
@@ -47,9 +47,10 @@ stderr:
     # Note: We want to see ResourceWarning but not other warnings, particularly
     # not DeprecationWarning which is issued on Python 2.7. Using the 'env'
     # parameter to set PYTHONWARNINGS does not work because PYTHONWARNINGS is
-    # disabled in execute_pywbemcli(). So we use '--warn' and manually process
+    # disabled in execute_command(). So we use '--warn' and manually process
     # the warnings that are issued.
-    rc, stdout, stderr = execute_pywbemcli(
+    rc, stdout, stderr = execute_command(
+        'pywbemcli',
         ['-s', server_url, '--no-verify', '--warn'],
         stdin='server brand')
 

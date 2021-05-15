@@ -17,7 +17,7 @@ import packaging.version
 import pywbem
 from pywbem_mock import FakedWBEMConnection
 
-from ..utils import execute_pywbemcli, assert_rc, assert_patterns, assert_lines
+from ..utils import execute_command, assert_rc, assert_patterns, assert_lines
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -244,8 +244,12 @@ class CLITestsBase(object):
             general_args = [general_args]
 
         cmd_line = []
+
         if condition == 'pdb':
+            capture = False
             cmd_line.append('--pdb')
+        else:
+            capture = True
 
         if general_args:
             cmd_line.extend(general_args)
@@ -272,22 +276,13 @@ class CLITestsBase(object):
         if not verbose:
             verbose = condition == 'verbose'
 
-        if verbose:
-            print('\nCMDLINE: {}'.format(cmd_line))
-
-        if verbose and env:
-            print('ENV: {}'.format(env))
-
         with connections_file(*connections_file_args):
-            rc, stdout, stderr = execute_pywbemcli(
-                cmd_line, env=env, stdin=stdin, verbose=verbose,
-                condition=condition)
+            rc, stdout, stderr = execute_command(
+                'pywbemcli', cmd_line, env=env, stdin=stdin, verbose=verbose,
+                capture=capture)
 
         exp_rc = exp_response['rc'] if 'rc' in exp_response else 0
         assert_rc(exp_rc, rc, stdout, stderr, desc)
-
-        if verbose:
-            print('RC={}\nSTDOUT={}\nSTDERR={}'.format(rc, stdout, stderr))
 
         if exp_response['test']:
             test_definition = exp_response['test']

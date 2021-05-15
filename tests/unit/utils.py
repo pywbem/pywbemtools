@@ -13,8 +13,7 @@
 # limitations under the License.
 
 """
-Utilities to exercise pywbemcli both as a separate executable and in line with
-a direct call.
+Utilities to execute a pywbemtools command and for comparing expected results.
 """
 
 from __future__ import absolute_import, print_function
@@ -23,14 +22,23 @@ import os
 import sys
 import re
 try:
+    from collections.abc import Mapping, Sequence
+except ImportError:
+    from collections import Mapping, Sequence
+try:
     from StringIO import StringIO  # Python 2
 except ImportError:
     from io import StringIO  # Python 3
 from copy import copy
 from subprocess import Popen, PIPE
+try:
+    from subprocess import TimeoutExpired
+except ImportError:
+    TimeoutExpired = None
 import packaging.version
 import click
 import six
+from six.moves import shlex_quote
 
 # Click issue #1231:
 # On Windows, the Click package has the issue that it writes '\n' at the Python
@@ -48,53 +56,63 @@ CLICK_VERSION = packaging.version.parse(click.__version__)
 CLICK_ISSUE_1231 = sys.version_info[0:2] <= (3, 4) and sys.platform == 'win32'
 
 
-def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
+def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
+                    capture=True):
     """
-    Invoke the 'pywbemcli' command as a child process.
+    Invoke a command as a child process.
 
-    This requires that the 'pywbemcli' command is installed in the current
+    The command must be accessible in the PATH, i.e. installed in the current
     Python environment.
 
     Parameters:
 
-      args (iterable of :term:`string`): Command line arguments and subcommand,
-        without the command name.
-        Each single argument must be its own item in the iterable; combining
-        the arguments into a string does not work.
-        The arguments may be binary strings, encoded in UTF-8, or unicode
+      cmdname (string): Command name (e.g. pywbemcli). The command name may be
+        a binary string encoded in UTF-8, or a unicode string.
+
+      args (sequence of string): Command line arguments, starting with the first
+        argument after the command name. Each single argument must be its own
+        item in the sequence; combining the arguments into a string does not
+        work. The arguments may be binary strings encoded in UTF-8, or unicode
         strings.
 
-      env (dict): Environment variables to be put into the environment when
-        calling the command. May be `None`. Dict key is the variable name as a
-        :term:`string`; dict value is the variable value as a :term:`string`
-        (without any shell escaping needed).
+      env (dict or None): Environment variables to be put into the environment
+        before executing the command. None means to not set any variables. Dict
+        key is the variable name as a string; dict value is the variable value
+        as a string (without any shell escaping needed), or None to unset the
+        variable. The environment of the current process is saved and restored.
 
-      stdin (:term:`string` or None):
-        Passed to the executable as stdin.
+      stdin (string or None):
+        Passed to the executable as stdin, if not None. Lines are separated
+        with NL. May be binary a string encoded in UTF-8, or a unicode string.
 
       verbose (bool):
-        If True, display args, env, and stdin before executing the command
+        Display args, env, and stdin before executing the command and rc,
+        stdout, stderr afterwards.
 
-      condition ('pdb', other values):
-        If 'pdb', the test breaks in the debugger before invoking the command.
+      capture (bool):
+        Capture stdout and stderr of the command. Not capturing that is useful
+        when invoking the commands with the --pdb option that breaks in the
+        built-in pdb debugger.
 
     Returns:
 
       tuple(rc, stdout, stderr): Output of the command, where:
 
-        * rc(int): Exit code of the command.
-        * stdout(:term:`unicode string`): Standard output of the command,
-          as a unicode string with newlines represented as '\\n'.
-          Returns empty string, if there was no data.
-        * stderr(:term:`unicode string`): Standard error of the command,
-          as a unicode string with newlines represented as '\\n'.
-          Returns empty string, if there was no data.
+        * rc (int): Exit code of the command.
+
+        * stdout (unicode string): Standard output of the command. Lines are
+          separated with NL. Empty string if there was no output. None if
+          output was not captured.
+
+        * stderr (unicode string): Standard error of the command. Lines are
+          separated with NL. Empty string if there was no output. None if
+          output was not captured.
     """
-    cli_cmd = u'pywbemcli'
 
     if env is None:
         env = {}
     else:
+        assert isinstance(env, Mapping)
         env = copy(env)
 
     env['PYTHONPATH'] = '.'  # Use local files
@@ -115,33 +133,38 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
             saved_env[name] = os.getenv(name)  # None if not set
             os.environ[name] = value
 
-    if verbose:
-        display_envvars = '\n'.join(
-            ['{}={}'.format(var, os.environ[var])
-             for var in os.environ if 'PYWBEMCLI' in var])
-        print('PYWBEMCLI env vars:\n{}'.format(display_envvars))
-
-    assert isinstance(args, (list, tuple))
-    cmd_args = [cli_cmd]
+    assert isinstance(args, Sequence)
+    if not isinstance(cmdname, six.text_type):
+        cmdname = cmdname.decode('utf-8')
+    cmd_args = [cmdname]
     for arg in args:
         if not isinstance(arg, six.text_type):
             arg = arg.decode('utf-8')
         cmd_args.append(arg)
 
+    if stdin is not None and not isinstance(stdin, six.text_type):
+        stdin = stdin.decode('utf-8')
+
     if verbose:
-        print('\nexecute_pywbemcli CMD_ARGS {}'.format(cmd_args))
+        display_envvars = ', '.join(
+            ['{}={}'.format(var, os.environ[var])
+             for var in os.environ if 'PYWBEM' in var])
+        print('\nEnvironment: {}'.format(display_envvars))
+        if stdin is not None:
+            print('Stdin: {!r}'.format(stdin))
 
-    if verbose and stdin:
-        print('stdin {}'.format(stdin))
-
-    if condition == 'pdb':
-        stdin_stream = None
-        stdout_stream = None
-        stderr_stream = None
-    else:
+    if capture:
         stdin_stream = PIPE
         stdout_stream = PIPE
         stderr_stream = PIPE
+    else:
+        stdin_stream = None
+        stdout_stream = None
+        stderr_stream = None
+        if stdin is not None:
+            if verbose:
+                print('Suppressing stdin because not capturing')
+            stdin = None
 
     if CLICK_ISSUE_1231:
         universal_newlines = False
@@ -150,13 +173,80 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     else:
         universal_newlines = True
 
-    # pylint: disable=consider-using-with
-    proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
-                 stdout=stdout_stream, stderr=stderr_stream,
-                 universal_newlines=universal_newlines)
+    # Note: Popen.communicate() and Popen.wait() wait not only for the child
+    # process to finish, but for all grandchild processes in addition. In case
+    # of the 'pywbemlistener start' command, the grandchild 'run' process
+    # however is supposed to continue running after the 'start' process has
+    # finished. Therefore, using Popen.communicate() and Popen.wait() does not
+    # work for this case. See https://stackoverflow.com/q/55160319/1424462.
+    # We use shell redirection in this case.
 
-    stdout_str, stderr_str = proc.communicate(input=stdin)
-    rc = proc.returncode
+    if capture and cmd_args[0] == 'pywbemlistener':
+        assert stdin is None
+        out_log = 'out.log'
+        err_log = 'err.log'
+        redirect = ' >{} 2>{}'.format(out_log, err_log)
+        cmd_args = ' '.join([shlex_quote(a) for a in cmd_args]) + redirect
+
+        if verbose:
+            print('Command (shell): {}'.format(cmd_args))
+
+        # pylint: disable=consider-using-with
+        proc = Popen(cmd_args, shell=True, stdin=None,
+                     stdout=None, stderr=None,
+                     universal_newlines=universal_newlines)
+
+        if TimeoutExpired:
+            # Python >= 3.3
+            try:
+                proc.wait(timeout=10)
+                rc = proc.returncode
+            except TimeoutExpired:
+                proc.kill()
+                rc = 255
+                print("Error: Timeout waiting for command to complete; Killed "
+                      "process and setting rc={}".
+                      format(rc))
+        else:
+            # Python < 3.3
+            proc.wait()
+            rc = proc.returncode
+
+        with open(out_log, 'rb') as fp:
+            stdout_str = fp.read()
+        with open(err_log, 'rb') as fp:
+            stderr_str = fp.read()
+
+    else:
+        if verbose:
+            print('Command (direct): {}'.format(cmd_args))
+
+        # pylint: disable=consider-using-with
+        proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
+                     stdout=stdout_stream, stderr=stderr_stream,
+                     universal_newlines=universal_newlines)
+
+        if TimeoutExpired:
+            # Python >= 3.3
+            try:
+                stdout_str, stderr_str = proc.communicate(
+                    input=stdin, timeout=10)
+                rc = proc.returncode
+            except TimeoutExpired:
+                proc.kill()
+                rc = 255
+                try:
+                    stdout_str, stderr_str = proc.communicate(timeout=10)
+                except TimeoutExpired:
+                    stdout_str = stderr_str = None
+                print("Error: Timeout waiting for command to complete; Killed "
+                      "process and setting rc={}; Stdout produced so far: "
+                      "{!r}; Stderr produced so far: {!r}".
+                      format(rc, stdout_str, stderr_str))
+        else:
+            # Python < 3.3
+            stdout_str, stderr_str = proc.communicate(input=stdin)
+            rc = proc.returncode
 
     # Restore environment of current process
     for name in saved_env:
@@ -167,21 +257,26 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
             os.environ[name] = value
 
     if verbose:
-        print('output type {}\nstdout:{!r}\nstderr:{!r}'
-              .format(type(stdout_str), stdout_str, stderr_str))
+        print('Exit code: {}'.format(rc))
+        if capture:
+            print('Stdout: {!r}'.format(stdout_str))
+            print('Stderr: {!r}'.format(stderr_str))
 
-    if isinstance(stdout_str, six.binary_type):
-        stdout_str = stdout_str.decode('utf-8')
-    if isinstance(stderr_str, six.binary_type):
-        stderr_str = stderr_str.decode('utf-8')
+    if stdout_str is not None:
+        if isinstance(stdout_str, six.binary_type):
+            stdout_str = stdout_str.decode('utf-8')
+        if CLICK_ISSUE_1231:
+            stdout_str = stdout_str.replace('\r\r\n', '\n')  \
+                                   .replace('\r\n', '\n')  \
+                                   .replace('\r', '')
 
-    if CLICK_ISSUE_1231:
-        stdout_str = stdout_str.replace('\r\r\n', '\n')  \
-                               .replace('\r\n', '\n')  \
-                               .replace('\r', '')
-        stderr_str = stderr_str.replace('\r\r\n', '\n')  \
-                               .replace('\r\n', '\n')  \
-                               .replace('\r', '')
+    if stderr_str is not None:
+        if isinstance(stderr_str, six.binary_type):
+            stderr_str = stderr_str.decode('utf-8')
+        if CLICK_ISSUE_1231:
+            stderr_str = stderr_str.replace('\r\r\n', '\n')  \
+                                   .replace('\r\n', '\n')  \
+                                   .replace('\r', '')
 
     return rc, stdout_str, stderr_str
 
@@ -227,8 +322,8 @@ def assert_patterns(exp_patterns, act_lines, source, desc):
     """
     Assert that the specified lines match the specified patterns.
 
-    The patterns are matched against the complete line from begin to end,
-    even if no begin and end markers are specified in the patterns.
+    The patterns are searched in the lines. If a pattern is supposed to match
+    a line from start to end, it must contain '^' and '$'.
 
     Parameters:
 
@@ -245,7 +340,7 @@ def assert_patterns(exp_patterns, act_lines, source, desc):
     assert len(act_lines) == len(exp_patterns), \
         "Unexpected number of lines on {} in test:\n" \
         "{}\n" \
-        "Expected lines (cnt={}):\n" \
+        "Expected patterns (cnt={}):\n" \
         "------------\n" \
         "{}\n" \
         "------------\n" \
@@ -253,17 +348,15 @@ def assert_patterns(exp_patterns, act_lines, source, desc):
         "------------\n" \
         "{}\n" \
         "------------\n". \
-        format(source, desc, len(act_lines), '\n'.join(act_lines),
-               len(exp_patterns), '\n'.join(exp_patterns))
+        format(source, desc, len(exp_patterns), '\n'.join(exp_patterns),
+               len(act_lines), '\n'.join(act_lines))
 
     for i, act_line in enumerate(act_lines):
-        exp_line = exp_patterns[i]
-        # if not exp_line.endswith('$'):
-        #    exp_line += '$'
-        assert re.match(exp_line, act_line), \
+        exp_pattern = exp_patterns[i]
+        assert re.search(exp_pattern, act_line), \
             "Unexpected line #{} on {} in test:\n" \
             "{}\n" \
-            "Expected line:\n" \
+            "Expected pattern:\n" \
             "------------\n" \
             "{}\n" \
             "------------\n" \
@@ -271,7 +364,59 @@ def assert_patterns(exp_patterns, act_lines, source, desc):
             "------------\n" \
             "{}\n" \
             "------------\n". \
-            format(i, source, desc, exp_line, act_line)
+            format(i, source, desc, exp_pattern, act_line)
+
+
+def assert_patterns_in_lines(exp_patterns, act_lines, source, desc):
+    """
+    Assert that for each pattern there is a matching line, in order of the
+    patterns
+
+    The patterns are searched in the lines. If a pattern is supposed to match
+    a line from start to end, it must contain '^' and '$'.
+
+    Parameters:
+
+      exp_patterns (iterable of string): regexp patterns defining the expected
+        value for a line.
+
+      act_lines (iterable of string): the lines to be matched.
+
+      source (string): Source from where the lines were obtained, e.g.
+        'stdout' or 'stderr'.
+
+      desc (string): Testcase description.
+    """
+    act_lines_iter = iter(act_lines)
+    try:
+        start_line = '<begin>'
+        act_line = next(act_lines_iter)
+        for i, exp_pattern in enumerate(exp_patterns):
+            start_line = act_line
+            found = False
+            while not found:
+                if re.search(exp_pattern, act_line):
+                    found = True
+                    break
+                act_line = next(act_lines_iter)
+    except StopIteration:
+        raise AssertionError(
+            "Pattern #{} not found in order on {} in test:\n"
+            "{}\n"
+            "Expected pattern:\n"
+            "------------\n"
+            "{!r}\n"
+            "------------\n"
+            "Start line for search:\n"
+            "------------\n"
+            "{!r}\n"
+            "------------\n"
+            "Actual lines:\n"
+            "------------\n"
+            "{}\n"
+            "------------\n".
+            format(i, source, desc, exp_pattern, start_line,
+                   '\n'.join(act_lines)))
 
 
 def assert_lines(exp_lines, act_lines, source, desc):
