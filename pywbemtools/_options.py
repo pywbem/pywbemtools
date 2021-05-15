@@ -52,3 +52,19 @@ def add_options(options):
         return func
 
     return _add_options
+
+
+def validate_required_arg(value, metavar):
+    """
+    Validate that a required CLI argument is present, and raise a usage error
+    otherwise.
+
+    This function is used for required arguments in cases where the command
+    has a --help-... option, so that the option can be used without specifying
+    the required arguments. Just using is_eager on the option is not sufficient
+    for that.
+    """
+    if not value:
+        raise click.UsageError(
+            "Missing argument '{}'.".format(metavar),
+            click.get_current_context())

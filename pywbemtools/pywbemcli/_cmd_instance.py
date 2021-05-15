@@ -46,7 +46,7 @@ from .config import DEFAULT_QUERY_LANGUAGE
 from ._cmd_class import get_namespaces, enumerate_classes_filtered
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from .._options import add_options, help_option
+from .._options import add_options, help_option, validate_required_arg
 from .._output_formatting import validate_output_format, format_table, \
     warning_msg
 
@@ -673,17 +673,6 @@ def instance_shrub(context, instancename, **options):
 #  Common functions for cmd_instance processing
 #
 ####################################################################
-
-
-def validate_required_arg(value, metavar):
-    """
-    Validate that a required CLI argument is present, and raise a usage error
-    otherwise.
-    """
-    if not value:
-        raise click.UsageError(
-            "Missing argument '{}'.".format(metavar),
-            click.get_current_context())
 
 
 def show_help_instancename():
