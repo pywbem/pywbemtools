@@ -48,9 +48,9 @@ from six.moves import shlex_quote
 # performs the universal newline conversions itself (it does what Popen() does,
 # and in addition replaces the incorrectly created '\r\r\n' sequence).
 # That issue has been fixed in Click 7.1 on Python 3, but Click 7.1 has also
-# removed support for Python 3.4 so pywbemtools now requires Click 7.1 where
-# possible and still needs the circumvention code for Python 2.7 and 3.4 on
-# Windows.
+# removed support for Python 3.4 so pywbemtools now requires Click 7.1 with
+# all Python versions except 3.4. It turns out that the circumvention is also
+# needed on Python 2.7, even though Click 7.1 is used there (not clear why).
 # The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
 CLICK_VERSION = packaging.version.parse(click.__version__)
 CLICK_ISSUE_1231 = sys.version_info[0:2] <= (3, 4) and sys.platform == 'win32'
