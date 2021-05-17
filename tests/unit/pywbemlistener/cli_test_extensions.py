@@ -21,14 +21,14 @@ through pywbemlistener execution.
 from __future__ import absolute_import, print_function
 
 import sys
+import subprocess
 try:
     from collections.abc import Sequence
 except ImportError:
     from collections import Sequence
-import subprocess
 import pytest
 
-from ..utils import execute_command, assert_rc, assert_patterns, \
+from ..utils import run, execute_command, assert_rc, assert_patterns, \
     assert_patterns_in_lines
 
 
@@ -155,10 +155,9 @@ def ensure_no_listeners(verbose, situation):
     This function relies on the 'pywbemlistener list' and 'stop' commands
     working.
     """
-    cmd_args = 'pywbemlistener -o plain list'
-    if verbose:
-        print("{}: Listing listeners: {}".format(situation, cmd_args))
-    out = subprocess.check_output(cmd_args, shell=True)
+    cmdline = 'pywbemlistener -o plain list'
+    prefix = "{}: Listing listeners".format(situation)
+    _, out, _ = run(cmdline, True, verbose, prefix)
     lis_lines = out.decode('utf-8').rstrip('\n').split('\n')
     for lis_line in lis_lines[1:]:
         lis_name = lis_line.split(' ')[0]

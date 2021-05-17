@@ -30,7 +30,8 @@ try:
 except ImportError:
     from io import StringIO  # Python 3
 from copy import copy
-from subprocess import Popen, PIPE
+import subprocess
+import tempfile
 try:
     from subprocess import TimeoutExpired
 except ImportError:
@@ -54,6 +55,56 @@ from six.moves import shlex_quote
 # The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
 CLICK_VERSION = packaging.version.parse(click.__version__)
 CLICK_ISSUE_1231 = sys.version_info[0:2] <= (3, 4) and sys.platform == 'win32'
+
+
+def run(cmdline, check=True, verbose=False, prefix=None):
+    """
+    Run the command line in a shell and capture its stdout and stderr by
+    redirection. This avoids the problem of subprocess.check_output() and
+    subprocess.Popen() if redirected, to wait for grand child processes to
+    terminate.
+
+    Parameters:
+
+      cmdline (string): Command line as a single string, shell escaped where
+        needed.
+      check (bool): Check that the exit code is 0, and raise CalledProcessError
+        otherwise.
+      verbose (bool): Print verbose messages.
+      prefix (string): Prefix in verbose messages.
+
+    Returns:
+      tuple(rc, stdout, stderr)
+
+    Raises:
+      subprocess.CalledProcessError: Check was set and rc was not zero.
+    """
+    with tempfile.NamedTemporaryFile() as out_fp:
+        out_log = out_fp.name
+        with tempfile.NamedTemporaryFile() as err_fp:
+            err_log = err_fp.name
+            cmdline = '{} >{} 2>{}'.format(cmdline, out_log, err_log)
+            if verbose:
+                print("{}: Command: {}".format(prefix, cmdline))
+            # pylint: disable=consider-using-with
+            p = subprocess.Popen(cmdline, shell=True)
+            p.communicate()
+            rc = p.returncode
+            if verbose:
+                print("{}: Exit code: {}".format(prefix, rc))
+                print("Debug: Reading stdout log file")
+            out_str = out_fp.read()
+            if verbose:
+                print("Debug: Reading stderr log file")
+            err_str = err_fp.read()
+            if verbose:
+                print("Debug: Done reading log files")
+    if verbose:
+        print("{}: Stdout: {}".format(prefix, out_str))
+        print("{}: Stderr: {}".format(prefix, err_str))
+    if rc != 0 and check:
+        raise subprocess.CalledProcessError(rc, cmdline, out_str)
+    return rc, out_str, err_str
 
 
 def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
@@ -154,9 +205,9 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
             print('Stdin: {!r}'.format(stdin))
 
     if capture:
-        stdin_stream = PIPE
-        stdout_stream = PIPE
-        stderr_stream = PIPE
+        stdin_stream = subprocess.PIPE
+        stdout_stream = subprocess.PIPE
+        stderr_stream = subprocess.PIPE
     else:
         stdin_stream = None
         stdout_stream = None
@@ -173,80 +224,85 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     else:
         universal_newlines = True
 
-    # Note: Popen.communicate() and Popen.wait() wait not only for the child
-    # process to finish, but for all grandchild processes in addition. In case
-    # of the 'pywbemlistener start' command, the grandchild 'run' process
-    # however is supposed to continue running after the 'start' process has
-    # finished. Therefore, using Popen.communicate() and Popen.wait() does not
-    # work for this case. See https://stackoverflow.com/q/55160319/1424462.
-    # We use shell redirection in this case.
-
-    if capture and cmd_args[0] == 'pywbemlistener':
-        assert stdin is None
-        out_log = 'out.log'
-        err_log = 'err.log'
-        redirect = ' >{} 2>{}'.format(out_log, err_log)
-        cmd_args = ' '.join([shlex_quote(a) for a in cmd_args]) + redirect
-
-        if verbose:
-            print('Command (shell): {}'.format(cmd_args))
-
-        # pylint: disable=consider-using-with
-        proc = Popen(cmd_args, shell=True, stdin=None,
-                     stdout=None, stderr=None,
-                     universal_newlines=universal_newlines)
-
-        if TimeoutExpired:
-            # Python >= 3.3
-            try:
-                proc.wait(timeout=10)
-                rc = proc.returncode
-            except TimeoutExpired:
-                proc.kill()
-                rc = 255
-                print("Error: Timeout waiting for command to complete; Killed "
-                      "process and setting rc={}".
-                      format(rc))
-        else:
-            # Python < 3.3
-            proc.wait()
-            rc = proc.returncode
-
-        with open(out_log, 'rb') as fp:
-            stdout_str = fp.read()
-        with open(err_log, 'rb') as fp:
-            stderr_str = fp.read()
-
+    if True:  # pylint: disable=using-constant-test
+        cmdline = ' '.join([shlex_quote(a) for a in cmd_args])
+        rc, stdout_str, stderr_str = run(cmdline, False, verbose, 'test')
     else:
-        if verbose:
-            print('Command (direct): {}'.format(cmd_args))
+        # Note: Popen.communicate() and Popen.wait() wait not only for the
+        # child process to finish, but for all grandchild processes in addition.
+        # In case of the 'pywbemlistener start' command, the grandchild 'run'
+        # process however is supposed to continue running after the 'start'
+        # process has finished. Therefore, using Popen.communicate() and
+        # Popen.wait() does not work for this case. See
+        # https://stackoverflow.com/q/55160319/1424462.
+        # We use shell redirection in this case.
 
-        # pylint: disable=consider-using-with
-        proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
-                     stdout=stdout_stream, stderr=stderr_stream,
-                     universal_newlines=universal_newlines)
+        if capture and cmd_args[0] == 'pywbemlistener':
+            assert stdin is None
+            out_log = 'out.log'
+            err_log = 'err.log'
+            redirect = ' >{} 2>{}'.format(out_log, err_log)
+            cmd_args = ' '.join([shlex_quote(a) for a in cmd_args]) + redirect
 
-        if TimeoutExpired:
-            # Python >= 3.3
-            try:
-                stdout_str, stderr_str = proc.communicate(
-                    input=stdin, timeout=10)
-                rc = proc.returncode
-            except TimeoutExpired:
-                proc.kill()
-                rc = 255
+            if verbose:
+                print('Command (shell): {}'.format(cmd_args))
+
+            # pylint: disable=consider-using-with
+            proc = subprocess.Popen(
+                cmd_args, shell=True, stdin=None, stdout=None, stderr=None,
+                universal_newlines=universal_newlines)
+
+            if TimeoutExpired:
+                # Python >= 3.3
                 try:
-                    stdout_str, stderr_str = proc.communicate(timeout=10)
+                    proc.wait(timeout=10)
+                    rc = proc.returncode
                 except TimeoutExpired:
-                    stdout_str = stderr_str = None
-                print("Error: Timeout waiting for command to complete; Killed "
-                      "process and setting rc={}; Stdout produced so far: "
-                      "{!r}; Stderr produced so far: {!r}".
-                      format(rc, stdout_str, stderr_str))
+                    proc.kill()
+                    rc = 255
+                    print("Error: Timeout waiting for command to complete; "
+                          "Killed process and setting rc={}".
+                          format(rc))
+            else:
+                # Python < 3.3
+                proc.wait()
+                rc = proc.returncode
+
+            with open(out_log, 'rb') as fp:
+                stdout_str = fp.read()
+            with open(err_log, 'rb') as fp:
+                stderr_str = fp.read()
+
         else:
-            # Python < 3.3
-            stdout_str, stderr_str = proc.communicate(input=stdin)
-            rc = proc.returncode
+            if verbose:
+                print('Command (direct): {}'.format(cmd_args))
+
+            # pylint: disable=consider-using-with
+            proc = subprocess.Popen(
+                cmd_args, shell=False, stdin=stdin_stream, stdout=stdout_stream,
+                stderr=stderr_stream, universal_newlines=universal_newlines)
+
+            if TimeoutExpired:
+                # Python >= 3.3
+                try:
+                    stdout_str, stderr_str = proc.communicate(
+                        input=stdin, timeout=10)
+                    rc = proc.returncode
+                except TimeoutExpired:
+                    proc.kill()
+                    rc = 255
+                    try:
+                        stdout_str, stderr_str = proc.communicate(timeout=10)
+                    except TimeoutExpired:
+                        stdout_str = stderr_str = None
+                    print("Error: Timeout waiting for command to complete; "
+                          "Killed process and setting rc={}; Stdout produced "
+                          "so far: {!r}; Stderr produced so far: {!r}".
+                          format(rc, stdout_str, stderr_str))
+            else:
+                # Python < 3.3
+                stdout_str, stderr_str = proc.communicate(input=stdin)
+                rc = proc.returncode
 
     # Restore environment of current process
     for name in saved_env:
