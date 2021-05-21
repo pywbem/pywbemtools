@@ -532,8 +532,6 @@ TEST_CASES = [
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
-
-
 ]
 
 

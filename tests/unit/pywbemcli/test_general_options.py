@@ -173,6 +173,7 @@ GENERAL_HELP_LINES = [
       qualifier   Command group for CIM qualifier declarations.
       server      Command group for WBEM servers.
       statistics  Command group for WBEM operation statistics.
+      subscription  Command group to manage WBEM indication subscriptions.
       connection  Command group for WBEM connection definitions.
       help        Show help message for interactive mode.
       repl        Enter interactive mode (default)."""

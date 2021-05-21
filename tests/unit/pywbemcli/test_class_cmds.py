@@ -1707,6 +1707,9 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # Class delete errors
+    # NOTE: Missing argument tests use regex test because with Python 3.4
+    # the Missing Argument output from click uses double quotes rather than
+    # single quotes
     ['Verify class command delete no classname',
      ['delete'],
      {'stderr': ['Error: Missing argument .CLASSNAME.'],
