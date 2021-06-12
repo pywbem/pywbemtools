@@ -609,7 +609,8 @@ def split_str_w_esc(astring, delimiter, escape='\\'):
     return ret
 
 
-def process_invokemethod(context, objectname, methodname, options):
+def process_invokemethod(context, objectname, methodname, namespace,
+                         parameters):
     # pylint: disable=line-too-long
     """
     Process the parameters for invokemethod at either the class or instance
@@ -617,10 +618,18 @@ def process_invokemethod(context, objectname, methodname, options):
 
     Parameters:
 
-      objectname (:term:`string` or :class:`~pywbem.CIMClassName` or :class:`~pywbem.CIMInstanceName`)  # noqa: E501
+      objectname (:class:`~pywbem.CIMClassName` or :class:`~pywbem.CIMInstanceName`)  # noqa: E501
+        The objectname (class or instance) that is the invokemethod
+        target. The namespace must have been inserted into the objectname
+        before calling this method
 
       methodname (:term:`string`):
         The name of the method to be executed
+
+      namespace()
+      options (:class:`py:dict`):
+        The command options dictionary.  Used to get the command namespace
+        and parameters.
 
     """  # pylint: enable=line-too-long
 
@@ -655,14 +664,13 @@ def process_invokemethod(context, objectname, methodname, options):
             params.append((name, cim_value))
         return params
 
+    assert isinstance(objectname, (CIMClassName, CIMInstanceName))
     conn = context.pywbem_server.conn
-    classname = objectname.classname \
-        if isinstance(objectname, (CIMClassName, CIMInstanceName)) \
-        else objectname
+    classname = objectname.classname
 
     cim_class = conn.GetClass(
         classname,
-        namespace=options['namespace'], LocalOnly=False)
+        namespace=namespace, LocalOnly=False)
 
     cim_methods = cim_class.methods
     if methodname not in cim_methods:
@@ -671,7 +679,7 @@ def process_invokemethod(context, objectname, methodname, options):
             .format(classname, methodname))
     cim_method = cim_methods[methodname]
 
-    params = create_params(classname, cim_method, options['parameter'])
+    params = create_params(classname, cim_method, parameters)
 
     rtn = conn.InvokeMethod(methodname, objectname, params)
 

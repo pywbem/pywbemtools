@@ -24,6 +24,11 @@ Released: not yet
 * Test: Fixed that test_utils.py changed the PYWBEMCLI_TERMWIDTH env var
   for testing purposes without restoring it.
 
+* Fixes issue where the command:
+  ``class invokemethod <class> <method> -n <namespace>``
+  ignores the command namespace option (-n) and usedsthe default
+  namespace. (see issue #990)
+
 **Enhancements:**
 
 **Cleanup:**

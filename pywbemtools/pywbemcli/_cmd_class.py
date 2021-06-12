@@ -869,8 +869,11 @@ def cmd_class_invokemethod(context, classname, methodname, options):
     """
     Create an instance and submit to a WBEM server
     """
+
     try:
-        process_invokemethod(context, classname, methodname, options)
+        cln = CIMClassName(classname, namespace=options['namespace'])
+        process_invokemethod(context, cln, methodname, options['namespace'],
+                             options['parameter'])
     except Error as er:
         raise pywbem_error_exception(er)
 

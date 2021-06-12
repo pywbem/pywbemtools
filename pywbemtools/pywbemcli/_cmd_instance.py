@@ -1113,7 +1113,8 @@ def cmd_instance_invokemethod(context, instancename, methodname,
     instancepath = get_instancename(context, instancename, options)
 
     try:
-        process_invokemethod(context, instancepath, methodname, options)
+        process_invokemethod(context, instancepath, methodname,
+                             options['namespace'], options['parameter'])
     except Error as er:
         raise pywbem_error_exception(er)
 
