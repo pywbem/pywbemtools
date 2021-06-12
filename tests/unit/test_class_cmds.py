@@ -66,6 +66,8 @@ MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
 TREE_TEST_MOCK_FILE = 'tree_test_mock_model.mof'
 
+SIMPLE_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
+
 #
 # The following list defines the help for each command in terms of particular
 # parts of lines that are to be tested.//FakedUrl:5988
@@ -608,6 +610,12 @@ TEST_CASES = [
                  '<METHOD( | .+ )NAME="DeleteNothing"'],
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate  --di --no --namespace',
+     ['enumerate', '--di', '--no', '-n', 'interop'],
+     {'stdout': ['CIM_Namespace', 'CIM_ObjectManager'],
+      'test': 'in'},
+     SIMPLE_INTEROP_MOCK_FILE, OK],
 
     #
     # Enumerate commands with the filter options
@@ -1331,6 +1339,13 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
     # pylint: enable=line-too-long
 
+    ['Verify class command enumerate  --di --no --namespace',
+     ['get', 'CIM_Namespace', '-n', 'interop'],
+     {'stdout': ['class CIM_Namespace',
+                 'string ObjectManagerCreationClassName;'],
+      'test': 'innows'},
+     SIMPLE_INTEROP_MOCK_FILE, OK],
+
     # get command errors
 
     ['Verify class command get invalid classname',
@@ -1416,6 +1431,13 @@ TEST_CASES = [
                  "  root/cimv2: CIM_Foo_sub_sub"],
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command find simple name in interop namespace',
+     ['find', 'CIM_*'],
+     {'stdout': ["  interop: CIM_Namespace",
+                 "  interop: CIM_ObjectManager"],
+      'test': 'in'},
+     SIMPLE_INTEROP_MOCK_FILE, OK],
 
     ['Verify class command find name in known namespace -o grid',
      {'general': ['-o', 'grid'],
@@ -1829,6 +1851,14 @@ TEST_CASES = [
       'test': 'innows'},
      [SIMPLE_MOCK_FILE, 'reject_deleteinstance_provider.py'],
      MOCK_SETUP_SUPPORTED],
+
+    ['Verify class command delete using --namespace interop fails because of '
+     'instances',
+     ['delete', 'CIM_ObjectManager', '-n', 'interop'],
+     {'stderr': ['Cannot delete class', 'instances'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_INTEROP_MOCK_FILE, OK],
 
     #
     # command "class tree"
@@ -2253,6 +2283,22 @@ TEST_CASES = [
       'rc': 0,
       'test': 'lines'},
      [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    ['Verify class command invokemethod CIM_Foo.FuzzyStatic() with --namespace',
+     ['invokemethod', 'CIM_Foo', 'FuzzyStatic', '--namespace', 'root/cimv2'],
+     {'stdout': ["ReturnValue=0"],
+      'rc': 0,
+      'test': 'lines'},
+     [SIMPLE_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
+
+    # Cannot do a test with interop as default because of issue #991
+    ['Verify class command invokemethod CIM_Foo.FuzzyStatic() with --namespace'
+     ' interop not found to validate that --namspace used',
+     ['invokemethod', 'CIM_Foo', 'FuzzyStatic', '--namespace', 'interop'],
+     {'stderr': ["CIM_ERR_NOT_FOUND", "not found in namespace 'interop'"],
+      'rc': 1,
+      'test': 'innows'},
+     [SIMPLE_INTEROP_MOCK_FILE, INVOKE_METHOD_MOCK_FILE], OK],
 
     ['Verify class command invokemethod CIM_Foo.FuzzyStatic() - one in parm',
      ['invokemethod', 'CIM_Foo', 'FuzzyStatic',

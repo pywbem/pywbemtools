@@ -16,6 +16,11 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fixes issue where the command:
+  ``class invokemethod <class> <method> -n <namespace>``
+  ignores the command namespace option (-n) and usedsthe default
+  namespace. (see issue #990)
+
 **Enhancements:**
 
 **Cleanup:**
