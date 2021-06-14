@@ -42,6 +42,13 @@ Released: not yet
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
   (issues #430, #479, #948)
 
+* Implement server schema command that returns information about the schemas
+  for each namespace including: 5. the DMTF schemas, 2. schema version, 3. whether
+  any classes in the schema/namespace are experimental, and 4) the number of
+  classes in this schema, and 5. the DMTF schemas (characters before the `_` in
+  the namespace). (see issue #444)
+
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools

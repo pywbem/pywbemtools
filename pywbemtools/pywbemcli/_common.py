@@ -39,7 +39,7 @@ from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
 from pywbem._nocasedict import NocaseDict
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
-from .._output_formatting import DEFAULT_MAX_CELL_WIDTH
+from .._output_formatting import DEFAULT_MAX_CELL_WIDTH, warning_msg
 
 
 ######################################################################
@@ -780,6 +780,97 @@ def sort_cimobjects(cim_objects):
                       key=lambda tup: tup[0].to_wbem_uri(format="canonical"))
 
     raise TypeError("Items of type {} cannot be sorted".format(type(tst_obj)))
+
+
+def parse_version_value(version_str, cln):
+    """
+    Parse the version qualifier string (ex. from the "version" qualifier) which
+    should contain 3 dot separated integers (ex. "2.41.1").  This function
+    always returns something even for invalid values and does not raise any
+    exception.
+
+    If the input string is invalid, this function will try to fix it either
+    by adding or removing components or if an exception occured by returning
+    the value [0, 0, 0].
+
+    A warning is issued if input version_str is invalid or incorrect.
+
+    Parameters:
+
+      version_str (:term:`string):
+        String of form <str> "." <str> "." <str>
+
+      cln (:term:string)
+        The classname containing the qualifier. Used only for the warning
+        message.
+
+    Returns:
+      List of 3 integers
+    """
+
+    try:
+        version_list = [int(x) for x in version_str.split('.')]
+    except ValueError:
+        warning_msg("Invalid Version qualifier value {}, class {}. "
+                    "Values must be integers. "
+                    "Replace with 0.0.0".format(version_str, cln))
+        return [0, 0, 0]
+    except TypeError:
+        warning_msg("Invalid Version qualifier value: {}, class {}. "
+                    "Returned 0.0.0".format(version_str, cln))
+        return [0, 0, 0]
+
+    if len(version_list) == 3:
+        return version_list
+
+    # There are cases of miss-defined version qualifiers in the DMTF
+    # released schema. Try to correct
+    version_list_mod = version_list
+    while len(version_list_mod) < 3:
+        version_list_mod.append(0)
+    if len(version_list_mod) > 3:
+        version_list_mod = version_list_mod[:3]
+    warning_msg("Invalid Version qualifier value {}, class {}. "
+                " Modified to {}".format(version_str, cln, version_list_mod))
+    return version_list_mod
+
+
+def is_experimental_class(klass):
+    """
+    Test CIM compoments of the klass parameter and if any have the experimental
+    qualifier and its value is True return True. Otherwise return False
+
+    Parameters:
+      klass :class:`~pywbem.CIMClass`:
+        The CIMClass to test for the experimental qualifier
+
+    Returns:
+      True if the experimental qualifier found in any element; otherwise
+      False.
+    """
+    def has_experimental(qualifiers):
+        """
+        Test for existence and True value of the experimental qualifier in
+        the qualifiers dictionary.  If found, set the experimental variable
+        True.
+        """
+        if 'Experimental' in qualifiers:
+            return bool(qualifiers['Experimental'].value)
+        return False
+    if has_experimental(klass.qualifiers):
+        return True
+
+    for prop in klass.properties.values():
+        if has_experimental(prop.qualifiers):
+            return True
+
+    for method in klass.methods.values():
+        if has_experimental(method.qualifiers):
+            return True
+        for param in method.parameters.values():
+            if has_experimental(param.qualifiers):
+                return True
+    return False
 
 
 def get_leafclass_names(classes):
