@@ -2030,8 +2030,7 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       Command group for WBEM servers.
 
       This command group defines commands to inspect and manage core components of a WBEM server including server
-      attributes, namespaces, compiling MOF, the Interop namespace, management profiles, and access to profile central
-      instances.
+      attributes, namespaces, compiling MOF, the Interop namespace and schema information.
 
       In addition to the command-specific options shown in this help text, the general options (see 'pywbemcli --help')
       can also be specified before the 'server' keyword.
@@ -2046,6 +2045,7 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       info        Get information about the server.
       add-mof     Compile MOF and add/update CIM objects in the server.
       remove-mof  Compile MOF and remove CIM objects from the server.
+      schema      Get information about the server schemas.
 
 
 .. _`pywbemcli server add-mof --help`:
@@ -2218,6 +2218,34 @@ Help text for ``pywbemcli server remove-mof`` (see :ref:`server remove-mof comma
       -I, --include INCLUDEDIR   Path name of a MOF include directory. May be specified multiple times.
       -d, --dry-run              Enable dry-run mode: Don't actually modify the server. Connection to the server is still
                                  required for reading.
+
+      -h, --help                 Show this help message.
+
+
+.. _`pywbemcli server schema --help`:
+
+pywbemcli server schema --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli server schema`` (see :ref:`server schema command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] server schema [COMMAND-OPTIONS]
+
+      Get information about the server schemas.
+
+      Gets information about the DMTF schemas that define the classes in each namespace. The information provided
+      includes:   * The schema version - the maximum version defined in a class   * Experimental vs. released schema   *
+      Schema name   * Class count
+
+    Command Options:
+      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
+      -d, --detail               Display details about each schema in the namespace rather than accumulated for the
+                                 namespace.
 
       -h, --help                 Show this help message.
 

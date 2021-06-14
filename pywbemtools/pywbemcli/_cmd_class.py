@@ -33,7 +33,8 @@ from pywbem import Error, CIMClassName, CIMError, ModelError, CIM_ERR_NOT_FOUND
 from .pywbemcli import cli
 from ._common import filter_namelist, resolve_propertylist, \
     process_invokemethod, pywbem_error_exception,  \
-    get_subclass_names, depending_classnames, get_leafclass_names
+    get_subclass_names, depending_classnames, get_leafclass_names, \
+    parse_version_value
 
 from ._display_cimobjects import display_cim_objects
 
@@ -484,10 +485,12 @@ def class_tree(context, classname, **options):
 #
 ####################################################################
 
+
 def parse_version_str(version_str):
     """
     Parse a string with 3 positive integers seperated by period (CIM version
-    string) into a 3 integer tuple and return the tuole
+    string) into a 3 integer tuple and return the tuple. Used to parse the
+    version value of the DMTF Version qualifier.
 
     Parameters:
         version_str (:term: str):
@@ -495,6 +498,10 @@ def parse_version_str(version_str):
 
     Returns:
         tuple containing 3 integers
+
+    Raises:
+        click.ClickException if the version_str is invalid (not integers,
+        not seperated by ".", not 3 values)
     """
     try:
         version_tuple = [int(x) for x in version_str.split('.')]
@@ -697,8 +704,9 @@ def _filter_classes(classes, filters, names_only, iq):
                         if filter_.qualifiername in cls.qualifiers:
                             cls_version = \
                                 cls.qualifiers[filter_.qualifiername].value
-                            version_val = parse_version_str(cls_version)
-                            option_value = version_val >= filter_.optionvalue
+                            val = parse_version_value(cls_version,
+                                                      cls.classname)
+                            option_value = bool(val >= filter_.optionvalue)
 
                     show_class_list.append(option_value)
                 else:

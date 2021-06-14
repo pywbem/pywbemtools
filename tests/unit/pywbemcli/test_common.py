@@ -31,14 +31,18 @@ import pytest
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, \
-    CIMClassName, CIMMethod, CIMParameter, __version__
+    CIMClassName, CIMMethod, CIMParameter, __version__, MOFCompiler
+
+from pywbem._mof_compiler import MOFWBEMConnection
+
 
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
     is_classname, pick_one_from_list, pick_multiple_from_list, \
     verify_operation, split_str_w_esc, shorten_path_str, get_subclass_names, \
-    dependent_classnames, depending_classnames, all_classnames_depsorted
+    dependent_classnames, depending_classnames, all_classnames_depsorted, \
+    parse_version_value, is_experimental_class
 from pywbemtools.pywbemcli._context_obj import ContextObj
 
 from .cli_test_extensions import setup_mock_connection
@@ -2669,6 +2673,234 @@ def test_all_classnames_depsorted(testcase, mock_items, exp_rtn):
     assert testcase.exp_exc_types is None
 
     assert list(act_rtn) == list(exp_rtn)
+
+
+TESTCASES_PARSE_VERSION_VALUE = [
+    # Testcases for parse_version_value()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * ver: String defining the version (valid is str . str . str)
+    #     where each str has only integer characters
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify valid version string 1',
+     dict(ver="2.41.1",
+          exp_rtn=[2, 41, 1]),
+     None, None, OK, ),
+
+    ('Verify valid version string 2',
+     dict(ver="1.1.1",
+          exp_rtn=[1, 1, 1]),
+     None, None, OK, ),
+
+    ('Verify valid version string 3',
+     dict(ver="99.99.99",
+          exp_rtn=[99, 99, 99]),
+     None, None, OK, ),
+
+    ('Verify invalid string with only two items returns 3 items',
+     dict(ver="2.41",
+          exp_rtn=[2, 41, 0]),
+     None, None, OK, ),
+
+    ('Verify invalid string with 4 items returns 3 items',
+     dict(ver="2.41.1.1",
+          exp_rtn=[2, 41, 1]),
+     None, None, RUN, ),
+
+    ('Verify invalid string with alphabetic characters returns 0.0.0',
+     dict(ver="a.41.1",
+          exp_rtn=[0, 0, 0]),
+     None, None, OK, ),
+
+    ('Verify invalid string with alphabetic characters returns 0.0.0',
+     dict(ver="2.abcdef.1",
+          exp_rtn=[0, 0, 0]),
+     None, None, OK, ),
+
+    ('Verify invalid string empty returns 3 items',
+     dict(ver="",
+          exp_rtn=[0, 0, 0]),
+     None, None, OK, ),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_PARSE_VERSION_VALUE)
+@simplified_test_function
+def test_parse_version_value(testcase, ver, exp_rtn):
+    """
+    Test function for _common.get_subclassnames()
+    """
+    # The code to be tested
+    act_rtn = parse_version_value(ver, "CIM_Fakeclassname")
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_IS_EXPERIMENTAL = [
+    # Testcases for parse_version_value()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * ver: String defining the version (valid is str . str . str)
+    #     where each str has only integer characters
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify experimintal in class qualifiers',
+     dict(klass="""
+[Version ( "2.6.0" ), Experimental]
+class TST_Exp{
+    string p;
+    uint32 counter;
+    string M1;
+    uint32 M2(
+      string P1);
+};
+""",
+          exp_rtn=True),
+     None, None, OK, ),
+
+    ('Verify experimental in property quaifier',
+     dict(klass="""
+                [Version ( "2.6.0" )]
+                class TST_Exp{
+                    [Experimental] string p;
+                    uint32 counter;
+                    string M1;
+                    uint32 M2(
+                      string P1);
+                };
+                """,
+          exp_rtn=True),
+     None, None, OK, ),
+
+    ('Verify experimental in method qualifiers',
+     dict(klass="""
+                [Version ( "2.6.0" )]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    string M1;
+                    [ Experimental] uint32 M2(
+                      string P1);
+                };
+                """,
+          exp_rtn=True),
+     None, None, OK, ),
+
+
+    ('Verify experimental in first method qualifiers',
+     dict(klass="""
+                [Version ( "2.6.0" )]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    [ Experimental] string M1;
+                    uint32 M2(
+                      string P1);
+                };
+                """,
+          exp_rtn=True),
+     None, None, OK, ),
+
+    ('Verify experimental in parameter qualifiers',
+     dict(klass="""
+                [Version ( "2.6.0" )]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    string M1;
+                     uint32 M2(
+                      [ Experimental] string P1);
+                };
+                """,
+          exp_rtn=True),
+     None, None, OK, ),
+
+    ('Verify no experimental qualifiers',
+     dict(klass="""
+                [Version ( "2.6.0" )]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    string M1;
+                    uint32 M2(
+                      string P1);
+                };
+                """,
+          exp_rtn=False),
+     None, None, OK, ),
+
+    ('Verify experimental with value False',
+     dict(klass="""
+                [Version ( "2.6.0" ), Experimental(false)]
+                class TST_Exp{
+                    string p;
+                    uint32 counter;
+                    string M1;
+                    uint32 M2(
+                      string P1);
+                };
+                """,
+          exp_rtn=False),
+     None, None, OK, ),
+
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_IS_EXPERIMENTAL)
+@simplified_test_function
+def test_is_experimental(testcase, klass, exp_rtn):
+    """
+    Test function for _common.get_subclassnames(). Note that we compile each
+    test class with a single qualifier, experimental
+    """
+
+    qualifier = """
+Qualifier Experimental : boolean = false,
+    Scope(any),
+    Flavor(EnableOverride, Restricted);
+Qualifier Version : string = null,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted, Translatable);
+
+"""
+    test_mof = qualifier + klass
+
+    # skip_if_moftab_regenerated()
+    mofcomp = MOFCompiler(
+        MOFWBEMConnection(),
+        search_paths=None,
+        verbose=False,
+        log_func=None)
+
+    mofcomp.compile_string(test_mof, ns='root/cimv2')
+    repo = mofcomp.handle
+
+    klass = repo.GetClass('TST_Exp', namespace='root/cimv2',
+                          LocalOnly=False, IncludeQualifiers=True)
+
+    # The code to be tested
+    act_rtn = is_experimental_class(klass)
+    # Ensure that exceptions raised in the remainder of this function
+    # are not mistaken as expected exceptions
+    assert testcase.exp_exc_types is None
+
+    assert act_rtn == exp_rtn
 
 
 # TODO Test compare and failure in compare_obj and with errors.

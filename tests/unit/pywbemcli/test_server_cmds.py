@@ -47,6 +47,10 @@ with open(SIMPLE_MOCK_MODEL_FILEPATH, 'r') as fp:
 MOF_WITH_ERROR_FILEPATH = os.path.join(
     os.path.dirname(__file__), 'mof_with_error.mof')
 
+MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
+
+QUALIFIER_FILTER_MODEL = "qualifier_filter_model.mof"
+
 # The following lists define the help for each command in terms of particular
 # parts of lines that are to be tested.
 # For each list, try to include:
@@ -66,6 +70,7 @@ SERVER_HELP_LINES = [
     'namespaces        List the namespaces of the server (deprecated).',
     'add-mof           Compile MOF and add/update CIM objects in the server.',
     'remove-mof        Compile MOF and remove CIM objects from the server.',
+    'schema            Get information about the server schemas.'
 ]
 
 SERVER_BRAND_HELP_LINES = [
@@ -92,9 +97,11 @@ SERVER_NAMESPACES_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
-SERVER_PROFILES_HELP_LINES = [
-    'Usage: pywbemcli [GENERAL-OPTIONS] server profiles [COMMAND-OPTIONS]',
-    'List management profiles advertized by the server.',
+SERVER_SCHEMA_HELP_LINES = [
+    'Usage: pywbemcli [GENERAL-OPTIONS] server schema [COMMAND-OPTIONS]',
+    'Get information about the server schemas.',
+    '-n, --namespace NAMESPACE  Namespace to use for this command, instead',
+    '-d, --detail               Display details about each schema in the',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -179,6 +186,18 @@ TEST_CASES = [
     ['Verify server command namespaces -h response',
      ['namespaces', '-h'],
      {'stdout': SERVER_NAMESPACES_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server command schema --help response',
+     ['schema', '--help'],
+     {'stdout': SERVER_SCHEMA_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify server command schema -h response',
+     ['schema', '-h'],
+     {'stdout': SERVER_SCHEMA_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -440,6 +459,81 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command schema with -n namespace of simple mock model',
+     {'args': ['schema', '-n', 'root/cimv2'],
+      'general': []},
+     {'stdout': ['Schema information; namespaces: root/cimv2;',
+                 'Namespace    schemas      classes  CIM schema  experimental',
+                 '                            count  version',
+                 'root/cimv2   CIM               12      ', ],
+      'rc': 0,
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL, OK],
+
+    ['Verify server command schema with mock_wbem_server',
+     {'args': ['schema'],
+      'general': []},
+     {'stdout': ['Schema information; namespaces: all;',
+                 'Namespace    schemas      classes  CIM schema  experimental',
+                 '                            count  version',
+                 'interop      CIM, PG           24  2. 45. 0   ',
+                 'root/cimv2   CIM, MCK          15  2. 45. 0   '],
+      'rc': 0,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL, OK],
+
+    ['Verify server command schema with mock_wbem_server & --namespace interop',
+     {'args': ['schema'],
+      'general': []},
+     {'stdout': ['Schema information; namespaces: all;',
+                 'Namespace    schemas      classes  CIM schema  experimental',
+                 '                            count  version',
+                 'interop      CIM, PG           24  2. 45. 0   ', ],
+      'rc': 0,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL, OK],
+
+    ['Verify server command schema with mock_wbem_server and --detail',
+     {'args': ['schema', '--detail'],
+      'general': []},
+     {'stdout': ['Schema information; detail; namespaces: all;',
+                 'Namespace    schemas      classes  schema  experimental',
+                 '                            count  version ',
+                 'interop     CIM               23  2.45.0  ',
+                 '            PG                 1      ',
+                 'root/cimv2  CIM               14  2.45.0   ',
+                 '            MCK                1     '],
+      'rc': 0,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL, OK],
+
+    ['Verify server command schema with qualifier filter model',
+     {'args': ['schema'],
+      'general': []},
+     {'stdout': ['Schema information; namespaces: all;',
+                 'Namespace    schemas      classes  CIM schema  experimental',
+                 '                            count  version',
+                 'root/cimv2   BLA, EXP, TST  20           Experimental'],
+      'rc': 0,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+    ['Verify server command schema with qualifier filter model --detail',
+     {'args': ['schema', '--detail'],
+      'general': []},
+     {'stdout': ['Schema information; detail; namespaces: all;',
+                 'Namespace    schemas      classes  schema  experimental',
+                 '                            count  version ',
+                 'root/cimv2   BLA                1  2.51.0 ',
+                 '             EXP                4  2.3.0    Experimental',
+                 '             TST               15  2.43.0   Experimental'],
+      'rc': 0,
+      'test': 'innows'},
+     QUALIFIER_FILTER_MODEL, OK],
+
+
+
 ]
 
 
@@ -462,5 +556,6 @@ class TestSubcmdServer(CLITestsBase):
           * Subcommands that can be tested with a single execution of a
             pywbemcli command.
         """
+
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition)

@@ -1380,6 +1380,9 @@ WBEM server itself:
 * :ref:`Server info command` - Get information about the server.
 * :ref:`Server interop command` - Get the Interop namespace of the server.
 * :ref:`Server namespaces command` - List the namespaces of the server.
+* :ref:`Server add-mof command` - Compile the MOF files defined.
+* :ref:`Server remove-mof command` - Remove the MOF objects from the server.
+* :ref:`Server schema command` - List the namespaces of the server.
 
 .. index:: pair: server commands; server brand
 
@@ -1539,6 +1542,7 @@ Example:
 See :ref:`pywbemcli server add-mof --help` for the exact help output of the
 command.
 
+
 .. index:: pair: server commands; server remove-mof
 
 .. _`Server remove-mof command`:
@@ -1546,8 +1550,8 @@ command.
 ``server remove-mof`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server remove-mof`` command compiles one or more MOF files and adds the
-resulting CIM objects to the target namespace in the WBEM server of the
+The ``server remove-mof`` command compiles one or more MOF files and removes the
+resulting CIM objects from the target namespace in the WBEM server of the
 :term:`current connection`.
 
 Example:
@@ -1555,6 +1559,85 @@ Example:
 .. code-block:: text
 
     $ pywbemcli --name myserver server remove-mof mymodel.mof
+
+See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
+command.
+
+.. _`Server schema command`:
+
+``server schema`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``server schema`` command returns information on the :ref:'schemas
+<schema>' in the namespace(s) of the :term:`current connection` WBEM server.
+
+The overview reports a summary by namespace of this information and the
+detail view (``server schema --detail``) reports the information for each
+:ref:`Schema` in the namespace.
+
+For each schema in each namespace, the report provides information on the :ref:`Schema`
+schema version (maximum qualifier 'Version' for classes in that schema)
+whether the :ref:`Schema` has experimental classes, and the number of classes
+in the :ref:`schema`.
+
+Pywbemcli determines the version of the :ref:`Schema` by finding the highest
+value of the Version qualifier on any of the classes in the namespace that
+are in that :ref:`schema`
+
+There are two report outputs possible:
+
+* Detail report (``--detail`` option) displays information on the number of classes,
+  maximum version for each schema in each or the selected namespace, and
+  whether the schema includes any experimental classes.
+
+* The overview output (no ``--detail`` option) displays information on the
+  number of classes, the :ref:`CIM Schema' and whether there are experimental
+  classes in each or the selected namespace. For the :ref:`CIM schema` in the
+  overview report the highest value is determined by finding the highest
+  'Version' qualifier value for each :ref:'schemas <schema>' in the :ref:`CIM
+  schema` (normally 'CIM', or 'PRS').
+
+Example:
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver server schema
+
+    Schema information; namespaces: all;
+    Namespace                      Schemas              classes  CIM schema    experimental
+                                                          count  version
+    -----------------------------  -----------------  ---------  -------------  --------------
+    root                                                      0
+    root/PG_InterOp                CIM, PG                  276  2.40.0
+    root/benchmark                 CIM, (no-schema)         206  2.40.0
+    root/cimv2                     CIM, PG, PRS            1463  2.41.0         Experimental
+
+
+The above report would indicate that the namespace root/cimv2 was probably
+created with DMTF released CIM schema version 2.41.0. Other namespaces show a
+lower level of version because they are not using any of the classes that
+have the qualifier Version value of 2.41.0.
+
+or a more detailed report (``--detail`` option):
+
+.. code-block:: text
+
+    $ pywbemcli --name myserver server schema --detail
+
+    Namespace                      Schemas              classes  schema     experimental
+                                                          count  version
+    -----------------------------  -----------------  ---------  ---------  --------------
+    root/PG_InterOp                CIM                      241  2.40.0
+                                   PG                        35  2.12.0
+    root/benchmark                 CIM                      177  2.40.0
+                                   (no-schema)               29  1.0.0
+    root/cimv2                     CIM                     1382  2.41.0     Experimental
+                                   PG                        20  2.12.0
+
+This report tells more about each :ref:`schema` in that it reports that there
+are classes in the root/cimv2 namespace 'CIM' schema that are experimental
+indicating that the CIM schema used was the Version 2.41.0, experimental CIM
+schema.
 
 See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
 command.
@@ -1614,11 +1697,11 @@ statistics gathering and reporting in pywbemcli:
 
     The capabilities for managing and retrieving server maintained statistics is
     supported only in some WBEM server implementations. While these capabilities
-    were documented in the DMTF CIM Schema, they were never included as part of
+    were documented in the :ref:`CIM Schema`, they were never included as part of
     a DMTF or SNIA management profile, so the implementations may vary across
     WBEM server implementations. Pywbemcli makes a best effort to interact with
     the server maintained statistics based on the documentation in the
-    DMTF CIM Schema, and has been verified to work with OpenPegasus.
+    :ref:`CIM Schema`, and has been verified to work with OpenPegasus.
 
 The statistics commands are:
 

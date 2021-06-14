@@ -200,6 +200,22 @@ This documentation uses a few special terms to refer to Python types:
       define the use of a query language, it is specified with the string
       ``DMTF:QCL``. CQL is described in DMTF standard :term:`DSP0202`.
 
+   schema
+      A schema (named CIM schema in the DMTF specification :term:`DSP0004`) in
+      the DMTF CIM model is a set of classes with a single defining authority
+      or owning organization. In the CIM model, the schema elements for a class
+      is defined as the components of the class name separated by the character
+      "_" and the schema is the first such element.  For example ``CIM`` is
+      the schema for the class ``CIM_ManagedElement``.
+
+   CIM schema
+      The collection of qualifier declarations and classes created and
+      maintained by the DMTF that make up the DMTF CIM model. This collection
+      is regularly released by the DMTF as a package marked with a version
+      number (ex. version 2.41.0). The DMTF CIM Schemas can be retrieved from
+      the DMTF web site at: `https://www.dmtf.org/standards/cim`_ .
+
+
 .. _`Profile advertisement methodologies`:
 
 Profile advertisement methodologies

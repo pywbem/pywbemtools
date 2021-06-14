@@ -27,12 +27,16 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import click
+import six
 
-from pywbem import Error, MOFCompiler
+from pywbem import Error, MOFCompiler, ModelError
 from pywbem._mof_compiler import MOFWBEMConnection, MOFCompileError
+from pywbem._nocasedict import NocaseDict
+from nocaselist import NocaseList
 
 from .pywbemcli import cli
-from ._common import pywbem_error_exception
+from ._common import pywbem_error_exception, parse_version_value, \
+    is_experimental_class
 from ._common_options import namespace_option
 from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
 from .._utils import pywbemtools_warn
@@ -40,7 +44,7 @@ from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option
 from .._output_formatting import validate_output_format, format_table, \
-    display_text
+    display_text, fold_strings
 
 # NOTE: A number of the options use double-dash as the short form.  In those
 # cases, a third definition of the options without the double-dash defines
@@ -78,8 +82,7 @@ def server_group():
 
     This command group defines commands to inspect and manage core components
     of a WBEM server including server attributes, namespaces, compiling MOF,
-    the Interop namespace, management profiles, and access to profile central
-    instances.
+    the Interop namespace and schema information.
 
     In addition to the command-specific options shown in this help text, the
     general options (see 'pywbemcli --help') can also be specified before the
@@ -225,6 +228,30 @@ def server_remove_mof(context, **options):
     The global --verbose option will show the CIM objects that are removed.
     """
     context.execute_cmd(lambda: cmd_server_remove_mof(context, options))
+
+
+@server_group.command('schema', cls=PywbemtoolsCommand,
+                      options_metavar=CMD_OPTS_TXT)
+@add_options(namespace_option)
+@click.option('-d', '--detail', is_flag=True, default=False,
+              help=u'Display details about each schema in the namespace rather '
+                   u'than accumulated for the namespace.')
+@add_options(help_option)
+@click.pass_obj
+def server_schema(context, **options):
+    """
+    Get information about the server schemas.
+
+    Gets information about the schemas and CIM schemas that define the classes
+    in each namespace. The information provided includes:
+      * The released DMTF CIM schema version that was the source for the
+        qualifier declarations and classes for the namespace.
+      * Experimental vs. final elements in the schema
+      * Schema name (defined by the prefix on each class before the first '_')
+      * Class count
+
+    """
+    context.execute_cmd(lambda: cmd_server_schema(context, options))
 
 
 ###############################################################
@@ -412,3 +439,161 @@ def cmd_server_remove_mof(context, options):
         raise click.ClickException("Compile failed.")
     except Error as exc:
         raise pywbem_error_exception(exc)
+
+
+def cmd_server_schema(context, options):
+    """
+    The schema command provides information on the CIM model in each namespace
+    including the CIM Schema's defined, the DMTF Release schema version, whether
+    the namespace/schema includes classes with the experimental qualifier, and
+    the count of classes for the namespace and for each schema..
+    """
+    # The schema names that can be considered DMTF schemas and are part of
+    # the dmtf_cim_schema
+    possible_dmtf_schemas = NocaseList(['CIM', 'PRS'])
+
+    def experimental_display(value):
+        """Return string Experimental or empty sting"""
+        return 'Experimental' if value else ''
+
+    def schema_display(schema):
+        """Replace dummy name for no-schema with real text"""
+        if schema == "~~~":
+            return "(no-schema)"
+        return schema
+
+    def version_str(version_tuple):
+        """Convert 3 integer tuple to string  (1.2.3) or empty strig"""
+        if all(i == version_tuple[0] for i in version_tuple):
+            return ""
+        return ".".join([str(i) for i in version_tuple])
+
+    conn = context.pywbem_server.conn
+    wbem_server = context.pywbem_server.wbem_server
+
+    output_format = validate_output_format(context.output_format, 'TABLE')
+    namespace_opt = options['namespace']
+
+    # Get namespaces. This bypasses the issue whene there is no interop
+    # namespace
+    try:
+        namespaces = [namespace_opt] if namespace_opt else \
+            wbem_server.namespaces
+    except ModelError:
+        namespaces = [wbem_server.conn.default_namespace]
+
+    detail = options['detail']
+
+    rows = []
+    for ns in sorted(namespaces):
+        klasses = conn.EnumerateClasses(namespace=ns, DeepInheritance=True,
+                                        LocalOnly=True)
+        classes_count = len(klasses)
+        # namespace level variables for experimental status and max version
+        ns_experimental = False
+        ns_max_dmtf_version = [0, 0, 0]
+
+        # Dictionaries for schemas, schema_max_version and experimental status
+        # per schema found in the namespaces
+        schemas = NocaseDict()  # Schema names are case independent
+        schema_max_ver = NocaseDict()
+        schema_experimental = NocaseDict()
+        no_schema = []
+
+        for klass in klasses:
+            schema_elements = klass.classname.split('_', 1)
+            schema = schema_elements[0] if len(schema_elements) > 1 \
+                else "~~~"  # this is dummy for sort that is replaced later.
+
+            schemas[schema] = schemas.get(schema, 0) + 1
+            if len(schema_elements) < 2:
+                no_schema.append(klass.classname)
+            if schema not in schema_max_ver:
+                schema_max_ver[schema] = [0, 0, 0]
+
+            this_class_experimental = False
+            # Determine if experimental qualifier exists and set namespace
+            # level experimental flag.
+            if ns_experimental is False:
+                if is_experimental_class(klass):
+                    ns_experimental = True
+                    this_class_experimental = True
+            # If detail, set the schema level experimental flag
+            if detail:
+                if schema not in schema_experimental:
+                    schema_experimental[schema] = False
+
+                if this_class_experimental:
+                    schema_experimental[schema] = True
+                elif ns_experimental:
+                    if schema_experimental[schema] is False:
+                        if is_experimental_class(klass):
+                            schema_experimental[schema] = True
+
+            # Get the version qualifier for this class
+            if 'Version' in klass.qualifiers:
+                version = klass.qualifiers['Version'].value
+                version = parse_version_value(version, klass.classname)
+
+                # update the namespace max version if this schema is a
+                # DMTF schema and not previously found
+                if schema in possible_dmtf_schemas:
+                    if version > ns_max_dmtf_version:
+                        ns_max_dmtf_version = version
+
+                # update the version in the schema_max_ver dictionary
+                if schema not in schema_max_ver or \
+                        version > schema_max_ver[schema]:
+                    schema_max_ver[schema] = version
+
+        # Build the table formatted output
+        prev_namespace = None
+        ns_version_str = version_str(ns_max_dmtf_version) \
+            if classes_count else ""
+
+        if detail:
+            headers = ['Namespace', 'schemas', 'classes\ncount',
+                       'schema\nversion', 'experimental']
+            # Display with a line for each namespace and one for each
+            # schema in the namespace
+            # replace the dummy "~~~" with the output text
+            for schema in sorted(schemas.keys()):
+                schema_max_ver_str = version_str(schema_max_ver[schema])
+                # Set the namespace in first row for each new namespace found
+                if ns != prev_namespace:
+                    prev_namespace = ns
+                    ns_display = ns
+                else:
+                    ns_display = ""
+                # Append the row for each schema in the namespace
+                rows.append([ns_display,              # namespace. don't repeat
+                             schema_display(schema),  # CIM schema
+                             schemas[schema],         #
+                             schema_max_ver_str,      # schema version
+                             experimental_display(schema_experimental[schema])])
+        else:  # display non-detail report
+            # Display one line for each namespace with list of schemas in the
+            # namespace
+            headers = ['Namespace', 'schemas', 'classes\ncount',
+                       'CIM schema\nversion', 'experimental']
+            schemas_str = ", ".join(sorted(list(six.iterkeys(schemas))))
+            schemas_str = schemas_str.replace('~~~', '(no-schema)')
+            folded_schemas = fold_strings(schemas_str, 45,
+                                          fold_list_items=False)
+
+            rows.append([ns,
+                         folded_schemas,
+                         classes_count,
+                         ns_version_str,
+                         experimental_display(ns_experimental)
+                         ])
+
+    # if output_format_is_table(context.output_format):
+    title = "Schema information{0} namespaces: {1};".format(
+        '; detail;' if detail else ";", namespace_opt or "all")
+
+    context.spinner_stop()
+    click.echo(format_table(rows,
+                            headers,
+                            title=title,
+                            table_format=output_format))
