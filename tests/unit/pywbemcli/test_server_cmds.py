@@ -233,7 +233,6 @@ TEST_CASES = [
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
-
     ['Verify server command brand with --output table fails',
      {'args': ['brand'],
       'general': ['-o', 'simple']},
