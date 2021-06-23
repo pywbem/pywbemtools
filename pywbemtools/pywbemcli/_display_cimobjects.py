@@ -426,7 +426,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                         try:
                             valuemapping = ValueMapping.for_property(
                                 conn,
-                                conn.default_namespace,
+                                inst.path.namespace,
                                 inst.classname,
                                 name)
                         except ValueError:

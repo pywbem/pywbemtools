@@ -21,6 +21,12 @@ Released: not yet
   ignores the command namespace option (-n) and usedsthe default
   namespace. (see issue #990)
 
+* Fix issue where an exception occurs if the user tries to display
+  cim instances as a table but the class for the instances returned are not in the
+  default namespace and an alternate namespace is defined for the command.
+  The function display_cim_objects(...) uses valuemapping_for_property() but
+  specifies the default namespace as the target.  (See issue #995)
+
 **Enhancements:**
 
 **Cleanup:**
