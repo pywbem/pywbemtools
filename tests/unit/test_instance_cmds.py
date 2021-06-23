@@ -61,8 +61,9 @@ INVOKE_METHOD_MOCK_FILE_1 = 'simple_mock_invokemethod_v1old.py'
 INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
     INVOKE_METHOD_MOCK_FILE_1
 
-
 COMPLEX_ASSOC_MODEL = "complex_assoc_model.mof"
+
+WBEMSERVER_MOCK_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
 
 
 #
@@ -1063,6 +1064,13 @@ Instances: TST_Person
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance enumerate to interop namespace as table works.',
+     {'args': ['enumerate', 'CIM_Namespace', '-n', 'interop'],
+      'general': ['-o', 'simple']},
+     {'stdout': "CreationClassName    Name    ObjectManagerCreationClassName",
+      'test': 'innows'},
+     WBEMSERVER_MOCK_MODEL, RUN],
 
     #
     # instance enumerate error returns

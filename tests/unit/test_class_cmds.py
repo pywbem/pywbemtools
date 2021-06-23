@@ -62,8 +62,6 @@ INVOKE_METHOD_MOCK_FILE = INVOKE_METHOD_MOCK_FILE_0 if PYWBEM_0 else \
 SIMPLE_ASSOC_MOCK_FILE = 'simple_assoc_mock_model.mof'
 QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 
-MOCK_SERVER_MODEL = os.path.join('testmock', 'wbemserver_mock.py')
-
 TREE_TEST_MOCK_FILE = 'tree_test_mock_model.mof'
 
 SIMPLE_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
