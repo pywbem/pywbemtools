@@ -5,7 +5,7 @@ pywbemlistener Help Command Details
 ===================================
 
 
-This section shows the help text for each pywbemlistener command group and command.
+This section shows the help text for each pywbemlistener command.
 
 
 
@@ -59,10 +59,10 @@ Help text for ``pywbemlistener``:
 
     Commands:
       list   List the currently running named WBEM indication listeners.
-      run    Run as a named WBEM indication listener.
       show   Show a named WBEM indication listener.
       start  Start a named WBEM indication listener in the background.
       stop   Stop a named WBEM indication listener.
+      run    Run as a named WBEM indication listener.
 
 
 .. _`pywbemlistener list --help`:
@@ -72,7 +72,7 @@ pywbemlistener list --help
 
 
 
-Help text for ``pywbemlistener list`` (see :ref:`list command group`):
+Help text for ``pywbemlistener list`` (see :ref:`pywbemlistener list command`):
 
 
 ::
@@ -94,7 +94,7 @@ pywbemlistener run --help
 
 
 
-Help text for ``pywbemlistener run`` (see :ref:`run command group`):
+Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
 
 
 ::
@@ -107,6 +107,10 @@ Help text for ``pywbemlistener run`` (see :ref:`run command group`):
       signal (e.g. kill), or the `pywbemlistener stop` command.
 
       A listener with that name must not be running, otherwise the command fails.
+
+      Note: The `pywbemlistener start` command should be used to start listeners, and it starts a `pywbemlistener run`
+      command as a background process. Use the `pywbemlistener run` command only when you need to have control over how
+      exactly the process runs in the background.
 
       Examples:
 
@@ -154,7 +158,7 @@ pywbemlistener show --help
 
 
 
-Help text for ``pywbemlistener show`` (see :ref:`show command group`):
+Help text for ``pywbemlistener show`` (see :ref:`pywbemlistener show command`):
 
 
 ::
@@ -167,7 +171,7 @@ Help text for ``pywbemlistener show`` (see :ref:`show command group`):
 
       Examples:
 
-        pywbemlistener stop lis1
+        pywbemlistener show lis1
 
     Command Options:
       -h, --help  Show this help message.
@@ -180,7 +184,7 @@ pywbemlistener start --help
 
 
 
-Help text for ``pywbemlistener start`` (see :ref:`start command group`):
+Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`):
 
 
 ::
@@ -239,7 +243,7 @@ pywbemlistener stop --help
 
 
 
-Help text for ``pywbemlistener stop`` (see :ref:`stop command group`):
+Help text for ``pywbemlistener stop`` (see :ref:`pywbemlistener stop command`):
 
 
 ::

@@ -62,7 +62,8 @@ CONTEXT_SETTINGS = dict(
 @click.group(invoke_without_command=False, cls=PywbemtoolsTopGroup,
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTS_TXT,
-             subcommand_metavar=SUBCMD_HELP_TXT)
+             subcommand_metavar=SUBCMD_HELP_TXT,
+             move_to_end='run')
 @click.option('-o', '--output-format', metavar='FORMAT',
               default=None,
               help=u'Output format for the command result. '
