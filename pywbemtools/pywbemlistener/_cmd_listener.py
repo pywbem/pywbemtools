@@ -291,6 +291,11 @@ def listener_run(context, name, **options):
 
     A listener with that name must not be running, otherwise the command fails.
 
+    Note: The `pywbemlistener start` command should be used to start listeners,
+    and it starts a `pywbemlistener run` command as a background process.
+    Use the `pywbemlistener run` command only when you need to have control
+    over how exactly the process runs in the background.
+
     Examples:
 
       pywbemlistener run lis1
@@ -356,7 +361,7 @@ def listener_show(context, name):
 
     Examples:
 
-      pywbemlistener stop lis1
+      pywbemlistener show lis1
     """
     context.execute_cmd(lambda: cmd_listener_show(context, name))
 

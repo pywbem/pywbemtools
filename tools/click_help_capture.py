@@ -200,8 +200,12 @@ def create_help_cmd_list(script_cmd, script_name):
     help_groups_result.sort()
     if USE_RST:
         print(rst_headline("{} Help Command Details".format(script_name), 2))
-        print('\nThis section shows the help text for each {} '
-              'command group and command.\n'.format(script_name))
+        if script_name == 'pywbemcli':
+            print('\nThis section shows the help text for each {} '
+                  'command group and command.\n'.format(script_name))
+        else:  # 'pywbemlistener'
+            print('\nThis section shows the help text for each {} '
+                  'command.\n'.format(script_name))
 
     for name in help_groups_result:
         command = '{} {}'.format(script_name, name)
@@ -209,14 +213,21 @@ def create_help_cmd_list(script_cmd, script_name):
         out = HELP_DICT[name]
         if USE_RST:
             level = len(name.split())  # 0: top, 1: group, 2: command
-            if level == 0:
-                line = 'Help text for ``{}``:'.format(script_name)
-            elif level == 1 and name not in ('repl', 'help'):
-                line = 'Help text for ``{}`` (see :ref:`{} command group`):' \
-                    .format(command, name)
-            else:
-                line = 'Help text for ``{}`` (see :ref:`{} command`):' \
-                    .format(command, name)
+            if script_name == 'pywbemcli':
+                if level == 0:
+                    line = 'Help text for ``{}``:'.format(script_name)
+                elif level == 1 and name not in ('repl', 'help'):
+                    line = 'Help text for ``{}`` (see :ref:`{} command ' \
+                    'group`):'.format(command, name)
+                else:
+                    line = 'Help text for ``{}`` (see :ref:`{} command`):' \
+                        .format(command, name)
+            else:  # 'pywbemlistener'
+                if level == 0:
+                    line = 'Help text for ``{}``:'.format(script_name)
+                else:  # level == 1
+                    line = 'Help text for ``{}`` (see :ref:`{} {} command`):'. \
+                    format(command, script_name, name)
             if level > 0:
                 # Don't generate section header for top level
                 print(rst_headline(command_help, 2 + level))

@@ -20,15 +20,15 @@ Pywbemlistener command
 
 The pywbemlistener command can run and manage WBEM listeners.
 
-Each listener is a process that executes the `pywbemlistener run`
+Each listener is a process that executes the ``pywbemlistener run``
 command to receive WBEM indications sent from a WBEM server.
 
-A listener process can be started with the `pywbemlistener start`
-command and stopped with the `pywbemlistener stop` command.
+A listener process can be started with the ``pywbemlistener start``
+command and stopped with the ``pywbemlistener stop`` command.
 
 There is no central registration of the currently running listeners.
 Instead, the currently running processes executing the
-`pywbemlistener run` command are by definition the currently running
+``pywbemlistener run`` command are by definition the currently running
 listeners. Because of this, there is no notion of a stopped listener nor
 does a listener have an operational status.
 
@@ -41,10 +41,6 @@ does a listener have an operational status.
    :maxdepth: 2
    :caption: Table of Contents in this Section:
 
-   cmdshelp.rst
-
-.. # TODO: Write these sections:
-   cmdlineinterface.rst
-   generaloptions.rst
-   features.rst
    commands.rst
+   generaloptions.rst
+   cmdshelp.rst
