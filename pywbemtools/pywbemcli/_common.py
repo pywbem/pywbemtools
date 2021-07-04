@@ -31,6 +31,7 @@ except ImportError:
 try:
     from collections.abc import Sequence
 except ImportError:
+    # pylint: disable=deprecated-class
     from collections import Sequence
 
 import six
