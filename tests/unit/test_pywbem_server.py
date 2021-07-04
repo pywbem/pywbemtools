@@ -549,7 +549,8 @@ def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
 
     # Create temp fake file.
     # NOTE: We cannot use fixtures because we are using simplified_test_function
-    open(FAKE_PEM_PATH, 'a').close()
+    with open(FAKE_PEM_PATH, 'a'):
+        pass
 
     # connect and test connection results. Try block insures finally is
     # called.

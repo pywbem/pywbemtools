@@ -159,8 +159,7 @@ def execute_pywbemcli(args, env=None, stdin=None, verbose=None, condition=True):
     rc = proc.returncode
 
     # Restore environment of current process
-    for name in saved_env:
-        value = saved_env[name]
+    for name, value in saved_env.items():
         if value is None:
             del os.environ[name]
         else:
