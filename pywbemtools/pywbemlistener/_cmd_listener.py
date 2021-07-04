@@ -425,6 +425,9 @@ def get_listeners(name=None):
         args = parse_listener_args(listener_args)
         if args:
             if name is None or args.name == name:
+                # pylint: disable=no-member
+                # Note: This is a workaround for Pylint raising no-member on
+                # Python 3.9 (see issue #1001)
                 logfile = get_logfile(args.logdir, args.name)
                 lis = ListenerProperties(
                     name=args.name, port=args.port, scheme=args.scheme,
@@ -433,6 +436,8 @@ def get_listeners(name=None):
                     indi_file=args.indi_file, indi_format=args.indi_format,
                     logfile=logfile,
                     pid=p.pid, created=datetime.fromtimestamp(p.create_time()))
+                # pylint: enable=no-member
+                # Note: End of workaround
                 ret.append(lis)
     return ret
 
