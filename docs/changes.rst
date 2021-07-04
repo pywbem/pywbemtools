@@ -35,6 +35,8 @@ Released: not yet
   The function display_cim_objects(...) uses valuemapping_for_property() but
   specifies the default namespace as the target.  (See issue #995)
 
+* Fixed issues raised by new Pylint version 2.9.
+
 **Enhancements:**
 
 **Cleanup:**

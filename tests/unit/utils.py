@@ -24,6 +24,7 @@ import re
 try:
     from collections.abc import Mapping, Sequence
 except ImportError:
+    # pylint: disable=deprecated-class
     from collections import Mapping, Sequence
 try:
     from StringIO import StringIO  # Python 2
@@ -249,8 +250,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
             rc = proc.returncode
 
     # Restore environment of current process
-    for name in saved_env:
-        value = saved_env[name]
+    for name, value in saved_env.items():
         if value is None:
             del os.environ[name]
         else:
