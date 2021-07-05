@@ -39,6 +39,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Added a 'pywbemlistener' command for running and managing WBEM listeners.
+  (issues #430, #479, #948)
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools
