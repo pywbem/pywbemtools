@@ -268,7 +268,10 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     if stdout_str is not None:
         if isinstance(stdout_str, six.binary_type):
             stdout_str = stdout_str.decode('utf-8')
-        if CLICK_ISSUE_1231:
+        # Note: The CRs were originally only fixed for CLICK_ISSUE_1231, but
+        # with the pywbemlistener testing, it became necessary on all Python
+        # versions on Windows.
+        if sys.platform == 'win32':
             stdout_str = stdout_str.replace('\r\r\n', '\n')  \
                                    .replace('\r\n', '\n')  \
                                    .replace('\r', '')
@@ -276,7 +279,10 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     if stderr_str is not None:
         if isinstance(stderr_str, six.binary_type):
             stderr_str = stderr_str.decode('utf-8')
-        if CLICK_ISSUE_1231:
+        # Note: The CRs were originally only fixed for CLICK_ISSUE_1231, but
+        # with the pywbemlistener testing, it became necessary on all Python
+        # versions on Windows.
+        if sys.platform == 'win32':
             stderr_str = stderr_str.replace('\r\r\n', '\n')  \
                                    .replace('\r\n', '\n')  \
                                    .replace('\r', '')
