@@ -117,6 +117,9 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
         pywbemlistener run lis1
 
     Command Options:
+      --start-pid PID              PID of the "pywbemlistener start" process to be notified about the startup of the run
+                                   command. Default: No such notification will happen.
+
       -p, --port PORT              The port number the listener will open to receive indications. This can be any available
                                    port. Default: 25989
 
