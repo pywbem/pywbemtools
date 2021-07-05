@@ -140,6 +140,14 @@ LISTEN_OPTIONS = [
 ]
 
 
+def print_out(line):
+    """
+    Print a line to stdout, and flush stdout.
+    """
+    print(line)
+    sys.stdout.flush()
+
+
 class ListenerProperties(object):
     """
     The properties of a running named listener.
@@ -147,7 +155,7 @@ class ListenerProperties(object):
 
     def __init__(self, name, port, scheme, certfile, keyfile,
                  indi_call, indi_display, indi_file, indi_format,
-                 logfile, pid, created):
+                 logfile, pid, start_pid, created):
         self._name = name
         self._port = port
         self._scheme = scheme
@@ -159,6 +167,7 @@ class ListenerProperties(object):
         self._indi_format = indi_format
         self._logfile = logfile
         self._pid = pid
+        self._start_pid = start_pid
         self._created = created
 
     def show_row(self):
@@ -174,6 +183,7 @@ class ListenerProperties(object):
             self.indi_file,
             self.logfile,
             str(self.pid),
+            str(self.start_pid),
             self.created.strftime("%Y-%m-%d %H:%M:%S"),
         )
 
@@ -191,6 +201,7 @@ class ListenerProperties(object):
             'Indication file',
             'Log file',
             'PID',
+            'Start PID',
             'Created',
         )
 
@@ -271,6 +282,11 @@ class ListenerProperties(object):
         return self._pid
 
     @property
+    def start_pid(self):
+        """int: Process ID of the start command of the listener"""
+        return self._start_pid
+
+    @property
     def created(self):
         """datetime: Point in time when the listener process was created"""
         return self._created
@@ -278,6 +294,11 @@ class ListenerProperties(object):
 
 @cli.command('run', cls=PywbemtoolsCommand, options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
+@click.option('--start-pid', type=str, metavar='PID',
+              required=False, default=None,
+              help=u'PID of the "pywbemlistener start" process to be '
+              'notified about the startup of the run command. '
+              'Default: No such notification will happen.')
 @add_options(LISTEN_OPTIONS)
 @add_options(help_option)
 @click.pass_obj
@@ -295,6 +316,10 @@ def listener_run(context, name, **options):
     and it starts a `pywbemlistener run` command as a background process.
     Use the `pywbemlistener run` command only when you need to have control
     over how exactly the process runs in the background.
+
+    Note: The --start-pid option is needed because on Windows, the
+    `pywbemlistener run` command is not the direct child process of the
+    `pywbemlistener start` command starting it.
 
     Examples:
 
@@ -412,6 +437,10 @@ def get_listeners(name=None):
     Returns:
       list of ListenerProperties
     """
+    if sys.platform == 'win32':
+        cmdname = 'pywbemlistener-script.py'
+    else:
+        cmdname = 'pywbemlistener'
     ret = []
     for p in psutil.process_iter():
         try:
@@ -420,7 +449,7 @@ def get_listeners(name=None):
             # Ignore processes we cannot access
             continue
         for i, item in enumerate(cmdline):
-            if item.endswith('pywbemlistener'):
+            if item.endswith(cmdname):
                 listener_index = i
                 break
         else:
@@ -439,47 +468,12 @@ def get_listeners(name=None):
                     certfile=args.certfile, keyfile=args.keyfile,
                     indi_call=args.indi_call, indi_display=args.indi_display,
                     indi_file=args.indi_file, indi_format=args.indi_format,
-                    logfile=logfile,
-                    pid=p.pid, created=datetime.fromtimestamp(p.create_time()))
+                    logfile=logfile, pid=p.pid, start_pid=args.start_pid,
+                    created=datetime.fromtimestamp(p.create_time()))
                 # pylint: enable=no-member
                 # Note: End of workaround
                 ret.append(lis)
     return ret
-
-
-def is_parent_start():
-    """
-    Determine whether the parent process is a 'start' command, and
-    return its PID if so. Otherwise, return None.
-
-    This is used by the 'run' command to find out whether it is
-    executed directly by a user, vs. launched by the 'start' command,
-    so it can signal startup completion to the 'start' command.
-
-    Returns:
-      int: PID of parent process, if it is 'start', otherwise None.
-    """
-    ppid = os.getppid()
-    pps = psutil.Process(ppid)
-
-    try:
-        cmdline = pps.cmdline()
-    except (psutil.AccessDenied, psutil.ZombieProcess):
-        # Ignore processes we cannot access
-        return None
-
-    seen_pywbemlistener = False
-    for item in cmdline:
-        if item.endswith('pywbemlistener'):
-            seen_pywbemlistener = True
-            continue
-        if seen_pywbemlistener and item == 'start':
-            break
-    else:
-        # Ignore processes that are not 'pywbemlistener [opts] start'
-        return None
-
-    return ppid
 
 
 def prepare_startup_completion():
@@ -501,8 +495,8 @@ def success_signal_handler(sig, frame):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Start process: Handling success signal ({}) from run process".
-              format(sig))
+        print_out("Start process: Handling success signal ({}) from run "
+                  "process".format(sig))
 
     RUN_STARTUP_STATUS = 'success'
     with RUN_STARTUP_COND:
@@ -519,8 +513,8 @@ def failure_signal_handler(sig, frame):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Start process: Handling failure signal ({}) from run process".
-              format(sig))
+        print_out("Start process: Handling failure signal ({}) from run "
+                  "process".format(sig))
 
     RUN_STARTUP_STATUS = 'failure'
     with RUN_STARTUP_COND:
@@ -540,8 +534,8 @@ def wait_startup_completion(child_pid):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Start process: Waiting for run process {} to complete startup".
-              format(child_pid))
+        print_out("Start process: Waiting for run process {} to complete "
+                  "startup".format(child_pid))
 
     RUN_STARTUP_STATUS = 'failure'
     with RUN_STARTUP_COND:
@@ -558,12 +552,13 @@ def wait_startup_completion(child_pid):
 
     if status == 'success':
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print("Start process: Startup of run process {} succeeded".
-                  format(child_pid))
+            print_out("Start process: Startup of run process {} succeeded".
+                      format(child_pid))
         return 0
 
     if status == 'timeout':
-        click.echo("Timeout")
+        click.echo("Timeout waiting for signal handler in start process to "
+                   "trigger wait condition")
 
     # The 'run' child process may still be running, or already a
     # zombie, or no longer exist. If it still is running, the likely cause is
@@ -573,8 +568,8 @@ def wait_startup_completion(child_pid):
     sleep(0.5)  # Give it some time to finish by itself before we clean it up
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Start process: Startup of run process {} failed".
-              format(child_pid))
+        print_out("Start process: Startup of run process {} failed".
+                  format(child_pid))
     child_exists = False
     try:
         child_ps = psutil.Process(child_pid)
@@ -587,8 +582,8 @@ def wait_startup_completion(child_pid):
 
     if child_exists:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print("Start process: Cleaning up run process {} and status {}".
-                  format(child_pid, child_status))
+            print_out("Start process: Cleaning up run process {} and status {}".
+                      format(child_pid, child_status))
         try:
             child_ps.terminate()
             child_ps.wait()
@@ -596,6 +591,10 @@ def wait_startup_completion(child_pid):
             raise click.ClickException(
                 "Cannot clean up 'run' child process with PID {}: {}: {}".
                 format(child_pid, type(exc), exc))
+    else:
+        if _config.VERBOSE_PROCESSES_ENABLED:
+            print_out("Start process: Run process {} does not exist anymore".
+                      format(child_pid))
     return 1
 
 
@@ -611,18 +610,23 @@ def run_exit_handler(start_pid, log_fp):
     In addition, it closes the log_fp log file.
     """
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Run process: Exit handler sends failure signal ({}) to start "
-              "process {}".
-              format(SIGNAL_RUN_STARTUP_FAILURE, start_pid))
+        print_out("Run process exit handler: Sending failure signal ({}) to "
+                  "start process {}".
+                  format(SIGNAL_RUN_STARTUP_FAILURE, start_pid))
     try:
         os.kill(start_pid, SIGNAL_RUN_STARTUP_FAILURE)  # Sends the signal
     except OSError:
+        # Note: ProcessLookupError is a subclass of OSError but was introduced
+        # only in Python 3.3.
+
         # The original start parent no longer exists -> the earlier startup
         # succeeded.
-        pass
+        if _config.VERBOSE_PROCESSES_ENABLED:
+            print_out("Run process exit handler: Start process {} does not "
+                      "exist anymore".format(start_pid))
 
     if log_fp:
-        print("Closing 'run' output log file at {}".format(datetime.now()))
+        print_out("Closing 'run' output log file at {}".format(datetime.now()))
         log_fp.close()
 
 
@@ -791,6 +795,7 @@ def parse_listener_args(listener_args):
     parser.add_argument('name', type=str, default=None)
 
     # Note: The following options must ne in sync with the Click command options
+    parser.add_argument('--start-pid', type=int, default=None)
     parser.add_argument('--port', '-p', type=int,
                         default=DEFAULT_LISTENER_PORT)
     parser.add_argument('--scheme', '-s', type=str,
@@ -826,7 +831,7 @@ def run_term_signal_handler(sig, frame):
     gets control and can gracefully stop the listener.
     """
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Run process: Received termination signal ({})".format(sig))
+        print_out("Run process: Received termination signal ({})".format(sig))
     raise SystemExit(1)
 
 
@@ -888,16 +893,64 @@ def cmd_listener_run(context, name, options):
     scheme = options['scheme']
     host = 'localhost'
 
+    start_pid = options['start_pid']
+    if start_pid is not None:
+        start_pid = int(start_pid)
+
+    # If the stdout of the run process is a pipe (e.g. when capturing
+    # the output of the run command or its parent start command during
+    # tests, or when a user pipes the output of the run or start command),
+    # the parent process will not terminate because its child run process
+    # has the same pipe open. This is addressed by setting the file descriptor
+    # of stdout to the file descriptor of the opened log file (when logging)
+    # or the file descriptor of the opened null device (when not logging),
+    # using os.dup2().
+    # Note that this needs to be done at the OS file descriptor level. Setting
+    # sys.stdout is not sufficient, because its prior file descriptor would
+    # still be the open pipe.
+
+    pid = os.getpid()
+
     logfile = get_logfile(context.logdir, name)
     if logfile:
-        print("Logging 'run' output to: {}".format(logfile))
+
+        # This message goes to the original stdout of the run process (wherever
+        # that is directed to)
+        print_out("Run process {}: Output is logged to: {}".
+                  format(pid, logfile))
+
         log_fp = open(logfile, 'a')  # pylint: disable=consider-using-with
-        # The log file will be closed in run_exit_handler()
-        sys.stdout = log_fp
-        sys.stderr = log_fp
-        print("Opening 'run' output log file at {}".format(datetime.now()))
+
+        if sys.platform == 'win32':
+            # On Windows, the standard file descriptors are not inherited
+            # to the run process (probably due to the additional process
+            # in between), so the recommended way of redirecting stdout
+            # does not prevent the start process from terminating.
+            sys.stdout = log_fp
+        else:
+            # On UNIX, see the comment at the begin of this function.
+            # The null device will be closed in run_exit_handler()
+            os.dup2(log_fp.fileno(), sys.stdout.fileno())
+
+        # This message is the first one of this run in the log file (appended)
+        print_out("Opening 'run' output log file at {}".format(datetime.now()))
     else:
-        log_fp = None
+
+        # pylint: disable=consider-using-with
+        log_fp = open(os.devnull, 'w')
+
+        if sys.platform == 'win32':
+            # On Windows, the standard file descriptors are not inherited
+            # to the run process (probably due to the additional process
+            # in between), so the recommended way of redirecting stdout
+            # does not prevent the start process from terminating.
+            sys.stdout = log_fp
+        else:
+            # On UNIX, see the comment at the begin of this function.
+            # The null device will be closed in run_exit_handler()
+            os.dup2(log_fp.fileno(), sys.stdout.fileno())
+
+        print_out("Run process {}: Assertion: This message should not appear")
 
     # Register a termination signal handler that causes the loop further down
     # to get control via SystemExit.
@@ -907,7 +960,6 @@ def cmd_listener_run(context, name, options):
     # atexit handler to make sure we get control when Click exceptions terminate
     # the process. The exit handler signals a failed startup to the start
     # process.
-    start_pid = is_parent_start()
     if start_pid:
         atexit.register(run_exit_handler, start_pid, log_fp)
 
@@ -962,8 +1014,7 @@ def cmd_listener_run(context, name, options):
             display_str = ("Error: Cannot format indication using format "
                            "\"{}\": {}: {}".
                            format(indi_format, exc.__class__.__name__, exc))
-        print(display_str)
-        sys.stdout.flush()
+        print_out(display_str)
 
     def file_func(indication, host):
         """
@@ -1031,14 +1082,12 @@ def cmd_listener_run(context, name, options):
 
     click.echo("Running listener {} at {}".format(name, url))
 
-    # Signal successful startup completion to the parent 'start'
-    # process.
-    start_pid = is_parent_start()
+    # Signal successful startup completion to the parent 'start' process.
     if start_pid:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print("Run process: Sending success signal ({}) to "
-                  "start process {}".
-                  format(SIGNAL_RUN_STARTUP_SUCCESS, start_pid))
+            print_out("Run process: Sending success signal ({}) to "
+                      "start process {}".
+                      format(SIGNAL_RUN_STARTUP_SUCCESS, start_pid))
         os.kill(start_pid, SIGNAL_RUN_STARTUP_SUCCESS)  # Sends the signal
 
     try:
@@ -1046,22 +1095,13 @@ def cmd_listener_run(context, name, options):
             sleep(60)
     except (KeyboardInterrupt, SystemExit) as exc:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print("Run process: Caught exception {}: {}".
-                  format(type(exc), exc))
-        # SystemExit occurs only due to being raised in the signal handler
+            print_out("Run process: Caught exception {}: {}".
+                      format(type(exc), exc))
+        # Note: SystemExit occurs only due to being raised in the signal handler
         # that was registered.
+
         listener.stop()
         click.echo("Shut down listener {} running at {}".format(name, url))
-
-        # Signal failure to the parent 'start' process if it still
-        # exists.
-        start_pid = is_parent_start()
-        if start_pid:
-            if _config.VERBOSE_PROCESSES_ENABLED:
-                print("Run process: Sending failure signal ({}) to start "
-                      "process {}".
-                      format(SIGNAL_RUN_STARTUP_FAILURE, start_pid))
-            os.kill(start_pid, SIGNAL_RUN_STARTUP_FAILURE)  # Sends the signal
 
 
 def cmd_listener_start(context, name, options):
@@ -1085,6 +1125,8 @@ def cmd_listener_start(context, name, options):
         raise click.ClickException(
             "Listener {} already running at {}".format(name, url))
 
+    pid = os.getpid()
+
     run_args = [
         'pywbemlistener',
     ]
@@ -1096,6 +1138,7 @@ def cmd_listener_start(context, name, options):
         'run', name,
         '--port', str(port),
         '--scheme', scheme,
+        '--start-pid', str(pid),
     ])
     if certfile:
         run_args.extend(['--certfile', certfile])
@@ -1120,12 +1163,13 @@ def cmd_listener_start(context, name, options):
     prepare_startup_completion()
 
     if six.PY2:
-        popen_kwargs = {}
+        popen_kwargs = dict(shell=False)
     else:
-        popen_kwargs = dict(start_new_session=True)
+        popen_kwargs = dict(shell=False, start_new_session=True)
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print("Start process: Starting run process as: {}".format(run_args))
+        print_out("Start process {}: Starting run process as: {}".
+                  format(pid, run_args))
 
     # pylint: disable=consider-using-with
     p = subprocess.Popen(run_args, **popen_kwargs)
@@ -1157,7 +1201,11 @@ def cmd_listener_stop(context, name):
     context.spinner_stop()
 
     p = psutil.Process(listener.pid)
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        print_out("Terminating run process {}".format(listener.pid))
     p.terminate()
+    if _config.VERBOSE_PROCESSES_ENABLED:
+        print_out("Waiting for run process {} to complete".format(listener.pid))
     p.wait()
 
     # A message about the successful shutdown has already been displayed by
