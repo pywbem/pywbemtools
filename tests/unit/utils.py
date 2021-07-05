@@ -174,6 +174,9 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     else:
         universal_newlines = True
 
+    # Time allowed for command before the test considers it to have timed out
+    cmd_timeout = 30
+
     # Note: Popen.communicate() and Popen.wait() wait not only for the child
     # process to finish, but for all grandchild processes in addition. In case
     # of the 'pywbemlistener start' command, the grandchild 'run' process
@@ -200,14 +203,14 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         if TimeoutExpired:
             # Python >= 3.3
             try:
-                proc.wait(timeout=10)
+                proc.wait(timeout=cmd_timeout)
                 rc = proc.returncode
             except TimeoutExpired:
                 proc.kill()
                 rc = 255
-                print("Error: Timeout waiting for command to complete; Killed "
-                      "process and setting rc={}".
-                      format(rc))
+                print("Error: Timeout ({} sec) when waiting for command to "
+                      "complete; Killed process and setting rc={}".
+                      format(cmd_timeout, rc))
         else:
             # Python < 3.3
             proc.wait()
@@ -231,7 +234,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
             # Python >= 3.3
             try:
                 stdout_str, stderr_str = proc.communicate(
-                    input=stdin, timeout=10)
+                    input=stdin, timeout=cmd_timeout)
                 rc = proc.returncode
             except TimeoutExpired:
                 proc.kill()
@@ -240,10 +243,10 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                     stdout_str, stderr_str = proc.communicate(timeout=10)
                 except TimeoutExpired:
                     stdout_str = stderr_str = None
-                print("Error: Timeout waiting for command to complete; Killed "
-                      "process and setting rc={}; Stdout produced so far: "
-                      "{!r}; Stderr produced so far: {!r}".
-                      format(rc, stdout_str, stderr_str))
+                print("Error: Timeout ({} sec) when waiting for command to "
+                      "complete; Killed process and setting rc={}; Stdout "
+                      "produced so far: {!r}; Stderr produced so far: {!r}".
+                      format(cmd_timeout, rc, stdout_str, stderr_str))
         else:
             # Python < 3.3
             stdout_str, stderr_str = proc.communicate(input=stdin)
