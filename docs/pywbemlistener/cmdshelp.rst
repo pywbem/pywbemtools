@@ -112,6 +112,9 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
       command as a background process. Use the `pywbemlistener run` command only when you need to have control over how
       exactly the process runs in the background.
 
+      Note: The --start-pid option is needed because on Windows, the `pywbemlistener run` command is not the direct child
+      process of the `pywbemlistener start` command starting it.
+
       Examples:
 
         pywbemlistener run lis1
