@@ -23,6 +23,10 @@ import pytest
 
 from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
 
+
+# Default indication format (must be in sync with actual default format)
+DEFAULT_INDI_FORMAT = '{dt} {h} {i_mof}'
+
 # Output patterns for 'pywbemlistener start --help'
 START_HELP_PATTERNS = [
     r"^Usage: pywbemlistener \[GENERAL-OPTIONS\] start NAME "
@@ -261,7 +265,7 @@ START_TESTCASES = [
                     r"Opening 'run' output log file at .+",
 
                     r"Added indication handler for displaying on stdout with "
-                    r"format .{dt} {h} {c} {p}.",
+                    r"format .{df}.".format(df=DEFAULT_INDI_FORMAT),
 
                     r"Running listener lis1 at http://localhost:50001",
                     r"Shut down listener lis1 running at "
@@ -435,7 +439,7 @@ START_TESTCASES = [
                     r"Opening 'run' output log file at .+",
 
                     r"Added indication handler for appending to file new\.log "
-                    r"with format .{dt} {h} {c} {p}.",
+                    r"with format .{df}.".format(df=DEFAULT_INDI_FORMAT),
 
                     r"Running listener lis1 at http://localhost:50001",
                     r"Shut down listener lis1 running at "
@@ -460,7 +464,7 @@ START_TESTCASES = [
                 r"Start process( [0-9]+)?: Starting run process as: "
                 r"\['pywbemlistener', '-vv', 'run', u?'lis1', '--port', "
                 r"'50001', '--scheme', 'http', '--start-pid', '[0-9]+', "
-                r"'--indi-format', u?'{dt} {h} {c} {p}'\]",
+                r"'--indi-format', u?'{df}'\]".format(df=DEFAULT_INDI_FORMAT),
                 r"Start process( [0-9]+)?: Waiting for run process [0-9]+ to "
                 r"complete startup",
                 r"Start process( [0-9]+)?: Handling success signal .+ from "

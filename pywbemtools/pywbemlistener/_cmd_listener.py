@@ -34,7 +34,6 @@ from datetime import datetime
 import click
 import psutil
 import six
-from nocasedict import NocaseDict
 
 from pywbem import WBEMListener, ListenerError
 
@@ -73,7 +72,7 @@ RUN_STARTUP_TIMEOUT = 60
 
 DEFAULT_LISTENER_PORT = 25989
 DEFAULT_LISTENER_SCHEME = 'https'
-DEFAULT_INDI_FORMAT = '{dt} {h} {c} {p}'
+DEFAULT_INDI_FORMAT = '{dt} {h} {i_mof}'
 
 LISTEN_OPTIONS = [
     click.option('-p', '--port', type=int, metavar='PORT',
@@ -630,17 +629,6 @@ def run_exit_handler(start_pid, log_fp):
         log_fp.close()
 
 
-class DisplayDict(NocaseDict):
-    # pylint: disable=too-many-ancestors
-    """
-    Dictionary with a string representation that uses name=value format.
-    """
-
-    def __str__(self):
-        items = ['{}={!r}'.format(k, v) for k, v in self.items()]
-        return ' '.join(items)
-
-
 def format_indication(indication, host, indi_format=None):
     """
     Return a string that contains the indication formatted according to the
@@ -653,16 +641,14 @@ def format_indication(indication, host, indi_format=None):
         # Below Python 3.6, it cannot determine the local timezone, and its
         # tzinfo argument is required.
         pass
-    p_dict = DisplayDict()
-    for pn, p in indication.properties.items():
-        p_dict[pn] = p.value
+    tz = dt.tzname() or ''
+    i_mof = indication.tomof().replace('\n', ' ')
     format_kwargs = dict(
         dt=dt,
-        dt_tzname=dt.tzname() or '',
+        tz=tz,
         h=host,
+        i_mof=i_mof,
         i=indication,
-        c=indication.classname,
-        p=p_dict,
     )
     if indi_format is None:
         indi_format = DEFAULT_INDI_FORMAT
@@ -675,30 +661,42 @@ def show_help_format():
     Display help for the format specification used with the --indi-format
     option.
     """
+    # pylint: disable=line-too-long
     print("""
 Help for the format specification with option:  --indi-format FORMAT
 
-FORMAT is a new-style format string that can use the following keyword args:
+FORMAT is a Python new-style format string that can use the following keyword
+arguments:
 
-* 'dt' - datetime object of the time the listener received the indication, in
-  local time. The object is timezone-aware on Python 3.6 or higher.
-* 'dt_tzname' - timezone name of the datetime object if timezone-aware, else
+* 'dt' - Python datetime object for the point in time the listener received the
+  indication. If used directly in a format specifier, it is shown in a standard
+  date & time format using local time and UTC offset of the local timezone.
+  This keyword argument can also be used for accessing its Python object
+  attributes in the format specifier (e.g. '{dt.hour}').
+
+* 'tz' - Timezone name of the local timezone. On Python versions before 3.6,
   the empty string.
-* 'h' - Host name or IP address of the host that sent the indication
-* 'i' - pywbem.CIMInstance object with the indication instance
-* 'c' - CIM classname of the indication instance
-* 'p' - Case-insensitive dictionary of the indication properties, displayed
-  as blank-separated name=value items
+
+* 'h' - Host name or IP address of the host that sent the indication.
+
+* 'i_mof' - Indication instance in single-line MOF representation.
+
+* 'i' - pywbem.CIMInstance object with the indication instance. This keyword
+  argument can be used for accessing its Python object attributes in the format
+  specifier (e.g. '{i.classname}'), or its CIM property values
+  (e.g. '{i[PropName]}'). For more complex cases, attributes of the CIMProperty
+  objects can also be accessed (e.g. '{i.properties[PropName].type}').
+
+The default format is: '""" + DEFAULT_INDI_FORMAT + """'
 
 Examples:
 
---indi-format '{dt} {c} {p}'
-2021-05-13 17:51:05.831117+02:00 CIM_AlertIndication Severity='high' \
-SequenceNumber='0'
+--indi-format '{dt} {h} {i_mof}'
+2021-05-13 17:51:05.831117+02:00 instance of CIM_AlertIndication { Message = "test"; ... }
 
---indi-format '{dt} {h} {c}: Severity={p[severity]}'
-2021-05-13 17:51:05.831117+02:00 127.0.0.1 CIM_AlertIndication: Severity=high
-""")
+--indi-format 'At {dt.hour}:{dt.minute} from {h}: {i.classname}: {i[Message]}'
+At 17:51 from 127.0.0.1: CIM_AlertIndication: test
+""")  # noqa: E501
 
 
 def show_help_call():
