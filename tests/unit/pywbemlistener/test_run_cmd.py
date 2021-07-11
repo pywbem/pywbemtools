@@ -35,7 +35,6 @@ RUN_HELP_PATTERNS = [
     r"^ *-c, --certfile FILE ?",
     r"^ *-k, --keyfile FILE ?",
     r"^ *--indi-call MODULE.FUNCTION ?",
-    r"^ *-d, --indi-display ?",
     r"^ *--indi-file FILE ?",
     r"^ *--indi-format FORMAT ?",
     r"^ *--help-format ?",

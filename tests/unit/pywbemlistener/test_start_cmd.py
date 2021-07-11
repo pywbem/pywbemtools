@@ -37,7 +37,6 @@ START_HELP_PATTERNS = [
     r"^ *-c, --certfile FILE ?",
     r"^ *-k, --keyfile FILE ?",
     r"^ *--indi-call MODULE.FUNCTION ?",
-    r"^ *-d, --indi-display ?",
     r"^ *--indi-file FILE ?",
     r"^ *--indi-format FORMAT ?",
     r"^ *--help-format ?",
@@ -239,86 +238,6 @@ START_TESTCASES = [
     ),
 
     # Test starting listeners with indication processing options and -v
-    (
-        "Verify success of 'start' with --indi-display, no log",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-display'],
-        ),
-        dict(
-            stdout=[''],
-            test='all',
-        ),
-        RUN_NOWIN,
-    ),
-    (
-        "Verify success of 'start' with --indi-display, with log",
-        dict(
-            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-display'],
-        ),
-        dict(
-            stdout=START_SUCCESS_LOG_PATTERNS,
-            log=(
-                'pywbemlistener_lis1.log',
-                [
-                    r"Opening 'run' output log file at .+",
-
-                    r"Added indication handler for displaying on stdout with "
-                    r"format .{df}.".format(df=DEFAULT_INDI_FORMAT),
-
-                    r"Running listener lis1 at http://localhost:50001",
-                    r"Shut down listener lis1 running at "
-                    r"http://localhost:50001",
-                    r"Closing 'run' output log file at .+",
-                ],
-            ),
-            test='all',
-        ),
-        RUN_NOWIN,
-    ),
-    (
-        "Verify success of 'start' with --indi-display and --indi-format, "
-        "no log",
-        dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-display',
-                  '--indi-format', '{c}'],
-        ),
-        dict(
-            stdout=[''],
-            test='all',
-        ),
-        RUN_NOWIN,
-    ),
-    (
-        "Verify success of 'start' with --indi-display and --indi-format, "
-        "with log",
-        dict(
-            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-display',
-                  '--indi-format', '{c}'],
-        ),
-        dict(
-            stdout=START_SUCCESS_LOG_PATTERNS,
-            log=(
-                'pywbemlistener_lis1.log',
-                [
-                    r"Opening 'run' output log file at .+",
-
-                    r"Added indication handler for displaying on stdout with "
-                    r"format .{c}.",
-
-                    r"Running listener lis1 at http://localhost:50001",
-                    r"Shut down listener lis1 running at "
-                    r"http://localhost:50001",
-                    r"Closing 'run' output log file at .+",
-                ],
-            ),
-            test='all',
-        ),
-        RUN_NOWIN,
-    ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
         "no log",

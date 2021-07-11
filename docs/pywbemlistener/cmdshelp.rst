@@ -139,9 +139,6 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
       --indi-call MODULE.FUNCTION  Call a Python function for each received indication. Invoke with --help-call for details
                                    on the function interface. Default: No function is called.
 
-      -d, --indi-display           Display received indications on stdout. The format can be modified using the --indi-
-                                   format option. Default: Not displayed.
-
       --indi-file FILE             Append received indications to a file. The format can be modified using the --indi-format
                                    option. Default: Not appended.
 
@@ -223,9 +220,6 @@ Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`)
 
       --indi-call MODULE.FUNCTION  Call a Python function for each received indication. Invoke with --help-call for details
                                    on the function interface. Default: No function is called.
-
-      -d, --indi-display           Display received indications on stdout. The format can be modified using the --indi-
-                                   format option. Default: Not displayed.
 
       --indi-file FILE             Append received indications to a file. The format can be modified using the --indi-format
                                    option. Default: Not appended.
