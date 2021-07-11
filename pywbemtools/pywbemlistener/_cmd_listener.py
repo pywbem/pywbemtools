@@ -110,11 +110,6 @@ LISTEN_OPTIONS = [
                  'Invoke with --help-call for details on the function '
                  'interface. '
                  'Default: No function is called.'),
-    click.option('-d', '--indi-display', is_flag=True,
-                 required=False, default=False,
-                 help=u'Display received indications on stdout. '
-                 'The format can be modified using the --indi-format option. '
-                 'Default: Not displayed.'),
     click.option('--indi-file', type=str, metavar='FILE',
                  required=False, default=None,
                  help=u'Append received indications to a file. '
@@ -153,7 +148,7 @@ class ListenerProperties(object):
     """
 
     def __init__(self, name, port, scheme, certfile, keyfile,
-                 indi_call, indi_display, indi_file, indi_format,
+                 indi_call, indi_file, indi_format,
                  logfile, pid, start_pid, created):
         self._name = name
         self._port = port
@@ -161,7 +156,6 @@ class ListenerProperties(object):
         self._certfile = certfile
         self._keyfile = keyfile
         self._indi_call = indi_call
-        self._indi_display = indi_display
         self._indi_file = indi_file
         self._indi_format = indi_format
         self._logfile = logfile
@@ -178,7 +172,6 @@ class ListenerProperties(object):
             self.certfile,
             self.keyfile,
             self.indi_call,
-            self.indi_display,
             self.indi_file,
             self.logfile,
             str(self.pid),
@@ -196,7 +189,6 @@ class ListenerProperties(object):
             'Certificate file',
             'Key file',
             'Indication call',
-            'Indication display',
             'Indication file',
             'Log file',
             'PID',
@@ -254,11 +246,6 @@ class ListenerProperties(object):
     def indi_call(self):
         """string: Call function MODULE.FUNCTION for each received indication"""
         return self._indi_call
-
-    @property
-    def indi_display(self):
-        """bool: Display each received indication in a format"""
-        return self._indi_display
 
     @property
     def indi_file(self):
@@ -465,8 +452,8 @@ def get_listeners(name=None):
                 lis = ListenerProperties(
                     name=args.name, port=args.port, scheme=args.scheme,
                     certfile=args.certfile, keyfile=args.keyfile,
-                    indi_call=args.indi_call, indi_display=args.indi_display,
-                    indi_file=args.indi_file, indi_format=args.indi_format,
+                    indi_call=args.indi_call, indi_file=args.indi_file,
+                    indi_format=args.indi_format,
                     logfile=logfile, pid=p.pid, start_pid=args.start_pid,
                     created=datetime.fromtimestamp(p.create_time()))
                 # pylint: enable=no-member
@@ -801,8 +788,6 @@ def parse_listener_args(listener_args):
     parser.add_argument('--certfile', type=str, default=None)
     parser.add_argument('--keyfile', type=str, default=None)
     parser.add_argument('--indi-call', type=str, default=None)
-    parser.add_argument('--indi-display', '-d', action='store_true',
-                        default=False)
     parser.add_argument('--indi-file', type=str, default=None)
     parser.add_argument('--indi-format', type=str, default=None)
 
@@ -998,21 +983,7 @@ def cmd_listener_run(context, name, options):
 
     indi_call = options['indi_call']
     indi_file = options['indi_file']
-    indi_display = options['indi_display']
     indi_format = options['indi_format'] or DEFAULT_INDI_FORMAT
-
-    def display_func(indication, host):
-        """
-        Indication callback function that displays the indication on stdout
-        using the specified format.
-        """
-        try:
-            display_str = format_indication(indication, host, indi_format)
-        except Exception as exc:  # pylint: disable=broad-except
-            display_str = ("Error: Cannot format indication using format "
-                           "\"{}\": {}: {}".
-                           format(indi_format, exc.__class__.__name__, exc))
-        print_out(display_str)
 
     def file_func(indication, host):
         """
@@ -1066,12 +1037,6 @@ def cmd_listener_run(context, name, options):
             click.echo("Added indication handler for calling function {}() "
                        "in module {}".format(func_name, mod_name))
 
-    if indi_display:
-        listener.add_callback(display_func)
-        if context.verbose >= _config.VERBOSE_SETTINGS:
-            click.echo("Added indication handler for displaying on stdout "
-                       "with format \"{}\"".format(indi_format))
-
     if indi_file:
         listener.add_callback(file_func)
         if context.verbose >= _config.VERBOSE_SETTINGS:
@@ -1111,7 +1076,6 @@ def cmd_listener_start(context, name, options):
     certfile = options['certfile']
     keyfile = options['keyfile']
     indi_call = options['indi_call']
-    indi_display = options['indi_display']
     indi_file = options['indi_file']
     indi_format = options['indi_format']
     host = 'localhost'
@@ -1144,8 +1108,6 @@ def cmd_listener_start(context, name, options):
         run_args.extend(['--keyfile', keyfile])
     if indi_call:
         run_args.extend(['--indi-call', indi_call])
-    if indi_display:
-        run_args.extend(['--indi-display'])
     if indi_file:
         run_args.extend(['--indi-file', indi_file])
     if indi_format:

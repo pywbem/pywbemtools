@@ -135,10 +135,6 @@ else.
 The following actions can be configured to be performed on each received
 indication. Multiple actions can be specified.
 
-* Displaying it on stdout:
-
-  This action is enabled by specifying the ``-d, -indi-display`` option.
-
 * Appending it as a line to a file:
 
   This action is enabled by specifying the ``--indi-file FILE`` option.

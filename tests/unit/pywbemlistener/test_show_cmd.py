@@ -100,7 +100,6 @@ SHOW_TESTCASES = [
                 r"^Certificate file *$",
                 r"^Key file *$",
                 r"^Indication call *$",
-                r"^Indication display +False$",
                 r"^Indication file *$",
                 r"^Log file *$",
                 r"^PID +[0-9]+$",
