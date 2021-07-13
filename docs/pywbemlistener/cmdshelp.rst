@@ -143,7 +143,7 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
                                    option. Default: Not appended.
 
       --indi-format FORMAT         Sets the format to be used when displaying received indications. Invoke with --help-
-                                   format for details on the format specification. Default: "{dt} {h} {c} {p}".
+                                   format for details on the format specification. Default: "{dt} {h} {i_mof}".
 
       --help-format                Show help message for the format specification used with the --indi-format option and
                                    exit.
@@ -225,7 +225,7 @@ Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`)
                                    option. Default: Not appended.
 
       --indi-format FORMAT         Sets the format to be used when displaying received indications. Invoke with --help-
-                                   format for details on the format specification. Default: "{dt} {h} {c} {p}".
+                                   format for details on the format specification. Default: "{dt} {h} {i_mof}".
 
       --help-format                Show help message for the format specification used with the --indi-format option and
                                    exit.

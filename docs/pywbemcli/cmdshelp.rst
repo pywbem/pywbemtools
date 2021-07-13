@@ -2238,9 +2238,10 @@ Help text for ``pywbemcli server schema`` (see :ref:`server schema command`):
 
       Get information about the server schemas.
 
-      Gets information about the DMTF schemas that define the classes in each namespace. The information provided
-      includes:   * The schema version - the maximum version defined in a class   * Experimental vs. released schema   *
-      Schema name   * Class count
+      Gets information about the schemas and CIM schemas that define the classes in each namespace. The information
+      provided includes:   * The released DMTF CIM schema version that was the source for the     qualifier declarations
+      and classes for the namespace.   * Experimental vs. final elements in the schema   * Schema name (defined by the
+      prefix on each class before the first '_')   * Class count
 
     Command Options:
       -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
