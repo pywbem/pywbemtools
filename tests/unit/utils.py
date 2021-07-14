@@ -175,7 +175,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         universal_newlines = True
 
     # Time allowed for command before the test considers it to have timed out
-    cmd_timeout = 30
+    cmd_timeout = 60
 
     # Note: Popen.communicate() and Popen.wait() wait not only for the child
     # process to finish, but for all grandchild processes in addition. In case
