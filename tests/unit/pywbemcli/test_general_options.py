@@ -136,7 +136,7 @@ GENERAL_HELP_LINES = [
     "-d, --default-namespace NAMESPACE Default namespace, to be used when ",
     "-o, --output-format FORMAT Output format for the command result. The",
     "-l, --log COMP[=DEST[:DETAIL]]",
-    "Enable logging of the WBEM operations,",
+    "Enable logging of WBEM operations,",
     "-C, --connections-file FILE PATH Path name of the connections file",
     CONNECTIONS_FILENAME,
     "-v, --verbose / --no-verbose Display extra information about the",

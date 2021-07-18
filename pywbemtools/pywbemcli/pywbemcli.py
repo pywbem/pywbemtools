@@ -519,22 +519,21 @@ def _create_server_instance(server, connection_name, resolved_default_namespace,
                           ob='|'.join(OUTPUT_FORMAT_GROUPS['CIM'][0]),
                           tx='|'.join(OUTPUT_FORMAT_GROUPS['TEXT'][0])))
 @click.option('-l', '--log', type=str, metavar='COMP[=DEST[:DETAIL]],...',
-              default=None,  # There is no default value
+              default=None,
               envvar=PYWBEMCLI_LOG_ENVVAR,
-              help=u'Enable logging of the WBEM operations, defined by a list '
+              help=u'Enable logging of WBEM operations, defined by a list '
                    u'of log configuration strings with: '
                    u'COMP: [{comp_choices}]; '
                    u'DEST: [{dest_choices}], default: {dest_default}; '
                    u'DETAIL: [{detail_choices}], default: {detail_default}. '
-                   u' Use "" to set default in interactive mode'
-                   u'Default: EnvVar {ev}, or {default}.'.
+                   u'"all=off" disables all logging. "all" is max logging. '
+                   u'EnvVar: {ev}. Default: no logging'.
                    format(comp_choices='|'.join(LOGGER_SIMPLE_NAMES),
                           dest_choices='|'.join(LOG_DESTINATIONS),
                           dest_default=DEFAULT_LOG_DESTINATION,
                           detail_choices='|'.join(LOG_DETAIL_LEVELS),
                           detail_default=DEFAULT_LOG_DETAIL_LEVEL,
-                          ev=PYWBEMCLI_LOG_ENVVAR,
-                          default='all'))
+                          ev=PYWBEMCLI_LOG_ENVVAR))
 @click.option('-v', '--verbose/--no-verbose',
               default=None,  # None separates no option from --no-verbose
               help=u'Display extra information about the processing.')

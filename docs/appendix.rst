@@ -208,12 +208,12 @@ This documentation uses a few special terms to refer to Python types:
       "_" and the schema is the first such element.  For example ``CIM`` is
       the schema for the class ``CIM_ManagedElement``.
 
-   CIM schema
+   CIM Schema
       The collection of qualifier declarations and classes created and
       maintained by the DMTF that make up the DMTF CIM model. This collection
       is regularly released by the DMTF as a package marked with a version
       number (ex. version 2.41.0). The DMTF CIM Schemas can be retrieved from
-      the DMTF web site at: `https://www.dmtf.org/standards/cim`_ .
+      the DMTF web site at: `<https://www.dmtf.org/standards/cim>`_ .
 
 
 .. _`Profile advertisement methodologies`:
