@@ -1568,20 +1568,21 @@ command.
 ``server schema`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server schema`` command returns information on the :ref:'schemas
-<schema>' in the namespace(s) of the :term:`current connection` WBEM server.
+The ``server schema`` command returns information on the
+:ref:'schemas <schema>' in the namespace(s) of the :term:`current connection`
+WBEM server.
 
 The overview reports a summary by namespace of this information and the
 detail view (``server schema --detail``) reports the information for each
-:ref:`Schema` in the namespace.
+:ref:`schema` in the namespace.
 
-For each schema in each namespace, the report provides information on the :ref:`Schema`
-schema version (maximum qualifier 'Version' for classes in that schema)
-whether the :ref:`Schema` has experimental classes, and the number of classes
-in the :ref:`schema`.
+For each schema in each namespace, the report provides information on the
+:ref:`CIM Schema` version (maximum qualifier 'Version' for classes in that schema)
+whether the :ref:`schemas <schema>` have experimental classes, and the number of classes
+in each :ref:`schema` and :ref:`CIM Schema`.
 
-Pywbemcli determines the version of the :ref:`Schema` by finding the highest
-value of the Version qualifier on any of the classes in the namespace that
+Pywbemcli determines the version of the :ref:`CIM Schema` by finding the highest
+value of the ``Version`` qualifier on any of the classes in the namespace that
 are in that :ref:`schema`
 
 There are two report outputs possible:

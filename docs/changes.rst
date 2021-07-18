@@ -41,6 +41,8 @@ Released: not yet
   used the instance wildcard (e.g. 'CIM_ManagedSystemElement.?') and the
   enumerate instances operation failed for some reason. (issue #963)
 
+* Fix issue where the general help for '--log' was unclear. (see issue #1025)
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.

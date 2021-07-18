@@ -120,10 +120,10 @@ Help text for ``pywbemcli``:
                                       [mof|xml|repr|txt]]; TEXT formats: [text].
 
       -l, --log COMP[=DEST[:DETAIL]],...
-                                      Enable logging of the WBEM operations, defined by a list of log configuration strings
+                                      Enable logging of WBEM operations, defined by a list of log configuration strings
                                       with: COMP: [api|http|all]; DEST: [file|stderr|off], default: file; DETAIL:
-                                      [all|paths|summary], default: all.  Use "" to set default in interactive modeDefault:
-                                      EnvVar PYWBEMCLI_LOG, or all.
+                                      [all|paths|summary], default: all. "all=off" disables all logging. "all" is max
+                                      logging. EnvVar: PYWBEMCLI_LOG. Default: no logging
 
       -v, --verbose / --no-verbose    Display extra information about the processing.
       --warn / --no-warn              Warnings control: True enables display of all Python warnings; False leaves warning
