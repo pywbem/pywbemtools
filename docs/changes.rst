@@ -37,6 +37,10 @@ Released: not yet
 
 * Fixed issues raised by new Pylint version 2.9.
 
+* Fixed an error that resulted in exception traceback when instance commands
+  used the instance wildcard (e.g. 'CIM_ManagedSystemElement.?') and the
+  enumerate instances operation failed for some reason. (issue #963)
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
