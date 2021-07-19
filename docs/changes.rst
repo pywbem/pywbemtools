@@ -43,6 +43,16 @@ Released: not yet
 
 * Fix issue where the general help for '--log' was unclear. (see issue #1025)
 
+* Fixed an error that resulted in exception traceback when instance commands
+  used the instance wildcard (e.g. 'CIM_ManagedSystemElement.?') and the
+  enumerate instances operation failed for some reason. (issue #963)
+
+* Fix issue with --log general option where the log was left enabled when the
+  option was used in interactive mode command; it did not revert to the log
+  state before the interactive command. The change caused the log configuration
+  to restore to either off if there was no --log option on the subsequent
+  command line or to the value defined on the command line.(see issue #1023)
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
@@ -77,6 +87,14 @@ Released: not yet
   with the last part of the name  _script.py and modified them to use the
   setup initialization with Python 3.6 and greater as well as the old
   script interface.
+
+* Modify pywbemcli.py code that copies command line defined pywbem_server for
+  reuse in interactive commands to use WBEMConnection.copy() rather than
+  deepcopy(). This includes adding a copy()  method to PywbemServer. This also
+  requires that the minimum version of pywbem be set to at least 1.3.0 where
+  the copy() method was added to  pywbem (see issue #1030).  This fixes issue
+  in python 2.7 with exception and avoids copying the FakedWBEMConnection
+  CIM repository.
 
 **Known issues:**
 

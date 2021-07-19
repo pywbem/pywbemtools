@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """
-Tests the general log option
+Tests the general log option. This tests the --log general option value
+for valid and invalid strings.
 """
 
 from __future__ import absolute_import, print_function
@@ -25,7 +26,8 @@ from .cli_test_extensions import CLITestsBase
 
 TEST_DIR = os.path.dirname(__file__)
 
-SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
+SIMPLE_MOCK_MODEL_FILE = 'simple_mock_model.mof'
+SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_MODEL_FILE)
 
 OK = True
 RUN = True
@@ -59,7 +61,7 @@ TEST_CASES = [
                  '-Exception:'],
       'test': 'regex',
       'rc': 1},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify log of class  get command get local-only. Test stdoit',
      {'general': ['-l', 'all=stderr:summary'],
@@ -72,7 +74,7 @@ TEST_CASES = [
                  '};', '', ],
       'stderr': ["blahblah"],
       'test': 'patterns'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify Log of class get command local-only. test stderr'
      'Cannot test stderr and stdout in same test.',
@@ -85,7 +87,7 @@ TEST_CASES = [
                  r'-Return:',
                  r'GetClass\(CIMClass ', r'CIM_Foo_sub2'],
       'test': 'regex'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify log of class get command local-only. Test stderr'
      'Cannot test stderr and stdout in same test.',
@@ -98,7 +100,7 @@ TEST_CASES = [
                  r'-Return:',
                  r'GetClass\(CIMClass ', r'CIM_Foo_sub2'],
       'test': 'regex'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify log http class get command local-only. Should be no log '
      'because mock does not use http'
@@ -108,7 +110,7 @@ TEST_CASES = [
       'args': ['get', 'CIM_Foo_sub2', '--local-only']},
      {'stderr': [],
       'test': 'in'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify log with error in definition. Cannot test stderr and stdout in '
      'same test.',
@@ -118,7 +120,7 @@ TEST_CASES = [
      {'stderr': ["Error: Logger configuration error. input: "],
       'rc': 1,
       'test': 'regex'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify log with error in definition. invalid type',
      {'general': ['-l', 'allx=stderr'],
@@ -128,8 +130,7 @@ TEST_CASES = [
                  "Exception: Invalid simple logger name:"],
       'rc': 1,
       'test': 'regex'},
-     SIMPLE_MOCK_FILE, OK],
-
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
     ['Verify invalid log parameter fails (no value) same test.',
      {'general': ['-l'],
@@ -138,8 +139,66 @@ TEST_CASES = [
      {'stderr': ["Usage: pywbemcli [GENERAL-OPTIONS] COMMAND [ARGS]"],
       'rc': 2,
       'test': 'in'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_MODEL_FILE, OK],
 
+    ['Verify log all=off. Cannot really test effect.',
+     {'general': ['-l', 'all=off'],
+      'cmdgrp': 'class',
+      'args': ['get', 'CIM_Foo_sub2', '--local-only']},
+     {'stderr': [""],
+      'test': 'innows'},
+     SIMPLE_MOCK_MODEL_FILE, OK],
+
+    ['Verify  --log general option and in interactive cmd that change log. '
+     'Turns on log in one command and off in the next command',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--log', 'all=off'],
+      'stdin': ['--log all=stderr:summary instance enumerate CIM_Foo',
+                'instance enumerate CIM_Foo'],
+      'cmdgrp': None},
+     {'stderr': ["OpenEnumerateInstances(ClassName", "CIM_Foo",
+                 'OpenEnumerateInstances(pull_inst_result_tuple'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify  --log general option in interactive cmd that change log. '
+     'Changes log for the interactive command',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-v', '--log',
+                  'api=stderr:summary'],
+      'stdin': ['--log all=stderr:summary instance enumerate CIM_Foo -s',
+                'instance enumerate CIM_Foo --summary'],
+      'cmdgrp': None},
+     {'stdout': ["Log configured to all=stderr:summary",
+                 "Log configured to api=stderr:summary"],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify  with --log general option in interactive cmds that change log. '
+     'Turns on log in one command and off in the next command',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--log', 'all=off'],
+      'stdin': ['--log all=stderr:summary instance enumerate CIM_Foo -s',
+                'instance enumerate CIM_Foo -s'],
+      'cmdgrp': None},
+     {'stderr': ["OpenEnumerateInstances(ClassName=", "CIM_Foo",
+                 'OpenEnumerateInstances(pull_inst_result_tuple'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify  no --log general option and in interactive cmds that change log. '
+     'Turns on log in one command and off in the next command',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '-v',
+                  '--log', 'all=off'],
+      'stdin': ['--log all=stderr:summary instance enumerate CIM_Foo -s',
+                'instance enumerate CIM_Foo -s'],
+      'cmdgrp': None},
+     # Use verbose mode to display log change msg
+     {'stdout': ["Log configured to all=stderr:summary",
+                 "Log configured to all=off"],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
 ]
 
 

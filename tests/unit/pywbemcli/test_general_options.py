@@ -1373,8 +1373,9 @@ TEST_CASES = [
      {'stdout': ['default-namespace  root/blah'],
       'rc': 0,
       'test': 'innows'},
-
      None, OK],
+
+    # NOTE: Other tests for --log option in interactive mode in test_log_option
 
     #
     #  Test that bad mock_error file names do not cause Abort but bad MOF
