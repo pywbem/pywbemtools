@@ -357,8 +357,11 @@ def pick_instance(context, objectname, namespace=None):
     conn = context.pywbem_server.conn
     if not is_classname(objectname):
         raise click.ClickException('{} must be a classname'.format(objectname))
-    instance_names = conn.PyWbemcliEnumerateInstancePaths(objectname,
-                                                          namespace)
+    try:
+        instance_names = conn.PyWbemcliEnumerateInstancePaths(
+            objectname, namespace)
+    except Error as ex:
+        raise pywbem_error_exception(ex)
 
     if not instance_names:
         click.echo('No instance paths found for {}'.format(objectname))

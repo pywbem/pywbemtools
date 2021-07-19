@@ -1516,6 +1516,16 @@ Instances: TST_Person
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['INSTANCENAME with wildcard keybinding and non-existing namespace '
+     '(error, issue #963)',
+     {'general': [],
+      'args': ['get', '-n', 'bad/ns', 'TST_Person.?']},
+     {'stderr': "CIM_ERR_INVALID_NAMESPACE.* Namespace does not exist in CIM "
+                "repository: 'bad/ns'",
+      'rc': 1,
+      'test': 'regex'},
+     SIMPLE_MOCK_FILE, OK],
+
     #
     #  instance get command
     #
