@@ -23,7 +23,6 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import traceback
-from copy import deepcopy
 import warnings
 import click
 import click_repl
@@ -68,6 +67,10 @@ PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 DEFAULT_VERIFY = True  # The default is to verify
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False, 'default': None}
+
+# Save for general opiton log parameter from the interactive
+# command before the current command in some cases.
+PREV_LOG_OPTION = None
 
 #
 # Context variables passed to click
@@ -761,6 +764,9 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # This requires being able to determine for each option whether it has been
     # specified and is why general options don't define defaults in the
     # decorators that define them.
+    # ctx is the higher level context that forms the basis for this
+    # command.  the ctx.obj defines parameters that were input with either
+    # env variables or the command line pywbemcli startup
 
     else:  # ctx.obj exists. Processing an interactive command.
         # Issue # 920Imposed this limit to avoid confusion of changing
@@ -789,13 +795,16 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 # This allows modifications to be made for a single
                 # interactive command but not kept beyond the life of
                 # that command.
+                # PywbemServer has its own copy method that does a
+                # recursive copy because the conn objects also have their
+                # own copy methods
                 if ctx.obj.pywbem_server_exists():
-                    pywbem_server = deepcopy(ctx.obj.pywbem_server)
+                    pywbem_server = ctx.obj.pywbem_server.copy()
 
         # Modify the currently defined pywbem_server if it is defined
         # with any general options including resetting options and if
         # there are any modifications to pywbem_server, set that modified
-        # server into the current context object.
+        # server into the current context object and reset it.
         # In cases where input parameter of "" is allowed to
         # reset option values, the option is tested for "is not None"
         # to include empty string in test.
@@ -875,15 +884,14 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                                           ca_certs)
 
         # The following variables are maintained only in the context_obj and
-        # not attached to any particular connection. If the cli argument is
-        # None, this argument was not defined as part of this interactive
-        # command and the value is set from the existing ctx.obj.
+        # not attached to any particular connection. If the value of each option
+        # is its default (None, or in some cases "") the value  is set to the
+        # the original cmd line input value (ctx.obj.xxx). Otherwise it is set
+        # to the value presented with the general options part of this
+        # interactive command.
 
-        # These variables are retrieved from the ctx.obj if the parameter
-        # value is none (not defined for current interactive command). Note
-        # that some of them allow the value "" to be used to reset the
-        # general option to its default value.
-        #
+        # The "" test for some formats allows the user to specifically set the
+        # value to the default
         if output_format is None:
             output_format = ctx.obj.output_format
         elif output_format == "":
@@ -892,13 +900,42 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if timestats is None:
             timestats = ctx.obj.timestats
 
-        if log is None:
-            log = ctx.obj.log
-        elif log == "":
-            log = None
-
         if verbose is None:
             verbose = ctx.obj.verbose
+
+        # Logging requires using configure_log() each time the log changes and
+        # the change depends on the command_line log option value and the
+        # value of the log option for previous log command.  This code only
+        # modifies the log configuration if pywbem_server exists and is
+        # already connected. Otherwise PywbemServer.connect defines the
+        # log configuration
+        cmd_line_log = ctx.obj.log
+        global PREV_LOG_OPTION  # pylint: disable=global-statement
+        new_log_configuration = None
+        if log is None:
+            # If cmd_line log value exists reset to that value
+            if cmd_line_log:
+                log = cmd_line_log
+                new_log_configuration = cmd_line_log
+
+            else:  # no cmd_line log so turn logging off
+                if PREV_LOG_OPTION:
+                    new_log_configuration = "all=off"
+            PREV_LOG_OPTION = ""
+
+        else:  # general_option --log exists. Set new if not the same
+            if PREV_LOG_OPTION and log != PREV_LOG_OPTION:
+                new_log_configuration = log
+            elif log != cmd_line_log:
+                new_log_configuration = log
+            PREV_LOG_OPTION = log
+
+        if new_log_configuration:
+            if pywbem_server and pywbem_server.connected:
+                pywbem_server.set_logger_config(new_log_configuration)
+
+        if verbose:
+            click.echo("Log configured to {}".format(log))
 
         # Commented out because we do not allow modification of the
         # connection file and have already set connections_repo in line

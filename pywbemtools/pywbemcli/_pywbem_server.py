@@ -407,7 +407,7 @@ class PywbemServer(object):
         once (e.g. in interactive mode).
         """
         ctx = click.get_current_context()
-        if self._wbem_server is None:
+        if not self.connected:
             self.get_password(ctx.obj)
             self.connect(
                 log=ctx.obj.log,
@@ -440,6 +440,44 @@ class PywbemServer(object):
             raise click.ClickException("{cmd} requires user/password, but "
                                        "no password provided."
                                        .format(cmd=ctx.invoked_subcommand))
+
+    def copy(self):
+        """"
+        *New in pywbemcli 1.0.*
+
+        Return a deep copy of the object with internal state reset.
+
+        The user-specifiable attributes of the object are deep-copied, and all
+        other internal state (e.g. session, statistics, debug data) is reset.
+
+        Used to copy PywbemServer so that a deep copy is not applied to
+        conn which would cause the repository to be copied in the
+        case of FakedWBEMConnection, and possible exceptions
+        with pywbem 2.7
+        """
+        cpy = PywbemServer(
+            server=self.server,
+            mock_server=self.mock_server,
+            name=self.name,
+            user=self.user,
+            password=self.password,
+            default_namespace=self.default_namespace,
+            timeout=self.timeout,
+            use_pull=self.use_pull,
+            pull_max_cnt=self.pull_max_cnt,
+            verify=self.verify,
+            certfile=self.certfile,
+            keyfile=self.keyfile,
+            ca_certs=self.ca_certs,
+            connections_file=self._connections_file
+        )  # init makes copies of mutable parameters
+
+        # Only copy conn and recreate wbemserver if connected
+        if self._wbem_server:
+            conn = self._wbem_server.conn.copy()   # WBEMConnection has own copy
+            # pylint: disable=protected-access
+            cpy._wbem_server = WBEMServer(conn)
+        return cpy
 
     def get_password(self, ctx):
         """
@@ -517,10 +555,28 @@ class PywbemServer(object):
         """
         Connect to the server, using the current attributes of this object.
 
+        The method parameters are context object parameters, not part of
+        the PywbemServer object.
+
         Must be disconnected from the server when calling this method.
 
         If `self.mock_server` is non-empty, a mock connection is created.
         Otherwise, `self.server` must be set and a real connection is created.
+
+        Parameters:
+
+          log (:term:`string):
+            String with syntax as defined for the general options --log and
+            the pywbem method configure_logging_from_string()
+
+          use_pull (:class:`py:bool` or None):
+            The flag that will be set into the PYWBEMCLIConnection or
+            PYWBEMCLIFakedConnection instantiation to define the usage of
+            the pull operations.
+
+          verbose (:class:`py:bool` or None):
+            The verbose flag to be passed on to other methods including
+            build_mockenv
 
         Raises:
           ClickException: Several issues that cause the command (the whole
@@ -566,58 +622,89 @@ class PywbemServer(object):
                 raise click.ClickException('No server found. Cannot '
                                            'connect.')
             if self.keyfile is not None and self.certfile is None:
-                ValueError('keyfile option requires certfile option')
+                raise ValueError('keyfile option requires certfile option')
 
-            creds = (self.user, self.password) if self.user else None
-
-            # If client cert and key provided, create dictionary for
-            # wbem connection certs (WBEMConnection takes dictionary for this
-            # info)
-            x509_dict = None
-            if self.certfile is not None:
-                x509_dict = {"cert_file": self.certfile}
-                if self.keyfile is not None:
-                    x509_dict.update({'key_file': self.keyfile})
-
-            # Create the WBEMConnection object and the _wbem_server object
-
-            # Negate verify to no_verification
-            if self.verify is None:
-                no_verification = self.verify
-            else:
-                no_verification = not self.verify
-
-            # Convert ca_certs command line option to ca_certs parameter
-            if getattr(pywbem, 'PYWBEM_USES_REQUESTS', False):
-                if self.ca_certs == 'certifi':
-                    ca_certs = None
-                else:
-                    ca_certs = self.ca_certs
-            else:
-                ca_certs = self.ca_certs
-
-            try:
-                conn = PYWBEMCLIConnection(
-                    self.server, creds,
-                    default_namespace=self.default_namespace,
-                    no_verification=no_verification,
-                    x509=x509_dict, ca_certs=ca_certs,
-                    timeout=self.timeout,
-                    use_pull_operations=use_pull,
-                    stats_enabled=True)
-            except IOError as exc:
-                raise click.ClickException(
-                    'Cannot create connection to {}: {}'.
-                    format(self.server, exc))
-
-            # Create a WBEMServer object
-            self._wbem_server = WBEMServer(conn)
+            self._create_connection(use_pull)
 
         if log:
+            self.set_logger_config(log)
+
+        if verbose:
+            if self._mock_server:
+                server_txt = "mock environment {}".format(self._mock_server)
+            else:
+                server_txt = "WBEM server {}".format(self._server)
+            click.echo("Connecting to {}".format(server_txt))
+
+    def set_logger_config(self, log):
+        """
+        Configure the logging from the log configuration string defined defined
+        by the the log parameter.  This must be a string as defined in the
+        --log general option (i.e. COMP=DEST:DETAILS)
+        """
+        # Ignore if there is no wbem_server created.  The connect will
+        # execute the log configure.
+        if self.wbem_server:
+            conn = self.wbem_server.conn
             try:
                 configure_loggers_from_string(log,
                                               log_filename=PYWBEMCLI_LOG,
-                                              connection=conn, propagate=True)
+                                              connection=conn,
+                                              propagate=True)
             except ValueError as ve:
                 raise click.ClickException('Logger configuration error. input: '
                                            '{}. Exception: {}'.format(log, ve))
+
+    def _create_connection(self, use_pull):
+        """
+        Create the connection object PYWBEMCLIConnection and the WBEMServer
+        object.
+
+        Raises:
+          ClickException: if connection creation fails
+        """
+        # Instantiate PYWBEMCLIConnection
+        creds = (self.user, self.password) if self.user else None
+
+        # If client cert and key provided, create dictionary for
+        # wbem connection certs (WBEMConnection takes dictionary for this
+        # info)
+        x509_dict = None
+        if self.certfile is not None:
+            x509_dict = {"cert_file": self.certfile}
+            if self.keyfile is not None:
+                x509_dict.update({'key_file': self.keyfile})
+
+        # Create the WBEMConnection object and the _wbem_server object
+
+        # Negate verify to no_verification
+        if self.verify is None:
+            no_verification = self.verify
+        else:
+            no_verification = not self.verify
+
+        # Convert ca_certs command line option to ca_certs parameter
+        if getattr(pywbem, 'PYWBEM_USES_REQUESTS', False):
+            if self.ca_certs == 'certifi':
+                ca_certs = None
+            else:
+                ca_certs = self.ca_certs
+        else:
+            ca_certs = self.ca_certs
+
+        try:
+            conn = PYWBEMCLIConnection(
+                self.server, creds,
+                default_namespace=self.default_namespace,
+                no_verification=no_verification,
+                x509=x509_dict, ca_certs=ca_certs,
+                timeout=self.timeout,
+                use_pull_operations=use_pull,
+                stats_enabled=True)
+        except IOError as exc:
+            raise click.ClickException(
+                'Cannot create connection to {}: {}'.
+                format(self.server, exc))
+
+        # Create a WBEMServer object
+        self._wbem_server = WBEMServer(conn)
