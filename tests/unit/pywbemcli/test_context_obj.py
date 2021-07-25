@@ -36,8 +36,6 @@ def test_ContextObj_init():
     svr = PywbemServer(server, ns, user=user, password=pw)
 
     output_format = 'mof'
-    use_pull = 'either'
-    pull_max_cnt = 100
     timestats = False
     log = 'all'
     verbose = True
@@ -50,8 +48,6 @@ def test_ContextObj_init():
     ctxobj = ContextObj(
         pywbem_server=svr,
         output_format=output_format,
-        use_pull=use_pull,
-        pull_max_cnt=pull_max_cnt,
         timestats=timestats,
         log=log,
         verbose=verbose,

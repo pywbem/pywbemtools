@@ -1150,7 +1150,7 @@ def cmd_instance_enumerate(context, classname, options):
                 namespace=options['namespace'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt)
+                MaxObjectCount=context.pywbem_server.pull_max_cnt)
         else:
             results = conn.PyWbemcliEnumerateInstances(
                 ClassName=classname,
@@ -1161,7 +1161,7 @@ def cmd_instance_enumerate(context, classname, options):
                 IncludeClassOrigin=options['include_classorigin'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt,
+                MaxObjectCount=context.pywbem_server.pull_max_cnt,
                 PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
@@ -1175,7 +1175,7 @@ def cmd_instance_enumerate(context, classname, options):
                                    'FilterQuery not allowed with traditional '
                                    'EnumerateInstance. --use-pull: '
                                    '{}. Exception: {}: {}'
-                                   .format(context.use_pull,
+                                   .format(context.pywbem_server.use_pull,
                                            ve.__class__.__name__, ve))
 
 
@@ -1201,7 +1201,7 @@ def cmd_instance_references(context, instancename, options):
                 Role=options['role'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt)
+                MaxObjectCount=context.pywbem_server.pull_max_cnt)
         else:
             results = conn.PyWbemcliReferenceInstances(
                 instancepath,
@@ -1211,7 +1211,7 @@ def cmd_instance_references(context, instancename, options):
                 IncludeClassOrigin=options['include_classorigin'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt,
+                MaxObjectCount=context.pywbem_server.pull_max_cnt,
                 PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
@@ -1225,7 +1225,7 @@ def cmd_instance_references(context, instancename, options):
                                    'FilterQuery not allowed with traditional '
                                    'References. --use-pull: '
                                    '{}. Exception: {}: {}'
-                                   .format(context.use_pull,
+                                   .format(context.pywbem_server.use_pull,
                                            ve.__class__.__name__, ve))
 
 
@@ -1250,7 +1250,7 @@ def cmd_instance_associators(context, instancename, options):
                 ResultRole=options['result_role'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt)
+                MaxObjectCount=context.pywbem_server.pull_max_cnt)
         else:
             results = conn.PyWbemcliAssociatorInstances(
                 instancepath,
@@ -1262,7 +1262,7 @@ def cmd_instance_associators(context, instancename, options):
                 IncludeClassOrigin=options['include_classorigin'],
                 FilterQuery=options['filter_query'],
                 FilterQueryLanguage=get_filterquerylanguage(options),
-                MaxObjectCount=context.pull_max_cnt,
+                MaxObjectCount=context.pywbem_server.pull_max_cnt,
                 PropertyList=property_list)
 
         display_cim_objects(context, results, output_fmt,
@@ -1277,7 +1277,7 @@ def cmd_instance_associators(context, instancename, options):
                                    'FilterQuery not allowed with traditional '
                                    'Associators. --use-pull: '
                                    '{}. Exception: {}: {}'
-                                   .format(context.use_pull,
+                                   .format(context.pywbem_server.use_pull,
                                            ve.__class__.__name__, ve))
 
 
@@ -1371,7 +1371,7 @@ def cmd_instance_query(context, query, options):
             options['query_language'],
             query,
             namespace=options['namespace'],
-            MaxObjectCount=context.pull_max_cnt)
+            MaxObjectCount=context.pywbem_server.pull_max_cnt)
 
         display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True)

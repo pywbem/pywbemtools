@@ -54,6 +54,15 @@ Released: not yet
   classes in this schema, and 5. the DMTF schemas (characters before the `_` in
   the namespace). (see issue #444)
 
+* Remove restrictions on parameter modification of server parameters when the
+  --name general option is specified.  Originally the --name server definition
+  could not be modified with other general options (ex. --timeout). Those
+  restrictions are removed. (see issue #1034)
+
+* Generate exception when general options such as --user, --password, etc.
+  that apply only to the server are used with the --mock-server general
+  option. (see issue #1035)
+
 
 **Cleanup:**
 

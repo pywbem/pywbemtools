@@ -61,7 +61,8 @@ begin with ``-``.
 .. index:: pair: command groups; command interface
 
 Command groups are named after the objects the commands operate on
-(ex. ``class``, ``instance``, ``qualifier``, ``server``). Executing
+(ex. ``class``, ``instance``, ``qualifier``, ``server``, ``connection``,
+``namespace``, etc.). Executing:
 
 .. code-block:: text
 
@@ -72,7 +73,7 @@ Command groups are named after the objects the commands operate on
    ...
 
 
-returns the list of command groups under the title `COMMANDS`.
+returns the list of command groups under the title `Commands`.
 
 Commands are named after actions on these objects
 (ex. ``get``, ``create``, ``delete``). The list of commands for each group
@@ -224,6 +225,25 @@ user):
     pywbemcli> :INTERNAL-COMMAND
 
     pywbemcli> !EXTERNAL-COMMAND
+
+The general options may be included on the interactive command line to
+override the general options entered in the initial command line for pywbemcli.
+Thus, a user can define a server on the command line and override elements
+of that definition with commands in the interactive mode.
+
+NOTE: The effects of any general option entered in the interactive mode exists
+only for that command and the original definition from the command line is
+restored for the next command. The changes to the connections file are retained.
+
+Thus:
+
+.. code-block:: text
+    pywbemcli --server http://blah
+    pywbemcli> class get CIM_ManagedObject
+    # The timeout change below only applies to the command on that line
+    pywbemcli> --timeout 90 class get CIM_ManagedObject.
+    # The --verbose mode only applies to the command on the same line.
+    pywbemcli> --verbose class get CIM_ManagedObject
 
 The following example starts a pywbemcli shell in interactive mode,
 executes several commands, and exits the shell:
@@ -418,9 +438,6 @@ without using the user and password because they have been reset for that comman
     pywbemcli -s https:blah --user fred --pasword blah
     pywbemcli> class enumerate
     pywbemcli> --user "" --pasword "" class enumerate
-
-
-
 
 .. index:: pair: Error handling; exit codes
 

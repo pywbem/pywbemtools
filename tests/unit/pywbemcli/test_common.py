@@ -377,7 +377,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
 
     # test option with only one choice bypasses user request
     if not choices:
-        context = ContextObj(None, None, None, None, None, None, None, None,
+        context = ContextObj(None, None, None, None, None, None,
                              None, None, False, False)
 
         # The code to be tested
@@ -396,7 +396,7 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
             mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
             with patch(mock_echo_func):
                 # Fake context object
-                context = ContextObj(None, None, None, None, None, None, None,
+                context = ContextObj(None, None, None, None, None,
                                      None, None, None, False, False)
 
                 # The code to be tested

@@ -679,8 +679,6 @@ def cmd_connection_select(context, name, options):
 
     new_ctx = ContextObj(connections_repo[name],
                          context.output_format,
-                         context.use_pull,
-                         context.pull_max_cnt,
                          context.timestats,
                          context.log,
                          context.verbose,
