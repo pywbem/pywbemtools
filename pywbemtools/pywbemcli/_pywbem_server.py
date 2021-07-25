@@ -411,7 +411,7 @@ class PywbemServer(object):
             self.get_password(ctx.obj)
             self.connect(
                 log=ctx.obj.log,
-                use_pull=ctx.obj.use_pull,
+                use_pull=ctx.obj.pywbem_server.use_pull,
                 verbose=ctx.obj.verbose)
         return self._wbem_server
 
@@ -462,8 +462,8 @@ class PywbemServer(object):
                             "password": self.password,
                             "default-namespace": self.default_namespace,
                             "timeout": self.timeout,
-                            "use_pull": self.use_pull,
-                            "pull_max_cnt": self.pull_max_cnt,
+                            "use-pull": self.use_pull,
+                            "pull-max-cnt": self.pull_max_cnt,
                             "verify": self.verify,
                             "certfile": self.certfile,
                             "keyfile": self.keyfile,

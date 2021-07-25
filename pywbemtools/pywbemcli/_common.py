@@ -816,7 +816,7 @@ def parse_version_value(version_str, cln):
     except ValueError:
         warning_msg("Invalid Version qualifier value {}, class {}. "
                     "Values must be integers. "
-                    "Replace with 0.0.0".format(version_str, cln))
+                    "Replaced with 0.0.0".format(version_str, cln))
         return [0, 0, 0]
     except TypeError:
         warning_msg("Invalid Version qualifier value: {}, class {}. "

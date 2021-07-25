@@ -43,9 +43,8 @@ class ContextObj(object):
     spinner_envvar = 'PYWBEMCLI_SPINNER'
 
     # pylint: disable=unused-argument
-    def __init__(self, pywbem_server, output_format, use_pull,
-                 pull_max_cnt, timestats, log, verbose, pdb,
-                 warn, connections_repo, interactive_mode,
+    def __init__(self, pywbem_server, output_format, timestats, log, verbose,
+                 pdb, warn, connections_repo, interactive_mode,
                  close_interactive_server):
         """
         Parameters:
@@ -56,14 +55,6 @@ class ContextObj(object):
           output_format (:term:`string or None):
             String representing the type of output from the --output-format
             general option or None if the default is to be used.
-
-          use_pull (:class:`py:bool` or None):
-            If boolean defines whether pull operations are to be used.  If
-            None, the pywbem client will decide.           `
-
-          pull_max_cnt(:term:`integer`):
-            Positive integer represenging the max size of each pull
-            operation response
 
           timestats (:class:`py:bool`):
             See timestats general option
@@ -94,8 +85,6 @@ class ContextObj(object):
 
         self._pywbem_server = pywbem_server
         self._output_format = output_format
-        self._use_pull = use_pull
-        self._pull_max_cnt = pull_max_cnt
         self.timestats = timestats   # has setter method
         self._log = log
         self._verbose = verbose
@@ -112,12 +101,11 @@ class ContextObj(object):
 
     def __repr__(self):
         return 'ContextObj(at {:08x}, pywbem_server={!r}, outputformat={}, ' \
-               'use_pull={}, pull_max_cnt={}, timestats={}, log={}, ' \
-               'verbose={}, spinner_enabled={}, interactive_mode={}' \
+               'timestats={}, log={}, verbose={}, spinner_enabled={}, ' \
+               'interactive_mode={}' \
                .format(id(self), self._pywbem_server, self.output_format,
-                       self.use_pull, self.pull_max_cnt, self.timestats,
-                       self.log, self.verbose, self.spinner_enabled,
-                       self._interactive_mode)
+                       self.timestats, self.log, self.verbose,
+                       self.spinner_enabled, self._interactive_mode)
 
     @property
     def output_format(self):
@@ -155,22 +143,6 @@ class ContextObj(object):
         assert isinstance(mode, bool)
         # pylint: disable=attribute-defined-outside-init
         self._interactive_mode = mode
-
-    @property
-    def use_pull(self):
-        """
-        :term:`string`: Choice of whether pull, traditional or either type
-        of operation is to be used for the instance enumerates, references,
-        or associator commands.
-        """
-        return self._use_pull
-
-    @property
-    def pull_max_cnt(self):
-        """
-        :term:`string`: Maximum number of objects to be returne for pull op.
-        """
-        return self._pull_max_cnt
 
     @property
     def log(self):

@@ -59,6 +59,28 @@ TEST_CONNECTIONS_FILE_DICT = {
     'default_connection_name': None,
 }
 
+# Test connection definition with url
+TEST_CONNECTIONS_FILE_DICT_SERVER = {
+    'connection_definitions': {
+        'realsvr': {
+            'name': 'blah',
+            'server': 'http://blah',
+            'user': None,
+            'password': None,
+            'default-namespace': 'root/cimv2',
+            'timeout': 30,
+            'use_pull': None,
+            'pull_max_cnt': 1000,
+            'verify': True,
+            'certfile': None,
+            'keyfile': None,
+            'ca-certs': None,
+            'mock-server': [],
+        },
+    },
+    'default_connection_name': None,
+}
+
 
 def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
     """
@@ -299,7 +321,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify valid --server and --mock-server invalid.',
+    ['Verify simultaneous --server and --mock-server on cmd line invalid.',
      {'general': ['--server', 'http://blah', '--mock-server',
                   SIMPLE_MOCK_FILE_PATH],
       'cmdgrp': 'connection',
@@ -309,6 +331,28 @@ TEST_CASES = [
                  'server:', 'http://blah'],
       'rc': 1,
       'test': 'in'},
+     None, OK],
+
+    ['Verify simultaneous --mock-server option and --name option fails',
+     {'general': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ['Error: Conflicting server definitions:',
+                 'mock-server:', SIMPLE_MOCK_FILE_PATH,
+                 'name:', 'MyConnName'],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify simultaneous --server option and --name option fails',
+     {'general': ['--server', 'http://blah', '--name', 'MyConnName'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ['Error: Conflicting server definitions:',
+                 'server:', 'http://blah',
+                 'name:', 'MyConnName'],
+      'rc': 1,
+      'test': 'innows'},
      None, OK],
 
     ['Verify valid --use-pull option parameter no.',
@@ -561,19 +605,65 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    # TODO: Add test where file exists.
-
-    ['Verify simultaneous --mock-server and --server options fail',
+    ['Verify --mock-server and WBEMConnection only option user',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                  '--server', 'http://localhost'],
+                  '--user', 'fred'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Conflicting server definitions:',
-                 'mock-server:', SIMPLE_MOCK_FILE_PATH,
-                 'server:', 'http://localhost'],
+     {'stderr': ["Error: General option(s): (--user) not allowed when using a "
+                 "mock server"],
       'rc': 1,
       'test': 'innows'},
      None, OK],
+
+    ['Verify --mock-server and WBEMConnection only options user and password',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--user', 'fred', '--password', 'fred'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ["Error: General option(s): (--user, --password) not allowed "
+                 "when using a mock server."],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --mock-server and WBEMConnection only options certfile, keyfile',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--certfile', 'fred', '--keyfile', 'fred'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ["Error: General option(s): (--certfile, --keyfile) not "
+                 "allowed when using a mock server."],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify --mock-server and WBEMConnection only option no-verify',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--no-verify'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ["Error: General option(s): (--verify) not allowed "
+                 "when using a mock server."],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify --mock-server and WBEMConnection only option --verify',
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+                  '--verify'],
+      'cmdgrp': 'connection',
+      'args': ['show']},
+     {'stderr': ["Error: General option(s): (--verify) not allowed "
+                 "when using a mock server."],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    # TODO: Add test where file exists.
+
 
     ['Verify --mock-server invalid name',
      {'general': ['--mock-server', 'fred'],
@@ -586,16 +676,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify -m option one file and name fails',
-     {'general': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
-      'cmdgrp': 'connection',
-      'args': ['show']},
-     {'stderr': ['Error: Conflicting server definitions:',
-                 'mock-server:', SIMPLE_MOCK_FILE_PATH,
-                 'name:', 'MyConnName'],
-      'rc': 1,
-      'test': 'innows'},
-     None, OK],
 
     ['Verify --timestats',
      {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH, '--timestats'],
@@ -734,15 +814,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify --name and other options fails',
-     {'general': ['--name', 'generaltest1', '--timeout', '90'],
-      'cmdgrp': 'connection',
-      'args': ['delete', 'generaltest1']},
-     {'stderr': ['timeout 90', 'invalid when'],
-      'rc': 1,
-      'test': 'innows'},
-     None, OK],
-
     ['Verify connection gets deleted.',
      {'cmdgrp': 'connection',
       'args': ['delete', 'generaltest1']},
@@ -781,12 +852,14 @@ TEST_CASES = [
      None, OK],
 
     ['Verify password prompt with server that requires one',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+     {'general': ['--server', "http://blahblah",
                   '--user', 'john'],
-      'cmdgrp': 'class',
-      'args': ['enumerate'],
+      'cmdgrp': 'connection',
+      'args': ['test'],
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
-     {'stdout': ['CIM_Foo'],
+     {'stdout': ["MOCK_CLICK_PROMPT Enter password (user john)"],
+      'stderr': ["ConnectionError: Failed to establish"],
+      'rc': 1,
       'test': 'innows'},
      None, OK],
 
@@ -794,8 +867,7 @@ TEST_CASES = [
     #   Verify password prompt. This is a sequence
     #
     ['Create a mock serve with user but no password. Sequence 0,1.',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
-                  '--user', 'john'],
+     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH],
       'args': ['save', 'mocktestVerifyPWPrompt'],
       'cmdgrp': 'connection', },
      {'stdout': "",
@@ -830,14 +902,14 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Create a mock server with user but no password. stdin to test for prompt',
-     {'general': ['--mock-server', SIMPLE_MOCK_FILE_PATH,
+    ['Create a server with user but no password. stdin to test for prompt',
+     # NOTE: the class enumerate fails but is required to ask for pw
+     {'general': ['--server', "http://blahblah",
                   '--user', 'john'],
       'stdin': ['class enumerate'],
       'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PW_PROMPT_FILE)}},
      {'stdout': ['MOCK_CLICK_PROMPT Enter password',
-                 '(user john)',
-                 'class CIM_Foo {'],
+                 '(user john)'],
       'test': 'innows'},
      None, OK],
 
@@ -1130,7 +1202,6 @@ TEST_CASES = [
       'stdin': ['--timeout 90 --user Fred '
                 '--default-namespace root/john --password  abcd '
                 ' --verify --certfile c1.pem --keyfile k1.pem '
-                'connection select testGeneralOpsMods',
                 'connection show testGeneralOpsMods --show-password'],
       'cmdgrp': None},
      {'stdout': ['testGeneralOpsMods',
@@ -1144,16 +1215,14 @@ TEST_CASES = [
                  'keyfile *k1.pem'],
       'rc': 0,
       'test': 'regex'},
-     None, FAIL],  # See issue #732
+     None, OK],  # See issue #732
 
     ['Change all parameters and save as t1. Sequence 2,4',
-     {'general': ['--name', 'testGeneralOpsMods'],
-      # args not allowed in interactive mode
+     {'general': ['--name', 'testGeneralOpsMods', '-v'],
       'stdin': ['--server  http://blahblah --timeout 90 --user Fred '
                 '--default-namespace root/john --password  abcd '
-                ' --verify --certfile c1.pem --keyfile k1.pem connection '
-                'save t1',
-                'connection list'],
+                '--verify --certfile c1.pem --keyfile k1.pem connection '
+                'save t1', 'connection show t1'],
       'cmdgrp': None},
      {'stdout': [''],
       'rc': 0,
@@ -1199,87 +1268,72 @@ TEST_CASES = [
     #  Test verbose option
     #
     ['Verify --verbose on by doing a connection show with --verbose',
-     {'general': ['--name', 't1', '--verbose'],
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '--verbose', '-C',
+                  TEST_CONNECTIONS_FILE_PATH],
       'args': 'show',
       'cmdgrp': 'connection'},
-     {'stdout': ['t1',
-                 '^server *http://blahblah$',
-                 '^default-namespace *root/john$',
-                 '^user *Fred$',
-                 '^timeout *90$',
-                 '^verify *True$',
-                 '^certfile *c1.pem$',
-                 '^keyfile *k1.pem$'],
+     {'stdout': ['Connections file loaded:',
+                 'server http://blah',
+                 'default-namespace root/cimv2',
+                 'user ',
+                 'timeout 30',
+                 'verify True',
+                 'certfile ',
+                 'keyfile'],
       'rc': 0,
-      'test': 'regex'},
-     None, OK],
-
-    ['Verify --verbose on by doing a connection show with -v',
-     {'general': ['--name', 't1', '-v'],
-      'args': 'show',
-      'cmdgrp': 'connection'},
-     {'stdout': ['t1',
-                 '^server *http://blahblah$',
-                 '^default-namespace *root/john$',
-                 '^user *Fred$',
-                 '^timeout *90$',
-                 '^verify *True$',
-                 '^certfile *c1.pem$',
-                 '^keyfile *k1.pem$'],
-      'rc': 0,
-      'test': 'regex'},
-     None, OK],
-
-    ['Verify --no-verbose',
-     {'general': ['--name', 't1', '--no-verbose'],
-      'args': ['show', '--show-password'],
-      'cmdgrp': 'connection'},
-     {'stdout': ['t1',
-                 '^server *http://blahblah$',
-                 '^default-namespace *root/john$',
-                 '^user *Fred$',
-                 '^password *abcd$',
-                 '^timeout *90$',
-                 '^verify *True$',
-                 '^certfile *c1.pem$',
-                 '^keyfile *k1.pem$'],
-      'rc': 0,
-      'test': 'regex'},
-     None, OK],
-
-    ['Verify -verbose but turned off on interactive cmd --show-password',
-     {'general': ['--name', 't1', '-v'],
-      'stdin': ['--no-verbose connection show --show-password'],
-      'cmdgrp': None},
-     {'stdout': ['t1',
-                 '^server *http://blahblah$',
-                 '^default-namespace *root/john$',
-                 '^user *Fred$',
-                 '^password *abcd$',
-                 '^timeout *90$',
-                 '^verify *True$',
-                 '^certfile *c1.pem$',
-                 '^keyfile *k1.pem$'],
-      'rc': 0,
-      'test': 'regex'},
-     None, OK],
-
-    ['Verify -verbose but turned off on interactive cmd',
-     {'general': ['--name', 't1', '-v'],
-      'stdin': ['--no-verbose connection show'],
-      'cmdgrp': None},
-     {'stdout': ['COMMAND', 'params='],
-      'rc': 0,
-      'test': 'not-innows'},
-     None, OK],
-
-    ['Delete testGeneralOpsMods.',
-     {'args': ['delete', 't1'],
-      'cmdgrp': 'connection', },
-     {'stdout': "",
       'test': 'innows'},
      None, OK],
 
+    ['Verify --verbose on by doing a connection show with -v',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': 'show',
+      'cmdgrp': 'connection'},
+     {'stdout': ['Connections file loaded:'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --no-verbose',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '--no-verbose', '--user', 'fred',
+                  '--password', 'abcd', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': ['show', '--show-password'],
+      'cmdgrp': 'connection'},
+     {'stdout': ['name blah (current)',
+                 'server http://blah',
+                 'default-namespace root/cimv2',
+                 'user ',
+                 'timeout 30',
+                 'verify True',
+                 'certfile ',
+                 'keyfile'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify -verbose but turned off on interactive cmd --show-password',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '--user', 'fred',
+                  '--password', 'abcd', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'stdin': ['--no-verbose connection show --show-password'],
+      'cmdgrp': None},
+     {'stdout': ['name  blah  (current)',
+                 'server  http://blah',
+                 'default-namespace  root/cimv2',
+                 'user  fred',
+                 'password  abcd',
+                 'timeout  30',
+                 'verify  True',
+                 'certfile',
+                 'keyfile'],
+      'rc': 0,
+      'test': 'innows'},
+     None, OK],
 
     ['Verify  server general options with "" value reset the option to None',
      {'general': ['--server', 'http://blah',
@@ -1301,7 +1355,6 @@ TEST_CASES = [
       'test': 'innows'},
 
      None, OK],
-
 
     ['Verify  misc general options with "" value reset the option to None',
      {'general': ['--server', 'http://blah',
@@ -1367,15 +1420,17 @@ TEST_CASES = [
       'test': 'not-innows'},
      None, OK],
 
-    # NOTE That we are not using this because of possible issue with previous
-    # test and windows.  Enable this before we add any more tests in future.
+    # NOTE Test ignored on windows because of issue in previous test
+    # This test depends on the previous one
     ['Delete fred. This one will fail if previous does not abort',
      {'general': [],
       'args': ['delete', 'fred'],
-      'cmdgrp': 'connection', },
-     {'stdout': "",
+      'cmdgrp': 'connection',
+      'platform': 'win32'},  # ignore this platform.  See comments above
+     {'stderr': 'Connection definition "fred" not found in connections file',
+      'rc': 1,
       'test': 'innows'},
-     None, FAIL],
+     None, OK],
 
     ['Verify operation that makes request to WBEM server fails with no server.',
      {'args': ['enumerate'],
@@ -1390,22 +1445,22 @@ TEST_CASES = [
     #  and server/mock server fails.
     #
 
-    ['Test conflicting server defintions interactive mode.',
-     {'stdin': ['--server http://blah --name blah connection show']},
+    ['Test conflicting server definitions interactive mode --mock-server.',
+     {'stdin': ['--server http://blah --mock-server '
+                'tests/unit/pywbemcli/simple_mock_model.mof']},
      {'stderr': "Conflicting server definitions:",
       'rc': 0,
       'test': 'innows'},
      None, OK],
 
-    #
-    # Test of 3 ways to execute same simple command. Creates a mock
+    # Test of ways to execute same simple command. Creates a mock
     # and tests combination of single command. Uses -v to test for
     # Connect and disconnect
 
     ['Verify new config file with defined data is created and saved.',
      {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH, None),
       'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH],
-      'stdin': ['connection save blah',
+      'stdin': ['connection save blah',   # saves SIMPLE_MOCK_MODEL as blah
                 'connection show']},
      {'stdout': ['default-namespace root/cimv2'],
       'test': 'innows'},
@@ -1429,13 +1484,14 @@ TEST_CASES = [
                                 TEST_CONNECTIONS_FILE_DICT),
       'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
       'stdin': ['class enumerate --di --no --subclass-of CIM_Foo_sub']},
-     {'stdout': ["Connecting to mock environment",
+     {'stdout': ["Connections file loaded: tmp_general_options.yaml",
+                 "Connecting to mock environment",
                  'CIM_Foo_sub_sub',
                  "Disconnecting from mock environment"],
       'test': 'innows'},
      None, OK],
 
-    ['Verify cmd with -n option in stdin.',
+    ['Verify cmd with --name option in stdin.',
      {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
                                 TEST_CONNECTIONS_FILE_DICT),
       'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
@@ -1447,7 +1503,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify interactive create mock with bad file name does not fail.',
+    ['Verify interactive delete connection name does not fail.',
      {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
                                 TEST_CONNECTIONS_FILE_DICT),
       'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH],
@@ -1456,6 +1512,160 @@ TEST_CASES = [
       'test': 'innows', },
      None, OK],
 
+    ['Verify new config file with defined server is created with additional '
+     'options.',
+     {'general': ['-v',
+                  '--server', 'http://blah', '--user', 'fred',
+                  '--password', 'fred', '--timeout', '90', '-d', 'root/cimv3',
+                  '--no-verify', '--certfile', 'certfile.pem',
+                  '--keyfile', 'keyfile.pem', '--ca-certs', 'blah',
+                  '--use-pull', 'no', '--pull-max-cnt', '222'],
+      'stdin': ['connection show']},
+     {'stdout': ['default-namespace root/cimv3',
+                 'server http://blah',
+                 'user fred',
+                 'timeout 90',
+                 'verify False',
+                 'use-pull False',
+                 'pull-max-cnt 222',
+                 'certfile certfile.pem',
+                 'keyfile keyfile.pem',
+                 'ca-certs  blah'],
+      'test': 'innows'},
+     None, OK],
+
+    # Test of interactive change of all server options.  Creates server,
+    # modifies server options in interactive cmd with connection show,
+    # does second connection show to test for original parameters
+    ['Verify created server with interactive modify server options works.',
+     {'general': ['-v', '--server', 'http://blah', '--user', 'fred',
+                  '--password', 'fred', '--timeout', '90', '-d', 'root/cimv3',
+                  '--no-verify', '--certfile', 'certfile.pem',
+                  '--keyfile', 'keyfile.pem', '--ca-certs', 'blah',
+                  '--use-pull', 'no', '--pull-max-cnt', '222'],
+      'stdin': ['--server http://blah2 --user john '
+                '--password john --timeout 45 -d root/cimv4 '
+                '--verify --certfile certfile2.pem '
+                '--keyfile keyfile2.pem --ca-certs blah2 '
+                '--use-pull yes --pull-max-cnt 444 '
+                'connection show',                       # first cmd
+                'connection show']},                     # second cmd
+     {'stdout': ['default-namespace root/cimv4',  # params from first cmd
+                 'server http://blah2',
+                 'user john',
+                 'timeout 45',
+                 'verify True',
+                 'use-pull True',
+                 'pull-max-cnt 444',
+                 'certfile certfile2.pem',
+                 'keyfile keyfile2.pem',
+                 'ca-certs  blah2',
+                 'default-namespace root/cimv3',  # params from second cmd
+                 'server http://blah',
+                 'user fred',
+                 'timeout 90',
+                 'verify False',
+                 'use-pull False',
+                 'pull-max-cnt 222',
+                 'certfile certfile.pem',
+                 'keyfile keyfile.pem',
+                 'ca-certs  blah'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --name  with all server general_options modified in interactive '
+     'cmd.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'stdin': ['--server http://blah2 --user john '
+                '--password john --timeout 45 -d root/cimv4 '
+                '--no-verify --certfile certfile2.pem '
+                '--keyfile keyfile2.pem --ca-certs blah2 '
+                '--use-pull yes --pull-max-cnt 444 '
+                'connection show',                       # first cmd
+                'connection show']},
+     {'stdout': ['default-namespace root/cimv4',  # params from first show cmd
+                 'server http://blah2',
+                 'user john',
+                 'timeout 45',
+                 'verify False',
+                 'use-pull True',
+                 'pull-max-cnt 444',
+                 'certfile certfile2.pem',
+                 'keyfile keyfile2.pem',
+                 'ca-certs  blah2',
+                 'default-namespace root/cimv2',  # params from second show
+                 'server http://blah',
+                 'user',
+                 'timeout 30',
+                 'verify False',
+                 'use-pull True',
+                 'pull-max-cnt 1000',
+                 'certfile',
+                 'keyfile',
+                 'ca-certs'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify cmd with --name and all server option modifications.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '-v', '-C', TEST_CONNECTIONS_FILE_PATH,
+                  '--user', 'john',
+                  '--password', 'john', '--timeout', '45', '-d', 'root/cimv4',
+                  '--no-verify', '--certfile', 'certfile2.pem',
+                  '--keyfile', 'keyfile2.pem', '--ca-certs', 'blah2',
+                  '--use-pull', 'yes', '--pull-max-cnt', '444',
+                  'connection', 'show']},
+     {'stdout': ['default-namespace root/cimv4',
+                 'server http://blah',
+                 'user  john',
+                 'timeout 45',
+                 'verify False',
+                 'use-pull True',
+                 'pull-max-cnt 444',
+                 'certfile certfile2.pem',
+                 'keyfile  keyfile2.pem',
+                 'ca-certs blah2'],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify default name request where default name not in repo fails.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                {'connection_definitions': {
+                                    'blah': {
+                                        'name': 'blah',
+                                        'server': None,
+                                        'user': None,
+                                        'password': None,
+                                        'default-namespace': 'root/cimv2',
+                                        'timeout': 30,
+                                        'use_pull': None,
+                                        'pull_max_cnt': 1000,
+                                        'verify': True,
+                                        'certfile': None,
+                                        'keyfile': None,
+                                        'ca-certs': None,
+                                        'mock-server': []}},
+                                 'default_connection_name': 'DoesNotExist'}
+                                ),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH, 'connection',
+                  'show']},
+     {'stderr': ['Default connection name: "DoesNotExist" not found in '
+                 'connections file'],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify request with invalid connection file name fails.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH, None),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH,
+                  'connection', 'show']},
+     {'stderr': ['Connections file does not exist: tmp_general_options.yaml'],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 ]
 
 # TODO add test for pull operations with pull ops max size variations
