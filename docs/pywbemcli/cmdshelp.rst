@@ -693,13 +693,14 @@ Help text for ``pywbemcli connection`` (see :ref:`connection command group`):
       -h, --help  Show this help message.
 
     Commands:
-      export  Export the current connection.
-      show    Show a WBEM connection definition or the current connection.
-      delete  Delete a WBEM connection definition.
-      select  Select a WBEM connection definition as current or default.
-      test    Test the current connection with a predefined WBEM request.
-      save    Save the current connection to a new WBEM connection definition.
-      list    List the WBEM connection definitions.
+      export       Export the current connection.
+      show         Show a WBEM connection definition or the current connection.
+      delete       Delete a WBEM connection definition.
+      select       Select a WBEM connection definition as current or default.
+      test         Test the current connection with a predefined WBEM request.
+      save         Save the current connection to a new WBEM connection definition.
+      list         List the WBEM connection definitions.
+      set-default  Set a connection as the default connection.
 
 
 .. _`pywbemcli connection delete --help`:
@@ -718,8 +719,8 @@ Help text for ``pywbemcli connection delete`` (see :ref:`connection delete comma
 
       Delete a WBEM connection definition.
 
-      Delete a named connection definition from the connections file. If the NAME argument is omitted, prompt for
-      selecting one of the connection definitions in the connections file.
+      Delete a named connection definition from the connections file. If the NAME argument is omitted, a list of all
+      connection definitions is displayed on the terminal  and a prompt for selecting one of these connections.
 
       Example:
 
@@ -813,7 +814,10 @@ Help text for ``pywbemcli connection save`` (see :ref:`connection save command`)
         pywbemcli --server https://srv1 connection save mysrv
 
     Command Options:
-      -h, --help  Show this help message.
+      -f, --set-default  Set this definition as the default definition that will be loaded upon pywbemcli startup if no
+                         server or name is included on the command line.
+
+      -h, --help         Show this help message.
 
 
 .. _`pywbemcli connection select --help`:
@@ -836,9 +840,9 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
       definition in the connections file must exist. If the NAME argument is omitted, a list of connection definitions
       from the connections file is presented with a prompt for the user to select a connection definition.
 
-      If the --default option is set, the default connection is set to the selected connection definition, in addition.
-      Once defined, the default connection will be used as a default in future executions of pywbemcli if none of the
-      server-defining general options (i.e. --server, --mock-server, or --name) was used.
+      If the --set-default option is set, the default connection is set to the selected connection definition, in
+      addition. Once defined, the default connection will be used as a default in future executions of pywbemcli if none
+      of the server-defining general options (i.e. --server, --mock-server, or --name) was used.
 
       The 'connection list' command marks the current connection with '*' and the default connection with '#'.
 
@@ -858,10 +862,38 @@ Help text for ``pywbemcli connection select`` (see :ref:`connection select comma
           . . .
 
     Command Options:
-      -d, --default  If set, the connection is set to be the default connection in the connections file in addition to
-                     setting it as the current connection.
+      -d, --set-default  If set, the connection is set to be the default connection in the connections file in addition to
+                         setting it as the current connection.
 
-      -h, --help     Show this help message.
+      -h, --help         Show this help message.
+
+
+.. _`pywbemcli connection set-default --help`:
+
+pywbemcli connection set-default --help
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Help text for ``pywbemcli connection set-default`` (see :ref:`connection set-default command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] connection set-default NAME [COMMAND-OPTIONS]
+
+      Set a connection as the default connection.
+
+      Sets either the connection defined in the NAME argument as the default current connection definition or, if there is
+      no NAME argument on the command it sets the current connection (if there is one) as the default connection.
+
+      The character "?" may be used as the name argument to allow selecting the connection to be set as the default
+      connection interactively from all of the existing connection definitions.
+
+    Command Options:
+      --clear       Clear default connection name.
+      -v, --verify  Prompt user to verify change before changing the default connection definition).
+      -h, --help    Show this help message.
 
 
 .. _`pywbemcli connection show --help`:

@@ -58,11 +58,11 @@ from .._utils import pywbemtools_warn, get_terminal_width, \
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS
 
-
 __all__ = ['cli']
 
 PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 
+DEFAULT_DEFINITION_NAME = "not-saved"
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify

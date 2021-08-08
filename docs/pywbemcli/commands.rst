@@ -1956,7 +1956,7 @@ implementations of WBEM servers such as the implementation of OpenPegasus.
 ``connection`` command group
 ----------------------------
 
-The ``connection`` command group has commands that manage named connection
+The ``connection`` command group includes commands that manage named connection
 definitions that are persisted in a :term:`connections file`.
 This allows maintaining multiple connection definitions and then using any
 one via the :ref:`--name general option`. Only a single connection is
@@ -1994,6 +1994,8 @@ The commands in this group are:
 * :ref:`Connection select command` - Select a WBEM connection definition as current or default.
 * :ref:`Connection show command` - Show connection info of a WBEM connection definition.
 * :ref:`Connection test command` - Test the current connection with a predefined WBEM request.
+* :ref:`Connection set-default command` - Sets or clears the default definition in a connections file.
+
 
 .. index:: pair: connection commands; connection delete
 
@@ -2162,6 +2164,14 @@ in the ``NAME`` argument.
 If a connection definition with that name already exists, it will be overwritten
 without notice.
 
+This command includes an option (``set-default``) that sets the default
+connection of the current connections file to the name of the definition being
+saved.
+
+.. code-block:: text
+
+    $ pywbemcli --server http://blah connection save <name> --set-default
+
 See :ref:`pywbemcli connection save --help` for the exact help output of the command.
 
 .. index:: pair: connection commands; connection select
@@ -2203,7 +2213,7 @@ mode of pywbemcli:
     +------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------+
     | name       | server           | namespace   | user        |   timeout | verify     | mock-server                             |
     |------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------|
-    | mock1      |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model.mof        |
+    | #mock1     |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_mock_model.mof        |
     | *mockassoc |                  | root/cimv2  |             |        30 | False      | tests/unit/simple_assoc_mock_model.mof  |
     | op         | http://localhost | root/cimv2  | me          |        30 | True       |                                         |
     +------------+------------------+-------------+-------------+-----------+------------+-----------------------------------------+
@@ -2297,6 +2307,79 @@ and ``--password`` and executes the test with successful result:
     Connection successful
 
 See :ref:`pywbemcli connection test --help` for the exact help output of the command.
+
+
+.. index:: pair: connection commands; connection set-default
+
+.. _`Connection set-default command`:
+
+``connection set-default`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. index::
+    single: connection set-default command
+    pair: command; connection set-default
+
+The ``connection set-default`` command sets or clears the
+:term:`default-connection-name` attribute  in the currently specified
+:term:`connections file`.
+
+The :term:`default-connection-name` attribute allows a connection definition in a
+connections file to be loaded on startup without using the --name option.  If
+pywbemcli is started without --name, --server, or --mock-server options, the
+``default-connection-name`` attribute is retrieved from the file and, if defined,
+the name in the value of this attribute used as the name of the connection
+definition set as current connection.
+
+Thus, for example, if the default connection definition is ``mytests`` the
+connection definition for ``mytests`` is created each time pywbemcli is started
+with no --server, --mock-server or --name option.
+
+This command also allows clearing the value of the default connections file
+attribute with the option ``--clear``
+
+The following demonstrates displaying the connection information for the
+current default connection ``mytests``.
+
+.. code-block:: text
+
+    $ pywbemcli connection show
+
+    name: mytests (current, default)
+      server: http://blah
+      default-namespace: root/cimv2
+      user: None
+      password: None
+      timeout: 30
+      verify: True
+      certfile: None
+      keyfile: None
+      mock-server:
+      ca-certs: None
+
+    $ pywbemcli connection set-default --clear
+      Connection default name cleared replacing None
+
+    $ pywbemcli connection show
+      Error: No connection defined
+
+    $ pywbemcli connection set-default mytests
+       'mytests' set as default connection
+
+    $ pywbemcli connection show
+    WBEM server connections(brief): (#: default, *: current)
+
+    file: tmp.yaml
+    name       server           mock-server
+    ---------  ---------------  -------------
+    *#mytests  http://blah
+    blahblah   http://blahblah
+
+The current status of the :term:`default-connection-name` can be viewed with the
+:ref:`Connection show command` and :ref:`Connection list command`.
+
+See :ref:`pywbemcli connection set-default --help` for the exact help output
+of the command.
+
 
 .. index:: pair: repl; command
 

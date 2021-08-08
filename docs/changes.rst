@@ -17,6 +17,10 @@ Released: not yet
 * The PYWBEMCLI_TERMWIDTH environment variable was renamed to
   PYWBEMTOOLS_TERMWIDTH since it is common to all pywbemtools commands.
 
+* Changed option --default on command ``connection select`` to ``set-default``.
+  to be compatible with other commands that touch the default connection
+  definition.
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -62,6 +66,12 @@ Released: not yet
 * Generate exception when general options such as --user, --password, etc.
   that apply only to the server are used with the --mock-server general
   option. (see issue #1035)
+
+* Extend the capability to set the default connection in a connections file to
+  the connection save command and a specific command that will set or clear the
+  default.  Since the ability to set the default connection was only an
+  option in the connection select command it was difficult to find.  This makes
+  the functionality more visible and more usable.
 
 
 **Cleanup:**

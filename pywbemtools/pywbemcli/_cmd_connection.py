@@ -37,7 +37,8 @@ from .config import PYWBEMCLI_SERVER_ENVVAR, \
     PYWBEMCLI_CERTFILE_ENVVAR, PYWBEMCLI_KEYFILE_ENVVAR, \
     PYWBEMCLI_CA_CERTS_ENVVAR, PYWBEMCLI_TIMEOUT_ENVVAR, \
     PYWBEMCLI_USE_PULL_ENVVAR, PYWBEMCLI_CONNECTIONS_FILE_ENVVAR
-from ._common import pick_one_from_list, pywbem_error_exception
+from ._common import pick_one_from_list, pywbem_error_exception, \
+    verify_operation
 from ._connection_repository import ConnectionsFileError
 from ._context_obj import ContextObj
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
@@ -158,8 +159,8 @@ def connection_delete(context, name):
     Delete a WBEM connection definition.
 
     Delete a named connection definition from the connections file. If the NAME
-    argument is omitted, prompt for selecting one of the connection definitions
-    in the connections file.
+    argument is omitted, a list of all connection definitions is displayed on
+    the terminal  and a prompt for selecting one of these connections.
 
     Example:
 
@@ -171,7 +172,7 @@ def connection_delete(context, name):
 @connection_group.command('select', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
-@click.option('-d', '--default', is_flag=True,
+@click.option('-d', '--set-default', is_flag=True,
               default=False,
               help=u'If set, the connection is set to be the default '
                    u'connection in the connections file in addition to setting '
@@ -188,7 +189,7 @@ def connection_select(context, name, **options):
     definitions from the connections file is presented with a prompt for the
     user to select a connection definition.
 
-    If the --default option is set, the default connection is set to the
+    If the --set-default option is set, the default connection is set to the
     selected connection definition, in addition.
     Once defined, the default connection will be used as a default in future
     executions of pywbemcli if none of the server-defining general options
@@ -245,9 +246,14 @@ def connection_test(context, **options):
 @connection_group.command('save', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=True)
+@click.option('-f', '--set-default', is_flag=True,
+              default=False,
+              help=u"Set this definition as the default definition "
+              "that will be loaded upon pywbemcli startup if no server or name "
+              "is included on the command line.")
 @add_options(help_option)
 @click.pass_obj
-def connection_save(context, name):
+def connection_save(context, name, **options):
     """
     Save the current connection to a new WBEM connection definition.
 
@@ -263,7 +269,7 @@ def connection_save(context, name):
 
       pywbemcli --server https://srv1 connection save mysrv
     """
-    context.execute_cmd(lambda: cmd_connection_save(context, name))
+    context.execute_cmd(lambda: cmd_connection_save(context, name, options))
 
 
 @connection_group.command('list', cls=PywbemtoolsCommand,
@@ -289,6 +295,33 @@ def connection_list(context, **options):
     See also the 'connection select' command.
     """
     context.execute_cmd(lambda: cmd_connection_list(context, options))
+
+
+@connection_group.command('set-default', cls=PywbemtoolsCommand,
+                          options_metavar=CMD_OPTS_TXT)
+@click.argument('name', type=str, metavar='NAME', required=False)
+@click.option('--clear', is_flag=True, default=False,
+              help=u'Clear default connection name.')
+@click.option('-v', '--verify', is_flag=True, default=False,
+              help=u'Prompt user to verify change before changing the '
+              'default connection definition).')
+@add_options(help_option)
+@click.pass_obj
+def connection_set_default(context, name, **options):
+    """
+    Set a connection as the default connection.
+
+    Sets either the connection defined in the NAME argument as the default
+    current connection definition or, if there is no NAME argument on the
+    command it sets the current connection (if there is one) as the default
+    connection.
+
+    The character "?" may be used as the name argument to allow selecting the
+    connection to be set as the default connection interactively from all of
+    the existing connection definitions.
+    """
+    context.execute_cmd(lambda: cmd_connection_set_default(context, name,
+                                                           options))
 
 
 ################################################################
@@ -419,7 +452,7 @@ def pick_connection(name, context, connections_repo):
     Parameters:
 
       name (:term:`string):
-        Name that will be validated against repository or Noe if the name
+        Name that will be validated against repository or None if the name
         is to be picked from a selection presented
 
       context (:class:`'~pywbemtools.pywbemcli._context_obj.ContextObj`):
@@ -521,6 +554,69 @@ def test_pull_operations(context, test_class):
 
     return rows
 
+
+def _set_default_connection(connections_repo, connection_name, verify=None):
+    """
+    Set the connection defined by connection_name as the default connection
+    in the connections file.
+
+    Parameters:
+      connections_repo
+
+      connection_name (:term:`string` or None)
+        If string, that is name to set into the default definition of
+        the connections file. If None, the connections file default defintion
+        is cleared to None.
+
+      verify (:class:`py:bool`):
+        When True, a verify prompt is issued
+
+    Raises:
+      click.ClickException:
+        For invalid parameters or user negative response if verify requested,
+    """
+
+    old_default = connections_repo.default_connection_name
+    if old_default:
+        if old_default == connection_name:
+            click.echo("{0} already set as default connection definition for "
+                       "connections file {1}.".
+                       format(connection_name,
+                              connections_repo.connections_file))
+            return
+    else:
+        if connection_name is None:
+            click.echo("Default connection definition already cleared; "
+                       "connections file {0}.".
+                       format(connections_repo.connections_file))
+            return
+
+    if verify:
+        if connection_name is None:
+            if not verify_operation("Clear connection default in connections "
+                                    "file {0}".
+                                    format(connections_repo.connections_file)):
+                raise click.ClickException("Default not changed.")
+        else:
+            if not verify_operation("Set {0} as connection default in "
+                                    "connections file {1}".
+                                    format(connection_name,
+                                           connections_repo.connections_file)):
+                raise click.ClickException("Default not changed.")
+
+    if old_default is None:
+        old_default = ""
+    else:
+        old_default = " replacing '{0}'".format(old_default)
+
+    connections_repo.default_connection_name = connection_name
+    if connection_name is None:
+        click.echo("Connection default name cleared{0}".format(
+            old_default))
+    else:
+        click.echo("Connection name '{0}' set as default{1}, connections "
+                   "file {2}".format(connection_name, old_default,
+                                     connections_repo.connections_file))
 
 ################################################################
 #
@@ -697,7 +793,7 @@ def cmd_connection_select(context, name, options):
         context.pywbem_server.disconnect()
 
     context.spinner_stop()
-    if options['default']:
+    if options['set_default']:
         connections_repo.default_connection_name = name
         click.echo('"{}" default and current'.format(name))
     else:
@@ -712,6 +808,7 @@ def cmd_connection_delete(context, name):
     is no name provided, a select list will be presented for the user
     to select the connection to be deleted.
     """
+
     connections_repo = context.connections_repo
 
     # Select the connection with prompt if name is None.
@@ -719,13 +816,16 @@ def cmd_connection_delete(context, name):
     name = pick_connection(name, context, connections_repo)
 
     current_name = get_current_connection_name(context)
+
+    # Delete the connection definition. If it is the default connection
+    # the default connection it is cleared.
     connections_repo.delete(name)
 
     default = 'default ' if current_name and current_name == name else ''
     click.echo('Deleted {} connection "{}".'.format(default, name))
 
 
-def cmd_connection_save(context, name):
+def cmd_connection_save(context, name, options):
     """
     Saves the current connection definition with the name provided. A current
     connection must exist.
@@ -749,6 +849,9 @@ def cmd_connection_save(context, name):
         click.echo('Fatal error: {0}: {1}'.format(cfe.__class__.__name__, cfe),
                    err=True)
         raise click.Abort()
+
+    if options['set_default']:
+        _set_default_connection(context.connections_repo, name, verify=False)
 
 
 def cmd_connection_list(context, options):
@@ -821,3 +924,45 @@ def cmd_connection_list(context, options):
                   table_type, dflt_sym, cur_sym,
                   connections_repo.connections_file),
         table_format=output_format))
+
+
+def cmd_connection_set_default(context, name, options):
+    """
+    Set a connection defined by:
+    1. A connection name as argument,
+    2. The character "?" as the name argument which causes the pick option, or
+    3. the current connection if there is one and modify the  connection
+    definition file to make this the default connection upon pywbemcli startup.
+    """
+
+    connections_repo = context.connections_repo
+
+    clear = options['clear']
+    verify = options['verify']
+
+    if name and clear:
+        raise click.ClickException("Name argument not allowed with --clear "
+                                   "option")
+
+    if clear:
+        context.spinner_stop()
+        _set_default_connection(connections_repo, name, verify=verify)
+        return
+
+    if name:
+        pick_name = None if name == "?" else name
+        name = pick_connection(pick_name, context, connections_repo)
+
+    # Otherwise use current connection as target
+    # This one is seriously in question since just not including the
+    # argument will cause it to set the current to default.
+    else:
+        if not context.pywbem_server_exists():
+            raise click.ClickException('No current connection connection with '
+                                       'set-default without name argument. '
+                                       'Define a current connection with '
+                                       '--name, --server, etc.')
+        name = context.pywbem_server.name
+
+    context.spinner_stop()
+    _set_default_connection(connections_repo, name, verify=verify)
