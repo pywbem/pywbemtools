@@ -49,6 +49,32 @@ def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
     return (str(os.path.join(TEST_DIR_REL, filename)))
 
 
+# Test connections file used in some testcases
+TEST_CONNECTIONS_FILE_PATH = 'tmp_general_options.yaml'
+TEST_CONNECTIONS_FILE_DICT = {
+    'connection_definitions': {
+        'blah': {
+            'name': 'blah',
+            'server': None,
+            'user': None,
+            'password': None,
+            'default-namespace': 'root/cimv2',
+            'timeout': 30,
+            'use_pull': None,
+            'pull_max_cnt': 1000,
+            'verify': True,
+            'certfile': None,
+            'keyfile': None,
+            'ca-certs': None,
+            'mock-server': [
+                os.path.join(TEST_DIR, 'simple_mock_model.mof'),
+            ],
+        },
+    },
+    'default_connection_name': None,
+}
+
+
 MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 
@@ -64,10 +90,11 @@ CONNECTION_HELP_LINES = [
     'delete  Delete a WBEM connection definition.',
     'export  Export the current connection.',
     'list    List the WBEM connection definitions.',
-    'save    Save the current connection to a new WBEM connection definition.',
+    'save    Save the current connection to a new WBEM connection',
     'select  Select a WBEM connection definition as current or default.',
     'show    Show a WBEM connection definition or the current connection.',
     'test    Test the current connection with a predefined WBEM request.',
+    'set-default Set a connection as the default connection.'
 ]
 
 CONNECTION_DELETE_HELP_LINES = [
@@ -100,7 +127,7 @@ CONNECTION_SELECT_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection select NAME '
     '[COMMAND-OPTIONS]',
     'Select a WBEM connection definition as current or default.',
-    '-d, --default  If set, the connection is set to be the default ',
+    '-d, --set-default  If set, the connection is set to be the default ',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -114,6 +141,13 @@ CONNECTION_SHOW_HELP_LINES = [
 CONNECTION_TEST_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] connection test [COMMAND-OPTIONS]',
     'Test the current connection with a predefined WBEM request.',
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
+CONNECTION_SET_DEFAULT_HELP_LINES = [
+    'Usage: pywbemcli [GENERAL-OPTIONS] connection set-default NAME '
+    '[COMMAND-OPTIONS]',
+    'Set a connection as the default connection.',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -232,6 +266,18 @@ TEST_CASES = [
     ['Verify connection command test --help response',
      ['test', '--help'],
      {'stdout': CONNECTION_TEST_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command set-default --help response',
+     ['set-default', '--help'],
+     {'stdout': CONNECTION_SET_DEFAULT_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify connection command set-default -h response',
+     ['set-default', '-h'],
+     {'stdout': CONNECTION_SET_DEFAULT_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -433,7 +479,7 @@ ca-certs
 
     ['Verify connection command select test2 and set default.. SEQ 0.9.1',
      {'general': [],
-      'args': ['select', 'test2', '--default']},
+      'args': ['select', 'test2', '--set-default']},
      {'stdout': ['test2', 'default'],
       'test': 'innows'},
      None, OK],
@@ -1020,7 +1066,7 @@ ca-certs
      None, OK],
 
     ['Verify connection select of svrtest. SEQ 7.3',
-     {'args': ['select', 'svrtest', '--default'],
+     {'args': ['select', 'svrtest', '--set-default'],
       'general': ['--server', 'http://blah']},
      {'stdout': '"svrtest" default and current',
       'test': 'innows',
@@ -1199,6 +1245,109 @@ ca-certs
       'test': 'innows',
       'file': {'before': 'None', 'after': 'None'}},
      None, OK],
+
+    #
+    # Test set-default option on connection save cmd line
+    #
+
+    ['Verify --setdefault on connection save works in cmd mode.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH, '-s',
+                  'http://blahblah'],
+      'args': ['save', 'blahblah', '--set-default']},
+     {'stdout': ["'blahblah' set as default"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify --set-default on connection save works interactive ',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH, '-s',
+                  'http://blahblah'],
+      'stdin': ['connection save blahblah --set-default',
+                'connection list']},
+     {'stdout': ["'blahblah' set as default",
+                 "#blahblah  http://blahblah"],
+      'test': 'innows'},
+     None, OK],
+
+    #
+    #  Test set-default command
+    #
+
+    ['Verify set_default cmd works cmd line mode.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': ['set-default', 'blah']},
+     {'stdout': ["'blah' set as default"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify set_default works interactive mode',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH, '-s',
+                  'http://blahblah'],
+      'stdin': ['connection save blahblah --set-default',
+                "connection set-default blahblah",
+                "connection list",
+                'connection set-default blah',
+                'connection list']},
+     {'stdout': ["'blahblah' set as default",
+                 '#blahblah  http://blahblah',
+                 "'blah' set as default replacing 'blahblah",
+                 '#blah '],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify set_default fails with no existing default and no name arg.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': ['set-default']},  # set-default with no name argument
+     {'stderr': ["No current connection connection"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify set_default fails name and --clear .',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': ['set-default', 'blah', '--clear']},
+     {'stderr': ["Name argument not allowed with --clear option"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify set_default --clears msg if no default .',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-n', 'blah', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'args': ['set-default', '--clear']},
+     {'stdout': ["Default connection definition already cleared"],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify set_default --clear works in interactive mode',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['-v', '-C', TEST_CONNECTIONS_FILE_PATH, '-s',
+                  'http://blahblah'],
+      'stdin': ['connection save blahblah --set-default',
+                "connection set-default blahblah",
+                "connection list",
+                'connection set-default --clear',
+                'connection list']},
+     {'stdout': ["'blahblah' set as default",
+                 '#blahblah  http://blahblah',
+                 "Connection default name cleared replacing 'blahblah",
+                 '#blah '],
+      'test': 'innows'},
+     None, OK],
+
 ]
 
 
@@ -1256,13 +1405,15 @@ class TestSubcmdClass(CLITestsBase):
             if 'before' in exp_response['file']:
                 test_file_existence(exp_response['file']['before'])
 
-        # add connections file if the general list exists.
-        if 'general' in inputs:
-            inputs['general'].extend(['--connections-file', connections_file])
-        else:
-            inputs = {"args": inputs}
-            inputs['general'] = ['--connections-file', connections_file]
-        assert '--connections-file' in inputs['general']
+        if 'connections_file_args' not in inputs:
+            # add connections file if the general list exists.
+            if 'general' in inputs:
+                inputs['general'].extend(['--connections-file',
+                                          connections_file])
+            else:
+                inputs = {"args": inputs}
+                inputs['general'] = ['--connections-file', connections_file]
+            assert '--connections-file' in inputs['general']
 
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition)
@@ -1412,6 +1563,7 @@ TEST_CASES_ERROR = [
       'test': 'innows',
       'file': {'before': 'exists', 'after': 'exists'}},
      None, OK],
+
 ]
 
 

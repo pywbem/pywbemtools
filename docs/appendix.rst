@@ -91,6 +91,20 @@ This documentation uses a few special terms to refer to Python types:
       ``PYWBEMCLI_CONNECTIONS_FILE`` environment variable, or with the
       :ref:`--connections-file general option`.
 
+      A connections file may also include a :term:`default-connection-name` that
+      defines a named connection in the file that is the default connection
+      to be created on pywbemcli startup.
+
+   default-connection-name
+      Each :term:`connections file` includes an attribute,
+      ``default-connection-name``, that contains the name of a connection
+      definition in the same connections file. Starting pywbemcli with without
+      specifying the a server on the command line (i.e specifying --server,
+      --name, or --mock-server options) triggers use of this name as the
+      current server.  This attribute can be defined, modified, or cleared with
+      the ``connection set-default``, command and modified with the
+      ``connection save`` or ``connection save`` commands.
+
    MOF
       MOF (Managed Object Format) is the language used by the DMTF to
       describe in textual form CIM objects including CIM classes,

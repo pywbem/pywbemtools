@@ -944,7 +944,7 @@ TEST_CASES = [
      None, OK],
 
     ['Verify select of test-default connection. sequence:1,4',
-     {'args': ['select', 'test-default', '--default'],
+     {'args': ['select', 'test-default', '--set-default'],
       'cmdgrp': 'connection', },
      {'stdout': ['test-default', 'current'],
       'test': 'innows'},
@@ -962,7 +962,7 @@ TEST_CASES = [
      {'general': ['--verbose'],
       'args': ['show'],
       'cmdgrp': 'connection', },
-     {'stdout': ['Current connection: "test-default"'],
+     {'stdout': ['test-default (current, default)'],
       'test': 'innows'},
      None, OK],
 
