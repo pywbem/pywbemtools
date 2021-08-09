@@ -14,8 +14,11 @@ import os
 import six
 import pywbem_mock
 
-# interop namespace used by this mock environment
+# Namespaces set up by this mock environment.
+# Must be consistent with the namespace pragmas in the main MOF file, because
+# the pywbem MOF compiler does not create any namespaces.
 INTEROP_NAMESPACE = 'interop'
+MODEL_NAMESPACE = 'root/cimv2'
 
 
 def register_dependents(conn, this_file_path, dependent_file_names):
@@ -46,6 +49,8 @@ def _setup(conn, server, verbose):
 
     if INTEROP_NAMESPACE not in conn.cimrepository.namespaces:
         conn.add_namespace(INTEROP_NAMESPACE)
+    if MODEL_NAMESPACE not in conn.cimrepository.namespaces:
+        conn.add_namespace(MODEL_NAMESPACE)
 
     if sys.version_info >= (3, 5):
         this_file_path = __file__
@@ -62,7 +67,7 @@ def _setup(conn, server, verbose):
                        'mock_interop.mof',
                        'simple_mock_model.mof']
     mof_path = os.path.join(os.path.dirname(this_file_path), mof_file)
-    conn.compile_mof_file(mof_path, namespace=None)
+    conn.compile_mof_file(mof_path, namespace=MODEL_NAMESPACE)
 
     register_dependents(conn, this_file_path, dependent_files)
     ns_provider = pywbem_mock.CIMNamespaceProvider(conn.cimrepository)
