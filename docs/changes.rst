@@ -39,7 +39,7 @@ Released: not yet
   The function display_cim_objects(...) uses valuemapping_for_property() but
   specifies the default namespace as the target.  (See issue #995)
 
-* Fixed issues raised by new Pylint version 2.9.
+* Fixed issues raised by new Pylint versions 2.9 and 2.10.
 
 * Fixed an error that resulted in exception traceback when instance commands
   used the instance wildcard (e.g. 'CIM_ManagedSystemElement.?') and the

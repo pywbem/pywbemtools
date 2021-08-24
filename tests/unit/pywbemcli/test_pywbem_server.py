@@ -21,6 +21,7 @@ Unit tests for PywbemServer class methods.
 from __future__ import absolute_import, print_function
 
 import os
+import io
 import pytest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
@@ -399,7 +400,7 @@ TESTCASES_PYSVR_INIT = [
             init_kwargs=dict(
                 timeout=None,
             ),
-            exp_attrs=dict(),
+            exp_attrs={},
         ),
         ValueError, None, OK
     ),
@@ -414,7 +415,7 @@ TESTCASES_PYSVR_INIT = [
                 server="http://blay",
                 mock_server="blah.mof"
             ),
-            exp_attrs=dict(),
+            exp_attrs={},
         ),
         ValueError, None, OK
     ),
@@ -426,7 +427,7 @@ TESTCASES_PYSVR_INIT = [
                 server='http://blah',
                 timeout=-3,
             ),
-            exp_attrs=dict(),
+            exp_attrs={},
         ),
         ValueError, None, OK
     ),
@@ -438,7 +439,7 @@ TESTCASES_PYSVR_INIT = [
                 server='http://blah',
                 timeout=99999,
             ),
-            exp_attrs=dict(),
+            exp_attrs={},
         ),
         ValueError, None, OK
     ),
@@ -549,7 +550,7 @@ def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
 
     # Create temp fake file.
     # NOTE: We cannot use fixtures because we are using simplified_test_function
-    with open(FAKE_PEM_PATH, 'a'):
+    with io.open(FAKE_PEM_PATH, 'a', encoding='utf-8'):
         pass
 
     # connect and test connection results. Try block insures finally is

@@ -23,6 +23,7 @@ in a module namespace for pickle to be able to load the corresponding objects.
 
 import sys
 import os
+import io
 import importlib
 import traceback
 import pywbem
@@ -128,7 +129,7 @@ def setup_script(file_path, conn, server, verbose):
                 DeprecatedSetupWarning, file_path, 0)
 
     else:  # Python 2.7 + 3.4
-        with open(file_path) as fp:
+        with io.open(file_path, 'r', encoding='utf-8') as fp:
             file_source = fp.read()
 
         # Using compile+exec instead of just exec allows specifying the file

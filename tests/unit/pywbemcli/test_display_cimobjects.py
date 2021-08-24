@@ -162,7 +162,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance to table",
         dict(
             args=([simple_instance()], None),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
@@ -173,7 +173,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance to table with col limit",
         dict(
             args=([simple_instance()], 30),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
@@ -184,7 +184,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance to table, unsorted",
         dict(
             args=([simple_instance_unsorted()], None),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
@@ -294,7 +294,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance with one string all components overflow line",
         dict(
             args=([simple_instance(pvalue="A B C D")], 4),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['"A "\n"B "\n"C "\n"D"']],
         ),
@@ -304,7 +304,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance with one string all components overflow line",
         dict(
             args=([simple_instance(pvalue="ABCD")], 4),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['\n"AB"\n"CD"']],
         ),
@@ -314,7 +314,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance with one string overflows line",
         dict(
             args=([simple_instance(pvalue="A B C D")], 8),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['"A B C "\n"D"']],
         ),
@@ -324,7 +324,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance withone unit32 max val",
         dict(
             args=([simple_instance(pvalue=Uint32(4294967295))], 8),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['4294967295']],
         ),
@@ -335,7 +335,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify simple instance with one string fits on line",
         dict(
             args=([simple_instance(pvalue="A B C D")], 12),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['"A B C D"']],
         ),
@@ -345,7 +345,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify datetime property",
         dict(
             args=([simple_instance(pvalue=DATETIME1_OBJ)], 20),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['\n"20140922104920.524"\n"789+000"']],
         ),
@@ -355,7 +355,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify datetime property",
         dict(
             args=([simple_instance(pvalue=DATETIME1_OBJ)], 30),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 ['"20140922104920.524789+000"']],
         ),
@@ -365,7 +365,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         "Verify integer property where len too small",
         dict(
             args=([simple_instance(pvalue=Uint32(999999))], 4),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[['999999']],
         ),
         None, None, True, ),
@@ -376,7 +376,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             args=([CIMInstance('P', [CIMProperty('P',
                                                  type='char16',
                                                  value='f')])], 4),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[[u"'f'"]],
         ),
         None, None, True, ),
@@ -390,7 +390,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                                                  type='uint32'),
                                      CIMProperty('R', value=None,
                                                  type='string'), ])], 4),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[[u'', u'', u'']],
         ),
         None, None, True, ),
@@ -407,7 +407,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                                        "REF_CLN",
                                        keybindings=OrderedDict(k1='v1')))])],
                   30),
-            kwargs=dict(),
+            kwargs={},
             exp_rtn=[
                 [u'"/:REF_CLN.k1=\\"v1\\""']],
         ),
@@ -465,7 +465,7 @@ TESTCASES_DISPLAY_INSTANCES_AS_TABLE = [
         "Verify print of simple instance to table",
         dict(
             args=([simple_instance()], None, 'simple'),
-            kwargs=dict(),
+            kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
 Pbf    Pbt    Pdt                   Pint32    Pint64  Pstr1
@@ -481,7 +481,7 @@ false  true   "20140922104920.5"        99      9999  "Test String"
         "Verify print of simple instance to table with col limit",
         dict(
             args=([simple_instance2()], 80, 'simple'),
-            kwargs=dict(),
+            kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
 Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
@@ -507,7 +507,7 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
                                        keybindings=OrderedDict(k1='v1',
                                                                k2=32)))])],
                   80, 'simple'),
-            kwargs=dict(),
+            kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
 P

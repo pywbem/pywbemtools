@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+import io
 try:
     from collections.abc import Sequence
 except ImportError:
@@ -165,7 +166,7 @@ def pywbemlistener_test(desc, inputs, exp_results, condition):
 
     if 'log' in exp_results:
         assert os.path.isfile(exp_log_file)
-        with open(exp_log_file, 'r') as log_fp:
+        with io.open(exp_log_file, 'r', encoding='utf-8') as log_fp:
             log_lines = log_fp.readlines()
         assert 'test' in exp_results
         test = exp_results['test']
@@ -275,7 +276,7 @@ def check_output(cmd_args, situation, msg, verbose):
             # should be only one log file, if any.
             log_files = 'pywbemlistener_*.log'
             for log_file in glob.glob(log_files):
-                with open(log_file, 'r') as log_fp:
+                with io.open(log_file, 'r', encoding='utf-8') as log_fp:
                     log_data = log_fp.read()
                 if isinstance(log_data, six.binary_type):
                     log_data = log_data.decode('utf-8')
