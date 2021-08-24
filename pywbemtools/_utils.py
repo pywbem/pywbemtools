@@ -21,6 +21,7 @@ Utility functions applicable across multiple pywbemtools commands.
 from __future__ import print_function, absolute_import
 
 import os
+import io
 import warnings
 import inspect
 from datetime import datetime
@@ -161,5 +162,5 @@ def debug_log(msg):
     """
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     caller = inspect.stack()[1][3]
-    with open("debug.log", "a") as fp:
+    with io.open("debug.log", "a", encoding='utf-8') as fp:
         fp.write("{} {}: {}\n".format(timestamp, caller, msg))

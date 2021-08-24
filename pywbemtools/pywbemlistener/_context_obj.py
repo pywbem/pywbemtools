@@ -166,7 +166,7 @@ class ContextObj(object):
         try:
             if self.pdb:
                 import pdb  # pylint: disable=import-outside-toplevel
-                pdb.set_trace()  # pylint: disable=no-member
+                pdb.set_trace()  # pylint: disable=forgotten-debug-statement
 
             cmd()  # The command function for the pywbemlistener command
 

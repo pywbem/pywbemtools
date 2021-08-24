@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+import io
 import subprocess
 import signal
 import atexit
@@ -926,7 +927,8 @@ def cmd_listener_run(context, name, options):
         print_out("Run process {}: Output is logged to: {}".
                   format(pid, logfile))
 
-        log_fp = open(logfile, 'a')  # pylint: disable=consider-using-with
+        # pylint: disable=consider-using-with
+        log_fp = io.open(logfile, 'a', encoding='utf-8')
 
         if sys.platform == 'win32':
             # On Windows, the standard file descriptors are not inherited
@@ -944,7 +946,7 @@ def cmd_listener_run(context, name, options):
     else:
 
         # pylint: disable=consider-using-with
-        log_fp = open(os.devnull, 'w')
+        log_fp = io.open(os.devnull, 'w', encoding='utf-8')
 
         if sys.platform == 'win32':
             # On Windows, the standard file descriptors are not inherited
@@ -1020,9 +1022,9 @@ def cmd_listener_run(context, name, options):
             display_str = ("Error: Cannot format indication using format "
                            "\"{}\": {}: {}".
                            format(indi_format, exc.__class__.__name__, exc))
-        with open(indi_file, 'a') as fp:
+        with io.open(indi_file, 'a', encoding='utf-8') as fp:
             fp.write(display_str)
-            fp.write('\n')
+            fp.write(u'\n')
 
     if indi_call:
         mod_func = indi_call.rsplit('.', 1)

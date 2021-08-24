@@ -21,6 +21,7 @@ the pywbemcli click tool
 from __future__ import absolute_import, print_function
 
 import os
+import io
 import sys
 import traceback
 import warnings
@@ -152,7 +153,7 @@ def _execute_startup_script(file_path, verbose):
         raise click.ClickException(
             "File '{}' does not exist".format(file_path))
 
-    with open(file_path) as fp:
+    with io.open(file_path, 'r', encoding='utf-8') as fp:
         file_source = fp.read()
         # Only verbose is allowed here
         globalparams = {'VERBOSE': verbose}

@@ -96,7 +96,7 @@ STOP_TESTCASES = [
                 ['lis1', '--scheme', 'http', '--port', '50001'],
             ]
         ),
-        dict(
+        dict(  # pylint:disable=use-dict-literal
             # TODO: Output goes neither on stdout nor on stderr
             # stdout=STOP_SUCCESS_PATTERNS,
             # test='all',
