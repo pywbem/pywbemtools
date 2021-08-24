@@ -7,6 +7,7 @@ through pywbemcli execution
 from __future__ import absolute_import, print_function
 import re
 import os
+import io
 from contextlib import contextmanager
 import yaml
 import pytest
@@ -547,13 +548,13 @@ def connections_file(conn_file, conn_content):
 
         # Create the new connections file.
         if conn_content is not None:
-            with open(conn_file, 'w') as fp:
+            with io.open(conn_file, 'w', encoding='utf-8') as fp:
                 if isinstance(conn_content, dict):
                     conn_content = yaml.dump(conn_content)
                 if isinstance(conn_content, six.binary_type):
                     conn_content = conn_content.decode('utf-8')
                 fp.write(conn_content)
-                fp.write('\n')
+                fp.write(u'\n')
 
     yield None
 

@@ -28,6 +28,7 @@ It also adds a method to FakeWBEMConnection to build the repository.
 from __future__ import absolute_import, print_function
 
 import os
+import io
 import errno
 import glob
 import hashlib
@@ -38,7 +39,7 @@ import pywbem
 import pywbem_mock
 
 from .config import DEFAULT_MAXPULLCNT
-from ._utils import ensure_bytes, DEFAULT_CONNECTIONS_FILE
+from ._utils import ensure_bytes, ensure_unicode, DEFAULT_CONNECTIONS_FILE
 from . import mockscripts
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
@@ -438,7 +439,7 @@ class BuildMockenvMixin(object):
             # Calculate the MD5 hash value of the content of the input files
             md5 = hashlib.md5()
             for file_path in file_path_list:
-                with open(file_path, 'rb') as fp:
+                with io.open(file_path, 'rb') as fp:
                     file_source = fp.read()
                     md5.update(file_source)
 
@@ -446,7 +447,7 @@ class BuildMockenvMixin(object):
                 if file_path.endswith('.py'):
                     dep_files = depreg.iter_dependents(file_path)
                     for dep_file in dep_files:
-                        with open(dep_file, 'rb') as fp:
+                        with io.open(dep_file, 'rb') as fp:
                             file_source = fp.read()
                             md5.update(file_source)
 
@@ -454,12 +455,12 @@ class BuildMockenvMixin(object):
             # invalidates the cache.
             md5.update(ensure_bytes(cache_dir))
 
-            new_md5_value = md5.hexdigest()
+            new_md5_value = ensure_unicode(md5.hexdigest())
 
             # Determine whether the mock environment needs to be rebuilt based
             # on the MD5 hash value of the input file content.
             if not need_rebuild:
-                with open(md5_file, 'r') as fp:
+                with io.open(md5_file, 'r', encoding='utf-8') as fp:
                     cached_md5_value = fp.read()
                 if new_md5_value != cached_md5_value:
                     if verbose:
@@ -504,7 +505,7 @@ class BuildMockenvMixin(object):
                     self._dump_mockenv(mockenv_pickle_file)
                     self._dump_depreg(
                         self.provider_dependent_registry, depreg_pickle_file)
-                    with open(md5_file, 'w') as fp:
+                    with io.open(md5_file, 'w', encoding='utf-8') as fp:
                         fp.write(new_md5_value)
                     if verbose:
                         click.echo("Mock environment for connection "
@@ -604,7 +605,7 @@ class BuildMockenvMixin(object):
             # pylint: disable=protected-access
             provider_registry=self._provider_registry,
         )
-        with open(mockenv_pickle_file, 'wb') as fp:
+        with io.open(mockenv_pickle_file, 'wb') as fp:
             pickle.dump(mockenv, fp)
 
     def _load_mockenv(self, mockenv_pickle_file, file_path_list):
@@ -638,7 +639,7 @@ class BuildMockenvMixin(object):
                 mockscripts.import_script(file_path)
 
         # Restore the provider registry and the CIM repository
-        with open(mockenv_pickle_file, 'rb') as fp:
+        with io.open(mockenv_pickle_file, 'rb') as fp:
             mockenv = pickle.load(fp)
 
         # Others have references to the self._cimrepository object, so we are
@@ -666,7 +667,7 @@ class BuildMockenvMixin(object):
 
           depreg_pickle_file (string): Path name of the pickle file.
         """
-        with open(depreg_pickle_file, 'wb') as fp:
+        with io.open(depreg_pickle_file, 'wb') as fp:
             pickle.dump(depreg, fp)
 
     @staticmethod
@@ -682,7 +683,7 @@ class BuildMockenvMixin(object):
         Returns:
           pywbem_mock.ProviderDependentRegistry: Provider dependent registry.
         """
-        with open(depreg_pickle_file, 'rb') as fp:
+        with io.open(depreg_pickle_file, 'rb') as fp:
             depreg = pickle.load(fp)
         return depreg
 
