@@ -1600,7 +1600,7 @@ def all_classnames_depsorted(namespace, conn):
         raise pywbem_error_exception(
             exc, "Cannot enumerate classes in namespace {}".format(namespace))
 
-    all_deps = dict()
+    all_deps = {}
     for cls in all_classes:
         dep_classnames = dependent_classnames(cls)
         all_deps[cls.classname] = set(dep_classnames)

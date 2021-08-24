@@ -23,6 +23,7 @@ renamed for the test and restored at the end of the test.
 from __future__ import absolute_import, print_function
 
 import os
+import io
 import pytest
 
 from pywbemtools.pywbemcli._utils import CONNECTIONS_FILENAME
@@ -1245,7 +1246,8 @@ class TestSubcmdClass(CLITestsBase):
             elif file_test.lower() == 'none':
                 if os.path.isfile(connections_file):
                     print('FILE THAT SHOULD NOT EXIST')
-                    with open(connections_file, 'r') as fin:
+                    with io.open(connections_file, 'r', encoding='utf-8') \
+                            as fin:
                         print(fin.read())
 
                 assert not os.path.isfile(connections_file), \
@@ -1260,7 +1262,7 @@ class TestSubcmdClass(CLITestsBase):
 
         if condition == 'pdb':
             import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()  # pylint: disable=no-member
+            pdb.set_trace()  # pylint: disable=forgotten-debug-statement
 
         if 'file' in exp_response:
             if 'before' in exp_response['file']:
@@ -1445,7 +1447,8 @@ class TestSubcmdClassError(CLITestsBase):
         restore it after the test.
         """
         # Create the connection file from the yaml
-        with open(CONNECTION_REPO_TEST_FILE_PATH, "wt") as repo_file:
+        with io.open(CONNECTION_REPO_TEST_FILE_PATH, "w", encoding='utf-8') \
+                as repo_file:
             repo_file.write(inputs['yaml'])
 
         connections_file = CONNECTION_REPO_TEST_FILE_PATH
@@ -1461,7 +1464,8 @@ class TestSubcmdClassError(CLITestsBase):
             elif file_test.lower() == 'none':
                 if os.path.isfile(connections_file):
                     print('FILE THAT SHOULD NOT EXIST')
-                    with open(connections_file, 'r') as fin:
+                    with io.open(connections_file, 'r', encoding='utf-8') \
+                            as fin:
                         print(fin.read())
 
                 assert not os.path.isfile(connections_file), \
@@ -1476,7 +1480,7 @@ class TestSubcmdClassError(CLITestsBase):
 
         if condition == 'pdb':
             import pdb  # pylint: disable=import-outside-toplevel
-            pdb.set_trace()  # pylint: disable=no-member
+            pdb.set_trace()  # pylint: disable=forgotten-debug-statement
 
         if 'file' in exp_response:
             if 'before' in exp_response['file']:

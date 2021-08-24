@@ -25,6 +25,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+import io
 from contextlib import contextmanager
 from mock import patch
 import pytest
@@ -593,7 +594,7 @@ def test_connection_file_load_error(testcase, file, yaml, exp_rtn):
     exceptions generated.
     """
     # Write the YAML text to the file
-    with open(file, "wt") as repo_file:
+    with io.open(file, "w", encoding='utf-8') as repo_file:
         repo_file.write(yaml)
 
     # This does not load the file yet, so it succeeds even for a bad file
@@ -710,7 +711,7 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
     """
     # Write the YAML text to the file
     if yaml:
-        with open(file, "wt") as repo_file:
+        with io.open(file, "w", encoding='utf-8') as repo_file:
             repo_file.write(yaml)
 
     repo = ConnectionRepository(file)

@@ -136,7 +136,8 @@ def simplified_test_function(test_func):
                 if exp_exc_types:
                     with pytest.raises(exp_exc_types):
                         if condition == 'pdb':
-                            pdb.set_trace()  # pylint: disable=no-member
+                            # pylint: disable=forgotten-debug-statement
+                            pdb.set_trace()
 
                         test_func(testcase, **kwargs)  # expecting an exception
 
@@ -146,7 +147,8 @@ def simplified_test_function(test_func):
                     # exception).
                 else:
                     if condition == 'pdb':
-                        pdb.set_trace()  # pylint: disable=no-member
+                        # pylint: disable=forgotten-debug-statement
+                        pdb.set_trace()
 
                     test_func(testcase, **kwargs)  # not expecting an exception
 
@@ -157,14 +159,16 @@ def simplified_test_function(test_func):
                 if exp_exc_types:
                     with pytest.raises(exp_exc_types):
                         if condition == 'pdb':
-                            pdb.set_trace()  # pylint: disable=no-member
+                            # pylint: disable=forgotten-debug-statement
+                            pdb.set_trace()
 
                         test_func(testcase, **kwargs)  # expecting an exception
 
                     ret = None  # Debugging hint
                 else:
                     if condition == 'pdb':
-                        pdb.set_trace()  # pylint: disable=no-member
+                        # pylint: disable=forgotten-debug-statement
+                        pdb.set_trace()
 
                     test_func(testcase, **kwargs)  # not expecting an exception
 

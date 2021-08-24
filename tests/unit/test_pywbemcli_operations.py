@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+import io
 import glob
 import re
 import warnings
@@ -1012,8 +1013,8 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
             # Change the MOF file
             mof_file = [mf for mf in mock_files if mf.endswith('.mof')][0]
             mof_size = os.stat(mof_file).st_size
-            with open(mof_file, 'a') as fp:
-                fp.write('\n// test_build_mockenv: Dummy line\n')
+            with io.open(mof_file, 'a', encoding='utf-8') as fp:
+                fp.write(u'\n// test_build_mockenv: Dummy line\n')
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -1026,7 +1027,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
 
             finally:
                 # Undo change to the MOF file
-                with open(mof_file, 'ab') as fp:
+                with io.open(mof_file, 'ab') as fp:
                     fp.truncate(mof_size)
 
         elif test_mode == 'load_rebuild_changed_pyfile':
@@ -1042,8 +1043,8 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
             # Change the mock script file
             py_file = [mf for mf in mock_files if mf.endswith('.py')][0]
             py_size = os.stat(py_file).st_size
-            with open(py_file, 'a') as fp:
-                fp.write('\n# test_build_mockenv: Dummy line\n')
+            with io.open(py_file, 'a', encoding='utf-8') as fp:
+                fp.write(u'\n# test_build_mockenv: Dummy line\n')
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -1056,7 +1057,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
 
             finally:
                 # Undo change to the mock script file
-                with open(py_file, 'ab') as fp:
+                with io.open(py_file, 'ab') as fp:
                     fp.truncate(py_size)
 
         elif test_mode == 'load_rebuild_changed_depfile':
@@ -1074,8 +1075,8 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
             dep_file = exp_dep_files[0]
             assert dep_file.endswith('.mof')
             dep_size = os.stat(dep_file).st_size
-            with open(dep_file, 'a') as fp:
-                fp.write('\n// test_build_mockenv: Dummy line\n')
+            with io.open(dep_file, 'a', encoding='utf-8') as fp:
+                fp.write(u'\n// test_build_mockenv: Dummy line\n')
 
             conn = PYWBEMCLIFakedConnection(default_namespace=default_namespace)
             server = pywbem.WBEMServer(conn)
@@ -1088,7 +1089,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
 
             finally:
                 # Undo change to the dependent file
-                with open(dep_file, 'ab') as fp:
+                with io.open(dep_file, 'ab') as fp:
                     fp.truncate(dep_size)
 
     finally:
