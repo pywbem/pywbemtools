@@ -97,10 +97,11 @@ def resolve_propertylist(propertylist):
 ######################################################################
 
 
-def pick_one_from_list(context, options, title):
+def pick_one_from_list(context, options, title, pick_always=None):
     """
     Interactive component that displays a set of options (strings) and asks
-    the user to select one.  Returns the item and index of the selected string.
+    the user to select one.  Returns the index in the list of the selected
+    string.
 
     If there is only a single item in the options, simply return that choice
     without user intervention.
@@ -112,6 +113,10 @@ def pick_one_from_list(context, options, title):
       title (:term:`string`):
         Title to display before selection
 
+      pick_always (py:class:`boolean`)
+        True if pick request to be issued even if there is only a single
+        choice.
+
     Retries until either integer within range of options list is input
     or user enter no value. Ctrl-C ends even the REPL.
 
@@ -121,10 +126,55 @@ def pick_one_from_list(context, options, title):
     Raises:
       ValueError if Ctrl-c input from console.
     """
+    selection = pick_one_index_from_list(context, options, title,
+                                         pick_always=pick_always)
+    if selection is None:
+        return None
+    assert isinstance(selection, int)
+    return options[selection]
 
-    # If there is only a single choice, return that choice.
-    if len(options) == 1:
-        return options[0]
+
+def pick_one_index_from_list(context, options, title, pick_always=None):
+    """
+    Interactive component that displays a set of options (strings) and asks
+    the user to select one.  Returns the index of the selected string in
+    the options list. This differs from pick_one_from_list only in that
+    it returns the index of the selected item rather than the selected item.
+
+    If there is only a single item in the options, simply return that choice
+    without user intervention.
+
+    Parameters:
+
+      context (:class:`ContextObj` or None)
+        If context is not None, disables spinner for the user input
+      options (list of :term:`string`)
+        List of strings from which one will is to be selected by the
+        user.  If list is empty or None, returns None
+
+      title (:term:`string`):
+        Title to display before selection
+
+      pick_always (:class:`py:bool`):
+        If True, issues pick request for even a single item. Otherwise,
+        simply returns the single item index
+
+
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl-C ends even the REPL.
+
+    Returns:
+      Index in the options list of the selected item
+
+    Raises:
+      ValueError if Ctrl-c input from console.
+    """
+    if not options:
+        return None
+    # If there is only a single choice, return that choice unless ht
+    # pick_always flag is set.
+    if len(options) == 1 and not pick_always:
+        return 0
 
     # Issue list of choices and prompt for user choice of index
     if context:
@@ -147,7 +197,7 @@ def pick_one_from_list(context, options, title):
             if 0 <= selection <= max_option:
                 if context:
                     context.spinner_start()
-                return options[selection]
+                return selection
         except ValueError:  # This causes the retry of the request
             pass
         except KeyboardInterrupt:
@@ -217,12 +267,44 @@ def pick_multiple_from_list(context, options, title):
         Title to display before selection
 
     Returns:
-      list of index of selected items
+      list of selected items from options
 
     Raises:
       ValueError if Ctrl-c input from console.
     """
+    selections = pick_multiple_indexes_from_list(context, options, title)
+    return [options[i] for i in selections]
 
+
+def pick_multiple_indexes_from_list(context, options, title):
+    """
+    Interactive component that displays a set of options (strings) and asks
+    the user to select multiple entries from that list.  Returns a list of
+    the indexes to the items in options
+
+    Retries until either integer within range of options list is input
+    or user enter no value. Ctrl-C ends even the REPL.
+
+    Parameters:
+      context (ContextObj or None):
+        If not None, the ContextObj which is used to stop and start the
+        spinner.
+      options (list of :term:`string)
+        List of strings which are presented to the user to select one or
+        more strings for which the index in options is returned.  An empty
+        list or None returns None.
+
+      title:
+        Title to display before selection
+
+    Returns:
+      list of indexes of selected items
+
+    Raises:
+      ValueError if Ctrl-c input from console.
+    """
+    if not options:
+        raise click.ClickException("Empty list for pick not allowed")
     if context:
         context.spinner_stop()
 
@@ -244,7 +326,7 @@ def pick_multiple_from_list(context, options, title):
 
             selection = int(selection_txt)
             if 0 <= selection <= index:
-                selection_list.append(options[selection])
+                selection_list.append(selection)
             continue
         except ValueError:
             pass
