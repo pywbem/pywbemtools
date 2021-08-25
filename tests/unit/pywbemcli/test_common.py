@@ -39,11 +39,11 @@ from pywbem._mof_compiler import MOFWBEMConnection
 from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     filter_namelist, parse_kv_pair, split_array_value, sort_cimobjects, \
     create_ciminstance, compare_instances, resolve_propertylist, \
-    is_classname, pick_one_from_list, pick_multiple_from_list, \
-    verify_operation, split_str_w_esc, shorten_path_str, get_subclass_names, \
+    is_classname, pick_one_from_list, pick_one_index_from_list, \
+    pick_multiple_from_list, verify_operation, split_str_w_esc, \
+    shorten_path_str, get_subclass_names, \
     dependent_classnames, depending_classnames, all_classnames_depsorted, \
     parse_version_value, is_experimental_class
-from pywbemtools.pywbemcli._context_obj import ContextObj
 
 from .cli_test_extensions import setup_mock_connection
 from ..pytest_extensions import simplified_test_function
@@ -315,7 +315,7 @@ def test_split_str_w_esc(testcase, input_str, delimiter, exp_rtn):
     assert act_result == exp_rtn
 
 
-TESTCASES_PICK_ONE_FROM_LIST = [
+TESTCASES_PICK_ONE_INDEX_FROM_LIST = [
     # Testcases for _common.pick_one_from_list()
     #
     # Each list item is a testcase tuple with these items:
@@ -323,65 +323,78 @@ TESTCASES_PICK_ONE_FROM_LIST = [
     # * kwargs: Keyword arguments for the test function:
     #   * options: tuple of strings defining properties
     #   * choices: list of choices to return from mock
+    #   * pa: pickBoolean
     #   * exp_rtn: expected function return.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify returns correct choice, in this case, ZERO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO'),
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], pa=False,
+          exp_rtn=0),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE'),
-     None, None, OK),
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], pa=None,
+          exp_rtn=1),
+     None, None, RUN),
 
     ('Verify returns correct choice, in this case TWO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], exp_rtn=u'TWO'),
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], pa=None,
+          exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
-          exp_rtn=u'ONE'),
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'], pa=False,
+          exp_rtn=1),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['3', '2'],
-          exp_rtn=u'TWO'),
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['3', '2'], pa=False,
+          exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after multiple inputs',
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
-          exp_rtn=u'TWO'),
+          pa=False, exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=[u'ZERO'], choices=None,
-          exp_rtn=u'ZERO'),
+     dict(options=[u'ZERO'], choices=None, pa=False, exp_rtn=0),
      None, None, OK),
+
+    ('Verify returns correct choice with only single choice pick_always set',
+     dict(options=[u'ZERO'], choices=['0'], pa=True, exp_rtn=0),
+     None, None, OK),
+
+    ('Verify exception with empty options',
+     dict(options=[], choices=None, pa=None, exp_rtn=None),
+     None, None, OK),
+
+    ('Verify returns None with None options',
+     dict(options=None, choices=None, pa=None, exp_rtn=None),
+     None, None, OK),
+
 ]
 
 
 @pytest.mark.parametrize(
     "desc, kwargs, exp_exc_types, exp_warn_types, condition",
-    TESTCASES_PICK_ONE_FROM_LIST)
+    TESTCASES_PICK_ONE_INDEX_FROM_LIST)
 @simplified_test_function
-def test_pick_one_from_list(testcase, options, choices, exp_rtn):
+def test_pick_one_index_from_list(testcase, options, choices, pa, exp_rtn):
     """
-    Test function for _common.pick_one_from_list().
+    Test function for _common.pick_one_index_from_list().
 
     Uses mock patch to define return values from the mock.
     """
-
-    title = "Test pick_one_from_list"
+    title = "Test pick_one_index_from_list"
 
     # test option with only one choice bypasses user request
-    if not choices:
-        context = ContextObj(None, None, None, None, None, None,
-                             None, None, False, False)
+    if not choices and not pa:
 
         # The code to be tested
-        act_rtn = pick_one_from_list(context, options, title)
+        act_rtn = pick_one_index_from_list(None, options, title, pick_always=pa)
 
         # Ensure that exceptions raised in the remainder of this
         # function are not mistaken as expected exceptions
@@ -395,18 +408,112 @@ def test_pick_one_from_list(testcase, options, choices, exp_rtn):
             # mock the echo to hide output
             mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
             with patch(mock_echo_func):
-                # Fake context object
-                context = ContextObj(None, None, None, None, None,
-                                     None, None, None, False, False)
 
                 # The code to be tested
-                act_rtn = pick_one_from_list(context, options, title)
+                act_rtn = pick_one_index_from_list(None, options, title,
+                                                   pick_always=pa)
 
                 # Ensure that exceptions raised in the remainder of this
                 # function are not mistaken as expected exceptions
                 assert testcase.exp_exc_types is None
 
-                context.spinner_stop()
+                assert mock_prompt.call_count == len(choices)
+
+    assert act_rtn == exp_rtn
+
+
+TESTCASES_PICK_ONE_FROM_LIST = [
+    # Testcases for _common.pick_one_from_list()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * options: tuple of strings defining properties
+    #   * choices: list of choices to return from mock
+    #   * pa: pick_always optional parameter, boolean
+    #   * exp_rtn: expected function return.
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+
+    ('Verify returns correct choice, in this case, ZERO',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO',
+          pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE',
+          pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case TWO',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], exp_rtn=u'TWO',
+          pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after one error',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
+          exp_rtn=u'ONE', pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after one error',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['3', '2'],
+          exp_rtn=u'TWO', pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice, in this case ONE after multiple inputs',
+     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
+          exp_rtn=u'TWO', pa=False),
+     None, None, OK),
+
+    ('Verify returns correct choice with only single choice so no usr request',
+     dict(options=[u'ZERO'], choices=['0'], exp_rtn=u'ZERO', pa=True),
+     None, None, OK),
+
+    ('Verify returns None with empty list input',
+     dict(options=[], choices=None, exp_rtn=None, pa=True),
+     None, None, OK),
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_PICK_ONE_FROM_LIST)
+@simplified_test_function
+def test_pick_one_from_list(testcase, options, choices, pa, exp_rtn):
+    """
+    Test function for _common.pick_one_from_list().
+
+    Uses mock patch to define return values from the mock.
+    """
+
+    title = "Test pick_one_from_list"
+
+    # test option with only one choice bypasses user request
+    if not choices:
+
+        # The code to be tested
+        act_rtn = pick_one_from_list(None, options, title, pick_always=pa)
+
+        # Ensure that exceptions raised in the remainder of this
+        # function are not mistaken as expected exceptions
+        assert testcase.exp_exc_types is None
+    else:
+        # Setup mock for this test.
+        # Mock the prompt with choices from the testcases as prompt response
+        mock_prompt_funct = 'pywbemtools.pywbemcli.click.prompt'
+        # side_effect returns next item in choices for each prompt call
+        with patch(mock_prompt_funct, side_effect=choices) as mock_prompt:
+            # mock the echo to hide output
+            mock_echo_func = 'pywbemtools.pywbemcli.click.echo'
+            with patch(mock_echo_func):
+                # The code to be tested
+                act_rtn = pick_one_from_list(None, options, title,
+                                             pick_always=pa)
+
+                # Ensure that exceptions raised in the remainder of this
+                # function are not mistaken as expected exceptions
+                assert testcase.exp_exc_types is None
                 assert mock_prompt.call_count == len(choices)
 
     assert act_rtn == exp_rtn
