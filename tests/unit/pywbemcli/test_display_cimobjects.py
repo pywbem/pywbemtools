@@ -87,6 +87,16 @@ def simple_instance(pvalue=None):
     return inst
 
 
+def array_instance(pvalue, ptype):
+    """
+    Build an instance with a single property named P and the value  and type
+    defined. Used to build test instance with array properties because
+    type cannot be determined from the data since it is an array.
+    """
+    properties = [CIMProperty("P", pvalue, type=ptype)]
+    return CIMInstance("CIM_Foo", properties)
+
+
 def simple_instance_unsorted(pvalue=None):
     """
     Build a simple instance to test and return that instance. The properties
@@ -167,7 +177,86 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
         ),
-        None, None, True, ),
+        None, None, OK),
+
+    (
+        "Verify simple instance to table with quote_strings=False",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[simple_instance()],
+                quote_strings=False),
+            exp_rtn=[
+                ["false", "true", DATETIME1_STR, "99", "9999",
+                 u'Test String']],
+        ),
+        None, None, OK),
+
+    (
+        "Verify simple instance str array to table with quote_strings=False",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[simple_instance(pvalue=["abc", 'def'])],
+                quote_strings=False),
+            exp_rtn=[
+                ['"abc", "def"']],
+        ),
+        None, None, OK),
+    (
+
+        "Verify simple instance int array with quote_strings=True",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
+                                      ptype='uint32')],
+                quote_strings=True),
+            exp_rtn=[
+                ['12345, 67891']],
+        ),
+        None, None, OK),
+
+    (
+        "Verify simple instance int array with col limit,quote_strings=True",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
+                                      ptype='uint32')],
+                max_cell_width=6,
+                quote_strings=True),
+            exp_rtn=[
+                ['12345,\n67891']],
+        ),
+        None, None, OK),
+
+    (
+        "Verify simple instance int array with quote_strings=False",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
+                                      ptype='uint32')],
+                quote_strings=False),
+            exp_rtn=[
+                ['12345, 67891']],
+        ),
+        None, None, OK),
+
+    (
+        "Verify simple instance int array with col limit,quote_strings=False",
+        dict(
+            args=(),
+            kwargs=dict(
+                insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
+                                      ptype='uint32')],
+                max_cell_width=6,
+                quote_strings=False),
+            exp_rtn=[
+                ['12345,\n67891']],
+        ),
+        None, None, OK),
 
     (
         "Verify simple instance to table with col limit",
@@ -178,7 +267,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify simple instance to table, unsorted",
@@ -189,7 +278,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ["false", "true", DATETIME1_STR, "99", "9999",
                  u'"Test String"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify instance with 2 keys and 2 non-keys, unsorted",
@@ -219,7 +308,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ['"K1"', '"K2"', '"V1"', '"V2"'],
             ],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify 2 instances with different sets of properties",
@@ -250,7 +339,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ['"VN1b"', '"VP1b"', '"VP2b"', ''],
             ],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify 2 instances where second one has path",
@@ -288,27 +377,27 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 ['"K1b"', '"K2b"', '"VP1b"', '"VP2b"'],
             ],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
-        "Verify simple instance with one string all components overflow line",
+        "Verify simple instance with one string all components overflow line1",
         dict(
             args=([simple_instance(pvalue="A B C D")], 4),
             kwargs={},
             exp_rtn=[
                 ['"A "\n"B "\n"C "\n"D"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
-        "Verify simple instance with one string all components overflow line",
+        "Verify simple instance with one string all components overflow line2",
         dict(
             args=([simple_instance(pvalue="ABCD")], 4),
             kwargs={},
             exp_rtn=[
                 ['\n"AB"\n"CD"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify simple instance with one string overflows line",
@@ -318,7 +407,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             exp_rtn=[
                 ['"A B C "\n"D"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify simple instance withone unit32 max val",
@@ -328,7 +417,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             exp_rtn=[
                 ['4294967295']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
 
     (
@@ -339,27 +428,27 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             exp_rtn=[
                 ['"A B C D"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
-        "Verify datetime property",
+        "Verify datetime property, folded",
         dict(
             args=([simple_instance(pvalue=DATETIME1_OBJ)], 20),
             kwargs={},
             exp_rtn=[
                 ['\n"20140922104920.524"\n"789+000"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
-        "Verify datetime property",
+        "Verify datetime property not folded",
         dict(
             args=([simple_instance(pvalue=DATETIME1_OBJ)], 30),
             kwargs={},
             exp_rtn=[
                 ['"20140922104920.524789+000"']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify integer property where len too small",
@@ -368,7 +457,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[['999999']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify char16 property",
@@ -379,7 +468,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[[u"'f'"]],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify properties with no value",
@@ -393,7 +482,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[[u'', u'', u'']],
         ),
-        None, None, True, ),
+        None, None, OK),
 
     (
         "Verify format of instance with reference property as row entry",
@@ -411,7 +500,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             exp_rtn=[
                 [u'"/:REF_CLN.k1=\\"v1\\""']],
         ),
-        None, None, True, ),
+        None, None, OK),
 ]
 
 
@@ -518,6 +607,9 @@ P
         None, None, not CLICK_ISSUE_1590 and PYWBEM_1_0_0B1
     ),
 ]
+
+# NOTE: The following test cannot use simplified test function because it uses
+# pytest capsys to capture date.
 
 
 @pytest.mark.parametrize(
