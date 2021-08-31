@@ -47,7 +47,7 @@ INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
-                        sort=False, property_list=None):
+                        sort=False, property_list=None, quote_strings=True):
     """
     Display CIM objects in form determined by input parameters.
 
@@ -100,6 +100,11 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         List of property names to be displayed, in the desired order, when the
         output format is a table, or None to use the default of sorting
         the properties alphabetically within key and non-key groups.
+
+      quote_strings (:class:`py.bool`):
+        If False, strings are not encased by quote marks in the table view for
+        instance displays. The default is True so that strings are encased in
+        quotes in all views.
     """
     # Note: In the docstring above, the line for parameter 'objects' was way too
     #       long. Since we are not putting it into docmentation, we folded it.
@@ -125,7 +130,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         if output_format_is_table(output_format):
             _display_objects_as_table(cim_objects, output_format,
                                       context=context,
-                                      property_list=property_list)
+                                      property_list=property_list,
+                                      quote_strings=quote_strings)
         else:
             # Call to display each object
             for obj in cim_objects:
@@ -137,7 +143,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format_is_table(output_format):
         _display_objects_as_table([object_], output_format, context=context,
-                                  property_list=property_list)
+                                  property_list=property_list,
+                                  quote_strings=quote_strings)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -181,7 +188,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
 
 
 def _display_objects_as_table(objects, output_format, context=None,
-                              property_list=None):
+                              property_list=None, quote_strings=True):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -194,7 +201,8 @@ def _display_objects_as_table(objects, output_format, context=None,
         if isinstance(objects[0], CIMInstance):
             _display_instances_as_table(objects, table_width, output_format,
                                         context=context,
-                                        property_list=property_list)
+                                        property_list=property_list,
+                                        quote_strings=quote_strings)
         elif isinstance(objects[0], CIMClass):
             _display_classes_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], CIMQualifierDeclaration):
@@ -353,7 +361,7 @@ def _display_qual_decls_as_table(qual_decls, table_width, table_format):
 
 def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                               include_classes=False, context=None,
-                              prop_names=None):
+                              prop_names=None, quote_strings=True):
     """
     Format the list of instances properties into as a list of the property
     values for each instance( a row of the table) gathered into a list of
@@ -443,7 +451,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                     val_str, _ = cimvalue_to_fmtd_string(
                         p.value, p.type, indent=0, maxline=max_cell_width,
                         line_pos=0, end_space=0, avoid_splits=False,
-                        valuemapping=valuemapping)
+                        valuemapping=valuemapping, quote_strings=quote_strings)
 
             line.append(val_str)
         lines.append(line)
@@ -453,7 +461,7 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
 
 def _display_instances_as_table(insts, table_width, table_format,
                                 include_classes=False, context=None,
-                                property_list=None):
+                                property_list=None, quote_strings=True):
     """
     Print the properties of the instances defined in insts as a table where
     each row is an instance and each column is a property value.
@@ -558,7 +566,8 @@ def _display_instances_as_table(insts, table_width, table_format,
 
     rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
                                      include_classes=include_classes,
-                                     context=context, prop_names=prop_names)
+                                     context=context, prop_names=prop_names,
+                                     quote_strings=quote_strings)
 
     title = 'Instances: {}'.format(insts[0].classname)
     click.echo(format_table(rows, new_header_line, title=title,

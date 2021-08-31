@@ -121,14 +121,14 @@ def _mofval(value, indent, maxline, line_pos=0, end_space=0):
 
 
 def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
-                        avoid_splits=False):
+                        avoid_splits=False, quote_strings=True):
     # pylint: disable=line-too-long,redefined-builtin
     """
     Return a MOF string representing a scalar CIM-typed value.
 
     `None` is returned as 'NULL'.
 
-    NOTE: This code taken from pywbem 0.14.0
+    NOTE: This code taken from pywbem 0.14.0 with some modifications.
 
     Parameters:
 
@@ -154,6 +154,10 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
       avoid_splits (bool): Avoid splits at the price of starting a new line
         instead of using the current line.
 
+      quote_strings (bool): If True, (the default) quote strings. If False
+      prepare strings without the quote characters pre and post-pending the
+      strings and folded string parts.
+
     Returns:
 
       tuple of
@@ -163,8 +167,9 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
 
     if type == 'string':  # pylint: disable=no-else-raise
         if isinstance(value, six.string_types):
+            quote_char = '"' if quote_strings else ""
             return _mofstr(value, indent, maxline, line_pos, end_space,
-                           avoid_splits)
+                           avoid_splits, quote_char=quote_char)
 
         if isinstance(value, (CIMInstance, CIMClass)):
             # embedded instance or class
@@ -182,9 +187,11 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
         return _mofval(val, indent, maxline, line_pos, end_space)
     elif type == 'datetime':
         val = six.text_type(value)
+        # Always quote datetime strings
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
     elif type == 'reference':
         val = value.to_wbem_uri(format='standard')
+        # Always quote reference strings
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
     elif isinstance(value, (CIMFloat, CIMInt, int, _Longint)):
         val = six.text_type(value)
@@ -358,10 +365,11 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
       avoid_splits (bool): Avoid splits at the price of starting a new line
         instead of using the current line.
 
-      quote_char (:term:`unicode string`): Character to be used for surrounding
-        the string parts with. For CIM string typed values, this must be a
-        double quote (the default), and for CIM char16 typed values, this must
-        be a single quote.
+      quote_char (:term:`unicode string`): Character to be used for
+        surrounding the string parts.. For CIM string typed values, this
+        must be a double quote (the default), and for CIM char16 typed values,
+        this must be a single quote. The value of this may be None, in which
+        case, no character will be used to surround the string parts.
 
     Returns:
 
@@ -374,7 +382,8 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
 
     value = mof_escaped(value)
 
-    quote_len = 2  # length of the quotes surrounding a string part
+    # length of the quotes surrounding a string part
+    quote_len = len(quote_char) * 2
     new_line = u'\n' + _indent_str(indent)
 
     mof = []
@@ -404,9 +413,11 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
 
         # Check whether the entire string fits (that is a last line, then)
         if len(value) <= avl_len - end_space:
-            mof.append(quote_char)
+            if quote_char:
+                mof.append(quote_char)
             mof.append(value)
-            mof.append(quote_char)
+            if quote_char:
+                mof.append(quote_char)
             line_pos += quote_len + len(value)
             break
 
@@ -417,9 +428,11 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
             split_pos = avl_len - 1
         part_value = value[0:split_pos + 1]
         value = value[split_pos + 1:]
-        mof.append(quote_char)
+        if quote_char:
+            mof.append(quote_char)
         mof.append(part_value)
-        mof.append(quote_char)
+        if quote_char:
+            mof.append(quote_char)
         line_pos += quote_len + len(part_value)
 
         if value == u'':
@@ -439,7 +452,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
 def cimvalue_to_fmtd_string(value, type, indent=0,
                             maxline=DEFAULT_MAX_CELL_WIDTH,
                             line_pos=0, end_space=0, avoid_splits=False,
-                            valuemapping=None):
+                            valuemapping=None, quote_strings=True):
     # pylint: disable=redefined-builtin
     """
     Return a MOF string representing a CIM-typed value (scalar or array).
@@ -466,11 +479,16 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
       end_space (:term:`integer`): Length of space to be left free on the last
         line.
 
-      avoid_splits (bool): Avoid splits at the price of starting a new line
-        instead of using the current line.
+      avoid_splits (:class:`py.bool): Avoid splits at the price of starting a
+        new line instead of using the current line.
 
       valuemapping (:class:`pywbem.ValueMapping`): None or a value mapping
         defining a string for the integer-typed property value(s).
+
+      quote_strings (:class:`py.bool):
+        If True, surround string values and their folded components with
+        quotes. If False, do not surround strings and their components
+        with quotes.
 
     Returns:
 
@@ -481,6 +499,10 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
 
     if isinstance(value, list):
 
+        # Need to quote arrays of strings since without quoting the
+        # strings cannot be distinguished
+        quote_strings = '"'
+
         mof = []
 
         for i, v in enumerate(value):
@@ -490,7 +512,8 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
                 line_pos += 2
 
             val_str, line_pos = _scalar_value_tomof(
-                v, type, indent, maxline, line_pos, end_space + 2, avoid_splits)
+                v, type, indent, maxline, line_pos, end_space + 2, avoid_splits,
+                quote_strings=quote_strings)
             if valuemapping:
                 val_str = "{} ({})".format(val_str, valuemapping.tovalues(v))
 
@@ -509,7 +532,8 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
 
     else:
         mof_str, line_pos = _scalar_value_tomof(
-            value, type, indent, maxline, line_pos, end_space, avoid_splits)
+            value, type, indent, maxline, line_pos, end_space, avoid_splits,
+            quote_strings=quote_strings)
         if valuemapping:
             mof_str = "{} ({})".format(mof_str, valuemapping.tovalues(value))
     return mof_str, line_pos
