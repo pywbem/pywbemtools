@@ -366,8 +366,8 @@ Thus, for example:
 * ``--association`` and ``no-experimental`` will display only classes that have
   the Association qualifier set and the Experimental qualifier not set.
 
-The following example displays classnames (``--no``) that are not associations
-(``--no-association``).  The use of ``--deep-inheritance`` returns the complete
+The following example displays classnames that are not associations
+(``--no-association``).  The use of ``--deep-inheritance`` option returns the complete
 set of classes in the namespace rather than just direct subclasses (in this case
 the root classes).
 
@@ -979,9 +979,10 @@ in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 The new property values are specified by possibly multiple ``--property``/``-p``
 command options.
+
 For details, see :ref:`Specifying CIM property and parameter values`.
 
-Note that key properties cannot be modified, as per :term:`DSP0004`.
+Key properties cannot be modified, as per :term:`DSP0004`.
 
 The ``--propertylist``/``--pl`` command option allows restricting the set of
 properties to be modified. It is supported for consistency with the
@@ -1071,7 +1072,7 @@ See :ref:`pywbemcli instance query --help` for the exact help output of the comm
 
 The ``instance shrub`` command executes a set of requests to get the
 association relationships for a non-association CIM instance defined by
-INSTANCENAME in a namespace and displays the result either as tree in ascii
+INSTANCENAME in a namespace and displays the result either as tree in ASCII
 or as a table showing the roles, reference classes, associated
 classes and associated instances for the input instance.
 
@@ -1094,10 +1095,10 @@ The ``instance shrub`` command includes command options to:
    default is to attempt to shorten the path by removing path components that
    are the same for all instances displayed.  This can be important for some
    of the components of the model where instance paths include keys like
-   ``CreationClassName`` and 'SystemCreationClassName'which are either already
+   ``CreationClassName`` and ``SystemCreationClassName`` which are either already
    known or do not distinguish instances but make the instance name difficult
    to visualize on the console. These key bindings are replaced with the
-   character ``~`` as a placemarker unless the ``--fullpath``/``-f`` option is
+   character ``~`` as a place-marker unless the ``--fullpath``/``-f`` option is
    defined.
 
 Thus, a full path might look like:
@@ -1133,7 +1134,7 @@ Example:
                      +-- TST_LD.InstanceID=6(refinst:1)
                      +-- TST_LD.InstanceID=8(refinst:2)
 
-This displays the Role (Initiator), AssociationClass (TST_A3), etc for the
+This displays the ``Role`` (Initiator), ``AssociationClass`` (TST_A3), etc. for the
 instance name defined in the command which is a complex association that
 contains 3 reference properties.  The tag ``refinst`` on each instance
 defines the corresponding reference instance so that the instances
@@ -1566,24 +1567,25 @@ command.
 .. _`Server schema command`:
 
 ``server schema`` command
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``server schema`` command returns information on the
-:ref:'schemas <schema>' in the namespace(s) of the :term:`current connection`
+:term:`schemas <schema>` in the namespace(s) of the :term:`current connection`
 WBEM server.
 
 The overview reports a summary by namespace of this information and the
 detail view (``server schema --detail``) reports the information for each
-:ref:`schema` in the namespace.
+:term:`schema` in the namespace.
 
 For each schema in each namespace, the report provides information on the
-:ref:`CIM Schema` version (maximum qualifier 'Version' for classes in that schema)
-whether the :ref:`schemas <schema>` have experimental classes, and the number of classes
-in each :ref:`schema` and :ref:`CIM Schema`.
+:term:`CIM Schema` version (maximum qualifier 'Version' for classes in that
+:term:`schema`), whether the :term:`schemas <schema>` have experimental
+classes, and the number of classes in each :term:`schema` and
+:term:`CIM Schema`.
 
-Pywbemcli determines the version of the :ref:`CIM Schema` by finding the highest
+Pywbemcli determines the version of the :term:`CIM Schema` by finding the highest
 value of the ``Version`` qualifier on any of the classes in the namespace that
-are in that :ref:`schema`
+are in that :term:`schema`
 
 There are two report outputs possible:
 
@@ -1591,12 +1593,12 @@ There are two report outputs possible:
   maximum version for each schema in each or the selected namespace, and
   whether the schema includes any experimental classes.
 
-* The overview output (no ``--detail`` option) displays information on the
-  number of classes, the :ref:`CIM Schema' and whether there are experimental
-  classes in each or the selected namespace. For the :ref:`CIM schema` in the
+* The overview output (without ``--detail`` command option) displays information on the
+  number of classes, the :term:`CIM Schema` and whether there are experimental
+  classes in each or the selected namespace. For the :term:`CIM Schema` in the
   overview report the highest value is determined by finding the highest
-  'Version' qualifier value for each :ref:'schemas <schema>' in the :ref:`CIM
-  schema` (normally 'CIM', or 'PRS').
+  'Version' qualifier value for each :term:`schemas <schema>` in the
+  :term:`CIM schema` (normally ``CIM``, or ``PRS``).
 
 Example:
 
@@ -1614,10 +1616,10 @@ Example:
     root/cimv2                     CIM, PG, PRS            1463  2.41.0         Experimental
 
 
-The above report would indicate that the namespace root/cimv2 was probably
-created with DMTF released CIM schema version 2.41.0. Other namespaces show a
+The above report would indicate that the namespace ``root/cimv2`` was probably
+created with DMTF released :term:`CIM Schema` version 2.41.0. Other namespaces show a
 lower level of version because they are not using any of the classes that
-have the qualifier Version value of 2.41.0.
+have the ``Version`` qualifier value of 2.41.0.
 
 or a more detailed report (``--detail`` option):
 
@@ -1635,10 +1637,10 @@ or a more detailed report (``--detail`` option):
     root/cimv2                     CIM                     1382  2.41.0     Experimental
                                    PG                        20  2.12.0
 
-This report tells more about each :ref:`schema` in that it reports that there
-are classes in the root/cimv2 namespace 'CIM' schema that are experimental
-indicating that the CIM schema used was the Version 2.41.0, experimental CIM
-schema.
+This report tells more about each :term:`schema` in that it reports that there
+are classes in the ``root/cimv2`` namespace 'CIM' schema that are experimental
+indicating that the :term:`CIM Schema` used was the Version 2.41.0, experimental
+:term:`CIM Schema`.
 
 See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
 command.
@@ -1698,11 +1700,11 @@ statistics gathering and reporting in pywbemcli:
 
     The capabilities for managing and retrieving server maintained statistics is
     supported only in some WBEM server implementations. While these capabilities
-    were documented in the :ref:`CIM Schema`, they were never included as part of
+    were documented in the :term:`CIM Schema`, they were never included as part of
     a DMTF or SNIA management profile, so the implementations may vary across
     WBEM server implementations. Pywbemcli makes a best effort to interact with
     the server maintained statistics based on the documentation in the
-    :ref:`CIM Schema`, and has been verified to work with OpenPegasus.
+    :term:`CIM Schema`, and has been verified to work with OpenPegasus.
 
 The statistics commands are:
 
@@ -1723,19 +1725,19 @@ The statistics commands are:
 
 The ``statistics server-on`` command attempts to enable statistics gathering
 on the current WBEM server and the returning of the server response time in the
-'WBEMServerResponseTime' header field of the CIM-XML response, by setting the
-'GatherStatisticalData' property to True in the 'CIM_ObjectManager' instance
+``WBEMServerResponseTime`` header field of the CIM-XML response, by setting the
+``GatherStatisticalData`` property to True in the ``CIM_ObjectManager`` instance
 for the WBEM server.
 
 See '_Operation statistics'_ for more information on statistics in pywbemcli
 and WBEM servers.
 
 Since only some WBEM server implementations actually implement statistics
-gathering, the command may fail, for example if the 'CIM_ObjectManager'
-class or its property 'GatherStatisticalData' have not been implemented by the
+gathering, the command may fail, for example if the ``CIM_ObjectManager``
+class or its property ``GatherStatisticalData`` have not been implemented by the
 server, or if the server does not allow a client to modify the property.
 
-Note that this command also affects whether the "Server Time" column of
+Note that this command also affects whether the **Server Time** column of
 the client maintained statistics shows a value.
 
 
@@ -1748,8 +1750,8 @@ the client maintained statistics shows a value.
 
 The ``statistics server-off`` command attempts to disable statistics gathering
 on the current WBEM server and the returning of the server response time in the
-'WBEMServerResponseTime' header field of the CIM-XML response, by setting the
-'GatherStatisticalData' property to False in the 'CIM_ObjectManager' instance
+``WBEMServerResponseTime`` header field of the CIM-XML response, by setting the
+``GatherStatisticalData`` property to False in the ``CIM_ObjectManager`` instance
 for the WBEM server.
 
 See '_Operation statistics'_ for more information on statistics in pywbemcli
@@ -1760,7 +1762,7 @@ gathering, the command may fail, for example if the 'CIM_ObjectManager'
 class or its property 'GatherStatisticalData' have not been implemented by the
 server, or if the server does not allow a client to modify the property.
 
-Note that this command also affects whether the "Server Time" column of
+Note that this command also affects whether the **Server Time** column of
 the client maintained statistics shows a value.
 
 
@@ -2085,8 +2087,8 @@ This shows which connection is the current connection
 and if any connection is set as the default connection (:ref:`Connection select
 command` ).
 
-The current connection is marked with `*` in the Name column.
-The default connection, if defined, is marked with `#` in the Name column.
+The current connection is marked with `*` in the **Name** column.
+The default connection, if defined, is marked with `#` in the **Name** column.
 
 The title also displays the path of the file that is being used as the
 current connections file.
@@ -2112,7 +2114,7 @@ current connections file.
     +--------------+------------------+----------------------------------------+
 
 A more complete display of the server parameters is available with the
-`--full` option as follows:
+``--full`` option as follows:
 
 .. code-block:: text
 
@@ -2290,10 +2292,10 @@ does not support the classes operations, this command should return a
 CIMError indicating that WBEM is supported (ex. CIM_ERR_NOT_SUPPORTED)
 indicating that WBEM is supported by the server.
 
-If the `--test-pull` command option is included, pywbemcli will issue an
+If the ``--test-pull`` command option is included, pywbemcli will issue an
 instances request for each of the DMTF defined pull operations and report the
 results. This could be important because the pull operations are defined
-as optional and some server may not include them.
+as optional and some servers may not include them or all of them.
 
 If the server accepts the request, a simple text ``OK <server url``
 will be returned.
@@ -2324,18 +2326,18 @@ The ``connection set-default`` command sets or clears the
 :term:`connections file`.
 
 The :term:`default-connection-name` attribute allows a connection definition in a
-connections file to be loaded on startup without using the --name option.  If
-pywbemcli is started without --name, --server, or --mock-server options, the
+connections file to be loaded on startup without using the ``--name`` option.  If
+pywbemcli is started without ``--name``, ``--server``, or ``--mock-server`` options, the
 ``default-connection-name`` attribute is retrieved from the file and, if defined,
 the name in the value of this attribute used as the name of the connection
 definition set as current connection.
 
 Thus, for example, if the default connection definition is ``mytests`` the
 connection definition for ``mytests`` is created each time pywbemcli is started
-with no --server, --mock-server or --name option.
+with no --server, --mock-server or ``--name`` option.
 
 This command also allows clearing the value of the default connections file
-attribute with the option ``--clear``
+attribute with the ``--clear`` option.
 
 The following demonstrates displaying the connection information for the
 current default connection ``mytests``.

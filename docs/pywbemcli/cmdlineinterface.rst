@@ -238,6 +238,7 @@ restored for the next command. The changes to the connections file are retained.
 Thus:
 
 .. code-block:: text
+
     pywbemcli --server http://blah
     pywbemcli> class get CIM_ManagedObject
     # The timeout change below only applies to the command on that line
