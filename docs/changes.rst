@@ -57,6 +57,9 @@ Released: not yet
   to restore to either off if there was no --log option on the subsequent
   command line or to the value defined on the command line.(see issue #1023)
 
+* Disabled new Pylint issue 'consider-using-f-string', since f-strings were
+  introduced only in Python 3.6.
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
