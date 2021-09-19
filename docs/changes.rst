@@ -33,6 +33,9 @@ Released: not yet
   used the instance wildcard (e.g. 'CIM_ManagedSystemElement.?') and the
   enumerate instances operation failed for some reason. (issue #963)
 
+* Disabled new Pylint issue 'consider-using-f-string', since f-strings were
+  introduced only in Python 3.6.
+
 **Enhancements:**
 
 **Cleanup:**
