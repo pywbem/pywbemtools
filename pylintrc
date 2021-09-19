@@ -73,7 +73,8 @@ disable=I0011, bad-option-value,
         wildcard-import, unused-wildcard-import,
         locally-enabled, superfluous-parens, useless-object-inheritance,
         consider-using-set-comprehension, unnecessary-pass, useless-return,
-        raise-missing-from, super-with-arguments, redundant-u-string-prefix
+        raise-missing-from, super-with-arguments, redundant-u-string-prefix,
+        consider-using-f-string
 
 # Note: The too-many-* messages are excluded temporarily, and should be dealt
 #       with at some point.
