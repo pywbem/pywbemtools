@@ -502,7 +502,7 @@ def success_signal_handler(sig, frame):
     Signal handler in 'start' process for the signal indicating
     success of startup completion of the 'run' child process.
     """
-    # pylint: disable=global-statement
+    # pylint: disable=global-statement,global-variable-not-assigned
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
@@ -520,7 +520,7 @@ def failure_signal_handler(sig, frame):
     Signal handler in 'start' process for the signal indicating
     failure of startup completion of the 'run' child process.
     """
-    # pylint: disable=global-statement
+    # pylint: disable=global-statement,global-variable-not-assigned
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
@@ -541,7 +541,7 @@ def wait_startup_completion(child_pid):
       int: Return code indicating whether the child started up successfully (0)
         or failed its startup (1).
     """
-    # pylint: disable=global-statement
+    # pylint: disable=global-statement,global-variable-not-assigned
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
