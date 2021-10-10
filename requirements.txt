@@ -34,6 +34,7 @@ click-repl>=0.1.6
 asciitree>=0.3.3
 tabulate>=0.8.2
 toposort>=1.6
+# psutil does not install on Python 3.4 on Windows due to missing MS C++ 10.0 on GitHub Actions.
 psutil>=5.5.0
 
 # prompt-toolkit>=2.0 failed on py27 (issue #192), so it was pinned to <2.0.
