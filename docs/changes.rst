@@ -40,6 +40,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Enhanced test matrix for push-driven runs on GitHub Actions to add
+  Python 3.5 on macOS, and removing Python 3.4 minimum on Windows.
+
 **Cleanup:**
 
 **Known issues:**
