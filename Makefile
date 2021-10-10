@@ -334,6 +334,82 @@ else
   cwd := $(shell pwd)
 endif
 
+# Issues reported by safety command that are ignored.
+# Package upgrade strategy due to reported safety issues:
+# - For packages that are direct or indirect runtime requirements, upgrade
+#   the package version only if possible w.r.t. the supported environments and
+#   if the issue affects pywbem, and add to the ignore list otherwise.
+# - For packages that are direct or indirect development or test requirements,
+#   upgrade the package version only if possible w.r.t. the supported
+#   environments and add to the ignore list otherwise.
+# Current safety ignore list, with reasons:
+# Runtime dependencies:
+# - 38100: PyYAML on py34 cannot be upgraded; no issue since PyYAML FullLoader is not used
+# - 38834: urllib3 on py34 cannot be upgraded -> remains an issue on py34
+# Development and test dependencies:
+# - 38765: We want to test install with minimum pip versions.
+# - 38892: lxml cannot be upgraded on py34; no issue since HTML Cleaner of lxml is not used
+# - 38224: pylint cannot be upgraded on py27+py34
+# - 37504: twine cannot be upgraded on py34
+# - 37765: psutil cannot be upgraded on PyPy
+# - 38107: bleach cannot be upgraded on py34
+# - 38330: Sphinx cannot be upgraded on py27+py34
+# - 38546: Bleach
+# - 39194: lxml cannot be upgraded on py34; no issue since HTML Cleaner of lxml is not used
+# - 39195: lxml cannot be upgraded on py34; no issue since output file paths do not come from untrusted sources
+# - 39462: The CVE for tornado will be replaced by a CVE for Python, see https://github.com/tornadoweb/tornado/issues/2981
+# - 39611: PyYAML cannot be upgraded on py34+py35; We are not using the FullLoader.
+# - 39621: Pylint cannot be upgraded on py27+py34
+# - 39525: Jinja2 cannot be upgraded on py34
+# - 40072: lxml HTML cleaner in lxml 4.6.3 no longer includes the HTML5 'formaction'
+# - 38932: cryptography cannot be upgraded to 3.2 on py34
+# - 39252: cryptography cannot be upgraded to 3.3 on py34+py35
+# - 39606: cryptography cannot be upgraded to 3.3.2 on py34+py35
+# - 40291: pip cannot be upgraded to 21.1 py<3.6
+# - 40380..40386: notebook issues fixed in 6.1.5 which would prevent using notebook on py2
+# - 42218: pip <21.1 - unicode separators in git references
+# - 42253: Notebook, before 5.7.1 allows XSS via untrusted notebook
+# - 42254: Notebook before 5.7.2, allows XSS via crafted directory name
+# - 42293: babel, before 2.9.1 CVS-2021-42771, Bable.locale issue
+# - 42297: Bleach before 3.11, a mutation XSS afects user calling bleach.clean
+# - 42298: Bleach before 3.12, mutation XSS affects bleach.clean
+
+safety_ignore_opts := \
+	-i 38100 \
+	-i 38834 \
+	-i 38765 \
+	-i 38892 \
+	-i 38224 \
+	-i 37504 \
+	-i 37765 \
+	-i 38107 \
+	-i 38330 \
+	-i 38546 \
+	-i 39194 \
+	-i 39195 \
+	-i 39462 \
+	-i 39611 \
+	-i 39621 \
+	-i 39525 \
+	-i 40072 \
+	-i 38932 \
+	-i 39252 \
+	-i 39606 \
+	-i 40291 \
+	-i 40380 \
+	-i 40381 \
+	-i 40382 \
+	-i 40383 \
+	-i 40384 \
+	-i 40385 \
+	-i 40386 \
+	-i 42218 \
+	-i 42253 \
+	-i 42254 \
+	-i 42203 \
+	-i 42297 \
+	-i 42298 \
+
 .PHONY: help
 help:
 	@echo "Makefile for $(package_name) package"
@@ -664,7 +740,7 @@ flake8_$(pymn).done: Makefile develop_$(pymn).done $(flake8_rc_file) $(py_src_fi
 safety_$(pymn).done: Makefile develop_$(pymn).done minimum-constraints.txt
 	@echo "makefile: Running pyup.io safety check"
 	-$(call RM_FUNC,$@)
-	-safety check -r minimum-constraints.txt --full-report
+	safety check -r minimum-constraints.txt --full-report $(safety_ignore_opts)
 	echo "done" >$@
 	@echo "makefile: Done running pyup.io safety check"
 

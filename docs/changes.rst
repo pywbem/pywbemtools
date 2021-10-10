@@ -52,6 +52,14 @@ Released: not yet
 
 **Cleanup:**
 
+- Add list of security issues to be ignored by Makefile security test and enable
+  failure of build if security test fails. This brings Pywbemtools into line
+  with pywbem Makefile.Reordered some of the items in the minumum_constraints.txt file
+  to better compare with the pywbem file and also commented out all minimum constraints
+  for Jupyter and its dependencies since we have no notebooks in pywbemcli
+  today. Modified minimum version of typed-ast, pylint and astrid to match pywbem
+  and pass saftey tests.
+
 **Known issues:**
 
 * See `list of open issues`_.
