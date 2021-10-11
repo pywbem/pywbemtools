@@ -308,10 +308,9 @@ TEST_CASES = [
     ['Verify --mock-server and --server together fail.',
      {'general': ['--mock-server', MOCK_FILE_PATH, '--server', 'http://blah'],
       'args': ['list']},
-     {'stderr': ['Conflicting server definitions:',
-                 'server:', 'http://blah',
-                 'mock-server:', MOCK_FILE_PATH],
-      'rc': 1,
+     {'stderr': ["Conflicting options: `mock-server` is mutually exclusive "
+                 "with options: (--name, --server)"],
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 

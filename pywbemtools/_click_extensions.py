@@ -170,3 +170,77 @@ def pywbemtools_format_options(self, ctx, formatter):
     if opts:
         with formatter.section(options_title):
             formatter.write_dl(opts)
+
+
+# The following MutuallyExclusiveOption originated with a number of
+# discussions on stack overflow and a github gist at
+# https://gist.github.com/stanchan/bce1c2d030c76fe9223b5ff6ad0f03db
+
+class MutuallyExclusiveOption(click.Option):
+    """
+    This class subclasses Click option to allow defining mutually exclusive
+    options.
+
+    An option is defined as mutually exclusive with another option on the
+    same command if the two options cannot be used simultaneously.
+    With this class, mutually exclusive options are defined by using this
+    class in place of the option class (Set the cls parameter to
+    cls=MutuallyExclusiveOption) and the parameter mutually_exclusive set
+    in the option defining the options with which this one is mutually
+    exclusive. A boolean parameter show_mutually_exclusive can be set to
+    True to add the text:
+    Conflicting options: <option_name> is mutually exclusive with "
+    "options: (<list of mutually exclusive options>)
+
+    Example:
+
+    @option('--first-option', cls=MutuallyExclusiveOption,
+        help="This option is mutually exclusieve with other-arg.",
+        mutually_exclusive=["second-option"])
+    @option('--second-option',
+        cls=MutuallyExclusiveOption,
+        help="second-option blah.",
+        mutually_exclusive=["first-option"],
+        show_mutually_exclusive=True)
+
+    This simple extension is used with pywbemcli now because the alternative
+    (click contrib options groups) only works with python 3.6+
+    """
+    def __init__(self, *args, **kwargs):
+        # Remove the mutually exclusive option parameters from kwargs
+        self.mutually_exclusive = kwargs.pop('mutually_exclusive', [])
+
+        # Get show_mutually_exclusive flag or True
+        show_mutually_exclusive_flag = kwargs.pop('show_mutually_exclusive',
+                                                  True)
+
+        # If flag set, add comment to help
+        if self.mutually_exclusive and show_mutually_exclusive_flag:
+            help_txt = kwargs.get('help', '')
+            kwargs['help'] = "{0} This option is mutually exclusive with " \
+                "options: ({1}).". \
+                format(help_txt, self._mutually_exclusive_display())
+
+        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
+
+    def handle_parse_result(self, ctx, opts, args):
+        """
+        If this is mutually exclusive opt and the list intersects with
+        the options in the command, generate click.UsageError
+        """
+        me_internal = set([i.replace('-', '_') for i in
+                           self.mutually_exclusive])
+        if me_internal.intersection(opts) and self.name in opts:
+            raise click.UsageError(
+                "Conflicting options: `{0}` is mutually exclusive with "
+                "options: ({1}).".
+                format(self.name.replace('_', '-'),
+                       self._mutually_exclusive_display()))
+
+        return super(MutuallyExclusiveOption, self).handle_parse_result(
+            ctx, opts, args)
+
+    def _mutually_exclusive_display(self):
+        """Format/sort list for display."""
+        return ', '.join(
+            sorted(["--{0}".format(i) for i in self.mutually_exclusive]))
