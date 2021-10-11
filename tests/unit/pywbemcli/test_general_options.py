@@ -327,10 +327,9 @@ TEST_CASES = [
                   SIMPLE_MOCK_FILE_PATH],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Conflicting server definitions:',
-                 'mock-server:', 'simple_mock_model.mof',
-                 'server:', 'http://blah'],
-      'rc': 1,
+     {'stderr': ["Conflicting options: `server` is mutually exclusive with "
+                 "options: (--mock-server, --name)"],
+      'rc': 2,
       'test': 'in'},
      None, OK],
 
@@ -338,21 +337,19 @@ TEST_CASES = [
      {'general': ['-m', SIMPLE_MOCK_FILE_PATH, '--name', 'MyConnName'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Conflicting server definitions:',
-                 'mock-server:', SIMPLE_MOCK_FILE_PATH,
-                 'name:', 'MyConnName'],
-      'rc': 1,
+     {'stderr': ["Conflicting options: `connection-name` is mutually exclusive "
+                 "with options: (--mock-server, --server)"],
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
-    ['Verify simultaneous --server option and --name option fails',
+    ['Verify conflicting --server option and --name option fails',
      {'general': ['--server', 'http://blah', '--name', 'MyConnName'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Conflicting server definitions:',
-                 'server:', 'http://blah',
-                 'name:', 'MyConnName'],
-      'rc': 1,
+     {'stderr': ["Conflicting options: `connection-name` is mutually exclusive "
+                 "with options: (--mock-server, --server)"],
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
@@ -776,10 +773,9 @@ TEST_CASES = [
                   '--server', 'http://blah'],
       'cmdgrp': 'instance',
       'args': ['enumerate', 'CIM_Foo']},
-     {'stderr': ['Error: Conflicting server definitions:',
-                 'mock-server:', SIMPLE_MOCK_FILE_PATH,
-                 'server:', 'http://blah'],
-      'rc': 1,
+     {'stderr': ['Conflicting options: `mock-server` is mutually exclusive '
+                 'with options: (--name, --server)'],
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
@@ -1126,12 +1122,11 @@ TEST_CASES = [
       'cmdgrp': None,
       },
      {'stdout': ["name not-saved (current)"],
-      'stderr': ['Conflicting server definitions:',
-                 'http://blah',
-                 'mock-server: tests/unit/pywbemcli/simple_mock_model.mof'],
+      'stderr': ["Conflicting options: `server` is mutually exclusive with "
+                 "options: (--mock-server, --name)"],
       'rc': 0,
       'test': 'innows'},
-     None, FAIL],  # TODO: this test fails on windows. Outputs don't compare'
+     None, OK],  # TODO: this test fails on windows. Outputs don't compare'
 
     ['Verify Change --name invalid in interactive mode. command no connections '
      'file',
@@ -1450,7 +1445,8 @@ TEST_CASES = [
     ['Test conflicting server definitions interactive mode --mock-server.',
      {'stdin': ['--server http://blah --mock-server '
                 'tests/unit/pywbemcli/simple_mock_model.mof']},
-     {'stderr': "Conflicting server definitions:",
+     {'stderr': "Conflicting options: `server` is mutually exclusive with "
+                "options: (--mock-server, --name)",
       'rc': 0,
       'test': 'innows'},
      None, OK],

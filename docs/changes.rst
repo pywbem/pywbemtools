@@ -102,12 +102,22 @@ Released: not yet
 * Enhanced test matrix for push-driven runs on GitHub Actions to add
   Python 3.5 on macOS, and removing Python 3.5 minimum on Windows.
 
+<<<<<<< HEAD
 * Implement command group subscription that manages the creation, viewing and
   removal of indication subscription on WBEM servers. This creates a new command
   group 'subscription' and new commands for adding, removing, and displaying
   (list) indication destination, filter, and subscription instances on target
   WBEM servers. It includes the code for the new commands, a set of tests
   and the documentation for the new commands. (see issue #4)
+
+* Add new class MutuallyExclusiveOption to pywbemtools/_click_extensions.py to
+=======
+* Add new MutuallyExclusiveOption class to pywbemtools/_click_extensions.py to
+>>>>>>> WIP
+  allow defining command options as mutually exclusive.  See the class
+  for documentation.  Modify pywbemcli.py mutually excluseive options --server, 
+  --name, and --mock-server to use this class.
+
 
 **Cleanup:**
 

@@ -52,7 +52,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
-    SUBCMD_HELP_TXT
+    SUBCMD_HELP_TXT, MutuallyExclusiveOption
 from .._utils import pywbemtools_warn, get_terminal_width, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
@@ -231,34 +231,6 @@ def _set_default_if_empty_str(tst_str, default=None):
     return default if tst_str == "" else tst_str
 
 
-def _validate_no_server_option_conficts(server, connection_name, mock_server):
-    """
-    Validate that only one of the general options server, connection_name,
-    or resolved_mock_server contains data since only one is allowed as the
-    means to define a server.
-
-    Raises:
-      click.ClickException if more that one of the defined parameters is not
-      None.
-    """
-    if server and connection_name:
-        raise click.ClickException(
-            'Conflicting server definitions: name: {}, server: {}'.
-            format(connection_name, server))
-
-    # Simultaneous mock_server and server fails
-    if server and mock_server:
-        raise click.ClickException(
-            'Conflicting server definitions: server: {}, mock-server: {}'.
-            format(server, ', '.join(mock_server)))
-
-    # Simultaneous mock_server and connection_name: Generate Exception.
-    if mock_server and connection_name:
-        raise click.ClickException(
-            'Conflicting server definitions: mock-server: {}, name: {}'.
-            format(', '.join(mock_server), connection_name))
-
-
 def _get_default_connection(connections_repo, verbose):
     """
     Attempt to get the default connection name from the connections repo
@@ -431,6 +403,9 @@ def _create_server_instance(
              options_metavar=GENERAL_OPTS_TXT,
              subcommand_metavar=SUBCMD_HELP_TXT)
 @click.option('-n', '--name', 'connection_name', type=str, metavar='NAME',
+              cls=MutuallyExclusiveOption,
+              mutually_exclusive=["server", 'mock-server'],
+              show_mutually_exclusive=False,
               # defaulted in code
               envvar=PYWBEMCLI_NAME_ENVVAR,
               help=u'Use the WBEM server defined by the WBEM connection '
@@ -441,6 +416,9 @@ def _create_server_instance(
                    format(ev=PYWBEMCLI_NAME_ENVVAR))
 @click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
               # defaulted in code
+              cls=MutuallyExclusiveOption,
+              mutually_exclusive=["server", 'name'],
+              show_mutually_exclusive=False,
               envvar=PYWBEMCLI_MOCK_SERVER_ENVVAR,
               help=u'Use a mock WBEM server that is automatically created in '
                    u'pywbemcli and populated with CIM objects that are defined '
@@ -449,11 +427,14 @@ def _create_server_instance(
                    u'See the pywbemcli documentation for more information. '
                    u'This option may be specified multiple times, and is '
                    u'mutually exclusive with the --server and --name options, '
-                   'since each defines a WBEM server. '
-                   'Default: EnvVar {ev}, or none.'.
+                   u'since each defines a WBEM server. '
+                   u'Default: EnvVar {ev}, or none.'.
                    format(ev=PYWBEMCLI_MOCK_SERVER_ENVVAR))
 @click.option('-s', '--server', type=str, metavar='URL',
               # defaulted in code
+              cls=MutuallyExclusiveOption,
+              mutually_exclusive=["mock-server", 'name'],
+              show_mutually_exclusive=False,
               envvar=PYWBEMCLI_SERVER_ENVVAR,
               help=u'Use the WBEM server at the specified URL with format: '
                    u'[SCHEME://]HOST[:PORT]. '
@@ -707,12 +688,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # Process mock_server option
     resolved_mock_server = _resolve_mock_server(mock_server) if mock_server \
         else None
-
-    # Validate that only one of server, mock_server, and connection name exists
-    # We this manually because click does not have way to do mutual exclusion
-    # on options.
-    _validate_no_server_option_conficts(server, connection_name,
-                                        resolved_mock_server)
 
     resolved_use_pull = USE_PULL_CHOICE[use_pull] if use_pull \
         else USE_PULL_CHOICE[DEFAULT_PULL_CHOICE]
