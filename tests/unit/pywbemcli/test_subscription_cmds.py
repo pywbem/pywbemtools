@@ -63,6 +63,8 @@ MOCK_SERVER_MODEL_FILE = os.path.join('testmock', 'wbemserver_mock_script.py')
 STARTUP_SCRIPT_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
 MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_1_FILE = "mock_prompt_pick_response_1.py"
+MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
+MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
 # Test connections file used in some testcases
 TEST_SUBSCRIPTIONS_FILE_PATH = 'tmp_subscription_options.yaml'
@@ -341,6 +343,36 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+    ['Verify add-destination duplicate -- permanent fails.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ["subscription add-destination x1 -l http://someone:50000 --permanent",  # noqa: E501
+                "subscription add-destination x1 -l http://someone:50000 --permanent",  # noqa: E501
+                "-o simple subscription list"]},
+     {'stdout': ["CIM_class                     owned    permanent    all",
+                 "--------------------------  -------  -----------  -----",
+                 "CIM_IndicationSubscription        0            0      0",
+                 "CIM_IndicationFilter              0            0      0",
+                 "CIM_ListenerDestinationCIMXML     0            1      1",
+                 "TOTAL INSTANCES                   0            1      1"],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add-destination duplicate -- owned fails.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ["subscription add-destination x1 -l http://someone:50000 --owned",  # noqa: E501
+                "subscription add-destination x1 -l http://someone:50000 --owned",  # noqa: E501
+                "-o simple subscription list"]},
+     {'stdout': ["CIM_class                     owned    permanent    all",
+                 "--------------------------  -------  -----------  -----",
+                 "CIM_IndicationSubscription        0            0      0",
+                 "CIM_IndicationFilter              0            0      0",
+                 "CIM_ListenerDestinationCIMXML     1            0      1",
+                 "TOTAL INSTANCES                   1            0      1"],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
     ['Verify add-destination list-destinations, remove destinations succeeds.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
       'stdin': ['subscription add-destination dest1 -l http://blah:50000 ',
@@ -388,6 +420,67 @@ TEST_CASES = [
 
                  ],
       'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add-destination list-destinations, remove/verify "y"" works.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'env': {STARTUP_SCRIPT_ENVVAR: GET_TEST_PATH_STR(MOCK_CONFIRM_Y_FILE)},
+      'stdin': ['subscription add-destination odest1 -l http://blah:50000 ',
+                '-o simple subscription list',
+                '-o simple subscription list-destinations',
+                '-v subscription remove-destination odest1 --verify',
+                '-o simple subscription list']},
+     {'stdout': ['Added owned destination: '
+                 'Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',
+                 'CIM_ListenerDestinationCIMXML     1            0      1',
+                 'Verify destination instance(s) to be removed:',
+                 'MOCK_CLICK_CONFIRM(y):',
+                 'CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",'  # noqa: E501
+                 'Name="pywbemdestination:defaultpywbemcliSubMgr:odest1",'
+                 'SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest"'  # noqa: E501
+                 'Removed owned indication destination:',
+                 # Should be no destinations after the remove statements
+                 'CIM_ListenerDestinationCIMXML  0     0  0'
+                 ],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add-destination list-destinations, remove/verify "n" works.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'env': {STARTUP_SCRIPT_ENVVAR: GET_TEST_PATH_STR(MOCK_CONFIRM_N_FILE)},
+      'stdin': ['subscription add-destination odest1 -l http://blah:50000 ',
+                '-o simple subscription list-destinations',
+                '-v subscription remove-destination odest1 --verify',
+                # List to show destination not remvoved.
+                '-o simple subscription list']},
+     {'stdout': ['Added owned destination: '
+                 'Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',
+                 'Verify destination instance(s) to be removed:',
+                 'MOCK_CLICK_CONFIRM(n):',
+                 'CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",'  # noqa: E501
+                 'Name="pywbemdestination:defaultpywbemcliSubMgr:odest1",'
+                 'SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest"',  # noqa: E501
+                 # Should be no destinations after the remove statements
+                 'CIM_ListenerDestinationCIMXML  1     0  1'
+                 ],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+
+    ['Verify add-destination owned twice same destination does not add second.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ['subscription add-destination odest1 -l http://blah:50000',
+                'subscription add-destination odest2 -l http://blah:50000',
+                # List to show 2nd destination not added
+                '-o simple subscription list']},
+     {'stdout': ['Added owned destination: '
+                 'Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',
+                 'CIM_ListenerDestinationCIMXML  1     0  1'
+                 ],
+      'stderr': ['owned destination: Name=odest2 Not added. Duplicates URL of'],
       'test': 'innows'},
      None, OK],
 
@@ -605,7 +698,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify add dests, filters, subsubscription  --permanent/owned OK.',
+    ['Verify add dests, filters, subscription  --permanent/owned OK.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
       'stdin': ['subscription add-destination pdest1 -l http://someone:50000 --permanent',  # noqa: E501
                 'subscription add-filter pfilter1 -q "SELECT * from CIM_Indication" --permanent',  # noqa: E501
@@ -778,6 +871,33 @@ TEST_CASES = [
                  'CIM_ListenerDestinationCIMXML     1            2      3',
                  ],
       'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add-subscription permanent with owned destination/filter fails,',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'env': {STARTUP_SCRIPT_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)},
+      'stdin': ['subscription add-destination odest1 -l http://blah:5000 --owned',  # noqa: E501
+                'subscription add-destination pdest1 -l http://blah:5000 --permanent',  # noqa: E501
+                'subscription add-filter ofilter1 -q "SELECT 3" --owned',
+                'subscription add-filter pfilter1 -q "SELECT 3" --permanent',
+                # All 3 subscriptions should fail
+                'subscription add-subscription odest1 pfilter1 --permanent',
+                'subscription add-subscription pdest1 ofilter1 --permanent',
+                'subscription add-subscription odest1 ofilter1 --permanent',
+                '-o simple subscription list', ]},
+     {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
+                 'Added permanent destination: Name=pdest1',
+                 'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
+                 'Added permanent filter: Name=pfilter1',
+                 # No indication subscriptions created
+                 'CIM_class                     owned    permanent    all',
+                 '--------------------------  -------  -----------  -----',
+                 'CIM_IndicationSubscription        0            0      0',
+                 'CIM_IndicationFilter              1            1      2',
+                 'CIM_ListenerDestinationCIMXML     1            1      2',
+                 ],
+      'stderr': ['Permanent subscriptions cannot be created with owned filters or destinations'],  # noqa: E501
       'test': 'innows'},
      None, OK],
 
@@ -994,7 +1114,8 @@ TEST_CASES = [
     #
     #  Error tests
     #
-    # NOTE: Some tests to not require MOCK_SERVER_MODEL_FILE becasue they
+
+    # NOTE: Some tests below to not require MOCK_SERVER_MODEL_FILE becasue they
     # fail in click before load of mock file.
     ['Verify any subscription command with no server specified fails.',
      ['add-filter', 'ofilter1', '-q', 'blah', '--owned'],
@@ -1002,6 +1123,13 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      None, OK],
+
+    ['Verify add destination with invalid url (no port) fails.',
+     ['add-destination', 'baddest1', '-l', 'http://blah'],
+     {'stderr': ["Port component missing in URL"],
+      'rc': 1,
+      'test': 'innows'},
+     MOCK_SERVER_MODEL_FILE, OK],
 
     # NOTE: regex used in following tests because python 3.4 produces
     # output for missing argument with double instead of single quote
