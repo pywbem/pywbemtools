@@ -35,11 +35,12 @@ from toposort import toposort_flatten
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue, Error
+    cimvalue, Error, ToleratedSchemaIssueWarning
 from pywbem._nocasedict import NocaseDict
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
-from .._output_formatting import DEFAULT_MAX_CELL_WIDTH, warning_msg
+from .._output_formatting import DEFAULT_MAX_CELL_WIDTH
+from .._utils import pywbemtools_warn
 
 
 ######################################################################
@@ -892,32 +893,34 @@ def parse_version_value(version_str, cln):
     Returns:
       List of 3 integers
     """
+    def issue_warning(txt, new_value):
+        if isinstance(new_value, list):
+            new_value = ".".join([str(v) for v in new_value])
+        pywbemtools_warn(
+            "Invalid Version qualifier value {0}, class {1}. {2}. Set to "
+            "{3}".format(version_str, cln, txt, new_value),
+            ToleratedSchemaIssueWarning)
 
     try:
         version_list = [int(x) for x in version_str.split('.')]
-    except ValueError:
-        warning_msg("Invalid Version qualifier value {}, class {}. "
-                    "Values must be integers. "
-                    "Replaced with 0.0.0".format(version_str, cln))
-        return [0, 0, 0]
-    except TypeError:
-        warning_msg("Invalid Version qualifier value: {}, class {}. "
-                    "Returned 0.0.0".format(version_str, cln))
+    except (ValueError, TypeError):
+        issue_warning("Values must be integers.", "0.0.0")
         return [0, 0, 0]
 
     if len(version_list) == 3:
         return version_list
 
     # There are cases of miss-defined version qualifiers in the DMTF
-    # released schema. Try to correct
-    version_list_mod = version_list
-    while len(version_list_mod) < 3:
-        version_list_mod.append(0)
-    if len(version_list_mod) > 3:
-        version_list_mod = version_list_mod[:3]
-    warning_msg("Invalid Version qualifier value {}, class {}. "
-                " Modified to {}".format(version_str, cln, version_list_mod))
-    return version_list_mod
+    # released schema. Try to correct them by adding or removing integers.
+    while len(version_list) < 3:
+        version_list.append(0)
+        issue_warning("Value must be 3 period-separated integers", version_list)
+
+    if len(version_list) > 3:
+        version_list = version_list[:3]
+        issue_warning("Value must be 3 period-separated integers", version_list)
+
+    return version_list
 
 
 def is_experimental_class(klass):

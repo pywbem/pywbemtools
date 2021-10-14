@@ -236,10 +236,12 @@ def get_objmgr_inst(context):
             raise click.ClickException(
                 'No instances of class {} found on server'.format(OBJMGR_CLN))
 
+        # Use warning_msg here rather than python Warnings class since this
+        # is to be always output.
         if len(objmanager_insts) > 1:
             warning_msg(
-                "Server returned multiple {} instances. Using first.".
-                format(objmanager_insts[0].classname))
+                "Server returned multiple  ObjectManager {0} instances. Using "
+                "first instance.".format(objmanager_insts[0].classname))
 
     except Error as er:
         raise click.ClickException(
