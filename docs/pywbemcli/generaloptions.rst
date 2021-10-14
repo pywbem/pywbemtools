@@ -91,7 +91,7 @@ the following arguments :
    The following general options can be used for specifying additional
    information for the connection:
 
-   * The :ref:`--default-namespace general option` defines the default namespace
+   * The :ref:`--default-namespace general option` defines the :term:`default namespace`
      to be used if a command does not specify a namespace.
    * The :ref:`--user general option` defines the user name for authenticating
      with the WBEM server.
@@ -295,7 +295,7 @@ The argument value of the ``--default-namespace``/``-d`` general option is a
 string that defines the default :term:`CIM namespace` to use for the target
 WBEM server.
 
-If this option is not specified, the default namespace will be ``root/cimv2``.
+If this option is not specified, the :term:`default namespace` will be ``root/cimv2``.
 
 The default namespace will be used if the ``--namespace``/``-n`` command option
 is not used on a command.
@@ -575,14 +575,15 @@ path of a MOF file or Python script that loads a mock WBEM server in the
 pywbemcli process with mock data (i.e. CIM objects).
 This allows pywbemcli to be used without access to a real WBEM server.
 
-This option may be specified multiple times.
-
 This option may be specified multiple times to define multiple MOF and Python
 files that make up the definition of a mock server. The files must have the
 suffix ".mof" for MOF files and ".py" for Python scripts.
 
 When this option is used, the security options (ex. ``--user``) are irrelevant;
 they may be specified but are not used.
+
+See section :ref:`Mock WBEM server support` for information on the characteristics
+of the MOF and Python files that define a mock environment
 
 The following example creates a mock server with two files defining the mock
 data, shows what parameters are defined for the connection, and then saves that
