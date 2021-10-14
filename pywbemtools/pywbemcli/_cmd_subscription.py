@@ -559,6 +559,10 @@ def subscription_remove_server(context, **options):
 #
 #####################################################################
 
+def owned_flag_str(owned_flag):
+    """Return string owned or all based on boolean owned_flag"""
+    return "owned" if owned_flag else "permanent"
+
 
 class CmdSubscriptionManager(object):
     """
@@ -647,7 +651,7 @@ class CmdSubscriptionManager(object):
         """
         return self._context
 
-    def get_destinations(self, owned):
+    def get_destinations(self, owned_flag):
         """
         Get the owned indication destinations or all indication
         destinations from WBEMSubscriptionManager. This method uses
@@ -667,17 +671,17 @@ class CmdSubscriptionManager(object):
             click.ClickException if the request encounters an error.
         """
         try:
-            if owned:
+            if owned_flag:
                 return self.submgr.get_owned_destinations(self.server_id)
 
             return self.submgr.get_all_destinations(self.server_id)
 
         except Error as er:
-            type_ = "owned" if owned else "all"
             raise click.ClickException(
-                self.err_msg("Get {0} destinations failed".format(type_), er))
+                self.err_msg("Get {0} destinations failed".
+                             format(owned_flag_str(owned_flag)), er))
 
-    def get_filters(self, owned):
+    def get_filters(self, owned_flag):
         """
         Get either the owned indication filters or all indication filters from
         WBEMSubscriptionManager. This method uses pywbem.SubscriptionManager
@@ -697,17 +701,17 @@ class CmdSubscriptionManager(object):
             click.ClickException if the request encounters an error.
         """
         try:
-            if owned:
+            if owned_flag:
                 return self.submgr.get_owned_filters(self.server_id)
 
             return self.submgr.get_all_filters(self.server_id)
 
         except Error as er:
-            type_ = "owned" if owned else "all"
             raise click.ClickException(
-                self.err_msg("Get {0} filters failed".format(type_), er))
+                self.err_msg("Get {0} filters failed".
+                             format(owned_flag_str(owned_flag)), er))
 
-    def get_subscriptions(self, owned):
+    def get_subscriptions(self, owned_flag):
         """
         Get  subscriptions from the server.  This method uses
         pywbem.SubscriptionManager APIs to return either owned subscriptions
@@ -715,7 +719,7 @@ class CmdSubscriptionManager(object):
 
         Parameters:
 
-            owned (:class:`py:bool`):
+            owned_flag (:class:`py:bool`):
                 True is owned, False is all subscriptions
 
         Returns:
@@ -723,17 +727,17 @@ class CmdSubscriptionManager(object):
 
         """
         try:
-            if owned:
+            if owned_flag:
                 return self.submgr.get_owned_subscriptions(self.server_id)
 
             return self.submgr.get_all_subscriptions(self.server_id)
 
         except Error as er:
-            type_ = "owned" if owned else "all"
             raise click.ClickException(
-                self.err_msg("Get {0} subscriptions failed".format(type_), er))
+                self.err_msg("Get {0} subscriptions failed".
+                             format(owned_flag_str(owned_flag)), er))
 
-    def add_destination(self, listener_url, owned, destination_id,
+    def add_destination(self, listener_url, owned_flag, destination_id,
                         destination_name, persistence_type=None):
         """
         Add listener destination URLs. Adds one listener destination to
@@ -750,29 +754,11 @@ class CmdSubscriptionManager(object):
         Raises:
             click.ClickException for all errors
         """
-        # TODO: change to test this for same identity if owned
-        dest_len = self.get_destinations(True)
         try:
             dest = self.submgr.add_destination(
-                self.server_id, listener_url, owned,
+                self.server_id, listener_url, owned_flag,
                 destination_id, destination_name,
                 persistence_type=persistence_type)
-            # Test because SubscriptionManager tests for url equality
-            # before testing for same Name property for owned dests
-            # See issue pywbem #2782
-            if owned:
-                # TODO: Remove this when pywbem pr #2784 merged
-                if dest_len == self.get_destinations(True):
-                    if dest['Name'].endswith(destination_id):
-                        raise click.ClickException(
-                            "add-destination failed. Name property '{}' "
-                            "already exists.".format(dest['Name']))
-
-                    # Raise CIMError that pywbem should have raised
-                    raise CIMError(
-                        CIM_ERR_ALREADY_EXISTS,
-                        "Listener destination instance with Name='{0}' already "
-                        "exists: {1}".format(dest['Name'], dest.path))
             return dest
 
         # Invalid input parameters exception
@@ -788,7 +774,7 @@ class CmdSubscriptionManager(object):
                 self.err_msg("add-destination failed", er))
 
     def add_filter(self, source_namespaces, query,
-                   query_language=DEFAULT_QUERY_LANGUAGE, owned=True,
+                   query_language=DEFAULT_QUERY_LANGUAGE, owned_flag=True,
                    filter_id=None, name=None, source_namespace=None):
         """
         Add an indication filter calls WBEMSubscriptionManager.add_filter and
@@ -808,8 +794,9 @@ class CmdSubscriptionManager(object):
         try:
             return self.submgr.add_filter(
                 self.server_id, source_namespaces, query,
-                query_language=query_language, owned=owned, filter_id=filter_id,
-                name=name, source_namespace=source_namespace)
+                query_language=query_language, owned=owned_flag,
+                filter_id=filter_id, name=name,
+                source_namespace=source_namespace)
 
         except (TypeError, ValueError) as exc:
             raise click.ClickException(
@@ -828,7 +815,7 @@ class CmdSubscriptionManager(object):
                 self.err_msg("add-filter failed with server exception", er))
 
     def add_subscriptions(self, filter_path, destination_paths=None,
-                          owned=True):
+                          owned_flag=True):
         """
         Add the subscription defined by filter_path and dest_path. Note that
         if the path of the subscription already exists it is not added.
@@ -839,7 +826,7 @@ class CmdSubscriptionManager(object):
             return self.submgr.add_subscriptions(
                 self.server_id, filter_path,
                 destination_paths=destination_paths,
-                owned=owned)
+                owned=owned_flag)
 
         except ValueError as ex:
             raise click.ClickException(
@@ -996,7 +983,7 @@ class CmdSubscriptionManager(object):
 
         return self._get_permanent_subscriptions()
 
-    def find_destinations_for_name(self, destination_name, fail_if_none=True):
+    def find_destinations_for_name(self, destination_name):
         """
         Find destination instances that match the identity provided
         where the identity is the value of the Name property.
@@ -1004,46 +991,37 @@ class CmdSubscriptionManager(object):
         all destination list is processed.
 
           Parameters:
-            destination_names (:term:`string`):
+            destination_name (:term:`string`):
 
           Returns:
-            destination instances found that match destination_name
+            destination instances found that match destination_name or None
+            if no destinations with the destination_name parameter exist
         """
         owned_destination_flag = destination_name.startswith(
             self.owned_destination_prefix)
 
         destinations = self.get_destinations(owned_destination_flag)
 
-        destination_insts = [f for f in destinations if f['Name'] ==
-                             destination_name]
+        return [f for f in destinations if f['Name'] == destination_name]
 
-        if fail_if_none:
-            if not destination_insts:
-                raise click.ClickException(
-                    "No destination found with Name: '{0}'".
-                    format(destination_name))
-
-        return destination_insts
-
-    def find_filters_for_name(self, filter_name, fail_if_none=True):
+    def find_filters_for_name(self, filter_name):
         """
         Find filter instances that match the identity provided
         where the identity is the value of the Name property.
         The name prefix determines whether the owned or
-        all filters lists are searched
+        all filters lists are searched.
+
+          Parameters:
+            filter_name (:term:`string`):
+
+          Returns:
+            filter instances found that match destination_name or None
+            if no destinations with the filter_name parameter exist
         """
         owned_filter_flag = filter_name.startswith(self.owned_filter_prefix)
         filters = self.get_filters(owned_filter_flag)
 
-        filter_insts = [f for f in filters if f['Name'] == filter_name]
-
-        if fail_if_none:
-            if not filter_insts:
-                raise click.ClickException(
-                    "No filters found with Name: '{0}'".
-                    format(filter_name))
-
-        return filter_insts
+        return [f for f in filters if f['Name'] == filter_name]
 
     def err_msg(self, text, er):
         """
@@ -1072,14 +1050,14 @@ class BaseIndicationObjectInstance(object):
         """ Initialize common attributes """
         self.csm = csm
         self.instance = instance
-        self.owned = None
+        self._owned_flag = None
 
     @property
-    def owned_str(self):
+    def owned_flag_str(self):
         """
         Returns boolean True if this instance is owned. Otherwise returns False
         """
-        return 'owned' if self.owned else 'permanent'
+        return owned_flag_str(self._owned_flag)
 
     def instance_property(self, property_name):
         """
@@ -1103,13 +1081,13 @@ class IndicationDestination(BaseIndicationObjectInstance):
         m = re.match(csm.destination_name_pattern,
                      self.instance.path.keybindings['Name'])
 
-        self.owned = bool(m)
+        self._owned_flag = bool(m)
 
         self.destination_id = m.group(1) if m else ""
         self.destination_name = "" if m else \
             self.instance.path.keybindings['Name']
 
-        self.identity = self.destination_id if self.owned \
+        self.identity = self.destination_id if self._owned_flag \
             else self.destination_name
 
     def select_id_str(self):
@@ -1133,12 +1111,12 @@ class IndicationFilter(BaseIndicationObjectInstance):
 
         path_ = filter_instance.path
         m = re.match(csm.filter_name_pattern, path_.keybindings['Name'])
-        self.owned = bool(m)
+        self._owned_flag = bool(m)
 
         self.filter_id = m.group(1) if m else ""
         self.filter_name = "" if m else path_.keybindings['Name']
 
-        self.identity = self.filter_id if self.owned else self.filter_name
+        self.identity = self.filter_id if self._owned_flag else self.filter_name
 
     def select_id_str(self):
         """
@@ -1160,7 +1138,7 @@ class IndicationSubscription(BaseIndicationObjectInstance):
     """
     def __init__(self, csm, subscription_instance):
         super(IndicationSubscription, self).__init__(csm, subscription_instance)
-        self.owned = csm.is_owned_subscription(subscription_instance)
+        self._owned_flag = csm.is_owned_subscription(subscription_instance)
 
     def select_id_str(self):
         """
@@ -1179,12 +1157,7 @@ class IndicationSubscription(BaseIndicationObjectInstance):
         destinst = IndicationDestination(self.csm, dest_inst)
         dest_str = destinst.select_id_str()
 
-        return '{0} {1} {2}'.format(self.owned, dest_str, filter_str)
-
-
-def get_owned_str(owned):
-    """Return "owned" or "permanent" string depending on input boolean """
-    return "owned" if owned else "permanent"
+        return '{0} {1} {2}'.format(self._owned_flag, dest_str, filter_str)
 
 
 def display_inst_nonnull_props(context, options, instances, output_format):
@@ -1331,17 +1304,14 @@ def get_insts_for_subscription_identities(csm, destination_identity,
         csm.owned_filter_prefix)
 
     # Searches for match the identity value provided
-
-    destination_instances = csm.find_destinations_for_name(
-        destination_identity, fail_if_none=destination_id_owned)
+    destination_instances = csm.find_destinations_for_name(destination_identity)
 
     # If the Identity  does not include owned prefix, search also for
     # the full owned name
     if not destination_id_owned:
         d2 = csm.find_destinations_for_name(
             "{0}:{1}".format(csm.owned_destination_prefix,
-                             destination_identity),
-            fail_if_none=False)
+                             destination_identity))
         if d2:
             destination_instances.extend(d2)
 
@@ -1350,14 +1320,13 @@ def get_insts_for_subscription_identities(csm, destination_identity,
         'destination', select_opt, cmd_action)
 
     filter_id_owned = filter_identity.startswith(csm.owned_filter_prefix)
-    filter_instances = csm.find_filters_for_name(
-        filter_identity, fail_if_none=filter_id_owned)
+    filter_instances = csm.find_filters_for_name(filter_identity)
 
     # If Identity not specifically owned, look also in owned with the owned
     # prefix. This may result  in multiples that must be resolved
     if not filter_id_owned:
         f2 = csm.find_filters_for_name("{0}:{1}".format(
-            csm.owned_filter_prefix, filter_identity), fail_if_none=False)
+            csm.owned_filter_prefix, filter_identity))
         if f2:
             filter_instances.extend(f2)
 
@@ -1380,9 +1349,9 @@ def cmd_subscription_add_destination(context, identity, options):
     """
     csm = CmdSubscriptionManager(context, options)
 
-    owned_opt = options['owned']
-    destination_id = identity if owned_opt else None
-    destination_name = None if owned_opt else identity
+    owned_flag_opt = options['owned']
+    destination_id = identity if owned_flag_opt else None
+    destination_name = None if owned_flag_opt else identity
 
     # FUTURE: Should we make this an input parameter under some circumstances.
     # ex. if name, we could set transient or permanent. Always transient
@@ -1393,9 +1362,8 @@ def cmd_subscription_add_destination(context, identity, options):
     # making request.
     # We do not allow permanent destinations with same name property
     # independent of complete path being equal to keep Name properties unique
-    if not owned_opt:
-        dests = csm.find_destinations_for_name(destination_name,
-                                               fail_if_none=False)
+    if not owned_flag_opt:
+        dests = csm.find_destinations_for_name(destination_name)
         if dests:
             dests_str = ", ".join([str(d.path) for d in dests])
             raise click.ClickException(
@@ -1403,28 +1371,33 @@ def cmd_subscription_add_destination(context, identity, options):
                 "existing destination(s): [{2}. Pywbemcli does not allow "
                 "permanent destinations with same Name property to keep Name "
                 "properties unique.".
-                format(get_owned_str(owned_opt), destination_name, dests_str))
+                format(owned_flag_str(owned_flag_opt), destination_name,
+                       dests_str))
 
     destination_result = csm.add_destination(
-        options['listener_url'], owned_opt, destination_id, destination_name,
-        persistence_type=persistence_type)
+        options['listener_url'], owned_flag_opt, destination_id,
+        destination_name, persistence_type=persistence_type)
 
     # Success: Show resulting name and conditionally, details
     context.spinner_stop()
 
     # If the URL, etc. of this owned add matches an existing owned destination
-    # pywbem returns the existing destination.  Modify the  result message
-    # to indicate what was returned.
-    if owned_opt and not destination_result['Name'].endswith(destination_id):
-        click.echo(
+    # pywbem returns the existing destination which has different name.
+    if owned_flag_opt and not destination_result['Name'].endswith(
+            ":{}".format(destination_id)):
+        rslt_info = IndicationDestination(csm, destination_result)
+        raise click.ClickException(
             "{0} destination: Name={1} Not added. Duplicates URL of "
-            "existing destination: {2}.".
-            format(get_owned_str(owned_opt), destination_name,
-                   destination_result['Name']))
-    else:
-        click.echo(
-            "Added {0} destination: Name={1}".
-            format(get_owned_str(owned_opt), destination_result['Name']))
+            "existing {2} destination: {3} URL: {4} PersistenceType: {5}.".
+            format(owned_flag_str(owned_flag_opt),
+                   destination_id,
+                   rslt_info.owned_flag_str,
+                   destination_result['Name'],
+                   destination_result['Destination'],
+                   destination_result['PersistenceType']))
+    click.echo(
+        "Added {0} destination: Name={1}".
+        format(owned_flag_str(owned_flag_opt), destination_result['Name']))
 
     if context.verbose:
         click.echo("\npath={0}\n\n{1}".
@@ -1437,9 +1410,9 @@ def cmd_subscription_add_filter(context, identity, options):
     Add a filter defined by the input argument to the target server.
     """
     csm = CmdSubscriptionManager(context, options)
-    owned_opt = options['owned']
-    filter_id = identity if owned_opt else None
-    filter_name = None if owned_opt else identity
+    owned_flag_opt = options['owned']
+    filter_id = identity if owned_flag_opt else None
+    filter_name = None if owned_flag_opt else identity
 
     # Get source namespaces, multiple strings in tuple and/or
     # multiple namespace names comma-separated in any string in tuple
@@ -1453,8 +1426,8 @@ def cmd_subscription_add_filter(context, identity, options):
         else:
             source_namespaces.append(sn)
 
-    if not owned_opt:
-        filters = csm.find_filters_for_name(filter_name, fail_if_none=False)
+    if not owned_flag_opt:
+        filters = csm.find_filters_for_name(filter_name)
         if filters:
             filters_str = ", ".join([str(f.path) for f in filters])
             raise click.ClickException(
@@ -1462,17 +1435,18 @@ def cmd_subscription_add_filter(context, identity, options):
                 "existing filters(s): [{2}. Pywbemcli does not allow "
                 "permanent filters with same Name property to keep Name "
                 "properties unique.".
-                format(get_owned_str(owned_opt), filter_name, filters_str))
+                format(owned_flag_str(owned_flag_opt), filter_name,
+                       filters_str))
 
     result_inst = csm.add_filter(source_namespaces, options['query'],
                                  options['query_language'],
-                                 owned_opt, filter_id,
+                                 owned_flag_opt, filter_id,
                                  filter_name)
 
     # Success: Show resulting name and conditionally, details
     context.spinner_stop()
     click.echo("Added {0} filter: Name={1}".
-               format(get_owned_str(owned_opt), result_inst['Name']))
+               format(owned_flag_str(owned_flag_opt), result_inst['Name']))
 
     if context.verbose:
         click.echo("\npath={0}\n\n{1}".
@@ -1495,7 +1469,7 @@ def cmd_subscription_add_subscription(context, destination_identity,
     """
     csm = CmdSubscriptionManager(context, options)
 
-    owned_opt = options['owned']
+    owned_flag_opt = options['owned']
     select_opt = options['select']
 
     # Search the existing filters and destinations to find instances
@@ -1507,7 +1481,7 @@ def cmd_subscription_add_subscription(context, destination_identity,
     # Duplicates test in SubscriptionManager but with message for parameters of
     # the command rather than the pywbem API.
     if (csm.is_owned_filter(sub_filter_inst) or
-            csm.is_owned_destination(sub_dest_inst)) and not owned_opt:
+            csm.is_owned_destination(sub_dest_inst)) and not owned_flag_opt:
         raise click.ClickException(
             "Permanent subscriptions cannot be created with owned filters "
             "or destinations. Create an owned subscription or use a "
@@ -1516,11 +1490,11 @@ def cmd_subscription_add_subscription(context, destination_identity,
                                      sub_filter_inst['Name']))
 
     rslt = csm.add_subscriptions(sub_filter_inst.path,
-                                 sub_dest_inst.path, owned_opt)
+                                 sub_dest_inst.path, owned_flag_opt)
 
     context.spinner_stop()
     click.echo("Added {0} subscription: DestinationName={1}, FilterName={2}".
-               format(get_owned_str(owned_opt),
+               format(owned_flag_str(owned_flag_opt),
                       sub_dest_inst.path['Name'],
                       sub_filter_inst.path["Name"]))
     if context.verbose:
@@ -1636,7 +1610,7 @@ def cmd_subscription_list_destinations(context, options):
                 dest.path, ResultClass=SUBSCRIPTION_CLASSNAME, Role='Handler')
 
             d = IndicationDestination(csm, dest)
-            row = [d.owned_str,
+            row = [d.owned_flag_str,
                    d.identity,
                    fold_strings(d.instance_property('Name'), 30,
                                 break_long_words=True),
@@ -1720,7 +1694,7 @@ def cmd_subscription_list_filters(context, options):
                     filter_.path, ResultClass=SUBSCRIPTION_CLASSNAME,
                     Role='Filter')
                 f = IndicationFilter(csm, filter_)
-                row = [f.owned_str,
+                row = [f.owned_flag_str,
                        f.identity,
                        fold_strings(f.instance_property('Name'), 30,
                                     break_long_words=True),
@@ -1819,9 +1793,9 @@ def cmd_subscription_list_subscriptions(context, options):
             start_time = start_time.datetime.strftime("%x %X") if start_time \
                 else ""
 
-            row = [is_.owned_str,
-                   "{0}({1})".format(id_.identity, id_.owned_str),
-                   "{0}({1})".format(if_.identity, if_.owned_str),
+            row = [is_.owned_flag_str,
+                   "{0}({1})".format(id_.identity, id_.owned_flag_str),
+                   "{0}({1})".format(if_.identity, if_.owned_flag_str),
                    dest_inst['Destination'],
                    fold_strings(if_.instance_property('query'), 30),
                    filter_inst['QueryLanguage'],
@@ -1860,20 +1834,20 @@ def cmd_subscription_remove_destination(context, identity, options):
     Remove multiple destination objects from the WBEM Server.
     """
     csm = CmdSubscriptionManager(context, options)
-    owned_opt = options['owned']
+    owned_flag_opt = options['owned']
 
-    if owned_opt and not identity.startswith(csm.owned_destination_prefix):
+    if owned_flag_opt and not identity.startswith(csm.owned_destination_prefix):
         target_name = "{0}:{1}".format(csm.owned_destination_prefix, identity)
     else:
         target_name = identity
 
-    dest_insts = csm.get_destinations(owned_opt)
+    dest_insts = csm.get_destinations(owned_flag_opt)
     matching_destinations = [d for d in dest_insts if d['Name'] == target_name]
 
     if not matching_destinations:
         raise click.ClickException(
             "No {0} destination found for identity={1}, Name-property={2}".
-            format(get_owned_str(owned_opt), identity, target_name))
+            format(owned_flag_str(owned_flag_opt), identity, target_name))
 
     if len(matching_destinations) == 1:
         destination_path = matching_destinations[0].path
@@ -1881,7 +1855,7 @@ def cmd_subscription_remove_destination(context, identity, options):
     else:  # Multiple instances returned
         context.spinner_stop()
         click.echo('{0} "{1}" multiple matching destinations'.
-                   format(get_owned_str(owned_opt), identity))
+                   format(owned_flag_str(owned_flag_opt), identity))
 
         if options['select']:
             destination_path = pick_one_path_from_instances_list(
@@ -1894,7 +1868,7 @@ def cmd_subscription_remove_destination(context, identity, options):
                 "Remove failed. Multiple destinations meet criteria "
                 "identity={0}, owned={1}. Use --select option to pick one "
                 "destination:\n  * {2}".
-                format(identity, get_owned_str(owned_opt),
+                format(identity, owned_flag_str(owned_flag_opt),
                        "\n  * ".join(inst_display)))
 
     if options['verify']:
@@ -1905,7 +1879,7 @@ def cmd_subscription_remove_destination(context, identity, options):
 
     context.spinner_stop()
     click.echo("Removed {0} indication destination: identity={1}, Name={2}..".
-               format(get_owned_str(owned_opt), identity, name_property))
+               format(owned_flag_str(owned_flag_opt), identity, name_property))
     if context.verbose:
         click.echo("indication destination path: {0}.".format(destination_path))
 
@@ -1919,29 +1893,29 @@ def cmd_subscription_remove_filter(context, identity, options):
     """
     csm = CmdSubscriptionManager(context, options)
 
-    owned_opt = options['owned']
+    owned_flag_opt = options['owned']
 
     # Determine if name should include owned identity components.
     # Search depends on correct definition of owned option.
-    if owned_opt and not identity.startswith(csm.owned_filter_prefix):
+    if owned_flag_opt and not identity.startswith(csm.owned_filter_prefix):
         target_name = "{0}:{1}".format(csm.owned_filter_prefix, identity)
     else:
         target_name = identity
 
-    filter_insts = csm.get_filters(owned_opt)
+    filter_insts = csm.get_filters(owned_flag_opt)
     matching_filters = [f for f in filter_insts if f['Name'] == target_name]
 
     if not matching_filters:
         raise click.ClickException(
             "No {0} filter found for identity={1}, Name-property={2}, ".
-            format(get_owned_str(owned_opt), identity, target_name))
+            format(owned_flag_str(owned_flag_opt), identity, target_name))
     # Multiples can only occur if outside client has added filters that match
     # name but not other components of path. Owned flag on cmd eliminates
     # multiples if permanent and owned ids are the same.
     if len(matching_filters) > 1:
         context.spinner_stop()
         click.echo('{0} "{1}" multiple matching filters.'.
-                   format(get_owned_str(owned_opt), identity))
+                   format(owned_flag_str(owned_flag_opt), identity))
 
         if options['select']:
             filter_path = pick_one_path_from_instances_list(
@@ -1952,7 +1926,7 @@ def cmd_subscription_remove_filter(context, identity, options):
             raise click.ClickException(
                 "Remove failed. Multiple filters meet criteria identity={0}, "
                 "owned={1}. Use --select option to pick one filter:\n  * {2}".
-                format(identity, get_owned_str(owned_opt),
+                format(identity, owned_flag_str(owned_flag_opt),
                        "\n  * ".join(inst_disp)))
 
     else:  # one filter returned
@@ -1966,7 +1940,7 @@ def cmd_subscription_remove_filter(context, identity, options):
 
     context.spinner_stop()
     click.echo("Removed {0} indication filter: identity={1}, Name={2}.".
-               format(get_owned_str(owned_opt), identity, name_property))
+               format(owned_flag_str(owned_flag_opt), identity, name_property))
     if context.verbose:
         click.echo("Indication filter path: {0}.".format(filter_path))
 
