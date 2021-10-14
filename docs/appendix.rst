@@ -73,6 +73,16 @@ This documentation uses a few special terms to refer to Python types:
       non-embedded instances of the class (not including subclasses) within the
       namespace.
 
+   Interop namespace
+      The Interop namespace is a :term:`CIM namespace` that exists in a WBEM
+      server as a point of interoperatbility with WBEM clients because it has a
+      well known name. A WBEM server may have only a single Interop namespace
+      and the names are limited normally to ``interop``, ``root/interop``.
+      Pywbemcli adds ``root/PG_Interop`` as a third alternative when it looks
+      for any Interop namespaces on a WBEM server.  The object manager,
+      profile, namespace information and indication subscription is available
+      through the interop namespace.
+
    connections file
       A file maintained by pywbemcli and managed by the
       :ref:`Connection command group`.
@@ -208,11 +218,47 @@ This documentation uses a few special terms to refer to Python types:
       if a :term:`default connection`) has been defined. The current connection can be
       changed in the interactive mode with the :ref:`connection select command`.
 
+   default namespace
+      The :term:`CIM namespace` set as the current namespace for CIM operations
+      if pywbemcli is started with a connection defined but without a specific
+      namespace defined.  Pywbemcli uses ``root/cimv2`` as the default
+      namespace.
+
    CQL
       CQL (CIM Query Language) is a query language defined by DMTF for use
       by query operations against WBEM servers. In operation parameters that
       define the use of a query language, it is specified with the string
-      ``DMTF:QCL``. CQL is described in DMTF standard :term:`DSP0202`.
+      ``DMTF:CQL``. CQL is described in DMTF standard :term:`DSP0202`.
+
+   WQL
+      WQL (WBEM Query Language) is a query language defined by Microsoft for use
+      by query operations against WBEM servers. In operation parameters that
+      define the use of a query language, it is specified with the string
+      ``WCL``. CQL is described in informal specifications generally available
+      on the internet. WQL is not a DMTF standard and there are differences
+      in implementations partly because of different versions of the WQL specification.
+      A number of WBEM servers implement WQL query processors because WQL was
+      the first query language defined for CIM query operations.
+
+   query language
+      A language defined to support query operations against WBEM servers
+      specifically the ``ExecuteQuery`` operation and its corresponding pull
+      operation. A WBEM server may implement any desired query language but the
+      DMTF specifies the characteristics of the :term:`CQL` the :term:`WQL`
+      query language is specified by Microsoft documents.
+
+   filter query language
+      A query language defined to support the DMTF pull instance enumeration
+      operation (ex. OpenEnumerateInstances, PullEnumerateInstances) specifically
+      so that filtering of responses based on a query statement can be integrated
+      into the enumeration of the instances.  The DMTF defined the filter query
+      language ``FQL`` (defined in DMTF specification (:term:`DSP0212`))as one
+      possible filter query language
+
+      See :term:query languages for query languages that support the ``ExecuteQuery``
+      operation and its corresponding pull  operation.
+
+      Query languages and filter query languages are not interchangable.
 
    schema
       A schema (named CIM schema in the DMTF specification :term:`DSP0004`) in
@@ -229,6 +275,37 @@ This documentation uses a few special terms to refer to Python types:
       number (ex. version 2.41.0). The DMTF CIM Schemas can be retrieved from
       the DMTF web site at: `<https://www.dmtf.org/standards/cim>`_ .
 
+   CIM indication subscription
+   indication subscription
+      A CIM indication subscription is the definition of :term:`listener destination`
+      and :term:`indication filter` contained within an association class
+      (``CIM_IndicationSubscription`` class) that defines for a WBEM server the
+      characteristics of indications to be generated and where they are to be
+      sent. The  listener destination is defined by the ``Handler`` reference
+      property (class name ``CIM_ListenerDestination``) and the filter is
+      defined by the ``Filter`` reference property(class name
+      ``CIM_IndicationFilter``). The DMTF indication profile and is defined in
+      :term:`DSP0154`
+
+   CIM indication destination
+   listener destination
+      A listener destination is an instance of a CIM class that maintains a
+      reference to a listener within an implementation. Specifically within
+      the scope of pywbemcli it is an instance of the class
+      ``CIM_ListenerDestinationCIMXML`` where the listener reference is the
+      ``Destination`` property which contains the URL of the target
+      indication listener.
+
+   CIM indication filter
+   indication filter
+      An indication filter is an instance of a CIM Class
+      (``CIM_IndicationFilter``) that defines characteristics of indications
+      that the WBEM server will generate. The basis for the indication
+      characteristics is the query language and query statement properties of
+      the instance.
+
+   dynamic indication filter
+      An :term: indication filter whose lifecycle is controlled by a client
 
 .. _`Profile advertisement methodologies`:
 
@@ -372,6 +449,9 @@ References
 
    DSP1033
       `DMTF DSP1033, Profile Registration Profile, Version 1.1 <https://www.dmtf.org/standards/published_documents/DSP1033_1.1.pdf>`_
+
+   DSP0154
+      `DMTF DSP1054, Indications Profile, Version 1.2.2, <https://www.dmtf.org/sites/default/files/standards/documents/DSP1054_1.2.2.pdf>`_
 
    RFC3986
       `IETF RFC3986, Uniform Resource Identifier (URI): Generic Syntax, January 2005 <https://tools.ietf.org/html/rfc3986>`_

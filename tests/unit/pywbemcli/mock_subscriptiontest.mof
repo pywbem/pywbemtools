@@ -1,0 +1,38 @@
+// This file extends the repository for the subscription tests to
+// add subclasses for the destination and filter classes and corresponding
+// subscriptions.  This is to allow:
+
+// * testing of add commands where the name exists already
+// * testing of the remove commands where multiple responses are being tested.
+
+// The new class and
+// instances create instances that have the same name as previously created
+// filters and destinations but different paths because some of the key
+// properties are different.
+
+# pragma namespace ("interop")
+
+class CIM_ListenerDestinationCIMXMLSub : CIM_ListenerDestinationCIMXML {
+};
+
+class CIM_IndicationFilterSub : CIM_IndicationFilter {
+};
+
+instance of CIM_ListenerDestinationCIMXMLSub  {
+    SystemCreationClassName = CIM_ComputerSystem;
+    SystemName = blah;
+    CreationClassName = CIM_ListenerDestinationCIMXMLSub;
+    Name = "duptestdest";
+    PersistenceType = 3;
+    Destination = "http://blah:5001";
+    Protocol = 2;
+};
+instance of CIM_IndicationFilterSub  {
+    SystemCreationClassName = CIM_ComputerSystem;
+    SystemName = blah;
+    CreationClassName = CIM_IndicationFilterSub;
+    Name = "duptestfilter";
+    Query = "SELECT * from CIM_Indication";
+    QueryLanguage = "DMTF:CQL";
+    IndividualSubscriptionSupported = true;
+};

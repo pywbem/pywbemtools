@@ -37,6 +37,7 @@ The command groups are:
 * :ref:`Qualifier command group` - Command group for CIM qualifier declarations.
 * :ref:`Server command group` - Command group for WBEM servers.
 * :ref:`Statistics command group` - Command group for WBEM operation statistics.
+* :ref:`Subscription command group` - Command group for WBEM operation indication subscription management.
 * :ref:`Connection command group` - Command group for WBEM connection definitions.
 
 The individual commands (no command group) are:
@@ -56,7 +57,7 @@ The ``namespace`` command group has commands that act on CIM namespaces:
 * :ref:`Namespace list command` - List the namespaces on the server.
 * :ref:`Namespace create command` - Create a namespace on the server.
 * :ref:`Namespace delete command` - Delete a namespace on the server.
-* :ref:`Namespace interop command` - Get the Interop namespace on the server.
+* :ref:`Namespace interop command` - Get the :term:`Interop namespace` on the server.
 
 See :ref:`pywbemcli namespace --help`.
 
@@ -75,7 +76,7 @@ the :term:`current connection`.
 The result is displayed using ``txt`` output format or
 :term:`Table output formats`.
 
-The Interop namespace must exist on the server.
+The :term:`Interop namespace` must exist on the server.
 
 Example:
 
@@ -106,16 +107,16 @@ See :ref:`pywbemcli namespace list --help` for the exact help output of the comm
 ``namespace create`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``namespace create`` command creates a CIM namespace on the WBEM server of
-the :term:`current connection`.
+The ``namespace create`` command creates a :term:`CIM namespace` on the WBEM
+server of the :term:`current connection`.
 
 Leading and trailing slash (``/``) characters specified in the NAMESPACE
 argument will be stripped.
 
 The namespace must not yet exist on the server.
 
-The Interop namespace must exist on the server and cannot be created using
-this command.
+The :term:`Interop namespace` must exist on the server and cannot be created
+using this command.
 
 WBEM servers may not allow this operation or may severely limit the
 conditions under which a namespace can be created on the server.
@@ -147,7 +148,7 @@ argument will be stripped.
 The namespace must exist and must be empty. That is, it must not contain
 any objects (qualifiers, classes or instances).
 
-The Interop namespace must exist on the server and cannot be deleted using
+The :term:`Interop namespace` must exist on the server and cannot be deleted using
 this command.
 
 WBEM servers may not allow this operation or may severely limit the
@@ -171,7 +172,7 @@ See :ref:`pywbemcli namespace delete --help` for the exact help output of the co
 ``namespace interop`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``namespace interop`` command gets and displays the Interop namespace of
+The ``namespace interop`` command gets and displays the :term:`Interop namespace` of
 the WBEM server of the :term:`current connection`.
 
 The Interop namespace must exist on the server.
@@ -305,7 +306,7 @@ indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
 The following example enumerates the class names of the root classes in the
-default namespace because there is no classname and the --DeepInheritance
+default namespace because there is no classname and the ``--DeepInheritance``
 option is not specified:
 
 .. code-block:: text
@@ -728,7 +729,7 @@ all namespaces in the server.
 
 This command displays the count of instances of each CIM class whose class name
 matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
-namespaces of the WBEM server, or in the specified namespaces (--namespace
+namespaces of the WBEM server, or in the specified namespaces (``--namespace``
 option).  This differs from instance enumerate, etc. in that it counts the
 instances specifically for the classname of each instance returned (the
 creation classname), not including subclasses.
@@ -848,11 +849,41 @@ The class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
+The ``instance enumerate`` may use either the traditional operation
+(``EnumerateInstances`` or ``EnumerateInstanceNames``) or the corresponding
+pull operations depending on the :ref:`--use-pull general option`.
+
 If the ``--names-only``/``--no`` command option is set, only the instance paths
-are displayed. Otherwise, the instances are displayed.
+are displayed. Otherwise, the instances are displayed. Depending on other options,
+the either EnumerateInstances or EnumerateInstanceNames may be executed when
+pywbem is called.
 
 The ``--propertylist``/``--pl`` command option allows restricting the set of
 properties to be retrieved and displayed on the instances.
+
+The ``--namespace`` / ``n`` command option allows using a namespace other than
+the :term:`default namespace` as the target of the enumeration.
+
+Additional options allow filtering information returned  including:
+
+The ``--local-only`` / ``--lo`` option that  when allows showing only local properties
+in the instance.
+
+The ``--deep-inheritance`` / ``--di`` option that allows showing all properties or
+only properties defined in the class defined in the ``CLASSNAME`` argument
+
+The ``--include-qualifiers`` / ``iq`` option that filters out qualifiers defined in
+the instances
+
+The ``--include-classorigin`` / ``--ico``  that allows showing the classorigin attribute
+in the instances.
+
+The ``filter-query`` / ``--fq`` and ``--filter-query-language`` /
+``fql``command options allow  filtering the resulting instances if a pull
+operation is executed with a :term:`filter query language``. They are ignored
+if pywbemcli executes the traditional Enumerate operation.
+
+TODO: add the above to other instance operations
 
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
@@ -1469,8 +1500,8 @@ See :ref:`pywbemcli server info --help` for the exact help output of the command
 ``server interop`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``server interop`` command gets the name of the Interop namespace of the
-WBEM server of the :term:`current connection`.
+The ``server interop`` command gets the name of the :term:`Interop namespace`
+of the WBEM server of the :term:`current connection`.
 
 The result is displayed using :term:`Table output formats`.
 
@@ -1501,7 +1532,7 @@ the :term:`current connection`.
 The result is displayed using ``txt`` output format or
 :term:`Table output formats`.
 
-The Interop namespace must exist on the server.
+The :term:`Interop namespace` must exist on the server.
 
 Example:
 
@@ -2300,8 +2331,9 @@ as optional and some servers may not include them or all of them.
 If the server accepts the request, a simple text ``OK <server url``
 will be returned.
 
-The following example defines the connection with ``--server``, ``--user``,
-and ``--password`` and executes the test with successful result:
+The following example defines the connection with :ref:`--server general
+option`, ``--user``, and ``--password`` and executes the test with successful
+result:
 
 .. code-block:: text
 
@@ -2325,16 +2357,18 @@ The ``connection set-default`` command sets or clears the
 :term:`default-connection-name` attribute  in the currently specified
 :term:`connections file`.
 
-The :term:`default-connection-name` attribute allows a connection definition in a
-connections file to be loaded on startup without using the ``--name`` option.  If
-pywbemcli is started without ``--name``, ``--server``, or ``--mock-server`` options, the
-``default-connection-name`` attribute is retrieved from the file and, if defined,
-the name in the value of this attribute used as the name of the connection
-definition set as current connection.
+The :term:`default-connection-name` attribute allows a connection definition in
+a connections file to be loaded on startup without using the :ref:`--name general option`.
+If pywbemcli is started without :ref:`--name general option`, :ref:`--server
+general option`, or :ref:`--mock-server general option`, the
+``default-connection-name`` attribute is retrieved from the connections file if
+defined, and the value of this attribute used as the name of the
+connection definition set as current connection.
 
 Thus, for example, if the default connection definition is ``mytests`` the
 connection definition for ``mytests`` is created each time pywbemcli is started
-with no --server, --mock-server or ``--name`` option.
+with no :ref:`--server general option`, :ref:`--mock-server general option` or
+the :ref:`--name general option`.
 
 This command also allows clearing the value of the default connections file
 attribute with the ``--clear`` option.
@@ -2381,6 +2415,977 @@ The current status of the :term:`default-connection-name` can be viewed with the
 
 See :ref:`pywbemcli connection set-default --help` for the exact help output
 of the command.
+
+.. index:: pair: command groups; subscription commands
+
+.. _`subscription command group`:
+
+``subscription`` command group
+------------------------------
+
+The DMTF specification DMTF Indication Profile :term:`DSP0004` defines the
+capability for WBEM servers to generate indications (asynchronous notifications
+based on events that occur in the WBEM server managed environment) and for the
+indications to be generated to be defined by CIM indication subscriptions which may
+be created by WBEM clients.
+
+A :term:`CIM indication subscription` consists of instances of 3 separate classes:
+
+1. ``CIM_IndicationFilter`` (filter/indication filter) - Defines an
+:term:`indication filter` (using a :term:`query language`) that defines
+the characteristics of indications to be sent to a :term:`listener destination`.
+
+2. ``CIM_ListenerDestination`` (destination/listener destination) - Defines a
+:term:`listener destination` (a URL) for indications exported from a WBEM
+server. Pywbem and pywbemcli use the subclass ``CIM_ListenerDestinationCIMXML``
+specifically because that class uses the protocol supported by pywbemcli and
+the :ref:`Pywbemlistener command`.
+
+3. ``CIM_IndicationSubscription`` (subscription/indication subscription) - A
+CIM association class that relates an indication filter definition (``Filter``
+reference property) and a listener destination (``Handler`` reference
+property) to link the definition of the indication to be generated and the
+listener destination for the indication.
+
+An indication subscription defines for a WBEM server the target WBEM
+listener destination instance for indications to be generated based on the
+``Query`` and ``QueryLanguage`` properties defined in the filter instance; an indication
+subscription relates a WBEM listener destination with the definition of the
+indications that will be generated.  When a WBEM server receives a valid
+indication subscription it is expected to activate the functionality to
+generate and send indications defined by that subscription.
+
+Pywbemcli provides commands that allow creating, displaying, and removing the
+components of CIM indication subscriptions from WBEM servers. In conjunction
+with pywbemtools :ref:`Pywbemlistener command`, a user can create indication
+subscriptions on a WBEM server and view indications generated by that WBEM
+server.
+
+The ``subscription`` command group has commands that act on the CIM indication
+classes on a WBEM server including:
+
+* :ref:`subscription add-destination command` - Add a new listener destination instance to the server.
+* :ref:`subscription add-filter command` - Add a new indication filter instance to the server.
+* :ref:`subscription add-subscription command` - Add a indication subscription instance to the server.
+* :ref:`subscription list command` - list overview of indication subscriptions on the server.
+* :ref:`subscription list-destinations command` - Display destinations on the server.
+* :ref:`subscription list-filters command` - Display indication filters on the server.
+* :ref:`subscription list-subscriptions command` - Display indication subscriptions on the server.
+* :ref:`subscription remove-destination command` - Remove destinations instances from the server.
+* :ref:`subscription remove-filter command` - Remove filters from the server.
+* :ref:`subscription remove-subscription command` - Remove subscriptions from the server.
+* :ref:`subscription remove-server command` - Remove all owned subscriptions from the server.
+
+Pywbemtools groups indication subscription instances with an ownership concept
+where the instances of filters, destinations, and subscriptions can be either
+owned by the pywbemtools client or permanent.
+
+All of the instances of indication destination, indication filter and
+indication subscriptions are created by pywbemcli are created in the WBEM
+server :term:`Interop namespace`.
+
+While the definition of indication subscriptions created by pywbemcli is based
+on the DMTF Indication Profile :term:`DSP0004` there are a number of limitations
+in the pywbem implementation including:
+
+* It does not provide direct access to any of the Indication Service or Indication
+  capability functionality such as ``CIM_IndicationService``.
+
+* It requires some properties in the instances that some of the options of
+  :term:`DSP0004` consider optional including the destination URL property
+  and the filter Query property.  Thus pywbemcli does not implement what the
+  specification calls free listener destinations where the ``Destination``
+  property is left empty when the destination is created in the WBEM server.
+
+* pywbemcli creates instances of ``CIM_ListenerDestinationCIMXML`` rather than
+  ``CIM_ListenerDestination`` because pywbemcli is tied to the CIMXML protocol.
+
+* pywbemcli subscription does not provide a command to modify an existing
+  destination, filter, or subscription instance.  That must be done using
+  the ``instance`` command group.
+
+* pywbemcli subscription always uses the CIM classes to create the listener
+  destination, indication filter, and indication subscription and does not
+  provide for using subclasses (ex. vendor specific subclasses) for creating
+  instances subclasses.
+
+
+Owned destinations, filters, and subscriptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index:: single: owned subscriptions
+.. index:: pair: subscription owned; owned subscriptions
+.. index:: indication subscription lifecycle
+
+Owned CIM instances are created with the :ref:`subscription add-destination
+command`, :ref:`subscription add-filter command`, and :ref:`subscription
+add-subscription command` and their life cycle is bound to the life cycle of
+the registration of a WBEM server with the subscription manager.
+
+Pywbemcli registers a WBEM Server with the registration manager the first time
+a ``subscription`` command is executed if a WBEM server is currently defined
+with the :ref:`--name general option`, :ref:`--server general option` or the
+:ref:`--mock-server general option`.
+
+Owned CIM instances are deleted automatically when their WBEM server is
+deregistered from pywbemcli. See :ref:`subscription remove-server command` or
+by command with :ref:`subscription remove-destination command`,
+:ref:`subscription remove-filter command`, :ref:`subscription
+remove-subscription command`.
+
+Owned instances provide a mechanism where the life cycle of indication
+subscriptions can be easily controlled by the pywbemcli client.
+
+Permanent destinations, filters, and subscriptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index:: single: permanent subscriptions
+
+Permanent CIM instances are created by the :ref:`subscription add-destination
+command`, :ref:`subscription add-filter command`, and :ref:`subscription
+add-subscription command` with the command option ``--permanent`` and their
+life cycle is independent of the life cycle of the registration of that WBEM
+server with the subscription manager.
+
+Permanent CIM instances are not deleted automatically when their WBEM server is
+deregistered from the subscription manager. The user is responsible for their
+lifetime management: They can be deleted by the commands  :ref:`subscription
+remove-destination command`, :ref:`subscription remove-filter command`,
+:ref:`subscription remove-subscription command` with the option
+``--permanent``.
+
+Permanent CIM instances should be used in cases where the user needs to have
+control over the destination or filter ``Name`` property (e.g. because a DMTF
+management profile requires a particular name).
+
+Static destinations, filters, and subscriptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index:: single: static subscriptions
+
+Static CIM instances pre-exist in the WBEM server and cannot be deleted
+(or created) by a WBEM client.
+
+When a client creates a subscription between a filter and a listener
+destination, the types of ownership of these three CIM instances may be
+arbitrarily mixed, with one exception:
+
+* A permanent subscription cannot be created on an owned filter or an owned
+  listener destination. Allowing that would prevent the automatic life cycle
+  management of the owned filter or listener destination by the subscription
+  manager. This restriction is enforced by the
+  :class:`~pywbem.WBEMSubscriptionManager` class.
+
+Pywbemcli remembers owned subscriptions, filters, and listener destinations
+between commands in both command line and interactive mode. It does this by
+recovering instances from the current WBEM server whenever the pywbem
+SubscriptionManager object is created by a pywbemcli subscription command.
+
+Each command command execution in command mode discovers owned subscriptions,
+filters, and listener destinations for the current server. This discovery,
+is based upon the Name property. Therefore, if the Name property is set by the
+user (e.g. because a management profile requires a particular name), the filter
+must be permanent and cannot be owned.
+
+**NOTE:** Pywbem_mock used in testing does not remember any of subscription
+instances between  non-interactive commands since the mock server is created
+for each command line instantiation. Therefore most pywbemcli mock usage with
+the subscription subcommand is in interactive mode (creating, viewing, and
+deleting instances within a single interactive session).
+
+Since pywbemcli does not directly modify existing instances of filter or
+destinations or subscriptions, the user must do this directly through the
+pywbemcli ``Instance modify`` command and then updating the local owned instances
+list by executing get_all_filters(), get_all_destinations(), or
+get_all_subscriptions().
+
+Pywbemcli creates all instances of ``CIM_IndicationSubscription``,
+``CIM_ListenerDestinationCIMXML`` and ``CIM_IndicationFilter`` in the
+:term:`Interop namespace`.
+
+
+See :ref:`pywbemcli subscription --help`.
+
+
+.. index::
+    pair: subscription commands; subscription add-destination
+
+.. _`subscription add-destination command`:
+
+``subscription add-destination`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index::
+    single: subscription add-destination
+    pair: command; subscription add-destination
+
+This command creates a listener destination instance (CIM class
+``CIM_ListenerDestinationCIMXML``) with the identity defined by the ``IDENTITY``
+argument and the ``--owned`` | ``--permanent`` option  in the :term:`Interop
+namespace` of the specified WBEM server on the target WBEM server.
+
+A listener destination defines the location of a WBEM indication
+listener (the listener URL including port) that defines the indication listener
+for indications exported from a WBEM server and other characteristics of the
+listener.
+
+The format of this command is:
+
+.. code-block:: text
+
+    pywbemcli [GENERAL-OPTIONS] subscription add-destination IDENTITY [COMMAND-OPTIONS]
+
+The listener destination  to be added is identified by the ``IDENTITY`` argument and the
+``--owned`` / ``--permanent`` option. Together these elements define the
+``Name`` property of the destination instance.
+
+If the instance is to be owned, (``--owned``) the value of the ``Name`` property
+will be:
+
+.. code-block:: text
+
+    ``"pywbemdestination:" {submgr_id} ":" {filter_id}``
+
+where:
+
+    - ``{submgr_id}`` is the subscription manager ID
+    - ``{IDENTITY}`` is the ``IDENTITY`` argument
+
+If the instance is to be permanent, (``--permanent`` option) the ``IDENTITY``
+argument directly defines the instance ``Name`` property.
+
+If a destination instance with the specified or generated ``Name`` property
+already exists, the command returns the alternate instance if ``--owned`` or raises
+an exception if ``--permanent`` defined. Note that the behavior for permanent requests is a
+more strict behavior than what a WBEM server would do, because the 'Name'
+property is only one of four key properties. The behavior for owned add
+requests allows the alternate name to be used in subscriptions.
+
+The options that can be applied when adding a destination are:
+
+* ``--listener-url`` - the URL of the listener including its scheme, host name
+  and protocol. The host name and protocol are required and the scheme defaults
+  to ``https`` if not specified.
+* ``-- owned`` / ``--permanent`` - flag defining whether the created instance
+  will be owned or permanent where the default is owned.
+
+The following example creates an owned destination instance with the IDENTITY ``ODEST1``
+and a permanent destination with IDENTITY ``PDEST1``
+
+In this case the owned instance will be created with the Name property value:
+
+.. code-block:: text
+
+    pywbemdestination:<subscription manager id>:ODEST1
+
+
+.. code-block:: text
+
+    $ pywbemcli subscription add-destinations ODEST1 --listener-url http://my-listener:5000 --owned
+    Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:ODEST1
+
+    $ pywbemcli subscription add-destinations PDEST1 --listener-url http://my-listener:5000 --permanent
+    Added permanent destination: Name=PDEST1
+
+See :ref:`pywbemcli subscription add-destination --help`.
+
+
+.. index::
+    pair: subscription commands; subscription add-filter
+
+.. _`subscription add-filter command`:
+
+``subscription add-filter`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The add-filter command creates a :term:`dynamic indication filter` to a WBEM
+server, by creating an indication filter instance (CIM class
+``CIM_IndicationFilter``) and adding this instance to the :term:`Interop namespace` of
+the current pywbemcli WBEM server (defined by the  :ref:`--name general option`,
+:ref:`--server general option`, or :ref:`--mock-server general option`).
+
+The format of this command is:
+
+.. code-block:: text
+
+    pywbemcli [GENERAL-OPTIONS] subscription add-filter IDENTITY [COMMAND-OPTIONS]
+
+The filter to be added is identified by the ``IDENTITY`` argument and the
+``--owned`` / ``--permanent`` option. Together these elements define the
+``Name`` property of the filter instance.
+
+If the instance is to be owned, (``--owned``) the value of the ``Name`` property
+will be:
+
+.. code-block:: text
+
+    "pywbemfilter:" {submgr_id} ":" {IDENTITY}``
+
+where:
+
+    - ``{submgr_id}`` is the subscription manager ID
+    - ``{IDENTITY}`` is the IDENTITY argument
+
+This should be used in cases where the user needs to have control over the
+filter name (e.g. because a DMTF management profile requires a particular
+name).
+
+If the instance is to be permanent, (``--permanent``) the the ``IDENTITY``
+argument directly defines the instance ``Name`` property.
+
+If a filter instance with the specified or generated ``Name`` property
+already exists, the command returns the alternate instance if ``--owned`` or raises
+an exception if ``--permanent`` defined. Note that the behavior for permanent requests is a
+more strict behavior than what a WBEM server would do, because the 'Name'
+property is only one of four key properties. The behavior for owned add
+requests allows the alternate name to be used in subscriptions.
+
+The command line options for this command are:
+
+* ``--query-language`` - The :term:`query language` in which the query is defined.  Normally
+  this must be either ``WQL`` a Microsoft specified query language (see
+  :term:`CQL`) or ``DMTF:CQL`` (the DMTF specified query language) (see
+  :term:`WQL`), The default language for this command is ``WQL``. The query
+  language specified must be implemented in the target server.
+* ``query`` - The query itself defined as a string using the :term:`query language`
+  defined by the ``query-language`` option.
+* ``-- owned`` / ``--permanent`` - flag defining whether the created instance
+  will be owned or permanent where the default is owned.
+
+The following example creates an owned subscription instance with the IDENTITY
+``ofilter1`` and a permanent filter with the ``Name`` property of ``pfilter1``.
+
+The owned instance ``ofilter1`` will be created with the ``Name`` property value of:
+
+    pywbemfilter:<subscription manager id>:pfilter1
+
+.. code-block:: text
+
+    $ pywbemcli subscription add-filter ofilter1 --query-language DMTF:CQL -q "SELECT * from CIM_blah" --owned
+    Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:pfilter1
+
+    $ pywbemcli subscription add-filter pfilter1 --listener-url http://my-listener:5000 --permanent
+    Added permanent filter: Name=filter1
+
+See :ref:`pywbemcli subscription add-filter --help`.
+
+
+.. index::
+    pair: subscription commands; subscription add-subscription
+
+
+.. _`subscription add-subscription command`:
+
+``subscription add-subscription`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The add-subscription command creates a single indication subscription instance
+(CIM class ``CIM_IndicationSubscription``) that defines the association between
+a previously defined indication filter and destination instance.
+
+The destination and filter are defined the two required arguments of
+the command ``DESTINATION_IDENTITY`` and ``FILTER_IDENTITY``. These arguments
+may be either the complete name property value of the destination and
+filter to be associated or the ``IDENTITY`` that was the IDENTITY argument of the
+command that created each of the elements.
+
+See :ref:`subscription add-destination command`: for the definition of
+``DESTINATION_IDENTITY and :ref:_`subscription add-filter command`: for the
+definition of the ``FILTER_ARGUMENT``
+
+
+The options for add-subscription are:
+
+* ``-- owned`` / ``--permanent`` - flag defining whether the created instance
+  will be owned or permanent where the default is owned. As described above, the
+  limitation is that owned destinations and filters cannot be attached to
+  permanent subscriptions.
+
+The following is an example of the creation of the destination, filter and
+subscription.
+
+.. code-block:: text
+
+    $> pywbemcli -s https:/blah
+    pywbemcli> subscription add-destinations odest1 --listener-url http://my-listener:5000 --owned
+    Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1
+
+    pywbemcli> subscription add-filter ofilter1 --query-language DMTF:CQL -q "SELECT * from CIM_blah" --owned
+    Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1
+
+    pywbemcli> subscription list-destinations
+    Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    | Ownership   | Identity   | Name                           | Destination       |   Persistence |   Protocol |   Subscription |
+    |             |            |                                |                   |          Type |            |          Count |
+    |-------------+------------+--------------------------------+-------------------+---------------+------------+----------------|
+    | owned       | odest1     | pywbemdestination:defaultpywbe | http://blah:5000  |             3 |          2 |              0 |
+    |             |            | mcliSubMgr:odest1              |                   |               |            |                |
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+
+    pywbemcli> subscription list-filters
+    Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    | Ownership   | identity   | Name                           | Query          | Query      | Source       |   Subscription |
+    |             |            |                                |                | Language   | Namespaces   |          Count |
+    |-------------+------------+--------------------------------+----------------+------------+--------------+----------------|
+    | owned       | ofilter1   | pywbemfilter:defaultpywbemcliS | SELECT * from  | WQL        | root/cimv2   |              0 |
+    |             |            | ubMgr:ofilter1                 | CIM_Indication |            |              |                |
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+
+    pywbemcli> subscription add-subscription pdest1 pfilter1 --owned
+    Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1
+
+See :ref:`pywbemcli subscription add-subscription --help`.
+
+.. index::
+    pair: subscription commands; subscription list
+
+.. _`subscription list command`:
+
+``subscription list`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``subscription list command`` provides a table with an overview of the
+subscription, filter, and destination counts organized by ownership.
+
+The options are:
+
+-  ``--type`` [ ``owned``| ``permanent`` | ``all`` ]  Defines whether the command is going to
+   filter owned ,permanent, or all objects for the response display.  The default is
+   all
+- ``-s`` / ``--summary``             If True, show only summary count of instances
+
+
+.. code-block:: text
+
+    $ subscription list
+    WBEM server instance counts: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988
+    +-------------------------------+---------+-------------+-------+
+    | CIM_class                     |   owned |   permanent |   all |
+    |-------------------------------+---------+-------------+-------|
+    | CIM_IndicationSubscription    |       1 |           0 |     1 |
+    | CIM_IndicationFilter          |       2 |           1 |     3 |
+    | CIM_ListenerDestinationCIMXML |       2 |           1 |     3 |
+    +-------------------------------+---------+-------------+-------+
+
+    $ subscription list --summary
+    1 subscriptions, 3 filters, 3 destinations
+
+
+.. index::
+    pair: subscription commands; subscription list-destinations
+
+.. _`subscription list-destinations command`:
+
+``subscription list-destinations`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``subscription ``list-destinations`` command displays the existing
+destination instances ((CIM class ``CIM_ListenerDestinationCIMXML``)) on
+the current WBEM server.
+
+**NOTE:** pywbemcli works only with the  ``CIM_ListenerDestinationCIMXML``
+class so that any indication destination instances defined with the superclass
+``CIM_ListenerDestination`` are not visible.
+
+The set of destinations to be displayed may be all of the destinations, the
+owned destinations, or the permanent (not-owned) destinations as defined by
+the ``--type`` option where the values are ``owned`` | ``permanent`` | ``all``.
+
+The format of the output is determined by the ``--output-format`` general
+option so that the destinations may be displayed as either CIM objects ( for
+example, ``-o mof``)  or in the table format. The default is to display the
+destinations as a table.  In the table format, the most important information
+for each instance is displayed, one instance per row.
+
+The detail level of the output is determined by the ``--summary`` and the
+``detail`` options and has an effect on both the mof and table outputs. The
+``--summary`` displays counts of the number of objects and the ``--detail``
+adds more data to the normal display, in particular displaying more properties
+in the table view.
+
+The options for list-destinations are:
+
+* ``-- type [ owned | permanent | all ]`` - choice option that
+  limits the list of destinations displayed to either just owned or permanent instances
+  or displays all destinations on the current WBEM server
+
+* ``--detail`` - displays additional detail for all of the possible output formats.
+  For MOF it includes empty properties. For table, it adds more rows with  properties
+  from the instance.
+
+* ``-s``/``--summary`` limits the display to an overview
+
+* ``--no``/``names-only`` displays only the CIM instance names of the
+  instances. This option only applies if the CIM object format (ex. mof) is used
+  for output.
+
+The following is an example of the display of the destinations as a table:
+
+.. code-block:: text
+
+    Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    | Ownership   | Identity   | Name                           | Destination       |   Persistence |   Protocol |   Subscription |
+    |             |            |                                |                   |          Type |            |          Count |
+    |-------------+------------+--------------------------------+-------------------+---------------+------------+----------------|
+    | owned       | odest1     | pywbemdestination:defaultpywbe | http://blah:5000  |             3 |          2 |              2 |
+    |             |            | mcliSubMgr:odest1              |                   |               |            |                |
+    | owned       | odest2     | pywbemdestination:defaultpywbe | http://blah:5001  |             3 |          2 |              1 |
+    |             |            | mcliSubMgr:odest2              |                   |               |            |                |
+    | permanent   | pdest1     | pdest1                         | https://blah:5003 |             2 |          2 |              2 |
+    | permanent   | pdest2     | pdest2                         | https://blah:5003 |             2 |          2 |              1 |
+    | owned       | pdestdup   | pywbemdestination:defaultpywbe | https://blah:5003 |             3 |          2 |              0 |
+    |             |            | mcliSubMgr:pdestdup            |                   |               |            |                |
+    | permanent   | pdestdup   | pdestdup                       | https://blah:5003 |             2 |          2 |              0 |
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+
+where the rows shown in the table view are:
+
+* *Ownership* - the owned/permanent definition of the destination.
+* *Identity* - The identity of the destination which should be the  ``IDENTITY``
+  used to remove the destination
+* *Name* - The value of the instance Name property
+* *Destination* - The value of the Destination property.
+* *Persistence Type* - The value of the ``PersistenceType`` property.
+* *Protocol* - The value of the ``Protocol`` property.
+* *Subscription Count* - The number of subscriptions with which this destination
+  is associated via the ``CIM_IndicationSubscription`` ``Handler`` reference.
+
+
+.. index::
+    pair: subscription commands; subscription list-filters
+
+.. _`subscription list-filters command`:
+
+``subscription list-filters`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``subscription ``list-filters`` command displays the existing
+indication filter instances ((CIM class ``CIM_IndicationFilter``)) on
+the current WBEM server.
+
+The set of filters to be displayed may be all of the filters, the
+owned filters, or the permanent (not owned) filters as defined by
+the ``--type`` option where the values are ``owned`` | ``permanent`` | ``all``.
+
+The format of the output is determined by the ``--output-format`` general
+option so that the destinations may be displayed as either CIM objects (``-o
+mof``)  or in the table format. The default is to display the destinations as a
+table.
+
+The detail level of the output is determined by the ``--summary`` and the
+``detail`` options and has an effect on both the MOF and table outputs. The
+``--summary`` displays counts of the number of objects and the ``--detail``
+adds more data to the normal display, in particular displaying more properties
+in the table view.
+
+The options for list-destinations are:
+
+* ``-- type [ owned | permanent | all ]`` - choice option that
+  limits the list of destinations displayed to either just owned or permanent instances
+  or displays all destinations on the current WBEM server
+
+* ``--detail`` - displays additional detail for all of the possible output formats.
+  For MOF it includes empty properties. For table, it adds more rows with  properties
+  from the instance.
+
+* ``-s``/``--summary`` limits the display to an overview
+
+* ``--no``/``names-only`` displays only the CIM instance names of the instances.
+  This option only applies if the CIM object format (ex. mof) is used for output.
+
+The following is an example of table output of indication filters:
+
+.. code-block:: text
+
+    Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    | Ownership   | identity   | Name                           | Query          | Query      | Source       |   Subscription |
+    |             |            |                                |                | Language   | Namespaces   |          Count |
+    |-------------+------------+--------------------------------+----------------+------------+--------------+----------------|
+    | owned       | ofilter1   | pywbemfilter:defaultpywbemcliS | SELECT * from  | WQL        | root/cimv2   |              2 |
+    |             |            | ubMgr:ofilter1                 | CIM_Indication |            |              |                |
+    | owned       | ofilter2   | pywbemfilter:defaultpywbemcliS | SELECT * from  | DMTF:CQL   | root/cimv2   |              1 |
+    |             |            | ubMgr:ofilter2                 | CIM_Indication |            |              |                |
+    | permanent   | pfilter1   | pfilter1                       | SELECT * from  | WQL        | root/cimv2   |              2 |
+    |             |            |                                | CIM_Indication |            |              |                |
+    | permanent   | pfilter2   | pfilter2                       | SELECT * from  | DMTF:CQL   | root/cimv2   |              1 |
+    |             |            |                                | CIM_Indication |            |              |                |
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+
+where the rows shown in the table view are:
+
+* *Ownership* - the owned/permanent definition of the destination.
+* *Identity* - The identity of the destination which should be the ``IDENTITY``
+  used to remove the destination
+* *Name* - The value of the instance Name property
+* *Query* - The query select statement defined for this filter.
+* *QueryLanguage* - The query language defined for this filter.
+* *SourceNamespaces* - The names of the local namespaces where the Indications
+  originate. If NULL, the namespace of the Filter registration is assumed.
+  SourceNamespaces replaces the deprecated SourceNamespace property on
+  IndicationFilter to provide a means of defining the multiple
+  namespaces where indications may originate.
+* *Subscription Count* - The number of subscriptions with which this filter
+  is associated via the ``CIM_IndicationSubscription`` ``Filter`` reference.
+
+
+.. index::
+    pair: subscription commands; subscription list-subscriptions
+
+.. _`subscription list-subscriptions command`:
+
+``subscription list-subscriptions`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``subscription ``list-filters`` command displays the existing
+indication filter instances ((CIM class ``CIM_IndicationSubscription``)) on
+the current WBEM server.
+
+The set of subscriptions to be displayed may be all of the destinations, the
+owned subscriptions, or the permanent (not owned) subscriptions as defined by
+the ``--type`` option where the values are ``owned`` | ``permanent`` | ``all``.
+
+The format of the output is determined by the ``--output-format`` general option so
+that the destinations may be displayed as either CIM objects (``-o mof``)  or
+in the table format. The default is to display the destinations as a table.
+
+The detail level of the output is determined by the ``--summary`` and the
+``detail`` options and has an effect on both the mof and table outputs. The
+``--summary`` displays counts of the number of objects and the ``--detail``
+adds more data to the normal display, in particular displaying more properties
+in the table view.
+
+The options for list-destinations are:
+
+* ``-- type [ owned | permanent | all ]`` - choice option that
+  limits the list of destinations displayed to either just owned or permanent instances
+  or displays all destinations on the current WBEM server
+
+* ``--detail`` - displays additional detail for all of the possible output formats.
+  For MOF it includes empty properties. For table, it adds more rows with  properties
+  from the instance.
+
+* ``-s``/``--summary`` limits the display to an overview
+
+* ``--no``/``names-only`` displays only the CIM instance names (paths) of the
+  instances. This option only applies if the CIM object format (ex. mof) is used
+  for output.
+
+The following is an example of table output of indication subscriptions:
+
+.. code-block:: text
+
+    pywbemcli> subscription list-subscriptions
+    Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+    | Ownership   | Handler           | Filter              | Handler           | Filter                       | Filter Query   | Subscription      |
+    |             | Identity          | Identity            | Destination       | Query                        | language       | StartTime         |
+    |-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------|
+    | permanent   | pdest1(permanent) | pfilter1(permanent) | https://blah:5003 | SELECT * from CIM_Indication | WQL            | 10/22/21 14:31:30 |
+    | permanent   | pdest2(permanent) | pfilter2(permanent) | https://blah:5003 | SELECT * from CIM_Indication | DMTF:CQL       | 10/22/21 14:31:30 |
+    | owned       | odest1(owned)     | ofilter1(owned)     | http://blah:5000  | SELECT * from CIM_Indication | WQL            | 10/22/21 14:31:30 |
+    | owned       | odest2(owned)     | ofilter2(owned)     | http://blah:5001  | SELECT * from CIM_Indication | DMTF:CQL       | 10/22/21 14:31:30 |
+    | owned       | odest1(owned)     | pfilter1(permanent) | http://blah:5000  | SELECT * from CIM_Indication | WQL            | 10/22/21 14:31:31 |
+    | owned       | pdest1(permanent) | ofilter1(owned)     | https://blah:5003 | SELECT * from CIM_Indication | WQL            | 10/22/21 14:31:31 |
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+    pywbemcli>
+
+where the rows shown in the table view are:
+
+* *Ownership* - the owned/permanent definition of the destination.
+* *HandlerIdentity* - The identity of the destination associated with this subscription.
+* *FilterIdentity* -  The identity of the filter associated with this subscription.
+* *Handler Destination* - The listener destination defined in the destination defined
+  by the HandlerIdentity
+* *FilterQuery* - The FilterQuery property from the associated filter defined by
+  the FilterIdentity
+* *FilterQueryLanguage* - The FilterQueryLanguage property from the associated
+  filter defined by the FilterIdentity
+* *Name* - The value of the instance Name property
+* *Query* - The query select statement defined for this filter.
+* *QueryLanguage* - The query language defined for this filter.
+* *SubscriptionStartTime* - The date and time that the subscription was created
+  if the WBEM server has implemented this property.
+
+.. index::
+    pair: subscription commands; subscription remove-destination
+
+.. _`subscription remove-destination command`:
+
+``subscription remove-destination`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Removes a listener destination instance (``CIM_ListenerDestinationCIMXML``)
+from the WBEM server where the instance to be removed is identified by the
+``IDENTITY`` argument and optional ``--owned`` option of the command.
+
+The listener destination  to be removed is identified by the ``IDENTITY``
+argument and the ``--owned`` / ``--permanent`` option. Together these elements
+define the ``Name`` property of the target destination instance.
+
+If the instance is owned, (``--owned``) the ``IDENTITY`` argument will define the
+``IDENTITY`` component of the ``Name`` property as follows:
+
+.. code-block:: text
+
+    ``"pywbemdestination:" {submgr_id} ":" {IDENTITY}``
+
+where:
+
+    - ``{submgr_id}`` is the subscription manager ID
+    - ``{IDENTITY}`` is the IDENTITY argument
+
+If the instance is to be permanent, (``--permanent`` option) the ``IDENTITY``
+argument directly defines the instance ``Name`` property.
+
+Some listener_destination instances on a server may be static in which case the
+server should generate an exception if an attempt to made to remove them.
+Pywbemcli has no way to identify these static destinations and they will appear
+as permanent destination instances.
+
+The ``--select`` option can be used if, for some reason, the ``IDENTITY`` and
+ownership option returns multiple instances. This should only occur in rare
+cases where destination instances have been created by other tools. If the
+--select option is not used pywbemcli displays the paths of the instances and
+terminates the command.
+
+If the instance to be removed is part of an existing association the command
+is aborted.  The :ref:`subscription list-destinations command` shows whether
+the destination is part of an existing subscription.
+
+The following example shows a command failure when an attempt is made to
+remove a destination that is part of a subscription and a good completion
+when that subscription has been removed.
+
+.. code-block:: text
+
+    pywbemcli> subscription list-destinations
+    Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    | Ownership   | Identity   | Name                           | Destination       |   Persistence |   Protocol |   Subscription |
+    |             |            |                                |                   |          Type |            |          Count |
+    |-------------+------------+--------------------------------+-------------------+---------------+------------+----------------|
+    | owned       | odest1     | pywbemdestination:defaultpywbe | http://blah:5000  |             3 |          2 |              1 |
+    |             |            | mcliSubMgr:odest1              |                   |               |            |                |
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    pywbemcli> subscription remove-destination odest1
+    Error: 1 (CIM_ERR_FAILED): The listener destination is referenced by subscriptions.; remove-destination failed: Exception :CIMError. Subscription mgr id: 'WBEMSubscriptionManager(_subscription_manager_id='defaultpywbemcliSubMgr', _servers={'http://FakedUrl:5988': WBEMServer(conn.url='http://FakedUrl:5988', interop_ns='interop', namespaces=None, namespace_paths=None, namespace_classname=None, brand='OpenPegasus', version='2.15.0', profiles=[0 instances])}, _systemnames={'http://FakedUrl:5988': 'Mock_WBEMServerTest'}...)', server id: 'http://FakedUrl:5988',
+
+    pywbemcli> subscription list-subscriptions
+    Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+    | Ownership   | Handler           | Filter              | Handler           | Filter                       | Filter Query   | Subscription      |
+    |             | Identity          | Identity            | Destination       | Query                        | language       | StartTime         |
+    |-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------|
+    | owned       | odest1(owned)     | ofilter1(owned)     | http://blah:5000  | SELECT * from CIM_Indication | WQL            | 10/24/21 11:36:03 |
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+
+    pywbemcli> subscription remove-subscription odest1 ofilter1
+    Removed 1 subscription(s) for destination-id: odest1, filter-id: ofilter1.
+
+.. index::
+    pair: subscription commands; subscription remove-filters
+
+.. _`subscription remove-filter command`:
+
+``subscription remove-filter`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Removes an indication filter instance (``CIM_IndicationFilter``) from the WBEM
+server.
+
+The filter  to be removed is identified by the ``IDENTITY`` argument and the
+``--owned`` / ``--permanent`` option. Together these elements define the
+``Name`` property of the target filter instance.
+
+If the instance is owned, (``--owned``) the ``IDENTITY`` argument will define the
+IDENTITY component of the ``Name`` property as follows:
+
+.. code-block:: text
+
+    ``"pywbemfilter:" {submgr_id} ":" {IDENTITY}``
+
+where:
+
+    - ``{submgr_id}`` is the subscription manager ID
+    - ``{IDENTITY}`` is the IDENTITY argument
+
+If the instance is to be permanent, (``--permanent`` option) the ``IDENTITY``
+argument directly defines the instance ``Name`` property.
+
+Some filter instances on a server may be static in which case the
+server should generate an exception if an attempt to made to remove them.
+Pywbemcli has no way to identify these static filters and they will appear
+as permanent filter instances.
+
+The ``--select`` option can be used if, for some reason, the ``IDENTITY``
+argument and ownership option returns multiple instances. This should only
+occur in rare cases where filter instances have been created by other tools. If
+the --select option is not used pywbemcli displays the paths of the instances
+and terminates the command.
+
+If the instance to be removed is part of an existing association the command
+is aborted.  The :ref:`subscription list-filters command` shows whether
+the filter is part of an existing subscription.
+
+.. code-block:: text
+
+    subscription list-filters
+    Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    | Ownership   | identity   | Name                           | Query          | Query      | Source       |   Subscription |
+    |             |            |                                |                | Language   | Namespaces   |          Count |
+    |-------------+------------+--------------------------------+----------------+------------+--------------+----------------|
+    | owned       | ofilter1   | pywbemfilter:defaultpywbemcliS | SELECT * from  | WQL        | root/cimv2   |              2 |
+    |             |            | ubMgr:ofilter1                 | CIM_Indication |            |              |                |
+    | owned       | ofilter2   | pywbemfilter:defaultpywbemcliS | SELECT * from  | DMTF:CQL   | root/cimv2   |              0 |
+    |             |            | ubMgr:ofilter2                 | CIM_Indication |            |              |                |
+    |             |            |                                | CIM_Indication |            |              |                |
+    | permanent   | pfilter2   | pfilter2                       | SELECT * from  | DMTF:CQL   | root/cimv2   |              1 |
+    |             |            |                                | CIM_Indication |            |              |                |
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    pywbemcli> subscription remove-filter ofilter2
+    Removed owned indication filter: identity=ofilter2, Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter2.
+
+.. index::
+    pair: subscription commands; subscription remove-subscriptions
+
+.. _`subscription remove-subscription command`:
+
+``subscription remove-subscription`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This command removes an indication subscription that is identified by two
+arguments that represent the identity of the destination and filter references
+of the target indication subscription.
+
+The destination and filter are defined the two required arguments of
+the command ``DESTINATION_IDENTITY`` and ``FILTER_IDENTITY``. These arguments
+may be either the complete name property value of the destination and
+filter associated instances or the IDENTITY that was the ``IDENTITY`` argument of the
+command that created each of the elements.
+
+
+The options for this command are:
+
+* ``-v`` | ``verify`` - Prompt the user to verify the subscription to be removed
+  before the request is sent to the WBEM server.
+
+* ``--remove-associated-instances`` - Remove the associated destination and
+  filter instances before removing the subscription. They will only be removed
+  if they are not part of any other associations.
+
+* ``--select`` - Prompt user to select from multiple objects that match the
+  identity arguments provided with the command. Otherwise, if the command finds
+  multiple instances that match the IDENTITY, the operation fails.
+
+The ``--select`` option can be used if, for some reason, the
+DESTINATION_IDENTITY and FILTER_IDENTITY and return multiple instances. This
+should only occur in rare cases where filter instances have been created by
+other tools. If the --select option is not used pywbemcli displays the instance
+names  of the instances and terminates the command.
+
+.. code-block:: text
+
+    subscription list-destinations
+    Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    | Ownership   | Identity   | Name                           | Destination       |   Persistence |   Protocol |   Subscription |
+    |             |            |                                |                   |          Type |            |          Count |
+    |-------------+------------+--------------------------------+-------------------+---------------+------------+----------------|
+    | owned       | odest1     | pywbemdestination:defaultpywbe | http://blah:5000  |             3 |          2 |              2 |
+    |             |            | mcliSubMgr:odest1              |                   |               |            |                |
+    | owned       | odest2     | pywbemdestination:defaultpywbe | http://blah:5001  |             3 |          2 |              0 |
+    |             |            | mcliSubMgr:odest2              |                   |               |            |                |
+    | permanent   | pdest1     | pdest1                         | https://blah:5003 |             2 |          2 |              2 |
+    | permanent   | pdest2     | pdest2                         | https://blah:5003 |             2 |          2 |              1 |
+    +-------------+------------+--------------------------------+-------------------+---------------+------------+----------------+
+    pywbemcli> subscription list-filters
+    Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    | Ownership   | identity   | Name                           | Query          | Query      | Source       |   Subscription |
+    |             |            |                                |                | Language   | Namespaces   |          Count |
+    |-------------+------------+--------------------------------+----------------+------------+--------------+----------------|
+    | owned       | ofilter1   | pywbemfilter:defaultpywbemcliS | SELECT * from  | WQL        | root/cimv2   |              2 |
+    |             |            | ubMgr:ofilter1                 | CIM_Indication |            |              |                |
+    | permanent   | pfilter1   | pfilter1                       | SELECT * from  | WQL        | root/cimv2   |              2 |
+    |             |            |                                | CIM_Indication |            |              |                |
+    | permanent   | pfilter2   | pfilter2                       | SELECT * from  | DMTF:CQL   | root/cimv2   |              1 |
+    |             |            |                                | CIM_Indication |            |              |                |
+    +-------------+------------+--------------------------------+----------------+------------+--------------+----------------+
+    pywbemcli> subscription list-subscriptions
+    Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+    | Ownership   | Handler           | Filter              | Handler           | Filter                       | Filter Query   | Subscription      |
+    |             | Identity          | Identity            | Destination       | Query                        | language       | StartTime         |
+    |-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------|
+    | permanent   | pdest1(permanent) | pfilter1(permanent) | https://blah:5003 | SELECT * from CIM_Indication | WQL            | 11/02/21 10:36:32 |
+    | permanent   | pdest2(permanent) | pfilter2(permanent) | https://blah:5003 | SELECT * from CIM_Indication | DMTF:CQL       | 11/02/21 10:36:33 |
+    | owned       | odest1(owned)     | ofilter1(owned)     | http://blah:5000  | SELECT * from CIM_Indication | WQL            | 11/02/21 10:36:33 |
+    | owned       | odest1(owned)     | pfilter1(permanent) | http://blah:5000  | SELECT * from CIM_Indication | WQL            | 11/02/21 10:36:33 |
+    | owned       | pdest1(permanent) | ofilter1(owned)     | https://blah:5003 | SELECT * from CIM_Indication | WQL            | 11/02/21 10:36:34 |
+    +-------------+-------------------+---------------------+-------------------+------------------------------+----------------+-------------------+
+    pywbemcli> subscription remove-subscription odest1 ofilter1
+    Removed 1 subscription(s) for destination-id: odest1, filter-id: ofilter1.
+
+
+.. index::
+    pair: subscription commands; subscription remove-server
+
+.. _`subscription remove-server command`:
+
+``Subscription remove-server`` command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    This command unregisters owned listeners from the WBEM server and removes
+    all owned indication subscriptions, owned indication filters, and owned
+    listener destinations for this currently active pywbemcli WBEM server from
+    that WBEM server.
+
+    It can be used to completely clean the owned subscription entities for the
+    currently active pywbemcli WBEM server from that wbem server and local
+    caches.
+
+    The currently active WBEM server is the WBEM server to which pywbemcli is
+    currently attached; the WBEM server defined by  the :ref:`--name general option`,
+    :ref:`--server general option`, or :ref:`--mock-server general option`.
+
+    The identity of the current wbem server id visible in the title of
+    each of the subscription list table outputs.
+
+    Thus, for example current server is defined by svr_id and is actually
+    the fixed name ``http://FakedUrl:5988`` of the mock server.
+
+.. code-block:: text
+
+    pywbemcli> subscription list
+
+    WBEM server instance counts: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988
+    +-------------------------------+---------+-------------+-------+
+    | CIM_class                     |   owned |   permanent |   all |
+    |-------------------------------+---------+-------------+-------|
+    | CIM_IndicationSubscription    |       2 |           2 |     6 |
+    | CIM_IndicationFilter          |       2 |           3 |     6 |
+    | CIM_ListenerDestinationCIMXML |       2 |           3 |     6 |
+    +-------------------------------+---------+-------------+-------+
+
+    pywbemcli> subscription remove-server
+    Removing owned destinations, filters, and subscriptions for server-id http://FakedUrl:5988. Remove counts: destinations=2, filters=2, subscriptions=2
+
+    pywbemcli> subscription list
+
+    WBEM server instance counts: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988
+    +-------------------------------+---------+-------------+-------+
+    | CIM_class                     |   owned |   permanent |   all |
+    |-------------------------------+---------+-------------+-------|
+    | CIM_IndicationSubscription    |       0 |           2 |     2 |
+    | CIM_IndicationFilter          |       0 |           3 |     3 |
+    | CIM_ListenerDestinationCIMXML |       0 |           3 |     3 |
+    +-------------------------------+---------+-------------+-------+
+
 
 
 .. index:: pair: repl; command
