@@ -31,7 +31,8 @@ import pytest
 
 from pywbem import CIMClass, CIMProperty, CIMQualifier, CIMInstance, \
     CIMQualifierDeclaration, CIMInstanceName, Uint8, \
-    CIMClassName, CIMMethod, CIMParameter, __version__, MOFCompiler
+    CIMClassName, CIMMethod, CIMParameter, __version__, MOFCompiler, \
+    ToleratedSchemaIssueWarning
 
 from pywbem._mof_compiler import MOFWBEMConnection
 
@@ -2812,27 +2813,33 @@ TESTCASES_PARSE_VERSION_VALUE = [
     ('Verify invalid string with only two items returns 3 items',
      dict(ver="2.41",
           exp_rtn=[2, 41, 0]),
-     None, None, OK, ),
+     None, ToleratedSchemaIssueWarning, OK, ),
 
     ('Verify invalid string with 4 items returns 3 items',
      dict(ver="2.41.1.1",
           exp_rtn=[2, 41, 1]),
-     None, None, RUN, ),
+     None, ToleratedSchemaIssueWarning, OK, ),
 
     ('Verify invalid string with alphabetic characters returns 0.0.0',
      dict(ver="a.41.1",
           exp_rtn=[0, 0, 0]),
-     None, None, OK, ),
+     None, ToleratedSchemaIssueWarning, OK, ),
 
     ('Verify invalid string with alphabetic characters returns 0.0.0',
      dict(ver="2.abcdef.1",
           exp_rtn=[0, 0, 0]),
-     None, None, OK, ),
+     None, ToleratedSchemaIssueWarning, OK, ),
+
+
+    ('Verify invalid string with alphabetic characters returns 0.0.0',
+     dict(ver="xyz.abcdef.jkl",
+          exp_rtn=[0, 0, 0]),
+     None, ToleratedSchemaIssueWarning, OK, ),
 
     ('Verify invalid string empty returns 3 items',
      dict(ver="",
           exp_rtn=[0, 0, 0]),
-     None, None, OK, ),
+     None, ToleratedSchemaIssueWarning, OK, ),
 ]
 
 
