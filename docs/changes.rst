@@ -63,9 +63,12 @@ Released: not yet
 * Fixed install error of wrapt 1.13.0 on Python 2.7 on Windows due to lack of
   MS Visual C++ 9.0 on GitHub Actions, by pinning it to <1.13.
 
-* Fix issue with message from _common.py (parse_version_value) that was 
-  passed to warning_msg but should have been subclass of python warning.  
+* Fix issue with message from _common.py (parse_version_value) that was
+  passed to warning_msg but should have been subclass of python warning.
   Changed to use pywbemtools_warn(). (see issue #1041)
+
+* Fixed issue with Sphinx and python 2.7 by changing the sphinx requirements
+  in dev-requirements.txt and minimum-constraints.txt. (see issue #1070)
 
 **Enhancements:**
 
