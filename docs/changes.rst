@@ -22,6 +22,10 @@ Released: not yet
 
 **Cleanup:**
 
+  Modify pywbemtools to use the library click version 8.x for python version
+  greater than 3.5 which is the minimum version of python usable with
+  click 8.x. With python <= 3.5, click < 8.x is used.
+
 **Known issues:**
 
 * See `list of open issues`_.
