@@ -70,6 +70,9 @@ Released: not yet
 * Fixed issue with Sphinx and python 2.7 by changing the sphinx requirements
   in dev-requirements.txt and minimum-constraints.txt. (see issue #1070)
 
+* Modify dev-requirements.txt to limit version of more-itertools to != 8.11.0
+  for python < 3.6. (see issue #1077)
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
@@ -120,6 +123,7 @@ Released: not yet
   the copy() method was added to  pywbem (see issue #1030).  This fixes issue
   in python 2.7 with exception and avoids copying the FakedWBEMConnection
   CIM repository.
+
 
 **Known issues:**
 

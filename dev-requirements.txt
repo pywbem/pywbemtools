@@ -22,6 +22,10 @@ pluggy>=0.13.0
 colorama>=0.3.9,<0.4.0; python_version <= '3.4'
 colorama>=0.4.0; python_version >= '3.5'
 
+# more-itertools version 8.11 requires python 3.6, See issue #2796
+more-itertools>=4.0.0,!=8.11.0; python_version < '3.6'
+more-itertools>=4.0.0; python_version >= '3.6'
+
 # Virtualenv
 # Virtualenv 20.0.19 has an issue where it does not install pip on Python 3.4.
 # Virtualenv 20.0.32 has an issue where it raises AttributeError on Python 3.4.
