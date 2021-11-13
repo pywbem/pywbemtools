@@ -42,6 +42,9 @@ Released: not yet
 * Fixed issue with Sphinx and python 2.7 by changing the sphinx requirements
   in dev-requirements.txt and minimum-constraints.txt. (see issue #1070)
 
+* Modify dev-requirements.txt to limit version of more-itertools to  < 8.10.1
+  for python < 3.6. (see issue #1077)
+
 **Enhancements:**
 
 * Enhanced test matrix for push-driven runs on GitHub Actions to add
