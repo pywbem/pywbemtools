@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------------
 # Makefile for pybemtools repository of pywbem project
-# Based on the makefile in the pywbem repository of pywbem project
+# Based on the Makefile in the pywbem repository of pywbem project
 #
-# Supported OS platforms for this makefile:
+# Supported OS platforms for this Makefile:
 #     Linux (any distro)
 #     OS-X
 #     Windows with UNIX-like env such as CygWin (with a UNIX-like shell and
@@ -10,7 +10,7 @@
 #     native Windows (with the native Windows command processor and Python in
 #       Windows)
 #
-# Prerequisites for running this makefile:
+# Prerequisites for running this Makefile:
 #   These commands are used on all supported OS platforms. On native Windows,
 #   they may be provided by UNIX-like environments such as CygWin:
 #     make (GNU make)
@@ -45,8 +45,8 @@ ifndef PACKAGE_LEVEL
   PACKAGE_LEVEL := latest
 endif
 ifeq ($(PACKAGE_LEVEL),minimum)
-  pip_level_opts := -c minimum-constraints.txt -c minimum-constraints-base.txt
-  pip_constraints_deps := minimum-constraints.txt minimum-constraints-base.txt
+  pip_level_opts := -c minimum-constraints.txt
+  pip_constraints_deps := minimum-constraints.txt
 else
   ifeq ($(PACKAGE_LEVEL),latest)
     pip_level_opts := --upgrade --upgrade-strategy eager
@@ -254,73 +254,6 @@ py_src_files := \
 # Test log
 test_log_file := test_$(python_version_fn).log
 
-ifdef TESTCASES
-  pytest_opts := $(TESTOPTS) -k $(TESTCASES)
-else
-  pytest_opts := $(TESTOPTS)
-endif
-pytest_end2end_opts := -v --tb=short $(pytest_opts)
-
-ifeq ($(python_m_version),3)
-  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
-  pytest_end2end_warning_opts := $(pytest_warning_opts)
-else
-  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
-  pytest_end2end_warning_opts := $(pytest_warning_opts)
-endif
-
-ifeq ($(python_mn_version),3.4)
-  pytest_cov_opts :=
-else
-  pytest_cov_opts := --cov $(package_name) $(coverage_report) --cov-config .coveragerc
-endif
-
-# Files to be put into distribution archive.
-# Keep in sync with dist_dependent_files.
-# This is used for 'include' statements in MANIFEST.in. The wildcards are used
-# as specified, without being expanded.
-dist_manifest_in_files := \
-    LICENSE.txt \
-    README.rst \
-		README_PYPI.rst \
-		requirements.txt \
-    *.py \
-    $(package_name)/*.py \
-    $(package_name)/*/*.py \
-		$(package_name)/*/*/*.py \
-
-# Files that are dependents of the distribution archive.
-# Keep in sync with dist_manifest_in_files.
-dist_dependent_files := \
-    LICENSE.txt \
-    README.rst \
-		README_PYPI.rst \
-		requirements.txt \
-    $(wildcard *.py) \
-    $(wildcard $(package_name)/*.py) \
-    $(wildcard $(package_name)/*/*.py) \
-		$(wildcard $(package_name)/*/*/*.py) \
-
-# Scripts are required to install the OS-level components of pywbem.
-ifeq ($(PLATFORM),Windows_native)
-  pywbem_os_setup_file := pywbem_os_setup.bat
-else
-  pywbem_os_setup_file := pywbem_os_setup.sh
-endif
-
-# This approach for the Pip install command is needed for Windows because
-# pip.exe is locked and thus cannot be upgraded. We use this approach also for
-# the other packages.
-PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
-
-ifeq ($(PLATFORM),Windows_native)
-  home := $(HOMEDRIVE)$(HOMEPATH)
-  cwd := $(shell cd)
-else
-  home := $(HOME)
-  cwd := $(shell pwd)
-endif
-
 # Issues reported by safety command that are ignored.
 # Package upgrade strategy due to reported safety issues:
 # - For packages that are direct or indirect runtime requirements, upgrade
@@ -399,6 +332,75 @@ safety_ignore_opts := \
 	-i 42298 \
 	-i 42559 \
 
+ifdef TESTCASES
+  pytest_opts := $(TESTOPTS) -k $(TESTCASES)
+else
+  pytest_opts := $(TESTOPTS)
+endif
+pytest_end2end_opts := -v --tb=short $(pytest_opts)
+
+ifeq ($(python_mn_version),3.4)
+  pytest_cov_opts :=
+else
+  pytest_cov_opts := --cov $(package_name) $(coverage_report) --cov-config .coveragerc
+endif
+
+ifeq ($(python_m_version),3)
+  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
+  pytest_end2end_warning_opts := $(pytest_warning_opts)
+else
+  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
+  pytest_end2end_warning_opts := $(pytest_warning_opts)
+endif
+
+# Files to be put into distribution archive.
+# Keep in sync with dist_dependent_files.
+# This is used for 'include' statements in MANIFEST.in. The wildcards are used
+# as specified, without being expanded.
+dist_manifest_in_files := \
+    LICENSE.txt \
+    README.rst \
+    README_PYPI.rst \
+    requirements.txt \
+    *.py \
+    $(package_name)/*.py \
+    $(package_name)/*/*.py \
+    $(package_name)/*/*/*.py \
+
+# Files that are dependents of the distribution archive.
+# Keep in sync with dist_manifest_in_files.
+dist_dependent_files := \
+    LICENSE.txt \
+    README.rst \
+    README_PYPI.rst \
+    requirements.txt \
+    $(wildcard *.py) \
+    $(wildcard $( package_name)/*.py) \
+    $(wildcard $(package_name)/*/*.py) \
+    $(wildcard $(package_name)/*/*/*.py) \
+
+# Scripts are required to install the OS-level components of pywbem.
+ifeq ($(PLATFORM),Windows_native)
+  pywbem_os_setup_file := pywbem_os_setup.bat
+else
+  pywbem_os_setup_file := pywbem_os_setup.sh
+endif
+
+# This approach for the Pip install command is needed for Windows because
+# pip.exe is locked and thus cannot be upgraded. We use this approach also for
+# the other packages.
+PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
+
+ifeq ($(PLATFORM),Windows_native)
+  home := $(HOMEDRIVE)$(HOMEPATH)
+  cwd := $(shell cd)
+else
+  home := $(HOME)
+  cwd := $(shell pwd)
+endif
+
+
+
 .PHONY: help
 help:
 	@echo "Makefile for $(package_name) package"
@@ -449,7 +451,7 @@ help:
 
 .PHONY: platform
 platform:
-	@echo "makefile: Platform related information as seen by make:"
+	@echo "Makefile: Platform related information as seen by make:"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Home directory: $(home)"
 	@echo "Current directory: $(cwd)"
@@ -467,12 +469,12 @@ platform:
 
 .PHONY: pip_list
 pip_list:
-	@echo "makefile: Python packages as seen by make:"
+	@echo "Makefile: Python packages as seen by make:"
 	$(PIP_CMD) list
 
 .PHONY: env
 env:
-	@echo "Environment as seen by make:"
+	@echo "Makefile: Environment as seen by make:"
 	$(ENV)
 
 .PHONY: _check_version
@@ -481,23 +483,22 @@ ifeq (,$(package_version))
 	$(error Package version could not be determined)
 endif
 
+.PHONY: _show_bitsize
+_show_bitsize:
+	@echo "Makefile: Determining bit size of Python executable"
+	$(PYTHON_CMD) tools/python_bitsize.py
+	@echo "Makefile: Done determining bit size of Python executable"
+
 # GitHub Actions has Pip 7.1.2 preinstalled on Python 3.4 on Windows, which does
 # not support python_requires yet, and thus would update Pip beyond the last
 # supported version. This rule ensures we have a minimum version of Pip that
 # supports what this project needs.
-pip_minimum_$(pymn).done: Makefile minimum-constraints-base.txt
-	@echo "makefile: Upgrading/downgrading Pip to minimum version"
+pip_minimum_$(pymn).done: Makefile minimum-constraints.txt
+	@echo "Makefile: Upgrading/downgrading Pip to minimum version"
 	-$(call RM_FUNC,$@)
-	$(PIP_INSTALL_CMD) -c minimum-constraints-base.txt pip
+	$(PIP_INSTALL_CMD) -c minimum-constraints.txt pip
 	echo "done" >$@
-	@echo "makefile: Done upgrading/downgrading Pip to minimum version"
-
-install_basic_$(pymn).done: Makefile pip_minimum_$(pymn).done $(pip_constraints_deps)
-	@echo "makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
-	-$(call RM_FUNC,$@)
-	$(PIP_INSTALL_CMD) $(pip_level_opts) pip setuptools wheel
-	echo "done" >$@
-	@echo "makefile: Done installing/upgrading basic Python packages"
+	@echo "Makefile: Done upgrading/downgrading Pip to minimum version"
 
 # Scripts are required to install the OS-level components of pywbem.
 # Makefile gets the required scripts from the pywbem project on GitHub.
@@ -508,24 +509,25 @@ pywbem_os_setup.sh: Makefile
 pywbem_os_setup.bat: Makefile
 	curl -s -o pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
 
-.PHONY: _show_bitsize
-_show_bitsize:
-	@echo "makefile: Determining bit size of Python executable"
-	$(PYTHON_CMD) tools/python_bitsize.py
-	@echo "makefile: Done determining bit size of Python executable"
+install_basic_$(pymn).done: Makefile pip_minimum_$(pymn).done $(pip_constraints_deps)
+	@echo "Makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
+	-$(call RM_FUNC,$@)
+	$(PIP_INSTALL_CMD) $(pip_level_opts) pip setuptools wheel
+	echo "done" >$@
+	@echo "Makefile: Done installing/upgrading basic Python packages"
 
 install_$(package_name)_$(pymn).done: Makefile install_basic_$(pymn).done requirements.txt setup.py MANIFEST.in $(pip_constraints_deps)
-	@echo "makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
+	@echo "Makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
 	$(PIP_INSTALL_CMD) $(pip_level_opts) -r requirements.txt
 	$(PIP_INSTALL_CMD) $(pip_level_opts) -e .
 	echo "done" >$@
-	@echo "makefile: Done installing $(package_name) and its Python runtime prerequisites"
+	@echo "Makefile: Done installing $(package_name) and its Python runtime prerequisites"
 
 .PHONY: install
 install: install_$(pymn).done
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name)_$(pymn).done
 	-$(call RM_FUNC,$@)
@@ -540,7 +542,7 @@ install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name
 # 'libcrypt-devel' and 'python3-devel'. These packages happen to also be used
 # by pywbem for development.
 develop_os_$(pymn).done: Makefile install_basic_$(pymn).done $(pywbem_os_setup_file)
-	@echo "makefile: Installing OS-level development requirements"
+	@echo "Makefile: Installing OS-level development requirements"
 	-$(call RM_FUNC,$@)
 ifeq ($(PLATFORM),Windows_native)
 	pywbem_os_setup.bat develop
@@ -548,139 +550,139 @@ else
 	./pywbem_os_setup.sh develop
 endif
 	echo "done" >$@
-	@echo "makefile: Done installing OS-level development requirements"
+	@echo "Makefile: Done installing OS-level development requirements"
 
 .PHONY: develop
 develop: develop_$(pymn).done
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 develop_$(pymn).done: Makefile install_basic_$(pymn).done install_$(pymn).done develop_os_$(pymn).done dev-requirements.txt $(pip_constraints_deps)
-	@echo "makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
+	@echo "Makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	$(PIP_INSTALL_CMD) $(pip_level_opts) -r dev-requirements.txt
 	echo "done" >$@
-	@echo "makefile: Done installing Python development requirements"
+	@echo "Makefile: Done installing Python development requirements"
 
 .PHONY: build
 build: $(bdist_file) $(sdist_file)
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: builddoc
 builddoc: html
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: flake8
 flake8: flake8_$(pymn).done
-	@echo '$@ done.'
+	@echo 'Makefile: Target $@ done.'
 
 .PHONY: check
 check: flake8_$(pymn).done safety_$(pymn).done
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: pylint
 pylint: pylint_$(pymn).done
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: todo
 todo: todo_$(pymn).done
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: all
 all: install develop build builddoc check pylint installtest test
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Target $@ done."
 
 .PHONY: clobber
 clobber: clean
-	@echo "makefile: Removing everything for a fresh start"
+	@echo "Makefile: Removing everything for a fresh start"
 	-$(call RM_FUNC,*.done epydoc.log $(dist_files) pywbem_os_setup.*)
 	-$(call RMDIR_FUNC,$(doc_build_dir) .tox $(coverage_html_dir))
 	-$(call RM_R_FUNC,*cover)
-	@echo "makefile: Done removing everything for a fresh start"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done removing everything for a fresh start"
+	@echo "Makefile: Target $@ done."
 
 # Remove *.pyc, __pycache__, MANIFEST, cache, eggs
 # Also remove any build products that are dependent on the Python version
 .PHONY: clean
 clean:
-	@echo "makefile: Removing temporary build products"
+	@echo "Makefile: Removing temporary build products"
 	-$(call RM_R_FUNC,*.pyc)
 	-$(call RMDIR_R_FUNC,__pycache__)
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build .cache .pytest_cache $(package_name).egg-info .eggs)
-	@echo "makefile: Done removing temporary build products"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done removing temporary build products"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: upload
 upload: _check_version $(dist_files)
-	@echo "makefile: Uploading to PyPI: $(package_name) $(package_version)"
+	@echo "Makefile: Uploading to PyPI: $(package_name) $(package_version)"
 	twine upload $(dist_files)
-	@echo "makefile: Done uploading to PyPI"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done uploading to PyPI"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: html
 html: $(doc_build_dir)/html/index.html
-	@echo "makefile: Target $@ done."
+	@echo "Kakefile: Target $@ done."
 
 $(doc_build_dir)/html/index.html: develop_$(pymn).done Makefile $(doc_dependent_files)
-	@echo "makefile: Creating the documentation as HTML pages"
+	@echo "Makefile: Creating the documentation as HTML pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b html $(doc_opts) $(doc_build_dir)/html
-	@echo "makefile: Done creating the documentation as HTML pages; top level file: $@"
+	@echo "Makefile: Done creating the documentation as HTML pages; top level file: $@"
 
 .PHONY: pdf
 pdf: develop_$(pymn).done Makefile $(doc_dependent_files)
-	@echo "makefile: Creating the documentation as PDF file"
+	@echo "Makefile: Creating the documentation as PDF file"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b latex $(doc_opts) $(doc_build_dir)/pdf
-	@echo "makefile: Running LaTeX files through pdflatex..."
+	@echo "Makefile: Running LaTeX files through pdflatex..."
 	$(MAKE) -C $(doc_build_dir)/pdf all-pdf
-	@echo "makefile: Done creating the documentation as PDF file in: $(doc_build_dir)/pdf/"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done creating the documentation as PDF file in: $(doc_build_dir)/pdf/"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: man
 man: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Creating the documentation as man pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b man $(doc_opts) $(doc_build_dir)/man
-	@echo "makefile: Done creating the documentation as man pages in: $(doc_build_dir)/man/"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done creating the documentation as man pages in: $(doc_build_dir)/man/"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: docchanges
 docchanges: develop_$(pymn).done
-	@echo "makefile: Creating the doc changes overview file"
+	@echo "Makefile: Creating the doc changes overview file"
 	$(doc_cmd) -b changes $(doc_opts) $(doc_build_dir)/changes
 	@echo
-	@echo "makefile: Done creating the doc changes overview file in: $(doc_build_dir)/changes/"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done creating the doc changes overview file in: $(doc_build_dir)/changes/"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: doclinkcheck
 doclinkcheck: develop_$(pymn).done
-	@echo "makefile: Creating the doc link errors file"
+	@echo "Makefile: Creating the doc link errors file"
 	$(doc_cmd) -b linkcheck $(doc_opts) $(doc_build_dir)/linkcheck
 	@echo
-	@echo "makefile: Done creating the doc link errors file: $(doc_build_dir)/linkcheck/output.txt"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done creating the doc link errors file: $(doc_build_dir)/linkcheck/output.txt"
+	@echo "Makefile: Target $@ done."
 
 .PHONY: doccoverage
 doccoverage: develop_$(pymn).done
-	@echo "makefile: Creating the doc coverage results file"
+	@echo "Makefile: Creating the doc coverage results file"
 	$(doc_cmd) -b coverage $(doc_opts) $(doc_build_dir)/coverage
-	@echo "makefile: Done creating the doc coverage results file: $(doc_build_dir)/coverage/python.txt"
-	@echo "makefile: Target $@ done."
+	@echo "Makefile: Done creating the doc coverage results file: $(doc_build_dir)/coverage/python.txt"
+	@echo "Makefile: Target $@ done."
 
 # Note: distutils depends on the right files specified in MANIFEST.in, even when
 # they are already specified e.g. in 'package_data' in setup.py.
 # We generate the MANIFEST.in file automatically, to have a single point of
 # control (this Makefile) for what gets into the distribution archive.
 MANIFEST.in: Makefile
-	@echo "makefile: Creating the manifest input file"
+	@echo "Makefile: Creating the manifest input file"
 	echo "# file GENERATED by Makefile, do NOT edit" >$@
 ifeq ($(PLATFORM),Windows_native)
 	for %%f in ($(dist_manifest_in_files)) do (echo include %%f >>$@)
 else
 	echo "$(dist_manifest_in_files)" |xargs -n 1 echo include >>$@
 endif
-	@echo "makefile: Done creating the manifest input file: $@"
+	@echo "Makefile: Done creating the manifest input file: $@"
 
 # Distribution archives.
 # Note: Deleting MANIFEST causes distutils (setup.py) to read MANIFEST.in and to
@@ -688,11 +690,11 @@ endif
 # Note: Deleting build is a safeguard against picking up partial build products
 # which can lead to incorrect hashbangs in the pywbem scripts in wheel archives.
 $(bdist_file) $(sdist_file): Makefile setup.py MANIFEST.in $(doc_utility_help_files) $(dist_dependent_files)
-	@echo "makefile: Creating the distribution archive files"
+	@echo "Makefile: Creating the distribution archive files"
 	-$(call RM_FUNC,MANIFEST)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info-INFO .eggs)
 	$(PYTHON_CMD) setup.py sdist -d $(dist_dir) bdist_wheel -d $(dist_dir) --universal
-	@echo "makefile: Done creating the distribution archive files: $(bdist_file) $(sdist_file)"
+	@echo "Makefile: Done creating the distribution archive files: $(bdist_file) $(sdist_file)"
 
 # PyLint status codes:
 # * 0 if everything went fine
@@ -706,83 +708,83 @@ $(bdist_file) $(sdist_file): Makefile setup.py MANIFEST.in $(doc_utility_help_fi
 # The make command checks for statuses: 1,2,32
 pylint_$(pymn).done: Makefile develop_$(pymn).done $(pylint_rc_file) $(py_src_files)
 ifeq ($(python_m_version),2)
-	@echo "makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
+	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
 else
 ifeq ($(python_mn_version),3.4)
-	@echo "makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
+	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
 else
-	@echo "makefile: Running Pylint"
+	@echo "Makefile: Running Pylint"
 	-$(call RM_FUNC,$@)
 	pylint --version
 	pylint $(pylint_opts) --rcfile=$(pylint_rc_file) $(py_src_files)
 	echo "done" >$@
-	@echo "makefile: Done running Pylint"
+	@echo "Makefile: Done running Pylint"
 endif
 endif
 
 flake8_$(pymn).done: Makefile develop_$(pymn).done $(flake8_rc_file) $(py_src_files)
-	@echo "makefile: Running Flake8"
+	@echo "Makefile: Running Flake8"
 	-$(call RM_FUNC,$@)
 	flake8 --version
 	flake8 --statistics --config=$(flake8_rc_file) --filename='*' $(py_src_files)
 	echo "done" >$@
-	@echo "makefile: Done running Flake8"
+	@echo "Makefile: Done running Flake8"
 
 safety_$(pymn).done: Makefile develop_$(pymn).done minimum-constraints.txt
-	@echo "makefile: Running pyup.io safety check"
+	@echo "Makefile: Running pyup.io safety check"
 	-$(call RM_FUNC,$@)
 	safety check -r minimum-constraints.txt --full-report $(safety_ignore_opts)
 	echo "done" >$@
-	@echo "makefile: Done running pyup.io safety check"
+	@echo "Makefile: Done running pyup.io safety check"
 
 todo_$(pymn).done: Makefile develop_$(pymn).done $(pylint_rc_file) $(py_src_files)
 ifeq ($(python_m_version),2)
-	@echo "makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
+	@echo "Makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
 else
 ifeq ($(python_mn_version),3.4)
-	@echo "makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
+	@echo "Makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
 else
-	@echo "makefile: Checking for TODOs"
+	@echo "Makefile: Checking for TODOs"
 	-$(call RM_FUNC,$@)
 	pylint --exit-zero --reports=n --disable=all --enable=fixme $(py_src_files)
 	-grep TODO $(doc_conf_dir) -r --include="*.rst"
 	echo "done" >$@
-	@echo "makefile: Done checking for TODOs"
+	@echo "Makefile: Done checking for TODOs"
 endif
 endif
 
 .PHONY: test
 test: develop_$(pymn).done $(doc_utility_help_files)
-	@echo "makefile: Running unit and function tests"
+	@echo "Makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
 else
 	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s
 endif
-	@echo "makefile: Done running tests"
+	@echo "Makefile: Done running tests"
 
 .PHONY: installtest
 installtest: $(bdist_file) $(sdist_file) tests/install/test_install.sh
-	@echo "makefile: Running install tests"
+	@echo "Makefile: Running install tests"
 ifeq ($(PLATFORM),Windows_native)
-	@echo "makefile: Warning: Skipping install test on native Windows" >&2
+	@echo "Makefile: Warning: Skipping install test on native Windows" >&2
 else
 	tests/install/test_install.sh $(bdist_file) $(sdist_file) $(PYTHON_CMD)
 endif
-	@echo "makefile: Done running install tests"
+	@echo "Makefile: Done running install tests"
 
 .PHONY: end2endtest
 end2endtest: develop_$(pymn).done
-	@echo "makefile: Running end2end tests"
+	@echo "Makefile: Running end2end tests"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
 else
 	TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s
 endif
-	@echo "makefile: Done running end2end tests"
+	@echo "Makefile: Done running end2end tests"
 
 $(doc_conf_dir)/$(command1)/cmdshelp.rst: $(package_name)/$(command1)/$(command1).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
-	@echo 'makefile: Creating $@ for documentation'
+	@echo "Makefile: Creating $@ for documentation"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@"
 else
@@ -791,10 +793,10 @@ endif
 	@echo 'Done: Created help command info for cmds: $@'
 
 $(doc_conf_dir)/$(command2)/cmdshelp.rst: $(package_name)/$(command2)/$(command2).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
-	@echo 'makefile: Creating $@ for documentation'
+	@echo 'Makefile: Creating $@ for documentation'
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command2) >$@"
 else
 	PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) $(PYTHON_CMD) -u tools/click_help_capture.py $(command2) >$@
 endif
-	@echo 'Done: Created help command info for cmds: $@'
+	@echo 'Makefile: Done creating help command info for cmds: $@'

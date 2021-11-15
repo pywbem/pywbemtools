@@ -151,6 +151,9 @@ Released: not yet
   today. Modified minimum version of typed-ast, pylint and astrid to match pywbem
   and pass saftey tests.
 
+* Remove the file minimum-constraints-base.txt and put contents into
+  minimum-constraints.txt. (see issue #1076)
+
 **Known issues:**
 
 * See `list of open issues`_.
