@@ -90,9 +90,11 @@ class AssociationShrub(object):
     This class does not handle Error exceptions from the host WBEM Server.
     They must be handled by the user.
     """
+
     def __init__(self, conn, source_path, Role=None, AssocClass=None,
                  ResultRole=None, ResultClass=None, fullpath=True,
                  verbose=None):
+        # pylint: disable=invalid-name
         """
         Parameters:
 

@@ -73,6 +73,8 @@ Released: not yet
 * Modify dev-requirements.txt to limit version of more-itertools to != 8.11.0
   for python < 3.6. (see issue #1077)
 
+* Fixed new issues raised by pylint 2.12.2.
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.
