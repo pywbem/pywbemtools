@@ -40,7 +40,7 @@ from .._options import add_options, help_option
 from ._display_cimobjects import display_cim_objects, fold_strings
 
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, MutuallyExclusiveOption
 
 from ._common import pick_one_index_from_list, sort_cimobjects, \
     verify_operation
@@ -54,10 +54,6 @@ DEFAULT_SUB_MGR_ID = "defaultpywbemcliSubMgr"
 
 OWNED = True
 ALL = None
-
-# DESTINATION_CLASSNAME = 'CIM_ListenerDestinationCIMXML'
-# FILTER_CLASSNAME = 'CIM_IndicationFilter'
-# SUBSCRIPTION_CLASSNAME = 'CIM_IndicationSubscription'
 
 ownedadd_flag_option = [              # pylint: disable=invalid-name
     click.option("--owned/--permanent", default=True,
@@ -77,8 +73,8 @@ ownedlist_choice_option = [              # pylint: disable=invalid-name
     click.option("--type", default='all',
                  type=click.Choice(['owned', 'permanent', 'all'],
                                    case_sensitive=False),
-                 help=u"Defines whether the command is going to filter owned "
-                      u",permanent, or all objects for the response display.  "
+                 help=u"Defines whether the command filters owned, "
+                      u" permanent, or all objects for the response.  "
                       u"Default: all"),
 ]
 
@@ -91,6 +87,9 @@ names_only_option = [              # pylint: disable=invalid-name
 
 detail_option = [             # pylint: disable=invalid-name
     click.option('-d', '--detail', is_flag=True, required=False,
+                 cls=MutuallyExclusiveOption,
+                 mutually_exclusive=["summary"],
+                 show_mutually_exclusive=True,
                  help=u"Show more detailed information. Otherwise only "
                  u"non-null or predefined property values are displayed. It "
                  u"applies to both MOF and TABLE output formats")
@@ -98,7 +97,10 @@ detail_option = [             # pylint: disable=invalid-name
 
 summary_option = [             # pylint: disable=invalid-name
     click.option('-s', '--summary', is_flag=True, required=False,
-                 help=u'If True, show only summary count of instances ')
+                 cls=MutuallyExclusiveOption,
+                 mutually_exclusive=["detail"],
+                 show_mutually_exclusive=True,
+                 help=u'Show only summary count of instances')
 ]
 
 verify_remove_option = [       # pylint: disable=invalid-name
@@ -314,6 +316,7 @@ def subscription_add_subscription(context, destination_identity,
                             options_metavar=CMD_OPTS_TXT)
 @add_options(ownedlist_choice_option)
 @add_options(summary_option)
+@add_options(detail_option)
 @add_options(help_option)
 @click.pass_obj
 def subscription_list(context, **options):
@@ -321,7 +324,11 @@ def subscription_list(context, **options):
     Display indication subscriptions overview.
 
     This command provides an overview of the count of subscriptions, filters,
-    and destinations retrieved from the WBEM server.
+    and destinations retrieved from the WBEM server. The level of detail
+    depends on the --summary and --detail options. '--summary' displays only
+    a single count for each; --detail displays a table for the instances
+    of each. The default is to display a table of the count of owned and
+    permanent for each.
     """
     context.execute_cmd(lambda: cmd_subscription_list(context, options))
 
@@ -1531,6 +1538,15 @@ def cmd_subscription_list(context, options):
     """
     Display overview information on the subscriptions, filters and indications
     """
+    if options['detail']:
+        options['names_only'] = False
+        options['detail'] = False
+        cmd_subscription_list_destinations(context, options)
+        click.echo("\n")
+        cmd_subscription_list_filters(context, options)
+        click.echo("\n")
+        cmd_subscription_list_subscriptions(context, options)
+        return
     output_format = validate_output_format(context.output_format,
                                            ['TEXT', 'TABLE'],
                                            default_format="table")
@@ -1609,11 +1625,6 @@ def cmd_subscription_list_destinations(context, options):
 
     destinations = csm.get_destinations_for_owned_choice(ownedchoice_opt)
 
-    if options['summary'] and options['detail']:
-        raise click.ClickException("The options '--summary' and '--detail' "
-                                   "conflict. Only one may be used in a "
-                                   "command")
-
     if options['names_only']:
         paths = [inst.path for inst in destinations]
 
@@ -1684,11 +1695,6 @@ def cmd_subscription_list_filters(context, options):
                                            ['CIM', 'TABLE'],
                                            default_format="table")
     csm = CmdSubscriptionManager(context, options)
-
-    # FUTURE: To be replaced when PR #1066 integrated.
-    if options['detail'] and options['summary']:
-        raise click.ClickException("The details and summary options are "
-                                   "mutually exclusive")
 
     filterchoice_opt = options['type']
     details_opt = options['detail']
@@ -1763,12 +1769,6 @@ def cmd_subscription_list_subscriptions(context, options):
                                            ['CIM', 'TABLE'],
                                            default_format="table")
     csm = CmdSubscriptionManager(context, options)
-
-    # FUTURE: replace with exclusive option
-    if options['summary'] and options['detail']:
-        raise click.ClickException("The options '--summary' and '--detail' "
-                                   "conflict. Only one may be used in a "
-                                   "command")
 
     svr_subscriptions = csm.get_subscriptions_for_owned_choice(options['type'])
     # Get all destinations and filters

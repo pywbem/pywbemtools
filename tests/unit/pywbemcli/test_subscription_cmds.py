@@ -124,10 +124,12 @@ VERIFY_REMOVE_OPTION = '-v, --verify Prompt user to verify instances to be ' \
 NAMES_ONLY_OPTION = '--names-only, --no Show the CIMInstanceName elements  ' \
     'of the'
 
-SUMMARY_OPTION = '-s, --summary If True, show only summary count of instances'
+SUMMARY_OPTION = '-s, --summary Show only summary count of instances'
+
+DETAIL_OPTION = '--detail Show more detailed information.'
 
 TYPE_OPTION = '--type [owned|permanent|all]  Defines whether the command ' \
-    'is going to filter'
+    'filters owned, permanent'
 
 SUBSCRIPTION_ADD_DESTINATION_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] subscription add-destination '
@@ -157,11 +159,20 @@ SUBSCRIPTION_ADD_SUBSCRIPTION_HELP_LINES = [
 ]
 
 # TODO : The list of options for each command is incomplete
+SUBSCRIPTION_LIST_HELP_LINES = [
+    'Usage: pywbemcli [GENERAL-OPTIONS] subscription list',
+    'Display indication subscriptions overview.',
+    SUMMARY_OPTION,
+    DETAIL_OPTION,
+    CMD_OPTION_HELP_HELP_LINE,
+]
+
 SUBSCRIPTION_LIST_DESTINATIONS_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] subscription list-destinations',
     'Display indication listeners on the WBEM server.',
     TYPE_OPTION,
     SUMMARY_OPTION,
+    DETAIL_OPTION,
     NAMES_ONLY_OPTION,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -171,6 +182,7 @@ SUBSCRIPTION_LIST_FILTERS_HELP_LINES = [
     'Display indication filters on the WBEM server.',
     TYPE_OPTION,
     SUMMARY_OPTION,
+    DETAIL_OPTION,
     NAMES_ONLY_OPTION,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -180,6 +192,7 @@ SUBSCRIPTION_LIST_SUBSCRIPTIONS_HELP_LINES = [
     'Display indication subscriptions on the WBEM server.',
     TYPE_OPTION,
     SUMMARY_OPTION,
+    DETAIL_OPTION,
     NAMES_ONLY_OPTION,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -285,6 +298,12 @@ TEST_CASES = [
     ['Verify subscription command add-subscription --help response',
      ['add-subscription', '--help'],
      {'stdout': SUBSCRIPTION_ADD_SUBSCRIPTION_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify subscription command list --help response',
+     ['list', '--help'],
+     {'stdout': SUBSCRIPTION_LIST_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
@@ -671,7 +690,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify add dest, filter, subscrip & list-* handles --permanent, '
+    ['Verify add dest, filter, subscription & list-* handles --permanent, '
      'remove-server OK.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
       'stdin': ['subscription add-destination pdest1 -l http://blah:50000 --permanent',  # noqa: E501
@@ -991,6 +1010,21 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
+
+    ['Verify add dest, filter, subscription and remove --permanent OK.',
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ['subscription add-destination odest1 -l http://someone:50000',
+                'subscription add-filter ofilter1 -q "blah"',
+                'subscription add-subscription odest1 ofilter1',
+                '-o simple subscription list --detail']},
+     {'stdout': ['Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all',  # noqa: E501
+                 'Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all',  # noqa: E501
+                 'Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all'  # noqa: E501
+                 ],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
     #
     #  Error tests
     #
@@ -1061,8 +1095,33 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
+    ['Verify list-destinations --summary and --detail fails.',
+     ['list-destinations', '--summary', '--detail'],
+     {'stderr': ["Conflicting options: `summary` is mutually exclusive with "
+                 "options: (--detail)"],
+      'rc': 2,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify list-filters --summary and --detail fails.',
+     ['list-filters', '--summary', '--detail'],
+     {'stderr': ["Conflicting options: `summary` is mutually exclusive with "
+                 "options: (--detail)"],
+      'rc': 2,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify list-subscriptions --summary and --detail fails.',
+     ['list-destinations', '--summary', '--detail'],
+     {'stderr': ["Conflicting options: `summary` is mutually exclusive with "
+                 "options: (--detail)"],
+      'rc': 2,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify add_destination  invalid url fails.',
-     ['add-destination', 'odest1', '--listener-url', 'fred://blah:50000', '--owned'],  # noqa: E501
+     ['add-destination', 'odest1', '--listener-url', 'fred://blah:50000',
+      '--owned'],
      {'stderr': ["add-destination failed: Unsupported scheme 'fred' in URL "
                  "'fred://blah:50000"],
       'rc': 1,
@@ -1149,7 +1208,7 @@ TEST_CASES = [
     # TESTS TO IMPLEMENT
     # 1. test of fail when add-subscription reverses dest and filter ids
     # 2. test of fail when remove-subscription reverses dest and filter ids
-    # 3. TODO list with paths
+    # 3. TODO list with --names-only
     # 4. Tests for subscription owned/permanent between filter/dest and fails
     # 5. Tests of summary and --detail beyond existing tests
     # 6. tests of output format text for those commands that implement this.
