@@ -118,6 +118,9 @@ Released: not yet
 
 * Increased minimum version of pywbem to 1.3.0. (issue #1020)
 
+* Support for Python 3.10: Added Python 3.10 in GitHub Actions tests, and in
+  package metadata.
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools
