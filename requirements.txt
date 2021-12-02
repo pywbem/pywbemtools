@@ -17,7 +17,9 @@ pywbem>=1.3.0
 
 nocaselist>=1.0.3
 nocasedict>=1.0.1
-six>=1.14.0
+# six 1.16.0 removes the ImportWarning raised by Python 3.10
+six>=1.14.0; python_version <= '3.9'
+six>=1.16.0; python_version >= '3.10'
 # Click 7.0 has issue #1231 on Windows which we circumvent in the test code
 # Click 7.1 has a bug with output capturing
 # Click 7.1 removed support for Python 3.4
@@ -31,10 +33,14 @@ Click>=7.1.1,<8.0; python_version >= '3.5'
 click-spinner>=0.1.8
 click-repl>=0.1.6
 asciitree>=0.3.3
-tabulate>=0.8.2
+# tabulate 0.8.8 fixes ImportError on Python 3.10.
+tabulate>=0.8.2; python_version <= '3.9'
+tabulate>=0.8.8; python_version >= '3.10'
 toposort>=1.6
 # psutil does not install on Python 3.4 on Windows due to missing MS C++ 10.0 on GitHub Actions.
-psutil>=5.5.0
+# psutil 5.8.0 fixes an install error on Python 3.10
+psutil>=5.5.0; python_version <= '3.9'
+psutil>=5.8.0; python_version >= '3.10'
 
 # prompt-toolkit>=2.0 failed on py27 (issue #192), so it was pinned to <2.0.
 #   Later, the fix for issue #224 allowed to lift that pinning.

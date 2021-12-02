@@ -68,13 +68,11 @@
 #   latest supported version on Python 3.4. Therefore, we initially upgrade the
 #   basic packages only to their minimum defined in this file.
 # * pip 10.0.0 introduced the --exclude-editable option.
-# * pip before 21.0 cannot install cryptography on py39
-
+# * pip 18.0 is needed on pypy3 (py36) to support constraints like cffi!=1.11.3,>=1.8.
+# * pip 20.2 introduced a new resolver whose backtracking had issues that were resolved only in 21.2.2.
+# * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
 pip==10.0.1; python_version <= '3.5'
-pip==18.0; python_version == '3.6'
-pip==18.1; python_version == '3.7'
-pip==19.3.1; python_version == '3.8'
-pip==21.0; python_version >= '3.9'
+pip==21.2.2; python_version >= '3.6'
 
 setuptools==39.0.1; python_version <= '3.6'
 setuptools==40.6.0; python_version == '3.7'

@@ -62,20 +62,26 @@ Click>=7.1.1,<8.0; python_version >= '3.5'
 # PyYAML 5.3 fixed narrow build error on Python 2.7
 # PyYAML 5.3.1 addressed issue 38100 reported by safety
 # PyYAML 5.2 addressed issue 38639 reported by safety
+# PyYAML 5.4.1 fixed install error on Python 3.10
 PyYAML>=5.3.1; python_version == '2.7'
 PyYAML>=5.2,<5.3; python_version == '3.4'
-PyYAML>=5.3.1; python_version > '3.4'
+PyYAML>=5.3.1; python_version >= '3.5' and python_version <= '3.9'
+PyYAML>=5.4.1; python_version >= '3.10'
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Keep in sync with rtd-requirements.txt
 # Sphinx 2.0.0 removed support for Python 2.7 and 3.4
 # Sphinx 4.0.0 breaks autodocsumm and needs to be excluded
+# Sphinx <4.2.0 fails on Python 3.10 because it tries to import non-existing
+#   types.Union. This also drives docutils>=0.14.
 # Sphinx pins docutils to <0.18 (some versions even to <0.17) but the package
 #   version resolver in the pip version used on py27 ignores package dependencies
 Sphinx>=1.7.6,<2.0.0; python_version <= '3.4'
-Sphinx>=3.5.4,!=4.0.0; python_version >= '3.5'
+Sphinx>=3.5.4,!=4.0.0; python_version >= '3.5' and python_version <= '3.9'
+Sphinx>=4.2.0; python_version >= '3.10'
 docutils>=0.13.1,<0.17; python_version == '2.7'
-docutils>=0.13.1; python_version >= '3.4'
+docutils>=0.13.1; python_version >= '3.4' and python_version <= '3.9'
+docutils>=0.14; python_version >= '3.10'
 sphinx-git>=10.1.1
 GitPython>=2.1.1;
 sphinxcontrib-fulltoc>=1.2.0
@@ -84,6 +90,8 @@ Pygments>=2.1.3; python_version == '2.7'
 Pygments>=2.1.3,<2.4.0; python_version == '3.4'
 Pygments>=2.1.3; python_version >= '3.5'
 sphinx-rtd-theme>=0.5.0
+# Babel 2.7.0 fixes an ImportError for MutableMapping which starts failing on Python 3.10
+Babel>=2.7.0
 
 # PyLint (no imports, invoked via pylint script)
 # Pylint requires astroid
@@ -114,14 +122,23 @@ wrapt>=1.11.2; python_version >= '3.4'
 # Flake8 and dependents (no imports, invoked via flake8 script):
 # flake8 3.9.0 has removed support for py34 and pip 19.1.1 on py34 does not deal
 # well with its pinned dependencies, so we need to repeat these for py34.
+# flake8 4.0.0 fixes an AttributeError on Python 3.10.
+# flake8 4.0.1 fixes a TypeError on files with incorrect syntax.
+flake8>=3.8.0; python_version == '2.7'
 flake8>=3.8.0,<3.9.0; python_version == '3.4'
+flake8>=3.8.0; python_version >= '3.5' and python_version <= '3.9'
+flake8>=4.0.1; python_version >= '3.10'
+mccabe>=0.6.0; python_version == '2.7'
 mccabe>=0.6.0,<0.7.0; python_version == '3.4'
+mccabe>=0.6.0; python_version >= '3.5'
+pycodestyle>=2.6.0,<2.8.0; python_version == '2.7'
 pycodestyle>=2.6.0a1,<2.7.0; python_version == '3.4'
+pycodestyle>=2.6.0; python_version >= '3.5' and python_version <= '3.9'
+pycodestyle>=2.8.0; python_version >= '3.10'
+pyflakes>=2.2.0,<2.4.0; python_version == '2.7'
 pyflakes>=2.2.0,<2.3.0; python_version == '3.4'
-flake8>=3.8.0; python_version != '3.4'
-mccabe>=0.6.0; python_version != '3.4'
-pycodestyle>=2.6.0; python_version != '3.4'
-pyflakes>=2.2.0; python_version != '3.4'
+pyflakes>=2.2.0; python_version >= '3.5' and python_version <= '3.9'
+pyflakes>=2.4.0; python_version >= '3.10'
 entrypoints>=0.3.0
 functools32>=3.2.3.post2; python_version == '2.7'  # technically: python_version < '3.2'
 
