@@ -229,13 +229,14 @@ This documentation uses a few special terms to refer to Python types:
       number (ex. version 2.41.0). The DMTF CIM Schemas can be retrieved from
       the DMTF web site at: `<https://www.dmtf.org/standards/cim>`_ .
 
-    SubscriptionManager ID
+   subscription manager ID
       A subscription manager ID is a string that is used as a component in
       the value of the `Name` property of owned indication filter and listener
       destination instances and thus allows identifying these instances
       in a WBEM server. The SubscriptionManagerID allows creating groups
       of owned indication destinations, filters and subscriptions.
-
+      The subscription manager ID is a fixed string (``defaultpywbemcliSubMgr``)
+      in pywbemcli
 
 .. _`Profile advertisement methodologies`:
 
