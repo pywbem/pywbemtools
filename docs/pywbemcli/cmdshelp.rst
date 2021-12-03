@@ -2623,9 +2623,10 @@ Help text for ``pywbemcli subscription add-filter`` (see :ref:`subscription add-
       --query-language TEXT     Filter query language for this subscription The query languages normally implemented are
                                 'DMTF:CQL' and 'WQL' .  Default: WQL
 
-      --source-namespaces TEXT  The namespace(s) for which the query is defined. If not defined, the default namespace of
-                                the server is used. Define multiple namespaces by using option multiple times or comma-
-                                separating namespaces names.
+      --source-namespaces TEXT  The namespace(s) for which the query is defined. Multiple values may be defined with a
+                                single comma-separated string of namespaces or multiple options. If defined the namespaces
+                                will be inserted into the SourceNamespaces property. Otherwise the property will not be
+                                created and the WBEM server should use the interop namespace for the indication filter.
 
       --owned / --permanent     Defines whether an owned or permanent filter, destination, or subscription is to be added.
                                 Default: owned
@@ -2710,13 +2711,21 @@ Help text for ``pywbemcli subscription list`` (see :ref:`subscription list comma
       Display indication subscriptions overview.
 
       This command provides an overview of the count of subscriptions, filters, and destinations retrieved from the WBEM
-      server.
+      server. The level of detail depends on the --summary and --detail options. '--summary' displays only a single count
+      for each; --detail displays a table for the instances of each. The default is to display a table of the count of
+      owned and permanent for each.
 
     Command Options:
-      --type [owned|permanent|all]  Defines whether the command is going to filter owned ,permanent, or all objects for the
-                                    response display.  Default: all
+      --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
+                                    Default: all
 
-      -s, --summary                 If True, show only summary count of instances
+      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
+                                    (--detail).
+
+      -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
+                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
+                                    exclusive with options: (--summary).
+
       -h, --help                    Show this help message.
 
 
@@ -2743,16 +2752,19 @@ Help text for ``pywbemcli subscription list-destinations`` (see :ref:`subscripti
       table or CIM objects (ex. mof) format using the --output general option (ex. --output mof).
 
     Command Options:
-      --type [owned|permanent|all]  Defines whether the command is going to filter owned ,permanent, or all objects for the
-                                    response display.  Default: all
+      --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
+                                    Default: all
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats
+                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
+                                    exclusive with options: (--summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
                                     format is one of the CIM object options (ex. mof
 
-      -s, --summary                 If True, show only summary count of instances
+      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
+                                    (--detail).
+
       -h, --help                    Show this help message.
 
 
@@ -2779,16 +2791,19 @@ Help text for ``pywbemcli subscription list-filters`` (see :ref:`subscription li
       table or CIM objects (ex. mof) format using the --output general option (ex. --output mof).
 
     Command Options:
-      --type [owned|permanent|all]  Defines whether the command is going to filter owned ,permanent, or all objects for the
-                                    response display.  Default: all
+      --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
+                                    Default: all
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats
+                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
+                                    exclusive with options: (--summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
                                     format is one of the CIM object options (ex. mof
 
-      -s, --summary                 If True, show only summary count of instances
+      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
+                                    (--detail).
+
       -h, --help                    Show this help message.
 
 
@@ -2817,16 +2832,19 @@ Help text for ``pywbemcli subscription list-subscriptions`` (see :ref:`subscript
       table or CIM objects (ex. mof) format using the --output general option (ex. --output mof).
 
     Command Options:
-      --type [owned|permanent|all]  Defines whether the command is going to filter owned ,permanent, or all objects for the
-                                    response display.  Default: all
+      --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
+                                    Default: all
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats
+                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
+                                    exclusive with options: (--summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
                                     format is one of the CIM object options (ex. mof
 
-      -s, --summary                 If True, show only summary count of instances
+      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
+                                    (--detail).
+
       -h, --help                    Show this help message.
 
 
