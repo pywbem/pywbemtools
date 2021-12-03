@@ -205,10 +205,13 @@ def subscription_add_destination(context, identity, **options):
 @click.option('--source-namespaces', type=str, metavar='TEXT',
               required=False, default=None,
               multiple=True,
-              help=u"The namespace(s) for which the query is defined. If not "
-                   u"defined, the default namespace of the server is used. "
-                   u"Define multiple namespaces by using option multiple times "
-                   u"or comma-separating namespaces names.")
+              help=u"The namespace(s) for which the query is defined. Multiple "
+                   u"values may be defined with a single comma-separated "
+                   u"string of namespaces or multiple options. If defined the "
+                   u"namespaces will be inserted into the SourceNamespaces "
+                   u"property. Otherwise the property will not be created and "
+                   u"the WBEM server typically use the Interop namespace for "
+                   u"the indication filter.")
 @add_options(ownedadd_flag_option)
 @add_options(help_option)
 @click.pass_obj
@@ -1345,16 +1348,32 @@ def get_insts_for_subscription_identities(csm, destination_identity,
 
 #####################################################################
 #
-#  Command functions for each of the subcommands in the subscription group
+#  Command action functions for each subcommands in the subscription group
 #
 #####################################################################
+
+def get_CmdSubscriptionManager(context, options):
+    """
+    Get the instance of CmdSubscriptionManager from the context or
+    instantiate a new instance.  All subscription action functions should
+    call this method to set up the instance of subscription manager and
+    cache that instance in the context PywbemServer.
+    """
+    if not context.pywbem_server_exists():
+        raise click.ClickException("No WBEM server defined.")
+
+    if context.pywbem_server.subscription_manager:
+        return context.pywbem_server.subscription_manager
+    csm = CmdSubscriptionManager(context, options)
+    context.pywbem_server.subscription_manager = csm
+    return context.pywbem_server.subscription_manager
 
 
 def cmd_subscription_add_destination(context, identity, options):
     """
     Add indication destination CIM instance to wbem server.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     owned_flag_opt = options['owned']
     destination_id = identity if owned_flag_opt else None
@@ -1416,22 +1435,22 @@ def cmd_subscription_add_filter(context, identity, options):
     """
     Add a filter defined by the input argument to the target server.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
     owned_flag_opt = options['owned']
     filter_id = identity if owned_flag_opt else None
     filter_name = None if owned_flag_opt else identity
 
     # Get source namespaces, multiple strings in tuple and/or
-    # multiple namespace names comma-separated in any string in tuple
-    # NOTE: SubscriptionManager requires list as input
+    # multiple namespace names comma-separated in any string in tuple.
+    # NOTE: SubscriptionManager requires list as input, not tuple
     source_ns_opt = options['source_namespaces'] or \
         [context.pywbem_server.conn.default_namespace]
     source_namespaces = []
-    for sn in source_ns_opt:
-        if ',' in sn:
-            source_namespaces.extend(sn.split(','))
+    for ns in source_ns_opt:
+        if ',' in ns:
+            source_namespaces.extend(ns.split(','))
         else:
-            source_namespaces.append(sn)
+            source_namespaces.append(ns)
 
     if not owned_flag_opt:
         filters = csm.find_filters_for_name(filter_name)
@@ -1474,7 +1493,7 @@ def cmd_subscription_add_subscription(context, destination_identity,
     If the owned option is False (--permanent) only permanent filters and
     listeners may be attached
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     owned_flag_opt = options['owned']
     select_opt = options['select']
@@ -1524,7 +1543,7 @@ def cmd_subscription_list(context, options):
     output_format = validate_output_format(context.output_format,
                                            ['TEXT', 'TABLE'],
                                            default_format="table")
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     summary_opt = options['summary']
 
@@ -1593,7 +1612,7 @@ def cmd_subscription_list_destinations(context, options):
     output_format = validate_output_format(context.output_format,
                                            ['CIM', 'TABLE'],
                                            default_format="table")
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     ownedchoice_opt = (options['type']).lower()
 
@@ -1668,7 +1687,7 @@ def cmd_subscription_list_filters(context, options):
     output_format = validate_output_format(context.output_format,
                                            ['CIM', 'TABLE'],
                                            default_format="table")
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     filterchoice_opt = options['type']
     details_opt = options['detail']
@@ -1742,7 +1761,7 @@ def cmd_subscription_list_subscriptions(context, options):
     output_format = validate_output_format(context.output_format,
                                            ['CIM', 'TABLE'],
                                            default_format="table")
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     svr_subscriptions = csm.get_subscriptions_for_owned_choice(options['type'])
     # Get all destinations and filters
@@ -1833,7 +1852,7 @@ def cmd_subscription_remove_destination(context, identity, options):
     """
     Remove multiple destination objects from the WBEM Server.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
     owned_flag_opt = options['owned']
 
     if owned_flag_opt and not identity.startswith(csm.owned_destination_prefix):
@@ -1891,7 +1910,7 @@ def cmd_subscription_remove_filter(context, identity, options):
     Remove a single indication filter found by the get_all_filters
     method.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     owned_flag_opt = options['owned']
 
@@ -1954,7 +1973,7 @@ def cmd_subscription_remove_subscription(context, destination_identity,
     on the same parameter set as create, a destination and filter because
     there is no identifying name on subscriptions.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     # find instances for the associations using the input identity parameters
     dest_inst, filter_inst = get_insts_for_subscription_identities(
@@ -2030,7 +2049,7 @@ def cmd_subscription_remove_server(context, options):
     Remove the current server_id which also un-registers listener destinations
     and removes all owned destinations, filters, and subscriptions.
     """
-    csm = CmdSubscriptionManager(context, options)
+    csm = get_CmdSubscriptionManager(context, options)
 
     filters = csm.get_filters(True)
     dests = csm.get_destinations(True)
@@ -2043,3 +2062,4 @@ def cmd_subscription_remove_server(context, options):
                format(csm.server_id, len(dests), len(filters), len(subscripts)))
 
     csm.remove_server()
+    context.pywbem_server.subscription_manager = None

@@ -45,7 +45,10 @@ Storage Management Initiative Specification (`SMI-S`_).
 
 The pywbemtools package includes the following tools:
 
-1. :ref:`Pywbemcli command` - provides access to WBEM servers from the command line
+1. :ref:`Pywbemcli command` - a cli (command line interface) that provides
+   access to WBEM servers from the command line.
+2. :ref:`Pywbemlistener command` - a cli that can manage multiple provides a
+   WBEM indication listeners to receive and display WBEM indications.
 
 
 .. _`Supported environments`:

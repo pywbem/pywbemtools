@@ -128,7 +128,7 @@ class PywbemServer(object):
         self.certfile = certfile
         self.keyfile = keyfile
         self.ca_certs = ca_certs
-
+        self._subscription_manager = None
         # May be None in case of not-saved connection (e.g. connection save)
         self._connections_file = connections_file
 
@@ -440,6 +440,19 @@ class PywbemServer(object):
             raise click.ClickException("{cmd} requires user/password, but "
                                        "no password provided."
                                        .format(cmd=ctx.invoked_subcommand))
+
+    @property
+    def subscription_manager(self):
+        """
+        :term:`string`: Scheme with subscription manager object.
+        """
+        return self._subscription_manager
+
+    @subscription_manager.setter
+    def subscription_manager(self, subscriptionmgr):
+        """Setter method; for a description see the getter method."""
+
+        self._subscription_manager = subscriptionmgr
 
     def copy(self):
         """"

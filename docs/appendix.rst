@@ -307,6 +307,15 @@ This documentation uses a few special terms to refer to Python types:
    dynamic indication filter
       An :term: indication filter whose lifecycle is controlled by a client
 
+   subscription manager ID
+      A subscription manager ID is a string that is used as a component in
+      the value of the `Name` property of owned indication filter and listener
+      destination instances and thus allows identifying these instances
+      in a WBEM server. The SubscriptionManagerID allows creating groups
+      of owned indication destinations, filters and subscriptions.
+      The subscription manager ID is a fixed string (``defaultpywbemcliSubMgr``)
+      in pywbemcli
+
 .. _`Profile advertisement methodologies`:
 
 Profile advertisement methodologies
