@@ -52,8 +52,8 @@ DEFAULT_QUERY_LANGUAGE = 'WQL'
 
 DEFAULT_SUB_MGR_ID = "defaultpywbemcliSubMgr"
 
-OWNED = True
-ALL = None
+OWNED_STR = True
+ALL_STR = 'all'
 
 ownedadd_flag_option = [              # pylint: disable=invalid-name
     click.option("--owned/--permanent", default=True,
@@ -80,27 +80,42 @@ ownedlist_choice_option = [              # pylint: disable=invalid-name
 
 names_only_option = [              # pylint: disable=invalid-name
     click.option('--names-only', '--no', is_flag=True, required=False,
+                 cls=MutuallyExclusiveOption,
+                 mutually_exclusive=["summary", 'detail'],
+                 show_mutually_exclusive=True,
                  help=u'Show the CIMInstanceName elements of the instances. '
                       u'This only applies when the --output-format is one '
-                      u'of the CIM object options (ex. mof')
+                      u'of the CIM object options (ex. mof.')
 ]
 
 detail_option = [             # pylint: disable=invalid-name
     click.option('-d', '--detail', is_flag=True, required=False,
                  cls=MutuallyExclusiveOption,
-                 mutually_exclusive=["summary"],
+                 mutually_exclusive=["summary", 'names-only'],
                  show_mutually_exclusive=True,
                  help=u"Show more detailed information. Otherwise only "
                  u"non-null or predefined property values are displayed. It "
-                 u"applies to both MOF and TABLE output formats")
+                 u"applies to both MOF and TABLE output formats.")
+]
+
+detail_subscription_option = [             # pylint: disable=invalid-name
+    click.option('-d', '--detail', is_flag=True, required=False,
+                 cls=MutuallyExclusiveOption,
+                 mutually_exclusive=["summary", 'names-only'],
+                 show_mutually_exclusive=True,
+                 help=u"Show more detailed information including MOF of "
+                 "referenced listeners and filters. Otherwise only "
+                 u"non-null or predefined property values are displayed. The "
+                 u"extra properties applies to both MOF and TABLE output "
+                 u"formats.")
 ]
 
 summary_option = [             # pylint: disable=invalid-name
     click.option('-s', '--summary', is_flag=True, required=False,
                  cls=MutuallyExclusiveOption,
-                 mutually_exclusive=["detail"],
+                 mutually_exclusive=["detail", 'names-only'],
                  show_mutually_exclusive=True,
-                 help=u'Show only summary count of instances')
+                 help=u'Show only summary count of instances.')
 ]
 
 verify_remove_option = [       # pylint: disable=invalid-name
@@ -387,7 +402,7 @@ def subscription_list_filters(context, **options):
 @subscription_group.command('list-subscriptions', cls=PywbemtoolsCommand,
                             options_metavar=CMD_OPTS_TXT)
 @add_options(ownedlist_choice_option)
-@add_options(detail_option)
+@add_options(detail_subscription_option)
 @add_options(names_only_option)
 @add_options(summary_option)
 @add_options(help_option)
@@ -661,6 +676,9 @@ class CmdSubscriptionManager(object):
         """
         return self._context
 
+    # The following methods interface to the pywbem SubscriptionManager.
+    # They all catch pywbem Error and some catch other exceptions.
+
     def get_destinations(self, owned_flag):
         """
         Get the owned indication destinations or all indication
@@ -775,13 +793,10 @@ class CmdSubscriptionManager(object):
         except ValueError as ve:
             raise click.ClickException(
                 "add-destination failed: {0}".format(ve))
-        except CIMError as er:
-            if er.status_code == CIM_ERR_ALREADY_EXISTS:
-                raise click.ClickException(
-                    "add-destination failed. Destination listener {0} "
-                    "already exists. Exception: {1}".format(destination_id, er))
+        except Error as er:
             raise click.ClickException(
-                self.err_msg("add-destination failed", er))
+                self.err_msg("add-destination {0} failed".
+                             format(owned_flag_str(owned_flag)), er))
 
     def add_filter(self, source_namespaces, query,
                    query_language=DEFAULT_QUERY_LANGUAGE, owned_flag=True,
@@ -904,6 +919,9 @@ class CmdSubscriptionManager(object):
             self.submgr.remove_server(self.server_id)
         except Error as er:
             raise click.ClickException(self.err_msg("remove-Server failed", er))
+
+    # The following are local methods and only call pywbem
+    # SubscriptionManager through one of the above methods
 
     def is_owned_destination(self, instance):
         """
@@ -1170,7 +1188,8 @@ class IndicationSubscription(BaseIndicationObjectInstance):
         return '{0} {1} {2}'.format(self._owned_flag, dest_str, filter_str)
 
 
-def display_inst_nonnull_props(context, options, instances, output_format):
+def display_inst_nonnull_props(context, options, instances, output_format,
+                               sort=False):
     """
     Display the instances defined in instances after removing any properties
     that are Null for all instances.
@@ -1185,7 +1204,7 @@ def display_inst_nonnull_props(context, options, instances, output_format):
     pl = list(pldict.keys())
 
     display_cim_objects(context, instances, output_format,
-                        summary=options['summary'], sort=True,
+                        summary=options['summary'], sort=sort,
                         property_list=pl)
 
 
@@ -1547,14 +1566,14 @@ def cmd_subscription_list(context, options):
 
     summary_opt = options['summary']
 
-    all_subscriptions = csm.get_subscriptions_for_owned_choice('all')
-    all_destinations = csm.get_destinations_for_owned_choice('all')
-    all_filters = csm.get_filters_for_owned_choice('all')
+    all_subscriptions = csm.get_subscriptions_for_owned_choice(ALL_STR)
+    all_destinations = csm.get_destinations_for_owned_choice(ALL_STR)
+    all_filters = csm.get_filters_for_owned_choice(ALL_STR)
 
     # Get info on owned objects also
-    owned_subscriptions = csm.get_subscriptions(OWNED)
-    owned_destinations = csm.get_destinations(OWNED)
-    owned_filters = csm.get_filters(OWNED)
+    owned_subscriptions = csm.get_subscriptions(OWNED_STR)
+    owned_destinations = csm.get_destinations(OWNED_STR)
+    owned_filters = csm.get_filters(OWNED_STR)
 
     if summary_opt:
         headers = ['subscriptions', 'filters', 'destinations']
@@ -1618,14 +1637,22 @@ def cmd_subscription_list_destinations(context, options):
 
     destinations = csm.get_destinations_for_owned_choice(ownedchoice_opt)
 
-    if options['names_only']:
-        paths = [inst.path for inst in destinations]
+    if output_format_is_cimobject(output_format):
+        if options['names_only']:
+            paths = [inst.path for inst in destinations]
+            display_cim_objects(context, paths, output_format)
+        elif options['detail']:
+            display_inst_nonnull_props(context, options, destinations,
+                                       output_format)
+        else:
+            display_cim_objects(context, destinations, output_format,
+                                summary=options['summary'], sort=True)
 
-        context.spinner_stop()
-        display_cim_objects(context, paths, output_format, options['summary'])
-        return
+    elif output_format_is_table(output_format):
+        if options['names_only']:
+            context.spinner_stop()
+            click.echo("Option --names-only ignored for table output.")
 
-    if output_format_is_table(output_format):
         headers = ['Ownership', 'Identity', 'Name\nProperty', 'Destination',
                    'Persistence\nType', 'Protocol', 'Subscription\nCount']
         if options['detail']:
@@ -1663,20 +1690,9 @@ def cmd_subscription_list_destinations(context, options):
         click.echo(format_table(rows, headers, title=title,
                                 table_format=output_format))
 
-        return
-
-    if output_format_is_cimobject(output_format):
-        context.spinner_stop()
-        if options['detail'] or options['summary']:
-            display_cim_objects(context, destinations, output_format,
-                                summary=options['summary'], sort=True)
-        else:
-            display_inst_nonnull_props(context, options, destinations,
-                                       output_format)
-
     else:
-        raise click.ClickException("Invalid output format {0}".
-                                   format(output_format))
+        assert False, "{0} Invalid output format for this command". \
+            format(output_format)
 
 
 def cmd_subscription_list_filters(context, options):
@@ -1694,64 +1710,61 @@ def cmd_subscription_list_filters(context, options):
 
     filters = csm.get_filters_for_owned_choice(filterchoice_opt)
 
-    if filters:
-        if output_format_is_cimobject(output_format):
-            if options['detail'] or options['summary']:
-                display_cim_objects(context, filters, output_format,
-                                    summary=options['summary'])
-            else:
-                display_inst_nonnull_props(context, options, filters,
-                                           output_format)
-
-        elif output_format_is_table(output_format):
-            headers = ['Ownership', 'Identity', 'Name\nProperty', 'Query',
-                       'Query\nLanguage', 'Source\nNamespaces',
-                       'Subscription\nCount']
-            if options['detail']:
-                headers.extend(
-                    ['CreationclassName', 'SystemCreationClassName',
-                     'SystemName'])
-
-            rows = []
-            for filter_ in filters:
-                conn = context.pywbem_server.conn
-                references = conn.ReferenceNames(
-                    filter_.path, ResultClass=SUBSCRIPTION_CLASSNAME,
-                    Role='Filter')
-                f = IndicationFilter(csm, filter_)
-                row = [f.owned_flag_str,
-                       f.identity,
-                       fold_strings(f.instance_property('Name'), 30,
-                                    break_long_words=True),
-                       fold_strings(f.instance_property('Query'), 25),
-                       f.instance_property('QueryLanguage'),
-                       "\n".join(f.instance_property('SourceNamespaces')),
-                       len(references)]
-                if details_opt:
-                    row.extend([
-                        f.instance_property('CreationClassName'),
-                        f.instance_property('SystemCreationClassName'),
-                        f.instance_property('SystemName')])
-                rows.append(row)
-            title = "Indication Filters: submgr-id={0}, svr-id={1} type={2}". \
-                format(csm.submgr_id, csm.server_id, filterchoice_opt)
-
-            context.spinner_stop()
-            click.echo(format_table(rows, headers, title=title,
-                                    table_format=output_format))
-
-        elif options['names_only']:
+    if output_format_is_cimobject(output_format):
+        if options['names_only']:
             paths = [inst.path for inst in filters]
             display_cim_objects(context, paths, output_format,
                                 options['summary'])
+        elif options['detail']:
+            display_inst_nonnull_props(context, options, filters,
+                                       output_format)
         else:
-            display_inst_nonnull_props(context, options, filters, output_format)
+            display_cim_objects(context, filters, output_format,
+                                summary=options['summary'])
+
+    elif output_format_is_table(output_format):
+        if options['names_only']:
+            context.spinner_stop()
+            click.echo("Option --names-only ignored for table output.")
+        headers = ['Ownership', 'Identity', 'Name\nProperty', 'Query',
+                   'Query\nLanguage', 'Source\nNamespaces',
+                   'Subscription\nCount']
+        if options['detail']:
+            headers.extend(
+                ['CreationclassName', 'SystemCreationClassName',
+                 'SystemName'])
+
+        rows = []
+        for filter_ in filters:
+            conn = context.pywbem_server.conn
+            references = conn.ReferenceNames(
+                filter_.path, ResultClass=SUBSCRIPTION_CLASSNAME,
+                Role='Filter')
+            f = IndicationFilter(csm, filter_)
+            row = [f.owned_flag_str,
+                   f.identity,
+                   fold_strings(f.instance_property('Name'), 30,
+                                break_long_words=True),
+                   fold_strings(f.instance_property('Query'), 25),
+                   f.instance_property('QueryLanguage'),
+                   "\n".join(f.instance_property('SourceNamespaces')),
+                   len(references)]
+            if details_opt:
+                row.extend([
+                    f.instance_property('CreationClassName'),
+                    f.instance_property('SystemCreationClassName'),
+                    f.instance_property('SystemName')])
+            rows.append(row)
+        title = "Indication Filters: submgr-id={0}, svr-id={1} type={2}". \
+            format(csm.submgr_id, csm.server_id, filterchoice_opt)
+
+        context.spinner_stop()
+        click.echo(format_table(rows, headers, title=title,
+                                table_format=output_format))
 
     else:
-        if context.verbose:
-            context.spinner_stop()
-            click.echo("No matching filters for server_id={0} "
-                       "type {1}".format(csm.server_id, filterchoice_opt))
+        assert False, "{0} Invalid output format for this command". \
+            format(output_format)
 
 
 def cmd_subscription_list_subscriptions(context, options):
@@ -1767,33 +1780,44 @@ def cmd_subscription_list_subscriptions(context, options):
     # Get all destinations and filters
     svr_destinations = csm.get_destinations(False)
     svr_filters = csm.get_filters(False)
-
-    # If summary, display only summary of subscriptions.
-    if options['summary']:
-        context.spinner_stop()
-        display_cim_objects(context, svr_subscriptions,
-                            output_format='mof', summary=True)
-        return
+    details_opt = options['detail']
 
     # Otherwise display subscriptions, indications, filters.
+    # For each subscription, display the subscription, filter,
+    # and destination
     inst_list = []
     if output_format_is_cimobject(output_format):
         for subscription in svr_subscriptions:
             inst_list.append(subscription)
-            for filter_ in svr_filters:
-                if subscription['Filter'] == filter_.path:
-                    inst_list.append(filter_)
-            for dest in svr_destinations:
-                if subscription['Handler'] == dest.path:
-                    inst_list.append(dest)
+            # Only show handler and filter instances if detail option
+            if details_opt:
+                for filter_ in svr_filters:
+                    if subscription['Filter'] == filter_.path:
+                        inst_list.append(filter_)
+                for dest in svr_destinations:
+                    if subscription['Handler'] == dest.path:
+                        inst_list.append(dest)
+        if options['summary'] or not details_opt:
+            display_cim_objects(context, inst_list,
+                                output_format='mof', summary=options['summary'])
+        elif details_opt:
+            display_inst_nonnull_props(context, options, inst_list,
+                                       output_format)
+        else:
+            display_cim_objects(context, inst_list, output_format,
+                                summary=options['summary'])
 
-        context.spinner_stop()
-        display_cim_objects(context, inst_list,
-                            output_format=context.output_format)
     elif output_format_is_table(output_format):
+        if options['names_only']:
+            context.spinner_stop()
+            click.echo("Option --names-only ignored for table output.")
         headers = ['Ownership', 'Handler\nIdentity', 'Filter\nIdentity',
                    'Handler\nDestination', 'Filter\nQuery',
                    'Filter Query\nlanguage', 'Subscription\nStartTime']
+        if details_opt:
+            headers.extend(
+                ['TimeOfLast\nStateChange', 'Subscription\nState'])
+
         rows = []
         conn = context.pywbem_server.conn
         for subscription in svr_subscriptions:
@@ -1819,6 +1843,10 @@ def cmd_subscription_list_subscriptions(context, options):
                    fold_strings(if_.instance_property('query'), 30),
                    filter_inst['QueryLanguage'],
                    start_time]
+            if details_opt:
+                row.extend([
+                    is_.instance_property('CreationClassName'),
+                    is_.instance_property('SystemCreationClassName')])
             rows.append(row)
 
         title = "Indication Subscriptions: submgr-id={0}, svr-id={1}, " \
@@ -2001,6 +2029,7 @@ def cmd_subscription_remove_subscription(context, destination_identity,
 
     if remove_list:
         remove_paths = [i.path for i in remove_list]
+
         if options['verify']:
             verify_instances_removal(remove_paths, 'subscription')
 

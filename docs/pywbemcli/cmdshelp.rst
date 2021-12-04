@@ -2626,7 +2626,7 @@ Help text for ``pywbemcli subscription add-filter`` (see :ref:`subscription add-
       --source-namespaces TEXT  The namespace(s) for which the query is defined. Multiple values may be defined with a
                                 single comma-separated string of namespaces or multiple options. If defined the namespaces
                                 will be inserted into the SourceNamespaces property. Otherwise the property will not be
-                                created and the WBEM server should use the interop namespace for the indication filter.
+                                created and the WBEM server typically use the Interop namespace for the indication filter.
 
       --owned / --permanent     Defines whether an owned or permanent filter, destination, or subscription is to be added.
                                 Default: owned
@@ -2719,12 +2719,12 @@ Help text for ``pywbemcli subscription list`` (see :ref:`subscription list comma
       --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
                                     Default: all
 
-      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
-                                    (--detail).
+      -s, --summary                 Show only summary count of instances. This option is mutually exclusive with options:
+                                    (--detail, --names-only).
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
-                                    exclusive with options: (--summary).
+                                    are displayed. It applies to both MOF and TABLE output formats. This option is mutually
+                                    exclusive with options: (--names-only, --summary).
 
       -h, --help                    Show this help message.
 
@@ -2756,14 +2756,15 @@ Help text for ``pywbemcli subscription list-destinations`` (see :ref:`subscripti
                                     Default: all
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
-                                    exclusive with options: (--summary).
+                                    are displayed. It applies to both MOF and TABLE output formats. This option is mutually
+                                    exclusive with options: (--names-only, --summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
-                                    format is one of the CIM object options (ex. mof
+                                    format is one of the CIM object options (ex. mof. This option is mutually exclusive with
+                                    options: (--detail, --summary).
 
-      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
-                                    (--detail).
+      -s, --summary                 Show only summary count of instances. This option is mutually exclusive with options:
+                                    (--detail, --names-only).
 
       -h, --help                    Show this help message.
 
@@ -2795,14 +2796,15 @@ Help text for ``pywbemcli subscription list-filters`` (see :ref:`subscription li
                                     Default: all
 
       -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
-                                    exclusive with options: (--summary).
+                                    are displayed. It applies to both MOF and TABLE output formats. This option is mutually
+                                    exclusive with options: (--names-only, --summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
-                                    format is one of the CIM object options (ex. mof
+                                    format is one of the CIM object options (ex. mof. This option is mutually exclusive with
+                                    options: (--detail, --summary).
 
-      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
-                                    (--detail).
+      -s, --summary                 Show only summary count of instances. This option is mutually exclusive with options:
+                                    (--detail, --names-only).
 
       -h, --help                    Show this help message.
 
@@ -2835,15 +2837,17 @@ Help text for ``pywbemcli subscription list-subscriptions`` (see :ref:`subscript
       --type [owned|permanent|all]  Defines whether the command filters owned,  permanent, or all objects for the response.
                                     Default: all
 
-      -d, --detail                  Show more detailed information. Otherwise only non-null or predefined property values
-                                    are displayed. It applies to both MOF and TABLE output formats This option is mutually
-                                    exclusive with options: (--summary).
+      -d, --detail                  Show more detailed information including MOF of referenced listeners and filters.
+                                    Otherwise only non-null or predefined property values are displayed. The extra
+                                    properties applies to both MOF and TABLE output formats. This option is mutually
+                                    exclusive with options: (--names-only, --summary).
 
       --names-only, --no            Show the CIMInstanceName elements of the instances. This only applies when the --output-
-                                    format is one of the CIM object options (ex. mof
+                                    format is one of the CIM object options (ex. mof. This option is mutually exclusive with
+                                    options: (--detail, --summary).
 
-      -s, --summary                 Show only summary count of instances This option is mutually exclusive with options:
-                                    (--detail).
+      -s, --summary                 Show only summary count of instances. This option is mutually exclusive with options:
+                                    (--detail, --names-only).
 
       -h, --help                    Show this help message.
 
