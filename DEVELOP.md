@@ -52,16 +52,12 @@ local clone of the `pywbem/pywbemtools` Git repo.
     When releasing a new major version (e.g. ``1.0.0``) based on the master
     branch:
 
-    .. code-block:: sh
-
         MNU=1.0.0
         MN=1.0
         BRANCH=master
 
     When releasing a new minor version (e.g. ``0.9.0``) based on the master
     branch:
-
-    .. code-block:: sh
 
         MNU=0.9.0
         MN=0.9
@@ -70,15 +66,11 @@ local clone of the `pywbem/pywbemtools` Git repo.
     When releasing a new update version (e.g. ``0.8.1``) based on the stable
     branch of its minor version:
 
-    .. code-block:: sh
-
         MNU=0.8.1
         MN=0.8
         BRANCH=stable_${MN}
 
 2.  Create a topic branch for the version that is being released:
-
-    .. code-block:: sh
 
         git checkout ${BRANCH}
         git pull
@@ -86,19 +78,13 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 3.  Edit the version file:
 
-    .. code-block:: sh
-
         vi pywbemtools/_version.py
 
     and set the ``__version__`` variable to the version that is being released:
 
-    .. code-block:: python
-
         __version__ = 'M.N.U'
 
 4.  Edit the change log:
-
-    .. code-block:: sh
 
         vi docs/changes.rst
 
@@ -117,14 +103,11 @@ local clone of the `pywbem/pywbemtools` Git repo.
 5.  When releasing based on the master branch, edit the GitHub workflow file
     ``test.yml``:
 
-    .. code-block:: sh
-
         vi .github/workflows/test.yml
 
     and in the ``on`` section, increase the version of the ``stable_*`` branch
     to the new stable branch ``stable_M.N`` created earlier:
 
-    .. code-block:: yaml
 
         on:
           schedule:
@@ -135,8 +118,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
             branches: [ master, stable_M.N ]
 
 6.  Commit your changes and push the topic branch to the remote repo:
-
-    .. code-block:: sh
 
         git status  # Double check the changed files
         git commit -asm "Release ${MNU}"
@@ -158,8 +139,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
 10. Add a new tag for the version that is being released and push it to
     the remote repo. Clean up the local repo:
 
-    .. code-block:: sh
-
         git checkout ${BRANCH}
         git pull
         git tag -f ${MNU}
@@ -168,8 +147,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 11. When releasing based on the master branch, create and push a new stable
     branch for the same minor version:
-
-    .. code-block:: sh
 
         git checkout -b stable_${MN}
         git push --set-upstream origin stable_${MN}
@@ -194,8 +171,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
       https://pywbemtools.readthedocs.io/
 
 14. Upload the package to PyPI:
-
-    .. code-block:: sh
 
         make upload
 
@@ -239,16 +214,12 @@ local clone of the `pywbem/pywbemtools` Git repo.
     When starting a new major version (e.g. ``1.0.0``) based on the master
     branch:
 
-    .. code-block:: sh
-
         MNU=1.0.0
         MN=1.0
         BRANCH=master
 
     When starting a new minor version (e.g. ``0.9.0``) based on the master
     branch:
-
-    .. code-block:: sh
 
         MNU=0.9.0
         MN=0.9
@@ -257,15 +228,11 @@ local clone of the `pywbem/pywbemtools` Git repo.
     When starting a new minor version (e.g. ``0.8.1``) based on the stable
     branch of its minor version:
 
-    .. code-block:: sh
-
         MNU=0.8.1
         MN=0.8
         BRANCH=stable_${MN}
 
 2.  Create a topic branch for the version that is being started:
-
-    .. code-block:: sh
 
         git checkout ${BRANCH}
         git pull
@@ -273,26 +240,18 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 3.  Edit the version file:
 
-    .. code-block:: sh
-
         vi pywbemtools/_version.py
 
     and update the version to a draft version of the version that is being
     started:
 
-    .. code-block:: python
-
         __version__ = 'M.N.U.dev1'
 
 4.  Edit the change log:
 
-    .. code-block:: sh
-
         vi docs/changes.rst
 
     and insert the following section before the top-most section:
-
-    .. code-block:: rst
 
         Version M.N.U.dev1
         ^^^^^^^^^^^^^^^^^^
@@ -319,8 +278,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 5.  Commit your changes and push them to the remote repo:
 
-    .. code-block:: sh
-
         git status  # Double check the changed files
         git commit -asm "Start ${MNU}"
         git push --set-upstream origin start_${MNU}
@@ -345,8 +302,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
     automatically deletes the branch on GitHub.
 
 10. Update and clean up the local repo:
-
-    .. code-block:: sh
 
         git checkout ${BRANCH}
         git pull
