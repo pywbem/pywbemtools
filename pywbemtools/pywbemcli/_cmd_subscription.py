@@ -1257,7 +1257,7 @@ def pick_one_path_from_instances_list(csm, instances, pick_msg):
 
 
 def resolve_instances(csm, instances, identity, obj_type_name,
-                      select_opt, action):
+                      select_opt, cmd_str):
     """
     Resolve list of instances to a single instance or exception.
     If select_opt, ask user to select.  Otherwise, generate
@@ -1282,7 +1282,7 @@ def resolve_instances(csm, instances, identity, obj_type_name,
             the user to select one of the list of instances will be
             presented.  If False, the command will be terminated with
 
-        action (:term:`string`)
+        cmd_str (:term:`string`)
             The name of the command ('add' or 'remove') to be used in
             the displays
 
@@ -1307,7 +1307,7 @@ def resolve_instances(csm, instances, identity, obj_type_name,
         # FUTURE: Need better than path for prompt info.
         inst = pick_one_inst_from_instances_list(
             csm, instances, "Pick one {0} to use for {1}:".
-            format(obj_type_name, action))
+            format(obj_type_name, cmd_str))
         return inst
 
     # Generate an exception with summary info on the instances
@@ -1319,20 +1319,24 @@ def resolve_instances(csm, instances, identity, obj_type_name,
 
 
 def get_insts_for_subscription_identities(csm, destination_identity,
-                                          filter_identity, cmd_action,
+                                          filter_identity, cmd_str,
                                           select_opt):
     """
-    Identity resolution for add and remove subscriptions where two identites
-    are to be provided as arguments for the command. Returns the instances
+    Identity resolution for add and remove subscriptions where two identities
+    are provided as arguments for the command. Returns the instances
     found or an exception if no instances for the destination and filter found.
     The identity can be either the full name as target or only the
-    id suffix of an owned element
+    id suffix of an owned element.
+
+    Returns: Two instances, instance of destination and instance of
+        filter if the identties match.
     """
     # Initial and only search if destination includes owned prefix
     destination_id_owned = destination_identity.startswith(
         csm.owned_filter_prefix)
 
-    # Searches for match the identity value provided
+    # Searches for match to the identity value provided
+    # FUTURE: may have issue here in that we have identity without ownership
     destination_instances = csm.find_destinations_for_name(destination_identity)
 
     # If the Identity  does not include owned prefix, search also for
@@ -1344,9 +1348,11 @@ def get_insts_for_subscription_identities(csm, destination_identity,
         if d2:
             destination_instances.extend(d2)
 
+    # Resolve to a single instance or use select if set or fail if resolve
+    # returns multiple instances.
     sub_destination_inst = resolve_instances(
         csm, destination_instances, destination_identity,
-        'destination', select_opt, cmd_action)
+        'destination', select_opt, cmd_str)
 
     filter_id_owned = filter_identity.startswith(csm.owned_filter_prefix)
     filter_instances = csm.find_filters_for_name(filter_identity)
@@ -1360,7 +1366,7 @@ def get_insts_for_subscription_identities(csm, destination_identity,
             filter_instances.extend(f2)
 
     sub_filter_inst = resolve_instances(csm, filter_instances, filter_identity,
-                                        'filter', select_opt, cmd_action)
+                                        'filter', select_opt, cmd_str)
 
     return sub_destination_inst, sub_filter_inst
 
@@ -1550,6 +1556,9 @@ def cmd_subscription_list(context, options):
     """
     Display overview information on the subscriptions, filters and indications
     """
+
+    # If --detail set, execute call to list all of the tables but
+    # with some options set to False
     if options['detail']:
         options['names_only'] = False
         options['detail'] = False
@@ -1559,6 +1568,7 @@ def cmd_subscription_list(context, options):
         click.echo("\n")
         cmd_subscription_list_subscriptions(context, options)
         return
+
     output_format = validate_output_format(context.output_format,
                                            ['TEXT', 'TABLE'],
                                            default_format="table")
@@ -1570,7 +1580,6 @@ def cmd_subscription_list(context, options):
     all_destinations = csm.get_destinations_for_owned_choice(ALL_STR)
     all_filters = csm.get_filters_for_owned_choice(ALL_STR)
 
-    # Get info on owned objects also
     owned_subscriptions = csm.get_subscriptions(OWNED_STR)
     owned_destinations = csm.get_destinations(OWNED_STR)
     owned_filters = csm.get_filters(OWNED_STR)
@@ -1792,10 +1801,10 @@ def cmd_subscription_list_subscriptions(context, options):
             # Only show handler and filter instances if detail option
             if details_opt:
                 for filter_ in svr_filters:
-                    if subscription['Filter'] == filter_.path:
+                    if subscription.path['Filter'] == filter_.path:
                         inst_list.append(filter_)
                 for dest in svr_destinations:
-                    if subscription['Handler'] == dest.path:
+                    if subscription.path['Handler'] == dest.path:
                         inst_list.append(dest)
         if options['summary'] or not details_opt:
             display_cim_objects(context, inst_list,
@@ -1824,8 +1833,8 @@ def cmd_subscription_list_subscriptions(context, options):
             is_ = IndicationSubscription(csm, subscription)
 
             try:
-                filter_inst = conn.GetInstance(subscription['Filter'])
-                dest_inst = conn.GetInstance(subscription['Handler'])
+                filter_inst = conn.GetInstance(subscription.path['Filter'])
+                dest_inst = conn.GetInstance(subscription.path['Handler'])
             except Error as er:
                 raise click.ClickException("GetInstance Failed {0}".format(er))
 
@@ -2010,21 +2019,22 @@ def cmd_subscription_remove_subscription(context, destination_identity,
 
     # FUTURE: account for multiples subscription cases.
     # FUTURE: account for owned/not-owned from the dest and filters when that
-    # works. See pywbemtoolls issue #
+    # works.
 
     subscriptions = csm.get_subscriptions(False)
 
     # Find the subscription defined by destination_identity and filter_identity
     remove_list = []
+
     for subscription in subscriptions:
-        if subscription['Filter'] == filter_inst.path and \
-                subscription['Handler'] == dest_inst.path:
+        if subscription.path['Filter'] == filter_inst.path and \
+                subscription.path['Handler'] == dest_inst.path:
             remove_list.append(subscription)
 
     if not remove_list:
         raise click.ClickException(
-            "Options destination_id={0} and filter_id={1} did "
-            "not locate any subscriptions to remove."
+            "Arguments destination_id={0} and filter_id={1} did not locate "
+            "any subscriptions to remove."
             .format(destination_identity, filter_identity))
 
     if remove_list:
@@ -2035,8 +2045,8 @@ def cmd_subscription_remove_subscription(context, destination_identity,
 
         # Get the list of destination paths to possibly remove these
         # associations.
-        destination_paths = [i['Handler'] for i in remove_list]
-        filter_paths = [i['Filter'] for i in remove_list]
+        destination_paths = [i.path['Handler'] for i in remove_list]
+        filter_paths = [i.path['Filter'] for i in remove_list]
 
         csm.remove_subscriptions(remove_paths)
 
