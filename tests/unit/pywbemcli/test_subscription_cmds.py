@@ -694,34 +694,47 @@ TEST_CASES = [
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
       'stdin': ['subscription add-destination odest1 -l http://someone:50000',
                 'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
-                'subscription add-subscription  pywbemdestination:defaultpywbemcliSubMgr:odest1  pywbemfilter:defaultpywbemcliSubMgr:ofilter1 --owned',  # noqa: E501
+                'subscription add-subscription odest1 ofilter1 --owned',  # noqa: E501
                 '-o simple subscription list',
                 '-o simple subscription list --summary',
-                '-o text subscription list --summary',
-                '-o plain subscription list-destinations',
-                '-o plain subscription list-destinations --names-only',
-                '-o plain subscription list-destinations --detail',
-                '-o mof=- subscription list-destinations --detail',
-                '-o plain subscription list-destinations --summary',
-                'subscription list-destinations --summary',
-                '-o plain subscription list-filters',
-                '-o mof subscription list-filters --detail',
-                '-o plain subscription list-filters --summary'
-                'subscription list-subscriptions --summary',
-                '-o plain subscription list-subscriptions',
-                '-o plain subscription list-subscriptions --type owned',
-                '-o plain subscription list-subscriptions --type permanent',
-                '-o mof subscription list-subscriptions --detail',
-                '-o plain subscription list-subscriptions --summary',
-                'subscription list-subscriptions --summary']},
+                '-o text subscription list',
+                '-o text subscription list --summary']},
      {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
                  'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
                  'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501
+                 # Valid table output
                  'CIM_class                     owned    permanent    all',
                  '--------------------------  -------  -----------  -----',
                  'CIM_IndicationSubscription        1            0      1',
                  'CIM_IndicationFilter              1            0      1',
                  'CIM_ListenerDestinationCIMXML     1            0      1',
+                 # Valid text output
+                 'CIM_IndicationSubscription: 1, 0, 1',
+                 'CIM_IndicationFilter: 1, 0, 1',
+                 'CIM_ListenerDestinationCIMXML: 1, 0, 1',
+                 'TOTAL INSTANCES: 3, 0, 3',
+                 # Valid summary output
+                 '1 subscriptions, 1 filters, 1 destinations'],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add owned dest, filter, subscription , verify list-destination options.',  # noqa: E501
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ['subscription add-destination odest1 -l http://someone:50000',
+                'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
+                'subscription add-subscription  odest1  ofilter1 --owned',  # noqa: E501
+                '-o plain subscription list-destinations',
+                # Returns message ignoring names-only and table
+                '-o plain subscription list-destinations --names-only',
+                '-o plain subscription list-destinations --detail',
+                '-o mof subscription list-destinations --detail',
+                '-o plain subscription list-destinations --summary',
+                '-o mof subscription list-destinations --summary',
+                ]},
+     {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
+                 'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
+                 'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501
                  'Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all',  # noqa: E501
                  'Ownership    Identity    Name       Destination      Persistence    Protocol    Subscription',  # noqa: E501
                  '                         Type         Count',
@@ -736,6 +749,34 @@ TEST_CASES = [
                  '   Destination = "http://someone:50000";',
                  '   Protocol = 2;',
                  '};',
+                 'instance of CIM_ListenerDestinationCIMXML {',
+                 '   CreationClassName = "CIM_ListenerDestinationCIMXML";',
+                 '   SystemCreationClassName = "CIM_ComputerSystem";',
+                 '   SystemName = "MockSystem_WBEMServerTest";',
+                 '   PersistenceType = 3;',
+                 '   Name = "pywbemdestination:defaultpywbemcliSubMgr:odest1";',
+                 '   Destination = "http://someone:50000";',
+                 '   Protocol = 2;',
+                 'Option --names-only ignored for table output.',
+                 '1 CIMInstance(s) returned',
+                 '};'],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add owned dest, filter, subscription , verify list-filter options.',  # noqa: E501
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ['subscription add-destination odest1 -l http://someone:50000',
+                'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
+                'subscription add-subscription  pywbemdestination:defaultpywbemcliSubMgr:odest1  pywbemfilter:defaultpywbemcliSubMgr:ofilter1 --owned',  # noqa: E501
+                '-o plain subscription list-filters',
+                '-o mof subscription list-filters --detail',
+                '-o plain subscription list-filters --summary',
+                '-o mof subscription list-filters --summary',
+                ]},
+     {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
+                 'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
+                 'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501
                  'Indication Filters: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988 type=all',  # noqa: E501
                  'Ownership    Identity Name  Query Query Source Subscription',
                  ' Property    Language    Namespaces      Count',
@@ -751,19 +792,6 @@ TEST_CASES = [
                  '   QueryLanguage = "WQL";',
                  '   IndividualSubscriptionSupported = true;',
                  '};',
-                 'Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all',  # noqa: E501
-                 'Ownership    Handler        Filter    Handler        Filter          Filter Query    Subscription',  # noqa: E501
-                 '      Identity       Identity  Destination    Query           language        StartTime',  # noqa: E501
-                 'instance of CIM_IndicationSubscription {',
-                 '   Filter =',
-                 'interop:CIM_IndicationFilter.CreationClassName=', 'CIM_IndicationFilter',  # noqa: E501
-                 'pywbemfilter:defaultpywbemcliSubMgr:ofilter1',
-                 'SystemCreationClassName=', 'CIM_ComputerSystem', 'SystemName=', 'MockSystem_WBEMServerTest',  # noqa: E501
-                 ' Handler =',
-                 '  OnFatalErrorPolicy = 2;',
-                 '   RepeatNotificationPolicy = 2;',
-                 '   SubscriptionState = 2;',
-                 '};',
                  'instance of CIM_IndicationFilter {',
                  '   CreationClassName = "CIM_IndicationFilter";',
                  '   SystemCreationClassName = "CIM_ComputerSystem";',
@@ -774,14 +802,44 @@ TEST_CASES = [
                  '   QueryLanguage = "WQL";',
                  '   IndividualSubscriptionSupported = true;',
                  '};',
-                 'instance of CIM_ListenerDestinationCIMXML {',
-                 '   CreationClassName = "CIM_ListenerDestinationCIMXML";',
-                 '   SystemCreationClassName = "CIM_ComputerSystem";',
-                 '   SystemName = "MockSystem_WBEMServerTest";',
-                 '   PersistenceType = 3;',
-                 '   Name = "pywbemdestination:defaultpywbemcliSubMgr:odest1";',
-                 '   Destination = "http://someone:50000";',
-                 '   Protocol = 2;',
+                 '1 CIMInstance(s) returned',
+                 ],
+      'stderr': [],
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify add owned dest, filter, subscription , verify list-subscription options.',  # noqa: E501
+     {'general': ['-m', MOCK_SERVER_MODEL_PATH],
+      'stdin': ['subscription add-destination odest1 -l http://someone:50000',
+                'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
+                'subscription add-subscription  pywbemdestination:defaultpywbemcliSubMgr:odest1  pywbemfilter:defaultpywbemcliSubMgr:ofilter1 --owned',  # noqa: E501
+                'subscription list-subscriptions --summary',
+                '-o plain subscription list-subscriptions',
+                '-o plain subscription list-subscriptions --type owned',
+                '-o plain subscription list-subscriptions --type permanent',
+                '-o plain subscription list-subscriptions --summary',
+                '-o mof subscription list-subscriptions',
+                '-o mof subscription list --names-only',
+                '-o mof subscription list-subscriptions --detail',
+                'subscription list-subscriptions --summary']},
+     {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
+                 'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
+                 'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501
+                 # plain table list
+                 'Indication Subscriptions: submgr-id=defaultpywbemcliSubMgr, svr-id=http://FakedUrl:5988, type=all',  # noqa: E501
+                 'Ownership    Handler        Filter    Handler        Filter          Filter Query    Subscription',  # noqa: E501
+                 '      Identity       Identity  Destination    Query           language        StartTime',  # noqa: E501
+                 'owned        odest1(owned)  ofilter1(owned)  http://someone:50000  SELECT * from CIM_Indication  WQL',  # noqa: E501
+                 'instance of CIM_IndicationSubscription {',
+                 '   Filter =',
+                 'interop:CIM_IndicationFilter.CreationClassName=', 'CIM_IndicationFilter',  # noqa: E501
+                 'pywbemfilter:defaultpywbemcliSubMgr:ofilter1',
+                 'SystemCreationClassName=', 'CIM_ComputerSystem', 'SystemName=', 'MockSystem_WBEMServerTest',  # noqa: E501
+                 ' Handler =',
+                 '  OnFatalErrorPolicy = 2;',
+                 '   RepeatNotificationPolicy = 2;',
+                 '   SubscriptionState = 2;',
+                 '};',
                  '};'],
       'stderr': [],
       'test': 'innows'},
@@ -1520,12 +1578,13 @@ TEST_CASES = [
     # 1. test of fail when add-subscription reverses dest and filter ids
     # 2. test of fail when remove-subscription reverses dest and filter ids
     # 5. Tests of summary and --detail beyond existing tests
-    # 6. tests of output format text for those commands that implement this.
+    # 6. Add tests-listpermanent and all and both types of owned
+    # 7. tests of output format text for those commands that implement this.
     # 8. Test fail with destination and filter if create duplicated.
     # 9. Add-subscription fail, value or type error
     # 10. dest/filter_for_type, owned (list-destinations owned)
     # 11. find_destinations_for_name( fail_if_none
-    # 12. subscription_class  select_id_str(
+    # 12. subscription_class  select_id_str( not tested, not used.
     # 13. pick_one_path_from_instances_list( subscription )
 
 ]
