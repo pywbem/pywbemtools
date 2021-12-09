@@ -113,9 +113,10 @@ Released: not yet
 
 * Add new MutuallyExclusiveOption class to pywbemtools/_click_extensions.py to
   allow defining command options as mutually exclusive.  See the class
-  for documentation.  Modify pywbemcli.py mutually excluseive options --server, 
+  for documentation.  Modify pywbemcli.py mutually excluseive options --server,
   --name, and --mock-server to use this class.
 
+* Increased minimum version of pywbem to 1.3.0. (issue #1020)
 
 **Cleanup:**
 
@@ -145,7 +146,7 @@ Released: not yet
   to better compare with the pywbem file and also commented out all minimum constraints
   for Jupyter and its dependencies since we have no notebooks in pywbemcli
   today. Modified minimum version of typed-ast, pylint and astrid to match pywbem
-  and pass saftey tests. 
+  and pass saftey tests.
 
 **Known issues:**
 
