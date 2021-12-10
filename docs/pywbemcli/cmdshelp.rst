@@ -2646,25 +2646,26 @@ Help text for ``pywbemcli subscription add-subscription`` (see :ref:`subscriptio
 
 ::
 
-    Usage: pywbemcli [GENERAL-OPTIONS] subscription add-subscription DESTINATION FILTER [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] subscription add-subscription DESTINATIONID FILTERID [COMMAND-OPTIONS]
 
       Add new indication subscription.
 
-      Adds an indication subscription to the current WBEM server for a particular DESTINATION and FILTER. The command
+      Adds an indication subscription to the current WBEM server for a particular DESTINATIONID and FILTERID. The command
       creates an instance of CIM association class "CIM_IndicationSubscription" in the Interop namespace of the server.
 
-      The destination and filter instances to be used in the subscription is based on the DESTINATION and FILTER arguments
-      which define the the 'Handler' and 'Filter' reference properties of the subscription instance to be created.
+      The destination and filter instances to be used in the subscription is based on the DESTINATIONID and FILTERID
+      arguments which define the the 'Handler' and 'Filter' reference properties of the subscription instance to be
+      created.
 
-      The required DESTINATION argument defines the existing destination instance that will be attached to the 'Handler'
+      The required DESTINATIONID argument defines the existing destination instance that will be attached to the 'Handler'
       reference of the association class. This argument may consist of either the value of the 'Name' property of the
       target destination instance or the identity of that instance.  The identity is the full value of the 'Name' property
       for permanent destinations and is a component of the 'Name' property for owned instances. If just the identity is
       used, this will result in multiple destinations being found if the same string is defined as the identity of an
       owned and permanent destination.
 
-      The required FILTER argument defines the existing filter instance that will be attached to the 'Filter' reference of
-      the association class. This argument may consist of either the value of the 'Name' property of the target filter
+      The required FILTERID argument defines the existing filter instance that will be attached to the 'Filter' reference
+      of the association class. This argument may consist of either the value of the 'Name' property of the target filter
       instance or the identity of that instance.  The identity is the full value of the 'Name' property for permanent
       filters and is a component of the 'Name' property for owned instances. If just the identity is used, this will
       result in multiple filters being found if the same string is defined as the identity of an owned and permanent
@@ -2974,24 +2975,24 @@ Help text for ``pywbemcli subscription remove-subscription`` (see :ref:`subscrip
 
 ::
 
-    Usage: pywbemcli [GENERAL-OPTIONS] subscription remove-subscription DESTINATION FILTER [COMMAND-OPTIONS]
+    Usage: pywbemcli [GENERAL-OPTIONS] subscription remove-subscription DESTINATIONID FILTERID [COMMAND-OPTIONS]
 
       Remove indication subscription from the WBEM server.
 
       This command removes an indication subscription instance from the WBEM server.
 
-      The selection of subscription to be removed is defined by the DESTINATION and FILTER arguments which define the Name
-      property of the destination and filter associations of the subscription to be removed.
+      The selection of subscription to be removed is defined by the DESTINATIONID and FILTERID arguments which define the
+      Name property of the destination and filter associations of the subscription to be removed.
 
-      The required DESTINATION argument defines the existing destination instance that will be attached to the Filter
+      The required DESTINATIONID argument defines the existing destination instance that will be attached to the Filter
       reference of the association class. This argument may consist of either the value of the Name property of the target
       destination instance or the identity of that instance.  The identity is the full value of the Name property for
       permanent destinations and is a component of the Name property for owned instances. If just the identity is used,
       this will result in multiple destinations being found if the same string is defined as the identity of an owned and
       permanent destination.
 
-      The required FILTER argument defines the existing filter instance that will be attached to the 'Filter' reference of
-      the association class. This argument may consist of either the value of the 'Name' property of the target filter
+      The required FILTERID argument defines the existing filter instance that will be attached to the 'Filter' reference
+      of the association class. This argument may consist of either the value of the 'Name' property of the target filter
       instance or the identity of that instance.  The identity is the full value of the 'Name' property for permanent
       filters and is a component of the 'Name' property for owned instances. If just the identity is used, this may result
       in multiple filters being found if the same string is defined as the identity of an owned and permanent filter.

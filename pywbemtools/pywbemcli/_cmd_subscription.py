@@ -268,9 +268,9 @@ def subscription_add_filter(context, identity, **options):
 
 @subscription_group.command('add-subscription', cls=PywbemtoolsCommand,
                             options_metavar=CMD_OPTS_TXT)
-@click.argument('destination-identity', type=str, metavar='DESTINATION',
+@click.argument('destination-identity', type=str, metavar='DESTINATIONID',
                 required=True,)
-@click.argument('filter-identity', type=str, metavar='FILTER', required=True,)
+@click.argument('filter-identity', type=str, metavar='FILTERID', required=True,)
 @add_options(ownedadd_flag_option)
 @add_options(select_option)
 @add_options(help_option)
@@ -281,26 +281,27 @@ def subscription_add_subscription(context, destination_identity,
     Add new indication subscription.
 
     Adds an indication subscription to the current WBEM server for a particular
-    DESTINATION and FILTER. The command creates an instance of CIM association
-    class "CIM_IndicationSubscription" in the Interop namespace of the server.
+    DESTINATIONID and FILTERID. The command creates an instance of CIM
+    association class "CIM_IndicationSubscription" in the Interop namespace of
+    the server.
 
     The destination and filter instances to be used in the subscription is
-    based on the DESTINATION and FILTER arguments which define the
+    based on the DESTINATIONID and FILTERID arguments which define the
     the 'Handler' and 'Filter' reference properties of the subscription
     instance to be created.
 
-    The required DESTINATION argument defines the existing destination instance
-    that will be attached to the 'Handler' reference of the association class.
-    This argument may consist of either the value of the 'Name' property of the
-    target destination instance or the identity of that instance.  The identity
-    is the full value of the 'Name' property for permanent destinations and is
-    a component of the 'Name' property for owned instances. If just the
-    identity is used, this will result in multiple destinations being found if
-    the same string is defined as the identity of an owned and permanent
-    destination.
+    The required DESTINATIONID argument defines the existing destination
+    instance that will be attached to the 'Handler' reference of the
+    association class. This argument may consist of either the value of the
+    'Name' property of the target destination instance or the identity of that
+    instance.  The identity is the full value of the 'Name' property for
+    permanent destinations and is a component of the 'Name' property for owned
+    instances. If just the identity is used, this will result in multiple
+    destinations being found if the same string is defined as the identity of
+    an owned and permanent destination.
 
-    The required FILTER argument defines the existing filter instance that will
-    be attached to the 'Filter' reference of the association class. This
+    The required FILTERID argument defines the existing filter instance that
+    will be attached to the 'Filter' reference of the association class. This
     argument may consist of either the value of the 'Name' property of the
     target filter instance or the identity of that instance.  The identity is
     the full value of the 'Name' property for permanent filters and is a
@@ -510,9 +511,9 @@ def subscription_remove_filter(context, identity, **options):
 
 @subscription_group.command('remove-subscription', cls=PywbemtoolsCommand,
                             options_metavar=CMD_OPTS_TXT)
-@click.argument('destination-identity', type=str, metavar='DESTINATION',
+@click.argument('destination-identity', type=str, metavar='DESTINATIONID',
                 required=True,)
-@click.argument('filter-identity', type=str, metavar='FILTER', required=True,)
+@click.argument('filter-identity', type=str, metavar='FILTERID', required=True,)
 @add_options(verify_remove_option)
 @click.option('--remove-associated-instances', is_flag=True,
               default=False,
@@ -531,11 +532,11 @@ def subscription_remove_subscription(context, destination_identity,
     WBEM server.
 
     The selection of subscription to be removed is defined by the
-    DESTINATION and FILTER arguments which define the Name property of the
+    DESTINATIONID and FILTERID arguments which define the Name property of the
     destination and filter associations of the subscription to be
     removed.
 
-    The required DESTINATION argument defines the existing destination
+    The required DESTINATIONID argument defines the existing destination
     instance that will be attached to the Filter reference of the association
     class. This argument may consist of either the value of the Name property
     of the target destination instance or the identity of that instance.  The
@@ -545,8 +546,8 @@ def subscription_remove_subscription(context, destination_identity,
     the same string is defined as the identity of an owned and permanent
     destination.
 
-    The required FILTER argument defines the existing filter instance that will
-    be attached to the 'Filter' reference of the association class. This
+    The required FILTERID argument defines the existing filter instance that
+    will be attached to the 'Filter' reference of the association class. This
     argument may consist of either the value of the 'Name' property of the
     target filter instance or the identity of that instance.  The identity is
     the full value of the 'Name' property for permanent filters and is a
