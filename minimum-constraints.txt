@@ -242,6 +242,13 @@ simplegeneric==0.8.1
 singledispatch==3.4.0.3; python_version < "3.4"
 smmap2==2.0.1
 snowballstemmer==1.2.1
+sphinxcontrib-applehelp==1.0.0; python_version >= '3.4'
+sphinxcontrib-devhelp==1.0.0; python_version >= '3.4'
+sphinxcontrib-htmlhelp==1.0.0; python_version >= '3.4' and python_version <= '3.9'
+sphinxcontrib-htmlhelp==2.0.0; python_version >= '3.10'
+sphinxcontrib-jsmath==1.0.0; python_version >= '3.4'
+sphinxcontrib-qthelp==1.0.0; python_version >= '3.4'
+sphinxcontrib-serializinghtml==1.1.5; python_version >= '3.4'
 terminado==0.6
 testpath==0.3
 toml==0.10.0
