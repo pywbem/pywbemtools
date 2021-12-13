@@ -943,8 +943,8 @@ class CmdSubscriptionManager(object):
         """
         Test if subscription instance and instance path are owned instances.
         """
-        hdlr = self.is_owned_destination(instance['Handler'])
-        fltr = self.is_owned_filter(instance['Filter'])
+        hdlr = self.is_owned_destination(instance.path['Handler'])
+        fltr = self.is_owned_filter(instance.path['Filter'])
         return fltr or hdlr
 
     def _get_permanent_destinations(self):
@@ -1176,8 +1176,8 @@ class IndicationSubscription(BaseIndicationObjectInstance):
         and destination instances.
         """
         conn = self.csm.context.pywbem_server.conn
-        filter_inst = conn.GetInstance(self.instance['Filter'])
-        dest_inst = conn.GetInstance(self.instance['Handler'])
+        filter_inst = conn.GetInstance(self.instance.path['Filter'])
+        dest_inst = conn.GetInstance(self.instance.path['Handler'])
 
         # Get filter and destination select_id_str strings
         filterinst = IndicationFilter(self.csm, filter_inst)
@@ -1631,6 +1631,24 @@ def cmd_subscription_list(context, options):
                                                        row[3]))
 
 
+def get_reference_count(subscription_paths, inst_name, role):
+    """
+    Get count of references to object_name for role in
+    CIM_IndicationSubscription instances.  This implements
+
+    The alternate path covers cases where references returns an error
+
+    Returns: int
+      Count of instance that match the reference definition
+
+    Raises:
+       ClickException if Error exception occurs
+    """
+    cnt = sum(path[role] == inst_name for path in subscription_paths)
+
+    return cnt
+
+
 def cmd_subscription_list_destinations(context, options):
     """
     List the subscription destinations objects found on the current connection.
@@ -1671,10 +1689,13 @@ def cmd_subscription_list_destinations(context, options):
         rows = []
 
         # FUTURE: summary with table not covered.
+
+        # subscription_paths = [s.path for s in csm.get_subscriptions(False)]
+        subscription_paths = [s.path for s in
+                              csm.get_subscriptions_for_owned_choice("all")]
         for dest in destinations:
-            conn = context.pywbem_server.conn
-            references = conn.ReferenceNames(
-                dest.path, ResultClass=SUBSCRIPTION_CLASSNAME, Role='Handler')
+            ref_cnt = get_reference_count(subscription_paths,
+                                          dest.path, 'Handler')
 
             d = IndicationDestination(csm, dest)
             row = [d.owned_flag_str,
@@ -1684,7 +1705,7 @@ def cmd_subscription_list_destinations(context, options):
                    d.instance_property('Destination'),
                    d.instance_property('PersistenceType'),
                    d.instance_property('Protocol'),
-                   len(references)]
+                   ref_cnt]
             if options['detail']:
                 row.extend([d.instance_property('CreationClassName'),
                             d.instance_property('SystemCreationClassName'),
@@ -1745,11 +1766,12 @@ def cmd_subscription_list_filters(context, options):
                  'SystemName'])
 
         rows = []
+        subscription_paths = [s.path for s in
+                              csm.get_subscriptions_for_owned_choice("all")]
         for filter_ in filters:
-            conn = context.pywbem_server.conn
-            references = conn.ReferenceNames(
-                filter_.path, ResultClass=SUBSCRIPTION_CLASSNAME,
-                Role='Filter')
+            ref_cnt = get_reference_count(subscription_paths,
+                                          filter_.path, 'Filter')
+
             f = IndicationFilter(csm, filter_)
             row = [f.owned_flag_str,
                    f.identity,
@@ -1758,7 +1780,7 @@ def cmd_subscription_list_filters(context, options):
                    fold_strings(f.instance_property('Query'), 25),
                    f.instance_property('QueryLanguage'),
                    "\n".join(f.instance_property('SourceNamespaces')),
-                   len(references)]
+                   ref_cnt]
             if details_opt:
                 row.extend([
                     f.instance_property('CreationClassName'),
@@ -1807,7 +1829,11 @@ def cmd_subscription_list_subscriptions(context, options):
                 for dest in svr_destinations:
                     if subscription.path['Handler'] == dest.path:
                         inst_list.append(dest)
-        if options['summary'] or not details_opt:
+        if options['names_only']:
+            paths = [inst.path for inst in svr_subscriptions]
+            display_cim_objects(context, paths, output_format,
+                                options['summary'])
+        elif options['summary'] or not details_opt:
             display_cim_objects(context, inst_list,
                                 output_format='mof', summary=options['summary'])
         elif details_opt:
