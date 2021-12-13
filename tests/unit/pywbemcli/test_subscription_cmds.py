@@ -426,8 +426,10 @@ TEST_CASES = [
                 '-o simple subscription list',
                 '-o simple subscription list-destinations',
                 '-o mof subscription list-destinations',
+                # The following two do not show any difference in test
                 '-o mof subscription list-destinations --owned',
                 '-o mof subscription list-destinations --permanent',
+                '-o mof subscription list-destinations --names-only',
                 '-v subscription remove-destination dest1',
                 '-v subscription remove-destination dest2 --owned',
                 '-v subscription remove-destination perm1 --permanent',
@@ -455,6 +457,9 @@ TEST_CASES = [
                  'https://blah:50001 3 2 0',
                  'permanent perm1 perm1 http://perm1:50002  2  2  0',
                  'instance of CIM_ListenerDestinationCIMXML {',
+                 # names-only
+                 'interop:CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",'  # noqa: E501
+                 'Name="perm1",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest"',  # noqa: E501
                  'Destination = "http://blah:50000"',
                  'Destination = "https://blah:50001"',
                  'Destination = "http://perm1:50002"',
@@ -695,25 +700,46 @@ TEST_CASES = [
       'stdin': ['subscription add-destination odest1 -l http://someone:50000',
                 'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
                 'subscription add-subscription odest1 ofilter1 --owned',  # noqa: E501
+                # subscription list
                 '-o simple subscription list',
-                '-o simple subscription list --summary',
                 '-o text subscription list',
-                '-o text subscription list --summary']},
+                '-o simple subscription list --summary',
+                '-o text subscription list --summary',
+                # list-destinations
+                '-o plain subscription list-destinations',
+                '-o plain subscription list-destinations --names-only',
+                '-o plain subscription list-destinations --detail',
+                '-o mof=- subscription list-destinations --detail',
+                '-o plain subscription list-destinations --summary',
+                'subscription list-destinations --summary',
+                # list-filters
+                '-o plain subscription list-filters',
+                '-o mof subscription list-filters --detail',
+                '-o plain subscription list-filters --summary',
+                # list-subscriptions
+                'subscription list-subscriptions --summary',
+                '-o plain subscription list-subscriptions',
+                '-o plain subscription list-subscriptions --type owned',
+                '-o plain subscription list-subscriptions --type permanent',
+                '-o mof subscription list-subscriptions --detail',
+                '-o mof subscription list-subscriptions --names-only',
+                '-o plain subscription list-subscriptions --summary',
+                'subscription list-subscriptions --summary']},
      {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
                  'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
                  'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501
-                 # Valid table output
+                 # Valid subscription list table (default) output
                  'CIM_class                     owned    permanent    all',
                  '--------------------------  -------  -----------  -----',
                  'CIM_IndicationSubscription        1            0      1',
                  'CIM_IndicationFilter              1            0      1',
                  'CIM_ListenerDestinationCIMXML     1            0      1',
-                 # Valid text output
+                 # Valid -o text subscription list output
                  'CIM_IndicationSubscription: 1, 0, 1',
                  'CIM_IndicationFilter: 1, 0, 1',
                  'CIM_ListenerDestinationCIMXML: 1, 0, 1',
                  'TOTAL INSTANCES: 3, 0, 3',
-                 # Valid summary output
+                 # Valid -o text subscription list --summary  output
                  '1 subscriptions, 1 filters, 1 destinations'],
       'stderr': [],
       'test': 'innows'},
