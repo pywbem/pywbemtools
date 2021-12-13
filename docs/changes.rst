@@ -75,6 +75,13 @@ Released: not yet
 
 * Fixed new issues raised by pylint 2.12.2.
 
+* Fixed issue with instance commands (ex. instance get, references, etc) that
+  use the wildcard .? to request that pywbemcli present list of possible
+  instances.  It was not handling the non-existence of class in the
+  target namespace correctly and would crash because no instances were returned
+  get_instanceNames() . Now generates an exception.
+  (see issue #1105)
+
 **Enhancements:**
 
 * Added a 'pywbemlistener' command for running and managing WBEM listeners.

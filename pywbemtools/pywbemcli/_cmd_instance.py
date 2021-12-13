@@ -943,6 +943,10 @@ def get_instancename(context, instancename, options):
             instance_path.namespace = options.get('namespace') or \
                 conn.default_namespace
 
+    if instance_path is None:
+        raise click.ClickException(
+            "No instance paths found for instancename {0}".format(instancename))
+
     return instance_path
 
 

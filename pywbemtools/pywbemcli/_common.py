@@ -247,7 +247,6 @@ def pick_instance(context, objectname, namespace=None):
         raise pywbem_error_exception(ex)
 
     if not instance_names:
-        click.echo('No instance paths found for {}'.format(objectname))
         return None
 
     try:

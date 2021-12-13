@@ -1462,6 +1462,29 @@ Instances: TST_Person
       'test': 'regex'},
      ASSOC_MOCK_FILE, OK],
 
+    ['get with INSTANCENAME/wildcard with invalid classname',
+     ['get', 'CIM_DoesNotExist.?'],
+     {'stderr': ["CIMError: 5 (CIM_ERR_INVALID_CLASS): Class "
+                 "'CIM_DoesNotExist' not found in namespace 'root/cimv2'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['get with INSTANCENAME/wildcard with no instances',
+     ['get', 'CIM_FooEmb1.?'],
+     {'stderr': ["No instance paths found for instancename CIM_FooEmb1.?"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, RUN],
+
+    ['INSTANCENAME with invalid namespace and wildcard',
+     ['get', 'CIM_Foo.?', '-n', 'root/DoesNotExist'],
+     {'stderr': ["CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does not "
+                 "exist in CIM repository: 'root/DoesNotExist'"],
+      'rc': 1,
+      'test': 'in'},
+     SIMPLE_MOCK_FILE, OK],
+
     ['INSTANCENAME with wildcard keybinding, --key option (error)',
      {'general': [],
       'args': ['get', 'TST_Person.?', '--key', 'name=Saara'],
@@ -2458,6 +2481,12 @@ Instances: TST_Person
       'rc': 1,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
+    ['Verify instance command references, invalid instance name',
+     ['references', 'TST_Blah.blah="abc.?"'],
+     {'stderr': "",
+      'rc': 1,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command references with wildcard keybinding',
      {'general': [],
@@ -2497,6 +2526,23 @@ Instances: TST_Person
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command references with no instances of CIM_FooFooEmb1',
+     {'args': ['references', 'CIM_FooEmb1.?'],
+      'general': ['--output-format', 'text']},
+     {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
+                 'TABLE formats:'],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, RUN],
+
+    ['references with INSTANCENAME/wildcard with invalid classname',
+     ['references', 'CIM_DoesNotExist.?'],
+     {'stderr': ["CIMError: 5 (CIM_ERR_INVALID_CLASS): Class "
+                 "'CIM_DoesNotExist' not found in namespace 'root/cimv2'"],
+      'rc': 1,
+      'test': 'in'},
+     ASSOC_MOCK_FILE, OK],
 
     # TODO add more invalid references tests
 
