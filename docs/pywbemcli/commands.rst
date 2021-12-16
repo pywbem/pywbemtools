@@ -748,7 +748,46 @@ classnames to include or exclude classes with the corresponding qualifiers.
 Thus the ``--association`` option returns only classes or classnames that are
 association classes.
 
+Thus, for example:
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock instance count --association -n root/cimv2
+      # Returns counts of instances of association classes from namespace root/cimv2
+
+    $ pywbemcli --name mymock instance count --experimental
+      # returns the counts of instances where the class has the experimental qualifier
+
+    $ pywbemcli -n mymock instance count CIM_* -n root/interop
+      # returns counts of instances in root/interop namespace where the classname
+      # starts with CIM_
+
+The ``--ignore-class`` option allows the user to ignore multiple selected
+classes in the scan for instances. This is useful in cases where the enumerate
+of instances of a class returns an error from the WBEM server. The command that
+will ignore some classes is as follows:
+
+.. code-block:: text
+
+    $ pywbemcli -n mymock instance count CIM_* -n root/interop --ignore-class classname1,classname2
+      # Ignores classname1 and classname2 and shows them in the table as
+
+      # classname1    ignored
+      # classname2    ignored
+
+    # The command form may also be used
+        $ pywbemcli -n mymock instance count CIM_* -n root/interop --ignore-class classname1 --ignore-class classname2
+
+
+
 Results for classes that have no instances are not displayed.
+
+The processing handles both CIMError exceptions (which are considered errors applicable
+to particular instances), and Error exceptions which are considered server
+errors so that the scan for instances is terminated).  In all cases it tries
+to include all classes in the display and adds status information
+in place of the count of instances returned when a particular class causes
+an exception.
 
 This command can take a long time to execute since it potentially enumerates
 all instance names for all classes in all namespaces.
@@ -775,7 +814,8 @@ Example:
 Count is useful to determine which classes in the environment are actually
 implemented. However this command can take a long time to execute because
 it must a) enumerate all classes in the namespace, b) enumerate the
-instances for each class.
+instances for each class that is defined by the classname glob and the
+namespace list..
 
 See :ref:`pywbemcli instance count --help` for the exact help output of the command.
 
