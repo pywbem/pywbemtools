@@ -1142,6 +1142,10 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       For example, "pywbem_*" returns classes whose name begins with "PyWBEM_", "pywbem_", etc. "*system*" returns classes
       whose names include the case insensitive string "system".
 
+      If a CIMError occurs on any enumerate, it is flagged with a warning message and the search for instances continues.
+      If an Error exception occurs (ex. Connection error) the scan is terminated under the assumption that the server may
+      have failed and the remaining items are shown as "Not scanned".
+
       This command can take a long time to execute since it potentially enumerates all instance names for all classes in
       all namespaces.
 
@@ -1150,6 +1154,12 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
                                       in all namespaces of the server.
 
       -s, --sort                      Sort by instance count. Otherwise sorted by class name.
+      --ignore-class CLASSNAME        Class names of classes to be ignored (not counted). Allows counting instances in
+                                      servers where instance retrieval may cause a CIMError or Error exceptionon some
+                                      classes. CIN errors on particular classes are ignored. Error exceptions cause scan to
+                                      stop and remaining classes status shown as 'not scanned'. Multiple class names are
+                                      allowed (one per option or comma-separated).
+
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
                                       classes that are not associations(--no-association). If the option is not defined no

@@ -572,6 +572,17 @@ def instance_query(context, query, **options):
 @add_options(multiple_namespaces_option)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help=u'Sort by instance count. Otherwise sorted by class name.')
+@click.option('--ignore-class', type=str,
+              multiple=True,
+              metavar='CLASSNAME',
+              help=u"Class names of classes to be ignored (not counted). "
+                   u"Allows counting instances in servers where instance "
+                   u"retrieval may cause a CIMError or Error exception"
+                   u"on some classes. CIN errors on particular "
+                   u"classes are ignored. Error exceptions cause scan to stop "
+                   u"and remaining classes status shown as 'not scanned'. "
+                   u"Multiple class names are allowed (one per option or "
+                   u"comma-separated).")
 @add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
@@ -599,6 +610,12 @@ def instance_count(context, classname, **options):
     For example, "pywbem_*" returns classes whose name begins with "PyWBEM_",
     "pywbem_", etc. "*system*" returns classes whose names include the case
     insensitive string "system".
+
+    If a CIMError occurs on any enumerate, it is flagged with a warning message
+    and the search for instances continues.  If an Error exception occurs
+    (ex. Connection error) the scan is terminated under the assumption
+    that the server may have failed and the remaining items are shown as
+    "Not scanned".
 
     This command can take a long time to execute since it potentially
     enumerates all instance names for all classes in all namespaces.
@@ -1292,6 +1309,13 @@ def cmd_instance_count(context, classname, options):
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, 'TABLE')
 
+    class_ignore_list = []
+    for cls in options['ignore_class']:
+        if ',' in cls:
+            class_ignore_list.extend(cls.split(','))
+        else:
+            class_ignore_list.append(cls)
+
     # Differs from class find because it classname is optional.
     # If None, select all
     if classname is None:
@@ -1320,36 +1344,65 @@ def cmd_instance_count(context, classname, options):
             cl_tup = [(namespace, cln) for cln in classlist]
             ns_cln_tuples.extend(cl_tup)
 
-    # sort since normal output for this command is  namespace, classname
+    # Sort since normal output for this command is  namespace, classname
     # alphabetic order.
     ns_cln_tuples.sort(key=lambda tup: (tup[0], tup[1]))
 
     display_data = []
+    error = 0
+    # Scan all of the class/namespace tuples to get count of instances
+    # of each class.
     for tup in ns_cln_tuples:
         ns = tup[0]
         cln = tup[1]
+        if cln in class_ignore_list:
+            display_tuple = (ns, cln, "ignored")
+            display_data.append(display_tuple)
+            continue
+        # If an error has occurred, just display the remaining items with
+        # Not scanned msg.
+        if error:
+            display_tuple = (ns, cln, "Not scanned")
+            display_data.append(display_tuple)
+            continue
         # Try block allows issues where enumerate does not properly execute
         # The totals may be wrong but at least it gets what it can.
         # This accounts for issues with some servers where there
         # are providers that return errors from the enumerate.
+        inst_names = None
         try:
             inst_names = conn.EnumerateInstanceNames(cln, namespace=ns)
         except CIMError as ce:
-            warning_msg('Server Error {} with {}:{}. Continuing.'
+            warning_msg("Server CIMError {0} with namepace={1}, class={2}. "
+                        "Continuing scan."
                         .format(ce, ns, cln))
+            display_tuple = (ns, cln, "CIMError {}".format(ce.status_code))
+            display_data.append(display_tuple)
+            continue
+        # Error exception cause termination of the connection. Add this
+        # item to the display with Server Fail message instead of count
+        except Error as er:
+            error = er
+            warning_msg("Server Error {0} with namepace={1}, class={2}. "
+                        "Terminating scan."
+                        .format(er, ns, cln))
+            display_tuple = (ns, cln, "Server Fail")
+            display_data.append(display_tuple)
+            continue
 
         # Sum the number of instances with the defined classname.
         # this counts only classes with that specific classname and not
         # subclasses
-        clnl = cln.lower()
-        count = sum(1 for inst_name in inst_names
-                    if (inst_name.classname.lower() == clnl))
+        if inst_names:
+            count = sum(1 for inst_name in inst_names
+                        if (inst_name.classname.lower() == cln.lower()))
+            # Display only non-zero elements
+            if count:
+                display_tuple = (ns, cln, count)
+                display_data.append(display_tuple)
 
-        if count != 0:
-            display_tuple = (ns, cln, count)
-            display_data.append(display_tuple)
-
-    # If sort set, resort by count size
+    # Post scan processing
+    # If sort set, re-sort by count size
     if options['sort']:
         display_data.sort(key=lambda x: x[2])
 
@@ -1363,6 +1416,10 @@ def cmd_instance_count(context, classname, options):
     click.echo(format_table(rows, headers,
                             title='Count of instances per class',
                             table_format=output_fmt))
+    if error:
+        raise click.ClickException("Server Error {0} at namespace={1}, "
+                                   "class:{2}. Scan incomplete."
+                                   .format(error, ns, cln))
 
 
 def cmd_instance_query(context, query, options):

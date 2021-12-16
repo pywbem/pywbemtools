@@ -148,10 +148,12 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
 ]
 
 INSTANCE_COUNT_HELP_LINES = [
+    # pylint: disable=line-too-long
     'Usage: pywbemcli [GENERAL-OPTIONS] instance count CLASSNAME-GLOB '
     '[COMMAND-OPTIONS]',
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
+    '--ignore-class CLASSNAME Class names of classes to be ignored (not counted). ',  # noqa: E501
     CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
@@ -1475,7 +1477,7 @@ Instances: TST_Person
      {'stderr': ["No instance paths found for instancename CIM_FooEmb1.?"],
       'rc': 1,
       'test': 'in'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
     ['INSTANCENAME with invalid namespace and wildcard',
      ['get', 'CIM_Foo.?', '-n', 'root/DoesNotExist'],
@@ -2534,7 +2536,7 @@ Instances: TST_Person
                  'TABLE formats:'],
       'rc': 1,
       'test': 'innows'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
     ['references with INSTANCENAME/wildcard with invalid classname',
      ['references', 'CIM_DoesNotExist.?'],
@@ -2759,7 +2761,27 @@ Instances: TST_Person
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count CIM_*, simple model, format table',
+    ['Verify instance command count CIM_* sorted simple model, format table',
+     {'args': ['count', 'CIM_*', '--sort'],
+      'general': ['--output-format', 'table',
+                  '--default-namespace', 'interop']},
+     {'stdout': """Count of instances per class
++-------------+-----------------+---------+
+| Namespace   | Class           |   count |
+|-------------+-----------------+---------|
+| interop     | CIM_FooAssoc    |       1 |
+| interop     | CIM_FooRef1     |       1 |
+| interop     | CIM_FooRef2     |       1 |
+| interop     | CIM_Foo_sub_sub |       3 |
+| interop     | CIM_Foo_sub     |       4 |
+| interop     | CIM_Foo         |       5 |
++-------------+-----------------+---------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command count CIM_*, notsorted simple model, fmt table',
      {'args': ['count', 'CIM_*'],
       'general': ['--output-format', 'table',
                   '--default-namespace', 'interop']},
@@ -2779,8 +2801,9 @@ Instances: TST_Person
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command count *, assoc model, format plain',
-     {'args': ['count', '*'],
+    ['Verify instance command count *, assoc model, format plain, '
+     '--ignore-class single class',
+     {'args': ['count', '*', '--ignore-class', 'TST_Person'],
       'general': ['--default-namespace', 'interop', '--output-format',
                   'plain']},
      {'stdout': """Count of instances per class
@@ -2788,8 +2811,43 @@ Namespace    Class                           count
 interop      TST_FamilyCollection                2
 interop      TST_Lineage                         3
 interop      TST_MemberOfFamilyCollection        3
-interop      TST_Person                          4
+interop      TST_Person                          ignored
 interop      TST_Personsub                       4
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command count *, assoc model, format plain, '
+     '--ignore-class comma-separated list of classnames',
+     {'args': ['count', '*', '--ignore-class', 'TST_Person,TST_Personsub'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': """Count of instances per class
+Namespace    Class                           count
+interop      TST_FamilyCollection                2
+interop      TST_Lineage                         3
+interop      TST_MemberOfFamilyCollection        3
+interop      TST_Person                          ignored
+interop      TST_Personsub                       ignored
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command count *, assoc model, format plain, '
+     '--ignore-class  multiple option use',
+     {'args': ['count', '*', '--ignore-class', 'TST_Person,TST_Personsub',
+               '--ignore-class', 'TST_Lineage'],
+      'general': ['--default-namespace', 'interop', '--output-format',
+                  'plain']},
+     {'stdout': """Count of instances per class
+Namespace    Class                           count
+interop      TST_FamilyCollection                2
+interop      TST_Lineage                         ignored
+interop      TST_MemberOfFamilyCollection        3
+interop      TST_Person                          ignored
+interop      TST_Personsub                       ignored
 """,
       'rc': 0,
       'test': 'linesnows'},
