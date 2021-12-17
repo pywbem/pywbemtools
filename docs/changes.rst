@@ -169,6 +169,8 @@ Released: not yet
 * Remove the file minimum-constraints-base.txt and put contents into
   minimum-constraints.txt. (see issue #1076)
 
+* Add instance count tests to end-end testing against OpenPegasus.
+
 **Known issues:**
 
 * See `list of open issues`_.
