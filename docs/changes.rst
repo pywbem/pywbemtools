@@ -82,8 +82,8 @@ Released: not yet
   get_instanceNames() . Now generates an exception.
   (see issue #1105)
 
-* Fixed issues in "instance count" including unitialized variable and 
-  correctly finishing scan when errors occur. Adds new option to this command 
+* Fixed issues in "instance count" including unitialized variable and
+  correctly finishing scan when errors occur. Adds new option to this command
   to allow user to ignore classes defined with this option (--ignore-class).
   (see issues #1108 and #916 )
 
@@ -165,6 +165,8 @@ Released: not yet
 
 * Remove the file minimum-constraints-base.txt and put contents into
   minimum-constraints.txt. (see issue #1076)
+
+* Add instance count tests to end-end testing against OpenPegasus.
 
 **Known issues:**
 
