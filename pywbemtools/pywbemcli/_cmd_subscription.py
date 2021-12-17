@@ -1964,7 +1964,7 @@ def cmd_subscription_remove_destination(context, identity, options):
     csm.remove_destinations(destination_path)
 
     context.spinner_stop()
-    click.echo("Removed {0} indication destination: identity={1}, Name={2}..".
+    click.echo("Removed {0} indication destination: identity={1}, Name={2}.".
                format(owned_flag_str(owned_flag_opt), identity, name_property))
     if context.verbose:
         click.echo("indication destination path: {0}.".format(destination_path))

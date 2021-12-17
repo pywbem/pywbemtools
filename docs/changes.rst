@@ -136,6 +136,8 @@ Released: not yet
 * Support for Python 3.10: Added Python 3.10 in GitHub Actions tests, and in
   package metadata.
 
+* Implement an end-end test for the subscription command group.
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools
