@@ -1156,7 +1156,7 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       -s, --sort                      Sort by instance count. Otherwise sorted by class name.
       --ignore-class CLASSNAME        Class names of classes to be ignored (not counted). Allows counting instances in
                                       servers where instance retrieval may cause a CIMError or Error exceptionon some
-                                      classes. CIN errors on particular classes are ignored. Error exceptions cause scan to
+                                      classes. CIM errors on particular classes are ignored. Error exceptions cause scan to
                                       stop and remaining classes status shown as 'not scanned'. Multiple class names are
                                       allowed (one per option or comma-separated).
 
