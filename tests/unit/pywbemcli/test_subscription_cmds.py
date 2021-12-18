@@ -426,7 +426,7 @@ TEST_CASES = [
                 '-o simple subscription list',
                 '-o simple subscription list-destinations',
                 '-o mof subscription list-destinations',
-                # The following two do not show any difference in test
+                # TODO: Test of the list features should be in its own test
                 '-o mof subscription list-destinations --owned',
                 '-o mof subscription list-destinations --permanent',
                 '-o mof subscription list-destinations --names-only',
@@ -557,6 +557,7 @@ TEST_CASES = [
                 'subscription add-filter perm1 --query "SELECT from blah3" --query-language DMTF:CQL --permanent ',  # noqa: E501
                 'subscription add-filter perm2 --query "SELECT from blah4" --query-language WQL --permanent ',  # noqa: E501
                 '-o simple subscription list',
+                # TODO the list tests should be separate. this is add/remove
                 '-o simple subscription list-filters',
                 '-o simple subscription list-filters --type owned',
                 '-o simple subscription list-filters --type permanent',
@@ -751,7 +752,6 @@ TEST_CASES = [
                 'subscription add-filter ofilter1 -q "SELECT * from CIM_Indication" --owned',  # noqa: E501
                 'subscription add-subscription  odest1  ofilter1 --owned',  # noqa: E501
                 '-o plain subscription list-destinations',
-                # Returns message ignoring names-only and table
                 '-o plain subscription list-destinations --names-only',
                 '-o plain subscription list-destinations --detail',
                 '-o mof subscription list-destinations --detail',
@@ -783,7 +783,10 @@ TEST_CASES = [
                  '   Name = "pywbemdestination:defaultpywbemcliSubMgr:odest1";',
                  '   Destination = "http://someone:50000";',
                  '   Protocol = 2;',
-                 'Option --names-only ignored for table output.',
+                 # Result -o plain subscription list-destinations --names-only
+                 'host    namespace    class     keysbindings',
+                 'interop      CIM_ListenerDestinationCIMXML',
+                 # Result list
                  '1 CIMInstance(s) returned',
                  '};'],
       'stderr': [],
@@ -798,6 +801,7 @@ TEST_CASES = [
                 '-o plain subscription list-filters',
                 '-o mof subscription list-filters --detail',
                 '-o plain subscription list-filters --summary',
+                '-o plain subscription list-filters --names-only',
                 '-o mof subscription list-filters --summary',
                 ]},
      {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
@@ -829,7 +833,9 @@ TEST_CASES = [
                  '   IndividualSubscriptionSupported = true;',
                  '};',
                  '1 CIMInstance(s) returned',
-                 ],
+                 # Result from -o plain subscription list-filters --names-only
+                 'host    namespace    class   keysbindings',
+                 'interop   CIM_IndicationFilter', ],
       'stderr': [],
       'test': 'innows'},
      None, OK],
@@ -844,6 +850,7 @@ TEST_CASES = [
                 '-o plain subscription list-subscriptions --type owned',
                 '-o plain subscription list-subscriptions --type permanent',
                 '-o plain subscription list-subscriptions --summary',
+                '-o plain subscription list-subscriptions --names-only',
                 '-o mof subscription list-subscriptions',
                 '-o mof subscription list --names-only',
                 '-o mof subscription list-subscriptions --detail',
@@ -866,10 +873,13 @@ TEST_CASES = [
                  '   RepeatNotificationPolicy = 2;',
                  '   SubscriptionState = 2;',
                  '};',
+                 # Limited result  -o plain ... list-subscriptions --name-only
+                 # The actual output it to ugly to compare.
+                 'host    namespace    class   keysbindings',
                  '};'],
       'stderr': [],
       'test': 'innows'},
-     None, OK],
+     None, RUN],
 
     ['Verify add dest, filter, subscription and remove --permanent OK.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],

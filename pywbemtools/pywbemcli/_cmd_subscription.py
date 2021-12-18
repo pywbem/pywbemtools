@@ -1678,8 +1678,9 @@ def cmd_subscription_list_destinations(context, options):
 
     elif output_format_is_table(output_format):
         if options['names_only']:
-            context.spinner_stop()
-            click.echo("Option --names-only ignored for table output.")
+            paths = [inst.path for inst in destinations]
+            display_cim_objects(context, paths, output_format)
+            return
 
         headers = ['Ownership', 'Identity', 'Name\nProperty', 'Destination',
                    'Persistence\nType', 'Protocol', 'Subscription\nCount']
@@ -1755,8 +1756,9 @@ def cmd_subscription_list_filters(context, options):
 
     elif output_format_is_table(output_format):
         if options['names_only']:
-            context.spinner_stop()
-            click.echo("Option --names-only ignored for table output.")
+            paths = [inst.path for inst in filters]
+            display_cim_objects(context, paths, output_format)
+            return
         headers = ['Ownership', 'Identity', 'Name\nProperty', 'Query',
                    'Query\nLanguage', 'Source\nNamespaces',
                    'Subscription\nCount']
@@ -1845,8 +1847,9 @@ def cmd_subscription_list_subscriptions(context, options):
 
     elif output_format_is_table(output_format):
         if options['names_only']:
-            context.spinner_stop()
-            click.echo("Option --names-only ignored for table output.")
+            paths = [inst.path for inst in svr_subscriptions]
+            display_cim_objects(context, paths, output_format)
+            return
         headers = ['Ownership', 'Handler\nIdentity', 'Filter\nIdentity',
                    'Handler\nDestination', 'Filter\nQuery',
                    'Filter Query\nlanguage', 'Subscription\nStartTime']
