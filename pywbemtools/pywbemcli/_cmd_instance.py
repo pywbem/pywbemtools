@@ -578,7 +578,7 @@ def instance_query(context, query, **options):
               help=u"Class names of classes to be ignored (not counted). "
                    u"Allows counting instances in servers where instance "
                    u"retrieval may cause a CIMError or Error exception"
-                   u"on some classes. CIN errors on particular "
+                   u"on some classes. CIM errors on particular "
                    u"classes are ignored. Error exceptions cause scan to stop "
                    u"and remaining classes status shown as 'not scanned'. "
                    u"Multiple class names are allowed (one per option or "
