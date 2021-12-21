@@ -294,9 +294,9 @@ def cmd_server_info(context):
         sep = '\n' if namespaces and len(namespaces) > 3 else ', '
         namespaces = sep.join(namespaces)
 
+        interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
         rows.append([wbem_server.brand, wbem_server.version,
-                     wbem_server.interop_ns,
-                     namespaces])
+                     interop_ns, namespaces])
         click.echo(format_table(rows, headers,
                                 title='Server General Information',
                                 table_format=output_format))
