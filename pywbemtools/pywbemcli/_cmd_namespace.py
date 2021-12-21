@@ -231,7 +231,8 @@ def cmd_namespace_delete(context, namespace, options):
     wbem_server = context.pywbem_server.wbem_server
     conn = context.pywbem_server.conn
 
-    if namespace == wbem_server.interop_ns:
+    interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
+    if namespace == interop_ns:
         raise click.ClickException(
             "Cannot delete namespace {} because it is the Interop "
             "namespace".format(namespace))
@@ -337,7 +338,7 @@ def cmd_namespace_interop(context):
     wbem_server = context.pywbem_server.wbem_server
     output_format = validate_output_format(context.output_format, 'TEXT')
     try:
-        interop_ns = wbem_server.interop_ns
+        interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
         context.spinner_stop()
         display_text(interop_ns, output_format)
     except Error as er:

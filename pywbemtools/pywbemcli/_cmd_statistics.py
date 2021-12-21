@@ -221,7 +221,7 @@ def get_objmgr_inst(context):
     conn = context.pywbem_server.conn
     wbem_server = context.pywbem_server.wbem_server
     try:
-        interop_ns = wbem_server.interop_ns
+        interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
     except Error as er:
         raise click.ClickException(
             'Cannot access interop namespace. Exception: {}'.format(er))
@@ -275,7 +275,7 @@ def set_server_statistics(context, desired_state):
     conn = context.pywbem_server.conn
     wbem_server = context.pywbem_server.wbem_server
 
-    interop_ns = wbem_server.interop_ns
+    interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
 
     objmgr = get_objmgr_inst(context)
 

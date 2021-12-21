@@ -196,8 +196,9 @@ def cmd_profile_list(context, options):
             registered_org=organization,
             registered_name=profile_name)
 
+        interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
         org_vm = ValueMapping.for_property(wbem_server,
-                                           wbem_server.interop_ns,
+                                           interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
         rows = []
@@ -238,8 +239,9 @@ def cmd_profile_centralinsts(context, options):
             registered_org=organization,
             registered_name=profile_name)
 
+        interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
         org_vm = ValueMapping.for_property(wbem_server,
-                                           wbem_server.interop_ns,
+                                           interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
         rows = []
