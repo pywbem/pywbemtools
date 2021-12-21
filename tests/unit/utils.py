@@ -174,8 +174,9 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     else:
         universal_newlines = True
 
-    # Time allowed for command before the test considers it to have timed out
-    cmd_timeout = 60
+    # Time in seconds allowed for command before the test considers it to have
+    # timed out. With 60 seconds, we got occasional timeouts in GitHub tests.
+    cmd_timeout = 120
 
     # Note: Popen.communicate() and Popen.wait() wait not only for the child
     # process to finish, but for all grandchild processes in addition. In case
