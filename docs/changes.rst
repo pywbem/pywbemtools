@@ -82,10 +82,13 @@ Released: not yet
   get_instanceNames() . Now generates an exception.
   (see issue #1105)
 
-* Fixed issues in "instance count" including unitialized variable and 
-  correctly finishing scan when errors occur. Adds new option to this command 
+* Fixed issues in "instance count" including unitialized variable and
+  correctly finishing scan when errors occur. Adds new option to this command
   to allow user to ignore classes defined with this option (--ignore-class).
   (see issues #1108 and #916 )
+
+* Fixed issue where pywbemcli can get exception if used against server that
+  does not support pull operations (see #1118)
 
 **Enhancements:**
 
