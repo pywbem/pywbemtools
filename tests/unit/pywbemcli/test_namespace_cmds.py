@@ -170,7 +170,7 @@ TEST_CASES = [
         ['list'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*Interop namespace does not exist'],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True
@@ -245,7 +245,7 @@ TEST_CASES = [
         ['create', 'interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*Interop namespace does not exist'],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True
@@ -419,7 +419,7 @@ TEST_CASES = [
         ['interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*Interop namespace does not exist'],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True

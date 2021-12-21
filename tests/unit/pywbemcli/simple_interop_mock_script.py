@@ -1,7 +1,7 @@
 """
-Test mock script that installs the pywbem provided namespace provider
-CIMNamespaceProvider and the simple Interop and user namespace model
-defined in simple_interop_mock_model.mof.
+Test mock script that prepares an Interop namespace and namespace provider,
+and then compiles namespace-neutral MOF into the default namespace (which may
+have been set from the outside).
 
 This mock script uses 'new-style' setup for Python >=3.5 and 'old-style' setup
 otherwise, and is therefore useable for all supported Python versions.
@@ -44,9 +44,6 @@ def _setup(conn, server, verbose):
       verbose (bool): Verbose flag
     """
 
-    if INTEROP_NAMESPACE not in conn.cimrepository.namespaces:
-        conn.add_namespace(INTEROP_NAMESPACE)
-
     if sys.version_info >= (3, 5):
         this_file_path = __file__
     else:
@@ -57,16 +54,27 @@ def _setup(conn, server, verbose):
         this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
         assert os.path.exists(this_file_path)
 
-    mof_file = 'simple_interop_mock_model.mof'
-    dependent_files = [mof_file,
-                       'mock_interop.mof',
-                       'simple_mock_model.mof']
-    mof_path = os.path.join(os.path.dirname(this_file_path), mof_file)
-    conn.compile_mof_file(mof_path, namespace=None)
+    # Prepare an Interop namespace and namespace provider
 
-    register_dependents(conn, this_file_path, dependent_files)
+    interop_mof_file = 'mock_interop.mof'
+    if INTEROP_NAMESPACE not in conn.cimrepository.namespaces:
+        conn.add_namespace(INTEROP_NAMESPACE, verbose=verbose)
+
+    interop_mof_path = os.path.join(
+        os.path.dirname(this_file_path), interop_mof_file)
+    conn.compile_mof_file(interop_mof_path, namespace=INTEROP_NAMESPACE,
+                          verbose=verbose)
+    register_dependents(conn, this_file_path, interop_mof_file)
+
     ns_provider = pywbem_mock.CIMNamespaceProvider(conn.cimrepository)
     conn.register_provider(ns_provider, INTEROP_NAMESPACE, verbose=verbose)
+
+    # Add namespace-neutral MOF to the default namespace
+
+    mof_file = 'simple_mock_model.mof'
+    mof_path = os.path.join(os.path.dirname(this_file_path), mof_file)
+    conn.compile_mof_file(mof_path, namespace=None, verbose=verbose)
+    register_dependents(conn, this_file_path, mof_file)
 
 
 if sys.version_info >= (3, 5):

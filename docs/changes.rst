@@ -131,15 +131,21 @@ Released: not yet
   for documentation.  Modify pywbemcli.py mutually excluseive options --server,
   --name, and --mock-server to use this class.
 
-* Increased minimum version of pywbem to 1.3.0. (issue #1020)
+* Increased minimum version of pywbem to 1.4.0. (issue #1020 and issue #991)
 
 * Support for Python 3.10: Added Python 3.10 in GitHub Actions tests, and in
   package metadata.
 
 * Implement an end-end test for the subscription command group.
 
-* Changed output format for table output of instance enumerate --no option to 
+* Changed output format for table output of instance enumerate --no option to
   show each key as a column in the table so that keys are more readable.
+
+* The '-v' option now displays better information about namespace creation
+  and deletion, particularly in mock environments. (related to issue #991)
+
+* Test: Added testcases for namespace creation and deletion. (related to
+  issue #991)
 
 **Cleanup:**
 
