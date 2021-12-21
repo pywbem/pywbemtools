@@ -30,7 +30,7 @@ from pywbem import WBEMServer, configure_loggers_from_string
 
 from . import mockscripts
 from .config import DEFAULT_URL_SCHEME, DEFAULT_CONNECTION_TIMEOUT, \
-    DEFAULT_NAMESPACE, MAX_TIMEOUT
+    DEFAULT_NAMESPACE, MAX_TIMEOUT, DEFAULT_MAXPULLCNT
 from ._pywbemcli_operations import PYWBEMCLIConnection, PYWBEMCLIFakedConnection
 
 WBEM_SERVER_OBJ = None
@@ -295,7 +295,7 @@ class PywbemServer(object):
     def pull_max_cnt(self):
         """
         :term:`int`: Count of number of objects to be retrieved with each
-        pull operation or None if the default value is to be used
+        pull operation. This should never be None.
         """
         return self._pull_max_cnt
 
@@ -303,7 +303,10 @@ class PywbemServer(object):
     def pull_max_cnt(self, pull_max_cnt):
         """Setter method; for a description see the getter method."""
 
-        if pull_max_cnt is None or isinstance(pull_max_cnt, six.integer_types):
+        if pull_max_cnt is None:
+            self._pull_max_cnt = DEFAULT_MAXPULLCNT
+
+        elif isinstance(pull_max_cnt, six.integer_types):
             # pylint: disable=attribute-defined-outside-init
             self._pull_max_cnt = pull_max_cnt
         else:

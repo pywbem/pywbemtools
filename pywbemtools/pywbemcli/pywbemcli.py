@@ -724,7 +724,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             user, password, resolved_timeout, resolved_use_pull,
             resolved_pull_max_cnt, resolved_verify, certfile, keyfile,
             ca_certs, resolved_mock_server, connections_repo, verbose,
-            # used for test in function
+            # used in function to test if option exists on cmd line
             default_namespace, use_pull, pull_max_cnt, timeout, verify)
 
         # Validate no WbemConnection only options used with FakedWBEMConnection
