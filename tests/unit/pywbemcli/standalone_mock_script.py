@@ -88,7 +88,8 @@ def setup(conn, server, verbose):
     # Make the mock script standalone by compiling the required MOF file
     # and by registering it as a dependent file.
     mof_file = os.path.join(os.path.dirname(__file__), 'simple_mock_model.mof')
-    conn.compile_mof_file(mof_file, namespace=conn.default_namespace)
+    conn.compile_mof_file(mof_file, namespace=conn.default_namespace,
+                          verbose=verbose)
     conn.provider_dependent_registry.add_dependents(__file__, mof_file)
 
     provider = CIM_FooMethodProvider(conn.cimrepository)

@@ -1,10 +1,6 @@
 """
 Test mock script that prepares an Interop namespace and namespace provider,
-compiles MOF into user namespace 'root/cimv2', and then disables pull operations
-on the mock connection.
-
-This script is used to test the general options around enabling and disabling
-pull operations.
+and then compiles MOF that has a pragma namespace 'foo'.
 
 This mock script uses 'new-style' setup for Python >=3.5 and 'old-style' setup
 otherwise, and is therefore useable for all supported Python versions.
@@ -47,8 +43,6 @@ def _setup(conn, server, verbose):
       verbose (bool): Verbose flag
     """
 
-    conn.disable_pull_operations  # pylint: disable=pointless-statement
-
     if sys.version_info >= (3, 5):
         this_file_path = __file__
     else:
@@ -56,8 +50,7 @@ def _setup(conn, server, verbose):
         # of the current script when it is executed using exec(), so we hard
         # code the file path. This requires that the tests are run from the
         # repo main directory.
-        this_file_path = \
-            'tests/unit/pywbemcli/simple_disablepull_mock_script.py'
+        this_file_path = 'tests/unit/pywbemcli/simple_foo_mock_script.py'
         assert os.path.exists(this_file_path)
 
     # Prepare an Interop namespace and namespace provider
@@ -75,15 +68,13 @@ def _setup(conn, server, verbose):
     ns_provider = pywbem_mock.CIMNamespaceProvider(conn.cimrepository)
     conn.register_provider(ns_provider, INTEROP_NAMESPACE, verbose=verbose)
 
-    # Compile a MOF file into the default namespace
+    # Compile a MOF file where the target namespace is determined by a pragma
+    # namespace 'foo' in the MOF
 
-    mof_file = 'simple_mock_model.mof'
-    mof_path = os.path.join(os.path.dirname(this_file_path), mof_file)
-    conn.compile_mof_file(mof_path, namespace='root/cimv2', verbose=verbose)
-    register_dependents(conn, this_file_path, mof_file)
-
-    # Disable the pull operations for this test
-    conn.disable_pull_operations = True
+    foo_mof_file = 'simple_foo_mock_model.mof'
+    foo_mof_path = os.path.join(os.path.dirname(this_file_path), foo_mof_file)
+    conn.compile_mof_file(foo_mof_path, namespace=None, verbose=verbose)
+    register_dependents(conn, this_file_path, foo_mof_file)
 
 
 if sys.version_info >= (3, 5):
