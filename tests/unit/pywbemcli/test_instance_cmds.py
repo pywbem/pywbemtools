@@ -806,35 +806,25 @@ TEST_CASES = [
 
     ['Verify instance command -o grid enumerate CIM_Foo --di --no',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
-      'general': ['--output-format', 'grid']},
+      'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
-+--------+-------------+-----------------+-------------------------------+
-| host   | namespace   | class           | keysbindings                  |
-+========+=============+=================+===============================+
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo1"         |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo2"         |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo3"         |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo30"        |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo31"        |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub1"     |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub2"     |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub3"     |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub4"     |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub1" |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub2" |
-+--------+-------------+-----------------+-------------------------------+
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub3" |
-+--------+-------------+-----------------+-------------------------------+
++--------+-------------+-----------------+------------------+
+| host   | namespace   | class           | key=             |
+|        |             |                 | InstanceID       |
+|--------+-------------+-----------------+------------------|
+|        | root/cimv2  | CIM_Foo         | CIM_Foo1         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo2         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo3         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo30        |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo31        |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub1     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub2     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub3     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub4     |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub1 |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub2 |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub3 |
++--------+-------------+-----------------+------------------+
 """,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -946,27 +936,47 @@ TEST_CASES = [
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
-+--------+-------------+-----------------+-------------------------------+
-| host   | namespace   | class           | keysbindings                  |
-|--------+-------------+-----------------+-------------------------------|
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo1"         |
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo2"         |
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo3"         |
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo30"        |
-|        | root/cimv2  | CIM_Foo         | InstanceID="CIM_Foo31"        |
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub1"     |
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub2"     |
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub3"     |
-|        | root/cimv2  | CIM_Foo_sub     | InstanceID="CIM_Foo_sub4"     |
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub1" |
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub2" |
-|        | root/cimv2  | CIM_Foo_sub_sub | InstanceID="CIM_Foo_sub_sub3" |
-+--------+-------------+-----------------+-------------------------------+
-
++--------+-------------+-----------------+------------------+
+| host   | namespace   | class           | key=             |
+|        |             |                 | InstanceID       |
+|--------+-------------+-----------------+------------------|
+|        | root/cimv2  | CIM_Foo         | CIM_Foo1         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo2         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo3         |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo30        |
+|        | root/cimv2  | CIM_Foo         | CIM_Foo31        |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub1     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub2     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub3     |
+|        | root/cimv2  | CIM_Foo_sub     | CIM_Foo_sub4     |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub1 |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub2 |
+|        | root/cimv2  | CIM_Foo_sub_sub | CIM_Foo_sub_sub3 |
++--------+-------------+-----------------+------------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify command enumerate with ssociation class inst name table output',
+     {'args': ['enumerate', 'TST_A3', '--names-only'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """InstanceNames: TST_A3
++--------+-------------+---------+---------------------+---------------------+---------------------+
+| host   | namespace   | class   | key=                | key=                | key=                |
+|        |             |         | Initiator           | Target              | LogicalUnit         |
+|--------+-------------+---------+---------------------+---------------------+---------------------|
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
+|        |             |         | InstanceID=1        | InstanceID=2        | InstanceID=3        |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
+|        |             |         | InstanceID=1        | InstanceID=5        | InstanceID=6        |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
+|        |             |         | InstanceID=1        | InstanceID=7        | InstanceID=8        |
++--------+-------------+---------+---------------------+---------------------+---------------------+
+""",  # noqa: E501
+      'rc': 0,
+      'test': 'linesnows'},
+     COMPLEX_ASSOC_MODEL, OK],
 
     ['Verify command enumerate with CIM_Foo summary table output',
      {'args': ['enumerate', 'CIM_Foo', '--summary'],

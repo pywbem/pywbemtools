@@ -138,6 +138,9 @@ Released: not yet
 
 * Implement an end-end test for the subscription command group.
 
+* Changed output format for table output of instance enumerate --no option to 
+  show each key as a column in the table so that keys are more readable.
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools
