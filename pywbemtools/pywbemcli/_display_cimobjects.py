@@ -31,11 +31,11 @@ from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMError, CIM_ERR_NOT_SUPPORTED
 from pywbem._nocasedict import NocaseDict
 
-from ._common import sort_cimobjects
+from ._common import sort_cimobjects, to_wbem_uri_folded
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 from .._utils import get_terminal_width
 from .._output_formatting import DEFAULT_MAX_CELL_WIDTH, \
-    output_format_is_table, format_table, fold_strings, format_keys
+    output_format_is_table, format_table, fold_strings
 
 INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
@@ -296,30 +296,83 @@ def _display_paths_as_table(objects, table_width, table_format):
             title = 'Classnames:'
             headers = ['Class Name']
             rows = [[obj] for obj in objects]
+
         elif isinstance(objects[0], CIMClassName):
             title = 'Classnames'
             headers = ('host', 'namespace', 'class')
             rows = [[obj.host, obj.namespace, obj.classname] for obj in objects]
+
         elif isinstance(objects[0], CIMInstanceName):
-            title = 'InstanceNames: {}'.format(objects[0].classname)
-            host_hdr = 'host'
-            ns_hdr = 'namespace'
-            class_hdr = 'class'
-            host_hdr_len = len(host_hdr) + 4
-            ns_hdr_len = len(ns_hdr) + 3
-            class_hdr_len = len(class_hdr) + 3
-            headers = (host_hdr, ns_hdr, class_hdr, 'keysbindings')
+            # Since there are cases where the list has instances with
+            # different keys (i.e. enumerate CIM_ManagedElement), build
+            # a dictionary for instances with the same key names.
+            # Sort into dictionary for each set of key names.  If all keys are
+            # the same, there will be one table.  This allows building
+            # a table for each set of keynames
+            objs_by_key_set = {}
+            original_keys = {}
 
-            host_lens = [len(obj.host) for obj in objects if obj.host]
-            host_max = max(host_lens) if host_lens else host_hdr_len
-            ns_lens = [len(obj.namespace) for obj in objects if obj.namespace]
-            ns_max = max(ns_lens) if ns_lens else ns_hdr_len
-            class_lens = [len(obj.classname) for obj in objects]
-            class_max = max(class_lens) if class_lens else class_hdr_len
+            for instname in objects:
+                # key_names is a tuple of sorted key names in lower case so
+                # all instances with the same set of keys ends up in a
+                # single dictionary item. NOTE: objects must be tuple to be
+                # a dictionary key, the key.
+                test_key_names = tuple(
+                    sorted(map(lambda x: x.lower(), instname.keys())))
+                try:
+                    objs_by_key_set[test_key_names].append(instname)
+                except KeyError:
+                    objs_by_key_set[test_key_names] = [instname]
 
-            max_key_len = (table_width) - (host_max + ns_max + class_max + 3)
-            rows = [[obj.host, obj.namespace, obj.classname,
-                     format_keys(obj, max_key_len)] for obj in objects]
+                # Set the original keys into dict to recover correct key
+                # case later
+                if test_key_names not in original_keys:
+                    original_keys[test_key_names] = instname.keys()
+
+            # If multiple key_names we create multiple tables and add table
+            # number to each table title.
+            table_number = 0
+            for key_names, inst_names in objs_by_key_set.items():
+                # Build headers for this table with the common elements and key
+                # names for each key in the object. We use inst_names[0] to
+                # restore original case to key strings.
+                inst_keys = original_keys[key_names]
+
+                rows = []
+                for instname in inst_names:
+                    # Build header row for this table
+                    row = [instname.host, instname.namespace,
+                           instname.classname]
+                    for key in inst_keys:
+                        if isinstance(instname[key], CIMInstanceName):
+                            # If key is CIMInstanceName, fold the value
+                            row.append(to_wbem_uri_folded(
+                                instname[key], format='standard', max_len=30))
+                        else:
+                            row.append(instname[key])
+                    rows.append(row)
+
+                # If multiple tables, number them as hint to reader that there
+                # are multiples.
+                if len(objs_by_key_set) > 1:
+                    table_number += 1
+                    table_number_str = ", (table #{})".format(table_number)
+                else:
+                    table_number_str = ''
+
+                headers = ['host', 'namespace', 'class'] + \
+                    ["key=\n{0}".format(kn) for kn in inst_keys]
+
+                title = 'InstanceNames: {0}{1}'.format(inst_names[0].classname,
+                                                       table_number_str)
+
+                # Generate multiple tables, one for each key_name and
+                # return local to this scope.
+                click.echo(format_table(rows, headers, title=title,
+                                        table_format=table_format))
+
+            return  # Return to avoid following table output
+
         else:
             raise click.ClickException("{0} invalid type ({1})for path display".
                                        format(objects[0], type(objects[0])))

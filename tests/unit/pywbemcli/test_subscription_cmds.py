@@ -784,8 +784,9 @@ TEST_CASES = [
                  '   Destination = "http://someone:50000";',
                  '   Protocol = 2;',
                  # Result -o plain subscription list-destinations --names-only
-                 'host    namespace    class     keysbindings',
-                 'interop      CIM_ListenerDestinationCIMXML',
+                 'host    namespace    class   key=  key=  key=',
+                 'interop  CIM_ListenerDestinationCIMXML  CIM_ComputerSystem '
+                 'MockSystem_WBEMServerTest  CIM_ListenerDestinationCIMXML',
                  # Result list
                  '1 CIMInstance(s) returned',
                  '};'],
@@ -834,8 +835,8 @@ TEST_CASES = [
                  '};',
                  '1 CIMInstance(s) returned',
                  # Result from -o plain subscription list-filters --names-only
-                 'host    namespace    class   keysbindings',
-                 'interop   CIM_IndicationFilter', ],
+                 'host  namespace  class key=  key=  key=  key=',
+                 'interop      CIM_IndicationFilter  CIM_ComputerSystem         MockSystem_WBEMServerTest  CIM_IndicationFilter  pywbemfilter:defaultpywbemcliSubMgr:ofilter1', ],  # noqa: E501
       'stderr': [],
       'test': 'innows'},
      None, OK],
@@ -874,8 +875,9 @@ TEST_CASES = [
                  '   SubscriptionState = 2;',
                  '};',
                  # Limited result  -o plain ... list-subscriptions --name-only
-                 # The actual output it to ugly to compare.
-                 'host    namespace    class   keysbindings',
+                 'host    namespace    class   key=',
+                 'Filter Handler',
+                 'interop  CIM_IndicationSubscription  /interop:CIM_IndicationFilter.  /interop:CIM_ListenerDestinationCIMXML.',  # noqa: E501
                  '};'],
       'stderr': [],
       'test': 'innows'},
