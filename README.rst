@@ -29,10 +29,16 @@ Pywbemtools is a collection of command line tools that communicate with WBEM
 servers. The tools are written in pure Python and support Python 2 and Python
 3.
 
-At this point, pywbemtools includes a single command line tool named
-``pywbemcli`` that uses the `pywbem package on Pypi`_ to issue operations to a
-WBEM server using the `CIM/WBEM standards`_ defined by the `DMTF`_ to perform
-system management tasks.
+Pywbemtools includes the following tools:
+
+* ``pywbemcli`` - A command line utility that uses the `pywbem package on Pypi`_
+  to issue operations to a WBEM server using the `CIM/WBEM standards`_ defined
+  by the `DMTF`_ to perform system management tasks.
+
+* ``pywbemlistener`` - A command line utility that manages WBEM indication
+  listeners running as background processes on the local system. These listeners
+  use the `pywbem package on Pypi`_ to receive indications sent by a WBEM
+  server using the `CIM/WBEM standards`_ defined by the `DMTF`_.
 
 CIM/WBEM standards are used for a wide variety of systems management tasks
 in the industry including DMTF management standards and the `SNIA`_
@@ -66,6 +72,15 @@ It provides functionality to:
 * Use an integrated mock WBEM server to try out commands. The mock server
   can be loaded with CIM objects defined in MOF files or via Python scripts.
 
+Pywbemlistener manages WBEM indication listeners that run on the local system as
+background processes.
+It provides functionality to:
+
+* Start and stop listeners.
+
+* List and show details of listeners.
+
+* Send test indications to listeners.
 
 Installation
 ------------
@@ -136,7 +151,8 @@ For the latest version of pywbemtools released on Pypi:
 Quickstart
 ----------
 
-All commands within pywbemcli show help with the ``-help`` or ``-h`` options:
+All commands within any of the pywbemtools commands show help with the ``-help``
+or ``-h`` options. For example, for the pywbemcli command:
 
 .. code-block:: text
 
@@ -361,6 +377,70 @@ executed:
     ----------------
     root/PG_InterOp
     pywbemcli> :q
+
+
+The pywbemlistener command allows setting up WBEM indication listeners on the
+local system. The following example starts a listener for HTTP on port 25000 and
+uses pywbemcli to set that server up for sending indications to the listener:
+
+.. code-block:: text
+
+    # Start OpenPegasus as a Docker container
+    $ docker create keyporttech/smi-server:0.1.2 --name pegasus
+    $ docker start pegasus
+
+    # Define a pywbemcli named connection for that OpenPegasus
+    $ pywbemcli -s https://localhost:5989 --no-verify connection save pegasus
+
+    # Start a pywbem listener that appends any received indications to a file
+    $ pywbemlistener start lis1 -s http -p 25000 --indi-file lis1.out
+    $ pywbemlistener list
+    +--------+--------+----------+-------+---------------------+
+    | Name   |   Port | Scheme   |   PID | Created             |
+    |--------+--------+----------+-------+---------------------|
+    | lis1   |  25000 | http     |  6662 | 2022-01-02 13:28:04 |
+    +--------+--------+----------+-------+---------------------+
+
+    # Add our pywbem listener as a listener destination to the OpenPegasus server
+    $ pywbemcli -n pegasus subscription add-destination lis1 -l http://localhost:25000
+    Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:lis1
+
+    $ pywbemcli -n pegasus subscription list-destinations
+    Indication Destinations: submgr-id=defaultpywbemcliSubMgr, svr-id=https://localhost:5989, type=all
+    +-------------+------------+--------------------------------+------------------------+---------------+------------+----------------+
+    | Ownership   | Identity   | Name                           | Destination            |   Persistence |   Protocol |   Subscription |
+    |             |            | Property                       |                        |          Type |            |          Count |
+    |-------------+------------+--------------------------------+------------------------+---------------+------------+----------------|
+    | owned       | lis1       | pywbemdestination:defaultpywbe | http://localhost:25000 |             3 |          2 |              0 |
+    |             |            | mcliSubMgr:lis1                |                        |               |            |                |
+    +-------------+------------+--------------------------------+------------------------+---------------+------------+----------------+
+
+    # Use pywbemlistener to send a test indication
+    # Note: This does not utilize the OpenPegasus server but sends it directly to the listener
+    $ pywbemlistener test lis1
+    Sending the following test indication:
+    instance of CIM_AlertIndication {
+       IndicationIdentifier = NULL;
+       AlertingElementFormat = 2;
+       AlertingManagedElement = NULL;
+       AlertType = 2;
+       Message = "Test message";
+       OwningEntity = "TEST";
+       PerceivedSeverity = 2;
+       ProbableCause = 0;
+       SystemName = NULL;
+       MessageArguments = { };
+       IndicationTime = "20220102134842.761734+000";
+       MessageID = "TESTnnnn";
+    };
+
+    Sent test indication #1 to listener lis1 at http://localhost:25000
+
+    $ cat lis1.out
+    2022-01-02 13:48:43.010994+01:00 127.0.0.1 instance of CIM_AlertIndication {    IndicationIdentifier = NULL;    AlertingElementFormat = 2;
+      AlertingManagedElement = NULL;    AlertType = 2;    Message = "Test message";    OwningEntity = "TEST";    PerceivedSeverity = 2;
+      ProbableCause = 0;    SystemName = NULL;    MessageArguments = { };    IndicationTime = "20220102134842.761734+000";
+      MessageID = "TEST0001"; };
 
 
 Project Planning
