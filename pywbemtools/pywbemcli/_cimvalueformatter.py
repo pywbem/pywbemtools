@@ -368,8 +368,9 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
       quote_char (:term:`unicode string`): Character to be used for
         surrounding the string parts.. For CIM string typed values, this
         must be a double quote (the default), and for CIM char16 typed values,
-        this must be a single quote. The value of this may be None, in which
-        case, no character will be used to surround the string parts.
+        this must be a single quote. The value of this may None or an
+        empty string, in which case, no character will be used to surround
+        the string parts.
 
     Returns:
 
@@ -383,7 +384,10 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
     value = mof_escaped(value)
 
     # length of the quotes surrounding a string part
-    quote_len = len(quote_char) * 2
+    if quote_char:
+        quote_len = len(quote_char) * 2
+    else:
+        quote_len = 0
     new_line = u'\n' + _indent_str(indent)
 
     mof = []
