@@ -131,7 +131,7 @@ Released: not yet
   for documentation.  Modify pywbemcli.py mutually excluseive options --server,
   --name, and --mock-server to use this class.
 
-* Increased minimum version of pywbem to 1.4.0. (issue #1020 and issue #991)
+* Increased minimum version of pywbem to 1.4.0. (issues #1020, #991, #1124)
 
 * Support for Python 3.10: Added Python 3.10 in GitHub Actions tests, and in
   package metadata.
