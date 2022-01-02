@@ -170,8 +170,8 @@ TEST_CASES = [
         ['list'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
+            stderr=['ModelError: Interop namespace does not exist'],
+            test='innows'
         ),
         TEST_USER_MOCK_FILE, True
     ),
@@ -245,8 +245,8 @@ TEST_CASES = [
         ['create', 'interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
+            stderr=['ModelError: Interop namespace does not exist'],
+            test='innows'
         ),
         TEST_USER_MOCK_FILE, True
     ),
@@ -419,8 +419,8 @@ TEST_CASES = [
         ['interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace does not exist'],
-            test='regex'
+            stderr=['ModelError: Interop namespace does not exist'],
+            test='innows'
         ),
         TEST_USER_MOCK_FILE, True
     ),
