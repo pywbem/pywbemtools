@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 0.9.1.dev1
-----------------------
+pywbemtools 0.9.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2022-01-03
 
 **Bug fixes:**
 
@@ -61,12 +57,6 @@ Released: not yet
   for Jupyter and its dependencies since we have no notebooks in pywbemcli
   today. Modified minimum version of typed-ast, pylint and astrid to match pywbem
   and pass saftey tests.
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.9.0
