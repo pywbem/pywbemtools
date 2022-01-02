@@ -28,10 +28,16 @@ Pywbemtools is a collection of command line tools that communicate with WBEM
 servers. The tools are written in pure Python and support Python 2 and Python
 3.
 
-At this point, pywbemtools includes a single command line tool named
-``pywbemcli`` that uses the `pywbem package on Pypi`_ to issue operations to a
-WBEM server using the `CIM/WBEM standards`_ defined by the `DMTF`_ to perform
-system management tasks.
+Pywbemtools includes the following tools:
+
+* ``pywbemcli`` - A command line utility that uses the `pywbem package on Pypi`_
+  to issue operations to a WBEM server using the `CIM/WBEM standards`_ defined
+  by the `DMTF`_ to perform system management tasks.
+
+* ``pywbemlistener`` - A command line utility that manages WBEM indication
+  listeners running as background processes on the local system. These listeners
+  use the `pywbem package on Pypi`_ to receive indications sent by a WBEM
+  server using the `CIM/WBEM standards`_ defined by the `DMTF`_.
 
 CIM/WBEM standards are used for a wide variety of systems management tasks
 in the industry including DMTF management standards and the `SNIA`_
@@ -42,13 +48,6 @@ Storage Management Initiative Specification (`SMI-S`_).
 .. _CIM/WBEM standards: https://www.dmtf.org/standards/wbem/
 .. _SNIA: https://www.snia.org/
 .. _SMI-S: https://www.snia.org/forums/smi/tech_programs/smis_home
-
-The pywbemtools package includes the following tools:
-
-1. :ref:`Pywbemcli command` - a cli (command line interface) that provides
-   access to WBEM servers from the command line.
-2. :ref:`Pywbemlistener command` - a cli that can manage multiple provides a
-   WBEM indication listeners to receive and display WBEM indications.
 
 
 .. _`Supported environments`:
