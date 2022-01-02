@@ -18,15 +18,24 @@ Tests the 'namespace' command group.
 
 from __future__ import absolute_import, print_function
 
+from packaging.version import parse as parse_version
+from pywbem import __version__ as pywbem_version
 import pytest
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
+PYWBEM_VERSION = parse_version(pywbem_version)
 
 # The mock files used for testing
 TEST_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
 TEST_USER_MOCK_FILE = 'simple_mock_model.mof'
+
+# Error message for Interop namespace not found
+INTEROP_NAMESPACE_NOT_FOUND_MSG = \
+    'Interop namespace could not be determined' \
+    if PYWBEM_VERSION.release < (1, 4, 0) else \
+    'Interop namespace does not exist'
 
 #
 # The following list defines the help for each command in terms of particular
@@ -170,7 +179,7 @@ TEST_CASES = [
         ['list'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*' + INTEROP_NAMESPACE_NOT_FOUND_MSG],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True
@@ -245,7 +254,7 @@ TEST_CASES = [
         ['create', 'interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*' + INTEROP_NAMESPACE_NOT_FOUND_MSG],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True
@@ -419,7 +428,7 @@ TEST_CASES = [
         ['interop'],
         dict(
             rc=1,
-            stderr=['ModelError.*Interop namespace could not be determined'],
+            stderr=['ModelError.*' + INTEROP_NAMESPACE_NOT_FOUND_MSG],
             test='regex'
         ),
         TEST_USER_MOCK_FILE, True
