@@ -220,6 +220,10 @@ Example:
     $ pywbemlistener stop lis1
     Shut down listener lis1 running at http://localhost:25989
 
+On Windows, the listener process is stopped immediately without giving the
+process control to clean up. On other platforms, the listener process is stopped
+gracefully, giving the process control to clean up.
+
 See :ref:`pywbemlistener stop --help` for the exact help output of the command.
 
 
