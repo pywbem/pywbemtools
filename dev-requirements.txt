@@ -29,8 +29,7 @@ more-itertools>=4.0.0; python_version >= '3.6'
 # Virtualenv
 # Virtualenv 20.0.19 has an issue where it does not install pip on Python 3.4.
 # Virtualenv 20.0.32 has an issue where it raises AttributeError on Python 3.4.
-virtualenv>=14.0.0,!=20.0.19,!=20.0.32; python_version < '3.5'
-virtualenv>=16.1.0; python_version >= '3.5' and python_version < '3.8'
+virtualenv>=16.1.0,!=20.0.19,!=20.0.32; python_version <= '3.7'
 virtualenv>=20.0.0; python_version >= '3.8'
 
 # Coverage reporting (no imports, invoked via coveralls script):
