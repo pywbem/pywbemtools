@@ -1,0 +1,124 @@
+// This is a simple mof model that creates the qualifier declarations,
+// classes, and instances to test the table output of instances including
+// functions showing/hiding properties with Null values
+
+#pragma locale ("en_US")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier EmbeddedInstance : string = null,
+    Scope(property, method, parameter);
+
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Description : string = null,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Override : string = null,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+     [Description ("Simple CIM Class Top level")]
+class CIM_Foo {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+        [Description ("This is Uint32 property.")]
+    uint32 IntegerProp;
+        [Description ("This property should always be Null for tests")]
+    string AlwaysNullProp;
+};
+
+    [Description ("Subclass of CIM_Foo that adds a single str property")]
+class CIM_FooStr : CIM_Foo {
+    string cimfoo_str;
+};
+
+    [Description ("Subclass of CIM_Foo adds single str always Null property")]
+class CIM_FooStrNull : CIM_Foo {
+    string AnotherAlwaysNull;
+};
+
+     [Association, Description ("Simple CIM Association CIM_Foo to CIM_Foo")]
+class CIM_FooAssoc {
+        [Key, Description ("This is key property.")]
+    string InstanceID;
+
+        [Description ("This first ref to CIM_Foo.")]
+    CIM_Foo REF Ref1;
+
+        [Description ("This is second reference to CIM_Foo.")]
+    CIM_Foo REF Ref2;
+};
+
+//
+// Instance definitions
+//
+
+// 3 instances of CIM_Foo class
+
+instance of CIM_Foo as $foo1{
+    InstanceID = "CIM_Foo1";
+    IntegerProp = 1;
+    AlwaysNullProp = null;
+};
+
+instance of CIM_Foo as $foo2{
+    InstanceID = "CIM_Foo2";
+    AlwaysNullProp = null;
+};
+
+instance of CIM_Foostr as $foostr1{
+    InstanceID = "CIM_Foostr1";
+    cimfoo_str = "String in subclass";
+    AlwaysNullProp = null;
+};
+
+instance of CIM_FooStrNull as $foostrnull1{
+    InstanceID = "CIM_FoostrNull1";
+    AlwaysNullProp = null;
+    AnotherAlwaysNull  = Null;
+};
+
+instance of CIM_FooAssoc {
+    InstanceID = "CIM_FooAssoc1";
+    Ref1 = $foo1;
+    Ref2 = $foo2;
+};
+
+instance of CIM_FooAssoc {
+    InstanceID = "CIM_FooAssoc2";
+    Ref1 = $foo1;
+    Ref2 = $foostr1;
+};

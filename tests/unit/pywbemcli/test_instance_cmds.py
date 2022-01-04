@@ -41,7 +41,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
     CMD_OPTION_HELP_INSTANCENAME_HELP_LINE, \
-    CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE
+    CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE, \
+    CMD_OPTION_SHOW_NULL_HELP_LINE
 
 
 _PYWBEM_VERSION = parse_version(pywbem_version)
@@ -65,6 +66,8 @@ COMPLEX_ASSOC_MODEL = "complex_assoc_model.mof"
 
 MOCK_SERVER_MODEL = os.path.join(TEST_DIR, 'testmock',
                                  'wbemserver_mock_script.py')
+
+INSTANCE_TABLE_MODEL_FILE = 'simple_instance_tablefmt_test.mof'
 
 
 #
@@ -196,6 +199,7 @@ INSTANCE_ENUMERATE_HELP_LINES = [
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
+    CMD_OPTION_SHOW_NULL_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -380,11 +384,6 @@ GET_INSTANCE_ALL_TYPES = """instance of PyWBEM_AllTypes {
 
 """
 
-ENUM_INSTANCE_GET_TABLE_RESP = """Instances: CIM_Foo
-InstanceID      IntegerProp
-------------  -------------
-"CIM_Foo1"                1
-"""
 
 REF_INSTS = """instance of TST_Lineage {
    InstanceID = "MikeGabi";
@@ -732,7 +731,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di',
+    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di ',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--pl', 'InstanceId', '--pl',
                'IntegerProp'],
       'general': ['--output-format', 'grid']},
@@ -768,7 +767,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di'
+    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di '
      'all properties',
      {'args': ['enumerate', 'CIM_Foo', '--di'],
       'general': ['--output-format', 'grid']},
@@ -1142,7 +1141,7 @@ Instances: TST_Person
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command get with -o txt fails',
+    ['Verify instance command enumerate with -o txt fails',
      {'args': ['enumerate', 'CIM_Foo'],
       'general': ['--output-format', 'text']},
      {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
@@ -1150,6 +1149,201 @@ Instances: TST_Person
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command -o simple enumerate alltypes, all array props',
+     {'args': ['enumerate', 'Pywbem_Alltypes', '--di',
+               '--pl', 'instanceid,arraybool,arraysint8,arrayuint8,'
+               'arraysint16,arrayuint16,arraysint32,arrayuint32,arrayreal32,'
+               'arraysint64,arrayuint64,arrayreal64,'
+               'arraystring,arraydatetime'],
+      'general': ['--output-format', 'plain']},
+     {'stdout': ['Instances: PyWBEM_AllTypes',
+                 "InstanceId   arrayBool  arraySint8  arrayUint8  arraySint16  "
+                 "arrayUint16  arraySint32 arrayUint32 arrayReal32 "
+                 "arraySint64 arrayUint64  arrayReal64",
+                 '"test_instance"  true, false -8  0, 8, 125  0, 45  0, 45  '
+                 '0, -9999   0, 9999  0.0, 1.9 -99999, 0, 0, 99999 0.0, 1.9 '
+                 '"This is a "   "1999122412000"', ],
+      'test': 'innows'},
+     ALLTYPES_MOCK_FILE, FAIL],  # TODO fix with col width improvement change
+
+    #
+    #  Tests of enumerate with --show-null option and table output
+    #  These tests use the model INSTANCE_TABLE_MODEL_FILE that contains
+    #  properties with null value.
+    #  NOTE: These tests currently run with --use-pull no because of pywbem
+    #  issue #2739
+    #
+
+    ['Verify instance command enumerate of CIM_Foo as table returns correct '
+     'properties for no --show-null',
+     {'args': ['enumerate', 'CIM_Foo', ],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++-------------------+---------------+
+| InstanceID        | IntegerProp   |
+|-------------------+---------------|
+| "CIM_Foo1"        | 1             |
+| "CIM_Foo2"        |               |
+| "CIM_Foostr1"     |               |
+| "CIM_FoostrNull1" |               |
++-------------------+---------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command enumerate of CIM_Foo as table returns correct '
+     'properties witho --show-null',
+     {'args': ['enumerate', 'CIM_Foo', '--show-null'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++-------------------+------------------+---------------+
+| InstanceID        | AlwaysNullProp   | IntegerProp   |
+|-------------------+------------------+---------------|
+| "CIM_Foo1"        |                  | 1             |
+| "CIM_Foo2"        |                  |               |
+| "CIM_Foostr1"     |                  |               |
+| "CIM_FoostrNull1" |                  |               |
++-------------------+------------------+---------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command enumerate of CIM_Foo as table returns correct '
+     'properties witho --show-null',
+     {'args': ['enumerate', 'CIM_Foo', '--di', ],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++-------------------+----------------------+---------------+
+| InstanceID        | cimfoo_str           | IntegerProp   |
+|-------------------+----------------------+---------------|
+| "CIM_Foo1"        |                      | 1             |
+| "CIM_Foo2"        |                      |               |
+| "CIM_Foostr1"     | "String in subclass" |               |
+| "CIM_FoostrNull1" |                      |               |
++-------------------+----------------------+---------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command enumerate of CIM_Foo as table returns correct '
+     'properties witho --show-null',
+     {'args': ['enumerate', 'CIM_Foo', '--di', '--show-null'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++-------------------+------------------+---------------------+----------------------+---------------+
+| InstanceID        | AlwaysNullProp   | AnotherAlwaysNull   | cimfoo_str           | IntegerProp   |
+|-------------------+------------------+---------------------+----------------------+---------------|
+| "CIM_Foo1"        |                  |                     |                      | 1             |
+| "CIM_Foo2"        |                  |                     |                      |               |
+| "CIM_Foostr1"     |                  |                     | "String in subclass" |               |
+| "CIM_FoostrNull1" |                  |                     |                      |               |
++-------------------+------------------+---------------------+----------------------+---------------+
+""",  # noqa: E501
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command references of CIM_Foo as table returns correct '
+     'properties with --show-null',
+     {'args': ['references', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--show-null'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     # NOTE: This should be changed to a more permissive test since we cannot
+     # completely control the folding of lines such as the path
+     {'stdout': """
+Instances: CIM_FooAssoc
++-----------------+----------------------------------------+----------------------------------------+
+| InstanceID      | Ref1                                  | Ref2                                  |
+|-----------------+----------------------------------------+----------------------------------------|
+| "CIM_FooAssoc1" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" |
+|                 | "_Foo1\\""                            | "_Foo2\\""                            |
+| "CIM_FooAssoc2" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" | "/root/cimv2:CIM_FooStr.InstanceID=\\"" |
+|                 | "_Foo1\\""                            | "CIM_Foostr1\\""                      |
++-----------------+----------------------------------------+----------------------------------------+
+
+""",  # noqa: E501
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, RUN],
+
+    ['Verify instance command associators of CIM_Foo as table returns correct '
+     'properties without --show-null option',
+     {'args': ['associators', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++---------------+----------------------+
+| InstanceID    | cimfoo_str           |
+|---------------+----------------------|
+| "CIM_Foo2"    |                      |
+| "CIM_Foostr1" | "String in subclass" |
++---------------+----------------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, RUN],
+
+    ['Verify instance command associators of CIM_Foo as table returns correct '
+     'properties with --show-null option',
+     {'args': ['associators', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--show-null'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++---------------+------------------+----------------------+
+| InstanceID    | AlwaysNullProp   | cimfoo_str           |
+|---------------+------------------+----------------------|
+| "CIM_Foo2"    |                  |                      |
+| "CIM_Foostr1" |                  | "String in subclass" |
++---------------+------------------+----------------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command associators of CIM_Foo as table returns correct '
+     'properties with --show-null option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', ],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++--------------+---------------+
+| InstanceID   |   IntegerProp |
+|--------------+---------------|
+| "CIM_Foo1"   |             1 |
++--------------+---------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
+
+    ['Verify instance command associators of CIM_Foo as table returns correct '
+     'properties with --show-null option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--show-null'],
+      'general': ['--output-format', 'table', '--use-pull', 'no']},
+     {'stdout': """
+Instances: CIM_Foo
++--------------+------------------+---------------+
+| InstanceID   | AlwaysNullProp   |   IntegerProp |
+|--------------+------------------+---------------|
+| "CIM_Foo1"   |                  |             1 |
++--------------+------------------+---------------+
+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     INSTANCE_TABLE_MODEL_FILE, OK],
 
     #
     #  Exhaustive tests for INSTANCENAME parameter (using instance get command)
@@ -1683,10 +1877,16 @@ Instances: TST_Person
       'test': 'lines'},
      ALLTYPES_MOCK_FILE, OK],
 
+
+
     ['Verify instance command -o grid get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'general': ['-o', 'simple']},
-     {'stdout': ENUM_INSTANCE_GET_TABLE_RESP,
+     {'stdout': """Instances: CIM_Foo
+InstanceID      IntegerProp
+------------  -------------
+"CIM_Foo1"                1
+""",
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
@@ -2644,7 +2844,7 @@ Instances: TST_Person
 """],
       'rc': 0,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, OK],
+     ASSOC_MOCK_FILE, RUN],
 
     ['Verify instance command associators with --pl in unsorted order',
      {'args': ['associators', 'TST_Person.name="Mike"',

@@ -110,3 +110,6 @@ CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE = \
 
 CMD_OPTION_HELP_INSTANCENAME_HELP_LINE = \
     '--hi, --help-instancename Show help message for specifying INSTANCENAME'
+
+CMD_OPTION_SHOW_NULL_HELP_LINE = \
+    '--show-null In the TABLE output formats, show properties with no '

@@ -16,7 +16,8 @@
 # limitations under the License.
 
 """
-Tests for _common.py functions.
+Tests for _common.py functions.  This is a unit test of the function and its
+API, not a test of pywbemcli commands.
 """
 
 from __future__ import absolute_import, print_function
@@ -37,9 +38,11 @@ from pywbem import CIMProperty, CIMInstance, CIMInstanceName, Uint32, Uint64, \
 from pywbemtools.pywbemcli._display_cimobjects import \
     _format_instances_as_rows, _display_instances_as_table
 
+from pywbemtools._output_formatting import DEFAULT_MAX_CELL_WIDTH
+
 from ..pytest_extensions import simplified_test_function
 
-OK = True     # mark tests OK when they execute correctly
+OK = True    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
@@ -146,6 +149,57 @@ def simple_instance2(pvalue=None):
     return inst
 
 
+def simple_array_instance2(pvalue=None):
+    """
+    Build a simple instance to test and return that instance. The properties
+    in the instance are sorted by (lower cased) property name.
+
+    For this test all of the array elements have a single value
+    """
+    if pvalue:
+        properties = [CIMProperty("P", pvalue)]
+    else:
+        properties = [
+            CIMProperty("Pbf", is_array=True, value=[False]),
+            CIMProperty("Pbt", is_array=True, value=[True]),
+            CIMProperty("Pdt", is_array=True, value=[DATETIME1_OBJ]),
+            CIMProperty("Pint64", is_array=True, value=[Uint64(9999)]),
+            CIMProperty("Psint32", is_array=True, value=[Sint32(-2147483648)]),
+            CIMProperty("Pstr1", is_array=True, value=[u"Test String"]),
+            CIMProperty("Puint32", is_array=True, value=[Uint32(4294967295)]),
+        ]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
+def simple_array_instance21(pvalue=None):
+    """
+    Build a simple instance to test and return that instance. The properties
+    in the instance are sorted by (lower cased) property name.
+
+    For this test all of the array elements have a two values
+    """
+    if pvalue:
+        properties = [CIMProperty("P", pvalue)]
+    else:
+        properties = [
+            CIMProperty("Pbf", is_array=True, value=[False, False]),
+            CIMProperty("Pbt", is_array=True, value=[True, True]),
+            CIMProperty("Pdt", is_array=True, value=[DATETIME1_OBJ,
+                                                     DATETIME1_OBJ]),
+            CIMProperty("Pint64", is_array=True, value=[Uint64(9999),
+                                                        Uint64(9999)]),
+            CIMProperty("Psint32", is_array=True, value=[Sint32(-2147483648),
+                                                         Sint32(-2147483648)]),
+            CIMProperty("Pstr1", is_array=True, value=[u"Test String",
+                                                       u"Test String"]),
+            CIMProperty("Puint32", is_array=True, value=[Uint32(4294967295),
+                                                         Uint32(4294967295)]),
+        ]
+    inst = CIMInstance("CIM_Foo", properties)
+    return inst
+
+
 def string_instance(tst_str):
     """
     Build a CIM instance with a single property.
@@ -185,6 +239,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             args=(),
             kwargs=dict(
                 insts=[simple_instance()],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                 quote_strings=False),
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
@@ -198,6 +253,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             args=(),
             kwargs=dict(
                 insts=[simple_instance(pvalue=["abc", 'def'])],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                 quote_strings=False),
             exp_rtn=[
                 ['"abc", "def"']],
@@ -211,6 +267,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs=dict(
                 insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
                                       ptype='uint32')],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                 quote_strings=True),
             exp_rtn=[
                 ['12345, 67891']],
@@ -238,6 +295,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs=dict(
                 insts=[array_instance(pvalue=[Uint32(12345), Uint32(67891)],
                                       ptype='uint32')],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                 quote_strings=False),
             exp_rtn=[
                 ['12345, 67891']],
@@ -272,7 +330,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance to table, unsorted",
         dict(
-            args=([simple_instance_unsorted()], None),
+            args=([simple_instance_unsorted()],
+                  DEFAULT_MAX_CELL_WIDTH,),
             kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
@@ -303,6 +362,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                         ),
                     ),
                 ],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
             ),
             exp_rtn=[
                 ['"K1"', '"K2"', '"V1"', '"V2"'],
@@ -333,6 +393,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                         ],
                     ),
                 ],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
             ),
             exp_rtn=[
                 ['', '"VP1a"', '"VP2a"', '"VP3a"'],
@@ -371,6 +432,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                         ),
                     ),
                 ],
+                max_cell_width=DEFAULT_MAX_CELL_WIDTH,
             ),
             exp_rtn=[
                 ['', '', '"VP1a"', '"VP2a"'],
@@ -382,7 +444,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance with one string all components overflow line1",
         dict(
-            args=([simple_instance(pvalue="A B C D")], 4),
+            args=([simple_instance(pvalue="A B C D")],
+                  4),
             kwargs={},
             exp_rtn=[
                 ['"A "\n"B "\n"C "\n"D"']],
@@ -392,7 +455,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance with one string all components overflow line2",
         dict(
-            args=([simple_instance(pvalue="ABCD")], 4),
+            args=([simple_instance(pvalue="ABCD")],
+                  4),
             kwargs={},
             exp_rtn=[
                 ['\n"AB"\n"CD"']],
@@ -402,7 +466,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance with one string overflows line",
         dict(
-            args=([simple_instance(pvalue="A B C D")], 8),
+            args=([simple_instance(pvalue="A B C D")],
+                  8),
             kwargs={},
             exp_rtn=[
                 ['"A B C "\n"D"']],
@@ -412,7 +477,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance withone unit32 max val",
         dict(
-            args=([simple_instance(pvalue=Uint32(4294967295))], 8),
+            args=([simple_instance(pvalue=Uint32(4294967295))],
+                  8),
             kwargs={},
             exp_rtn=[
                 ['4294967295']],
@@ -423,7 +489,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify simple instance with one string fits on line",
         dict(
-            args=([simple_instance(pvalue="A B C D")], 12),
+            args=([simple_instance(pvalue="A B C D")],
+                  12),
             kwargs={},
             exp_rtn=[
                 ['"A B C D"']],
@@ -433,7 +500,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify datetime property, folded",
         dict(
-            args=([simple_instance(pvalue=DATETIME1_OBJ)], 20),
+            args=([simple_instance(pvalue=DATETIME1_OBJ)],
+                  20),
             kwargs={},
             exp_rtn=[
                 ['\n"20140922104920.524"\n"789+000"']],
@@ -443,7 +511,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify datetime property not folded",
         dict(
-            args=([simple_instance(pvalue=DATETIME1_OBJ)], 30),
+            args=([simple_instance(pvalue=DATETIME1_OBJ)],
+                  30),
             kwargs={},
             exp_rtn=[
                 ['"20140922104920.524789+000"']],
@@ -453,7 +522,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
     (
         "Verify integer property where len too small",
         dict(
-            args=([simple_instance(pvalue=Uint32(999999))], 4),
+            args=([simple_instance(pvalue=Uint32(999999))],
+                  4),
             kwargs={},
             exp_rtn=[['999999']],
         ),
@@ -464,7 +534,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
         dict(
             args=([CIMInstance('P', [CIMProperty('P',
                                                  type='char16',
-                                                 value='f')])], 4),
+                                                 value='f')])],
+                  4),
             kwargs={},
             exp_rtn=[[u"'f'"]],
         ),
@@ -478,7 +549,8 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                                      CIMProperty('Q', value=None,
                                                  type='uint32'),
                                      CIMProperty('R', value=None,
-                                                 type='string'), ])], 4),
+                                                 type='string'), ])],
+                  4),
             kwargs={},
             exp_rtn=[[u'', u'', u'']],
         ),
@@ -583,6 +655,67 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
         ),
         None, None, not CLICK_ISSUE_1590
     ),
+
+    (
+        "Verify print of simple array instance to table with col limit",
+        dict(
+            args=([simple_array_instance2()], 80, 'simple'),
+            kwargs={},
+            exp_stdout="""\
+Instances: CIM_Foo
+Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
+-----  -----  ---------  --------  -----------  --------  ----------
+false  true   "2014092"      9999  -2147483648  "Test "   4294967295
+              "2104920"                         "String"
+              ".524789"
+              "+000"
+""",
+        ),
+        None, None, not CLICK_ISSUE_1590
+    ),
+
+    (
+        "Verify print of simple array instance21 to table with col limit",
+        dict(
+            args=([simple_array_instance21()], 220, 'simple'),
+            kwargs={},
+            exp_stdout="""\
+Instances: CIM_Foo
+Pbf           Pbt         Pdt                           Pint64      Psint32                   Pstr1                   Puint32
+------------  ----------  ----------------------------  ----------  ------------------------  ----------------------  ----------------------
+false, false  true, true  "20140922104920.524789+000",  9999, 9999  -2147483648, -2147483648  "Test String", "Test "  4294967295, 4294967295
+                          "20140922104920.524789+000"                                         "String"
+""",   # noqa: E501
+        ),
+        None, None, not CLICK_ISSUE_1590
+    ),
+
+    # The following test fails apparently in an issue in the capsys so marked
+    # fail until we sort out issu es when a second instance is added. Did same
+    # ctest above with very largeell size and another with single instance
+    # and that works.  TODO
+    (
+        "Verify print of simple array instance21 to table with col limit",
+        dict(
+            args=([simple_array_instance21()], 80, 'simple'),
+            kwargs={},
+            exp_stdout="""\
+Instances: CIM_Foo
+Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
+-----  -----  ---------  --------  -----------  --------  ----------
+false  true   "2014092"      9999  -2147483648  "Test "   4294967295
+              "2104920"                         "String"
+              ".524789"
+              "+000"
+false  true   "2014092"      9999  -2147483648  "Test "   4294967295
+              "2104920"                         "String"
+              ".524789"
+              "+000"
+""",
+        ),
+        None, None, FAIL  # WAS not CLICK_ISSUE_1590
+    ),
+
     (
         "Verify print of instance with reference property",
         dict(
@@ -633,7 +766,6 @@ def test_display_instances_as_table(
     args = kwargs['args']
     kwargs_ = kwargs['kwargs']
     exp_stdout = kwargs['exp_stdout']
-
     # The code to be tested
     _display_instances_as_table(*args, **kwargs_)
 

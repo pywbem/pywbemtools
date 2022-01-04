@@ -17,6 +17,10 @@
 Common function to display cim objects in multiple formats.
 display_cimobjects() is the function that should be used for all CIM
 object display in pywbemcli.
+
+It displays a list of CIM objects of a single type in multiple formats
+defined by output_format (as CIM objects (mof, etc.) as one or more tables
+or as text.
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
@@ -41,13 +45,14 @@ INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
 ####################################################################
 #
-#  Display of CIM objects.
+#  Display of CIM objects in format defined by output_format
 #
 ####################################################################
 
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
-                        sort=False, property_list=None, quote_strings=True):
+                        sort=False, property_list=None, quote_strings=True,
+                        ignore_null_properties=True):
     """
     Display CIM objects in form determined by input parameters.
 
@@ -105,6 +110,14 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         If False, strings are not encased by quote marks in the table view for
         instance displays. The default is True so that strings are encased in
         quotes in all views.
+
+      ignore_null_properties (:class:`py.bool`):
+        If True, cases where a property has Null value or does not exist in all
+        of the instances to be displayed will not be included in table output.
+        They will be included in CIM object(MOF) output. If False, The
+        properties that do not have a value in any instance will be included in
+        tables.  This allows table output to ignore properties that do not add
+        value to the table display.
     """
     # Note: In the docstring above, the line for parameter 'objects' was way too
     #       long. Since we are not putting it into docmentation, we folded it.
@@ -112,7 +125,7 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     context.spinner_stop()
 
     if summary:
-        display_cim_objects_summary(context, cim_objects, output_format)
+        _display_cim_objects_summary(context, cim_objects, output_format)
         return
 
     if not cim_objects and context.verbose:
@@ -122,18 +135,21 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     if sort:
         cim_objects = sort_cimobjects(cim_objects)
 
-    # default when displaying cim objects is mof
+    # Default when displaying cim objects is mof
     assert output_format
 
     if isinstance(cim_objects, (list, tuple)):
         # Table format output is processed as a group
         if output_format_is_table(output_format):
-            _display_objects_as_table(cim_objects, output_format,
-                                      context=context,
-                                      property_list=property_list,
-                                      quote_strings=quote_strings)
+            _display_objects_as_table(
+                cim_objects, output_format,
+                context=context,
+                property_list=property_list,
+                quote_strings=quote_strings,
+                ignore_null_properties=ignore_null_properties)
         else:
             # Call to display each object
+            # ignore_null_properties not passed on to MOF, etc. display
             for obj in cim_objects:
                 display_cim_objects(context, obj, output_format=output_format)
         return
@@ -142,9 +158,13 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     object_ = cim_objects
     # This allows passing single objects to the table formatter (i.e. not lists)
     if output_format_is_table(output_format):
-        _display_objects_as_table([object_], output_format, context=context,
-                                  property_list=property_list,
-                                  quote_strings=quote_strings)
+        _display_objects_as_table(
+            [object_], output_format, context=context,
+            property_list=property_list,
+            quote_strings=quote_strings,
+            ignore_null_properties=ignore_null_properties)
+
+    # Display in the selected CIM object format (mof, xml, repr, txt)
     elif output_format == 'mof':
         try:
             click.echo(object_.tomof())
@@ -188,7 +208,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
 
 
 def _display_objects_as_table(objects, output_format, context=None,
-                              property_list=None, quote_strings=True):
+                              property_list=None, quote_strings=True,
+                              ignore_null_properties=True):
     """
     Call the method for each type of object to print that object type
     information as a table.
@@ -199,10 +220,12 @@ def _display_objects_as_table(objects, output_format, context=None,
 
     if objects:
         if isinstance(objects[0], CIMInstance):
-            _display_instances_as_table(objects, table_width, output_format,
-                                        context=context,
-                                        property_list=property_list,
-                                        quote_strings=quote_strings)
+            _display_instances_as_table(
+                objects, table_width, output_format,
+                context=context,
+                property_list=property_list,
+                quote_strings=quote_strings,
+                ignore_null_properties=ignore_null_properties)
         elif isinstance(objects[0], CIMClass):
             _display_classes_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], CIMQualifierDeclaration):
@@ -218,12 +241,12 @@ def _display_objects_as_table(objects, output_format, context=None,
 ############################################################################
 #
 # Support methods for displaying CIM objects.  This includes multiple
-# output formats (ie.e MOF, TABLE, TEXT)
+# output formats (ie. MOF, TABLE, TEXT)
 #
 ############################################################################
 
 
-def get_cimtype(objects):
+def _get_cimtype(objects):
     """
     Get the cim_type for any returned cim object.  Normally this is the
     name of the class name except that the classname return from
@@ -250,7 +273,7 @@ def get_cimtype(objects):
     return cim_type
 
 
-def display_cim_objects_summary(context, objects, output_format):
+def _display_cim_objects_summary(context, objects, output_format):
     """
     Display a summary of the objects received. This displays the
     count of objects.
@@ -258,7 +281,7 @@ def display_cim_objects_summary(context, objects, output_format):
     context.spinner_stop()
 
     if objects:
-        cim_type = get_cimtype(objects)
+        cim_type = _get_cimtype(objects)
 
         if output_format_is_table(output_format):
             rows = [[len(objects), cim_type]]
@@ -412,12 +435,12 @@ def _display_qual_decls_as_table(qual_decls, table_width, table_format):
                             table_format=table_format))
 
 
-def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
-                              include_classes=False, context=None,
-                              prop_names=None, quote_strings=True):
+def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
+                              context=None, prop_names=None,
+                              quote_strings=True):
     """
-    Format the list of instances properties into as a list of the property
-    values for each instance( a row of the table) gathered into a list of
+    Format the list of instances properties into a list of the property
+    values for each instance(a row of the table) gathered into a list of
     the rows.
 
     The prop_names parameter is the list of (originally cased) property names
@@ -445,13 +468,15 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
         item in a row is a cell entry
     """
     conn = context.pywbem_server.conn if context else None
+
     # Avoid crash deeper in code if max_cell_width is None.
     if max_cell_width is None:
         max_cell_width = DEFAULT_MAX_CELL_WIDTH
-    lines = []
+    rows = []
 
+    # Build list of properties in any of the instances to display.
     if prop_names is None:
-        prop_names = sorted_prop_names(insts)
+        prop_names = _sorted_prop_names(insts)
 
     # Cache of ValueMapping objects for integer-typed properties.
     # Key: classname.propertyname, both in lower case.
@@ -459,16 +484,14 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
     valuemappings = {}
 
     for inst in insts:
-        if not isinstance(inst, CIMInstance):
-            raise ValueError('Only accepts CIMInstance; not type {}'
-                             .format(type(inst)))
+        assert isinstance(inst, CIMInstance), \
+            "Invalid CIM Type {}".format(type(inst))
 
         # Insert classname as first col if flag set
-        line = [inst.classname] if include_classes else []
+        row = [inst.classname] if include_classes else []
 
-        # get value for each property in this object
+        # Get value for each property in this object
         for name in prop_names:
-
             # Account for possible instances without all properties
             # Outputs empty  string.  Note that instance with no value
             # results in same output as not instance name.
@@ -506,15 +529,16 @@ def _format_instances_as_rows(insts, max_cell_width=DEFAULT_MAX_CELL_WIDTH,
                         line_pos=0, end_space=0, avoid_splits=False,
                         valuemapping=valuemapping, quote_strings=quote_strings)
 
-            line.append(val_str)
-        lines.append(line)
+            row.append(val_str)
+        rows.append(row)
 
-    return lines
+    return rows
 
 
 def _display_instances_as_table(insts, table_width, table_format,
                                 include_classes=False, context=None,
-                                property_list=None, quote_strings=True):
+                                property_list=None, quote_strings=True,
+                                ignore_null_properties=True):
     """
     Print the properties of the instances defined in insts as a table where
     each row is an instance and each column is a property value.
@@ -527,6 +551,7 @@ def _display_instances_as_table(insts, table_width, table_format,
     have a ValueMap qualifier (effectively, in the creation class of the
     instance) are shown with both the actual property value and the mapped
     value in parenthesis.
+
     """
     conn = context.pywbem_server.conn if context else None
 
@@ -536,10 +561,23 @@ def _display_instances_as_table(insts, table_width, table_format,
     for inst in insts:
         assert isinstance(inst, CIMInstance)
 
+    # Build list of properties, either all properties in a list or all
+    # properties in all instances in list of instances
     if property_list:
-        prop_names = propertylist_prop_names(insts, property_list)
+        prop_names = _propertylist_prop_names(insts, property_list)
     else:
-        prop_names = sorted_prop_names(insts)
+        prop_names = _sorted_prop_names(insts)
+
+    if ignore_null_properties:
+        # Get names of properties in any instances that have a value (i.e.
+        # not None or empty list)
+        props_with_value_dict = NocaseDict()
+        for inst in insts:
+            for propname, propvalue in inst.properties.items():
+                if propvalue.value is not None:
+                    props_with_value_dict[propname] = True
+        # Rebuild prop names from dict in same order as original list
+        prop_names = [pn for pn in prop_names if pn in props_with_value_dict]
 
     # Try to estimate max cell width from number of cols
     # This allows folding long data.  However it is incomplete in
@@ -586,9 +624,9 @@ def _display_instances_as_table(insts, table_width, table_format,
             class_objs[classname] = class_obj
 
     # Construct the header line
-    header_line = []  # list of header strings
+    headers = []  # list of header strings
     if include_classes:
-        header_line.append("classname")
+        headers.append("classname")
     for pname in prop_names:
         hdr = pname
         if show_units:
@@ -607,30 +645,31 @@ def _display_instances_as_table(insts, table_width, table_format,
                     siunits.append(siunit)
             for siunit in siunits:
                 hdr += " [{}]".format(siunit)
-        header_line.append(hdr)
+        headers.append(hdr)
 
-    # Fold long property names
-    new_header_line = []
-    for header in header_line:
+    rows = _format_instances_as_rows(
+        insts, max_cell_width,
+        include_classes=include_classes,
+        context=context, prop_names=prop_names,
+        quote_strings=quote_strings)
+
+    # Fold the headers if necessary
+    disp_headers = []
+    for header in headers:
         if len(header) > max_cell_width:
-            new_header_line.append(fold_strings(header, max_cell_width))
+            disp_headers.append(fold_strings(header, max_cell_width))
         else:
-            new_header_line.append(header)
-
-    rows = _format_instances_as_rows(insts, max_cell_width=max_cell_width,
-                                     include_classes=include_classes,
-                                     context=context, prop_names=prop_names,
-                                     quote_strings=quote_strings)
+            disp_headers.append(header)
 
     title = 'Instances: {}'.format(insts[0].classname)
-    click.echo(format_table(rows, new_header_line, title=title,
+    click.echo(format_table(rows, disp_headers, title=title,
                             table_format=table_format))
 
 
-def sorted_prop_names(insts):
+def _sorted_prop_names(insts):
     """
     Return the list of (originally cased) property names that is the superset
-    of all properties in the input instances.
+    of all properties in the  any of theinput instances.
 
     The returned list has the key properties first, followed by the non-key
     properties. Each group is sorted case insensitively.
@@ -660,7 +699,7 @@ def sorted_prop_names(insts):
     return key_prop_list
 
 
-def propertylist_prop_names(insts, property_list):
+def _propertylist_prop_names(insts, property_list):
     """
     Return the originally cased property list, based on the lexical case
     in the instances.
