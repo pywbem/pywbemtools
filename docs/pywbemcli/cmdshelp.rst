@@ -1104,6 +1104,10 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
+      --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
+                                      instances to be displayed. Otherwise only properties at least one instance has a non-
+                                      Null property are displayed
+
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
 
@@ -1330,6 +1334,10 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
+      --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
+                                      instances to be displayed. Otherwise only properties at least one instance has a non-
+                                      Null property are displayed
+
       -h, --help                      Show this help message.
 
 
@@ -1379,6 +1387,10 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
       -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
+
+      --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
+                                      instances to be displayed. Otherwise only properties at least one instance has a non-
+                                      Null property are displayed
 
       -h, --help                      Show this help message.
 
@@ -1576,6 +1588,10 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the instances in the result via a filter query.
                                       By default, and when traditional operations are used, no such filtering takes place.
+
+      --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
+                                      instances to be displayed. Otherwise only properties at least one instance has a non-
+                                      Null property are displayed
 
       --fql, --filter-query-language QUERY-LANGUAGE
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.

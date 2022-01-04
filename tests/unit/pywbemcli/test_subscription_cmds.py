@@ -855,7 +855,7 @@ TEST_CASES = [
                 '-o mof subscription list-subscriptions',
                 '-o mof subscription list --names-only',
                 '-o mof subscription list-subscriptions --detail',
-                'subscription list-subscriptions --summary']},
+                '-o mof subscription list-subscriptions --summary']},
      {'stdout': ['Added owned destination: Name=pywbemdestination:defaultpywbemcliSubMgr:odest1',  # noqa: E501
                  'Added owned filter: Name=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',  # noqa: E501
                  'Added owned subscription: DestinationName=pywbemdestination:defaultpywbemcliSubMgr:odest1, FilterName=pywbemfilter:defaultpywbemcliSubMgr:ofilter1',   # noqa: E501

@@ -160,6 +160,13 @@ help_instancename_option = [              # pylint: disable=invalid-name
                  help=u'Show help message for specifying INSTANCENAME '
                       u'including use of the --key and --namespace options.')]
 
+show_null_option = [              # pylint: disable=invalid-name
+    click.option('--show-null', 'show_null', is_flag=True, required=False,
+                 help=u'In the TABLE output formats, show properties with no '
+                      u'value (i.e. Null) in all of the instances to be '
+                      u'displayed. Otherwise only properties at least '
+                      u'one instance has a non-Null property are displayed')]
+
 
 ##########################################################################
 #
@@ -201,6 +208,7 @@ def instance_group():
 @add_options(summary_option)
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
+@add_options(show_null_option)
 @add_options(help_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
@@ -240,6 +248,7 @@ def instance_enumerate(context, classname, **options):
 @add_options(keybinding_key_option)
 @add_options(namespace_option)
 @add_options(help_instancename_option)
+@add_options(show_null_option)
 @add_options(help_option)
 @click.pass_obj
 def instance_get(context, instancename, **options):
@@ -399,6 +408,7 @@ def instance_modify(context, instancename, **options):
 @add_options(summary_option)
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
+@add_options(show_null_option)
 @add_options(help_instancename_option)
 @add_options(help_option)
 @click.pass_obj
@@ -451,6 +461,7 @@ def instance_associators(context, instancename, **options):
 @add_options(namespace_option)
 @add_options(summary_option)
 @add_options(filter_query_option)
+@add_options(show_null_option)
 @add_options(filter_query_language_option)
 @add_options(help_instancename_option)
 @add_options(help_option)
@@ -1000,7 +1011,8 @@ def cmd_instance_get(context, instancename, options):
             PropertyList=property_list)
 
         display_cim_objects(context, instance, output_fmt,
-                            property_list=property_list)
+                            property_list=property_list,
+                            ignore_null_properties=not options['show_null'])
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -1187,7 +1199,8 @@ def cmd_instance_enumerate(context, classname, options):
 
         display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True,
-                            property_list=property_list)
+                            property_list=property_list,
+                            ignore_null_properties=not options['show_null'])
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -1237,7 +1250,8 @@ def cmd_instance_references(context, instancename, options):
 
         display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True,
-                            property_list=property_list)
+                            property_list=property_list,
+                            ignore_null_properties=not options['show_null'])
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -1288,7 +1302,8 @@ def cmd_instance_associators(context, instancename, options):
 
         display_cim_objects(context, results, output_fmt,
                             summary=options['summary'], sort=True,
-                            property_list=property_list)
+                            property_list=property_list,
+                            ignore_null_properties=not options['show_null'])
 
     except Error as er:
         raise pywbem_error_exception(er)
