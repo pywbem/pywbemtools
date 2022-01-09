@@ -346,6 +346,10 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
       would still make it fit onto the line, and only if there is no space
       character in that range, the string is split at a non-space position.
 
+
+    Warning: A very small value for maxline (ex. lt about 5) can cause the
+    endless loop assert to fail.
+
     Parameters:
 
       value (:term:`unicode string`): The string value. Must not be `None`.
@@ -391,7 +395,6 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
     new_line = u'\n' + _indent_str(indent)
 
     mof = []
-
     while True:
 
         # Prepare safety check for endless loops
@@ -403,7 +406,8 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
         if len(value) > avl_len - end_space:
             if avoid_splits or avl_len < 0:
                 # Start a new line
-                mof.append(new_line)
+                if mof:
+                    mof.append(new_line)
                 line_pos = indent
                 avl_len = maxline - indent - quote_len
             else:
@@ -411,7 +415,8 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
                 blank_pos = value.rfind(u' ', 0, avl_len)
                 if blank_pos < 0:
                     # We cannot split at a blank -> start a new line
-                    mof.append(new_line)
+                    if mof:
+                        mof.append(new_line)
                     line_pos = indent
                     avl_len = maxline - indent - quote_len
 
@@ -446,8 +451,8 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
         assert value != saved_value, \
             "Endless loop in _mofstr() with state: " \
             "mof_str={0}, value={1}, avl_len={2}, end_space={3}, " \
-            "split_pos={4}". \
-            format(u''.join(mof), value, avl_len, end_space, split_pos)
+            "split_pos={4} with maxline={5} input". \
+            format(u''.join(mof), value, avl_len, end_space, split_pos, maxline)
 
     mof_str = u''.join(mof)
     return mof_str, line_pos

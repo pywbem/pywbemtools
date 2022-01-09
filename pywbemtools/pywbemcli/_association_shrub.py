@@ -620,7 +620,7 @@ class AssociationShrub(object):
         # Remove host and namespace if same as source instance
         path = self.simplify_path(path)
 
-        return to_wbem_uri_folded(path, format=format, max_len=max_len)
+        return to_wbem_uri_folded(path, uri_format=format, max_len=max_len)
 
     def build_inst_names(self, inst_names_tuple, ref_cln, replacements,
                          fullpath=None):

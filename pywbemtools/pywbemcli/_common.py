@@ -430,13 +430,18 @@ def verify_operation(txt, msg=None):
     return False
 
 
-def to_wbem_uri_folded(path, format='standard', max_len=15):
+def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
     # pylint: disable=redefined-builtin
     """
     Return the (untyped) WBEM URI string of this CIM instance path.
     This method modifies the pywbem:CIMInstanceName.to_wbem_uri method
     to return a reformatted string where components are on
     separate lines if the length is longer than the max_len argument.
+
+    It can fold the line after host, namespace, classname, and each key
+    definition depending on the url length. It does not fold to within the
+    defined max_len but to the next path component that is greater than the
+    max_len. It does not fold key names or key value strings.
 
     See :meth:`pywbem.CIMInstanceName.to_wbem_uri` for detailed
     information. This method was derived from
@@ -448,7 +453,7 @@ def to_wbem_uri_folded(path, format='standard', max_len=15):
         The instance name to convert to a wbem uri and fold based on
         the max_len parameter
 
-      format  (:term:`string`): Format for the generated WBEM URI string
+      uri_format  (:term:`string`): Format for the generated WBEM URI string
         using one of the formats defined in
         :meth:`pywbem.CIMInstanceName.to_wbem_uri`
 
@@ -467,7 +472,7 @@ def to_wbem_uri_folded(path, format='standard', max_len=15):
       ValueError: Invalid format
     """
 
-    path_str = path.to_wbem_uri(format=format)
+    path_str = path.to_wbem_uri(format=uri_format)
     if len(path_str) <= max_len:
         return path_str
 
@@ -480,43 +485,70 @@ def to_wbem_uri_folded(path, format='standard', max_len=15):
 
     def case(astring):
         """Return the string in the correct lexical case for the format."""
-        if format == 'canonical':
+        if uri_format == 'canonical':
             astring = astring.lower()
         return astring
 
     def case_sorted(keys):
         """Return the keys in the correct order for the format."""
-        if format == 'canonical':
+        if uri_format == 'canonical':
             case_keys = [case(k) for k in keys]
             keys = sorted(case_keys)
         return keys
 
-    if format not in ('standard', 'canonical', 'cimobject', 'historical'):
-        raise ValueError('Invalid format argument: {0}'.format(format))
+    last_fold = 0
+    if uri_format not in ('standard', 'canonical', 'cimobject', 'historical'):
+        raise ValueError('Invalid format argument: {0}'.format(uri_format))
 
-    if path.host is not None and format != 'cimobject':
+    if path.host is not None and uri_format != 'cimobject':
         # The CIMObject format assumes there is no host component
         ret.append('//')
         ret.append(case(path.host))
 
-    if path.host is not None or format not in ('cimobject', 'historical'):
+    if path.host is not None or uri_format not in ('cimobject', 'historical'):
         ret.append('/')
+
+    # Fold on hostname if lt max_len
+    line_len = sum([len(i) for i in ret])
+    if line_len > max_len:
+        ret.append('\n')
+        last_fold = len(ret)
 
     if path.namespace is not None:
         ret.append(case(path.namespace))
 
-    if path.namespace is not None or format != 'historical':
+    if path.namespace is not None or uri_format != 'historical':
         ret.append(':')
 
-    ret.append(case(path.classname))
+    # Fold on namespace if namespace gt maxlen or
+    line_len = sum([len(i) for i in ret[last_fold:]])
+    if line_len > max_len:
+        ret.append('\n')
+        last_fold = len(ret)
 
-    ret.append('.\n')
+    ret.append(case(path.classname))
+    ret.append(".")
+    line_len = sum([len(i) for i in ret[last_fold:]])
+    if line_len > max_len:
+        ret.append('\n')
+        last_fold = len(ret)
 
     for key in case_sorted(six.iterkeys(path.keybindings)):
+        # Fold for each key where sum of last line exceeds max_len
+        line_len = sum([len(i) for i in ret[last_fold:]])
+        if line_len > max_len:
+            ret.append('\n')
+            last_fold = len(ret)
+
         value = path.keybindings[key]
 
         ret.append(key)
         ret.append('=')
+
+        line_len = sum([len(i) for i in ret[last_fold:]])
+        if line_len > max_len:
+            ret.append('\n')
+            last_fold = len(ret)
 
         if isinstance(value, six.binary_type):
             value = to_unicode(value)
@@ -547,7 +579,7 @@ def to_wbem_uri_folded(path, format='standard', max_len=15):
         elif isinstance(value, CIMInstanceName):
             # reference
             ret.append('"')
-            ret.append(value.to_wbem_uri(format=format).
+            ret.append(value.to_wbem_uri(format=uri_format).
                        replace('\\', '\\\\').
                        replace('"', '\\"'))
             ret.append('"')
@@ -560,9 +592,6 @@ def to_wbem_uri_folded(path, format='standard', max_len=15):
             raise TypeError(
                 "Invalid type {0} in keybinding value: {1}={2}"
                 .format(type(value), key, value))
-        ret.append(',\n')
-
-    del ret[-1]
 
     return ensure_unicode(''.join(ret))
 

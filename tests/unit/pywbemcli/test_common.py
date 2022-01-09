@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 
 import sys
 import os
+import six
 from packaging.version import parse as parse_version
 import click
 from mock import patch
@@ -44,7 +45,7 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
     pick_multiple_from_list, verify_operation, split_str_w_esc, \
     shorten_path_str, get_subclass_names, \
     dependent_classnames, depending_classnames, all_classnames_depsorted, \
-    parse_version_value, is_experimental_class
+    parse_version_value, is_experimental_class, to_wbem_uri_folded
 
 from .cli_test_extensions import setup_mock_connection
 from ..pytest_extensions import simplified_test_function
@@ -2866,8 +2867,8 @@ TESTCASES_IS_EXPERIMENTAL = [
     # Each list item is a testcase tuple with these items:
     # * desc: Short testcase description.
     # * kwargs: Keyword arguments for the test function:
-    #   * ver: String defining the version (valid is str . str . str)
-    #     where each str has only integer characters
+    #   * klass: MOF for class including version qualifier
+    #   * exp_rtn: True if function returns True, else False
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
@@ -3015,6 +3016,99 @@ Qualifier Version : string = null,
     assert testcase.exp_exc_types is None
 
     assert act_rtn == exp_rtn
+
+
+TESTCASES_TO_WBEMURI_FOLDED = [
+    # Testcases for to_wbem_uri_folded()
+    #
+    # Each list item is a testcase tuple with these items:
+    # * desc: Short testcase description.
+    # * kwargs: Keyword arguments for the test function:
+    #   * path: CIMInstanceName object to be formatted
+    #   * uri_format: None or string 'standard', 'canonical', 'cimobject',
+    #     'historical'. If None, the default 'standard' is used.
+    #   * maxlen: Integer or list of integers. The list form allows creating
+    #     multiple tests with a single instancename. Only works if testing
+    #     for successful return
+    #   * exp_rtn, String or list of strings if maxlen is a list.  The
+    #     formatted wbemuri including folding as a string
+    # * exp_exc_types: Expected exception type(s), or None.
+    # * exp_warn_types: Expected warning type(s), or None.
+    # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
+    # TODO: Remove the first two tests.
+    ('Verify simple sucessful format without  fold',
+     dict(path=CIMInstanceName(classname='CIM_Foo',
+                               keybindings=dict(InstanceID='1234'),
+                               namespace='root/cimv2',
+                               host='fred'),
+          uri_format=None,
+          max_lens=60,
+          exp_rtns='//fred/root/cimv2:CIM_Foo.InstanceID="1234"'),
+     None, None, OK, ),
+
+    ('Verify simple sucessful format with  fold',
+     dict(path=CIMInstanceName(classname='CIM_Foo',
+                               keybindings=dict(InstanceID='1234'),
+                               namespace='root/cimv2',
+                               host='fred'),
+          uri_format=None,
+          max_lens=30,
+          exp_rtns='//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"'),
+     None, None, OK, ),
+
+    ('Verify simple sucessful format with fold and no fold',
+     dict(path=CIMInstanceName(classname='CIM_Foo',
+                               keybindings=dict(InstanceID='1234'),
+                               namespace='root/cimv2',
+                               host='fred'),
+          uri_format=None,
+          max_lens=[60, 30],
+          exp_rtns=['//fred/root/cimv2:CIM_Foo.InstanceID="1234"',
+                    '//fred/root/cimv2:CIM_Foo.InstanceID=\n"1234"']),
+     None, None, OK, ),
+
+    ('Verify simple sucessful format with vers small fold int',
+     dict(path=CIMInstanceName(classname='CIM_Foo',
+                               keybindings=dict(InstanceID='1234'),
+                               namespace='root/cimv2',
+                               host='fred'),
+          uri_format=None,
+          max_lens=[5, 10],
+          exp_rtns=['//fred/\nroot/cimv2:\nCIM_Foo.\nInstanceID=\n"1234"',
+                    '//fred/root/cimv2:\nCIM_Foo.InstanceID=\n"1234"']),
+     None, None, OK, ),
+    # TODO: Add more test values to cover multiple keys more complex keys and
+    # keys with very long name and values.
+]
+
+
+@pytest.mark.parametrize(
+    "desc, kwargs, exp_exc_types, exp_warn_types, condition",
+    TESTCASES_TO_WBEMURI_FOLDED)
+@simplified_test_function
+def test_to_wbemuri_folded(testcase, path, uri_format, max_lens, exp_rtns):
+    """
+    Test function for _common.to_wbemuri_folded().
+    """
+    # setup to allow multiple maxlen and exprtn items.
+    if isinstance(max_lens, int):
+        assert isinstance(exp_rtns, six.string_types)
+        max_lens = [max_lens]
+        exp_rtns = [exp_rtns]
+        assert len(exp_rtns) == len(max_lens)
+
+    # The code to be tested. Loops to test multiple max lengths
+    for max_len, exp_rtn in zip(max_lens, exp_rtns):
+        if uri_format is None:
+            act_rtn = to_wbem_uri_folded(path, max_len=max_len)
+        else:
+            act_rtn = to_wbem_uri_folded(path, uri_format=uri_format,
+                                         max_len=max_len)
+        # Ensure that exceptions raised in the remainder of this function
+        # are not mistaken as expected exceptions
+        assert testcase.exp_exc_types is None
+
+        assert act_rtn == exp_rtn
 
 
 # TODO Test compare and failure in compare_obj and with errors.

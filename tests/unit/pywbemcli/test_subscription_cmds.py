@@ -877,7 +877,7 @@ TEST_CASES = [
                  # Limited result  -o plain ... list-subscriptions --name-only
                  'host    namespace    class   key=',
                  'Filter Handler',
-                 'interop  CIM_IndicationSubscription  /interop:CIM_IndicationFilter.  /interop:CIM_ListenerDestinationCIMXML.',  # noqa: E501
+                 'interop CIM_IndicationSubscription  /interop:CIM_IndicationFilter.SystemCreationClassName=  /interop:CIM_ListenerDestinationCIMXML.',  # noqa: E501
                  '};'],
       'stderr': [],
       'test': 'innows'},

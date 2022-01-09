@@ -961,17 +961,14 @@ TEST_CASES = [
      {'args': ['enumerate', 'TST_A3', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: TST_A3
-+--------+-------------+---------+---------------------+---------------------+---------------------+
-| host   | namespace   | class   | key=                | key=                | key=                |
-|        |             |         | Initiator           | Target              | LogicalUnit         |
-|--------+-------------+---------+---------------------+---------------------+---------------------|
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
-|        |             |         | InstanceID=1        | InstanceID=2        | InstanceID=3        |
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
-|        |             |         | InstanceID=1        | InstanceID=5        | InstanceID=6        |
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP. | /root/cimv2:TST_EP. | /root/cimv2:TST_LD. |
-|        |             |         | InstanceID=1        | InstanceID=7        | InstanceID=8        |
-+--------+-------------+---------+---------------------+---------------------+---------------------+
++--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------+
+| host   | namespace   | class   | key=                            | key=                            | key=                            |
+|        |             |         | Initiator                       | Target                          | LogicalUnit                     |
+|--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------|
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=2 | /root/cimv2:TST_LD.InstanceID=3 |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=5 | /root/cimv2:TST_LD.InstanceID=6 |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=7 | /root/cimv2:TST_LD.InstanceID=8 |
++--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------+
 """,  # noqa: E501
       'rc': 0,
       'test': 'linesnows'},
@@ -1080,7 +1077,16 @@ Instances: TST_Person
     ['Verify instance enumerate to interop namespace as table works.',
      {'args': ['enumerate', 'CIM_Namespace', '-n', 'interop'],
       'general': ['-o', 'simple']},
-     {'stdout': "CreationClassName    Name    ObjectManagerCreationClassName",
+     {'stdout': ["Instances: CIM_Namespace",
+
+                 "CreationClassName    Name    ObjectManagerCreatio "
+                 "ObjectManagerName SystemCreationClassN SystemName",
+
+                 "nClassName ame ",
+
+                 '"CIM_Namespace" "interop" "CIM_ObjectManager " '
+                 '"FakeObjectManager" "CIM_ComputerSystem" '
+                 '"MockSystem_WBEMSer"', ],
       'test': 'innows'},
      MOCK_SERVER_MODEL, OK],
 
@@ -1260,14 +1266,14 @@ Instances: CIM_Foo
      # completely control the folding of lines such as the path
      {'stdout': """
 Instances: CIM_FooAssoc
-+-----------------+----------------------------------------+----------------------------------------+
++-----------------+------------------------------------------+------------------------------------------+
 | InstanceID      | Ref1                                  | Ref2                                  |
-|-----------------+----------------------------------------+----------------------------------------|
-| "CIM_FooAssoc1" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" |
-|                 | "_Foo1\\""                            | "_Foo2\\""                            |
-| "CIM_FooAssoc2" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM" | "/root/cimv2:CIM_FooStr.InstanceID=\\"" |
-|                 | "_Foo1\\""                            | "CIM_Foostr1\\""                      |
-+-----------------+----------------------------------------+----------------------------------------+
+|-----------------+------------------------------------------+------------------------------------------|
+| "CIM_FooAssoc1" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM_F" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM_F" |
+|                 | "oo1\\""                            | "oo2\\""                            |
+| "CIM_FooAssoc2" | "/root/cimv2:CIM_Foo.InstanceID=\\"CIM_F" | "/root/cimv2:CIM_FooStr.InstanceID=\\"CI" |
+|                 | "oo1\\""                            | "M_Foostr1\\""                      |
++-----------------+------------------------------------------+------------------------------------------+
 
 """,  # noqa: E501
       'rc': 0,

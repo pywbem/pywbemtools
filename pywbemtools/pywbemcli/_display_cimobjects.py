@@ -43,6 +43,10 @@ from .._output_formatting import DEFAULT_MAX_CELL_WIDTH, \
 
 INT_TYPE_PATTERN = re.compile(r'^[su]int(8|16|32|64)$')
 
+# Minimum width for table view cell size. Below this width the columns become
+# unreadable.  Note that this overrides the max_terminal width.
+MIN_CELL_WIDTH = 10
+
 ####################################################################
 #
 #  Display of CIM objects in format defined by output_format
@@ -370,7 +374,8 @@ def _display_paths_as_table(objects, table_width, table_format):
                         if isinstance(instname[key], CIMInstanceName):
                             # If key is CIMInstanceName, fold the value
                             row.append(to_wbem_uri_folded(
-                                instname[key], format='standard', max_len=30))
+                                instname[key], uri_format='standard',
+                                max_len=30))
                         else:
                             row.append(instname[key])
                     rows.append(row)
@@ -499,10 +504,10 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
                 val_str = ''
             else:
                 value = inst.get(name)
-                p = inst.properties[name]
+                prop = inst.properties[name]
 
                 # Cache value mappings for integer-typed properties
-                if INT_TYPE_PATTERN.match(p.type) and context:
+                if INT_TYPE_PATTERN.match(prop.type) and context:
                     vm_key = '{}.{}'.format(
                         inst.classname.lower(), name.lower())
                     try:
@@ -525,10 +530,9 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
                     val_str = u''
                 else:
                     val_str, _ = cimvalue_to_fmtd_string(
-                        p.value, p.type, indent=0, maxline=max_cell_width,
+                        prop.value, prop.type, indent=0, maxline=max_cell_width,
                         line_pos=0, end_space=0, avoid_splits=False,
                         valuemapping=valuemapping, quote_strings=quote_strings)
-
             row.append(val_str)
         rows.append(row)
 
@@ -579,16 +583,18 @@ def _display_instances_as_table(insts, table_width, table_format,
         # Rebuild prop names from dict in same order as original list
         prop_names = [pn for pn in prop_names if pn in props_with_value_dict]
 
-    # Try to estimate max cell width from number of cols
-    # This allows folding long data.  However it is incomplete in
-    # that we do not fold the property name.  Further, the actual output
+    # Try to estimate max cell width from number of cols and properties
+    # This allows folding long data. Further, the actual output
     # width of a column involves the tabulate outputter, output_format
     # so this is not deterministic.
     if prop_names:
-        num_cols = len(prop_names)
-        max_cell_width = int(table_width / num_cols) - 2
+        max_cell_width = int(table_width / len(prop_names))
     else:
         max_cell_width = table_width
+
+    # Sets a minimum size for cells so they are at least readable.
+    # This means we can build tables wider than the terminal width.
+    max_cell_width = max(max_cell_width, MIN_CELL_WIDTH)
 
     # ISSUE #953 Future: Decide whether and how the showing of units should be
     #            controlled. Or are we satisfied with always showing them?
@@ -653,11 +659,15 @@ def _display_instances_as_table(insts, table_width, table_format,
         context=context, prop_names=prop_names,
         quote_strings=quote_strings)
 
-    # Fold the headers if necessary
+    # Fold the headers if necessary. Fold on either hypens or single word
+    # too long because the headers are all single words
     disp_headers = []
     for header in headers:
         if len(header) > max_cell_width:
-            disp_headers.append(fold_strings(header, max_cell_width))
+            disp_headers.append(fold_strings(header,
+                                             max_cell_width,
+                                             break_long_words=True,
+                                             break_on_hyphens=True))
         else:
             disp_headers.append(header)
 
