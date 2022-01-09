@@ -915,8 +915,8 @@ only properties defined in the class defined in the ``CLASSNAME`` argument
 The ``--include-qualifiers`` / ``iq`` option that filters out qualifiers defined in
 the instances
 
-The ``--include-classorigin`` / ``--ico``  that allows showing the classorigin attribute
-in the instances.
+The ``--include-classorigin`` / ``--ico``  that allows showing the classorigin
+attribute in the instances.
 
 The ``filter-query`` / ``--fq`` and ``--filter-query-language`` /
 ``fql``command options allow  filtering the resulting instances if a pull
@@ -926,21 +926,76 @@ if pywbemcli executes the traditional Enumerate operation.
 TODO: add the above to other instance operations
 
 Valid output formats in both cases are :term:`CIM object output formats` or
-:term:`Table output formats`.
+:term:`Table output formats`. The table view displays a single instance per
+row and a column for each property in the instance.
 
 The following example returns two instances as MOF:
 
 .. code-block:: text
 
-    $ pywbemcli --name mymock instance enumerate TST_FamilyCollection
+    $ pywbemcli --name mock1 instance enumerate CIM_Foo
 
-    instance of TST_FamilyCollection {
-       name = "family1";
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo1";
+       IntegerProp = 1;
     };
 
-    instance of TST_FamilyCollection {
-       name = "Family2";
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo2";
+       IntegerProp = 2;
     };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo3";
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo30";
+    };
+
+    instance of CIM_Foo {
+       InstanceID = "CIM_Foo31";
+    };
+
+    instance of CIM_Foo_sub {
+       InstanceID = "CIM_Foo_sub1";
+       IntegerProp = 4;
+    };
+
+    instance of CIM_Foo_sub {
+       InstanceID = "CIM_Foo_sub2";
+       IntegerProp = 5;
+    };
+
+    instance of CIM_Foo_sub {
+       InstanceID = "CIM_Foo_sub3";
+       IntegerProp = 6;
+    };
+
+    ... The remainder of the instances are shown
+
+The corresponding table view would be:
+
+.. code-block:: text
+
+    ppp -o table -n mock1 instance enumerate CIM_Foo
+    Instances: CIM_Foo
+    +--------------------+---------------+
+    | InstanceID         | IntegerProp   |
+    |--------------------+---------------|
+    | "CIM_Foo1"         | 1             |
+    | "CIM_Foo2"         | 2             |
+    | "CIM_Foo3"         |               |
+    | "CIM_Foo30"        |               |
+    | "CIM_Foo31"        |               |
+    | "CIM_Foo_sub1"     | 4             |
+    | "CIM_Foo_sub2"     | 5             |
+    | "CIM_Foo_sub3"     | 6             |
+    | "CIM_Foo_sub4"     | 7             |
+    | "CIM_Foo_sub_sub1" | 8             |
+    | "CIM_Foo_sub_sub2" | 9             |
+    | "CIM_Foo_sub_sub3" | 10            |
+    +--------------------+---------------+
 
 See :ref:`pywbemcli instance enumerate --help` for the exact help output of the command.
 
@@ -975,7 +1030,7 @@ or using the keys wildcard:
 
 .. code-block:: text
 
-    $ pywbemcli --name mymock instance get root/cimv2:TST_Person.?
+    $ pywbemcli --name mock1 instance get TST_Person.?
     Pick Instance name to process
     0: root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"
     1: root/cimv2:CIM_Foo.InstanceID="CIM_Foo2"
@@ -985,6 +1040,16 @@ or using the keys wildcard:
        name = "Saara";
     };
 
+or using the key option:
+
+.. code-block:: text
+
+    pywbemcli> instance get TST_Person --key=name=Gabi
+    instance of TST_Person {
+       name = "Gabi";
+       likes = { 2 };
+       gender = 1;
+    };
 
 See :ref:`pywbemcli instance get --help` for the exact help output of the command.
 

@@ -147,6 +147,12 @@ Released: not yet
 * Test: Added testcases for namespace creation and deletion. (related to
   issue #991)
 
+* Extended the table view of CIM instances to improve formatting, allow
+  hiding columns where all property values are Null (--show-null option)
+  and allow the table to be wider than the terminal width if there is
+  more information than could be shown in the terminal width.  (see issue
+  #1131)
+
 **Cleanup:**
 
 * Prepared the development environment for having more than one pywbemtools

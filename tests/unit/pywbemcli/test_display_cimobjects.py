@@ -42,7 +42,7 @@ from pywbemtools._output_formatting import DEFAULT_MAX_CELL_WIDTH
 
 from ..pytest_extensions import simplified_test_function
 
-OK = True    # mark tests OK when they execute correctly
+OK = False    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
@@ -629,10 +629,10 @@ TESTCASES_DISPLAY_INSTANCES_AS_TABLE = [
             kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
-Pbf    Pbt    Pdt                   Pint32    Pint64  Pstr1
------  -----  ------------------  --------  --------  -------------
-false  true   "20140922104920.5"        99      9999  "Test String"
-              "24789+000"
+Pbf    Pbt    Pdt                     Pint32    Pint64  Pstr1
+-----  -----  --------------------  --------  --------  -------------
+false  true   "20140922104920.524"        99      9999  "Test String"
+              "789+000"
 """,
 
         ),
@@ -645,12 +645,11 @@ false  true   "20140922104920.5"        99      9999  "Test String"
             kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
-Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
------  -----  ---------  --------  -----------  --------  ----------
-false  true   "2014092"      9999  -2147483648  "Test "   4294967295
-              "2104920"                         "String"
-              ".524789"
-              "+000"
+Pbf    Pbt    Pdt            Pint64      Psint32  Pstr1        Puint32
+-----  -----  -----------  --------  -----------  --------  ----------
+false  true   "201409221"      9999  -2147483648  "Test "   4294967295
+              "04920.524"                         "String"
+              "789+000"
 """,
         ),
         None, None, not CLICK_ISSUE_1590
@@ -663,12 +662,11 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
             kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
-Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
------  -----  ---------  --------  -----------  --------  ----------
-false  true   "2014092"      9999  -2147483648  "Test "   4294967295
-              "2104920"                         "String"
-              ".524789"
-              "+000"
+Pbf    Pbt    Pdt            Pint64      Psint32  Pstr1        Puint32
+-----  -----  -----------  --------  -----------  --------  ----------
+false  true   "201409221"      9999  -2147483648  "Test "   4294967295
+              "04920.524"                         "String"
+              "789+000"
 """,
         ),
         None, None, not CLICK_ISSUE_1590
@@ -681,10 +679,9 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
             kwargs={},
             exp_stdout="""\
 Instances: CIM_Foo
-Pbf           Pbt         Pdt                           Pint64      Psint32                   Pstr1                   Puint32
-------------  ----------  ----------------------------  ----------  ------------------------  ----------------------  ----------------------
-false, false  true, true  "20140922104920.524789+000",  9999, 9999  -2147483648, -2147483648  "Test String", "Test "  4294967295, 4294967295
-                          "20140922104920.524789+000"                                         "String"
+Pbf           Pbt         Pdt                                                       Pint64      Psint32                   Pstr1                         Puint32
+------------  ----------  --------------------------------------------------------  ----------  ------------------------  ----------------------------  ----------------------
+false, false  true, true  "20140922104920.524789+000", "20140922104920.524789+000"  9999, 9999  -2147483648, -2147483648  "Test String", "Test String"  4294967295, 4294967295
 """,   # noqa: E501
         ),
         None, None, not CLICK_ISSUE_1590
