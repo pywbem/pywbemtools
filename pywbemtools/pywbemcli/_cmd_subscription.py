@@ -199,8 +199,8 @@ def subscription_add_destination(context, identity, **options):
 
     If the --verbose general option is set, the created instance is displayed.
     """
-    context.execute_cmd(lambda: cmd_subscription_add_destination(
-        context, identity, options))
+    context.execute_cmd(
+        lambda: cmd_subscription_add_destination(context, identity, options))
 
 
 @subscription_group.command('add-filter', cls=PywbemtoolsCommand,
@@ -262,8 +262,8 @@ def subscription_add_filter(context, identity, **options):
 
     If the --verbose general option is set, the created instance is displayed.
     """
-    context.execute_cmd(lambda: cmd_subscription_add_filter(
-        context, identity, options))
+    context.execute_cmd(
+        lambda: cmd_subscription_add_filter(context, identity, options))
 
 
 @subscription_group.command('add-subscription', cls=PywbemtoolsCommand,
@@ -327,8 +327,9 @@ def subscription_add_subscription(context, destination_identity,
 
     If the --verbose general option is set, the created instance is displayed.
     """
-    context.execute_cmd(lambda: cmd_subscription_add_subscription(
-        context, destination_identity, filter_identity, options))
+    # pylint: disable=line-too-long
+    context.execute_cmd(
+        lambda: cmd_subscription_add_subscription(context, destination_identity, filter_identity, options))  # noqa: E501
 
 
 @subscription_group.command('list', cls=PywbemtoolsCommand,
@@ -372,8 +373,8 @@ def subscription_list_destinations(context, **options):
     options and can be displayed as either a table or CIM objects (ex. mof)
     format using the --output general option (ex. --output mof).
     """
-    context.execute_cmd(lambda: cmd_subscription_list_destinations(context,
-                                                                   options))
+    context.execute_cmd(
+        lambda: cmd_subscription_list_destinations(context, options))
 
 
 @subscription_group.command('list-filters', cls=PywbemtoolsCommand,
@@ -424,8 +425,8 @@ def subscription_list_subscriptions(context, **options):
     format using the --output general option (ex. --output mof).
 
     """
-    context.execute_cmd(lambda: cmd_subscription_list_subscriptions(
-        context, options))
+    context.execute_cmd(
+        lambda: cmd_subscription_list_subscriptions(context, options))
 
 
 @subscription_group.command('remove-destination', cls=PywbemtoolsCommand,
@@ -467,8 +468,8 @@ def subscription_remove_destination(context, identity, **options):
     and terminates the
     command.
     """
-    context.execute_cmd(lambda: cmd_subscription_remove_destination(
-        context, identity, options))
+    context.execute_cmd(
+        lambda: cmd_subscription_remove_destination(context, identity, options))
 
 
 @subscription_group.command('remove-filter', cls=PywbemtoolsCommand,
@@ -505,8 +506,8 @@ def subscription_remove_filter(context, identity, **options):
     used pywbemcli displays the paths of the instances and terminates the
     command.
     """
-    context.execute_cmd(lambda: cmd_subscription_remove_filter(
-        context, identity, options))
+    context.execute_cmd(
+        lambda: cmd_subscription_remove_filter(context, identity, options))
 
 
 @subscription_group.command('remove-subscription', cls=PywbemtoolsCommand,
@@ -559,8 +560,9 @@ def subscription_remove_subscription(context, destination_identity,
     unless the option --remove-associated-instances is included in the command
     and the associated instances are not used in any other association.
     """
-    context.execute_cmd(lambda: cmd_subscription_remove_subscription(
-        context, destination_identity, filter_identity, options))
+    context.execute_cmd(
+        # pylint: disable=line-too-long
+        lambda: cmd_subscription_remove_subscription(context, destination_identity, filter_identity, options))  # noqa: E501
 
 
 @subscription_group.command('remove-server', cls=PywbemtoolsCommand,
@@ -575,8 +577,8 @@ def subscription_remove_server(context, **options):
     all owned indication subscriptions, owned indication filters, and owned
     listener destinations for this server-id from the WBEM server.
     """
-    context.execute_cmd(lambda: cmd_subscription_remove_server(context,
-                                                               options))
+    context.execute_cmd(
+        lambda: cmd_subscription_remove_server(context, options))
 
 
 #####################################################################

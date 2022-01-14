@@ -77,8 +77,8 @@ def qualifier_get(context, qualifiername, **options):
     In the output, the qualifier declaration will formatted as defined by the
     --output-format general option.
     """
-    context.execute_cmd(lambda: cmd_qualifier_get(context, qualifiername,
-                                                  options))
+    context.execute_cmd(
+        lambda: cmd_qualifier_get(context, qualifiername, options))
 
 
 @qualifier_group.command('delete', cls=PywbemtoolsCommand,
@@ -103,8 +103,8 @@ def qualifier_delete(context, qualifiername, **options):
     In the output, the qualifier declaration will formatted as defined by the
     --output-format general option.
     """
-    context.execute_cmd(lambda: cmd_qualifier_delete(
-        context, qualifiername, options))
+    context.execute_cmd(
+        lambda: cmd_qualifier_delete(context, qualifiername, options))
 
 
 @qualifier_group.command('enumerate', cls=PywbemtoolsCommand,

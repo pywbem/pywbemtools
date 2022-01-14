@@ -146,8 +146,8 @@ def class_enumerate(context, classname, **options):
 
       pywbemcli -n myconn class enumerate CIM_Foo -n interop
     """
-    context.execute_cmd(lambda: cmd_class_enumerate(context, classname,
-                                                    options))
+    context.execute_cmd(
+        lambda: cmd_class_enumerate(context, classname, options))
 
 
 @class_group.command('get', cls=PywbemtoolsCommand,
@@ -271,8 +271,8 @@ def class_invokemethod(context, classname, methodname, **options):
 
       pywbemcli -n myconn class invokemethod CIM_Foo methodx -p p1=9 -p p2=Fred
     """
-    context.execute_cmd(lambda: cmd_class_invokemethod(context, classname,
-                                                       methodname, options))
+    context.execute_cmd(
+        lambda: cmd_class_invokemethod(context, classname, methodname, options))
 
 
 @class_group.command('references', cls=PywbemtoolsCommand,
@@ -318,8 +318,8 @@ def class_references(context, classname, **options):
 
       pywbemcli -n myconn class references CIM_Foo -n interop
     """
-    context.execute_cmd(lambda: cmd_class_references(context, classname,
-                                                     options))
+    context.execute_cmd(
+        lambda: cmd_class_references(context, classname, options))
 
 
 @class_group.command('associators', cls=PywbemtoolsCommand,
@@ -372,8 +372,8 @@ def class_associators(context, classname, **options):
 
       pywbemcli -n myconn class associators CIM_Foo -n interop
     """
-    context.execute_cmd(lambda: cmd_class_associators(context, classname,
-                                                      options))
+    context.execute_cmd(
+        lambda: cmd_class_associators(context, classname, options))
 
 
 @class_group.command('find', cls=PywbemtoolsCommand,
@@ -415,8 +415,9 @@ def class_find(context, classname_glob, **options):
 
       pywbemcli -n myconn class find *Foo*
     """
-    context.execute_cmd(lambda: cmd_class_find(context, classname_glob,
-                                               options))
+
+    context.execute_cmd(
+        lambda: cmd_class_find(context, classname_glob, options))
 
 
 @class_group.command('tree', cls=PywbemtoolsCommand,

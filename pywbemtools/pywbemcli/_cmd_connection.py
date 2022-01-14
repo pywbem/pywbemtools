@@ -320,8 +320,8 @@ def connection_set_default(context, name, **options):
     connection to be set as the default connection interactively from all of
     the existing connection definitions.
     """
-    context.execute_cmd(lambda: cmd_connection_set_default(context, name,
-                                                           options))
+    # pylint: disable=line-too-long
+    context.execute_cmd(lambda: cmd_connection_set_default(context, name, options))  # noqa: E501
 
 
 ################################################################
