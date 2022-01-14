@@ -225,8 +225,8 @@ def instance_enumerate(context, classname, **options):
     defined by the --output-format general option. Table formats on instances
     will be replaced with MOF format.
     """
-    context.execute_cmd(lambda: cmd_instance_enumerate(context, classname,
-                                                       options))
+    context.execute_cmd(
+        lambda: cmd_instance_enumerate(context, classname, options))
 
 
 @instance_group.command('get', cls=PywbemtoolsCommand,
@@ -260,8 +260,8 @@ def instance_get(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_get(context, instancename,
-                                                 options))
+    context.execute_cmd(
+        lambda: cmd_instance_get(context, instancename, options))
 
 
 @instance_group.command('delete', cls=PywbemtoolsCommand,
@@ -288,8 +288,8 @@ def instance_delete(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_delete(context, instancename,
-                                                    options))
+    context.execute_cmd(
+        lambda: cmd_instance_delete(context, instancename, options))
 
 
 @instance_group.command('create', cls=PywbemtoolsCommand,
@@ -321,8 +321,8 @@ def instance_create(context, classname, **options):
 
       pywbemcli instance create CIM_blah -P id=3 -P arr="bla bla",foo
     """
-    context.execute_cmd(lambda: cmd_instance_create(context, classname,
-                                                    options))
+    context.execute_cmd(
+        lambda: cmd_instance_create(context, classname, options))
 
 
 @instance_group.command('modify', cls=PywbemtoolsCommand,
@@ -368,8 +368,8 @@ def instance_modify(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_modify(context, instancename,
-                                                    options))
+    context.execute_cmd(
+        lambda: cmd_instance_modify(context, instancename, options))
 
 
 @instance_group.command('associators', cls=PywbemtoolsCommand,
@@ -429,8 +429,8 @@ def instance_associators(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_associators(context, instancename,
-                                                         options))
+    context.execute_cmd(
+        lambda: cmd_instance_associators(context, instancename, options))
 
 
 @instance_group.command('references', cls=PywbemtoolsCommand,
@@ -482,8 +482,8 @@ def instance_references(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_references(context, instancename,
-                                                        options))
+    # pylint: disable=line-too-long
+    context.execute_cmd(lambda: cmd_instance_references(context, instancename, options))  # noqa: E501
 
 
 @instance_group.command('invokemethod', cls=PywbemtoolsCommand,
@@ -533,10 +533,8 @@ def instance_invokemethod(context, instancename, methodname, **options):
         return
     validate_required_arg(instancename, 'INSTANCENAME')
     validate_required_arg(methodname, 'METHODNAME')
-    context.execute_cmd(lambda: cmd_instance_invokemethod(context,
-                                                          instancename,
-                                                          methodname,
-                                                          options))
+    # pylint: disable=line-too-long
+    context.execute_cmd(lambda: cmd_instance_invokemethod(context, instancename, methodname, options))  # noqa: E501
 
 
 @instance_group.command('query', cls=PywbemtoolsCommand,
@@ -681,8 +679,8 @@ def instance_shrub(context, instancename, **options):
         show_help_instancename()
         return
     validate_required_arg(instancename, 'INSTANCENAME')
-    context.execute_cmd(lambda: cmd_instance_shrub(context, instancename,
-                                                   options))
+    # pylint: disable=line-too-long
+    context.execute_cmd(lambda: cmd_instance_shrub(context, instancename, options))  # noqa: E501
 
 
 ####################################################################
