@@ -5,12 +5,12 @@ Change log
 ==========
 
 
-pywbemtools 1.0.0.dev1
-----------------------
+pywbemtools 1.0.0
+-----------------
 
-This version contains all fixes up to version 0.9.x.
+This version contains all fixes up to version 0.9.1.
 
-Released: not yet
+Released: 2022-02-01
 
 **Incompatible changes:**
 
@@ -25,8 +25,6 @@ Released: not yet
   It had been marked deprecated in pywbemtools version 0.9.0 and was superseded
   by the ``--include-instances`` option which performs exactly the same function.
   (see issue # 1142)
-
-**Deprecations:**
 
 **Bug fixes:**
 
@@ -197,12 +195,6 @@ Released: not yet
   It had been created in pywbemtools version 0.8.0 and was deprecated in
   version 0.90 in favor of the ``--include-instances`` option which performs
   exactly the same function. (see issue # 1142)
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 0.9.0
