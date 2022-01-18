@@ -456,8 +456,9 @@ def get_listeners(name=None):
     for p in psutil.process_iter():
         try:
             cmdline = p.cmdline()
-        except (psutil.AccessDenied, psutil.ZombieProcess):
-            # Ignore processes we cannot access
+        except (psutil.AccessDenied, psutil.ZombieProcess,
+                psutil.NoSuchProcess):
+            # Ignore processes we cannot access or that ended meanwhile
             continue
         for i, item in enumerate(cmdline):
             if item.endswith(cmdname):
