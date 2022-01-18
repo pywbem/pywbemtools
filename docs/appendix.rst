@@ -156,12 +156,19 @@ This documentation uses a few special terms to refer to Python types:
       by a set of general options.
 
    Unix-style path name pattern
-      A pattern used in Unix environments for path names (file names and
-      directory names). It is used by pywbemcli for example to expand class
-      names in the ``class find`` command.
+   GLOB pattern
+      A pattern used in Unix environments for wild card search for path names
+      (file names and directory names). It is used by pywbemcli for example to
+      expand class names in the ``class find`` command.
       No tilde expansion is done, but ``*``, ``?``, and character ranges
-      expressed with ``[]`` are supported.
-      Example: ``CIM_*Device*``.
+      expressed with ``[]`` are supported. The escape characters patterns are:
+
+      *  ``*`` matches any number of any character including none.
+      *  ``?`` matches any single character.
+      *  ``[abc]`` matches one character in the bracket.
+      *  ``[a-z]`` matches the character range in the bracket.
+
+      Example: ``CIM_*Device*`` or ``CIM*``.
 
    source end role
       The reference in an association class that is on the source side when
@@ -315,6 +322,7 @@ This documentation uses a few special terms to refer to Python types:
       of owned indication destinations, filters and subscriptions.
       The subscription manager ID is a fixed string (``defaultpywbemcliSubMgr``)
       in pywbemcli
+
 
 .. _`Profile advertisement methodologies`:
 
