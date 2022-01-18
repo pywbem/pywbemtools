@@ -45,7 +45,8 @@ The individual commands (no command group) are:
 * :ref:`repl command` - Enter interactive mode (default).
 
 
-.. index:: pair: command groups; namespace commands
+.. index::
+    pair: command groups; namespace commands
 
 .. _`Namespace command group`:
 
@@ -64,6 +65,8 @@ See :ref:`pywbemcli namespace --help`.
 
 .. index::
     pair: namespace commands; namespace list
+    pair: list command; namespace command group
+    pair: list; namespace
 
 .. _`Namespace list command`:
 
@@ -101,6 +104,8 @@ See :ref:`pywbemcli namespace list --help` for the exact help output of the comm
 
 .. index::
     pair: namespace commands; namespace create
+    pair: create command; namespace command group
+    pair: create; namespace
 
 .. _`Namespace create command`:
 
@@ -110,7 +115,10 @@ See :ref:`pywbemcli namespace list --help` for the exact help output of the comm
 The ``namespace create`` command creates a :term:`CIM namespace` on the WBEM
 server of the :term:`current connection`.
 
-Leading and trailing slash (``/``) characters specified in the NAMESPACE
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] namespace create ``NAMESPACE`` [COMMAND-OPTIONS]
+
+Leading and trailing slash (``/``) characters specified in the ``NAMESPACE``
 argument will be stripped.
 
 The namespace must not yet exist on the server.
@@ -133,6 +141,8 @@ See :ref:`pywbemcli namespace create --help` for the exact help output of the co
 
 .. index::
     pair: namespace commands; namespace delete
+    pair: delete command; namespace command group
+    pair: delete; namespace
 
 .. _`Namespace delete command`:
 
@@ -142,7 +152,10 @@ See :ref:`pywbemcli namespace create --help` for the exact help output of the co
 The ``namespace delete`` command deletes a CIM namespace from the WBEM server of
 the :term:`current connection`.
 
-Leading and trailing slash (``/``) characters specified in the NAMESPACE
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] namespace delete ``NAMESPACE`` [COMMAND-OPTIONS]
+
+Leading and trailing slash (``/``) characters specified in the ``NAMESPACE``
 argument will be stripped.
 
 The namespace must exist and must be empty. That is, it must not contain
@@ -166,16 +179,20 @@ See :ref:`pywbemcli namespace delete --help` for the exact help output of the co
 
 .. index::
     pair: namespace commands; namespace interop
+    pair: interop command; namespace command group
+    pair: interop; namespace
 
 .. _`Namespace interop command`:
 
 ``namespace interop`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``namespace interop`` command gets and displays the :term:`Interop namespace` of
-the WBEM server of the :term:`current connection`.
+The ``namespace interop`` command gets and displays the :term:`Interop
+namespace` of the WBEM server that is the pywbemcli :term:`current connection`.
 
-The Interop namespace must exist on the server.
+The :term:`Interop namespace` namespace must exist on the WBEM server.  Some
+functionality such as determining namespaces and registered profiles assumes an
+interop namespace to function correctly.
 
 Example:
 
@@ -209,7 +226,8 @@ See :ref:`pywbemcli class --help`.
 
 .. index::
     pair: class commands; class associators
-    single: associators; class
+    pair: associators command; class command group
+    pair: associators; class
 
 .. _`Class associators command`:
 
@@ -218,6 +236,11 @@ See :ref:`pywbemcli class --help`.
 
 The ``class associators`` command lists the CIM classes that are associated
 with the specified source class.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class associators ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class associators
 
 The source class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
@@ -228,8 +251,54 @@ displayed, using :term:`CIM object output formats` or
 :term:`Table output formats`. Otherwise, the class definition is displayed,
 using :term:`CIM object output formats`.
 
-Note: This command returns class associations. The :ref:`Instance associators
+**Note:** This command returns class associations. The :ref:`Instance associators
 command` returns instance associations.
+
+The command options are:
+
+*  ``--assoc-class``/``--ac`` ``CLASSNAME`` - This option passes the ``CLASSNAME`` to
+   the server to filter the result set by the association class name and its
+   subclasses.
+
+*  ``--result-class`/``--rc``` ``CLASSNAME`` -  This option passes the CLASSNAME to
+   the server to filter the result set by result class name.  Subclasses of the
+   specified class also match.
+
+*  ``--role``/``--r`` ``PROPERTYNAME`` -  This option defines a reference
+   property property name in the association class. The responses are filtered to match this role and
+   property name.
+
+*  ``--result-role``/``--rr`` ``PROPERTYNAME`` - This option defines a reference
+   property name in the association class. The responses are filtered to match
+   this role and property name.
+
+*  ``--no-qualifiers`/``--nq```   This option passes the flag to the
+   server to not include qualifiers in the returned class(es). The default
+   is to include qualifiers in the classes definitions returned.
+
+*  ``--include-classorigin``/``--ico`` - This option passes the includeclassorigin
+   flag to the server so the returned class(es) will include the class origin attribute.
+   The default is to not include class origin information.
+
+*  ``--propertylist``/``--pl`` ``PROPERTYLIST`` - This option passes the ``PROPERTYLIST`` to
+   the server so that only properties in the list are included in the returned
+   object(s). Multiple properties may be specified with either a
+   comma-separated list of property names or by using the option multiple
+   times. Properties specified in this option that are not in the object(s)
+   will be ignored. AN empty string will include no properties. If this option
+   is not set, the server is expected to return all properties.
+
+*  ``--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the class definitions.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+* ``-s``/``--summary`` - Displays a summary count of the objects that are returned
+  by the request rather than a table or CIM object representation of each
+  object.
 
 Example:
 
@@ -240,8 +309,10 @@ Example:
 
 See :ref:`pywbemcli class associators --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class delete
-.. index:: pair: delete classes; class commands
+.. index::
+    pair: class commands; class delete
+    pair: delete command; class command group
+    pair: delete; class
 
 .. _`Class delete command`:
 
@@ -250,7 +321,12 @@ See :ref:`pywbemcli class associators --help` for the exact help output of the c
 
 The ``class delete`` command deletes the specified class on the server.
 
-The class is named with the ``CLASSNAME`` argument and is in the
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class delete ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class delete
+
+The class to be deleted is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
@@ -260,12 +336,26 @@ If the class has instances, the command is rejected, unless the
 ``--include-instances`` command option was specified, in which case the
 instances are also deleted.
 
-WARNING: Deleting classes can cause damage to the server: It can impact
+**WARNING:** Deleting classes can cause damage to the server: It can impact
 instance providers and other components in the server. Use this command with
 caution.
 
 Many WBEM servers may not allow this operation or may severely limit
 the conditions under which a class can be deleted from the server.
+
+The command options are:
+
+*  ``--include-instances`` - Delete any instances of the class as well.
+   **WARNING:**  Deletion of instances will cause the removal of corresponding
+   resources in the managed environment (i.e. in the real world).Default:
+   Reject command if the class has any instances.
+
+*  ``--dry-run`` - Do not actually delete the objects, but display what
+   would be done.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
 
 Example:
 
@@ -275,7 +365,10 @@ Example:
 
 See :ref:`pywbemcli class delete --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class enumerate
+.. index::
+    pair: class commands; class enumerate
+    pair: enumerate command; class command group
+    pair: enumerate; class
 
 .. _`Class enumerate command`:
 
@@ -284,6 +377,9 @@ See :ref:`pywbemcli class delete --help` for the exact help output of the comman
 
 The ``class enumerate`` command enumerates the subclasses of the specified
 class, or the root classes of the class hierarchy.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class enumerate ``CLASSNAME`` [COMMAND-OPTIONS]
 
 .. index:: pair: CLASSNAME argument; class enumerate
 
@@ -306,6 +402,55 @@ If the ``--deep-inheritance``/``--di`` command option is set, all direct and
 indirect subclasses are included in the result. Otherwise, only one level of
 the class hierarchy is in the result.
 
+.. index:: pair: result filters; class enumerate command
+
+The ``class enumerate`` command includes result filter options that filter
+returned classes to display only those classes that have the defined filter
+option. See ref:`Filter responses for specific types of classes` for
+the documentation on these options.
+
+Thus, for example:
+
+* ``pywbemcli class enumerate --association`` displays only classes
+    that are associations
+* the combination of ``--subclass-of CIM_blah`` and
+  ``--leaf-classes`` will return all leaf classes that are a subclass of ``CIM_Blah``.
+* ``--association`` and ``no-experimental`` will display only classes that have
+  the Association qualifier set and the Experimental qualifier not set.
+
+The command options are:
+
+*  ``--deep-inheritance``/``--di``  - Include the complete subclass hierarchy of the
+   requested classes in the result set. The default is for the server to
+   return only the first level subclasses of ``CLASSNAME``.
+
+*  ``--local-only``/``--lo`` - Do not include superclass properties and
+   methods in the returned class(es). The default is to include properties and
+   methods from all superclasses of ``CLASSNAME``.
+
+*  ``--no-qualifiers``/``--nq``   This option passes a flag to the
+   server to not include qualifiers in the returned class(es). The default
+   is to include qualifiers in the classes definitions returned.
+
+*  ``--include-classorigin``/``--ico`` - This option passes the include-classorigin
+   flag to the server so the returned class(es) will include the class origin attribute.
+   The default is to not include class origin information.
+
+*  ``--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the class definitions.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+*  ``-s``/``--summary`` - Show only a summary (count) of the objects.
+
+*  The response filter options which further filter the classes to be displayed by
+   characteristics such as whether the class is an association or is
+   experimental, etc. These options are defined in
+   :ref:`Filtering responses for specific types of classes`.
+
 The following example enumerates the class names of the root classes in the
 default namespace because there is no classname and the ``--DeepInheritance``
 option is not specified:
@@ -317,56 +462,6 @@ option is not specified:
     TST_Lineage
     TST_MemberOfFamilyCollection
     TST_FamilyCollection
-
-.. index:: pair: result filters; class enumerate command
-
-The ``class enumerate`` command includes result filter options that filter returned
-classes to display only those classes that have the defined filter option.
-Thus, ``pywbemcli class enumerate --association`` displays only classes that
-have the Association qualifier set. The filters are documented in the `class
-filter options table`_ .
-
-.. index:: single: result filters; class enumerate command
-
-.. _class filter options table:
-
-.. table: Class/qualifier filter options
-
-==========================================  =======================================
-Filter option name                          Component filtered
-==========================================  =======================================
-``--association``/``--no-association``      Association qualifier(class) (see Note 1)
-``--indication``/``--no-indication``        Indications qualifier(class)
-``--experimental``/``--no-experimental``    Experimental qualifier(class)
-``--deprecated``/``--no-deprecated``        Deprecated qualifier (any class element)
-``--since <CIM_Version_string>``            Version qualifier GE <CIM_Version_string> (see Note 2)
-``--schema <schema_string>``                Schema component of classname equality(see Note 3)
-``--subclasses <classname>``                Subclasses of <classname>.
-``--leaf-classes``                          Classes with no subclass.
-==========================================  =======================================
-
-1. The filters defined as ``--...``/``--no-...`` allow testing for the existence
-   of the condition (association qualifier exists) or the non-existence(association
-   qualifier does not exist on the class). When neither definition of the
-   option is defined the association qualifier is ignored in the filtering.
-   This applies to boolean qualifier declarations.
-2. The CIM version string value in the Version qualifier is defined as 3 integers
-   separated by periods  (ex. 2.14.0). All 3 integers must exist.
-3. The schema component is True if the schema component of classname (characters
-   before "_" match <schema_string>). Ex --schema "CIM"
-4. The ``--leaf-classes`` filter can be important because the pywbem MOF compiler
-   can compile all dependent classes given only the leaf classes.
-
-If multiple filter options are applied, all of the boolean options must be true for
-the class to be displayed and only the classes that pass non-boolean filters
-(ex. ``--schema CIM``) for the classes to be displayed.
-
-Thus, for example:
-
-* the combination of ``--subclass-of CIM_blah`` and
-  ``--leaf-classes`` will return all leaf classes that are a subclass of ``CIM_Blah``.
-* ``--association`` and ``no-experimental`` will display only classes that have
-  the Association qualifier set and the Experimental qualifier not set.
 
 The following example displays classnames that are not associations
 (``--no-association``).  The use of ``--deep-inheritance`` option returns the complete
@@ -381,8 +476,10 @@ the root classes).
 
 See :ref:`pywbemcli class enumerate --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class find
-.. index:: pair: find command; class group
+.. index::
+    pair: class commands; class find
+    pair: find command; class group
+    pair: find; class
 
 .. _`Class find command`:
 
@@ -395,16 +492,34 @@ argument in all namespaces of the connection, or otherwise in the specified
 namespaces if the ``-namespace``/``-n`` command option is specified one or more
 times.
 
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class find ``CLASSNAME-GLOB`` [COMMAND-OPTIONS]
+
 .. index:: pair: result filters; class find command
 
 The ``class find`` command includes filter options that filter returned classes
 to display only those classes that have the defined filter options.  Thus,
 ``pywbemcli class enumerate --association`` displays only classes that have the
-Association qualifier set. The filters are documented in the `class filter
-options table`_ .
+Association qualifier set. The filters are documented in
+section :ref:`Filtering responses for specific types of classes`.
 
 The command displays the namespaces and class names of the result using the
 ``txt`` output format (default), or using :term:`Table output formats`.
+
+The command options are:
+
+*  ``--namespace`` ``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
+   This option may be specified multiple times or the namespace list may
+   be specified by comma-separated entries. If no namespace option is included,
+   all namespaces in the current connection are included.
+
+*  ``--sort``/``-s`` - Sort the results by namespace. The default is to sort by
+   classname
+
+*  The response filter options which further filter the classes to be displayed by
+   characteristics such as whether the class is an association or is
+   experimental, etc. These options are defined in
+   :ref:`Filtering responses for specific types of classes`.
 
 .. code-block:: text
 
@@ -451,7 +566,10 @@ The command displays the namespaces and class names of the result using the
 
 See :ref:`pywbemcli class find --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class get
+.. index::
+    pair: class commands; class get
+    pair: get command; class command group
+    pair: get; class
 
 .. _`Class get command`:
 
@@ -460,9 +578,38 @@ See :ref:`pywbemcli class find --help` for the exact help output of the command.
 
 The ``class get`` command gets the specified class.
 
-The class is named with the ``CLASSNAME`` argument and is in the
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class get ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class get
+
+The class to be retrieved is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
+
+The command options are:
+
+* ``--local-only``/``--lo`` - Do not include superclass properties and
+  methods in the returned class(es). Default: Include superclass properties and
+  methods.
+
+* ``--no-qualifiers``/``--nq`` - Do not include qualifiers in the returned
+  class(es). Default: Include qualifiers.
+
+* ``--include-classorigin``/``--ico`` - Include class origin information in the
+  returned class(es). Default: Do not include class origin information.
+
+*  ``--propertylist``/``--pl`` ``PROPERTYLIST`` - This option passes the ``PROPERTYLIST`` to
+   the server so that only properties in the list are included in the returned
+   object(s). Multiple properties may be specified with either a
+   comma-separated list of property names or by using the option multiple
+   times. Properties specified in this option that are not in the object(s)
+   will be ignored. AN empty string will include no properties. If this option
+   is not set, the server is expected to return all properties.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
 
 The class definition is displayed using :term:`CIM object output formats`.
 This command does not support :term:`Table output formats`.
@@ -509,7 +656,10 @@ The following example shows getting the MOF representation of the class
 
 See :ref:`pywbemcli class get --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class invokemethod
+.. index::
+    pair: class commands; class invokemethod
+    pair: invokemethod command; class command group
+    pair: invokemethod; class
 
 .. _`Class invokemethod command`:
 
@@ -519,6 +669,11 @@ See :ref:`pywbemcli class get --help` for the exact help output of the command.
 The ``class invokemethod`` command invokes a CIM method on the specified class
 and displays the return value and any output parameters.
 
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class invokemethod ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class associators
+
 The class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
@@ -526,6 +681,16 @@ in the default namespace of the connection.
 Input parameters for the method can be specified with the ``--parameter``/``-p``
 command option, which can be specified multiple times.
 For details, see :ref:`Specifying CIM property and parameter values`.
+
+The command options are:
+
+* ``--parameter``\``-p`` ``PARAMETERNAME=VALUE`` Specify a method input
+  parameter with its value. May be used several time to define multiple input
+  values.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
 
 The return value and output parameters are displayed using
 :term:`CIM object output formats`.
@@ -545,7 +710,10 @@ Example:
 
 See :ref:`pywbemcli class invokemethod --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class references
+.. index::
+    pair: class commands; class references
+    pair: references command; class command group
+    pair: references; class
 
 .. _`Class references command`:
 
@@ -554,6 +722,11 @@ See :ref:`pywbemcli class invokemethod --help` for the exact help output of the 
 
 The ``class references`` command lists the CIM classes that reference
 the specified source class.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class references ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class associators
 
 The source class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
@@ -564,8 +737,39 @@ displayed, using :term:`CIM object output formats` or
 :term:`Table output formats`. Otherwise, the class definition is displayed,
 using :term:`CIM object output formats`.
 
-Note: This command returns the class references, not the instance references.
+**Note:** This command returns the class references, not the instance references.
 The :ref:`Instance references command` returns the instance references.
+
+The command options are:
+
+*  ``--assoc-class``/``--ac`` ``CLASSNAME`` This option passes the CLASSNAME to the server
+   to filter the result set by association class name and subclasses.
+
+*  ``--role``/``-r`` ``PROPERTYNAME``  This option passes the CLASSNAME to the
+   server to filter the result set by the association class source end role name.
+
+*  ``--no-qualifiers``/``--nq``   This option passes the flag to the
+   server to not include qualifiers in the returned class(es). The default
+   is to include qualifiers in the classes definitions returned.
+
+*  ``--include-classorigin``/``--ico`` This option passes the include-classorigin
+   flag to the server so the returned class(es) will include the class origin attribute.
+   The default is to not include class origin information.
+
+**  ``--propertylist``/``--pl`` ``PROPERTYLIST`` - command option allows restricting the set of
+    properties to be retrieved and displayed on each object returned. Multiple properties
+    may be specified with either a comma-separated list or by using the option
+    multiple times. Properties specified in this option that are not in the
+    object(s) will be ignored. The empty string will include no properties.
+    Default: Do not filter properties.
+
+*  ``--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the class definitions.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
 
 .. code-block:: text
 
@@ -575,7 +779,10 @@ The :ref:`Instance references command` returns the instance references.
 
 See :ref:`pywbemcli class references --help` for the exact help output of the command.
 
-.. index:: pair: class commands; class tree
+.. index::
+    pair: class commands; class tree
+    pair: tree command; class command group
+    pair: tree; class
 
 .. _`Class tree command`:
 
@@ -585,7 +792,12 @@ See :ref:`pywbemcli class references --help` for the exact help output of the co
 The ``class tree`` command displays the subclass or superclass hierarchy of the
 specified class.
 
-The class is named with the ``CLASSNAME`` argument and is in the
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] class tree ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; class associators
+
+The class is named with the optional ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
 in the default namespace of the connection.
 
@@ -600,6 +812,18 @@ The class hierarchy (or ancestry) is always formatted in the
 :term:`Tree output format`; the ``--output-format``/``-o`` general option is
 ignored.
 
+The command options are:
+
+*  ``--superclasses``/``-s`` - Show the superclass hierarchy starting with
+   ``CLASSNAME``. Normally the subclass hierarchy is displayed.
+
+*  ``--detail`/``-d``` - Show details about the class including the Version,
+   Association, Indication, and Abstact qualifiers.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
 Example:
 
 .. code-block:: text
@@ -610,12 +834,6 @@ Example:
      |   +-- CIM_Foo_sub_sub
      +-- CIM_Foo_sub2
 
-
-Options to the `class tree` command allow the following:
-
-1. Display the superclass hierarchy for a given class (``--superclasses``/``-s``)
-   as shown in the following example:
-
 Example:
 
 .. code-block:: text
@@ -625,10 +843,8 @@ Example:
      +-- CIM_Foo
          +-- CIM_Foo_sub2
 
-2. Display additional information about each class (``--detail``/``-d``) including
-   the value of the Version qualifier and the existence of the class the
-   Association, Indication, Abstract qualifiers if they are True as shown in
-   the following example:
+The following example displays additional information using the ``--detail``
+option.
 
 Example:
 
@@ -648,7 +864,8 @@ Example:
 
 See :ref:`pywbemcli class tree --help` for the exact help output of the command.
 
-.. index:: pair: command groups; instance commands
+.. index::
+    pair: command groups; instance commands
 
 .. _`Instance command group`:
 
@@ -673,7 +890,8 @@ See :ref:`pywbemcli instance --help`.
 
 .. index::
     pair: instance commands; instance associators
-    single: associators; instance
+    pair: associators command; instance command group
+    pair: associators; instance
 
 .. _`Instance associators command`:
 
@@ -682,6 +900,11 @@ See :ref:`pywbemcli instance --help`.
 
 The ``instance associators`` command lists the CIM instances that are associated
 with the specified source instance.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance associators ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance associators
 
 The specification of the instance name (INSTANCENAME argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
@@ -692,8 +915,64 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
-Note: This command returns the instance associators, not the class associators.
+**Note:** This command returns the instance associators, not the class associators.
 The :ref:`Class associators command` returns the class associators.
+
+The command options are:
+
+*  ``--assoc-class``/``--ac`` ``CLASSNAME`` - This option passes ``CLASSNAME`` to
+   the server to filter the result set by association class name and subclasses.
+
+*  ``--result-class``/``--rc`` ``CLASSNAME`` - This option passes ``CLASSNAME`` to
+   the server to filter the result set by result class name.  Subclasses of the
+   specified class also match.
+
+*  ``--role``/``-r`` ``PROPERTYNAME`` - This option passes ``CLASSNAME`` to the
+   server to filter the result set by the association class source end role name.
+
+*  ``--result-role``/``--rr`` ``PROPERTYNAME`` - This option passes ``PROPERTYNAME`` to the
+   server to filter the result set by far end role name.
+
+*  ``--no-qualifiers``/``--nq`` - This option passes the flag to the
+   server to not include qualifiers in the returned class(es). The default
+   is to include qualifiers in the classes definitions returned.
+
+*  ``--include-classorigin``/``--ico`` - This option passes the includeclassorigin
+   flag to the server so the returned class(es) will include the class origin attribute.
+   The default is to not include class origin information.
+
+**  ``--propertylist``/``--pl`` ``PROPERTYLIST`` command option allows restricting the set of
+    properties to be retrieved and displayed on each object returned. Multiple properties
+    may be specified with either a comma-separated list or by using the option
+    multiple times. Properties specified in this option that are not in the
+    object(s) will be ignored. The empty string will include no properties.
+    If this option is not set, the server is expected to return all properties.
+
+*  ``--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the class definitions.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+*  ``-s``/``--summary`` - Show only a summary (count) of the objects.
+
+*  ``--fq``/``--filter-query`` ``QUERY-STRING`` - When pull operations are used, filter
+   the instances in the result via a filter query. By default, and when
+   traditional operations are used, no such filtering takes place.
+
+*  ``--fql``/``--filter-query-language QUERY-LANGUAGE`` = The filter query
+   language to be used with ``--filter-query``. Default: DMTF:FQL.
+
+*  ``--show-null`` -In the TABLE output formats, show propertieswith no value
+   (i.e. Null) in all of the instances to be displayed. Otherwise only
+   properties at least one instance has a non- Null property are displayed
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
 
 Example:
 
@@ -717,19 +996,34 @@ Example:
 
 See :ref:`pywbemcli instance associators --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance count
+.. index::
+    pair: instance commands; instance count
+    pair: count command; instance command group
+    pair: count; instance
 
 .. _`Instance count command`:
 
 ``instance count`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance count`` command counts the CIM instances of some or all classes
-in the namespaces specified with the ``-namespace``/``-n`` command option, or
-all namespaces in the server.
+Count the instances of one or more classes defined by a :term:`GLOB pattern`
+with matching class name
+
+The ``instance count`` command counts the CIM instances classes that match a
+:term:`GLOB pattern` in the namespaces specified with the ``-namespace``/``-n``
+command option, or all namespaces in the server.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance count ``CLASSNAME-GLOB`` [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME-GLOB argument; instance count
+
+This command first finds all of the CIM classes that match the CLASSNAME-GLOB and
+``-namespace``/``-n`` command option  and then gets the instance names of all
+instances of these classes.
 
 This command displays the count of instances of each CIM class whose class name
-matches the specified wildcard expression (CLASSNAME-GLOB) in all CIM
+matches the specified wildcard expression (``CLASSNAME-GLOB``) in all CIM
 namespaces of the WBEM server, or in the specified namespaces (``--namespace``
 option).  This differs from instance enumerate, etc. in that it counts the
 instances specifically for the classname of each instance returned (the
@@ -746,8 +1040,35 @@ The ``--association``/``--no-association``,
 ``--indication``/``--no-indication``, ,``--experimental``/``--no-experimental``
 and ``--deprecated``/``--no-deprecated`` options filter the returned classes or
 classnames to include or exclude classes with the corresponding qualifiers.
-Thus the ``--association`` option returns only classes or classnames that are
+Thus the ``--association`` option returns only  instances of classes that are
 association classes.
+
+The command options are:
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
+   May be specified multiple times. If this option is not specified the
+   search defaults to using all namespaces in the server.  Note that this
+   option differs from the option of the same name in commands like
+   ``instance enumerate`` in that it allows multiple namespaces and defaults
+   to defining a list of all namespaces rather than defaulting to the
+   connection default namespace.
+
+*  ``--sort``/``-s`` - Sort by instance count. Otherwise the display is sorted by
+   class name.
+
+*  ``--ignore-class`` ``CLASSNAME`` - Class names of classes to be ignored (not
+   inspected or counted). This option allows counting instances in servers where
+   instance retrieval may cause a CIMError or Error exception during the
+   enumeration of some classes. CIM errors on particular classes are ignored.
+   Error exceptions cause scan to stop and remaining classes status shown as 'not
+   scanned'. Multiple class names are allowed (one per option or comma-separated).
+
+*  The response filter options which further filter the classes to be displayed by
+   characteristics such as whether the class is an association or is
+   experimental, etc. These options are defined in
+   :ref:`Filtering responses for specific types of classes`.
+
+Valid output formats are :term:`Table output formats`.
 
 Thus, for example:
 
@@ -779,8 +1100,6 @@ will ignore some classes is as follows:
     # The command form may also be used
         $ pywbemcli -n mymock instance count CIM_* -n root/interop --ignore-class classname1 --ignore-class classname2
 
-
-
 Results for classes that have no instances are not displayed.
 
 The processing handles both CIMError exceptions (which are considered errors applicable
@@ -791,9 +1110,8 @@ in place of the count of instances returned when a particular class causes
 an exception.
 
 This command can take a long time to execute since it potentially enumerates
-all instance names for all classes in all namespaces.
+all instance names for all classes in all namespaces of the WBEM server.
 
-Valid output formats are :term:`Table output formats`.
 
 Example:
 
@@ -811,16 +1129,18 @@ Example:
     | root/cimv2  | TST_Personsub                |       4 |
     +-------------+------------------------------+---------+
 
-
 Count is useful to determine which classes in the environment are actually
-implemented. However this command can take a long time to execute because
-it must a) enumerate all classes in the namespace, b) enumerate the
-instances for each class that is defined by the classname glob and the
-namespace list..
+implemented and define instances. However this command can take a long time to
+execute because it must a) enumerate all classes in the namespace, b) enumerate
+the instances for each class that is defined by the classname :term:`GLOB pattern` and the
+namespace list.
 
 See :ref:`pywbemcli instance count --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance create
+.. index::
+    pair: instance commands; instance create
+    pair: create command; instance command group
+    pair: create; instance
 
 .. _`Instance create command`:
 
@@ -830,6 +1150,11 @@ See :ref:`pywbemcli instance count --help` for the exact help output of the comm
 The ``instance create`` command creates a CIM instance in the namespace
 specified with the ``-namespace``/``-n`` command option, or otherwise in the
 default namespace of the connection.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance create CLASSNAME [COMMAND-OPTIONS]
+
+.. index:: pair: CLASSNAME argument; instance create
 
 The new CIM instance has the creation class specified in the ``CLASSNAME``
 argument and initial property values as specified by zero or more
@@ -843,6 +1168,23 @@ Since the WBEM server (and pywbem) requires that each property be typed,
 pywbemcli retrieves the creation class from the WBEM server to determine
 the data types for the properties.
 
+The command options are:
+
+*  ``--property``/``-p`` ``PROPERTYNAME=VALUE`` - This option defines the initial
+   property value for the new instance and sets that property into the
+   instance. The option may be specified multiple times. Array property values
+   are specified as a comma- separated list; embedded instances are not
+   supported. The default if there are no ``--property`` options is a new
+   instance with no properties.
+
+*  ``--verify``/``-V`` - Prompt the user for confirmation before performing a
+    change, to allow for verification of parameters. Default: Do not prompt for
+    confirmation.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the
+   :term:``current connection``.
+
 The following examples create an instance of the class TST_Blah with two
 scalar and one array property:
 
@@ -854,7 +1196,10 @@ scalar and one array property:
 
 See :ref:`pywbemcli instance create --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance delete
+.. index::
+    pair: instance commands; instance delete
+    pair: delete command; instance command group
+    pair: delete; instance
 
 .. _`Instance delete command`:
 
@@ -863,8 +1208,28 @@ See :ref:`pywbemcli instance create --help` for the exact help output of the com
 
 The ``instance delete`` command deletes a CIM instance.
 
-The specification of the instance name (INSTANCENAME argument) is documented
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance delete ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance delete
+
+The specification of the instance name (``INSTANCENAME`` argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
+
+The command options are:
+
+*  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
+   CIM instance name. May be specified multiple times. This option
+   allows defining keys on the command line without the issues of quotes.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the
+   :term:``current connection``.
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
 
 The following example deletes an instance by specifying its instance name.
 Note the extra backslash (see :term:`backslash-escaped`) that is required to
@@ -876,7 +1241,10 @@ escape the double quote on the terminal:
 
 See :ref:`pywbemcli instance delete --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance enumerate
+.. index::
+    pair: instance commands; instance enumerate
+    pair: enumerate command; instance command group
+    pair: enumerate; instance
 
 .. _`Instance enumerate command`:
 
@@ -885,6 +1253,11 @@ See :ref:`pywbemcli instance delete --help` for the exact help output of the com
 
 The ``instance enumerate`` command lists the CIM instances of the specified
 class (including subclasses) in a namespace.
+
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance enumerate ``CLASSNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: classname argument; instance enumerate
 
 The class is named with the ``CLASSNAME`` argument and is in the
 namespace specified with the ``-namespace``/``-n`` command option, or otherwise
@@ -896,35 +1269,58 @@ pull operations depending on the :ref:`--use-pull general option`.
 
 If the ``--names-only``/``--no`` command option is set, only the instance paths
 are displayed. Otherwise, the instances are displayed. Depending on other options,
-the either EnumerateInstances or EnumerateInstanceNames may be executed when
+either EnumerateInstances or EnumerateInstanceNames may be executed when
 pywbem is called.
 
-The ``--propertylist``/``--pl`` command option allows restricting the set of
-properties to be retrieved and displayed on the instances.
+The command options are:
 
-The ``--namespace`` / ``n`` command option allows using a namespace other than
-the :term:`default namespace` as the target of the enumeration.
+*  ``--local-only`` / ``--lo`` - option that allows showing only local properties
+   in the instance rather than including the properties from superclasses. The
+   default is to show properties from superclasses.
 
-Additional options allow filtering information returned  including:
+*  ``--deep-inheritance``/``--di`` -  option that allows showing all properties or
+   only properties defined in the class defined in the ``CLASSNAME`` argument
 
-The ``--local-only`` / ``--lo`` option that  when allows showing only local properties
-in the instance.
+*  ``--include-qualifiers``/``--iq`` - This option passes the flag to the
+   server to include qualifiers in the returned instanc(es). The default
+   is to not include qualifiers in the classes definitions returned. Since the
+   use of qualifiers on instances has been deprecated,
 
-The ``--deep-inheritance`` / ``--di`` option that allows showing all properties or
-only properties defined in the class defined in the ``CLASSNAME`` argument
+*  ``--include-classorigin``/``--ico`` - This option passes the includeclassorigin
+   flag to the server so the returned class(es) will include the class origin attribute.
+   The default is to not include class origin information.
 
-The ``--include-qualifiers`` / ``iq`` option that filters out qualifiers defined in
-the instances
+*  ``--propertylist``/``--pl`` ``PROPERTYLIST`` - This option passes the ``PROPERTYLIST`` to
+   the server so that only properties in the list are included in the returned
+   object(s). Multiple properties may be specified with either a
+   comma-separated list of property names or by using the option multiple
+   times. Properties specified in this option that are not in the object(s)
+   will be ignored. An empty string will include no properties. If this option
+   is not set, the server is expected to return all properties.
 
-The ``--include-classorigin`` / ``--ico``  that allows showing the classorigin
-attribute in the instances.
+*  ```--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the class definitions.
 
-The ``filter-query`` / ``--fq`` and ``--filter-query-language`` /
-``fql``command options allow  filtering the resulting instances if a pull
-operation is executed with a :term:`filter query language``. They are ignored
-if pywbemcli executes the traditional Enumerate operation.
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the
+   :term:``current connection``.
 
-TODO: add the above to other instance operations
+*  ``--summary``/``-s`` - Show only a summary (count) of the objects.
+
+*  ``filter-query``/ `--fq`` ``QUERY-STRING`` - When pull operations are used, filter
+   the instances in the result via a filter query defined by ``QUERY-STRING``.
+   By default, and when traditional operations (non-pull) are used, no such
+   filtering takes place and the option is ignored.
+
+*  ``--filter-query-language``/``fql`` ``QUERY-LANGUAGE`` = The filter query
+   language to be used with ``--filter-query``. This parameter is restricted
+   to when pull operations are used. Default: DMTF:FQL. This parameter is
+   ignored if traditional operations are executed.
+
+*  ``--show-null`` - In the TABLE output formats, show propertieswith no value
+   (i.e. Null) in all of the instances to be displayed. Otherwise only
+   properties at least one instance has a non- Null property are displayed
 
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`. The table view displays a single instance per
@@ -1000,7 +1396,10 @@ The corresponding table view would be:
 
 See :ref:`pywbemcli instance enumerate --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance get
+.. index::
+    pair: instance commands; instance get
+    pair: get command; instance command group
+    pair: get; instance
 
 .. _`Instance get command`:
 
@@ -1009,11 +1408,52 @@ See :ref:`pywbemcli instance enumerate --help` for the exact help output of the 
 
 The ``instance get`` command gets a CIM instance.
 
-The specification of the instance name (INSTANCENAME argument) is documented
+The command format is:
+    $ pywbemcli [GENERAL-OPTIONS] instance get ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance get
+
+The specification of the instance name (``INSTANCENAME`` argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
 
-The ``--propertylist``/``--pl`` command option allows restricting the set of
-properties to be retrieved and displayed on the instance.
+The command options are:
+
+*  ``--local-only``/``--lo`` - Do not include superclass properties in the
+   returned instance. Some servers may ignore this option. Default: Include
+   superclass properties.
+
+*  ``--include-qualifiers``/``--iq`` - Include qualifiers in the returned instance.
+   Not all servers return qualifiers on instances. Default: Do not include
+   qualifiers.
+
+*  ``--include-classorigin``/``--ico`` - Include class origin information in the
+   returned instance(s). Some servers may ignore this option. Default: Do not
+   include class origin information.
+
+*  ``--propertylist``/``--pl`` ``PROPERTYLIST`` command option allows restricting the set of
+   properties to be retrieved and displayed on each object returned. Multiple properties
+   may be specified with either a comma-separated list or by using the option
+   multiple times. Properties specified in this option that are not in the
+   object(s) will be ignored. The empty string will include no properties.
+   If this option is not set, the server is expected to return all properties.
+
+*  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
+   CIM instance name. May be specified multiple times. This option
+   allows defining keys on the command line without the issues of quotes.
+   Default: No keybindings provided.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the
+   :term:``current connection``.
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
+
+*  ``--show-null`` - In the TABLE output formats, show properties with no value
+   (i.e. Null) in all of the instances to be displayed. Otherwise only
+   properties at least one instance that has a non-Null property are displayed
 
 The command displays the instance using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -1045,7 +1485,7 @@ or using the key option:
 
 .. code-block:: text
 
-    pywbemcli> instance get TST_Person --key=name=Gabi
+    $ pywbemcli --name mock1 instance get TST_Person --key=name=Gabi
     instance of TST_Person {
        name = "Gabi";
        likes = { 2 };
@@ -1054,7 +1494,10 @@ or using the key option:
 
 See :ref:`pywbemcli instance get --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance invokemethod
+.. index::
+    pair: instance commands; instance invokemethod
+    pair: invokemethod command; instance command group
+    pair: invokemethod; instance
 
 .. _`Instance invokemethod command`:
 
@@ -1064,7 +1507,12 @@ See :ref:`pywbemcli instance get --help` for the exact help output of the comman
 The ``instance invokemethod`` command invokes a CIM method on the specified
 instance and displays the return value and any output parameters.
 
-The specification of the instance name (INSTANCENAME argument) is documented
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] instance invokemethod ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance invokemethod
+
+The specification of the instance name (``INSTANCENAME`` argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
 
 Input parameters for the method can be specified with the ``--parameter``/``-p``
@@ -1073,6 +1521,25 @@ For details, see :ref:`Specifying CIM property and parameter values`.
 
 The return value and output parameters are displayed using
 :term:`CIM object output formats`.
+
+The command options are:
+
+* ``--parameter``\``-p`` ``PARAMETERNAME=VALUE`` Specify a method input
+  parameter with its value. May be used several time to define multiple input
+  values.
+
+*  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
+   CIM instance name. May be specified multiple times. This option
+   allows defining keys on the command line without the issues of quotes.
+   Default: No keybindings provided.
+
+* ``--namespace``/``-n`` ``NAMESPACE`` - Namespace to use for this command,
+    instead of the default namespace of the :term: current connection.
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
 
 Example:
 
@@ -1101,7 +1568,10 @@ Or using the wildcard to create a selection list for the instance names
 
 See :ref:`pywbemcli instance invokemethod --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance modify
+.. index::
+    pair: instance commands; instance modify
+    pair: modify command; instance command group
+    pair: modify; instance
 
 .. _`Instance modify command`:
 
@@ -1110,6 +1580,11 @@ See :ref:`pywbemcli instance invokemethod --help` for the exact help output of t
 
 The ``instance modify`` command modifies the properties of an existing CIM
 instance.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] instance modify ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance modify
 
 The specification of the instance name (INSTANCENAME argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
@@ -1121,12 +1596,40 @@ For details, see :ref:`Specifying CIM property and parameter values`.
 
 Key properties cannot be modified, as per :term:`DSP0004`.
 
-The ``--propertylist``/``--pl`` command option allows restricting the set of
-properties to be modified. It is supported for consistency with the
-corresponding parameter at the CIM-XML protocol level, but given that the set
-of properties to be modified is already determined by the specified
-``--property``/``-p`` command options, the ``--propertylist``/``--pl`` command
-option does not need to be specified.
+The command arguments are:
+
+*  ``--property``/``-p`` ``PROPERTYNAME=VALUE`` - This option defines the initial
+   property value for the new instance and sets that property into the
+   instance. The option may be specified multiple times. Array property values
+   are specified as a comma- separated list; embedded instances are not
+   supported. The default if there are no ``--property`` options is a new
+   instance with no properties.
+
+**  ``--propertylist``/``--pl`` ``PROPERTYLIST`` command option allows restricting the set of
+    properties to be retrieved and displayed on each object returned. Multiple properties
+    may be specified with either a comma-separated list or by using the option
+    multiple times. Properties specified in this option that are not in the
+    object(s) will be ignored. The empty string will include no properties.
+    If this option is not set, the server is expected to return all properties.
+
+*  ``--verify``/``-V`` -Prompt for confirmation before performing a
+   change, to allow for verification of parameters. Default: Do not prompt for
+   confirmation.
+
+*  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
+   CIM instance name. May be specified multiple times. This option
+   allows defining keys on the command line without the issues of quotes.
+   Default: No keybindings provided.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
+
 
 Since the WBEM server (and pywbem) requires that each property be typed,
 pywbemcli retrieves the creation class from the WBEM server to determine
@@ -1143,7 +1646,10 @@ scalar and one array property:
 
 See :ref:`pywbemcli instance modify --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance references
+.. index::
+    pair: instance commands; instance references
+    pair: references command; instance command group
+    pair: references; instance
 
 .. _`Instance references command`:
 
@@ -1152,6 +1658,11 @@ See :ref:`pywbemcli instance modify --help` for the exact help output of the com
 
 The ``instance references`` command lists the CIM instances that reference
 the specified source instance.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] instance references ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance references
 
 The specification of the instance name (INSTANCENAME argument) is documented
 in the section :ref:`Specifying the INSTANCENAME command argument`.
@@ -1162,8 +1673,58 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
-Note: This command returns the instance references, not the class references.
+**Note:** This command returns the instance references, not the class references.
 The :ref:`Class references command` returns the class references.
+
+The command options are:
+
+* ``--assoc-class``/``--ac`` ``CLASSNAME`` This option passes the CLASSNAME to the server
+  to filter the result set by association class name and subclasses.
+
+* ``--role``/`-r``` ``PROPERTYNAME``  This option passes the property name to the
+  server to filter the result set by the association class source end role name.
+
+* ``--no-qualifiers``/``--nq``   This option passes the flag to the
+  server to not include qualifiers in the returned class(es). The default
+  is to include qualifiers in the classes definitions returned.
+
+* ``--include-classorigin``/``--ico`` This option passes the include-classorigin
+  flag to the server so the returned class(es) will include the class origin attribute.
+  The default is to not include class origin information.
+
+*  ``--propertylist``/``--pl`` ``PROPERTYLIST`` - This option passes the ``PROPERTYLIST`` to
+   the server so that only properties in the list are included in the returned
+   object(s). Multiple properties may be specified with either a
+   comma-separated list of property names or by using the option multiple
+   times. Properties specified in this option that are not in the object(s)
+   will be ignored. AN empty string will include no properties. If this option
+   is not set, the server is expected to return all properties.
+
+*  ``--names-only``/``-no`` - This option determines whether the request to return classes
+   or just class names is sent to the server. When set, only the object paths (names)
+   are requested. The default is to return the instances.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the current connection.
+
+*  ``--summary``/``-s`` - Show only a summary (count) of the objects.
+
+*  ``--filter-query``/``--fq`` ``QUERY-STRING``` - When pull operations are used, the
+   WBEM server filters the instances in the result via a filter query. By
+   default, and when traditional operations are used, no such filtering takes
+   place.
+
+*  ``--filter-query-language``/``--fql`` ``QUERY-LANGUAGE`` - The filter query
+   language to be used with ``--filter-query``. Default: DMTF:FQL.
+
+*  ``--show-null`` - In the TABLE output formats, show properties with no value
+   (i.e. Null) in all of the instances to be displayed. Otherwise only
+   properties at least one instance has a non- Null property are displayed
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
 
 Example:
 
@@ -1178,29 +1739,55 @@ Example:
 
 See :ref:`pywbemcli instance references --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance query
+.. index::
+    pair: instance commands; instance query
+    pair: query command; instance command group
+    pair: query; instance
 
 .. _`Instance query command`:
 
 ``instance query`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``instance query`` command executes a query for CIM instances in a
-namespace.
+The ``instance query`` command executes a query for CIM instances in a namespace.
 
-The query is specified with the ``QUERY`` argument and must be a valid query
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] instance query ``QUERY-STRING`` [COMMAND-OPTIONS]
+
+.. index:: pair: QUERY-STRING argument; instance query
+
+The query is specified with the ``QUERY-STRING`` argument and must be a valid query
 in the query language specified with the ``--query-language``/``--ql`` command
 option. The default for that option is ``DMTF:CQL`` (see :term:`CQL`).
 
-The namespace is specified with the ``--namespace``/``-n`` command option, or
-otherwise is the default namespace of the connection.
+**NOTE:** FQL is the filter query language and is not a valid query language for
+the query command
+
+The command options are:
+
+* ``--query-language`` ``QUERY-LANGUAGE`` - The :term:`query language` in which
+  the query is defined.  Normally this must be either ``WQL`` a Microsoft
+  specified query language (see :term:`WQL`) or ``DMTF:CQL`` (the DMTF
+  specified query language) (see :term:`CQL`), The default language for this
+  command is ``WQL``. The query language specified must be implemented in the
+  target server.   pywbemcli  does not validate the query language specified but
+  passes it on to the WBEM server.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+*  ``--summary`` / ``-s`` - If set, show only summary count of instances returned.
 
 Valid output formats are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
 See :ref:`pywbemcli instance query --help` for the exact help output of the command.
 
-.. index:: pair: instance commands; instance shrub
+.. index::
+    pair: instance commands; instance shrub
+    pair: shrub command; instance command group
+    pair: srub; instance
 
 .. _`Instance shrub command`:
 
@@ -1209,26 +1796,58 @@ See :ref:`pywbemcli instance query --help` for the exact help output of the comm
 
 The ``instance shrub`` command executes a set of requests to get the
 association relationships for a non-association CIM instance defined by
-INSTANCENAME in a namespace and displays the result either as tree in ASCII
+``INSTANCENAME`` in a namespace and displays the result either as tree in ASCII
 or as a table showing the roles, reference classes, associated
 classes and associated instances for the input instance.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] instance shrub ``INSTANCENAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: INSTANCENAME argument; instance shrub
+
+The command has a number of options to allow defining the request parameters for
+an association the same as the ``instance associators`` command. However, this
+command executes a number of requests on the server to get detailed characteristics
+of both the properties of the associated class as seen by the references
+request and of the associations.
 
 A shrub is a structure that attempts to show all of the relationships and the
 paths between the input INSTANCENAME and the associated instances whereas the
 References command only shows referencing(associator) classes or instances and
 the Associators command only shows associated classes or instances.
 
-The namespace for the INSTANCENAME is specified with the ``-namespace``/``-n``
-command option, or otherwise is the default namespace of the connection.
-
 Valid output formats are :term:`Table output formats` or the default which
 displays the a visual tree.
 
-The ``instance shrub`` command includes command options to:
+The command options are:
 
-1. ``--summary``/``-s``: Show only the class components and a count of instances.
+*  ``--assoc-class``/``--ac`` ``CLASSNAME`` - This option passes the ``CLASSNAME`` to
+   the server to filter the result set by the association class name and its
+   subclasses.
 
-2. ``--fullpath``/``-f``: Show the full path of the instances.  The
+*  ``--result-class`/``--rc``` ``CLASSNAME`` -  This option passes the CLASSNAME to
+   the server to filter the result set by result class name.  Subclasses of the
+   specified class also match.
+
+*  ``--role``/``--r`` ``PROPERTYNAME`` -  This option defines a reference
+   property property name in the association class. The responses are filtered
+   to match this role and property name.
+
+*  ``--result-role``/``--rr`` ``PROPERTYNAME`` - This option defines a reference
+   property name in the association class. The responses are filtered to match
+   this role and property name.
+
+*  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
+   CIM instance name. May be specified multiple times. This option
+   allows defining keys on the command line without the issues of quotes.
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
+   to use for this command, instead of the default namespace of the
+   :term:`current connection`.
+
+*  ``--summary``/``-s``: Show only the class components and a count of instances.
+
+*  ``--fullpath``/``-f``: Show the full path of the instances.  The
    default is to attempt to shorten the path by removing path components that
    are the same for all instances displayed.  This can be important for some
    of the components of the model where instance paths include keys like
@@ -1237,6 +1856,11 @@ The ``instance shrub`` command includes command options to:
    to visualize on the console. These key bindings are replaced with the
    character ``~`` as a place-marker unless the ``--fullpath``/``-f`` option is
    defined.
+
+*  ``--help-instancename``/``--hi`` -  Show help message for specifying
+   ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
+   options because instance name specification on the command line is complex
+   and there are several options to specifying the instance name.
 
 Thus, a full path might look like:
 
@@ -1303,7 +1927,8 @@ Example:
     |           |                   |              |                    | InstanceID=8(refinst:2) |
     +-----------+-------------------+--------------+--------------------+-------------------------+
 
-.. index:: pair: command groups; qualifier commands
+.. index::
+    pair: command groups; qualifier commands
 
 .. _`Qualifier command group`:
 
@@ -1318,7 +1943,10 @@ declarations:
 * :ref:`qualifier enumerate command` - List the qualifier declarations in a
   namespace.
 
-.. index:: pair: qualifier commands; qualifier get
+.. index::
+    pair: qualifier commands; qualifier get
+    pair: get command; qualifier command group
+    pair: get; qualifier
 
 .. _`Qualifier get command`:
 
@@ -1326,6 +1954,11 @@ declarations:
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``qualifier get`` command gets the specified qualifier declaration.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] qualifier get ``QUALIFIERNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: QUALIFIERNAME argument; qualifier get
 
 The qualifier declaration is named with the ``QUALIFIERNAME`` argument and is
 in the namespace specified with the ``-namespace``/``-n`` command option, or
@@ -1346,7 +1979,10 @@ default namespace:
 
 See :ref:`pywbemcli qualifier get --help` for the exact help output of the command.
 
-.. index:: pair: qualifier commands; qualifier delete
+.. index::
+    pair: qualifier commands; qualifier delete
+    pair: delete command; qualifier command group
+    pair: delete; qualifier
 
 .. _`Qualifier delete command`:
 
@@ -1354,6 +1990,11 @@ See :ref:`pywbemcli qualifier get --help` for the exact help output of the comma
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``qualifier delete`` command deletes the specified qualifier declaration.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] qualifier delete ``QUALIFIERNAME`` [COMMAND-OPTIONS]
+
+.. index:: pair: QUALIFIERNAME argument; qualifier delete
 
 The qualifier declaration is named with the ``QUALIFIERNAME`` argument and is
 in the namespace specified with the ``-namespace``/``-n`` command option, or
@@ -1373,7 +2014,10 @@ default namespace:
 
 See :ref:`pywbemcli qualifier delete --help` for the exact help output of the command.
 
-.. index:: pair: qualifier commands; qualifier enumerate
+.. index::
+    pair: qualifier commands; qualifier enumerate
+    pair: enumerate command; qualifier command group
+    pair: enumerate; qualifier
 
 .. _`Qualifier enumerate command`:
 
@@ -1382,6 +2026,9 @@ See :ref:`pywbemcli qualifier delete --help` for the exact help output of the co
 
 The ``qualifier enumerate`` command enumerates the qualifier declarations in
 a namespace.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] qualifier enumerate [COMMAND-OPTIONS]
 
 The namespace is specified with the ``-namespace``/``-n`` command option, or
 otherwise is the default namespace of the connection.
@@ -1423,7 +2070,10 @@ See :ref:`pywbemcli qualifier enumerate --help` for the exact help output of the
 * :ref:`Profile list command` - List management profiles advertised by the server.
 * :ref:`Profile centralinsts command` - List central instances of management profiles on the server.
 
-.. index:: pair: profile commands; profile list
+.. index::
+    pair: profile commands; profile list
+    pair: list command; profile command group
+    pair: list; profile
 
 .. _`Profile list command`:
 
@@ -1434,12 +2084,23 @@ The ``profile list`` command lists the
 :term:`management profiles <management profile>` advertised by the
 WBEM server of the :term:`current connection`.
 
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] profile list [COMMAND-OPTIONS]
+
 The returned management profiles are displayed with organization, profile name,
 and profile version using the :term:`Table output formats`.
 
-The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
-used to filter the returned management profiles by organization and profile
-name, respectively.
+* The ``--organization``/``-o`` and ``--profile``/ ``-p`` command options can be
+  used to filter the returned management profiles by organization and profile
+  name, respectively.
+
+The command options are:
+
+*  ``--organization``/``-o``  ``ORGANIZATION_NAME`` Filter the returned
+   management profiles by the organization name ex. ``DMTF``.
+
+*  ``--profile``/``-p`` ``PROFILE-NAME`` Filter the returned management profiles
+   by the profile name. (ex. -p Array)
 
 Example:
 
@@ -1472,7 +2133,10 @@ Example:
 
 See :ref:`pywbemcli profile list --help` for the exact help output of the command.
 
-.. index:: pair: sprofile commands; profile centralinsts
+.. index::
+    pair: profile commands; profile centralinsts
+    pair: centralinsts command; profile command group
+    pair: centralinsts; profile
 
 .. _`Profile centralinsts command`:
 
@@ -1482,6 +2146,9 @@ See :ref:`pywbemcli profile list --help` for the exact help output of the comman
 The ``profile centralinsts`` command gets the :term:`central instances`
 of the :term:`management profiles <management profile>` advertised by the
 WBEM server of the :term:`current connection`.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] profile centralinsts [COMMAND-OPTIONS]
 
 The command displays the instance paths of the central instances by profile,
 using the :term:`Table output formats`.
@@ -1505,6 +2172,8 @@ Example:
 
 See :ref:`pywbemcli profile centralinsts --help` for the exact help output of the command.
 
+.. index:: pair: command groups; server commands
+
 .. _`Server command group`:
 
 ``server`` command group
@@ -1522,7 +2191,10 @@ WBEM server itself:
 * :ref:`Server remove-mof command` - Remove the MOF objects from the server.
 * :ref:`Server schema command` - List the namespaces of the server.
 
-.. index:: pair: server commands; server brand
+.. index::
+    pair: server commands; server brand
+    pair: brand command; server command group
+    pair: brand; server
 
 .. _`Server brand command`:
 
@@ -1531,6 +2203,9 @@ WBEM server itself:
 
 The ``server brand`` command gets the brand of the WBEM server of the
 :term:`current connection`.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server brand [COMMAND-OPTIONS]
 
 The brand is intended to identify the product that represents the WBEM server
 infrastructure. Since that was not clearly defined in the DMTF
@@ -1553,7 +2228,11 @@ Example:
 
 See :ref:`pywbemcli server brand --help` for the exact help output of the command.
 
-.. index:: pair: server commands; server info
+
+.. index::
+    pair: server commands; server info
+    pair: info command; server command group
+    pair: info; server
 
 .. _`Server info command`:
 
@@ -1562,6 +2241,9 @@ See :ref:`pywbemcli server brand --help` for the exact help output of the comman
 
 The ``server info`` command gets general information on the WBEM server of the
 :term:`current connection`.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server info [COMMAND-OPTIONS]
 
 This includes the brand, version, namespaces, and other reasonable information
 on the WBEM server.
@@ -1599,7 +2281,11 @@ Example:
 
 See :ref:`pywbemcli server info --help` for the exact help output of the command.
 
-.. index:: pair: server commands; server interop
+
+.. index::
+    pair: server commands; server interop
+    pair: interop command; server command group
+    pair: interop; server
 
 .. _`Server interop command`:
 
@@ -1608,6 +2294,9 @@ See :ref:`pywbemcli server info --help` for the exact help output of the command
 
 The ``server interop`` command gets the name of the :term:`Interop namespace`
 of the WBEM server of the :term:`current connection`.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server interop [COMMAND-OPTIONS]
 
 The result is displayed using :term:`Table output formats`.
 
@@ -1625,7 +2314,12 @@ Example:
 
 See :ref:`pywbemcli server interop --help` for the exact help output of the command.
 
-.. index:: pair: server commands; server namespaces
+
+
+.. index::
+    pair: server commands; server namespaces
+    pair: namespaces command; server command group
+    pair: namespaces; server
 
 .. _`Server namespaces command`:
 
@@ -1634,6 +2328,9 @@ See :ref:`pywbemcli server interop --help` for the exact help output of the comm
 
 The ``server namespaces`` command lists the namespaces of the WBEM server of
 the :term:`current connection`.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server namespaces [COMMAND-OPTIONS]
 
 The result is displayed using ``txt`` output format or
 :term:`Table output formats`.
@@ -1660,16 +2357,36 @@ Example:
 
 See :ref:`pywbemcli server namespaces --help` for the exact help output of the command.
 
-.. index:: pair: server commands; server add-mof
+.. index::
+    pair: server commands; server add-mof
+    pair: add-mof command; server command group
+    pair: add-mof; server
 
 .. _`Server add-mof command`:
 
 ``server add-mof`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Compiles MOF and adds/updates CIM objects in the WBEM server.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server add-mof [COMMAND-OPTIONS]
+
 The ``server add-mof`` command compiles one or more MOF files and adds the
 resulting CIM objects to the target namespace in the WBEM server of the
 :term:`current connection`.
+
+The command options are:
+
+*  ``--namespace``/``-n`` ``NAMESPACE`` This option defines the term:`Namespace` to
+   use for this command, instead of the default namespace of the current connection.
+
+* ``--include``/``-I`` ``INCLUDEDIR PATH`` the path name of a MOF include directory.
+  This option may be   specified multiple times.
+
+* ``--dry-run``/``-d`` Enable dry-run mode: Don't actually modify the
+  server. The onnection to the WBEM server is still required for reading information
+  required to execute the compile from the server.
 
 Example:
 
@@ -1681,16 +2398,37 @@ See :ref:`pywbemcli server add-mof --help` for the exact help output of the
 command.
 
 
-.. index:: pair: server commands; server remove-mof
+.. index::
+    pair: server commands; server remove-mof
+    pair: remove-mof command; server command group
+    pair: remove-mof; server
 
 .. _`Server remove-mof command`:
 
 ``server remove-mof`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Compile the MOF defined by the command option and remove the resulting objects
+from the server.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server remove-mof [COMMAND-OPTIONS]
+
 The ``server remove-mof`` command compiles one or more MOF files and removes the
 resulting CIM objects from the target namespace in the WBEM server of the
 :term:`current connection`.
+
+The command options are:
+
+* ``--namespace``/``-n`` ``NAMESPACE`` The namespace to use for this command,
+  instead of the default namespace of the connection.
+
+* ``--include``/``-I`` ``INCLUDEDIR PATH`` the path name of a MOF include directory.
+  This option may be   specified multiple times.
+
+* ``--dry-run``/``-d`` Enable dry-run mode: Don't actually modify the
+  server. The connection to the WBEM server is still required for reading information
+  required to execute the compile from the server.
 
 Example:
 
@@ -1701,6 +2439,12 @@ Example:
 See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
 command.
 
+
+.. index::
+    pair: server commands; server schema
+    pair: schema command; server command group
+    pair: schema; server
+
 .. _`Server schema command`:
 
 ``server schema`` command
@@ -1709,6 +2453,9 @@ command.
 The ``server schema`` command returns information on the
 :term:`schemas <schema>` in the namespace(s) of the :term:`current connection`
 WBEM server.
+
+The format of the command is:
+    pywbemcli [GENERAL-OPTIONS] server schema [COMMAND-OPTIONS]
 
 The overview reports a summary by namespace of this information and the
 detail view (``server schema --detail``) reports the information for each
@@ -1783,7 +2530,8 @@ See :ref:`pywbemcli server remove-mof --help` for the exact help output of the
 command.
 
 
-.. index:: pair: command groups;statistics command group
+.. index::
+    pair: command groups; statistics command group
 
 .. _`Statistics command group`:
 
@@ -1853,7 +2601,11 @@ The statistics commands are:
 * :ref:`Statistics status command` - Show enabled status of client and server maintained statistics.
 
 
-.. index:: pair: statistics commands; statistics server-on
+.. index::
+    pair: statistics commands; statistics server-on
+    pair: server-on command; statistics command group
+    pair: server-on; statistics
+
 
 .. _`Statistics server-on command`:
 
@@ -1878,7 +2630,10 @@ Note that this command also affects whether the **Server Time** column of
 the client maintained statistics shows a value.
 
 
-.. index:: pair: statistics commands; statistics server-off
+.. index::
+    pair: statistics commands; statistics server-off
+    pair: server-off command; statistics command group
+    pair: server-off; statistics
 
 .. _`Statistics server-off command`:
 
@@ -1903,7 +2658,10 @@ Note that this command also affects whether the **Server Time** column of
 the client maintained statistics shows a value.
 
 
-.. index:: pair: statistics commands; statistics status
+.. index::
+    pair: statistics commands; statistics status
+    pair: status command; statistics command group
+    pair: status; statistics
 
 .. _`Statistics status command`:
 
@@ -1918,19 +2676,25 @@ See '_Operation statistics'_ for more information on statistics in pywbemcli
 and WBEM servers.
 
 
-.. index:: pair: statistics commands; statistics reset
+.. index::
+    pair: statistics commands; statistics reset
+    pair: reset command; statistics group
+    single: reset; statistics
 
 .. _`Statistics reset command`:
 
 ``statistics reset`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``statistics reset`` command resets the counters of the client maintained
+The ``statistics reset`` command resets the counters of the client-maintained
 statistics. This includes the server response times returned by the WBEM server
 that are part of the client maintained statistics.
 
 
-.. index:: pair: statistics commands; statistics show
+.. index::
+    pair: statistics commands; statistics show
+    pair: show command; statistics command group
+    pair: show; statistics
 
 .. _`Statistics show command`:
 
@@ -2024,7 +2788,10 @@ bodies of the CIM-XML request and response messages, respectively. These values
 do not include the size of the HTTP header fields.
 
 
-.. index:: pair: statistics commands; statistics server-show
+.. index::
+    pair: statistics commands; statistics server-show
+    pair: server-show command; statistics command group
+    pair: server-show; statistics
 
 .. _`Statistics server-show command`:
 
@@ -2088,7 +2855,8 @@ management profiles, so the statements above are based on typical
 implementations of WBEM servers such as the implementation of OpenPegasus.
 
 
-.. index:: pair: command groups;connection commands
+.. index::
+    pair: command groups;connection commands
 
 .. _`Connection command group`:
 
@@ -2136,7 +2904,10 @@ The commands in this group are:
 * :ref:`Connection set-default command` - Sets or clears the default definition in a connections file.
 
 
-.. index:: pair: connection commands; connection delete
+.. index::
+    pair: connection commands; connection delete
+    pair: delete command; connection command group
+    pair: delete; connection
 
 .. _`Connection delete command`:
 
@@ -2145,6 +2916,9 @@ The commands in this group are:
 
 The ``connection delete`` command deletes a connection definition from the
 :term:`connections file`.
+
+The format of this command is:
+    pywbemcli [GENERAL-OPTIONS] connection delete ``NAME`` [COMMAND-OPTIONS]
 
 If the ``NAME`` argument is specified, the connection definition with that name
 is deleted. Otherwise, the command displays the list of connection definitions
@@ -2172,7 +2946,10 @@ Example that deletes a connection definition by selecting it:
 
 See :ref:`pywbemcli connection delete --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection export
+.. index::
+    pair: connection commands; connection export
+    pair: export command; connection command group
+    pair: export; connection
 
 .. _`Connection export command`:
 
@@ -2182,7 +2959,11 @@ See :ref:`pywbemcli connection delete --help` for the exact help output of the c
 The ``connection export`` command exports the current connection as a set of
 environment variables.
 
-This is done by displaying the commands to set the environment variables.
+The format of this command is:
+    pywbemcli [GENERAL-OPTIONS] connection export [COMMAND-OPTIONS]
+
+This is done by displaying the commands to set the environment variables to
+stdout.
 
 .. code-block:: text
 
@@ -2207,7 +2988,10 @@ as follows:
 
 See :ref:`pywbemcli connection export --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection list
+.. index::
+    pair: connection commands; connection list
+    pair: list command; connection command group
+    pair: list; connection
 
 .. _`Connection list command`:
 
@@ -2217,6 +3001,10 @@ See :ref:`pywbemcli connection export --help` for the exact help output of the c
 The ``connection list`` command lists the connection definitions in the
 :term:`connections file` and the current connection(if it has not been
 saved to the connections file).
+
+
+The format of this command is:
+    pywbemcli [GENERAL-OPTIONS] connection list [COMMAND-OPTIONS]
 
 Valid output formats are :term:`Table output formats`.
 
@@ -2289,7 +3077,10 @@ used by the server.
 
 See :ref:`pywbemcli connection list --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection save
+.. index::
+    pair: connection commands; connection save
+    pair: save command; connection command group
+    pair: save; connection
 
 .. _`Connection save command`:
 
@@ -2300,34 +3091,56 @@ The ``connection save`` command saves the current connection in the
 :term:`connections file` as a connection definition with the name specified
 in the ``NAME`` argument.
 
-If a connection definition with that name already exists, it will be overwritten
+The format is:
+    pywbemcli [GENERAL-OPTIONS] connection save ``NAME`` [COMMAND-OPTIONS]
+
+If a connection definition with that ``NAME`` already exists, it will be overwritten
 without notice.
 
 This command includes an option (``set-default``) that sets the default
 connection of the current connections file to the name of the definition being
-saved.
+saved. Once the default connection is set, that be comes the connection if
+pywbemcli is executed with no options for defining the server.
+
+A new connection MYCONN can be created with the following command:
 
 .. code-block:: text
 
-    $ pywbemcli --server http://blah connection save <name> --set-default
+    $ pywbemcli --server http://blah connection save MYCONN
+
+A connection can be created, saved and set as the default  connection with:
+
+.. code-block:: text
+
+    $ pywbemcli --server http://blah connection save MYCONN --set-default
 
 See :ref:`pywbemcli connection save --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection select
+
+.. index::
+    pair: connection commands; connection select
+    pair: select command; connection command group
+    pair: select; connection
 
 .. _`Connection select command`:
 
 ``connection select`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. index:: single: connection select command
+.. index:: pair: command; connection select
+
 The ``connection select`` command selects a connection definition from the
-:term:`connections file` to become the current connection.
+:term:`connections file` to become the :term:`current connection`.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] connection select ``NAME`` [COMMAND-OPTIONS]
 
 If the ``NAME`` argument is specified, the connection definition with that name
-is selected. Otherwise, the command displays the list of connection definitions
-and prompts the user to pick the one to be selected. If there is only a
-single connection, that connection is selected without the user
-request.
+is selected. Otherwise, pywbemcl displays the list of connection definitions
+from the connections fileand prompts the user to pick one to be selected.
+If there is only a single connection, that connection is selected without the
+user request.
 
 If the ``--default``/``-d`` command option is set, the connection definition in
 addition becomes the default connection, by marking it accordingly in the
@@ -2374,7 +3187,12 @@ mode of pywbemcli:
 
 See :ref:`pywbemcli connection select --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection show
+
+
+.. index::
+    pair: connection commands; connection show
+    pair: show command; connection command group
+    pair: show; connection
 
 .. _`Connection show command`:
 
@@ -2385,6 +3203,9 @@ See :ref:`pywbemcli connection select --help` for the exact help output of the c
 .. index:: pair: command; connection show
 
 The ``connection show`` command shows information about a connection definition:
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] connection show ``NAME`` [COMMAND-OPTIONS]
 
 * If ``NAME`` is ``?``, pywbemcli prompts the user to select one and shows
   the existing current connection. If there is only a single connection the
@@ -2409,7 +3230,10 @@ The ``connection show`` command shows information about a connection definition:
 
 See :ref:`pywbemcli connection show --help` for the exact help output of the command.
 
-.. index:: pair: connection commands; connection test
+.. index::
+    pair: connection commands; connection test
+    pair: test command; connection command group
+    pair: test; connection
 
 .. _`Connection test command`:
 
@@ -2420,8 +3244,11 @@ See :ref:`pywbemcli connection show --help` for the exact help output of the com
     single: connection test command
     pair: command; connection test
 
-The ``connection test`` command executes a single predefined operation on
-the current connection to verify that accessing the WBEM server works.
+The ``connection test`` command executes a single predefined WBEM operation on
+the :term:`current connection` to verify that accessing the WBEM server works.
+
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] connection test [COMMAND-OPTIONS]
 
 The predefined operation is ``EnumerateClasses`` which attempts to enumerate
 the classes in the default namespace of the WBEM Server.  Even if the server
@@ -2449,7 +3276,10 @@ result:
 See :ref:`pywbemcli connection test --help` for the exact help output of the command.
 
 
-.. index:: pair: connection commands; connection set-default
+.. index::
+    pair: connection commands; connection set-default
+    pair: set-default command; connection command group
+    pair: set-default; connection
 
 .. _`Connection set-default command`:
 
@@ -2463,13 +3293,17 @@ The ``connection set-default`` command sets or clears the
 :term:`default-connection-name` attribute  in the currently specified
 :term:`connections file`.
 
-The :term:`default-connection-name` attribute allows a connection definition in
-a connections file to be loaded on startup without using the :ref:`--name general option`.
-If pywbemcli is started without :ref:`--name general option`, :ref:`--server
-general option`, or :ref:`--mock-server general option`, the
-``default-connection-name`` attribute is retrieved from the connections file if
-defined, and the value of this attribute used as the name of the
-connection definition set as current connection.
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] connection set-default ``NAME`` [COMMAND-OPTIONS]
+
+The :term:`default-connection-name` attribute in the connection file allows a
+connection definition in a connections file to be loaded on startup without
+using the :ref:`--name general option`. If pywbemcli is started without
+:ref:`--name general option`, :ref:`--server general option`, or
+:ref:`--mock-server general option`, the ``default-connection-name`` attribute
+is retrieved from the connections file if defined, and the value of this
+attribute used as the name of the connection definition set as current
+connection.
 
 Thus, for example, if the default connection definition is ``mytests`` the
 connection definition for ``mytests`` is created each time pywbemcli is started
@@ -2522,7 +3356,8 @@ The current status of the :term:`default-connection-name` can be viewed with the
 See :ref:`pywbemcli connection set-default --help` for the exact help output
 of the command.
 
-.. index:: pair: command groups; subscription commands
+.. index::
+   pair: command groups; subscription commands
 
 .. _`subscription command group`:
 
@@ -2553,9 +3388,9 @@ reference property) and a listener destination (``Handler`` reference
 property) to link the definition of the indication to be generated and the
 listener destination for the indication.
 
-An indication subscription defines for a WBEM server the target WBEM
-listener destination instance for indications to be generated based on the
-``Query`` and ``QueryLanguage`` properties defined in the filter instance; an indication
+An indication subscription defines for a WBEM server the target WBEM listener
+destination instance for indications to be generated based on the ``Query`` and
+``QueryLanguage`` properties defined in the filter instance; an indication
 subscription relates a WBEM listener destination with the definition of the
 indications that will be generated.  When a WBEM server receives a valid
 indication subscription it is expected to activate the functionality to
@@ -2640,7 +3475,7 @@ with the :ref:`--name general option`, :ref:`--server general option` or the
 
     $ pywbemcli -s http://myserver subscription add-destination -l http://localhost:50000
 
-    # will register the server http://myserver with the the pywbemcli subscription
+    # will register the server http://myserver with the pywbemcli subscription
     # manager and that server will remain registered until specifically unregistered.
 
 The server remains registered until specifically unregistered with the
@@ -2807,6 +3642,10 @@ destination instance (``Handler`` reference property) names both the
 destination and filter must be defined to uniquely define an indication
 subscription on add-subscription and remove-subscriptions commands.
 
+.. index::
+    pair: DESTINATIONID argument; subscription add-subscription
+    pair: FILTERID argument; subscription add-subscription
+
 Thus two identities are used to identify a subscription which uniquely identify
 the filter and destination associated with the subscription. For example:
 
@@ -2851,15 +3690,24 @@ See :ref:`pywbemcli subscription --help` for the exact help output.
 
 .. index::
     pair: subscription commands; subscription add-destination
+    pair: add-destination command; subscription command group
+    pair: add-destination; subscription
 
 .. _`subscription add-destination command`:
 
 ``subscription add-destination`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Add a new indication listener to the current WBEM server.
+
 .. index::
     single: subscription add-destination
     pair: command; subscription add-destination
+
+The format of this command is:
+    pywbemcli [GENERAL-OPTIONS] subscription add-destination ``IDENTITY`` [COMMAND-OPTIONS]
+
+.. index:: pair: IDENTITY argument; subscription add-destination
 
 This command creates a listener destination instance (CIM class
 ``CIM_ListenerDestinationCIMXML``) with the identity defined by the ``IDENTITY``
@@ -2871,13 +3719,7 @@ listener (the listener URL including port) that defines the indication listener
 for indications exported from a WBEM server and other characteristics of the
 listener.
 
-The format of this command is:
-
-.. code-block:: text
-
-    $ pywbemcli [GENERAL-OPTIONS] subscription add-destination IDENTITY [COMMAND-OPTIONS]
-
-The listener destination  to be added is identified by the ``IDENTITY`` argument and the
+The listener destination to be added is identified by the ``IDENTITY`` argument and the
 ``--owned`` / ``--permanent`` option. Together these elements define the
 ``Name`` property of the destination instance.
 
@@ -2903,10 +3745,11 @@ because the 'Name' property is only one of four key properties.
 
 The options that can be applied when adding a destination are:
 
-* ``--listener-url`` - the URL of the listener including its scheme, host name
-  and protocol. The host name and protocol are required and the scheme defaults
+* ``--listener-url``/ ``-l URL`` - the URL of the listener including its scheme,
+  host name and protocol. The host name and protocol are required and the scheme defaults
   to ``https`` if not specified.
-* ``-- owned`` / ``--permanent`` - flag defining whether the created instance
+
+* ``-- owned``/``--permanent`` - flag defining whether the created instance
   will be owned or permanent where the default is owned.
 
 The following example creates an owned destination instance with the IDENTITY ``ODEST1``
@@ -2931,6 +3774,8 @@ output of the command.
 
 .. index::
     pair: subscription commands; subscription add-filter
+    pair: add-filter command; subscription command group
+    pair: add-filter; subscription
 
 .. _`subscription add-filter command`:
 
@@ -2944,10 +3789,12 @@ the current pywbemcli WBEM server (defined by the  :ref:`--name general option`,
 :ref:`--server general option`, or :ref:`--mock-server general option`).
 
 The format of this command is:
+    $ pywbemcli [GENERAL-OPTIONS] subscription add-filter ``IDENTITY`` [COMMAND-OPTIONS]
 
-.. code-block:: text
+The filter defines a query and optionally a query language which is the basis
+for defining an indication.
 
-    $ pywbemcli [GENERAL-OPTIONS] subscription add-filter IDENTITY [COMMAND-OPTIONS]
+.. index:: pair: IDENTITY argument; subscription add-filter
 
 The filter to be added is identified by the ``IDENTITY`` argument and the
 ``--owned`` / ``--permanent`` option. Together these elements define the
@@ -2965,7 +3812,7 @@ where:
     - ``{submgr_id}`` is the :term:`subscription manager ID`
     - ``{IDENTITY}`` is the IDENTITY argument in add and remove commands
 
-If the instance is to be permanent, (``--permanent``) the the ``IDENTITY``
+If the instance is to be permanent, (``--permanent``) the ``IDENTITY``
 argument directly defines the instance ``Name`` property. This should be used
 in cases where the user needs to have control over the filter name (e.g.
 because a DMTF management profile requires a particular name).
@@ -2977,21 +3824,25 @@ because the ``Name`` property is only one of four key properties.
 
 The command line options for this command are:
 
-* ``--query-language`` - The :term:`query language` in which the query is defined.  Normally
-  this must be either ``WQL`` a Microsoft specified query language (see
-  :term:`CQL`) or ``DMTF:CQL`` (the DMTF specified query language) (see
-  :term:`WQL`), The default language for this command is ``WQL``. The query
-  language specified must be implemented in the target server.
-* ``query`` - The query itself defined as a string using the :term:`query language`
-  defined by the ``query-language`` option.
-* ``-- owned`` / ``--permanent`` - flag defining whether the created instance
-  will be owned or permanent where the default is owned.
-* ``--source-namespaces`` The name of WBEM namespaces on the server where
+* ``--query-language`` ``TEXT`` - The :term:`query language` in which the query
+  is defined.  Normally this must be either ``WQL`` a Microsoft specified query
+  language (see :term:`WQL`) or ``DMTF:CQL`` (the DMTF specified query
+  language) (see :term:`CQL`), The default language for this command is
+  ``WQL``. The query language specified must be implemented in the target
+  server.
+
+* ``query``/``q`` ``FILTER`` - The query itself defined as a string using the
+  :term:`query language` defined by the ``query-language`` option.
+
+* ``--source-namespaces`` - The name of WBEM namespaces on the server where
   indications originate.  Multiple namespaces may be defined as one or
   more namespaces per options instantiation where multiple namespaces are
   separated by comma (","). For example either, ``--source-namespaces
   root/cimv2,root/cimv3`` or ``--source-namespaces root/cimv2 --source-namespaces root/cimv3``
   provide the same result.
+
+* ``-- owned`` / ``--permanent`` - Flag defining whether the created instance
+  will be owned or permanent where the default is owned.
 
 The following example creates an owned subscription instance with the IDENTITY
 ``ofilter1`` and a permanent filter with the ``Name`` property of ``pfilter1``.
@@ -3013,6 +3864,8 @@ See :ref:`pywbemcli subscription add-filter --help` for the help output of the c
 
 .. index::
     pair: subscription commands; subscription add-subscription
+    pair: add-subscription command; subscription command group
+    pair: add-subscription; subscription
 
 .. _`subscription add-subscription command`:
 
@@ -3022,6 +3875,8 @@ See :ref:`pywbemcli subscription add-filter --help` for the help output of the c
 The add-subscription command creates a single indication subscription instance
 (CIM class ``CIM_IndicationSubscription``) that defines the association between
 a previously defined indication filter and destination instance.
+
+.. index:: pair: IDENTITY argument; subscription add-subscription
 
 The destination and filter are defined the two required arguments of the
 command ``DESTINATIONID`` and ``FILTERID``. These arguments may be either the
@@ -3033,10 +3888,13 @@ The format of this command is:
 
 .. code-block:: text
 
-    $ pywbemcli [GENERAL-OPTIONS] subscription add-subscription DESTINATIONID
-                 FILTERID [COMMAND-OPTIONS]
+    $ pywbemcli [GENERAL-OPTIONS] subscription add-subscription ``DESTINATIONID`` ``FILTERID`` [COMMAND-OPTIONS]
 
 where:
+
+.. index::
+    pair: DESTINATIONID argument; subscription add-subscription
+    pair: FILTERID argument; subscription add-subscription
 
 * ``DESTINATIONID`` is the ``IDENTITY`` for the listener destination instance
   to be attached to the subscription. See :ref:`subscription add-destination
@@ -3044,7 +3902,6 @@ where:
 * ``FILTERID`` is the ``IDENTITY`` for the indication filter instance to be
   attached to the subscription.  See :ref:`subscription add-filter command`:
   for the definition of ``FILTERID``.
-
 
 The options for add-subscription are:
 
@@ -3101,6 +3958,8 @@ See :ref:`pywbemcli subscription add-subscription --help` for the help output of
 
 .. index::
     pair: subscription commands; subscription list
+    pair: list command; subscription command group
+    pair: list; subscription
 
 .. _`subscription list command`:
 
@@ -3110,12 +3969,16 @@ See :ref:`pywbemcli subscription add-subscription --help` for the help output of
 The ``subscription list command`` provides a table with an overview of the
 subscription, filter, and destination counts organized by ownership.
 
+The command format is:
+    pywbemcli [GENERAL-OPTIONS] subscription list [COMMAND-OPTIONS]
+
 The options are:
 
--  ``--type`` [ ``owned``| ``permanent`` | ``all`` ]  Defines whether the command is going to
+*  ``--type`` [ ``owned``| ``permanent`` | ``all`` ]  Defines whether the command is going to
    filter owned ,permanent, or all objects for the response display.  The default is
-   all
-- ``-s`` / ``--summary``             If True, show only summary count of instances
+   ``all``.
+
+*  ``--summary`` / ``-s`` - If True, show only summary count of instances returned.
 
 
 .. code-block:: text
@@ -3140,6 +4003,8 @@ See :ref:`pywbemcli subscription list --help` for the help output of the command
 
 .. index::
     pair: subscription commands; subscription list-destinations
+    pair: list-destinations; subscription command group
+    pair: list-destinations; subscription
 
 .. _`subscription list-destinations command`:
 
@@ -3186,7 +4051,7 @@ The options for list-destinations are:
   For MOF it includes empty properties. For table, it adds more rows with  properties
   from the instance.
 
-* ``-s``/``--summary`` limits the display to an overview
+* ``--summary``/``-s`` limits the display to an overview
 
 * ``--no``/``names-only`` displays only the CIM instance names of the
   instances. This option only applies if the CIM object format (ex. mof) is used
@@ -3232,6 +4097,8 @@ of the command.
 
 .. index::
     pair: subscription commands; subscription list-filters
+    pair: list-filters command; subscription command group
+    pair: list-filters; subscription
 
 .. _`subscription list-filters command`:
 
@@ -3321,6 +4188,8 @@ of the command.
 
 .. index::
     pair: subscription commands; subscription list-subscriptions
+    pair: list-subscriptions; subscription command group
+    pair: list-subscriptions; subscription
 
 .. _`subscription list-subscriptions command`:
 
@@ -3410,6 +4279,8 @@ of the command.
 
 .. index::
     pair: subscription commands; subscription remove-destination
+    pair: remove-destination command; subscription command group
+    pair: remove-destination; subscription
 
 .. _`subscription remove-destination command`:
 
@@ -3425,6 +4296,8 @@ The format of this command is:
 .. code-block:: text
 
     $ pywbemcli [GENERAL-OPTIONS] subscription remove-destination IDENTITY [COMMAND-OPTIONS]
+
+.. index:: pair: IDENTITY argument; subscription remove-destination
 
 The listener destination to be removed is identified by the ``IDENTITY``
 argument and the ``--owned`` / ``--permanent`` option. Together these elements
@@ -3494,6 +4367,8 @@ of the command.
 
 .. index::
     pair: subscription commands; subscription remove-filters
+    pair: remove-filter command; subscription command group
+    pair: remove-filter; subscription
 
 .. _`subscription remove-filter command`:
 
@@ -3508,6 +4383,8 @@ The format of this command is:
 .. code-block:: text
 
     $ pywbemcli [GENERAL-OPTIONS] subscription remove-filter IDENTITY [COMMAND-OPTIONS]
+
+.. index:: pair: IDENTITY argument; subscription remove-filter
 
 The filter  to be removed is identified by the ``IDENTITY`` argument and the
 ``--owned`` / ``--permanent`` option. Together these elements define the
@@ -3569,7 +4446,9 @@ of the command.
 
 
 .. index::
-    pair: subscription commands; subscription remove-subscriptions
+    pair: subscription commands; subscription remove-subscription
+    pair: remove-subscription command; subscription command group
+    pair: remove-subscription; subscription
 
 .. _`subscription remove-subscription command`:
 
@@ -3588,12 +4467,18 @@ The format of this command is:
 
 where the two required arguments:
 
+.. index::
+    pair: DESTINATIONID argument; subscription remove-subscription
+    pair: FILTERID argument; subscription remove-subscription
+
 * ``DESTINATIONID`` is the ``IDENTITY`` for the listener destination instance to be
   attached to the subscription. See :ref:`subscription add-destination
   command`: for the definition of ``DESTINATIONID``
 * ``FILTERID`` is the ``IDENTITY`` for the indication filter instance to be
   attached to the subscription.  See :ref:`subscription add-filter command`:
   for the definition of ``FILTERID``.
+
+.. index:: pair: IDENTITY argument; subscription remove-subscription
 
 These arguments may be either the complete ``Name`` property value of the
 destination and filter associated instances or the IDENTITY that was the
@@ -3675,6 +4560,8 @@ of the command.
 
 .. index::
     pair: subscription commands; subscription remove-server
+    pair: remove-server command; subscription command group
+    pair: remove-server; subscription
 
 .. _`subscription remove-server command`:
 
@@ -3738,7 +4625,8 @@ See :ref:`pywbemcli subscription remove-server --help` for the help output
 of the command.
 
 
-.. index:: pair: repl; command
+.. index::
+    pair: repl; command
 
 .. _`Repl command`:
 
@@ -3782,7 +4670,8 @@ string. Hitting <ENTER> selects the currently shown command.
 see :ref:`interactive mode` for more details on using this mode and the
 search.
 
-.. index:: pair: help; command
+.. index::
+    pair: help; command
 
 .. _`Help command`:
 

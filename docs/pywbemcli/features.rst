@@ -33,6 +33,11 @@ syntactic implementation of the features. This includes:
   pywbemcli for certain objects rather than typing in long names the full name.
   see :ref:`Specifying the INSTANCENAME command argument`.
 
+* The ability to filter classes and instances returned from a number of the
+  enumerate commands filtered by characteristics of the classes. Thus,
+  for example, it can for experimental classes, association classes, and
+  deprecated classes.
+
 
 .. _`pywbemcli commands to WBEM operations`:
 
@@ -388,3 +393,73 @@ value.
 Example::
 
     CIM_Foo --key InstanceId=inst1
+
+
+.. _`Filtering responses for specific types of classes`:
+
+Filtering responses for specific types of classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Several of the commands include result filter options that filter
+returned information to include only those classes that have the defined filter
+option. Thus, ``pywbemcli class enumerate --association`` displays only classes
+that have the Association qualifier set. The filters are documented in the
+`class filter options table`_  below.
+
+All of this filtering is done in pywbemcli so that it may require that
+significant information on the classes be requested from the server that would
+not be required without the filter. Thus, these commands may take more processing
+time.
+
+.. index:: single: result filters; class enumerate command
+
+.. _class filter options table:
+
+.. table: Class/qualifier filter options
+
+==========================================  =======================================
+Filter option name                          Component filtered
+==========================================  =======================================
+``--association``/``--no-association``      Association qualifier(class) (see Note 1)
+``--indication``/``--no-indication``        Indications qualifier(class)
+``--experimental``/``--no-experimental``    Experimental qualifier(class)
+``--deprecated``/``--no-deprecated``        Deprecated qualifier (any class element)
+``--since <CIM_Version_string>``            Version qualifier GE <CIM_Version_string> (see Note 2)
+``--schema <schema_string>``                Schema component of classname equality(see Note 3)
+``--subclasses <classname>``                Subclasses of <classname>.
+``--leaf-classes``                          Classes with no subclass.
+==========================================  =======================================
+
+1. The filters defined as ``--...``/``--no-...`` allow testing for the existence
+   of the condition (association qualifier exists) or the non-existence(association
+   qualifier does not exist on the class). When neither definition of the
+   option is defined the association qualifier is ignored in the filtering.
+   This applies to boolean qualifier declarations.
+2. The CIM version string value in the Version qualifier is defined as 3 integers
+   separated by periods  (ex. 2.14.0). All 3 integers must exist.
+3. The schema component is True if the schema component of classname (characters
+   before "_" match <schema_string>). Ex --schema "CIM"
+4. The ``--leaf-classes`` filter can be important because the pywbem MOF compiler
+   can compile all dependent classes given only the leaf classes.
+
+If multiple filter options are applied, all of the boolean options must be true for
+the class to be displayed and only the classes that pass non-boolean filters
+(ex. ``--schema CIM``) for the classes to be displayed.
+
+Thus, for example:
+
+* the combination of ``--subclass-of CIM_blah`` and
+  ``--leaf-classes`` will return all leaf classes that are a subclass of ``CIM_Blah``.
+* ``--association`` and ``no-experimental`` will display only classes that have
+  the Association qualifier set and the Experimental qualifier not set.
+
+The following example displays classnames that are not associations
+(``--no-association``).  The use of ``--deep-inheritance`` option returns the complete
+set of classes in the namespace rather than just direct subclasses (in this case
+the root classes).
+
+.. code-block:: text
+
+    $ pywbemcli --name mymock class enumerate --no --deep-inheritance --no-association
+    TST_Person
+    TST_Lineage
