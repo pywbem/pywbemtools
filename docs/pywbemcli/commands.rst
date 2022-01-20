@@ -256,8 +256,9 @@ in the default namespace of the connection.
 
 If the class has subclasses, the command is rejected.
 
-If the class has instances, the command is rejected, unless the ``--force``
-command option was specified, in which case the instances are also deleted.
+If the class has instances, the command is rejected, unless the
+``--include-instances`` command option was specified, in which case the
+instances are also deleted.
 
 WARNING: Deleting classes can cause damage to the server: It can impact
 instance providers and other components in the server. Use this command with

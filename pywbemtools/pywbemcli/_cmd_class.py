@@ -44,7 +44,6 @@ from ._common_options import propertylist_option, names_only_option, \
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
-from .._utils import pywbemtools_warn
 from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
     validate_output_format, format_table, warning_msg
@@ -186,9 +185,6 @@ def class_get(context, classname, **options):
 @class_group.command('delete', cls=PywbemtoolsCommand,
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
-@click.option('-f', '--force', is_flag=True, default=False,
-              help=u'Same as --include-instances. The -f / --force option has '
-                   'been deprecated and will be removed in a future version.')
 @click.option('--include-instances', is_flag=True, default=False,
               help=u'Delete any instances of the class as well. '
                    'WARNING: Deletion of instances will cause the removal '
@@ -1187,12 +1183,6 @@ def cmd_class_delete(context, classname, options):
     conn = context.pywbem_server.conn
 
     include_instances = options['include_instances']
-    if options['force']:
-        include_instances = options['force']
-        pywbemtools_warn(
-            "The --force / -f option has been deprecated and will be removed "
-            "in a future version. Use --include-instances instead.",
-            DeprecationWarning)
     dry_run = options['dry_run']
     dry_run_prefix = "Dry run: " if dry_run else ""
 
