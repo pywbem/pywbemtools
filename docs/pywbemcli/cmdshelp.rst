@@ -295,9 +295,6 @@ Help text for ``pywbemcli class delete`` (see :ref:`class delete command`):
         pywbemcli -n myconn class delete CIM_Foo -n interop
 
     Command Options:
-      -f, --force                Same as --include-instances. The -f / --force option has been deprecated and will be
-                                 removed in a future version.
-
       --include-instances        Delete any instances of the class as well. WARNING: Deletion of instances will cause the
                                  removal of corresponding resources in the managed environment (i.e. in the real
                                  world).Default: Reject command if the class has any instances.

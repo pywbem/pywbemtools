@@ -109,7 +109,6 @@ CLASS_DELETE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class delete CLASSNAME '
     '[COMMAND-OPTIONS]',
     'Delete a class.',
-    '-f, --force Same as --include-instances.',
     '--include-instances Delete any instances of the class as well.',
     CMD_OPTION_NAMESPACE_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -1656,25 +1655,6 @@ TEST_CASES = [
      {'stdout': CLASS_DELETE_HELP_LINES,
       'test': 'innows'},
      None, OK],
-
-    # Class delete successful
-    ['Verify class command delete successful with no subclasses, '
-     '--force (deprecated)',
-     {'args': ['delete', 'CIM_Foo_sub_sub', '--force'],
-      'general': ['--warn']},
-     {'stderr': ['DeprecationWarning: The --force / -f option has been '
-                 'deprecated'],
-      'test': 'in'},
-     SIMPLE_MOCK_FILE, OK],
-
-    ['Verify class command delete successful with no subclasses, '
-     '-f (deprecated)',
-     {'args': ['delete', 'CIM_Foo_sub_sub', '-f'],
-      'general': ['--warn']},
-     {'stderr': ['DeprecationWarning: The --force / -f option has been '
-                 'deprecated'],
-      'test': 'in'},
-     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command delete successful with no subclasses, '
      '--include-instances',

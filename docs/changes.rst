@@ -21,6 +21,11 @@ Released: not yet
   to be compatible with other commands that touch the default connection
   definition.
 
+* Removed the deprecated option ``--force`` from the ``class delete`` command.
+  It had been marked deprecated in pywbemtools version 0.9.0 and was superseded
+  by the ``--include-instances`` option which performs exactly the same function.
+  (see issue # 1142)
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -187,6 +192,11 @@ Released: not yet
   minimum-constraints.txt. (see issue #1076)
 
 * Add instance count tests to end-end testing against OpenPegasus.
+
+* Removed the deprecated option ``--force`` from the ``class delete`` command.
+  It had been created in pywbemtools version 0.8.0 and was deprecated in
+  version 0.90 in favor of the ``--include-instances`` option which performs
+  exactly the same function. (see issue # 1142)
 
 **Known issues:**
 
