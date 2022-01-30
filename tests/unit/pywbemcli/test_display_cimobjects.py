@@ -42,7 +42,7 @@ from pywbemtools._output_formatting import DEFAULT_MAX_CELL_WIDTH
 
 from ..pytest_extensions import simplified_test_function
 
-OK = False    # mark tests OK when they execute correctly
+OK = True    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False  # mark tests that are to be skipped.
@@ -459,7 +459,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                   4),
             kwargs={},
             exp_rtn=[
-                ['\n"AB"\n"CD"']],
+                ['"AB"\n"CD"']],
         ),
         None, None, OK),
 
@@ -504,7 +504,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                   20),
             kwargs={},
             exp_rtn=[
-                ['\n"20140922104920.524"\n"789+000"']],
+                ['"20140922104920.524"\n"789+000"']],
         ),
         None, None, OK),
 
