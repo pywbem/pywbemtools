@@ -785,8 +785,7 @@ TEST_CASES = [
                  '   Protocol = 2;',
                  # Result -o plain subscription list-destinations --names-only
                  'host    namespace    class   key=  key=  key=',
-                 'interop  CIM_ListenerDestinationCIMXML  CIM_ComputerSystem '
-                 'MockSystem_WBEMServerTest  CIM_ListenerDestinationCIMXML',
+                 'interop CIM_ListenerDestinationCIMXML  CIM_ListenerDestinationCIMXML  pywbemdestination:defaultpywbemcliSubMgr:odest1  CIM_ComputerSystem   MockSystem_WBEMServerTest',   # noqa: E501
                  # Result list
                  '1 CIMInstance(s) returned',
                  '};'],
@@ -836,7 +835,7 @@ TEST_CASES = [
                  '1 CIMInstance(s) returned',
                  # Result from -o plain subscription list-filters --names-only
                  'host  namespace  class key=  key=  key=  key=',
-                 'interop      CIM_IndicationFilter  CIM_ComputerSystem         MockSystem_WBEMServerTest  CIM_IndicationFilter  pywbemfilter:defaultpywbemcliSubMgr:ofilter1', ],  # noqa: E501
+                 'interop   CIM_IndicationFilter  CIM_IndicationFilter  pywbemfilter:defaultpywbemcliSubMgr:ofilter1  CIM_ComputerSystem  MockSystem_WBEMServerTest', ],  # noqa: E501
       'stderr': [],
       'test': 'innows'},
      None, OK],
@@ -868,7 +867,8 @@ TEST_CASES = [
                  '   Filter =',
                  'interop:CIM_IndicationFilter.CreationClassName=', 'CIM_IndicationFilter',  # noqa: E501
                  'pywbemfilter:defaultpywbemcliSubMgr:ofilter1',
-                 'SystemCreationClassName=', 'CIM_ComputerSystem', 'SystemName=', 'MockSystem_WBEMServerTest',  # noqa: E501
+                 'SystemCreationClassName=', 'CIM_ComputerSystem', 'SystemName=',  # noqa: E501
+                 'MockSystem_WBEMServerTest',
                  ' Handler =',
                  '  OnFatalErrorPolicy = 2;',
                  '   RepeatNotificationPolicy = 2;',

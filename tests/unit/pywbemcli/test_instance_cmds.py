@@ -957,17 +957,17 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify command enumerate with ssociation class inst name table output',
+    ['Verify command enumerate with association class inst name table output',
      {'args': ['enumerate', 'TST_A3', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: TST_A3
 +--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------+
 | host   | namespace   | class   | key=                            | key=                            | key=                            |
-|        |             |         | Initiator                       | Target                          | LogicalUnit                     |
+|        |             |         | Initiator                       | LogicalUnit                     | Target                          |
 |--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------|
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=2 | /root/cimv2:TST_LD.InstanceID=3 |
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=5 | /root/cimv2:TST_LD.InstanceID=6 |
-|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_EP.InstanceID=7 | /root/cimv2:TST_LD.InstanceID=8 |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_LD.InstanceID=3 | /root/cimv2:TST_EP.InstanceID=2 |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_LD.InstanceID=6 | /root/cimv2:TST_EP.InstanceID=5 |
+|        | root/cimv2  | TST_A3  | /root/cimv2:TST_EP.InstanceID=1 | /root/cimv2:TST_LD.InstanceID=8 | /root/cimv2:TST_EP.InstanceID=7 |
 +--------+-------------+---------+---------------------------------+---------------------------------+---------------------------------+
 """,  # noqa: E501
       'rc': 0,

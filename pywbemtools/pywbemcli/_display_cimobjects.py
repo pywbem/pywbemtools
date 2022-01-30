@@ -362,8 +362,9 @@ def _display_paths_as_table(objects, table_width, table_format):
             for key_names, inst_names in objs_by_key_set.items():
                 # Build headers for this table with the common elements and key
                 # names for each key in the object. We use inst_names[0] to
-                # restore original case to key strings.
-                inst_keys = original_keys[key_names]
+                # restore original case to key strings. We sort keys for
+                # consistent table output.
+                inst_keys = sorted(original_keys[key_names])
 
                 rows = []
                 for instname in inst_names:
