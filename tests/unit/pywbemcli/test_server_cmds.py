@@ -66,8 +66,6 @@ SERVER_HELP_LINES = [
     CMD_OPTION_HELP_HELP_LINE,
     'brand             Get the brand of the server.',
     'info              Get information about the server.',
-    'interop           Get the Interop namespace of the server (deprecated).',
-    'namespaces        List the namespaces of the server (deprecated).',
     'add-mof           Compile MOF and add/update CIM objects in the server.',
     'remove-mof        Compile MOF and remove CIM objects from the server.',
     'schema            Get information about the server schemas.'
@@ -82,18 +80,6 @@ SERVER_BRAND_HELP_LINES = [
 SERVER_INFO_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] server info [COMMAND-OPTIONS]',
     'Get information about the server.',
-    CMD_OPTION_HELP_HELP_LINE,
-]
-
-SERVER_INTEROP_HELP_LINES = [
-    'Usage: pywbemcli [GENERAL-OPTIONS] server interop [COMMAND-OPTIONS]',
-    'Get the Interop namespace of the server (deprecated).',
-    CMD_OPTION_HELP_HELP_LINE,
-]
-
-SERVER_NAMESPACES_HELP_LINES = [
-    'Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [COMMAND-OPTIONS]',
-    'List the namespaces of the server (deprecated)',
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -165,30 +151,6 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify server command interop --help response',
-     ['interop', '--help'],
-     {'stdout': SERVER_INTEROP_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify server command interop -h response',
-     ['interop', '-h'],
-     {'stdout': SERVER_INTEROP_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify server command namespaces --help response',
-     ['namespaces', '--help'],
-     {'stdout': SERVER_NAMESPACES_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify server command namespaces -h response',
-     ['namespaces', '-h'],
-     {'stdout': SERVER_NAMESPACES_HELP_LINES,
-      'test': 'innows'},
-     None, OK],
-
     ['Verify server command schema --help response',
      ['schema', '--help'],
      {'stdout': SERVER_SCHEMA_HELP_LINES,
@@ -204,46 +166,6 @@ TEST_CASES = [
     #
     #   Verify the individual commands returning data
     #
-    ['Verify server command interop default output',
-     {'args': ['interop'], },
-     {'stdout': ['interop'],
-      'rc': 0,
-      'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
-
-    ['Verify server command interop',
-     {'args': ['interop'],
-      'general': ['-o', 'text']},
-     {'stdout': ['interop'],
-      'rc': 0,
-      'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
-
-    ['Verify server command namespaces',
-     {'args': ['namespaces'],
-      'general': ['-o', 'simple']},
-     {'stdout': ['Namespace Name',
-                 '----------------',
-                 'interop',
-                 'root/cimv2'],
-      'rc': 0,
-      'test': 'lines'},
-     MOCK_SERVER_MODEL, OK],
-
-    ['Verify server command namespaces, text output',
-     {'args': ['namespaces'],
-      'general': ['-o', 'text']},
-     {'stdout': ['interop', 'root/cimv2'],
-      'rc': 0,
-      'test': 'lines'},
-     MOCK_SERVER_MODEL, OK],
-
-    ['Verify server command namespaces with sort option',
-     {'args': ['namespaces'], },
-     {'stdout': ['interop'],
-      'rc': 0,
-      'test': 'innows'},
-     MOCK_SERVER_MODEL, OK],
 
     ['Verify server command brand',
      {'args': ['brand'], },

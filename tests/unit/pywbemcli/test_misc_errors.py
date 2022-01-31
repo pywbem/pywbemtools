@@ -62,8 +62,7 @@ TEST_CASES_CONNECTION_FAIL = [
     ['qualifier', 'get qualblah', OK],
     ['qualifier', 'enumerate', OK],
 
-    ['server', 'namespaces', OK],
-    ['server', 'interop', OK],
+
     ['server', 'brand', OK],
     ['server', 'info', OK],
 

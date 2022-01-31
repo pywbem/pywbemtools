@@ -38,8 +38,6 @@ from .pywbemcli import cli
 from ._common import pywbem_error_exception, parse_version_value, \
     is_experimental_class
 from ._common_options import namespace_option
-from ._cmd_namespace import cmd_namespace_list, cmd_namespace_interop
-from .._utils import pywbemtools_warn
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option
@@ -89,46 +87,6 @@ def server_group():
     'server' keyword.
     """
     pass  # pylint: disable=unnecessary-pass
-
-
-@server_group.command('namespaces', cls=PywbemtoolsCommand,
-                      options_metavar=CMD_OPTS_TXT)
-@add_options(help_option)
-@click.pass_obj
-def server_namespaces(context):
-    """
-    List the namespaces of the server (deprecated).
-
-    The Interop namespace must exist on the server.
-
-    Deprecated: The 'server namespaces' command is deprecated and will be
-    removed in a future version. Use the 'namespace list' command instead.
-    """
-    pywbemtools_warn(
-        "The 'server namespaces' command is deprecated and will be removed in "
-        "a future version. Use the 'namespace list' command instead.",
-        DeprecationWarning)
-    context.execute_cmd(lambda: cmd_namespace_list(context))
-
-
-@server_group.command('interop', cls=PywbemtoolsCommand,
-                      options_metavar=CMD_OPTS_TXT)
-@add_options(help_option)
-@click.pass_obj
-def server_interop(context):
-    """
-    Get the Interop namespace of the server (deprecated).
-
-    The Interop namespace must exist on the server.
-
-    Deprecated: The 'server interop' command is deprecated and will be removed
-    in a future version. Use the 'namespace interop' command instead.
-    """
-    pywbemtools_warn(
-        "The 'server interop' command is deprecated and will be removed in "
-        "a future version. Use the 'namespace interop' command instead.",
-        DeprecationWarning)
-    context.execute_cmd(lambda: cmd_namespace_interop(context))
 
 
 @server_group.command('brand', cls=PywbemtoolsCommand,

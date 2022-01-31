@@ -1976,8 +1976,6 @@ Help text for ``pywbemcli server`` (see :ref:`server command group`):
       -h, --help  Show this help message.
 
     Commands:
-      namespaces  List the namespaces of the server (deprecated).
-      interop     Get the Interop namespace of the server (deprecated).
       brand       Get the brand of the server.
       info        Get information about the server.
       add-mof     Compile MOF and add/update CIM objects in the server.
@@ -2064,56 +2062,6 @@ Help text for ``pywbemcli server info`` (see :ref:`server info command`):
       Get information about the server.
 
       The information includes CIM namespaces and server brand.
-
-    Command Options:
-      -h, --help  Show this help message.
-
-
-.. _`pywbemcli server interop --help`:
-
-pywbemcli server interop --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-Help text for ``pywbemcli server interop`` (see :ref:`server interop command`):
-
-
-::
-
-    Usage: pywbemcli [GENERAL-OPTIONS] server interop [COMMAND-OPTIONS]
-
-      Get the Interop namespace of the server (deprecated).
-
-      The Interop namespace must exist on the server.
-
-      Deprecated: The 'server interop' command is deprecated and will be removed in a future version. Use the 'namespace
-      interop' command instead.
-
-    Command Options:
-      -h, --help  Show this help message.
-
-
-.. _`pywbemcli server namespaces --help`:
-
-pywbemcli server namespaces --help
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-Help text for ``pywbemcli server namespaces`` (see :ref:`server namespaces command`):
-
-
-::
-
-    Usage: pywbemcli [GENERAL-OPTIONS] server namespaces [COMMAND-OPTIONS]
-
-      List the namespaces of the server (deprecated).
-
-      The Interop namespace must exist on the server.
-
-      Deprecated: The 'server namespaces' command is deprecated and will be removed in a future version. Use the 'namespace
-      list' command instead.
 
     Command Options:
       -h, --help  Show this help message.

@@ -16,6 +16,10 @@ Released: not yet
 
 * Dropped support for Python 3.4. (issue #1129)
 
+* Removed deprecated commands (``server namespaces`` and ``server interop``.
+  These commands are part of the namespace group ``namespace list`` and
+  ``namespace interop``.)
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -44,6 +48,8 @@ Released: not yet
   was modified to use root/interop in the container. The image contains the
   OpenPegasus components to run the server against a repository based on
   the DMTF schema version 2.41.0.
+
+* Remove deprecated commands ``server namespaces`` and ``server interop``.
 
 **Known issues:**
 
