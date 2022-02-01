@@ -25,4 +25,4 @@ Version of the pywbemtools package.
 #:
 #: * "M.N.P.devD": Development level D of a not yet released version M.N.P
 #: * "M.N.P": A released version M.N.P
-__version__ = '1.0.0'
+__version__ = '1.0.1.dev1'
