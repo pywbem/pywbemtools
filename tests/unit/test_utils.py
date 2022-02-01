@@ -20,6 +20,7 @@ Tests for _utils.py module
 from __future__ import absolute_import, print_function
 
 import os
+import shutil
 import mock
 import click
 import six
@@ -362,8 +363,8 @@ def test_to_unicode(testcase, obj, exp_result):
     assert act_result == exp_result
 
 
-# Special value to expect width returned by click.get_terminal_size()
-CLICK_TERMINAL_WIDTH = -1
+# Special value to expect the actual terminal width.
+ACTUAL_TERMINAL_WIDTH = -1
 
 TESTCASES_GET_TERMINAL_WIDTH = [
 
@@ -379,8 +380,7 @@ TESTCASES_GET_TERMINAL_WIDTH = [
     #   * default_table_width_conf: Input value for DEFAULT_TABLE_WIDTH config
     #     parameter, None for using the built-in default.
     #   * exp_result: Expected returned terminal width. The special value
-    #     CLICK_TERMINAL_WIDTH can be used to expect the click terminal width
-    #     as determined by click.get_terminal_size().
+    #     ACTUAL_TERMINAL_WIDTH can be used to expect the actual terminal width.
     # * exp_exc_types: Expected exception type(s), or None.
     # * exp_warn_types: Expected warning type(s), or None.
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
@@ -391,7 +391,7 @@ TESTCASES_GET_TERMINAL_WIDTH = [
             termwidth_env=None,
             use_terminal_width_conf=None,
             default_table_width_conf=None,
-            exp_result=CLICK_TERMINAL_WIDTH,
+            exp_result=ACTUAL_TERMINAL_WIDTH,
         ),
         None, None, True
     ),
@@ -411,7 +411,7 @@ TESTCASES_GET_TERMINAL_WIDTH = [
             termwidth_env='abc',
             use_terminal_width_conf=None,
             default_table_width_conf=None,
-            exp_result=CLICK_TERMINAL_WIDTH,
+            exp_result=ACTUAL_TERMINAL_WIDTH,
         ),
         None, None, True
     ),
@@ -421,7 +421,7 @@ TESTCASES_GET_TERMINAL_WIDTH = [
             termwidth_env=None,
             use_terminal_width_conf=True,
             default_table_width_conf=83,
-            exp_result=CLICK_TERMINAL_WIDTH,
+            exp_result=ACTUAL_TERMINAL_WIDTH,
         ),
         None, None, True
     ),
@@ -493,8 +493,11 @@ def test_get_terminal_width(
         # are not mistaken as expected exceptions
         assert testcase.exp_exc_types is None
 
-        if exp_result == CLICK_TERMINAL_WIDTH:
-            exp_result = click.get_terminal_size()[0]
+        if exp_result == ACTUAL_TERMINAL_WIDTH:
+            try:
+                exp_result = shutil.get_terminal_size()[0]
+            except AttributeError:
+                exp_result = click.get_terminal_size()[0]
 
         assert act_result == exp_result
 

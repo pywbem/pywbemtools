@@ -22,6 +22,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for
+  new features. Adjusted testcases accordingly.
+
 **Cleanup:**
 
 * Extend use of general options in interactive mode to allow setting the

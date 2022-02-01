@@ -45,9 +45,10 @@ safety>=1.9.0; python_version >= '3.5'
 dparse>=0.4.1,<0.5.0; python_version == '2.7'
 dparse>=0.5.1; python_version >= '3.5'
 # Safety requires Click>6.0 and the upgrade strategy 'eager' causes Click to be
-# upgraded to 8.0.0, unless we repeat the Click requirements from requirements.txt.
-Click>=7.1.1,<8.0; python_version == '2.7'
-Click>=7.1.1,<8.0; python_version >= '3.5'
+# upgraded to 8.0.0, unless we repeat the Click requirements from
+# requirements.txt. Keep them in sync.
+Click>=7.1.1,<8.0; python_version <= '3.5'
+Click>=8.0.1; python_version >= '3.6'
 
 # PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 5.3 fixed narrow build error on Python 2.7

@@ -22,6 +22,7 @@ from __future__ import print_function, absolute_import
 
 import os
 import io
+import shutil
 import warnings
 import inspect
 from datetime import datetime
@@ -132,10 +133,7 @@ def pywbemtools_warn_explicit(*args, **kwargs):
 
 def get_terminal_width():
     """
-    Return the terminal width to use.
-
-    Note: On Windows, click.get_terminal_size() results in terminal sizes of 0
-    in some cases.
+    Return the terminal width to use, as an integer.
     """
 
     terminal_width = os.getenv(TERMWIDTH_ENVVAR, None)
@@ -147,7 +145,16 @@ def get_terminal_width():
             pass
 
     if USE_TERMINAL_WIDTH:
-        return click.get_terminal_size()[0]
+        # We first try shutil.get_terminal_size() which was added in Python 3.3.
+        # Click 8.0 has deprecated click.get_terminal_size() and issues a
+        # DeprecationWarning, but on Python 2.7, Click is pinned to <8.0, so we
+        # can use click.get_terminal_size() without triggering the
+        # DeprecationWarning.
+        try:
+            ts = shutil.get_terminal_size()
+        except AttributeError:
+            ts = click.get_terminal_size()
+        return ts[0]
 
     return DEFAULT_TABLE_WIDTH
 
