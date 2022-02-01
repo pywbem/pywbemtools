@@ -953,7 +953,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                               display_attrs=True)
 
     _python_nm = sys.version_info[0:2]
-    if _python_nm in ((2, 7), (3, 4)):
+    if _python_nm in ((2, 7),):
         pywbemtools_warn(
             "Pywbemcli support for Python {}.{} is deprecated and will be "
             "removed in a future version".

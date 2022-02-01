@@ -138,7 +138,7 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
     ctx.obj = ContextObj(output_format, logdir, verbose, pdb, warn)
 
     _python_nm = sys.version_info[0:2]
-    if _python_nm in ((2, 7), (3, 4)):
+    if _python_nm in ((2, 7),):
         pywbemtools_warn(
             "Pywbemlistener support for Python {}.{} is deprecated and will be "
             "removed in a future version".
