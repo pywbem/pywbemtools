@@ -4,6 +4,7 @@ This file contains extensions to Click for pywbemtools.
 
 import sys
 from collections import OrderedDict
+import packaging.version
 
 import click
 
@@ -11,6 +12,9 @@ import click
 GENERAL_OPTS_TXT = '[GENERAL-OPTIONS]'
 CMD_OPTS_TXT = '[COMMAND-OPTIONS]'
 SUBCMD_HELP_TXT = "COMMAND [ARGS] " + CMD_OPTS_TXT
+
+# Click version as a tuple
+CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 
 class PywbemtoolsGroup(click.Group):
@@ -107,6 +111,21 @@ class PywbemtoolsTopGroup(click.Group):
                 cmd_list.append(cmd_list.pop(i - pop_count))
                 pop_count += 1
         return cmd_list
+
+    def __call__(self, *args, **kwargs):
+        """
+        This method is called once for each execution of the pywbemtools
+        command, by the generated command entry point code (e.g. the 'pywbemcli'
+        script).
+
+        This method extends the default behavior by disabling wildcard expansion
+        on Windows, when using Click 8.0.1 or higher (that is the version which
+        introduced this argument).
+        """
+        if CLICK_VERSION >= (8, 0, 1):
+            kwargs = dict(kwargs)
+            kwargs['windows_expand_args'] = False
+        return self.main(*args, **kwargs)
 
 
 class PywbemtoolsCommand(click.Command):

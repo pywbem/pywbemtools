@@ -106,10 +106,11 @@ nocaselist==1.0.3
 nocasedict==1.0.1
 six==1.14.0; python_version <= '3.9'
 six==1.16.0; python_version >= '3.10'
-Click==7.1.1; python_version == '2.7'
-Click==7.1.1; python_version >= '3.5'
+Click==7.1.1; python_version <= '3.5'
+Click==8.0.1; python_version >= '3.6'
 click-spinner==0.1.8
-click-repl==0.1.6
+click-repl==0.1.6; python_version <= '3.5'
+click-repl==0.2; python_version >= '3.6'
 asciitree==0.3.3
 tabulate==0.8.2; python_version <= '3.9'
 tabulate==0.8.8; python_version >= '3.10'

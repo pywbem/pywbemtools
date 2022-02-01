@@ -41,6 +41,10 @@ import click
 import six
 from six.moves import shlex_quote
 
+
+# Click version as a tuple
+CLICK_VERSION = packaging.version.parse(click.__version__).release
+
 # Click issue #1231:
 # On Windows, the Click package has the issue that it writes '\n' at the Python
 # level as '\r\r\n' at the level of the Windows shell, and Popen() with
@@ -53,7 +57,6 @@ from six.moves import shlex_quote
 # all Python versions except 3.4. It turns out that the circumvention is also
 # needed on Python 2.7, even though Click 7.1 is used there (not clear why).
 # The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
-CLICK_VERSION = packaging.version.parse(click.__version__)
 CLICK_ISSUE_1231 = sys.version_info[0:2] <= (3, 4) and sys.platform == 'win32'
 
 

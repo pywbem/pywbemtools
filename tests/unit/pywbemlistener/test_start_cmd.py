@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function
 import pytest
 
 from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
+from ..utils import CLICK_VERSION
 
 
 # Default indication format (must be in sync with actual default format)
@@ -132,8 +133,10 @@ START_TESTCASES = [
         ),
         dict(
             rc=2,
-            stderr=[r"Invalid value for .*--scheme.: invalid choice: "
-                    r"badscheme"],
+            stderr=[r"Invalid value for .*--scheme.: " +
+                    r"invalid choice: badscheme"
+                    if CLICK_VERSION < (8, 0) else
+                    r"'badscheme' is not one of 'http', 'https'"],
             test='contains',
         ),
         RUN,

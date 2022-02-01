@@ -31,6 +31,7 @@ from pywbemtools._utils import CONNECTIONS_FILENAME
 
 from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
+from ..utils import CLICK_VERSION
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -401,7 +402,10 @@ TEST_CASES = [
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Invalid value', '-U', '--use-pull',
-                 'invalid choice: blah. (choose from yes, no, either)'],
+                 'invalid choice: blah. (choose from yes, no, either)'
+                 if CLICK_VERSION < (8, 0) else
+                 "'blah' is not one of 'yes', 'no', 'either'"
+                 ],
       'rc': 2,
       'test': 'innows'},
      None, OK],
@@ -420,7 +424,9 @@ TEST_CASES = [
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Invalid value for', '--pull-max-cnt',
-                 'blah is not a valid integer'],
+                 "blah is not a valid integer"
+                 if CLICK_VERSION < (8, 0) else
+                 "'blah' is not a valid integer"],
       'rc': 2,
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
