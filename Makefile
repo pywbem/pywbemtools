@@ -294,6 +294,7 @@ test_log_file := test_$(python_version_fn).log
 # - 42297: Bleach before 3.11, a mutation XSS afects user calling bleach.clean
 # - 42298: Bleach before 3.12, mutation XSS affects bleach.clean
 # - 42559 pip, before 21.1 CVE-2021-3572
+# - 43975: urllib3 before 1.26.5 CVE-2021-33503, not important for pywbemtools
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -331,6 +332,7 @@ safety_ignore_opts := \
 	-i 42297 \
 	-i 42298 \
 	-i 42559 \
+	-i 43975 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
