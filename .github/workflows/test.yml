@@ -38,69 +38,15 @@ jobs:
         if [[ "${{ github.event_name }}" == "schedule" || "${{ github.head_ref }}" =~ ^release_ ]]; then \
           echo "::set-output name=matrix::{ \
             \"os\": [ \"ubuntu-latest\", \"macos-latest\", \"windows-latest\" ], \
-            \"python-version\": [ \"2.7\", \"3.4\", \"3.5\", \"3.6\", \"3.7\", \"3.8\", \"3.9\", \"3.10\" ], \
+            \"python-version\": [ \"2.7\", \"3.5\", \"3.6\", \"3.7\", \"3.8\", \"3.9\", \"3.10\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
-            \"exclude\": [ \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"latest\" \
-              } \
-            ], \
-            \"include\": [ \
-              { \
-                \"os\": \"ubuntu-18.04\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-18.04\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"latest\" \
-              } \
-            ] \
           }"; \
         else \
           echo "::set-output name=matrix::{ \
             \"os\": [ \"ubuntu-latest\" ], \
-            \"python-version\": [ \"2.7\", \"3.10\" ], \
+            \"python-version\": [ \"2.7\", \"3.5\", \"3.10\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"include\": [ \
-              { \
-                \"os\": \"ubuntu-18.04\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-18.04\", \
-                \"python-version\": \"3.4\", \
-                \"package_level\": \"latest\" \
-              }, \
               { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"2.7\", \
@@ -245,7 +191,7 @@ jobs:
         COVERALLS_PARALLEL: true
         COVERALLS_FLAG_NAME: "${{ matrix.os }},${{ matrix.python-version }},${{ matrix.package_level }}"
       run: |
-        if ! [[ ${{ matrix.python-version }} =~ (3.4) ]]; then coveralls; fi
+        coveralls
     - name: Run installtest
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
