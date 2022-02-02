@@ -191,6 +191,10 @@ jobs:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
       run: |
         make install
+    - name: Display Python packages
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+      run: |
         echo "Installed Python packages:"
         pip list
     - name: Development setup
@@ -198,6 +202,10 @@ jobs:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
       run: |
         make develop
+    - name: Display Python packages
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+      run: |
         echo "Installed Python packages:"
         pip list
     - name: Display platform and env vars
