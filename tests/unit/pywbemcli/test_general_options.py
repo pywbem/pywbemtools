@@ -570,10 +570,9 @@ TEST_CASES = [
      {'general': ['--mock-server', 'invalidfilename.mof'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Mock file ',
-                 'invalidfilename.mof',
-                 ' does not exist'],
-      'rc': 1,
+     {'stderr': "Invalid value for '-m' / '--mock-server': "
+                "File 'invalidfilename.mof' does not exist.",
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
@@ -581,10 +580,9 @@ TEST_CASES = [
      {'general': ['--mock-server', 'invalidfilename.mofx'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Mock file ',
-                 'invalidfilename.mofx',
-                 ' has invalid suffix'],
-      'rc': 1,
+     {'stderr': "Invalid value for '-m' / '--mock-server': File " \
+                "'invalidfilename.mofx' does not exist.",
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
@@ -716,10 +714,9 @@ TEST_CASES = [
      {'general': ['--mock-server', 'fred'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': ['Error: Mock file',
-                 'fred',
-                 'has invalid suffix'],
-      'rc': 1,
+     {'stderr': ["Invalid value for", "'-m' / '--mock-server'", "File",
+                 "'fred'", "does not exist."],
+      'rc': 2,
       'test': 'innows'},
      None, OK],
 
@@ -1417,7 +1414,7 @@ TEST_CASES = [
 
      None, OK],
 
-    ['Verify  misc general options with "" value reset the option to None',
+    ['Verify  misc general options with value "" resetting the option to None',
      {'general': ['--server', 'http://blah',
                   '--default-namespace', 'root/blah',
                   '--user', 'fred',
@@ -1430,11 +1427,11 @@ TEST_CASES = [
       'stdin': ['--log "" --output-format "" connection show'],
       'cmdgrp': None},
      # Test for user and password with no values
-     # NOTE: We cannot really test --log, --output-format changes
+     # NOTE: We cannot really test --log, changes
      {'stdout': ['default-namespace  root/blah'],
       'rc': 0,
       'test': 'innows'},
-     None, OK],
+     None, RUN],
 
     # NOTE: Other tests for --log option in interactive mode in test_log_option
 
@@ -1770,6 +1767,7 @@ realsvr2  http://realsvr2  root/cim5    fred           90  False                
 
 
 class TestGeneralOptions(CLITestsBase):
+    # pylint: disable=too-few-public-methods
     """
     Test the general options including statistics,  --server,
     --timeout, --use-pull, --pull-max-cnt, --output-format

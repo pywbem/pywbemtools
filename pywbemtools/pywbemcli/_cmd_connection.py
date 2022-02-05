@@ -42,10 +42,13 @@ from ._common import pick_one_from_list, pywbem_error_exception, \
 from ._connection_repository import ConnectionsFileError
 from ._context_obj import ContextObj
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TabCompleteArgument
+
 from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
     validate_output_format, format_table, fold_strings
+
+from .pywbemcli import connection_name_complete
 
 # Issue 224 - Exception in prompt-toolkit with python 2.7. Caused because
 # with prompt-toolkit 2 + the completer requires unicode and click_repl not
@@ -151,7 +154,9 @@ def connection_show(context, name, **options):
 
 @connection_group.command('delete', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=False)
+@click.argument('name', type=str, metavar='NAME', required=False,
+                shell_complete=connection_name_complete,
+                cls=TabCompleteArgument)
 @add_options(help_option)
 @click.pass_obj
 def connection_delete(context, name):

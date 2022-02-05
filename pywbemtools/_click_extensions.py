@@ -191,11 +191,42 @@ def pywbemtools_format_options(self, ctx, formatter):
             formatter.write_dl(opts)
 
 
+class TabCompleteArgument(click.Argument):
+    """
+    click.argument subclass to be used wherever shell_complete is part of the
+    attributes. Removes the shell_complete attribute if Click version less that
+    version 8 since it is not defined for Click 7
+    """
+    def __init__(self, *args, **kwargs):
+        # Remove the shell_complete option which is not defined in click 7
+        if CLICK_VERSION[0] < 8:
+            kwargs.pop('shell_complete', [])
+
+        super(TabCompleteArgument, self).__init__(*args, **kwargs)
+
+
+class TabCompleteOption(click.Option):
+    """
+    click.Option subclass to override Option for any option that sets the
+    shell_complete attribute. If click version 7, remove the click8 only
+    attribute since that attribute does not exist in Click 7
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Remove shell_complete option and pass other args and kwargs to
+        superclass
+        """
+        # Remove the shell_complete option which is not defined in click 7
+        if CLICK_VERSION[0] < 8:
+            kwargs.pop('shell_complete', [])
+        super(TabCompleteOption, self).__init__(*args, **kwargs)
+
+
 # The following MutuallyExclusiveOption originated with a number of
 # discussions on stack overflow and a github gist at
 # https://gist.github.com/stanchan/bce1c2d030c76fe9223b5ff6ad0f03db
 
-class MutuallyExclusiveOption(click.Option):
+class MutuallyExclusiveOption(TabCompleteOption):
     """
     This class subclasses Click option to allow defining mutually exclusive
     options.

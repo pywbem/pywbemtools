@@ -27,13 +27,19 @@ within the pywbemtools package.
 
 Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
-The command line can contain the following components:
+The pywbemcli command is invoked with a command  and arguments/options:
+
+.. code-block:: text
+
+    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGS]
+
+Where the components are:
 
 The pywbemcli command is invoked with a command and arguments/options:
 
 .. code-block:: text
 
-    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGUMENTSS]
+    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGUMENTS]
     or
     $ pywbemcli [GENERAL-OPTIONS] COMMAND [ARGUMENTS] [COMMAND-OPTIONS]
 
@@ -58,7 +64,7 @@ Where the components are:
 
 .. index:: pair: command arguments; command components
 
-* **ARGUMENTSS** - Arguments may be defineda specific command. Arguments
+* **ARGUMENTS** - Arguments may be defineda specific command. Arguments
   are not individually
   documented in the help and do not have preceeding dashes. In pywbemcli
   arguments are only used in commands. There are no general arguments.
@@ -76,17 +82,17 @@ do not begin with ``-``.
 
 .. index:: pair: command groups; command interface
 
-Command groups are named after the objects the commands operate on
+Command groups are generally named after the objects the commands operate on
 (ex. ``class``, ``instance``, ``qualifier``, ``server``, ``connection``,
 ``namespace``, etc.). Executing:
 
 .. code-block:: text
 
    $ pywbemcli --help
-   ...
+
    Commands:
      class       Command group for CIM classes.
-   ...
+     ...
 
 
 returns the list of command groups under the title `Commands`.
@@ -94,6 +100,9 @@ returns the list of command groups under the title `Commands`.
 Commands are named after actions on these objects
 (ex. ``get``, ``create``, ``delete``). The list of commands for each group
 is displayed with the command `pywbemcli <group name> --help`.
+
+The list of commands for each group
+is listed with the command `pywbemcli <group name> --help`.
 
 For example, the command:
 
@@ -106,12 +115,67 @@ the MOF output format. The option ``--output-format`` is a general option
 and ``--namespace`` is a command option.
 
 .. index::
-   pair: tab-completion; auto-completion
+   pair: tab-completion; auto-suggestion
    single: auto-suggestion
 
-Pywbemcli supports several modes of tab-completion, auto-completion suggestions
-depending on whether it is in command or interactive mode. This is detailed
-in the following sections.
+Pywbemcli supports  :term:`tab-completion` and :term:`auto-suggestion`
+depending on whether it is in command mode or interactive mode.
+
+  * :ref:`interactive mode` - both tab-completion and auto-suggestion are always
+    available.
+  * :ref:`command mode` - tab-completion is available with some command shells
+    and only when activated for the shell type.  Auto-suggestion is not
+    available.
+
+Tab-completion is available in pywbemcli for:
+    * All comand group and command names
+    * All option names
+    * At least the following general options values:
+        * --name
+        * --mock-server - The completion uses the default connection file
+          unless the --connection-file general option has already been defined
+          for an alternate connection file on the command line.
+        * --connection-file
+        * --keyfile
+        * --certfile
+        * --use-pull
+        * --output-format
+    * At least the following command arguments
+        * help <subject-argument>
+    * At least the following command options
+        * Subscription <command> --owned / -- permanent option
+
+Tab-completion for option/argument values only works for pywbemcli running with
+Python version greater than 3.5. If pywbemcli is running on Python 3.5 or 2.7,
+option values has no support for tab-completion. Nothing happens if <TAB> is
+hit while entering an option value. However, the tab-completion of other
+command line syntax elements is supported.
+
+
+.. code-block:: text
+
+    $ pywbemcli --<TAB><TAB>
+    ... <shows the general options to select from>
+
+    $ pywbemcli <TAB><TAB>
+    ... <shows the command groups to select from>
+
+    $ pywbemcli clas<TAB>
+    ... completes the command group class
+
+    $ pywbemcli class <TAB><TAB>
+    ... <shows the class commands to select from>
+
+    $ pywbemcli -n moc <TAB><TAB>  (Only only with Python 3)
+    ... returns connection names in the default connection file that start
+    ... with moc
+
+Tab-completion for ``pywbemcli`` is used like any other tab-completion by
+hitting <TAB> or <TAB><TAB> where completion is possible. Generally <TAB>
+returns a complete response completion if there is only one available while
+<TAB><TAB> returns a list if there are multiple possible completions but the
+exact behavior depends on the shell and any number of shell flags, extensions
+that are particular to each shell.
 
 .. index::
     pair: Modes of operation; Command mode
@@ -161,41 +225,13 @@ WBEM server on ``localhost``:
 
 .. index::
    pair: tab-completion; command mode
-   pair: auto-completion; command mode
+   pair: auto-suggestion; command mode
 
-In command mode, tab completion is also supported for some command shells, but
-must be enabled specifically for each shell.
+In command mode, tab-completion is supported for some command shells (ex. bash,
+zsh), but must be activated specifically for each command line shell type.
+Section :ref:"Activating shell tab-completion" documents the mechanisms for
+activating shell completion.
 
-.. index::
-   pair: command mode; bash
-
-For example, with a bash shell, enter the following to enable tab completion of
-pywbemcli:
-
-.. code-block:: text
-
-    $ eval "$(_PYWBEMCLI_COMPLETE=source pywbemcli)"
-
-Bash tab completion for ``pywbemcli`` is used like any other bash tab
-completion:
-
-.. code-block:: text
-
-    $ pywbemcli --<TAB><TAB>
-    ... <shows the general options to select from>
-
-    $ pywbemcli <TAB><TAB>
-    ... <shows the command groups to select from>
-
-    $ pywbemcli class <TAB><TAB>
-    ... <shows the class commands to select from>
-
-Pywbemcli uses the Python
-`click package <https://click.palletsprojects.com/en/8.x/>`_
-for its command line handling. See
-`Bash Complete in the Click documentation <https://click.palletsprojects.com/en/8.x/bashcomplete/>`_
-for additional features of the Bash tab completion of pywbemcli. This includes
-information on how to enable the auto complete on the command line.
 
 
 .. index:: pair: interactive mode; command modes
@@ -210,6 +246,9 @@ In interactive mode (also known as :term:`REPL` mode), pywbem provides an
 interactive shell environment that allows typing pywbemcli commands, internal
 commands (for operating the pywbemcli shell), and external commands (that are
 executed in the standard shell of the user).
+
+The pywbemcli shell uses the prompt ``pywbemcli>``. The cursor is shown in
+the examples as an underscore (``_``) in the following examples in this document.
 
 This pywbemcli shell is started when the ``pywbemcli`` command is invoked
 without specifying any command group or command:
@@ -226,9 +265,6 @@ command:
 
     $ pywbemcli [GENERAL-OPTIONS] repl
     pywbemcli> _
-
-The pywbemcli shell uses the prompt ``pywbemcli>``. The cursor is shown in
-the examples above as an underscore (``_``).
 
 The commands and options that can be typed in the pywbemcli shell are the rest
 of the command line that would follow the ``pywbemcli`` command in
@@ -363,14 +399,17 @@ example:
 
 .. index::
    pair: tab-completion; interactive mode
-   pair: auto-completion; interactive mode
+   pair: auto-suggestion; interactive mode
 
-The pywbemcli shell in the interactive mode supports popup help text while for
-commands, arguments, and options typing, where the valid choices are shown
-based upon what was typed so far, and where an item from the popup list can be
-picked with <TAB> or with the cursor keys. It can be used to select from the
-list of general options. In the following examples, an underscore ``_`` is
-shown as the cursor:
+The pywbemcli shell in the interactive mode always supports tab-completion and
+usually with popup help text for commands, arguments, and options typing, where
+the valid choices are shown based upon what was typed so far, and where an item
+from the popup list can be picked with <TAB> or with the cursor keys. It can be
+used to select from the list of general options. Interacitve
+mode tab-completion may differ from command mode tab-completion because the
+support is provided by a python package and not the shell. The following
+examples show interactive mode tab-completion; an
+underscore ``_`` is shown as the cursor:
 
 .. code-block:: text
 
@@ -383,10 +422,80 @@ shown as the cursor:
     pywbemcli> cl_
                   class
 
+Interactive mode uses a combination of tab-completion and auto-suggestion  for
+aut completion which are both always active:
+
+  * :term:`tab-completion` - In this mode, a single <TAB> enables the display of
+    available completion possibilities for command groups, commands, options
+    and selected option values.
+  * :term:`auto-suggestion` - The pywbemcli interactive mode also supports
+    automated parameter suggestions based on the pywbemcli history file which
+    works with the tab-completion described above. The input is compared to
+    the history and when there is another entry starting with the given text,
+    the completion will be shown as gray text behind the current input.
+    Pressing the right arrow → or <CTRL>-e will insert this suggestion.
+
+
+General options can be entered in the interactive mode but they generally only
+apply to the current command defined in the same command input as the general
+option.  Thus, to modify the output format for a particular command, enter the
+--output-format general option before the command.  The following command
+sets the output format to ``table`` before executing the command and then
+restores it to the original value.:
+
+.. code-block:: text
+
+    pywbemcli> --output-format table instance enumerate CIM_Foo
+
+A particular difference between general options in the interactive mode and
+the command line mode is the ability to set general options back to their
+default value in the interactive mode.   In the command mode this is not
+required.  However, in the interactive mode, it could be useful to reset a
+general option to its default value for a command.  Thus, if the log was set
+on startup (--log all), it could be disabled for a command or the user name
+(--user) could be set back to None.  However, normally the default value is
+only set by not including that general option with the command line input
+
+To reset selected string type general options in the interactive, the string
+value of ``""`` (an empty string) is provided as the value which causes pywbemcli
+to set the default value of that general option.
+
+The following code defines a server with ``--user`` and ``--password`` in interactive
+mode.  Then it attempts to modify the user and password to their default values
+of None and execute the class enumerate again.  This command would be executed
+without using the user and password because they have been reset for that command.
+
+The following is an example of tab-completion when the next expected element is
+an option; a single <TAB> enables the display of available completion possibilities:
+
+.. code-block:: text
+
+    pywbemcli> class enumerate <TAB>
+     --di                   Include the complete subclass hierarchy of the requested classes in the result set. Default: Do not include sub...
+     --deep-inheritance     Include the complete subclass hierarchy of the requested classes in the result set. Default: Do not include sub...
+     --lo                   Do not include superclass properties and methods in the returned class(es). Default: Include superclass propert...
+     --local-only           Do not include superclass properties and methods in the returned class(es). Default: Include superclass propert...
+     --nq                   Do not include qualifiers in the returned class(es). Default: Include qualifiers.
+     --no-qualifiers        Do not include qualifiers in the returned class(es). Default: Include qualifiers.
+     --ico                  Include class origin information in the returned class(es). Default: Do not include class origin information.
+
+Example of auto suggestion:
+
+.. code-block:: text
+
+    pywbemcli> cl
+       The command line shows the proposed command grayed out based on that
+       command being previously executed as depicted below. The <TAB> can be
+       used to modify what is selected.
+    pywbemcli> class get PG_TestElement -n test/static
+
+
 .. index:: pair: command history; interactive mode
 
-The pywbemcli shell supports history across multiple invocations of the shell
-using <UP_ARROW>, <DOWN-ARROW> to step through the history line by line.
+The pywbemcli shell supports commandhistory across multiple invocations of the shell
+using <UP_ARROW>, <DOWN-ARROW> to step through the history line by line. The
+pywbem interactive mode history file is separate from any shell history
+files and is used only by pywbemcli.
 
 .. index::
    single: command history; search
@@ -417,45 +526,6 @@ find other commands in the history containing the same string.
 
 The pywbemcli history is stored in the user home directory on linux systems.
 
-.. index::
-   pair: interactive mode; auto-suggestion
-
-The pywbemcli interactive mode also supports automated parameter suggestions based on
-the pywbemcli history file which works with the auto completion described
-above. The input is compared to the history and when there is another entry
-starting with the given text, the completion will be shown as gray text behind
-the current input. Pressing the right arrow → or c-e will insert this
-suggestion.
-
-General options can be entered in the interactive mode but they generally only
-apply to the current command defined in the same command input as the general
-option.  Thus, to modify the output format for a particular command, enter the
---output-format general option before the command.  The following command
-sets the output format to ``table`` before executing the command and then
-restores it to the original value.:
-
-
-.. code-block:: text
-
-    pywbemcli> --output-format table instance enumerate CIM_Foo
-
-A particular difference between general options in the interactive mode and
-the command line mode is the ability to set general options back to their
-default value in the interactive mode.   In the command mode this is not
-required.  However, in the interactive mode, it could be useful to reset a
-general option to its default value for a command.  Thus, if the log was set
-on startup (--log all), it could be disabled for a command or the user name
-(--user) could be set back to None.  However, normally the default value is
-only set by not including that general option with the command line input
-
-To reset selected string type general options in the interactive, the string
-value of ``""`` (an empty string) is provided as the value which causes pywbemcli
-to set the default value of that general option.
-
-The following code defines a server with ``--user`` and ``--password`` in interactive
-mode.  Then it attempts to modify the user and password to their default values
-of None and execute the class enumerate again.  This command would be executed
-without using the user and password because they have been reset for that command.
 
 A summary of help can be viewed by entering ``help repl`` when in the
 interactive mode.
@@ -532,3 +602,193 @@ Pywbemcli terminates with one of the following program exit codes:
 
   If this happens for a command entered in interactive mode, the pywbemcli shell
   is not terminated; only the command that displayed the help is terminated.
+
+
+.. _`Activating shell tab-completion`:
+
+Activating shell tab-completion
+-------------------------------
+
+.. index:: tab-completion
+.. index:: Activating tab-completion
+
+In order to activate shell completion for the shells where pywbemcli supports
+shell completion , you need to informthe shell that completion is available
+for pywbemcli, and how.  The general way this works is through a magic
+environment variable called _<PROG_NAME>PYWBEMCLI_COMPLETE and a callback from
+the shell defined by the value of that variable (ex ``bash_source``).
+
+Pywbemcli includes tab-completion capability for all commands which is:
+
+* Always enabled in the :ref:`Interactive mode`. **NOTE:** Currently the
+  tab-completion of values and arguments is NOT available in the interactive
+  mode.
+* Enabled in the :ref:`command mode` when shell tab-completion is activated
+  and only with the selected shells:
+
+  * **bash shell** - (bash version 4.4 or greater). not all Linux implementations
+    include the bash_complete addon so that the user may be required to install
+    the add-on. A simple test with a utility like ``ls`` will indicate if
+    tab-completion is available  in bash(ex. enter ``ls <TAB>`` to test for the
+    existence of the bash_complet addon).
+  * **zsh shell** - Tab-completion is available for all versions of zsh but
+    may need to be activated in the zsh config file. Furthermore there are two
+    different completion systems for zsh.
+  * **fish shell** - Available for all versions of this shell.
+
+Once tab-completion is activated for pywbemcli, hitting <TAB> or <TAB><TAB> initiates
+tab-completion for command names, option names, and some option values which
+attempts to return the completion of the string where <TAB> was entered. If
+there are multiple possible completions, some shells return the list and others
+do nothing until a second <TAB> is entered.
+
+
+Generally activation of pywbemcli involves the following but with different
+formats for each shell type:
+
+1. Getting from pywbemcli the body of a complete script for the shell type to be
+   activated. This is done by executing a shell statement of form
+   ``_PYWBEMCLI_COMPLETE=bash_source pywbemcli`` which causes the shell completion
+   functionality to call pywbemcli to return the complete script it maintains
+   for bash tab-completion.
+2. Notifying the shell of this completion script by:
+   * notifying the shell with a shell  ``eval`` statement
+   * or saving the script to a complete scriptfile and notifying the shell later by
+   sourcing the resulting complete script file.
+
+Since much of the logic of activating shell tab-completion for pywbemcli is
+based on the shell completion logic in the Click package, that package also
+provides documentation on the activation process. Search for "python Click
+shell completion" in a web browser.
+
+Activation with eval statement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following table shows the eval statement for the shells that pywbemcli
+supports for tab-completion that would be added to a shell startup file defined
+in table:ref:`tab-complete-eval-statement`. The shell command assigns a value
+to the variable _PYWBEMCLI_COMPLETE and calls back to pywbemcli with the
+variable value and other environment variables set by the shell; pywbemcli
+returns with a string containing the shell complete script. Thus, for bash:
+
+  _COMPLETE_PYWBEMCLI=bash_source pywbemcli
+
+.. _tab-complete-eval-statement:
+
+.. table:: Eval statement and proposed startup shell startup file to use for several shells
+
+  ======  =======================================  =============================================================
+  Shell   File to insert eval statement            Eval command
+  ======  =======================================  =============================================================
+  bash    ~/.bashrc                                eval "$(_PYWBEMCLI_COMPLETE=bash_source pywbemcli)"
+  zsh     ~/.zshrc                                 eval "$(_PYWBEMCLI_COMPLETE=zsh_source pywbemcli)"
+  fish    ~/.config/fish/completions/foo-bar.fish  eval (env _PYWBEMCLI_COMPLETE=fish_source pywbemcli)
+  ======  =======================================  =============================================================
+
+**NOTE:** the variable value (ex. bash_source) must have the two words reversed
+if tab-completion is to be activated with Python 2.7 or Python 3.5 (ex.
+source_bash)
+
+The above method may be difficult when virtual the location of the pywbemcli
+executable is not in the path (ex. when pywbemcli is in a virtual environment)
+since the eval statement initiates a callback to the pywbemcli. Also it can
+slow down terminal startup because pywbemcli must be called on each terminal
+startup to get the completion script definition.
+
+Activation by creating a complete script file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An alternative is to create a complete script file using the same statement
+(ex. ``_PYWBEMCLI_COMPLETE=bash_source pywbemcli``) but saving the resulting
+script in a file.  A file containing shell commands is created that defines the
+completion and completion activation and the tab-completion is then activated
+by sourcing that file (ex. ``source ~/.pywbemcli-complete.bash``).
+
+.. _shell-completion-script:
+
+.. table:: Creation of the complete script file as the tab-completion initialization
+   :name: shell-completion-script
+
+  =====  ==========================================================================
+  Shell  Script
+  =====  ==========================================================================
+  bash   _PYWBEMCLI_COMPLETE=bash_source pywbemcli > ~/.pywbemcli-complete.bash
+  zsh    _PYWBEMCLI_COMPLETE=zsh_source pywbemcli > ~/.pywbemcli-complete.zsh
+  fish   _PYWBEMCLI_COMPLETE=fish_source pywbemcli > ~/.config/fish/completions/pywbemcli.fish
+  =====  ==========================================================================
+
+**NOTE:** the variable value (ex. bash_source) must have the two words reversed
+if tab-completion is to be activated with Python 2.7 or Python 3.5 (ex.
+source_bash)
+
+Tab-completion activation must then be completed completed by sourcing the
+complete script file for example as follows:
+
+.. code-block:: text
+
+    $ source  ~/.pywbemcli-complete.bash
+
+Redo this source statement every time a terminal window is started by, for example:
+
+* including this activation statement in a terminal startup script (ex. in .bashrc)
+* including this activation as part of a virtula environment startup
+* or simply by executing the script itself(ex. ``source  ~/.pywbemcli-complete.bash``).
+
+Thus, for bash, pywbemcli can be activated by inserting the following
+evaluation script into .bashrc if pywbemcli is executable whenever the terminal
+is started:
+
+.. code-block::
+
+    eval "$(_PYWBEMCLI_COMPLETE=bash_source pywbemcli)"
+
+or by creating a completion file one time as follows:
+
+.. code-block::
+
+    # Execute once when pywbemcli is in the path:
+
+    PYWBEMCLII_COMPLETE=bash_source pywbemcli > ~/.pywbemcli-complete.bash
+
+    # Source the resulting file each time a terminal is started
+    source  ~/.pywbemcli-complete.bash
+
+
+Testing that pywbemcli tab-completion is activated
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The tab-completion activation of pywbemcli can be tested in a terminal by
+simply entering part of a known pywbemcli command and using the <TAB> to
+request completion. The example below shows testing:
+
+.. code-block:: text
+
+   $ pywbemcli clas<TAB>
+
+   This should complete the class statement (i.e. expand cmd line to
+   ``pywbemcli class``).
+
+Each shell type has one or more commands to determine the state of
+tab-completion for a particular application.  In bash it is the builtin command
+``complete`` used both to define the tab-completion for a particular command
+and to list which commands have been activated.
+
+Executing the bash builtin ``complete -p pywbemcli`` command should return the
+a line that defines the completion for pywbemcli as follows:
+
+.. code-block:: text
+
+    $ complete -p pywbemcli       < ------------ This returns the following
+
+    complete -o nosort -F _pywbemcli_completion pywbemcli
+
+Zsh has corresponding commands depending on the version of completion and the
+use of the bashcompinit plugin.
+
+Removing shell tab-completion activation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Bash: The command ``complete -r pywbemcli`` removes the tab-completion for
+pywbemcli.
+
+Zsh: TODO
