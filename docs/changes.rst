@@ -24,6 +24,9 @@ Released: not yet
 
 **Cleanup:**
 
+* Extend use of general options in interactive mode to allow setting the
+  connections-file for an interactive command. (see issue #1037)
+
 **Known issues:**
 
 * See `list of open issues`_.

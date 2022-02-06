@@ -50,8 +50,8 @@ once and retain their value throughout the execution of the interactive mode.
 
 General options defined in the command line may be overwritten by specifying
 them on interactive mode commands. The resulting new value is used only for
-that one command, and is not retained between interactive mode command
-executions.
+that one command, and is not retained for subsequent interactive mode commands.
+
 
 In the following example, the :ref:`--output-format general option` is used
 on an interactive mode command to overwrite the default output format, and the
@@ -667,9 +667,6 @@ The actually used path name of the connections file is shown in the
 
 The connection definitions in the connections file are managed with the
 commands in the :ref:`connection command group`.
-
-In the interactive mode, this option may not be modified after the command
-line is processed.
 
 .. index:: triple: --pdb; general options; pdb
 
