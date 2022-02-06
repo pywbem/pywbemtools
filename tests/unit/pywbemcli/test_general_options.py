@@ -825,8 +825,8 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify -n option with non-existent connection file fails',
-     {'general': ['-n', 'namedoesnotexist'],
+    ['Verify --namen option with non-existent connection file fails',
+     {'general': ['--name', 'namedoesnotexist'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ['Connection definition',
@@ -1082,19 +1082,10 @@ TEST_CASES = [
       'test': 'regex'},
      None, OK],
 
-    ['Verify --connection-file general option not allowed in interactive mode.',
+    ['Verify --connection-file general option in interactive mode bad file.',
      {'general': ['--server', 'http://blah', ],
-      'stdin': ['--connections-file blah.yaml connection list']},
-     {'stderr': ['General option "--connections-file" not allowed in '
-                 'interactive mode'],
-      'test': 'innows'},
-     None, OK],
-
-    ['Verify -C general option not allowed in interactive mode.',
-     {'general': ['--server', 'http://blah', ],
-      'stdin': ['-C blah.yaml connection list']},
-     {'stderr': ['General option "--connections-file" not allowed in '
-                 'interactive mode'],
+      'stdin': ['--connections-file blah.yaml --name blah connection list']},
+     {'stderr': ["Connections file ", "blah.yaml", "does not exist"],
       'test': 'innows'},
      None, OK],
 
@@ -1179,6 +1170,29 @@ TEST_CASES = [
                  'NAMEDOESNOTEXIST',
                  'not found in connections file'],
       'rc': 0,
+      'test': 'innows'},
+     None, OK],
+
+    # Test that interactive --connections-file works. The connections file
+    # is set in an interactive command and not there in third command.
+    ['Verify --connection-file general option in interactive mode works.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT),
+      'general': ['--server', 'http://initialserver', ],
+      'stdin': ['-o table connection show',
+                '-v --connections-file {} -n blah connection list'.
+                format(TEST_CONNECTIONS_FILE_PATH),
+                # Show that the original server is restored
+                'connection show']},
+     {'stdout': ["| name | not-saved (current) |",     # Results, first cmd
+                 "| server  | http://initialserver |",
+                 # results from second command (defines new connection file)
+                 "Connections file loaded",         # test blah.yaml loaded
+                 "tmp_general_options.yaml",        # and the name of the file
+                 "*blah",                           # test connection list cmd
+                 # results from third command (connection show)
+                 "name   not-saved (current)",
+                 "server http://initialserver", ],
       'test': 'innows'},
      None, OK],
 

@@ -233,7 +233,9 @@ of that definition with commands in the interactive mode.
 
 NOTE: The effects of any general option entered in the interactive mode exists
 only for that command and the original definition from the command line is
-restored for the next command. The changes to the connections file are retained.
+restored for the next command. Any changes to the :term:`connections file`
+defined in the interactive mode and executed in the same command are retained
+(ex. setting the default connection).
 
 Thus:
 
@@ -405,7 +407,7 @@ the current input. Pressing the right arrow → or c-e will insert this
 suggestion.
 
 General options can be entered in the interactive mode but they generally only
-apply to the current command defined on the same command input as the general
+apply to the current command defined in the same command input as the general
 option.  Thus, to modify the output format for a particular command, enter the
 --output-format general option before the command.  The following command
 sets the output format to ``table`` before executing the command and then

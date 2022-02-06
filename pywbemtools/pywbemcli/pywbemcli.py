@@ -745,12 +745,15 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # env variables or the command line pywbemcli startup
 
     else:  # ctx.obj exists. Processing an interactive command.
-        # Issue # 920Imposed this limit to avoid confusion of changing
-        # connections file in interactive mode
+        # If connection file general option exists, get the new connection_repo.
+        # This overrides the existing ctx defined repo only for current command.
         if connections_file:
-            raise click.ClickException('General option "--connections-file" '
-                                       'not allowed in interactive mode.')
-        connections_repo = ctx.obj.connections_repo
+            connections_repo = ConnectionRepository(connections_file, verbose)
+        elif connections_file == "":
+            connections_repo = DEFAULT_CONNECTIONS_FILE
+        else:
+            connections_repo = ctx.obj.connections_repo
+
         # Apply the general options from the command line options
         # or from the context object to modify the PywbemServer object and
         # for a new ContextObj for the command
@@ -913,14 +916,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if verbose:
             click.echo("Log configured to {}".format(log))
 
-        # Commented out because we do not allow modification of the
-        # connection file and have already set connections_repo in line
-        # above. This code would have allowed resetting to default.
-        # See issue #920
-        # if connections_repo is None:
-        #    connections_repo = ctx.obj.connections_repo
-        # elif connections_repo == "":
-        #    connections_repo = DEFAULT_CONNECTIONS_FILE
+        # NOTE: connection-file general option handled as first test because
+        # it could be used for other option processing
 
         if pdb is None:
             pdb = ctx.obj.pdb
