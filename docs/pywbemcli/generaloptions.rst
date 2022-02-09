@@ -393,12 +393,29 @@ any subsequent pywbemcli commands:
 ``--timeout`` general option
 """"""""""""""""""""""""""""
 
-The argument value of the ``--timeout``/``-t`` general option is an integer that
-defines the
-client side timeout in seconds. The pywbem client includes a timeout mechanism
-that closes a WBEM connection if there is no response to a request to the WBEM
-server in the time defined by this value. Pywbemcli defaults to a
-predefined timeout (normally 30 seconds) if this option is not defined.
+The argument value of the ``--timeout``/``-t`` general option is an integer
+that defines the client side read timeout in seconds. The pywbem client
+includes a timeout mechanism that closes a WBEM connection and terminates the
+current pywbemcli request if there is no response to a WBEM server request
+in the time defined by timeout with multiple retries. A read timeout
+occurs any time no bytes have been received on the underlying socket for
+timeout seconds.
+
+See ``pywbemcli --help`` for the actual retry count value.  Thus, the actual
+time to command failure is multiple times the value of this option. Therefore
+a request that does not receive any response data and with timeout value of
+5 would timeout in, for example ( 5 sec * 3 (request and retries)) = 15 seconds.
+
+Pywbemcli defaults to a predefined read timeout (normally 30 seconds) if this
+option is not defined.
+
+The connection functionality has a separate timeout time set by pywbem and
+set at 10 seconds also with retries. The connection timeout is not modifiable
+by pywbemcli.
+
+In general the timeout value should only be modified where there is a specific
+reason such as specific commands or servers that have very long delay before
+returning data.
 
 .. index:: triple: --verify; general options; verify
 
