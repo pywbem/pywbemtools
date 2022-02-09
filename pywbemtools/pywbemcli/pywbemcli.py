@@ -35,6 +35,8 @@ from pywbem import LOGGER_SIMPLE_NAMES, \
     DEFAULT_LOG_DETAIL_LEVEL
 from pywbem import __version__ as pywbem_version
 
+from pywbem._cim_operations import HTTP_READ_RETRIES
+
 from .config import PYWBEMCLI_NAME_ENVVAR, PYWBEMCLI_SERVER_ENVVAR, \
     PYWBEMCLI_MOCK_SERVER_ENVVAR, \
     PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR, PYWBEMCLI_USER_ENVVAR, \
@@ -57,6 +59,7 @@ from .._utils import pywbemtools_warn, get_terminal_width, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS
+
 
 __all__ = ['cli']
 
@@ -508,10 +511,13 @@ def _create_server_instance(
               metavar='INT',
               # defaulted in code
               envvar=PYWBEMCLI_TIMEOUT_ENVVAR,
-              help=u'Client-side timeout in seconds for operations with the '
-                   u'WBEM server. '
-                   u'Default: EnvVar {ev}, or {default}.'.
-                   format(ev=PYWBEMCLI_TIMEOUT_ENVVAR,
+              help=u'Client-side timeout (seconds) on data read for '
+                   u'operations with the WBEM server. This integer is the '
+                   u'timeout for a single server request. Pywbem retries '
+                   u'reads {rt} times so the delay for read timeout failure '
+                   u'may be multiple times the timeout value.'
+                   u'Default: EnvVar {ev}, or {default}. Min/max: '.
+                   format(rt=HTTP_READ_RETRIES, ev=PYWBEMCLI_TIMEOUT_ENVVAR,
                           default=DEFAULT_CONNECTION_TIMEOUT))
 @click.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
               # defaulted in code

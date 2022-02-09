@@ -151,7 +151,7 @@ GENERAL_HELP_LINES = [
     "--verify / --no-verify  If --verify, client verifies the X.509 server",
     "--ca-certs CACERTS  Certificates used to validate the certificate",
     "-c, --certfile FILE  Path name of a PEM file containing a X.509",
-    "-t, --timeout INT  Client-side timeout in seconds for operations",
+    "-t, --timeout INT  Client-side timeout (seconds) on data read for",
     "-U, --use-pull [yes|no|either] Determines whether pull operations are ",
     "--pull-max-cnt INT  Maximum number of instances to be returned by",
     "-T, --timestats / --no-timestats",
