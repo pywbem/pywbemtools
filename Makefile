@@ -67,7 +67,7 @@ endif
 # Docker image for end2end tests.
 # Keep the version in sync with the test.yml workflow.
 ifndef TEST_SERVER_IMAGE
-  TEST_SERVER_IMAGE := keyporttech/smi-server:0.1.2
+  TEST_SERVER_IMAGE := kschopmeyer/openpegasus-server:0.1.1
 endif
 
 # Determine OS platform make runs on.
