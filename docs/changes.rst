@@ -30,6 +30,19 @@ Released: not yet
 * Extend use of general options in interactive mode to allow setting the
   connections-file for an interactive command. (see issue #1037)
 
+* Change DOCKER TEST_SERVER_IMAGE defined in Makefile to use one created from
+  OpenPegasus toolset.  See github OpenPegasus/OpenPegasusDocker repository
+  for pegasus, pegasus tools, and pegasus docker build tools.  This image
+  should be faster and is smaller (lt 400 mb) although still too large. This
+  docker file was created using the Docker definition and makefiles in the
+  github project OpenPegasus and repository OpenPegasusDocker. It contains
+  a build of OpenPegasus on Ubuntu 20.04 platform with the OpenPegasus
+  test provider environment installed. The docker server image build was
+  tested against the OpenPegasus testsuite.  However, the interop namespace
+  was modified to use root/interop in the container. The image contains the
+  OpenPegasus components to run the server against a repository based on
+  the DMTF schema version 2.41.0.
+
 **Known issues:**
 
 * See `list of open issues`_.
