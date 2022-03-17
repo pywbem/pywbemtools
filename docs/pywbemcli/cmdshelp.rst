@@ -228,7 +228,9 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
                                       empty string will include no properties. Default: Do not filter properties.
       --no, --names-only              Retrieve only the object paths (names). Default: Retrieve the complete objects
                                       including object paths.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this help message.
 
@@ -326,7 +328,9 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
                                       class origin information.
       --no, --names-only              Retrieve only the object paths (names). Default: Retrieve the complete objects
                                       including object paths.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -s, --summary                   Show only a summary (count) of the objects.
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
@@ -390,8 +394,9 @@ Help text for ``pywbemcli class find`` (see :ref:`class find command`):
         pywbemcli -n myconn class find *Foo*
 
     Command Options:
-      -n, --namespace NAMESPACE       Add a namespace to the search scope. May be specified multiple times. Default: Search
-                                      in all namespaces of the server.
+      -n, --namespace NAMESPACE(s)    Namespace(s) for search scope. May be specified multiple times using either the option
+                                      multiple times and/or comma separated list. Default: Search in all namespaces of the
+                                      server.
       -s, --sort                      Sort by namespace. Default is to sort by classname
       --association / --no-association
                                       Filter the returned classes to return only indication classes (--association) or
@@ -458,7 +463,9 @@ Help text for ``pywbemcli class get`` (see :ref:`class get command`):
                                       specified with either a comma-separated list or by using the option multiple times.
                                       Properties specified in this option that are not in the object(s) will be ignored. The
                                       empty string will include no properties. Default: Do not filter properties.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -h, --help                      Show this help message.
 
 
@@ -548,7 +555,9 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
                                       empty string will include no properties. Default: Do not filter properties.
       --no, --names-only              Retrieve only the object paths (names). Default: Retrieve the complete objects
                                       including object paths.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this help message.
 
@@ -1030,7 +1039,9 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
                                       including object paths.
       -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM instance name. May be specified multiple times.
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the instances in the result via a filter query.
@@ -1085,8 +1096,9 @@ Help text for ``pywbemcli instance count`` (see :ref:`instance count command`):
       namespaces.
 
     Command Options:
-      -n, --namespace NAMESPACE       Add a namespace to the search scope. May be specified multiple times. Default: Search
-                                      in all namespaces of the server.
+      -n, --namespace NAMESPACE(s)    Namespace(s) for search scope. May be specified multiple times using either the option
+                                      multiple times and/or comma separated list. Default: Search in all namespaces of the
+                                      server.
       -s, --sort                      Sort by instance count. Otherwise sorted by class name.
       --ignore-class CLASSNAME        Class names of classes to be ignored (not counted). Allows counting instances in
                                       servers where instance retrieval may cause a CIMError or Error exception on some
@@ -1236,7 +1248,9 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
                                       specified with either a comma-separated list or by using the option multiple times.
                                       Properties specified in this option that are not in the object(s) will be ignored. The
                                       empty string will include no properties. Default: Do not filter properties.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       --no, --names-only              Retrieve only the object paths (names). Default: Retrieve the complete objects
                                       including object paths.
       -s, --summary                   Show only a summary (count) of the objects.
@@ -1289,7 +1303,9 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
                                       empty string will include no properties. Default: Do not filter properties.
       -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM instance name. May be specified multiple times.
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
       --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
@@ -1472,7 +1488,9 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
                                       including object paths.
       -k, --key KEYNAME=VALUE         Value for a key in keybinding of CIM instance name. May be specified multiple times.
                                       Allows defining keys without the issues of quotes. Default: No keybindings provided.
-      -n, --namespace NAMESPACE       Namespace to use for this command, instead of the default namespace of the connection.
+      -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
+                                      be specified multiple times using either the option multiple times and/or comma
+                                      separated list. Default: connection default namespace.
       -s, --summary                   Show only a summary (count) of the objects.
       --fq, --filter-query QUERY-STRING
                                       When pull operations are used, filter the instances in the result via a filter query.

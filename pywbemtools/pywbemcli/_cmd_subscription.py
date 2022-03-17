@@ -1191,8 +1191,7 @@ class IndicationSubscription(BaseIndicationObjectInstance):
         return '{0} {1} {2}'.format(self._owned_flag, dest_str, filter_str)
 
 
-def display_inst_nonnull_props(context, options, instances, output_format,
-                               sort=False):
+def display_inst_nonnull_props(context, options, instances, output_format):
     """
     Display the instances defined in instances after removing any properties
     that are Null for all instances.
@@ -1207,8 +1206,7 @@ def display_inst_nonnull_props(context, options, instances, output_format,
     pl = list(pldict.keys())
 
     display_cim_objects(context, instances, output_format,
-                        summary=options['summary'], sort=sort,
-                        property_list=pl)
+                        summary=options['summary'], property_list=pl)
 
 
 def pick_one_inst_from_instances_list(csm, instances, pick_msg):
@@ -1676,7 +1674,7 @@ def cmd_subscription_list_destinations(context, options):
                                        output_format)
         else:
             display_cim_objects(context, destinations, output_format,
-                                summary=options['summary'], sort=True)
+                                summary=options['summary'])
 
     elif output_format_is_table(output_format):
         if options['names_only']:

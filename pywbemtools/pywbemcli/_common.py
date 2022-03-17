@@ -992,6 +992,9 @@ def sort_cimobjects(cim_objects):
       string of the CIMClassName object. This makes the sort case insensitive.
       This case covers the result of 'class references/associators'.
 
+    The list is sorted by classname for class, instance objects and by wbem_uri
+    for objects that represent names (CIMInstanceName, etc.)
+
     Parameters:
 
       cim_objects (Sequence): Objects to be sorted.
@@ -1010,7 +1013,7 @@ def sort_cimobjects(cim_objects):
 
     tst_obj = cim_objects[0]
 
-    # This case covers result of 'class enumerate':
+    # Result of 'class enumerate':
     if isinstance(tst_obj, six.string_types):
         return sorted(cim_objects)
 
@@ -1018,7 +1021,11 @@ def sort_cimobjects(cim_objects):
         return sorted(cim_objects,
                       key=lambda obj: obj.classname)
 
-    if isinstance(tst_obj, (CIMClassName, CIMInstanceName)):
+    if isinstance(tst_obj, (CIMInstanceName)):
+        return sorted(cim_objects,
+                      key=lambda obj: obj.to_wbem_uri(format="canonical"))
+
+    if isinstance(tst_obj, (CIMClassName)):
         return sorted(cim_objects,
                       key=lambda obj: obj.to_wbem_uri(format="canonical"))
 
@@ -1038,7 +1045,7 @@ def sort_cimobjects(cim_objects):
         return sorted(cim_objects,
                       key=lambda obj: obj.name)
 
-    # This case covers result of 'class references/associators':
+    # Result of 'class references/associators':
     if isinstance(tst_obj, tuple):
         if not isinstance(tst_obj[0], CIMClassName) or \
                 not isinstance(tst_obj[1], CIMClass):

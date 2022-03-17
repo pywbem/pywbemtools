@@ -71,6 +71,25 @@ namespace_option = [
                       u'default namespace of the connection.'),
 ]
 
+multiple_namespaces_option_dflt_conn = [
+    click.option('-n', '--namespace', type=str, multiple=True,
+                 required=False, metavar='NAMESPACE(s)',
+                 help=u'Namespace(s) to use for this command, instead of the '
+                      u'default connection namespace. May be specified '
+                      u'multiple times using either the option multiple times '
+                      u'and/or comma separated list. '
+                      u'Default: connection default namespace.'),
+]
+
+multiple_namespaces_option_dflt_all = [
+    click.option('-n', '--namespace', type=str, multiple=True,
+                 required=False, metavar='NAMESPACE(s)', default=[],
+                 help=u'Namespace(s) for search scope. May be specified '
+                      u'multiple times using either the option multiple times '
+                      u'and/or comma separated list. '
+                      u'Default: Search in all namespaces of the server.'),
+]
+
 summary_option = [
     click.option('-s', '--summary', is_flag=True, required=False,
                  help=u'Show only a summary (count) of the objects.'),
@@ -81,14 +100,6 @@ verify_option = [
                  help=u'Prompt for confirmation before performing a change, '
                       u'to allow for verification of parameters. '
                       u'Default: Do not prompt for confirmation.'),
-]
-
-multiple_namespaces_option = [
-    click.option('-n', '--namespace', type=str, multiple=True,
-                 required=False, metavar='NAMESPACE',
-                 help=u'Add a namespace to the search scope. '
-                      u'May be specified multiple times. '
-                      u'Default: Search in all namespaces of the server.'),
 ]
 
 class_filter_options = [

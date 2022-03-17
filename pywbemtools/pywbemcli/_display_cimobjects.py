@@ -55,8 +55,9 @@ MIN_CELL_WIDTH = 10
 
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
-                        sort=False, property_list=None, quote_strings=True,
+                        property_list=None, quote_strings=True,
                         ignore_null_properties=True):
+
     """
     Display CIM objects in form determined by input parameters.
 
@@ -64,21 +65,20 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     any of the CIM types.  This is used to display:
 
       * CIMClass
-
       * CIMClassName:
-
       * CIMInstance
-
       * CIMInstanceName
-
       * CIMQualifierDeclaration
-
-      * Or list of the above
+      * class associatiors (tuple of CIMClassName, CIMClass)
+      * list of the above types
+      * Dictionary of the above types where the keys are namespaces and the
+        values are any of the above types. This is the return from commands
+        that handle multiple namespaces in the command option --namespace.
 
     This function may override output type choice in cases where the output
     choice is not available for the object type.  Thus, for example,
     mof output makes no sense for class names. In that case, the output is
-    the str of the type.
+    the str with the name or namespace:name.
 
     Parameters:
 
@@ -88,8 +88,13 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
       objects (iterable of :class:`~pywbem.CIMInstance`,
         :class:`~pywbem.CIMInstanceName`, :class:`~pywbem.CIMClass`,
         :class:`~pywbem.CIMClassName`,
-        or :class:`~pywbem.CIMQualifierDeclaration`):
-        Iterable of zero or more CIM objects to be displayed.
+        :class:`~pywbem.CIMQualifierDeclaration`, or tuple where the tuple
+        consists of (CIMClassName, CIMClass) and is return from class
+        associators or class references.
+        Iterable of zero or more CIM objects to be displayed.  If the iterable
+        is a dictionary it contains the objects for multiple namespaces where
+        the keys are namespace names and the values are lists of objects in
+        the namespace.
 
       output_format (:term:`string`):
         String defining the preferred output format. Must not be None since
@@ -101,9 +106,6 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
       summary (:class:`py:bool`):
         Boolean that defines whether the data in objects should be displayed
         or just a summary of the objects (ex. count of number of objects).
-
-      sort (:class:`py:bool`):
-        Boolean that defines whether the objects will be sorted.
 
       property_list (iterable of :term:`string`):
         List of property names to be displayed, in the desired order, when the
@@ -122,132 +124,255 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         properties that do not have a value in any instance will be included in
         tables.  This allows table output to ignore properties that do not add
         value to the table display.
-    """
-    # Note: In the docstring above, the line for parameter 'objects' was way too
-    #       long. Since we are not putting it into docmentation, we folded it.
 
+      namespace  (:term:`string`):
+        The names of a namespace if namespace is to be appended to the
+        display.  Used only when the command is processing multiple
+        namespaces.
+    """
+
+    # Note: In the docstring above, the line for parameter 'objects' was too
+    #       long. Since we are not putting it into docmentation, we folded it.
     context.spinner_stop()
 
+    # Assure that there is output format exists, None not allowed.
+    assert output_format
+
+    # If dictionary of objects in namespaces and there is only one namespace
+    # reduce to list of cim objects. Code deals with single namespace request
+    # without identifying it in displays as we do for multiple namespace display
+    if isinstance(cim_objects, NocaseDict) and len(cim_objects) == 1:
+        ns1 = list(cim_objects.keys())
+        ns = ns1[0]
+        cim_objects = cim_objects[ns]
+
+    # If summary flag, call the summary display function and return
     if summary:
         _display_cim_objects_summary(context, cim_objects, output_format)
         return
 
-    if not cim_objects and context.verbose:
-        click.echo("No objects returned")
+    # Terminate if no actual cim_objects returned for single item and list
+    # before any further processing. Simplifies further processing so it
+    # can ignore None conditions.
+    if cim_objects is None or (isinstance(cim_objects, list) and
+                               not cim_objects):
+        if context.verbose:
+            click.echo("No objects returned")
         return
 
-    if sort:
-        cim_objects = sort_cimobjects(cim_objects)
-
-    # Default when displaying cim objects is mof
-    assert output_format
-
-    if isinstance(cim_objects, (list, tuple)):
-        # Table format output is processed as a group
-        if output_format_is_table(output_format):
-            _display_objects_as_table(
-                cim_objects, output_format,
-                context=context,
-                property_list=property_list,
-                quote_strings=quote_strings,
-                ignore_null_properties=ignore_null_properties)
-        else:
-            # Call to display each object
-            # ignore_null_properties not passed on to MOF, etc. display
-            for obj in cim_objects:
-                display_cim_objects(context, obj, output_format=output_format)
+    if isinstance(cim_objects, NocaseDict) and \
+            not any(list(cim_objects.values())):
+        if context.verbose:
+            click.echo("No objects returned for namespace(s): {}".
+                       format(", ".join(cim_objects.keys())))
         return
 
-    # Display a single item.
-    object_ = cim_objects
-    # This allows passing single objects to the table formatter (i.e. not lists)
+    # Process by type based on receiving dictionaries of ns:objects or lists
+    # of objects or tuples from class associators/references
+
     if output_format_is_table(output_format):
-        _display_objects_as_table(
-            [object_], output_format, context=context,
-            property_list=property_list,
-            quote_strings=quote_strings,
-            ignore_null_properties=ignore_null_properties)
+        # Table format output is processed as a group in a single table both
+        # for multiple and single namespaces.
+        _display_objects_as_table(cim_objects, output_format, context,
+                                  property_list, quote_strings,
+                                  ignore_null_properties, namespace=None)
+        return
+
+    # CIM Object and text output formats are displayed as single objects.
+    # Note: for class associaters/references each object is a tuple of
+    # CIMClassName, CIMClass
+    if isinstance(cim_objects, NocaseDict):
+        for ns, ns_objects in cim_objects.items():
+            if not isinstance(ns_objects, list):
+                ns_objects = [ns_objects]
+            ns_objects = sort_cimobjects(ns_objects)
+            for obj in ns_objects:
+                _display_one_cim_object(
+                    context, obj, output_format, property_list, quote_strings,
+                    ignore_null_properties, namespace=ns)
+        return
+
+    # If not NocaseDict, it is list or single object. Sort by classname and
+    # then call _display_one_cim_objects with each item from list
+    if not isinstance(cim_objects, list):
+        cim_objects = [cim_objects]
+    if isinstance(cim_objects, list):
+        # Sort the objects by classname and call to display each object
+        cim_objects = sort_cimobjects(cim_objects)
+        for obj in cim_objects:
+            _display_one_cim_object(
+                context, obj, output_format, property_list, quote_strings,
+                ignore_null_properties)
+
+
+############################################################################
+#
+# Support methods for displaying CIM objects.  This includes multiple
+# output formats (ie. MOF, TABLE, TEXT), table display and summary display.
+#
+############################################################################
+
+
+def _display_one_cim_object(context, cim_object, output_format, property_list,
+                            quote_strings, ignore_null_properties,
+                            namespace=None):
+
+    """
+    Display a single CIM object.  This creates and outputs the display for one
+    CIM object in  the output formats groups CIM object (MOF, XML, Text).
+    """
+    assert isinstance(
+        cim_object, (CIMClass, CIMClassName, CIMInstance, CIMInstanceName,
+                     CIMQualifierDeclaration, tuple, six.string_types))
+
+    if output_format_is_table(output_format):
+        _display_objects_as_table([cim_object], output_format, context,
+                                  property_list, quote_strings,
+                                  ignore_null_properties, namespace)
 
     # Display in the selected CIM object format (mof, xml, repr, txt)
     elif output_format == 'mof':
         try:
-            click.echo(object_.tomof())
+            mofstr = cim_object.tomof()
+            if namespace:
+                click.echo("#pragma namespace (\"{}\")".format(namespace))
+            click.echo(mofstr)
         except AttributeError:
-            # insert NL between instance names for readability
-            if isinstance(object_, CIMInstanceName):
+            # inserting NL between instance names for readability
+            if isinstance(cim_object, CIMInstanceName):
                 click.echo("")
-                click.echo(object_)
-            elif isinstance(object_, (CIMClassName, six.string_types)):
-                click.echo(object_)
+                click.echo(cim_object)
+            elif isinstance(cim_object, CIMClassName):
+                click.echo(cim_object)
+            elif isinstance(cim_object, tuple):  # representation of class assoc
+                assert isinstance(cim_object[0], CIMClassName)
+                assert isinstance(cim_object[1], CIMClass)
+                click.echo(cim_object[0])
+                click.echo(cim_object[1].tomof())
+            elif isinstance(cim_object, six.string_types):
+                if namespace:
+                    click.echo("{}:{}".format(namespace, cim_object))
+                else:
+                    click.echo(cim_object)
             else:
                 raise click.ClickException('output_format {} invalid for {} '
                                            .format(output_format,
-                                                   type(object_)))
+                                                   type(cim_object)))
     elif output_format == 'xml':
         try:
-            click.echo(object_.tocimxmlstr(indent=4))
+            if isinstance(cim_object,
+                          (CIMClass, CIMInstance, CIMQualifierDeclaration,
+                           CIMInstanceName, CIMClassName)):
+                if namespace:
+                    click.echo("<!-- Namespace = {} -->".format(namespace))
+                click.echo(cim_object.tocimxmlstr(indent=4))
+            elif isinstance(cim_object, tuple):
+                if namespace:
+                    click.echo("<!-- Namespace = {} -->".format(namespace))
+                assert isinstance(cim_object[0], CIMClassName)
+                assert isinstance(cim_object[1], CIMClass)
+                click.echo(cim_object[0].tocimxmlstr(indent=4))
+                click.echo(cim_object[1].tocimxmlstr(indent=4))
+            elif isinstance(cim_object, six.string_types):
+                if namespace:
+                    click.echo("{}:{}".format(namespace, cim_object))
+                else:
+                    click.echo(cim_object)
+            else:
+                assert False, "Output_format {} invalid for {}".format(
+                    output_format, type(cim_object))
+
         except AttributeError:
             # no tocimxmlstr functionality
             raise click.ClickException('Output Format {} not supported. '
                                        'Default to\n{!r}'
-                                       .format(output_format, object_))
+                                       .format(output_format, cim_object))
     elif output_format == 'repr':
         try:
-            click.echo(repr(object_))
+            click.echo(repr(cim_object))
         except AttributeError:
             raise click.ClickException('"repr" display of {!r} failed'
-                                       .format(object_))
+                                       .format(cim_object))
 
     elif output_format == 'txt':
         try:
-            click.echo(object_)
+            click.echo(cim_object)
         except AttributeError:
             raise click.ClickException('"txt" display of {!r} failed'
-                                       .format(object_))
-    # elif output_format == 'tree':
-    #    raise click.ClickException('Tree output format not allowed')
+                                       .format(cim_object))
     else:
         raise click.ClickException('Invalid output format {}'
                                    .format(output_format))
 
 
-def _display_objects_as_table(objects, output_format, context=None,
-                              property_list=None, quote_strings=True,
-                              ignore_null_properties=True):
+def _display_objects_as_table(objects, output_format, context,
+                              property_list, quote_strings,
+                              ignore_null_properties, namespace=None):
     """
     Call the method for each type of object to print that object type
-    information as a table.
+    information as a table.  This function process objects from multiple
+    namespaces in a NocaseDict to produce a single table showing the
+    requested output in one row per namespace/class.
 
     Output format is retrieved from context.
+
+    Parameters:
+      objects: list or NocaseDict
+        If objects is a list, it is processing a single namespace.  If it is
+        a dictionary it is processing multiple namespaces.
+
+      namespace (bool or string containing namespace)
+        If bool, indicates that namespace should be included in the output
+        for each object.  If string, it is only for class enumerate where we
+        do not yet have a table output for class.
+
     """
     table_width = get_terminal_width()
 
+    if isinstance(objects, NocaseDict):
+        # Everything except classes and classnames includes namespace
+        # convert back to a single list so a single table can be created
+        #
+        new_objects = []
+        # If the object type is string, it is just a classname.
+        # Expand to create list of tuples of (ns, classname)
+        # Otherwise, just map the values to a single list
+        for ns, values in objects.items():
+            if values:
+                if not isinstance(values, list):
+                    values = [values]
+                if isinstance(values[0], six.string_types):
+                    new_objects.extend([CIMClassName(v, namespace=ns)
+                                        for v in sort_cimobjects(values)])
+                else:
+                    new_objects.extend(sort_cimobjects(values))
+
+        namespace = True
+        objects = new_objects
     if objects:
+        # If single object, cvt to list for further processing
+        if not isinstance(objects, (list)):
+            objects = [objects]
+        objects = sort_cimobjects(objects)
         if isinstance(objects[0], CIMInstance):
             _display_instances_as_table(
                 objects, table_width, output_format,
                 context=context,
                 property_list=property_list,
                 quote_strings=quote_strings,
-                ignore_null_properties=ignore_null_properties)
+                ignore_null_properties=ignore_null_properties,
+                namespace=namespace)
         elif isinstance(objects[0], CIMClass):
             _display_classes_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], CIMQualifierDeclaration):
             _display_qual_decls_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
-                                     six.string_types)):
-            _display_paths_as_table(objects, table_width, output_format)
+                                     six.string_types, tuple)):
+            _display_paths_as_table(objects, table_width, output_format,
+                                    namespace=namespace)
         else:
             raise click.ClickException("Cannot print {} as table"
                                        .format(type(objects[0])))
-
-
-############################################################################
-#
-# Support methods for displaying CIM objects.  This includes multiple
-# output formats (ie. MOF, TABLE, TEXT)
-#
-############################################################################
 
 
 def _get_cimtype(objects):
@@ -255,19 +380,29 @@ def _get_cimtype(objects):
     Get the cim_type for any returned cim object.  Normally this is the
     name of the class name except that the classname return from
     getclass and enumerate class is just unicode string
+
+    Parameters:
+      objects (dict, list, object where object is any CIM object or tuple)
+
+    Returns:
+      The CIM type (string) for that object. If the object is a tuple, the
+      type comes from the second object in the tuple
+
+      If no objects are in thd dict or list None is returned
+
     """
     # associators and references return tuple
-    if isinstance(objects, list):
+    if isinstance(objects, list) and objects:
         test_object = objects[0]
     elif objects:
         test_object = object
     else:
-        cim_type = 'unknown'
         return None
 
     if isinstance(test_object, tuple):
-        # associator or reference class level return is tuple
-        cim_type = test_object[0].__class__.__name__
+        # associator or reference class level return is tuple get type
+        # from second item, it is the requested object
+        cim_type = test_object[1].__class__.__name__
     else:
         cim_type = test_object.__class__.__name__
 
@@ -284,20 +419,41 @@ def _display_cim_objects_summary(context, objects, output_format):
     """
     context.spinner_stop()
 
-    if objects:
-        cim_type = _get_cimtype(objects)
-
-        if output_format_is_table(output_format):
-            rows = [[len(objects), cim_type]]
-            click.echo(format_table(rows, ['Count', 'CIM Type'],
-                                    title='Summary of {} returned'
-                                    .format(cim_type),
-                                    table_format=output_format))
-            return
-        click.echo('{} {}(s) returned'.format(len(objects), cim_type))
-
+    cim_type = None
+    if isinstance(objects, NocaseDict):
+        headers = ['Namespace', 'Count', 'CIM Type']
+        rows = []
+        for ns, objlist in objects.items():
+            if not cim_type:
+                cim_type = _get_cimtype(objlist)
+            rows.append([ns, len(objlist), cim_type])
     else:
-        click.echo('0 objects returned')
+        headers = ['Count', 'CIM Type']
+        if isinstance(objects, list):
+            cim_type = _get_cimtype(objects)
+            rows = [[len(objects), cim_type]]
+        elif objects is not None:
+            cim_type = _get_cimtype(objects)
+            rows = [["1", cim_type]]
+        else:
+            rows = [[0, cim_type]]
+
+    title = 'Summary of {}(s) returned'.format(cim_type)
+    if output_format_is_table(output_format):
+        click.echo(format_table(rows, headers, title=title,
+                                table_format=output_format))
+    else:
+        for row in rows:  # must be type text
+            # The following two are hangover from initial format output
+            # "<number <object_name>(s)". Future, redo this whole output format
+            cim_type_pos = len(row) - 1
+            len_pos = len(row) - 2
+            if row[len_pos] == 0:
+                row[cim_type_pos] = "objects"
+            else:
+                row[cim_type_pos] = "{}(s)".format(row[cim_type_pos])
+            row[len_pos] = str(row[len_pos])
+            click.echo('{} returned'.format(" ".join(row)))
 
 
 def _display_classes_as_table(classes, table_width, table_format):
@@ -311,7 +467,7 @@ def _display_classes_as_table(classes, table_width, table_format):
         click.echo(class_.tomof())
 
 
-def _display_paths_as_table(objects, table_width, table_format):
+def _display_paths_as_table(objects, table_width, table_format, namespace=None):
     # pylint: disable=unused-argument
     """
     Display paths as a table. This include CIMInstanceName, ClassPath,
@@ -321,8 +477,18 @@ def _display_paths_as_table(objects, table_width, table_format):
     if objects:
         if isinstance(objects[0], six.string_types):
             title = 'Classnames:'
+            if namespace:
+                title = title + (" namespace: {}".format(namespace))
             headers = ['Class Name']
-            rows = [[obj] for obj in objects]
+            if namespace:
+                rows = [[namespace, obj] for obj in objects]
+            else:
+                rows = [[obj] for obj in objects]
+        # if obj is tuple, this is a tuple of namespace and classname
+        elif isinstance(objects[0], tuple):
+            title = 'Classnames:'
+            headers = ("namespace", 'class')
+            rows = [[obj[0], obj[1]] for obj in objects]
 
         elif isinstance(objects[0], CIMClassName):
             title = 'Classnames'
@@ -358,6 +524,7 @@ def _display_paths_as_table(objects, table_width, table_format):
 
             # If multiple key_names we create multiple tables and add table
             # number to each table title.
+            # FUTURE: This was a hack. by forcing classname into the table
             table_number = 0
             for key_names, inst_names in objs_by_key_set.items():
                 # Build headers for this table with the common elements and key
@@ -443,7 +610,7 @@ def _display_qual_decls_as_table(qual_decls, table_width, table_format):
 
 def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
                               context=None, prop_names=None,
-                              quote_strings=True):
+                              quote_strings=True, namespace=None):
     """
     Format the list of instances properties into a list of the property
     values for each instance(a row of the table) gathered into a list of
@@ -493,8 +660,13 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
         assert isinstance(inst, CIMInstance), \
             "Invalid CIM Type {}".format(type(inst))
 
-        # Insert classname as first col if flag set
-        row = [inst.classname] if include_classes else []
+        # Setup row list and set namespace if this is multi-namespace
+        # Note: We use namespace as a flag here ignoring the actual values.
+        row = [inst.path.namespace] if namespace else []
+
+        # Insert classname as before properties if flag set
+        if include_classes:
+            row.append([inst.classname])
 
         # Get value for each property in this object
         for name in prop_names:
@@ -543,7 +715,8 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
 def _display_instances_as_table(insts, table_width, table_format,
                                 include_classes=False, context=None,
                                 property_list=None, quote_strings=True,
-                                ignore_null_properties=True):
+                                ignore_null_properties=True,
+                                namespace=None):
     """
     Print the properties of the instances defined in insts as a table where
     each row is an instance and each column is a property value.
@@ -617,10 +790,9 @@ def _display_instances_as_table(insts, table_width, table_format,
                 # class retrieval as part of getting  units information.
                 show_units = False
                 break
-            namespace = inst.path.namespace
             try:
                 class_obj = conn.GetClass(
-                    classname, namespace=namespace,
+                    classname, namespace=inst.path.namespace,
                     IncludeQualifiers=True, LocalOnly=False)
             except CIMError as exc:
                 if exc.status_code == CIM_ERR_NOT_SUPPORTED:
@@ -632,6 +804,9 @@ def _display_instances_as_table(insts, table_width, table_format,
 
     # Construct the header line
     headers = []  # list of header strings
+    # If we want to include namespace in table as a row
+    if namespace:
+        headers.append("namespace")
     if include_classes:
         headers.append("classname")
     for pname in prop_names:
@@ -658,7 +833,7 @@ def _display_instances_as_table(insts, table_width, table_format,
         insts, max_cell_width,
         include_classes=include_classes,
         context=context, prop_names=prop_names,
-        quote_strings=quote_strings)
+        quote_strings=quote_strings, namespace=namespace)
 
     # Fold the headers if necessary. Fold on either hypens or single word
     # too long because the headers are all single words
@@ -673,6 +848,7 @@ def _display_instances_as_table(insts, table_width, table_format,
             disp_headers.append(header)
 
     title = 'Instances: {}'.format(insts[0].classname)
+
     click.echo(format_table(rows, disp_headers, title=title,
                             table_format=table_format))
 

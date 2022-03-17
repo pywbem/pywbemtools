@@ -27,6 +27,17 @@ Released: not yet
 * Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for
   new features. Adjusted testcases accordingly.
 
+  Extended class and instance enumerate/get/associators/references to allow
+  getting the objects from multiple namespaces with a single request.  This
+  extends the command option --namespace to allow multiple namespaces for
+  these commands using either comma-separated format
+  (ex. --namespace root/cimv2,root/cimv3) or multiple definitions of the option
+  (ex. --namespace root/cimv2 --namespace root/cimv3) The display of results
+  have been extended to include the namespace name for the objects in all
+  of the output formats if multiple namespaces are used. As before, the
+  namespaces are not shown if only a single or the default namespace is
+  requested.  (see issues # 1058 and #1059)
+
 **Cleanup:**
 
 * Extend use of general options in interactive mode to allow setting the

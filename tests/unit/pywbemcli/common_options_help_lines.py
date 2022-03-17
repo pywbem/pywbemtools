@@ -76,13 +76,14 @@ CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE = \
     '--ico, --include-classorigin Include class origin information in the ' \
     'returned'
 
-CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE = \
-    '-n, --namespace NAMESPACE  Add a namespace to the search scope. May be'
+CMD_OPTION_MULTIPLE_NAMESPACE_ALL_HELP_LINE = \
+    '-n, --namespace NAMESPACE(s) Namespace(s) for search scope. May be ' \
+    'specified '
 
 CMD_OPTION_KEYS_HELP_LINE = \
-    '-k, --key KEYNAME=VALUE         Value for a key in keybinding of'
+    '-k, --key KEYNAME=VALUE   Value for a key in keybinding of'
 
-# NOTE: The FILTER help lines should exist as a group wherever used.
+# NOTE: The FILTER help lines below should exist as a group wherever used.
 
 CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE = \
     '--association / --no-association'
@@ -97,19 +98,22 @@ CMD_OPTION_DEPRECATED_FILTER_HELP_LINE = \
     '--deprecated / --no-deprecated'
 
 CMD_OPTION_SINCE_FILTER_HELP_LINE = \
-    'Filter the returned classes to return only'
+    '--since VERSION Filter the returned classes to return only'
 
 CMD_OPTION_SCHEMA_FILTER_HELP_LINE = \
-    "Filter the returned classes to return only classes"
+    "--schema SCHEMA Filter the returned classes to return only classes"
 
 CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE = \
-    "Filter the returned classes to return only"
+    "--subclass-of CLASSNAME Filter the returned classes to return only"
 
 CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE = \
-    "Filter the returned classes to return only"
+    "--leaf-classes Filter the returned classes to return only"
 
 CMD_OPTION_HELP_INSTANCENAME_HELP_LINE = \
     '--hi, --help-instancename Show help message for specifying INSTANCENAME'
 
 CMD_OPTION_SHOW_NULL_HELP_LINE = \
     '--show-null In the TABLE output formats, show properties with no '
+
+CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE = \
+    'Namespace(s) to use for this command, instead of the'
