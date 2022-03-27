@@ -16,6 +16,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Resolved new issues reported by Pylint 2.13. (issue #1164)
+
 **Enhancements:**
 
 **Cleanup:**
