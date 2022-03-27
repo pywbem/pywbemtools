@@ -401,8 +401,9 @@ def assert_patterns_in_lines(exp_patterns, act_lines, source, desc):
       desc (string): Testcase description.
     """
     act_lines_iter = iter(act_lines)
+    start_line = '<begin>'
+    i = 0  # avoids pylint warning used-before-assignment
     try:
-        start_line = '<begin>'
         act_line = next(act_lines_iter)
         for i, exp_pattern in enumerate(exp_patterns):
             start_line = act_line
