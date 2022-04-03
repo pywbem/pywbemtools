@@ -291,10 +291,12 @@ test_log_file := test_$(python_version_fn).log
 # - 42253: Notebook, before 5.7.1 allows XSS via untrusted notebook
 # - 42254: Notebook before 5.7.2, allows XSS via crafted directory name
 # - 42293: babel, before 2.9.1 CVS-2021-42771, Bable.locale issue
-# - 42297: Bleach before 3.11, a mutation XSS afects user calling bleach.clean
+# - 42297: Bleach before 3.11, a mutation XSS affects user calling bleach.clean
 # - 42298: Bleach before 3.12, mutation XSS affects bleach.clean
 # - 42559 pip, before 21.1 CVE-2021-3572
 # - 43975: urllib3 before 1.26.5 CVE-2021-33503, not important for pywbemtools
+# - 47833: click lt 8.0.0 uses mktemp rather than mkstemp. click < 8 rqd for python < 3.6
+# - 45775: sphinx 3.0.4 updated jQuery version from 3.4.1 to 3.5.1, security issue. Sphinx < 2.0.0 rqd for python 2.7
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -333,6 +335,8 @@ safety_ignore_opts := \
 	-i 42298 \
 	-i 42559 \
 	-i 43975 \
+	-i 47833 \
+	-i 45775
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)

@@ -45,6 +45,12 @@ Released: not yet
   OpenPegasus components to run the server against a repository based on
   the DMTF schema version 2.41.0.
 
+* Modified Makefile safety_ignore_opts list to include ignore two safety
+  issues that involve using pywbemtools with older versions of python,
+  specifically click and sphinx. We must use those older versions as long
+  as we support python 3.5 and python 2.7. (See issue # 1167)
+
+
 **Known issues:**
 
 * See `list of open issues`_.
