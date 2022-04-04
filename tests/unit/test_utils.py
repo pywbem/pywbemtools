@@ -494,6 +494,7 @@ def test_get_terminal_width(
         assert testcase.exp_exc_types is None
 
         if exp_result == CLICK_TERMINAL_WIDTH:
+            # pylint: disable=no-member
             exp_result = click.get_terminal_size()[0]
 
         assert act_result == exp_result
