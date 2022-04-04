@@ -312,6 +312,7 @@ pytz==2019.1; python_version >= '3.10'
 pyzmq==16.0.4
 qtconsole==4.2.1
 requests-toolbelt==0.8.0
+rich==12.0.0; python_version >= '3.6'
 scandir==1.9.0
 sh==1.12.14
 simplegeneric==0.8.1
