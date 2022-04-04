@@ -497,6 +497,7 @@ def test_get_terminal_width(
             try:
                 exp_result = shutil.get_terminal_size()[0]
             except AttributeError:
+                # pylint: disable=no-member
                 exp_result = click.get_terminal_size()[0]
 
         assert act_result == exp_result
