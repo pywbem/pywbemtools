@@ -153,7 +153,7 @@ def get_terminal_width():
         try:
             ts = shutil.get_terminal_size()
         except AttributeError:
-            ts = click.get_terminal_size()
+            ts = click.get_terminal_size()  # pylint: disable=no-member
         return ts[0]
 
     return DEFAULT_TABLE_WIDTH
