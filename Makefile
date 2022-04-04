@@ -295,6 +295,8 @@ test_log_file := test_$(python_version_fn).log
 # - 42298: Bleach before 3.12, mutation XSS affects bleach.clean
 # - 42559 pip, before 21.1 CVE-2021-3572
 # - 43975: urllib3 before 1.26.5 CVE-2021-33503, not important for pywbemtools
+# - 45775 Sphinx 3.0.4 updates jQuery version, cannot upgrade Sphinx on py27
+# - 47833 Click 8.0.0 uses 'mkstemp()', cannot upgrade Click due to incompatibilities
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -333,6 +335,8 @@ safety_ignore_opts := \
 	-i 42298 \
 	-i 42559 \
 	-i 43975 \
+	-i 45775 \
+	-i 47833 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
