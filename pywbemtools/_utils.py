@@ -147,6 +147,7 @@ def get_terminal_width():
             pass
 
     if USE_TERMINAL_WIDTH:
+        # pylint: disable=no-member
         return click.get_terminal_size()[0]
 
     return DEFAULT_TABLE_WIDTH
