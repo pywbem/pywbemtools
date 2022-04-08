@@ -2647,4 +2647,4 @@ class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
             pywbemcli command.
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition)
+                          mock, condition, verbose=True)

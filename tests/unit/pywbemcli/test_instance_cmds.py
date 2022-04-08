@@ -3637,7 +3637,7 @@ instance of CIM_Foo {
 """],
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify instance get from two namespaces table output',
      {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--namespace',
@@ -3653,7 +3653,7 @@ instance of CIM_Foo {
 """],
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     # TODO xml, etc
 
@@ -3666,7 +3666,7 @@ instance of CIM_Foo {
      {'stdout': MULTIPLE_NS_ENUM_INST_RTN,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify instance enumerate from two namespaces summary',
      {'args': ['enumerate', 'CIM_Foo', '--summary',
@@ -3675,7 +3675,7 @@ instance of CIM_Foo {
                  'root/cimv3 13 CIMInstance(s) returned'],
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify instance enumerate from two namespaces summary, --summary, table',
      {'args': ['enumerate', 'CIM_Foo', '--summary',
@@ -3691,7 +3691,7 @@ instance of CIM_Foo {
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify instances (--no) enumerate from two namespaces --summary ',
      {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
@@ -3701,7 +3701,7 @@ root/cimv3 13 CIMInstanceName(s) returned
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify namesnames (--no) enumerate from two namespaces ',
      {'args': ['enumerate', 'CIM_Foo_Sub', '--no',
@@ -3724,7 +3724,7 @@ root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify classnames enumerate from two namespaces --summary, -o table',
      {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
@@ -3740,7 +3740,7 @@ root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
 
     # instance references request
@@ -3753,7 +3753,7 @@ root/cimv3 1 CIMInstanceName(s) returned
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify references names from two namespaces --summary, -o table',
      {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
@@ -3769,7 +3769,7 @@ root/cimv3 1 CIMInstanceName(s) returned
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     # pylint: disable=line-too-long
     ['Verify  references names  from two namespaces --summary, -o table',
@@ -3789,7 +3789,7 @@ root/cimv3 1 CIMInstanceName(s) returned
 """,   # noqa: E501
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
     # pylint: enable=line-too-long
 
     ['Verify references names from two namespaces MOF',
@@ -3808,7 +3808,7 @@ instance of CIM_FooAssoc {
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
 
     ['Verify references  names from two namespaces MOF, --no 2 namespaces',
@@ -3820,7 +3820,7 @@ instance of CIM_FooAssoc {
 ''',
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
 
     # instance associators request
@@ -3840,7 +3840,7 @@ instance of CIM_FooAssoc {
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     # Test multi-namespace enum/get where there are no instances returned
 
