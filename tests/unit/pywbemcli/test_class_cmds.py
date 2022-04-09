@@ -47,7 +47,7 @@ _PYWBEM_VERSION = parse_version(pywbem_version)
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
 # Create variable that is True if python version gt 3.5
-PYTHON_VER_GT_35 = bool(sys.version_info > (3, 5))
+PYTHON_VER_GT_35 = sys.version_info > (3, 5)
 
 # Mock scripts with setup() function are supported
 MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
@@ -71,6 +71,7 @@ TREE_TEST_MOCK_FILE = 'tree_test_mock_model.mof'
 SIMPLE_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
 
 THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
+
 
 #
 # The following list defines the help for each command in terms of particular
@@ -2575,6 +2576,29 @@ class CIM_FooRef2 : CIM_BaseRef {
      {'args': ['associators', 'CIM_FooRef1',
                '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'xml']},
+     {'stdout': ['<!-- Namespace = root/cimv2 -->',
+                 '<CLASSPATH>',
+                 '<NAMESPACEPATH>',
+                 '<HOST>FakedUrl:5988</HOST>',
+                 '<LOCALNAMESPACEPATH>',
+                 '<NAMESPACE NAME="root"/>',
+                 '<NAMESPACE NAME="cimv2"/>',
+                 '</LOCALNAMESPACEPATH>',
+                 '</NAMESPACEPATH>',
+                 '</CLASSPATH>',
+                 '<!-- Namespace = root/cimv3 -->',
+                 '<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef">',
+                 '</QUALIFIER>',
+                 '</CLASS>'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify associators from two namespaces xml output',
+     {'args': ['associators', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'xml']},
      {'stdout': '''<!-- Namespace = root/cimv2 -->
 <CLASSPATH>
     <NAMESPACEPATH>
@@ -2613,18 +2637,16 @@ class CIM_FooRef2 : CIM_BaseRef {
 ''',  # noqa: E501
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, PYTHON_VER_GT_35],  # Test fails python <= 3.5
-                                             # See bug pywbem #2882
+     [THREE_NS_MOCK_FILE, "Bug Pywbem #2882"], PYTHON_VER_GT_35],
+
     # pylint: enable=line-too-long
-
-
-    # TODO: Test class  REPR outputs
 ]
 
 # TODO command class delete. Extend this test to use stdin (delete, test)
 # namespace
 # TODO: add test for  errors: class invalid, namespace invalid
 # other tests.  Test local-only on top level
+# TODO: Test class  REPR outputs
 
 
 class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
@@ -2647,4 +2669,4 @@ class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
             pywbemcli command.
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition)
