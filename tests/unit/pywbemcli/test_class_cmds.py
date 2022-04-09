@@ -46,8 +46,8 @@ _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
-# Create variable that is True if python version gt 3.5
-PYTHON_VER_GT_35 = sys.version_info > (3, 5)
+# Create variable that is True if python version ge 3.6
+PYTHON_GE_36 = sys.version_info > (3, 6)
 
 # Mock scripts with setup() function are supported
 MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
@@ -364,7 +364,7 @@ REFERENCES_CLASS_RTN_QUALS2 = [
     '};']
 
 
-OK = True     # mark tests OK when they execute correctly
+OK = False     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -2637,7 +2637,7 @@ class CIM_FooRef2 : CIM_BaseRef {
 ''',  # noqa: E501
       'rc': 0,
       'test': 'innows'},
-     [THREE_NS_MOCK_FILE, "Bug Pywbem #2882"], PYTHON_VER_GT_35],
+     THREE_NS_MOCK_FILE, PYTHON_GE_36],
 
     # pylint: enable=line-too-long
 ]
