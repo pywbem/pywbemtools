@@ -35,7 +35,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_LIST_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_INSTANCE_GET_HELP_LINE, \
-    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_ALL_HELP_LINE, \
     CMD_OPTION_KEYS_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
@@ -94,6 +95,8 @@ MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 ALLTYPES_INVOKEMETHOD_MOCK_FILE = 'all_types_method_mock_v0.py' if PYWBEM_0 \
     else 'all_types_method_mock_v1old.py'
 
+THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
+
 
 #
 # The following list define the help for each command in terms of particular
@@ -141,7 +144,7 @@ INSTANCE_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
@@ -157,7 +160,7 @@ INSTANCE_COUNT_HELP_LINES = [
     'Count the instances of each class with matching class name.',
     '-s, --sort Sort by instance count.',
     '--ignore-class CLASSNAME Class names of classes to be ignored (not counted). ',  # noqa: E501
-    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_ALL_HELP_LINE,
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE,
@@ -194,7 +197,7 @@ INSTANCE_ENUMERATE_HELP_LINES = [
     CMD_OPTION_INCLUDE_QUALIFIERS_LIST_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
@@ -211,7 +214,7 @@ INSTANCE_GET_HELP_LINES = [
     CMD_OPTION_INCLUDE_QUALIFIERS_GET_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_KEYS_HELP_LINE,
     CMD_OPTION_HELP_INSTANCENAME_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
@@ -261,7 +264,7 @@ INSTANCE_REFERENCES_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_FILTER_QUERY_LINE,
     CMD_OPTION_FILTER_QUERY_LANGUAGE_LINE,
@@ -346,6 +349,151 @@ instance of CIM_Foo_sub_sub {
    IntegerProp = 9;
 };
 
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub3";
+   IntegerProp = 10;
+};
+"""
+
+MULTIPLE_NS_ENUM_INST_RTN = """#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo2";
+   IntegerProp = 2;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo3";
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo30";
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo31";
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub1";
+   IntegerProp = 4;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub2";
+   IntegerProp = 5;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub3";
+   IntegerProp = 6;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub4";
+   IntegerProp = 7;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub1";
+   IntegerProp = 8;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub2";
+   IntegerProp = 9;
+};
+
+#pragma namespace ("root/cimv2")
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub3";
+   IntegerProp = 10;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo2";
+   IntegerProp = 2;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo3";
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo3-third-ns";
+   IntegerProp = 3;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo30";
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo31";
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub1";
+   IntegerProp = 4;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub2";
+   IntegerProp = 5;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub3";
+   IntegerProp = 6;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub {
+   InstanceID = "CIM_Foo_sub4";
+   IntegerProp = 7;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub1";
+   IntegerProp = 8;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo_sub_sub {
+   InstanceID = "CIM_Foo_sub_sub2";
+   IntegerProp = 9;
+};
+
+#pragma namespace ("root/cimv3")
 instance of CIM_Foo_sub_sub {
    InstanceID = "CIM_Foo_sub_sub3";
    IntegerProp = 10;
@@ -920,7 +1068,7 @@ TEST_CASES = [
      ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, OK],
+     SIMPLE_MOCK_FILE, RUN],
 
     ['Verify instance command enumerate with query, traditional ops fails',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
@@ -977,7 +1125,7 @@ TEST_CASES = [
     ['Verify command enumerate with CIM_Foo summary table output',
      {'args': ['enumerate', 'CIM_Foo', '--summary'],
       'general': ['--output-format', 'table']},
-     {'stdout': """Summary of CIMInstance returned
+     {'stdout': """Summary of CIMInstance(s) returned
 +---------+-------------+
 |   Count | CIM Type    |
 |---------+-------------|
@@ -1278,7 +1426,7 @@ Instances: CIM_FooAssoc
 """,  # noqa: E501
       'rc': 0,
       'test': 'linesnows'},
-     INSTANCE_TABLE_MODEL_FILE, RUN],
+     INSTANCE_TABLE_MODEL_FILE, OK],
 
     ['Verify instance command associators of CIM_Foo as table returns correct '
      'properties without --show-null option',
@@ -1296,7 +1444,7 @@ Instances: CIM_Foo
 """,
       'rc': 0,
       'test': 'linesnows'},
-     INSTANCE_TABLE_MODEL_FILE, RUN],
+     INSTANCE_TABLE_MODEL_FILE, OK],
 
     ['Verify instance command associators of CIM_Foo as table returns correct '
      'properties with --show-null option',
@@ -1865,8 +2013,8 @@ Instances: CIM_Foo
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command get with instancename empty  prop list '
-     'returns  empty instance',
+    ['Verify instance command get with instancename and empty  prop list rtns '
+     'empty instance',
      ['get', 'CIM_Foo.InstanceID="CIM_Foo1"', '--pl', '""'],
      {'stdout': ['instance of CIM_Foo {',
                  '};',
@@ -1885,7 +2033,7 @@ Instances: CIM_Foo
 
 
 
-    ['Verify instance command -o grid get CIM_Foo',
+    ['Verify instance command -o simple get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'general': ['-o', 'simple']},
      {'stdout': """Instances: CIM_Foo
@@ -2474,7 +2622,7 @@ InstanceID      IntegerProp
      SIMPLE_MOCK_FILE, OK],
 
     #
-    #  instance references command
+    #  instance references command tests
     #
     ['Verify instance command references --help response',
      ['references', '--help'],
@@ -2607,7 +2755,7 @@ InstanceID      IntegerProp
      {'args': ['references', 'TST_Person.name="Mike"', '--no', '--summary',
                '--rc', 'TST_Lineage'],
       'general': ['--output-format', 'table']},
-     {'stdout': ["""Summary of CIMInstanceName returned
+     {'stdout': ["""Summary of CIMInstanceName(s) returned
 +---------+-----------------+
 |   Count | CIM Type        |
 |---------+-----------------|
@@ -2850,7 +2998,7 @@ InstanceID      IntegerProp
 """],
       'rc': 0,
       'test': 'linesnows'},
-     ASSOC_MOCK_FILE, RUN],
+     ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command associators with --pl in unsorted order',
      {'args': ['associators', 'TST_Person.name="Mike"',
@@ -3452,6 +3600,250 @@ interop      TST_PersonExp        4
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
+
+    #
+    #  Multiple Namespaces Option tests --namespace a,b and -n a -n b
+    #  The following tests exercise the multiple-namespace functionality
+    #  for instances (enumerate, get, associators, references) and
+    #  corresponding names-only options.
+    #
+    #  Get request
+    #
+
+    ['Verify instance get from two namespaces. single namespace/comma option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 '#pragma namespace ("root/cimv3")',
+                 'instance of CIM_Foo {'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, RUN],
+
+    ['Verify instance get from two namespaces use multiple namespace option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--namespace',
+               'root/cimv2', '--namespace', 'root/cimv3']},
+     {'stdout': ["""#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+"""],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces table output',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--namespace',
+               'root/cimv2', '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: CIM_Foo
++-------------+--------------+---------------+
+| namespace   | InstanceID   |   IntegerProp |
+|-------------+--------------+---------------|
+| root/cimv2  | "CIM_Foo1"   |             1 |
+| root/cimv3  | "CIM_Foo1"   |             1 |
++-------------+--------------+---------------+
+"""],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # TODO xml, etc
+
+    #
+    # Enumerate request
+    #
+
+    ['Verify instance enumerate from two namespaces, CIM_Foo',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': MULTIPLE_NS_ENUM_INST_RTN,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance enumerate from two namespaces summary',
+     {'args': ['enumerate', 'CIM_Foo', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': ['root/cimv2 12 CIMInstance(s) returned',
+                 'root/cimv3 13 CIMInstance(s) returned'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance enumerate from two namespaces summary, --summary, table',
+     {'args': ['enumerate', 'CIM_Foo', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstance(s) returned
++-------------+---------+-------------+
+| Namespace   |   Count | CIM Type    |
+|-------------+---------+-------------|
+| root/cimv2  |      12 | CIMInstance |
+| root/cimv3  |      13 | CIMInstance |
++-------------+---------+-------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instances (--no) enumerate from two namespaces --summary ',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """root/cimv2 12 CIMInstanceName(s) returned
+root/cimv3 13 CIMInstanceName(s) returned
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify namesnames (--no) enumerate from two namespaces ',
+     {'args': ['enumerate', 'CIM_Foo_Sub', '--no',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """
+root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"
+root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"
+root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"
+root/cimv2:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"
+root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"
+root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"
+root/cimv2:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify classnames enumerate from two namespaces --summary, -o table',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstanceName(s) returned
++-------------+---------+-----------------+
+| Namespace   |   Count | CIM Type        |
+|-------------+---------+-----------------|
+| root/cimv2  |      12 | CIMInstanceName |
+| root/cimv3  |      13 | CIMInstanceName |
++-------------+---------+-----------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
+    # instance references request
+
+    ['Verify classnames references from two namespaces --summary',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '-s', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """root/cimv2 1 CIMInstanceName(s) returned
+root/cimv3 1 CIMInstanceName(s) returned
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify references names from two namespaces --summary, -o table',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '-s', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstanceName(s) returned
++-------------+---------+-----------------+
+| Namespace   |   Count | CIM Type        |
+|-------------+---------+-----------------|
+| root/cimv2  |       1 | CIMInstanceName |
+| root/cimv3  |       1 | CIMInstanceName |
++-------------+---------+-----------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify  references names  from two namespaces --summary, -o table',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """InstanceNames: CIM_FooAssoc
++---------------+-------------+--------------+-------------------------------------+-------------------------------------+
+| host          | namespace   | class        | key=                                | key=                                |
+|               |             |              | Ref1                                | Ref2                                |
+|---------------+-------------+--------------+-------------------------------------+-------------------------------------|
+| FakedUrl:5988 | root/cimv2  | CIM_FooAssoc | /root/cimv2:CIM_FooRef1.InstanceID= | /root/cimv2:CIM_FooRef2.InstanceID= |
+|               |             |              | "CIM_FooRef11"                      | "CIM_FooRef21"                      |
+| FakedUrl:5988 | root/cimv3  | CIM_FooAssoc | /root/cimv3:CIM_FooRef1.InstanceID= | /root/cimv3:CIM_FooRef2.InstanceID= |
+|               |             |              | "CIM_FooRef11"                      | "CIM_FooRef21"                      |
++---------------+-------------+--------------+-------------------------------------+-------------------------------------+
+""",   # noqa: E501
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+    # pylint: enable=line-too-long
+
+    ['Verify references names from two namespaces MOF',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """#pragma namespace ("root/cimv2")
+instance of CIM_FooAssoc {
+   Ref1 = "/root/cimv2:CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"";
+   Ref2 = "/root/cimv2:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\"";
+};
+#pragma namespace ("root/cimv3")
+instance of CIM_FooAssoc {
+   Ref1 = "/root/cimv3:CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"";
+   Ref2 = "/root/cimv3:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\"";
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
+    ['Verify references  names from two namespaces MOF, --no 2 namespaces',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': '''
+//FakedUrl:5988/root/cimv2:CIM_FooAssoc.Ref1="root/cimv2:CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"",Ref2="root/cimv2:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\""
+//FakedUrl:5988/root/cimv3:CIM_FooAssoc.Ref1="root/cimv3:CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"",Ref2="root/cimv3:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\""
+''',
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
+    # instance associators request
+
+    ['Verify associators classnames from two namespaces --summary, -o table',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--summary', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstanceName(s) returned
++-------------+---------+-----------------+
+| Namespace   |   Count | CIM Type        |
+|-------------+---------+-----------------|
+| root/cimv2  |       1 | CIMInstanceName |
+| root/cimv3  |       1 | CIMInstanceName |
++-------------+---------+-----------------+
+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # Test multi-namespace enum/get where there are no instances returned
+
 
     # TODO test results if we have keys that get hidden.  This will require
     # a more complex model with CreationClassName, etc. in paths.

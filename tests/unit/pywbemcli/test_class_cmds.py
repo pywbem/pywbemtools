@@ -31,7 +31,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_PROPERTYLIST_HELP_LINE, \
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE, \
     CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE, CMD_OPTION_NO_QUALIFIERS_HELP_LINE, \
-    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_ALL_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE, \
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE, \
     CMD_OPTION_INDICATION_FILTER_HELP_LINE, \
     CMD_OPTION_EXPERIMENTAL_FILTER_HELP_LINE, \
@@ -44,6 +45,9 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
 _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
+
+# Create variable that is True if python version ge 3.6
+PYTHON_GE_36 = sys.version_info > (3, 6)
 
 # Mock scripts with setup() function are supported
 MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
@@ -65,6 +69,9 @@ QUALIFIER_FILTER_MODEL = 'qualifier_filter_model.mof'
 TREE_TEST_MOCK_FILE = 'tree_test_mock_model.mof'
 
 SIMPLE_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'
+
+THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
+
 
 #
 # The following list defines the help for each command in terms of particular
@@ -100,7 +107,7 @@ CLASS_ASSOCIATORS_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -123,7 +130,7 @@ CLASS_ENUMERATE_HELP_LINES = [
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     # NOTE: The FILTER options are a group. Define all of them.
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
@@ -143,7 +150,7 @@ CLASS_FIND_HELP_LINES = [
     '[COMMAND-OPTIONS]',
     'List the classes with matching class names on the server.',
     '-s, --sort  Sort by namespace. Default is to sort by',
-    CMD_OPTION_MULTIPLE_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_ALL_HELP_LINE,
     # FILTER OPTIONS
     CMD_OPTION_ASSOCIATION_FILTER_HELP_LINE,
     CMD_OPTION_INDICATION_FILTER_HELP_LINE,
@@ -164,7 +171,7 @@ CLASS_GET_HELP_LINES = [
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -187,7 +194,7 @@ CLASS_REFERENCES_HELP_LINES = [
     CMD_OPTION_INCLUDE_CLASSORIGIN_HELP_LINE,
     CMD_OPTION_PROPERTYLIST_HELP_LINE,
     CMD_OPTION_NAMES_ONLY_HELP_LINE,
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -357,7 +364,7 @@ REFERENCES_CLASS_RTN_QUALS2 = [
     '};']
 
 
-OK = True     # mark tests OK when they execute correctly
+OK = False     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -536,13 +543,13 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate CIM_Foo summary table',
+    ['Verify class command enumerate CIM_Foo summary default output format',
      ['enumerate', 'CIM_Foo', '-s'],
      {'stdout': ['2 CIMClass(s) returned'],
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate CIM_Foo summary, table',
+    ['Verify class command enumerate CIM_Foo summary, default output format',
      ['enumerate', 'CIM_Foo', '--summary'],
      {'stdout': ['2 CIMClass(s) returned'],
       'test': 'innows'},
@@ -551,7 +558,7 @@ TEST_CASES = [
     ['Verify class command enumerate CIM_Foo summary table output',
      {'args': ['enumerate', 'CIM_Foo', '--summary'],
       'general': ['--output-format', 'table']},
-     {'stdout': ["""Summary of CIMClass returned
+     {'stdout': ["""Summary of CIMClass(s) returned
 +---------+------------+
 |   Count | CIM Type   |
 |---------+------------|
@@ -611,7 +618,7 @@ TEST_CASES = [
     ['Verify class command enumerate  --di --no --namespace',
      ['enumerate', '--di', '--no', '-n', 'interop'],
      {'stdout': ['CIM_Namespace', 'CIM_ObjectManager'],
-      'test': 'in'},
+      'test': 'innows'},
      SIMPLE_INTEROP_MOCK_FILE, OK],
 
     #
@@ -951,7 +958,6 @@ TEST_CASES = [
      {'stdout': ['0 objects returned'],
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
-
 
     ['Verify class command enumerate with --schema "NOT_EXIST".',
      ['enumerate', '--schema', 'NOT_EXIST', '--names-only'],
@@ -1336,7 +1342,7 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
     # pylint: enable=line-too-long
 
-    ['Verify class command enumerate  --di --no --namespace',
+    ['Verify class command get  --di --no --namespace',
      ['get', 'CIM_Namespace', '-n', 'interop'],
      {'stdout': ['class CIM_Namespace',
                  'string ObjectManagerCreationClassName;'],
@@ -2349,12 +2355,298 @@ TEST_CASES = [
       'rc': 0,
       'test': 'innows'},
      None, OK],
+
+    #
+    #  Multiple Namespaces Option tests --namespace a,b and -n a -n b
+    #  The following tests exercise the multiple-namespace functionality
+    #  for classes (enumerate, get, associators, references) and
+    #  corresponding names-only options.
+    #
+
+    ['Verify class get from two namespaces. single namespace/comma option',
+     {'args': ['get', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 '#pragma namespace ("root/cimv3")',
+                 'CIM_Foo {'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class get from two namespaces use multiple namespace option',
+     {'args': ['get', 'CIM_Foo', '--namespace', 'root/cimv2',
+               '--namespace', 'root/cimv3']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 '#pragma namespace ("root/cimv3")',
+                 'CIM_Foo {'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces multiple namespace option,'
+     ' no classname',
+     {'args': ['enumerate', '--namespace', 'root/cimv2',
+               '--namespace', 'root/cimv3']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 '#pragma namespace ("root/cimv3")',
+                 'class CIM_Foo {'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces, CIM_Foo',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 '#pragma namespace ("root/cimv3")',
+                 'class CIM_Foo_sub : CIM_Foo {'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces summary',
+     {'args': ['enumerate', 'CIM_Foo', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': ['root/cimv2 2 CIMClass(s) returned',
+                 'root/cimv3 2 CIMClass(s) returned'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces summary, table',
+     {'args': ['enumerate', 'CIM_Foo', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMClass(s) returned
++-------------+---------+------------+
+| Namespace   |   Count | CIM Type   |
+|-------------+---------+------------|
+| root/cimv2  |       2 | CIMClass   |
+| root/cimv3  |       2 | CIMClass   |
++-------------+---------+------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify classnames (--no) enumerate from two namespaces summary',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """root/cimv2 2 CIMClassName(s) returned
+root/cimv3 2 CIMClassName(s) returned
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify classnames (--no) enumerate from two namespaces ',
+     {'args': ['enumerate', 'CIM_Foo', '--no',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """
+root/cimv2:CIM_Foo_sub
+root/cimv2:CIM_Foo_sub2
+root/cimv3:CIM_Foo_sub
+root/cimv3:CIM_Foo_sub2
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify classnames enumerate from two namespaces --no --summary, -o table',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMClassName(s) returned
++-------------+---------+--------------+
+| Namespace   |   Count | CIM Type     |
+|-------------+---------+--------------|
+| root/cimv2  |       2 | CIMClassName |
+| root/cimv3  |       2 | CIMClassName |
++-------------+---------+--------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    #  References requests with multiple namespaces tests
+
+    ['Verify class references classnames from two namespaces',
+     {'args': ['references', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooAssoc
+   [Association ( true ),
+    Description ( "Simple CIM Association" )]
+class CIM_FooAssoc {
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   CIM_FooRef1 REF Ref1;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   CIM_FooRef2 REF Ref2;
+
+};
+
+//FakedUrl:5988/root/cimv3:CIM_FooAssoc
+   [Association ( true ),
+    Description ( "Simple CIM Association" )]
+class CIM_FooAssoc {
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   CIM_FooRef1 REF Ref1;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   CIM_FooRef2 REF Ref2;
+
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify references classname (--no) from two namespaces',
+     {'args': ['references', 'CIM_FooRef1', '--no',
+               '--namespace', 'root/cimv2,root/cimv3'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooAssoc
+//FakedUrl:5988/root/cimv3:CIM_FooAssoc
+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class references from two namespaces, XML format, Min compare',
+     {'args': ['references', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': '''<!-- Namespace = root/cimv2 -->
+<CLASSPATH>
+</CLASSPATH>
+<CLASS NAME="CIM_FooAssoc">
+</CLASS>
+<!-- Namespace = root/cimv3 -->
+''',
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, FAIL],  # Fails compare of XML
+
+    ['Verify class references from two namespaces, XML format, Min compare',
+     {'args': ['references', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'repr']},
+     {'stdout': """(CIMClassName(classname='CIM_FooAssoc',
+CIMClass(classname='CIM_FooAssoc',
+(CIMClassName(classname='CIM_FooAssoc', namespace='root/cimv3',
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, FAIL],  # Fails compare of XML
+
+    # Associators requests with multiple namespaces tests
+
+    ['Verify associators classnames from two namespaces --names-only',
+     {'args': ['associators', 'CIM_FooRef1', '--no',
+               '--namespace', 'root/cimv2,root/cimv3'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooRef2
+//FakedUrl:5988/root/cimv3:CIM_FooRef2
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify associators from two namespaces --names-only',
+     {'args': ['associators', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooRef2
+   [Description ( "Class 2 that is referenced" )]
+class CIM_FooRef2 : CIM_BaseRef {
+};
+//FakedUrl:5988/root/cimv3:CIM_FooRef2
+   [Description ( "Class 2 that is referenced" )]
+class CIM_FooRef2 : CIM_BaseRef {
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify associators from two namespaces xml output',
+     {'args': ['associators', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': ['<!-- Namespace = root/cimv2 -->',
+                 '<CLASSPATH>',
+                 '<NAMESPACEPATH>',
+                 '<HOST>FakedUrl:5988</HOST>',
+                 '<LOCALNAMESPACEPATH>',
+                 '<NAMESPACE NAME="root"/>',
+                 '<NAMESPACE NAME="cimv2"/>',
+                 '</LOCALNAMESPACEPATH>',
+                 '</NAMESPACEPATH>',
+                 '</CLASSPATH>',
+                 '<!-- Namespace = root/cimv3 -->',
+                 '<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef">',
+                 '</QUALIFIER>',
+                 '</CLASS>'],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify associators from two namespaces xml output',
+     {'args': ['associators', 'CIM_FooRef1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': '''<!-- Namespace = root/cimv2 -->
+<CLASSPATH>
+    <NAMESPACEPATH>
+        <HOST>FakedUrl:5988</HOST>
+        <LOCALNAMESPACEPATH>
+            <NAMESPACE NAME="root"/>
+            <NAMESPACE NAME="cimv2"/>
+        </LOCALNAMESPACEPATH>
+    </NAMESPACEPATH>
+    <CLASSNAME NAME="CIM_FooRef2"/>
+</CLASSPATH>
+
+<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef">
+    <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+        <VALUE>Class 2 that is referenced</VALUE>
+    </QUALIFIER>
+</CLASS>
+
+<!-- Namespace = root/cimv3 -->
+<CLASSPATH>
+    <NAMESPACEPATH>
+        <HOST>FakedUrl:5988</HOST>
+        <LOCALNAMESPACEPATH>
+            <NAMESPACE NAME="root"/>
+            <NAMESPACE NAME="cimv3"/>
+        </LOCALNAMESPACEPATH>
+    </NAMESPACEPATH>
+    <CLASSNAME NAME="CIM_FooRef2"/>
+</CLASSPATH>
+
+<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef">
+    <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+        <VALUE>Class 2 that is referenced</VALUE>
+    </QUALIFIER>
+</CLASS>
+''',  # noqa: E501
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, PYTHON_GE_36],
+
+    # pylint: enable=line-too-long
 ]
 
 # TODO command class delete. Extend this test to use stdin (delete, test)
 # namespace
 # TODO: add test for  errors: class invalid, namespace invalid
 # other tests.  Test local-only on top level
+# TODO: Test class  REPR outputs
 
 
 class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods

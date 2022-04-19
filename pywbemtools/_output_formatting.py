@@ -100,6 +100,21 @@ def output_format_is_cimobject(output_format):
     return output_format in CIM_OBJECT_FORMATS
 
 
+def output_format_is_testgroup(output_format):
+    """
+    Return boolean indicating whether an output format is a text format.
+
+    Parameters:
+
+      output_format (:term:`string`):
+         The output format keyword (e.g. 'text') to be checked.
+
+    Returns:
+      bool: Boolean indicating whether the output format is a text format.
+    """
+    return output_format in TEXT_FORMATS
+
+
 def output_format_in_groups(output_format, format_groups):
     """
     Return boolean indicating whether an output format is in a given format

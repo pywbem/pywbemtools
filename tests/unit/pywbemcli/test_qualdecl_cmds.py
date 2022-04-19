@@ -246,7 +246,7 @@ TEST_CASES = [
     ['Verify qualifier command enumerate summary returns qual decls table',
      {'args': ['enumerate', '--summary'],
       'general': ['--output-format', 'table']},
-     {'stdout': ["""Summary of CIMQualifierDeclaration returned
+     {'stdout': ["""Summary of CIMQualifierDeclaration(s) returned
 +---------+-------------------------+
 |   Count | CIM Type                |
 |---------+-------------------------|

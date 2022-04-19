@@ -292,9 +292,14 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
+index:    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
-   :term:`current connection`.
+   :term:`current connection`. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 * ``-s``/``--summary`` - Displays a summary count of the objects that are returned
   by the request rather than a table or CIM object representation of each
@@ -352,6 +357,9 @@ The command options are:
 
 *  ``--dry-run`` - Do not actually delete the objects, but display what
    would be done.
+
+index:
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -440,9 +448,16 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
+.. index::
+    pair: namespace; multiple namespaces
+    pair: --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
-   :term:`current connection`.
+   :term:`current connection`.  This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 *  ``-s``/``--summary`` - Show only a summary (count) of the objects.
 
@@ -507,6 +522,9 @@ The command displays the namespaces and class names of the result using the
 ``txt`` output format (default), or using :term:`Table output formats`.
 
 The command options are:
+
+index:
+    pair --namespace option; command option --namespace
 
 *  ``--namespace`` ``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
    This option may be specified multiple times or the namespace list may
@@ -607,9 +625,15 @@ The command options are:
    will be ignored. AN empty string will include no properties. If this option
    is not set, the server is expected to return all properties.
 
+.. index::
+    pair: namespace; multiple namespaces
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
-   :term:`current connection`.
+   :term:`current connection`. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 The class definition is displayed using :term:`CIM object output formats`.
 This command does not support :term:`Table output formats`.
@@ -687,6 +711,9 @@ The command options are:
 * ``--parameter``\``-p`` ``PARAMETERNAME=VALUE`` Specify a method input
   parameter with its value. May be used several time to define multiple input
   values.
+
+index:
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -767,9 +794,15 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
+index:
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
-   :term:`current connection`.
+   :term:`current connection`. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 .. code-block:: text
 
@@ -819,6 +852,9 @@ The command options are:
 
 *  ``--detail`/``-d``` - Show details about the class including the Version,
    Association, Indication, and Abstact qualifiers.
+
+index:
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -952,9 +988,15 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
+index:
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
-   :term:`current connection`.
+   :term:`current connection`. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 *  ``-s``/``--summary`` - Show only a summary (count) of the objects.
 
@@ -1045,9 +1087,12 @@ association classes.
 
 The command options are:
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
    May be specified multiple times. If this option is not specified the
-   search defaults to using all namespaces in the server.  Note that this
+   search defaults to searching all namespaces in the server.  Note that this
    option differs from the option of the same name in commands like
    ``instance enumerate`` in that it allows multiple namespaces and defaults
    to defining a list of all namespaces rather than defaulting to the
@@ -1181,6 +1226,9 @@ The command options are:
     change, to allow for verification of parameters. Default: Do not prompt for
     confirmation.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
    :term:``current connection``.
@@ -1221,6 +1269,9 @@ The command options are:
 *  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
    CIM instance name. May be specified multiple times. This option
    allows defining keys on the command line without the issues of quotes.
+
+.. index::
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
@@ -1302,9 +1353,15 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
-   :term:``current connection``.
+   :term:``current connection``. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 *  ``--summary``/``-s`` - Show only a summary (count) of the objects.
 
@@ -1442,9 +1499,15 @@ The command options are:
    allows defining keys on the command line without the issues of quotes.
    Default: No keybindings provided.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
-   :term:``current connection``.
+   :term:``current connection``. This option accepts single or multiple namespaces
+   and displays the results for the list of namespaces supplied.
+   See :ref: `Pywbemcli special command line features` for more information
+   on using multiple namespaces
 
 *  ``--help-instancename``/``--hi`` -  Show help message for specifying
    ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
@@ -1621,6 +1684,9 @@ The command arguments are:
    allows defining keys on the command line without the issues of quotes.
    Default: No keybindings provided.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
    :term:`current connection`.
@@ -1704,6 +1770,9 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the instances.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the current connection.
 
@@ -1773,6 +1842,9 @@ The command options are:
   target server.   pywbemcli  does not validate the query language specified but
   passes it on to the WBEM server.
 
+.. index::
+    pair --namespace option; command option --namespace
+
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
    :term:`current connection`.
@@ -1840,6 +1912,9 @@ The command options are:
 *  ``--key``/``-k`` ``KEYNAME=VALUE`` - The value for a key in the keybinding of
    CIM instance name. May be specified multiple times. This option
    allows defining keys on the command line without the issues of quotes.
+
+.. index::
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -2302,6 +2377,9 @@ resulting CIM objects to the target namespace in the WBEM server of the
 :term:`current connection`.
 
 The command options are:
+
+.. index::
+    pair --namespace option; command option --namespace
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the current connection.

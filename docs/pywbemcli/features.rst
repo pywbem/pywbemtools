@@ -38,6 +38,25 @@ syntactic implementation of the features. This includes:
   for example, it can for experimental classes, association classes, and
   deprecated classes.
 
+.. index::
+    pair: namespace; multiple namespaces
+    pair: --namespace option; command option --namespace
+
+* The ability to view information on multiple namespaces in a single command.
+  Many of the pywbemcli commands target a term:`Namespace` in the WBEM server for
+  as the source of information (ex. enumerate, get, associators, references,
+  create, delete, modify). Commands like create, delete, and modify are
+  restricted to a single namespace which can be either the default namespace
+  defined for the connection or a namespace defined with the ``--namespace``
+  command option. Commands like enumerate, get, associators,
+  and references can be used to get CIM information from multiple namespaces
+  in a single pywbemcli request using the ``--namespace``
+  command option.  Thus, if single namespace is defined (``--namespace root/blah``)
+  that becomes the namespace for the command. However with these particular
+  commands, multiple namespaces can be specified (``--namespace root/cimv2,root/cimv3``
+  or ``--namespace root/cimv2 --namespace root/cimv3) and the CIM objects retrieved
+  from all of the namespaces on this list and displayed.
+
 
 .. _`pywbemcli commands to WBEM operations`:
 
@@ -87,7 +106,7 @@ GetClass                           class get CLASSNAME
 ModifyClass                        Not implemented
 CreateClass                        Not implemented
 DeleteClass                        class delete CLASSNAME
-**QualifierDeclaration ops:**
+**QualifierDeclaration Ops:**
 EnumerateQualifiers                qualifier enumerate
 GetQualifier                       qualifier get QUALIFIERNAME
 SetQualifier                       Not implemented

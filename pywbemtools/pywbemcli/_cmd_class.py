@@ -23,12 +23,13 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
+import copy
 from collections import namedtuple
 import click
 
-from pywbem._nocasedict import NocaseDict
-
 from pywbem import Error, CIMClassName, CIMError, ModelError, CIM_ERR_NOT_FOUND
+
+from pywbem._nocasedict import NocaseDict
 
 from .pywbemcli import cli
 from ._common import filter_namelist, resolve_propertylist, \
@@ -40,7 +41,8 @@ from ._display_cimobjects import display_cim_objects
 
 from ._common_options import propertylist_option, names_only_option, \
     include_classorigin_class_option, namespace_option, summary_option, \
-    multiple_namespaces_option, class_filter_options
+    multiple_namespaces_option_dflt_conn, multiple_namespaces_option_dflt_all, \
+    class_filter_options
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
@@ -113,7 +115,7 @@ def class_group():
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(names_only_option)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(class_filter_options)
 @add_options(help_option)
@@ -156,7 +158,7 @@ def class_enumerate(context, classname, **options):
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(help_option)
 @click.pass_obj
 def class_get(context, classname, **options):
@@ -285,7 +287,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -339,7 +341,7 @@ def class_references(context, classname, **options):
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
 @add_options(names_only_option)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -376,7 +378,7 @@ def class_associators(context, classname, **options):
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname-glob', type=str, metavar='CLASSNAME-GLOB',
                 required=True)
-@add_options(multiple_namespaces_option)
+@add_options(multiple_namespaces_option_dflt_all)
 @click.option('-s', '--sort', is_flag=True, required=False,
               help=u'Sort by namespace. Default is to sort by classname')
 @add_options(class_filter_options)
@@ -481,6 +483,54 @@ def class_tree(context, classname, **options):
 #  in this fmodule and possibly other modules
 #
 ####################################################################
+
+
+def get_classnames_in_namespaces(context, options, namespaces, classname_glob):
+    """
+    Get the classnames of all classes in the namespaces parameter that
+    matches the classname_glob pattern.
+
+    Parameters:
+
+      context :
+        Context object for the command
+
+      options (python dictionary)
+        Options dictionary for the command executiong
+
+      namespaces (list of strings):
+        List of the namespaces from which namespace names are to be retrieved.
+
+      classname_glob ((:term: `string`))
+        A string that may contain GLOB characters which serves as the
+        filter
+
+    Returns:
+        NocaseDict where the keys are namespace names and the value for
+        each key is the list of classnames that match the glob patter  in
+        each namespace in namespaces
+
+    """
+
+    # Dictionary key is namespaces, value is list of classes
+    names_dict = NocaseDict()
+    if namespaces:
+        # Use di True, and names_only build options to get all names
+        # Create deep copy to insure no changes to original dict
+        options_tmp = copy.deepcopy(options)
+        options_tmp['deep_inheritance'] = True
+        options_tmp['names_only'] = True
+        try:
+            for ns in namespaces:
+                # Enumerate filtered for classnames and add to dictionary
+                # of returns for each namespace
+                classnames = enumerate_classes_filtered(context, ns, None,
+                                                        options_tmp)
+                names_dict[ns] = filter_namelist(classname_glob, classnames)
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+    return names_dict
 
 
 def parse_version_str(version_str):
@@ -741,7 +791,7 @@ def _filter_classes(classes, filters, names_only, iq):
     return filtered_classes
 
 
-def enumerate_classes_filtered(context, classname, options):
+def enumerate_classes_filtered(context, namespace, classname, options):
     """
     Execute EnumerateClasses or EnumerateClassNames in a single namespace
     defined in options['namespace'] and return results.
@@ -756,12 +806,13 @@ def enumerate_classes_filtered(context, classname, options):
 
     Parameters:
 
-      context:  Click context
+      context:  (instance of :class:`ContextObj`):
+        Used to retrieve conn parameter
 
-      classname:
+      classname (:term:`string`):
         classname for the enumerate or None if all classes to be enumerated.
 
-      options:Click options dictionary
+      options: Click options dictionary
         Options that form basis for this Enumerate and filter processing.
 
     Returns:
@@ -771,7 +822,6 @@ def enumerate_classes_filtered(context, classname, options):
         pywbem Error exceptions generated by EnumerateClassNames and
         enumerateClasses
     """
-    namespace = options['namespace']
     conn = context.pywbem_server.conn
     filters = _build_filters_dict(conn, namespace, options)
 
@@ -854,18 +904,21 @@ def cmd_class_get(context, classname, options):
     conn = context.pywbem_server.conn
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
+    ns_names = get_namespaces(context, options['namespace'])
 
+    # NocaseDict insures ordering with old versions of Python
+    results = NocaseDict()
     try:
-        result_class = conn.GetClass(
-            classname,
-            namespace=options['namespace'],
-            LocalOnly=options['local_only'],
-            IncludeQualifiers=options['no_qualifiers'],
-            IncludeClassOrigin=options['include_classorigin'],
-            PropertyList=resolve_propertylist(options['propertylist']))
+        for ns in ns_names:
+            results[ns] = conn.GetClass(
+                classname,
+                namespace=ns,
+                LocalOnly=options['local_only'],
+                IncludeQualifiers=options['no_qualifiers'],
+                IncludeClassOrigin=options['include_classorigin'],
+                PropertyList=resolve_propertylist(options['propertylist']))
+        display_cim_objects(context, results, output_format=output_format)
 
-        display_cim_objects(context, result_class,
-                            output_format=output_format)
     except Error as er:
         raise pywbem_error_exception(er)
 
@@ -890,12 +943,17 @@ def cmd_class_enumerate(context, classname, options):
     """
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
+    ns_names = get_namespaces(context, options['namespace'])
 
+    # NocaseDict insures ordering with old versions of Python
+    results = NocaseDict()
     try:
-        results = enumerate_classes_filtered(context, classname, options)
+        for ns in ns_names:
+            results[ns] = enumerate_classes_filtered(context, ns, classname,
+                                                     options)
 
         display_cim_objects(context, results, output_format,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'])
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -907,29 +965,31 @@ def cmd_class_references(context, classname, options):
     the classname defined
     """
     conn = context.pywbem_server.conn
-    if options['namespace']:
-        classname = CIMClassName(classname, namespace=options['namespace'])
-
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
+    ns_names = get_namespaces(context, options['namespace'])
 
+    # NocaseDict insures ordering with old versions of Python
+    results = NocaseDict()
     try:
-        if options['names_only']:
-            results = conn.ReferenceNames(
-                classname,
-                ResultClass=options['result_class'],
-                Role=options['role'])
-        else:
-            results = conn.References(
-                classname,
-                ResultClass=options['result_class'],
-                Role=options['role'],
-                IncludeQualifiers=options['no_qualifiers'],
-                IncludeClassOrigin=options['include_classorigin'],
-                PropertyList=resolve_propertylist(options['propertylist']))
+        for ns in ns_names:
+            cln = CIMClassName(classname, namespace=ns)
+            if options['names_only']:
+                results[ns] = conn.ReferenceNames(
+                    cln,
+                    ResultClass=options['result_class'],
+                    Role=options['role'])
+            else:
+                results[ns] = conn.References(
+                    cln,
+                    ResultClass=options['result_class'],
+                    Role=options['role'],
+                    IncludeQualifiers=options['no_qualifiers'],
+                    IncludeClassOrigin=options['include_classorigin'],
+                    PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, output_format,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'])
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -942,70 +1002,115 @@ def cmd_class_associators(context, classname, options):
     """
     conn = context.pywbem_server.conn
 
-    if options['namespace']:
-        classname = CIMClassName(classname, namespace=options['namespace'])
-
     format_group = get_format_group(context, options)
     output_format = validate_output_format(context.output_format, format_group)
+    ns_names = get_namespaces(context, options['namespace'])
 
+    # NocaseDict insures ordering with old versions of Python
+    results = NocaseDict()
     try:
-        if options['names_only']:
-            results = conn.AssociatorNames(
-                classname,
-                AssocClass=options['assoc_class'],
-                Role=options['role'],
-                ResultClass=options['result_class'],
-                ResultRole=options['result_role'])
-        else:
-            results = conn.Associators(
-                classname,
-                AssocClass=options['assoc_class'],
-                Role=options['role'],
-                ResultClass=options['result_class'],
-                ResultRole=options['result_role'],
-                IncludeQualifiers=options['no_qualifiers'],
-                IncludeClassOrigin=options['include_classorigin'],
-                PropertyList=resolve_propertylist(options['propertylist']))
+        for ns in ns_names:
+            cln = CIMClassName(classname, namespace=ns)
+            if options['names_only']:
+                results[ns] = conn.AssociatorNames(
+                    cln,
+                    AssocClass=options['assoc_class'],
+                    Role=options['role'],
+                    ResultClass=options['result_class'],
+                    ResultRole=options['result_role'])
+            else:
+                results[ns] = conn.Associators(
+                    cln,
+                    AssocClass=options['assoc_class'],
+                    Role=options['role'],
+                    ResultClass=options['result_class'],
+                    ResultRole=options['result_role'],
+                    IncludeQualifiers=options['no_qualifiers'],
+                    IncludeClassOrigin=options['include_classorigin'],
+                    PropertyList=resolve_propertylist(options['propertylist']))
 
         display_cim_objects(context, results, output_format,
-                            summary=options['summary'], sort=True)
+                            summary=options['summary'])
 
     except Error as er:
         raise pywbem_error_exception(er)
 
 
-def get_namespaces(context, namespaces):
+def get_namespaces(context, namespaces, default_rtn=False):
     """
-    Returns either the namespaces provided or if that is None, the set of
-    namespaces that are defined in the wbem server as a list
+    Returns either the namespaces defined in namespaces parameter or if
+    namespaces is empty, either all of the namespaces available in the server or
+    the value None depending on the value of the parameter default.
+
+    Processes either single namespace string, single string containing
+    multiple comma-separated,namespace definitions  or combination of string
+    and tuple.
+
+    This allows a single processor for the namespace option that returns
+    namespace or default in a form that matches the type of namespaces
+    (tuple, list) or (string, string)
+
+    Parameters:
+
+      context context (:class:`ContextObj` provided with command)
+
+      namespaces (list of (:term: str)
+        List of strings where each string is one or more namespace names.
+        Any single string can contain multiple namespaces by comma-separating
+        the namespace names
+
+      default_rtn (:class:`py:bool`):
+        Boolean that determines default return if namespaces is None or []:
+          True: Return all namespaces in server
+          False: Return None (default)
+
+    Returns:
+        If namespaces is a tuple, returns list of namespaces or empty default
+        [None].
+        If namespaces is string returns the single namespace or None
 
     Raises:
         CIMError if status code not CIM_ERR_NOT_FOUND
     """
-    conn = context.pywbem_server.conn
-    wbem_server = context.pywbem_server.wbem_server
+    def get_default_ns(default_ns):
+        return default_ns if not isinstance(namespaces, tuple) else [default_ns]
 
+    # Return the provided namespace(s) by expanding each entry that has
+    # comma-separated values
     ns_names = []
-
-    # Return the provided namespace(s)
     if namespaces:
-        return namespaces
+        for ns in namespaces:
+            ns_names.extend(ns.split(','))
+        return ns_names
+
+    # If default input param is None, return the default namespace.
+    # We set the default namespace here rather than None (where the request
+    # would get the default namespace) because the find command
+    # attempts to build a dict with namespace and None fails
+    conn = context.pywbem_server.conn
+    default_ns = conn.default_namespace
+    if not default_rtn:
+        return get_default_ns(default_ns)
 
     # Otherwise get all namespaces from server
+    wbem_server = context.pywbem_server.wbem_server
     try:
+        assert isinstance(namespaces, tuple)
         ns_names = wbem_server.namespaces
         ns_names.sort()
         return ns_names
 
     except ModelError:
-        return [conn.default_namespace]
+        return get_default_ns(default_ns)
     except CIMError as ce:
-        # allow processing to continue if no interop namespace
+        # Allow processing to continue if no interop namespace
         if ce.status_code == CIM_ERR_NOT_FOUND:
             warning_msg('{}. Using default_namespace {}.'
                         .format(ce, conn.default_namespace))
-            ns_names = [conn.default_namespace]
-        return ns_names
+            return get_default_ns(default_ns)
+        raise click.ClickException('Failed to find namespaces. Exception: {} '
+                                   .format(ce))
+
     except Error as er:
         raise pywbem_error_exception(er)
 
@@ -1019,25 +1124,15 @@ def cmd_class_find(context, classname_glob, options):
     output_format = validate_output_format(context.output_format, 'TABLE')
 
     context.spinner_stop()
-    namespaces = get_namespaces(context, options['namespace'])
+    namespaces = get_namespaces(context, options['namespace'],
+                                default_rtn=True)
 
     try:
         # Define sort by namespace name if --sort, or  othersise by count
         sort_col = 0 if options['sort'] else 1
 
-        # Dictionary key is namespaces, value is list of classes
-        names_dict = NocaseDict()
-        if namespaces:
-            for ns in namespaces:
-                # Uses di True, and names_only. Build options for enumerate
-                options['deep_inheritance'] = True
-                options['namespace'] = ns
-                options['names_only'] = True
-
-                # enumerate filtered for classnames and add to namespace in
-                # dictionary
-                classnames = enumerate_classes_filtered(context, None, options)
-                names_dict[ns] = filter_namelist(classname_glob, classnames)
+        names_dict = get_classnames_in_namespaces(context, options, namespaces,
+                                                  classname_glob)
 
         context.spinner_stop()
 

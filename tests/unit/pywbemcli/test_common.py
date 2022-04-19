@@ -339,7 +339,7 @@ TESTCASES_PICK_ONE_INDEX_FROM_LIST = [
     ('Verify returns correct choice, in this case ONE',
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], pa=None,
           exp_rtn=1),
-     None, None, RUN),
+     None, None, OK),
 
     ('Verify returns correct choice, in this case TWO',
      dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], pa=None,
@@ -1186,7 +1186,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             objects=[],
             exp_indexes=[]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "string: One object",
@@ -1194,7 +1194,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             objects=['abc'],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "string: Two objects, opposite sort order",
@@ -1202,7 +1202,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             objects=['xyz', 'abc'],
             exp_indexes=[1, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClass: One object",
@@ -1216,7 +1216,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClass: Verify that equal sort keys are supported and sort is "
@@ -1241,7 +1241,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 2, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClass: Verify that sort key is only by class name and does not "
@@ -1266,7 +1266,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 2, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClassName: One object",
@@ -1276,7 +1276,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClassName: Verify that equal sort keys are supported and sort is "
@@ -1289,7 +1289,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 2, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMClassName: Verify sort precedence of host, namespace, classname",
@@ -1302,7 +1302,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 0, 3, 2]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstanceName: One object",
@@ -1316,7 +1316,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstanceName: Verify that equal sort keys are supported and sort "
@@ -1341,7 +1341,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 2, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstanceName: Verify sort precedence of host, namespace, "
@@ -1371,7 +1371,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[3, 2, 1, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstance: One object",
@@ -1383,7 +1383,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstance: Verify that equal sort keys are supported and sort "
@@ -1402,7 +1402,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[2, 0, 1]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstance: Verify that sort is by instance path, and does not also"
@@ -1421,7 +1421,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[2, 0, 1]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMInstance: Invalid objects without path set",
@@ -1432,7 +1432,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=None
         ),
-        ValueError, None, True
+        ValueError, None, OK
     ),
     (
         "CIMQualifierDeclaration: One object",
@@ -1442,7 +1442,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMQualifierDeclaration: Verify that equal sort keys are supported "
@@ -1455,7 +1455,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[2, 0, 1]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "CIMQualifierDeclaration: Verify that sort key is by qualifier name, "
@@ -1468,7 +1468,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 2, 0]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "tuple(CIMClassName, CIMClass): Three objects in opposite sort order "
@@ -1505,7 +1505,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=[1, 0, 2]
         ),
-        None, None, True
+        None, None, OK
     ),
     (
         "Invalid type: single tuple(CIMClass, CIMClassName)",
@@ -1523,7 +1523,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
     (
         "Invalid type: single tuple(CIMInstanceName, CIMClass)",
@@ -1541,7 +1541,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
     (
         "Invalid type: single int object",
@@ -1549,7 +1549,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             objects=[42],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
     (
         "Invalid type: two int objects",
@@ -1557,17 +1557,17 @@ TESTCASES_SORT_CIMOBJECTS = [
             objects=[42, 43],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
     (
         "Invalid type: Single CIMQualifier object",
         dict(
             objects=[
-                CIMQualifier('Key', value=True),
+                CIMQualifier('Key', value=OK),
             ],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
     (
         "Invalid type: Two CIMQualifier objects",
@@ -1578,7 +1578,7 @@ TESTCASES_SORT_CIMOBJECTS = [
             ],
             exp_indexes=None
         ),
-        TypeError, None, True
+        TypeError, None, OK
     ),
 ]
 
@@ -1606,7 +1606,8 @@ def test_sort_cimobjects(testcase, objects, exp_indexes):
     # order is incorrect.
     result_ids = [id(obj) for obj in result_objects]
     exp_ids = [id(objects[ix]) for ix in exp_indexes]
-    assert result_ids == exp_ids
+    assert result_ids == exp_ids, "Ids misorder\n{}\n{}".format(result_ids,
+                                                                exp_ids)
 
 
 TESTCASES_SPLIT_ARRAY_VALUE = [
