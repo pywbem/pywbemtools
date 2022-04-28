@@ -28,8 +28,10 @@ import click
 
 from pywbem import ValueMapping, Error
 
+from .._utils import get_terminal_width
+
 from .pywbemcli import cli
-from ._common import pywbem_error_exception
+from ._common import pywbem_error_exception, to_wbem_uri_folded
 from .._options import add_options, help_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
@@ -228,8 +230,8 @@ def cmd_profile_centralinsts(context, options):
     Display general information on the central instances of one or more
     profiles.
     """
-    output_format = validate_output_format(context.output_format, ['CIM',
-                                                                   'TABLE'])
+    output_format = validate_output_format(context.output_format,
+                                           ['TABLE'], default_format="table")
 
     wbem_server = context.pywbem_server.wbem_server
     organization = options['organization']
@@ -240,36 +242,57 @@ def cmd_profile_centralinsts(context, options):
             registered_name=profile_name)
 
         interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
-        org_vm = ValueMapping.for_property(wbem_server,
-                                           interop_ns,
+        org_vm = ValueMapping.for_property(wbem_server, interop_ns,
                                            'CIM_RegisteredProfile',
                                            'RegisteredOrganization')
-        rows = []
+
+        # Format profile info into list of lists where inner lists are
+        # [formatted name, list of profile paths]
+        profile_disp = {}
         for inst in found_server_profiles:
-            pi = get_profile_info(org_vm, inst)
-            row = [":".join(pi)]
+            pn = get_profile_info(org_vm, inst)
+            profile_name = ":".join(pn)
             try:
-                ci = wbem_server.get_central_instances(
+                cis = wbem_server.get_central_instances(
                     inst.path,
                     central_class=options['central_class'],
                     scoping_class=options['scoping_class'],
                     scoping_path=options['scoping_path'],
                     reference_direction=options['reference_direction'])
-                row.append("\n".join([str(p) for p in ci]))
-            # mark current inst as failed and continue
+                profile_disp[profile_name] = cis
+            # Output warning that above call failed and continue
             except Exception as ex:  # pylint: disable=broad-except
-                click.echo('Exception: {} {}'.format(row, ex))
-                row.append("Failed")
+                click.echo('Exception: profile: {} path: {} exc: {}'.
+                           format(profile_name, inst.path, ex))
+
+        # Get max length for profile name for table output.
+        max_profile_name = max([len(prof_name) for prof_name in profile_disp])
+        max_path_width = get_terminal_width() - (max_profile_name + 10)
+
+        # Format table rows list
+        rows = []
+        for profile_name in sorted(profile_disp):
+            row = [profile_name]
+            paths = profile_disp[profile_name]
+            if not paths:
+                row.append("")
+            else:
+                try:
+                    row.append(
+                        "\n".join([to_wbem_uri_folded(path,
+                                                      max_len=max_path_width)
+                                   for path in paths]))
+                except ValueError as ve:  # pylint: disable=broad-except
+                    click.echo('Exception: profile: {} path: {} exc: {}'.
+                               format(profile_name, paths, ve))
+                    click.echo("Continue with other profiles")
             rows.append(row)
 
         headers = ['Profile', 'Central Instance paths']
-
-        # sort by profile
-        rows.sort(key=lambda x: (x[0]))
-
         click.echo(format_table(rows,
                                 headers,
                                 title='Advertised Central Instances:',
                                 table_format=output_format))
+
     except Error as er:
         raise pywbem_error_exception(er)
