@@ -495,7 +495,6 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             case_keys = [case(k) for k in keys]
             keys = sorted(case_keys)
         return keys
-
     last_fold = 0
     if uri_format not in ('standard', 'canonical', 'cimobject', 'historical'):
         raise ValueError('Invalid format argument: {0}'.format(uri_format))
