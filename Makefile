@@ -297,6 +297,7 @@ test_log_file := test_$(python_version_fn).log
 # - 43975: urllib3 before 1.26.5 CVE-2021-33503, not important for pywbemtools
 # - 45775 Sphinx 3.0.4 updates jQuery version, cannot upgrade Sphinx on py27
 # - 47833 Click 8.0.0 uses 'mkstemp()', cannot upgrade Click due to incompatibilities
+# - 45185 Pylint 2.13.0 fixes crash with doc_params ext, cannot upgrade on py27/35
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -337,6 +338,7 @@ safety_ignore_opts := \
 	-i 43975 \
 	-i 45775 \
 	-i 47833 \
+	-i 45185 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
