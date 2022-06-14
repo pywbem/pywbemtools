@@ -292,7 +292,7 @@ idna==2.5
 imagesize==0.7.1
 importlib-metadata==0.12
 isort==4.3.5
-Jinja2==2.8; python_version <= '3.9'
+Jinja2==2.8.1; python_version <= '3.9'
 Jinja2==2.10.2; python_version >= '3.10'
 jsonschema==2.6.0
 linecache2==1.0.0
