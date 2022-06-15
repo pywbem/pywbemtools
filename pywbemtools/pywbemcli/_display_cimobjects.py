@@ -595,7 +595,7 @@ def _display_qual_decls_as_table(qual_decls, table_width, table_format):
         flavors.append('ToSubclass' if q.tosubclass else 'Restricted')
         if q.translatable:
             flavors.append('Translatable')
-        if sum([len(i) for i in flavors]) >= max_column_width:
+        if sum(map(len, flavors)) >= max_column_width:
             sep = "\n"
         else:
             sep = ", "

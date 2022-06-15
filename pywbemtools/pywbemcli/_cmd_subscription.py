@@ -1606,6 +1606,7 @@ def cmd_subscription_list(context, options):
                      len(owned_destinations),
                      len(all_destinations) - len(owned_destinations),
                      len(all_destinations)])
+        # pylint: disable=consider-using-generator
         rows.append(["TOTAL INSTANCES",
                      sum([r[1] for r in rows]),
                      sum([r[2] for r in rows]),
