@@ -509,7 +509,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
         ret.append('/')
 
     # Fold on hostname if lt max_len
-    line_len = sum([len(i) for i in ret])
+    line_len = sum(map(len, ret))
     if line_len > max_len:
         ret.append('\n')
         last_fold = len(ret)
@@ -521,21 +521,21 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
         ret.append(':')
 
     # Fold on namespace if namespace gt maxlen or
-    line_len = sum([len(i) for i in ret[last_fold:]])
+    line_len = sum(map(len, ret[last_fold:]))
     if line_len > max_len:
         ret.append('\n')
         last_fold = len(ret)
 
     ret.append(case(path.classname))
     ret.append(".")
-    line_len = sum([len(i) for i in ret[last_fold:]])
+    line_len = sum(map(len, ret[last_fold:]))
     if line_len > max_len:
         ret.append('\n')
         last_fold = len(ret)
 
     for key in case_sorted(six.iterkeys(path.keybindings)):
         # Fold for each key where sum of last line exceeds max_len
-        line_len = sum([len(i) for i in ret[last_fold:]])
+        line_len = sum(map(len, ret[last_fold:]))
         if line_len > max_len:
             ret.append('\n')
             last_fold = len(ret)
@@ -545,7 +545,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
         ret.append(key)
         ret.append('=')
 
-        line_len = sum([len(i) for i in ret[last_fold:]])
+        line_len = sum(map(len, ret[last_fold:]))
         if line_len > max_len:
             ret.append('\n')
             last_fold = len(ret)
