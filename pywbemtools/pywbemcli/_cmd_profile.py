@@ -266,7 +266,7 @@ def cmd_profile_centralinsts(context, options):
                            format(profile_name, inst.path, ex))
 
         # Get max length for profile name for table output.
-        max_profile_name = max([len(prof_name) for prof_name in profile_disp])
+        max_profile_name = max(map(len, profile_disp))
         max_path_width = get_terminal_width() - (max_profile_name + 10)
 
         # Format table rows list

@@ -195,15 +195,13 @@ sphinx-rtd-theme==0.5.0
 Babel==2.7.0
 
 # PyLint (no imports, invoked via pylint script)
-pylint==1.6.4; python_version == '2.7'
 pylint==2.5.2; python_version >= '3.5'
-astroid==1.4.9; python_version == '2.7'
 astroid==2.4.0; python_version >= '3.5'
 # typed-ast is used by astroid on py34..py37
 typed-ast==1.4.0; python_version >= '3.6' and python_version < '3.8' and implementation_name=='cpython'
 lazy-object-proxy==1.4.3
 platformdirs==2.2.0; python_version >= '3.6'
-wrapt==1.11.2
+wrapt==1.11.2; python_version >= '3.5'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
 flake8==3.8.0; python_version <= '3.9'
