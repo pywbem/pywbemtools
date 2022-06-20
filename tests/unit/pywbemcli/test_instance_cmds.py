@@ -89,6 +89,7 @@ MOCK_PROMPT_0_FILE = "mock_prompt_0.py"
 MOCK_PROMPT_PICK_RESPONSE_3_FILE = 'mock_prompt_pick_response_3.py'
 MOCK_PROMPT_PICK_RESPONSE_5_FILE = 'mock_prompt_pick_response_5.py'
 MOCK_PROMPT_PICK_RESPONSE_11_FILE = 'mock_prompt_pick_response_11.py'
+MOCK_PROMPT_PICK_RESPONSE_12_FILE = 'mock_prompt_pick_response_12.py'
 MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
@@ -1637,8 +1638,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace, option --namespace with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1646,8 +1647,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace, option -n with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '-n', 'root/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1655,8 +1656,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace, option --namespace with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'test/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1664,8 +1665,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace, option -n with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '-n', 'test/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1673,8 +1674,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace, options --key and --namespace (error)',
      ['get', 'root/cimv2:CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
       '--namespace', 'root/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1926,8 +1927,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace and with wildcard keybinding, '
      'option --namespace with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'root/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1935,8 +1936,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace and with wildcard keybinding, '
      'option -n with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '-n', 'root/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1944,8 +1945,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace and with wildcard keybinding, '
      'option --namespace with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '--namespace', 'test/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1953,8 +1954,8 @@ Instances: CIM_Foo
     ['INSTANCENAME with namespace and with wildcard keybinding, '
      'option -n with diff ns (error)',
      ['get', 'root/cimv2:CIM_Foo.?', '-n', 'test/cimv2'],
-     {'stderr': "Using the --namespace option conflicts with specifying a "
-                "namespace",
+     {'stderr': ["Using --namespace option:",
+                 "conflicts with specifying namespace in INSTANCENAME:"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -3164,8 +3165,46 @@ InstanceID      IntegerProp
 
     # The following use interop ns to avoid warning about namespaces.
 
-    ['Verify instance command count CIM_* sorted, simple model, format table',
+    ['Verify instance command count CLASSNAME_GLOB CIM_* sorted, simple model',
      {'args': ['count', 'CIM_*', '--sort'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Count of instances per class
++-------------+-----------------+---------+
+| Namespace   | Class           |   count |
+|-------------+-----------------+---------|
+| root/cimv2  | CIM_FooAssoc    |       1 |
+| root/cimv2  | CIM_FooRef1     |       1 |
+| root/cimv2  | CIM_FooRef2     |       1 |
+| root/cimv2  | CIM_Foo_sub_sub |       3 |
+| root/cimv2  | CIM_Foo_sub     |       4 |
+| root/cimv2  | CIM_Foo         |       5 |
++-------------+-----------------+---------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command count CLASSNAME_GLOB * sort, format table',
+     {'args': ['count', '*', '--sort'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Count of instances per class
++-------------+-----------------+---------+
+| Namespace   | Class           |   count |
+|-------------+-----------------+---------|
+| root/cimv2  | CIM_FooAssoc    |       1 |
+| root/cimv2  | CIM_FooRef1     |       1 |
+| root/cimv2  | CIM_FooRef2     |       1 |
+| root/cimv2  | CIM_Foo_sub_sub |       3 |
+| root/cimv2  | CIM_Foo_sub     |       4 |
+| root/cimv2  | CIM_Foo         |       5 |
++-------------+-----------------+---------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify instance command count no CLASSNAME_GLOB sort, format table',
+     {'args': ['count', '--sort'],
       'general': ['--output-format', 'table',
                   '--default-namespace', 'interop']},
      {'stdout': """Count of instances per class
@@ -3206,18 +3245,17 @@ InstanceID      IntegerProp
 
     ['Verify instance command count CIM_*, notsorted simple model, fmt table',
      {'args': ['count', 'CIM_*'],
-      'general': ['--output-format', 'table',
-                  '--default-namespace', 'interop']},
+      'general': ['--output-format', 'table']},
      {'stdout': """Count of instances per class
 +-------------+-----------------+---------+
 | Namespace   | Class           |   count |
 |-------------+-----------------+---------|
-| interop     | CIM_Foo         |       5 |
-| interop     | CIM_FooAssoc    |       1 |
-| interop     | CIM_FooRef1     |       1 |
-| interop     | CIM_FooRef2     |       1 |
-| interop     | CIM_Foo_sub     |       4 |
-| interop     | CIM_Foo_sub_sub |       3 |
+| root/cimv2  | CIM_Foo         |       5 |
+| root/cimv2  | CIM_FooAssoc    |       1 |
+| root/cimv2  | CIM_FooRef1     |       1 |
+| root/cimv2  | CIM_FooRef2     |       1 |
+| root/cimv2  | CIM_Foo_sub     |       4 |
+| root/cimv2  | CIM_Foo_sub_sub |       3 |
 +-------------+-----------------+---------+
 """,
       'rc': 0,
@@ -3833,6 +3871,35 @@ root/cimv3 13 CIMInstanceName(s) returned
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify instances (--no) enumerate from non default ns --summary ',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
+               '--namespace', 'root/cimv3']},
+     {'stdout': "13 CIMInstanceName(s) returned",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instances enumerate from non default ns --no',
+     {'args': ['enumerate', 'CIM_Foo', '--no',
+               '--namespace', 'root/cimv3']},
+     {'stdout': """root/cimv3:CIM_Foo.InstanceID="CIM_Foo1"
+root/cimv3:CIM_Foo.InstanceID="CIM_Foo2"
+root/cimv3:CIM_Foo.InstanceID="CIM_Foo3"
+root/cimv3:CIM_Foo.InstanceID="CIM_Foo3-third-ns"
+root/cimv3:CIM_Foo.InstanceID="CIM_Foo30"
+root/cimv3:CIM_Foo.InstanceID="CIM_Foo31"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub1"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub2"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub3"
+root/cimv3:CIM_Foo_sub.InstanceID="CIM_Foo_sub4"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub1"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub2"
+root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
     ['Verify namesnames (--no) enumerate from two namespaces ',
      {'args': ['enumerate', 'CIM_Foo_Sub', '--no',
                '--namespace', 'root/cimv2,root/cimv3']},
@@ -3872,8 +3939,133 @@ root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    # Get instance multiple request multiple namespaces tests
 
-    # instance references request
+    ['Verify instance get from two namespaces --key option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces --key option. table option',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Instances: CIM_Foo
++-------------+--------------+---------------+
+| namespace   | InstanceID   |   IntegerProp |
+|-------------+--------------+---------------|
+| root/cimv2  | "CIM_Foo1"   |             1 |
+| root/cimv3  | "CIM_Foo1"   |             1 |
++-------------+--------------+---------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
+    ['Verify instance get from two namespaces pick option.',
+     {'args': ['get', 'CIM_Foo.?',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
+     {'stdout': """#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces pick option. prompt 12, ns # 2',
+     {'args': ['get', 'CIM_Foo.?',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'env': {MOCK_DEFINITION_ENVVAR:
+              GET_TEST_PATH_STR(MOCK_PROMPT_PICK_RESPONSE_12_FILE)}},
+     {'stdout': """#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces full instance name',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """#pragma namespace ("root/cimv2")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+
+#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from ns in INSTANCEID, not default',
+     {'args': ['get', 'root/cimv3:CIM_Foo.InstanceID="CIM_Foo1"']},
+     {'stdout': """instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from ns in INSTANCEID, not default, bad ns',
+     {'args': ['get', 'root/NotExist:CIM_Foo.InstanceID="CIM_Foo1"']},
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does "
+                "not exist in CIM repository: 'root/NotExist'",
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces full instance name, fail ban ns',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
+               '--namespace', 'root/cimv2,root/DoesNotExist']},
+     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does "
+                "not exist in CIM repository: 'root/DoesNotExist'",
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # instance references request multiple namespaces
 
     ['Verify classnames references from two namespaces --summary',
      {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
@@ -3887,7 +4079,23 @@ root/cimv3 1 CIMInstanceName(s) returned
 
     ['Verify references names from two namespaces --summary, -o table',
      {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
-               '--no', '-s', '--namespace', 'root/cimv2,root/cimv3'],
+               '--summary', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstance(s) returned
++-------------+---------+-------------+
+| Namespace   |   Count | CIM Type    |
+|-------------+---------+-------------|
+| root/cimv2  |       1 | CIMInstance |
+| root/cimv3  |       1 | CIMInstance |
++-------------+---------+-------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify references names from two namespaces --summary, --no, -o table',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--summary', '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'table']},
      {'stdout': """Summary of CIMInstanceName(s) returned
 +-------------+---------+-----------------+
@@ -3900,6 +4108,31 @@ root/cimv3 1 CIMInstanceName(s) returned
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
+
+    ['Verify references from non-default namespace --names-only',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'mof']},
+     {'stdout': """instance of CIM_FooAssoc {
+   Ref1 = "/root/cimv3:CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"";
+   Ref2 = "/root/cimv3:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\"";
+};
+         """,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify references names from non-default namespace --names-only',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--names-only', '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'mof']},
+     {'stdout': '//FakedUrl:5988/root/cimv3:CIM_FooAssoc.Ref1="root/cimv3:'
+                'CIM_FooRef1.InstanceID=\\"CIM_FooRef11\\"",'
+                'Ref2="root/cimv3:CIM_FooRef2.InstanceID=\\"CIM_FooRef21\\""',
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
 
     # pylint: disable=line-too-long
     ['Verify  references names  from two namespaces --summary, -o table',
@@ -3955,7 +4188,7 @@ instance of CIM_FooAssoc {
 
     # instance associators request
 
-    ['Verify associators classnames from two namespaces --summary, -o table',
+    ['Verify associators instancenames from two namespaces --summary, -o table',
      {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
                '--no', '--summary', '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'table']},
@@ -3971,6 +4204,63 @@ instance of CIM_FooAssoc {
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
+
+    ['Verify associators names-only non-default namespace --summary, -o table',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--summary', '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstanceName(s) returned
++---------+-----------------+
+|   Count | CIM Type        |
+|---------+-----------------|
+|       1 | CIMInstanceName |
++---------+-----------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify associators names-only non-default namespace --names-only mof',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'mof']},
+     {'stdout':
+      '//FakedUrl:5988/root/cimv3:CIM_FooRef2.InstanceID="CIM_FooRef21"',
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
+    ['Verify associators instances non-default namespace  -o table',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Instances: CIM_FooRef2
++----------------+
+| InstanceID     |
+|----------------|
+| "CIM_FooRef21" |
++----------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify associators names-only non-default namespaces -o table',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--namespace', 'root/cimv3'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """InstanceNames: CIM_FooRef2
++---------------+-------------+-------------+--------------+
+| host          | namespace   | class       | key=         |
+|               |             |             | InstanceID   |
+|---------------+-------------+-------------+--------------|
+| FakedUrl:5988 | root/cimv3  | CIM_FooRef2 | CIM_FooRef21 |
++---------------+-------------+-------------+--------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, RUN],
 
     # Test multi-namespace enum/get where there are no instances returned
 

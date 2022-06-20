@@ -1,7 +1,3 @@
-# The previous statement is used by pywbemcli to force this script to be
-# run at pywbemcli startup and not included in the list of --mock-server
-# files that are used to build the repository.  This is a development
-# test aid.
 # (C) Copyright 2019 IBM Corp.
 # (C) Copyright 2019 Inova Development Inc.
 # All Rights Reserved
@@ -17,6 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# The previous statement is used by pywbemcli to force this script to be
+# run at pywbemcli startup and not included in the list of --mock-server
+# files that are used to build the repository.  This is a development
+# test aid.
 """
     Python code to mock pywbemcli._common.pywbemcli_prompt. Returns the
     value defined in RETURN_VALUE
@@ -31,6 +32,11 @@
 
     This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
     environment variable.
+
+    The environment variable is used by pywbemcli to force this script to be
+    run at pywbemcli startup and not included in the list of --mock-server
+    files that are used to build the repository.  This is a development
+    test aid.
 """
 from mock import Mock
 

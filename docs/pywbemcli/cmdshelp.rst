@@ -167,7 +167,7 @@ Help text for ``pywbemcli class`` (see :ref:`class command group`):
       -h, --help  Show this help message.
 
     Commands:
-      enumerate     List top classes or subclasses of a class in a namespace.
+      enumerate     List top classes or subclasses of a class in namespace(s).
       get           Get a class.
       delete        Delete a class.
       invokemethod  Invoke a method on a class.
@@ -296,7 +296,7 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
 
     Usage: pywbemcli [GENERAL-OPTIONS] class enumerate CLASSNAME [COMMAND-OPTIONS]
 
-      List top classes or subclasses of a class in a namespace.
+      List top classes or subclasses of a class in namespace(s).
 
       Enumerate CIM classes starting either at the top of the class hierarchy in the specified CIM namespace (--namespace
       option), or at the specified class (CLASSNAME argument) in the specified namespace. If no namespace was specified, the
@@ -1219,7 +1219,7 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
       List the instances of a class.
 
       Enumerate the CIM instances of the specified class (CLASSNAME argument), including instances of subclasses in the
-      specified CIM namespace (--namespace option), and display the returned instances, or instance paths if --names-only
+      specified CIM namespace(s) (--namespace option), and display the returned instances, or instance paths if --names-only
       was specified. If no namespace was specified, the default namespace of the connection is used.
 
       The instances to be retrieved can be filtered by the --filter-query option.
@@ -1899,15 +1899,17 @@ Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate c
 
       List the qualifier declarations in a namespace.
 
-      Enumerate the CIM qualifier declarations in the specified CIM namespace (--namespace option). If no namespace was
+      Enumerate the CIM qualifier declarations in the specified CIM namespace(s) (--namespace option). If no namespace was
       specified, the default namespace of the connection is used.
 
       In the output, the qualifier declaration will formatted as defined by the --output-format general option.
 
     Command Options:
-      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
-      -s, --summary              Show only a summary (count) of the objects.
-      -h, --help                 Show this help message.
+      -n, --namespace NAMESPACE(s)  Namespace(s) to use for this command, instead of the default connection namespace. May
+                                    be specified multiple times using either the option multiple times and/or comma
+                                    separated list. Default: connection default namespace.
+      -s, --summary                 Show only a summary (count) of the objects.
+      -h, --help                    Show this help message.
 
 
 .. _`pywbemcli qualifier get --help`:
@@ -1932,8 +1934,10 @@ Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
       In the output, the qualifier declaration will formatted as defined by the --output-format general option.
 
     Command Options:
-      -n, --namespace NAMESPACE  Namespace to use for this command, instead of the default namespace of the connection.
-      -h, --help                 Show this help message.
+      -n, --namespace NAMESPACE(s)  Namespace(s) to use for this command, instead of the default connection namespace. May
+                                    be specified multiple times using either the option multiple times and/or comma
+                                    separated list. Default: connection default namespace.
+      -h, --help                    Show this help message.
 
 
 .. _`pywbemcli repl --help`:

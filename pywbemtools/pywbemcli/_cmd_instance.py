@@ -22,6 +22,8 @@ NOTE: Commands are ordered in help display by their order in this file.
 
 from __future__ import absolute_import, print_function
 
+import six
+
 import click
 
 from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
@@ -219,7 +221,7 @@ def instance_enumerate(context, classname, **options):
     List the instances of a class.
 
     Enumerate the CIM instances of the specified class (CLASSNAME argument),
-    including instances of subclasses in the specified CIM namespace
+    including instances of subclasses in the specified CIM namespace(s)
     (--namespace option), and display the returned instances, or instance paths
     if --names-only was specified. If no namespace was specified, the default
     namespace of the connection is used.
@@ -812,31 +814,36 @@ An instance path is specified using the INSTANCENAME argument and optionally the
 """)
 
 
-def get_instancename(context, instancename, options, ns_names=None):
+def get_instancename(context, instancename, options, default_all_ns=False):
     """
     Common function to construct a CIMInstanceName object from the
     INSTANCENAME argument and the --key and --namespace options specified
     in the command line.
 
-    The keybindings of the returned CIM instance path must be specified in
+    The keybindings of the returned CIM instance path(s) must be specified in
     exactly one of these ways:
 
     * If the keybindings component in the instance name string is "?"
-      (e.g. "CIM_Foo.?"), the instances of that class are listed and the user is
-      prompted to pick one.
+      (e.g. "CIM_Foo.?"), the instances of that class are listed and the user
+      is prompted to pick instance name. If multiple namespaces are specified
+      in the "--namespaces" option the instances in all requested namespaces
+      are listed for the user to pick one.
 
     * If the "key" option is non-empty, the so specified key values are used as
-      keybindings for the returned instance path, and the instance name string
+      keybindings for the returned instance path, and the instancename string
       is interpreted as a class WBEM URI.
 
-    * If the instance name string specifies keybindings, they are used.
+    * If the instance name string specifies keybindings, these keybindings
+      are used to define the instance name to return.
 
     The namespace of the returned CIM instance path must be specified in
     exactly one of these ways:
 
     * If the instance name string specifies a namespace, it is used.
 
-    * If the "namespace" option is non-empty, it is used.
+    * If the "--namespace" option is non-empty, it is used. If the "--namespace"
+      option is a list, the request is to return instance names in any of the
+      namespaces.
 
     * Otherwise, the default namespace of the connection in the context is used.
 
@@ -849,16 +856,18 @@ def get_instancename(context, instancename, options, ns_names=None):
         The INSTANCENAME argument from the command line.
 
       options (dict):
-        Command-specific options from the command line (including --key and
-        --namespace if specified).
+        Command-specific options from the command line (including "-key" and
+        "--namespace" if specified).
 
-      ns_names (list of :term:`string` or None)
-        If None, this is a command with a single namespace.
-        If a list, this is a command with multiple namespaces
+      default_all_ns (:class:`py:bool`)
+        If True, the default is to return all namespaces.  Otherwise the
+        default is to return None.
 
     Returns:
 
       :class:`~pywbem.CIMInstanceName`: CIM instance path. It is never None.
+      Namespace included in instance name ONLY if it is in the parameter
+      instance name or multiple namespaces were specified with "--namespace".
 
     Raises:
 
@@ -866,8 +875,23 @@ def get_instancename(context, instancename, options, ns_names=None):
     """
     conn = context.pywbem_server.conn
 
-    if instancename.endswith(".?"):
+    def validate_namespace_option(class_path):
+        """Validate either namespace in instance or --namespace but not both"""
+        if class_path.namespace:
+            if options['namespace']:
+                raise click.ClickException(
+                    "Using --namespace option: {} conflicts with specifying "
+                    "namespace in INSTANCENAME: {}".format(options['namespace'],
+                                                           instancename))
 
+    if isinstance(options['namespace'], tuple):
+        ns_names = get_namespaces(context, options['namespace'],
+                                  default_all_ns=default_all_ns)
+    else:
+        ns_names = options['namespace']
+
+    # Process the 3 exclusive cmd option (".?", --key option, instance name )
+    if instancename.endswith(".?"):
         if options['key']:
             raise click.ClickException(
                 "Using the --key option conflicts with specifying a "
@@ -880,26 +904,22 @@ def get_instancename(context, instancename, options, ns_names=None):
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-        if class_path.namespace:
-            if options.get('namespace'):
-                raise click.ClickException(
-                    "Using the --namespace option conflicts with specifying a "
-                    "namespace in INSTANCENAME: {}".format(instancename))
-        else:
-            if ns_names:
-                class_path.namespace = ns_names[0] or conn.default_namespace
-            else:
-                class_path.namespace = options.get('namespace') or \
-                    conn.default_namespace
+        validate_namespace_option(class_path)
 
         try:
+            # User picks one instance.  returned instance path includes
+            # namespace.
             instance_path = pick_instance(
-                context, class_path.classname, class_path.namespace)
+                context, class_path.classname, ns_names)
+            # Reset the namespace in instance name if multiple namespaces
+            if instance_path:
+                if ns_names:
+                    instance_path.namespace = None
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
+    # if --key option exists.
     elif options['key']:
-
         # Transform the --key option values into WBEM URI keybinding strings
         kb_strs = []
         for kv in options['key']:
@@ -935,10 +955,11 @@ def get_instancename(context, instancename, options, ns_names=None):
                 # unprintable characters, and no quotes that might interfere
                 # with the shell.
                 kb_value = '"{}"'.format(mof_escaped(value))
+
             kb_strs.append("{}={}".format(key, kb_value))
 
-        # We perform an extra verification that instancename was a class path,
-        # in order to get a more understandable error message if it is not,
+        # We perform an extra verification that instance name was a class
+        # path to get a more understandable error message if it is not,
         # compared to leaving that to CIMInstanceName.from_wbem_uri().
         try:
             CIMClassName.from_wbem_uri(instancename)
@@ -949,15 +970,14 @@ def get_instancename(context, instancename, options, ns_names=None):
 
         try:
             instance_path = CIMInstanceName.from_wbem_uri(instancename_kb)
+            validate_namespace_option(instance_path)
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-    else:  # else for options['key']]
-
-        assert not options['key']  # There cannot be a conflict anymore
-
+    else:  # else for not options['key']] or ".?", i.e. full key in inst path
         try:
             instance_path = CIMInstanceName.from_wbem_uri(instancename)
+            validate_namespace_option(instance_path)
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
@@ -965,20 +985,13 @@ def get_instancename(context, instancename, options, ns_names=None):
         raise click.ClickException(
             "No instance paths found for instancename {0}".format(instancename))
 
-    # Handle possible setting of namespace in instance name and use of
-    # namespace in INSTANCENAME
-    if instance_path.namespace:
-        if options['namespace']:
-            raise click.ClickException(
-                "Using the --namespace option conflicts with specifying "
-                "a namespace in INSTANCENAME: {}".format(instancename))
-
-    else:  # not instance_path.namespace
-        if not options['namespace']:
-            instance_path.namespace = conn.default_namespace
-        else:
-            if not ns_names:
-                instance_path.namespace = options['namespace']
+    # Set namespace into path if ns_names not set
+    if not instance_path.namespace:
+        if not ns_names:
+            instance_path.namespace = options.get('namespace') or \
+                conn.default_namespace
+        if isinstance(ns_names, six.string_types):
+            instance_path.namespace = ns_names
 
     return instance_path
 
@@ -994,8 +1007,9 @@ def cmd_instance_get(context, instancename, options):
     """
     Get and display an instance of a CIM Class.
 
-    Gets the instance defined by instancename argument and displays in output
-    format defined.
+    Gets the instance defined by instancename argument in the namespaces defined
+    and displays in output format defined.  If multiple namespaces are defined
+    this method may get multiple instances.
 
     If the wildcard key is used (CLASSNAME.?), pywbemcli presents a list of
     instances to the console from which one can be picked to get from the
@@ -1003,15 +1017,17 @@ def cmd_instance_get(context, instancename, options):
     """
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
-    ns_names = get_namespaces(context, options['namespace'])
-    instancepath = get_instancename(context, instancename, options,
-                                    ns_names=ns_names)
+
+    # Returns list of namespaces from namespace option
+    instancepath = get_instancename(context, instancename, options)
 
     # If namespace returned from get_instancename in path, put it into
     # ns_names. path on the instance overrides the use of --namespace and
     # therefore return from get_namespaces()
     if instancepath.namespace:
         ns_names = [instancepath.namespace]
+    else:
+        ns_names = get_namespaces(context, options['namespace'])
 
     property_list = resolve_propertylist(options['propertylist'])
 
@@ -1039,7 +1055,8 @@ def cmd_instance_delete(context, instancename, options):
     """
         If option interactive is set, get instances of the class defined
         by instance name and allow the user to select the instance to
-        delete.
+        delete. This method allows only a single namespace.
+
         Otherwise attempt to delete the instance defined by instancename
     """
     conn = context.pywbem_server.conn
@@ -1104,6 +1121,8 @@ def cmd_instance_modify(context, instancename, options):
     """
     Build an instance defined by the options and submit to wbemserver
     as a ModifyInstance method.
+
+    This method allows only a single namespace.
 
     In order to make a correct instance, this method first gets the
     corresponding class and uses that as the template for creating the intance.
@@ -1224,7 +1243,6 @@ def cmd_instance_enumerate(context, classname, options):
     """
     Enumerate CIM instances or CIM instance names
 
-
     Returns:
         list of objects retrieved.
 
@@ -1253,18 +1271,21 @@ def cmd_instance_references(context, instancename, options):
        the classname defined. This may be either interactive or if the
        interactive option is set or use the instancename directly.
 
+       This method allows multiple namespaces
+
        If the interactive option is selected, the instancename MUST BE
        a classname.
     """
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
-    ns_names = get_namespaces(context, options['namespace'])
+    instancepath = get_instancename(context, instancename, options)
 
-    instancepath = get_instancename(context, instancename, options,
-                                    ns_names=ns_names)
     if instancepath.namespace:
         ns_names = [instancepath.namespace]
+    else:
+        ns_names = get_namespaces(context, options['namespace'])
+
     property_list = resolve_propertylist(options['propertylist'])
 
     # NocaseDict because it insures ordering with old versions of Python
@@ -1309,16 +1330,20 @@ def cmd_instance_references(context, instancename, options):
 def cmd_instance_associators(context, instancename, options):
     """
     Execute the references request operation to get references for
-    the classname defined
+    the classname defined.
+
+    This method allows multiple namespaces.
     """
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
-    ns_names = get_namespaces(context, options['namespace'])
 
-    instancepath = get_instancename(context, instancename, options,
-                                    ns_names=ns_names)
+    instancepath = get_instancename(context, instancename, options)
+
     if instancepath.namespace:
         ns_names = [instancepath.namespace]
+    else:
+        ns_names = get_namespaces(context, options['namespace'])
+
     property_list = resolve_propertylist(options['propertylist'])
 
     # NocaseDict because it insures ordering with old versions of Python
@@ -1385,7 +1410,9 @@ def cmd_instance_count(context, classname, options):
         classname = '*'
 
     # Create list of namespaces from the option or from all namespaces
-    ns_names = get_namespaces(context, options['namespace'], default_rtn=True)
+    # default_rtn forces
+    ns_names = get_namespaces(context, options['namespace'],
+                              default_all_ns=True)
 
     ns_cln_tuples = []  # a list of tuples of namespace, classname
     for namespace in ns_names:
@@ -1486,7 +1513,12 @@ def cmd_instance_count(context, classname, options):
 
 
 def cmd_instance_query(context, query, options):
-    """Execute the query defined by the inputs"""
+    """
+    Execute the query defined by the inputs.
+
+    This commands creates a Query request based on the command input variables
+    and options and outputs the result in either CIM or TABLE format.
+    """
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
 
@@ -1511,8 +1543,11 @@ def cmd_instance_shrub(context, instancename, options):
     return the names of associated instances.
     """
     conn = context.pywbem_server.conn
+
+    # ns_names = get_namespaces(context, options['namespace'], default_rtn=None)
+    instancepath = get_instancename(context, instancename, options)
+
     try:
-        instancepath = get_instancename(context, instancename, options)
 
         # Collect the data for the shrub
         shrub = AssociationShrub(conn, instancepath,

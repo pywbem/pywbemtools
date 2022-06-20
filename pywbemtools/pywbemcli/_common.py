@@ -218,7 +218,7 @@ def pick_one_index_from_list(context, options, title, pick_always=None):
         click.echo('"{}" Invalid response {}'.format(selection_txt, msg))
 
 
-def pick_instance(context, objectname, namespace=None):
+def pick_instance(context, classname, namespaces=None):
     """
     Display list of instances names from provided classname to console and user
     selects one. Returns the selected instancename.
@@ -231,20 +231,35 @@ def pick_instance(context, objectname, namespace=None):
       classname:
         Classname to use to get instance names from server
 
+      namespaces: None or string or list of strings
+        - list - Searches each namespace in list .Each string must be a valid
+        namespace
+        - string - Namespace to use to get instance names
+        - None - Uses default  namespace to get instance names
+
     Returns:
-        instancename selected or None if there are no instances to pick
+        instancename selected or None if there are no instances picked by
+        user or found for the class.
 
     Raises:
         ClickException if user choses to terminate the selection process
     """
     conn = context.pywbem_server.conn
-    if not is_classname(objectname):
-        raise click.ClickException('{} must be a classname'.format(objectname))
-    try:
-        instance_names = conn.PyWbemcliEnumerateInstancePaths(
-            objectname, namespace)
-    except Error as ex:
-        raise pywbem_error_exception(ex)
+    if not is_classname(classname):
+        raise click.ClickException('{} must be a classname'.format(classname))
+
+    if namespaces is None:
+        namespaces = [conn.default_namespace]
+    elif isinstance(namespaces, six.string_types):
+        namespaces = [namespaces]
+
+    instance_names = []
+    for ns in namespaces:
+        try:
+            instance_names.extend(conn.PyWbemcliEnumerateInstancePaths(
+                classname, ns))
+        except Error as ex:
+            raise pywbem_error_exception(ex)
 
     if not instance_names:
         return None
@@ -495,6 +510,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             case_keys = [case(k) for k in keys]
             keys = sorted(case_keys)
         return keys
+
     last_fold = 0
     if uri_format not in ('standard', 'canonical', 'cimobject', 'historical'):
         raise ValueError('Invalid format argument: {0}'.format(uri_format))

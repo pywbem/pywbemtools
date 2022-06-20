@@ -305,6 +305,20 @@ def _display_one_cim_object(context, cim_object, output_format, property_list,
                                    .format(output_format))
 
 
+class QualDeclWrapper():  # pylint: disable=too-few-public-methods
+    """
+    Convert qualifier declaractions to instance of this class to be able to
+    pass the namespace to the display function unambiguously.
+    """
+    def __init__(self, namespace, qual_decl_inst):
+        self.qualdecl = qual_decl_inst
+        self.namespace = namespace
+
+    def name(self):
+        """Return the qualifier declaration name."""
+        return self.qualdecl.name
+
+
 def _display_objects_as_table(objects, output_format, context,
                               property_list, quote_strings,
                               ignore_null_properties, namespace=None):
@@ -330,9 +344,11 @@ def _display_objects_as_table(objects, output_format, context,
     table_width = get_terminal_width()
 
     if isinstance(objects, NocaseDict):
-        # Everything except classes and classnames includes namespace
-        # convert back to a single list so a single table can be created
-        #
+        # Everything except classes, classnames, strings (representing
+        # classnames) and qual decls includes namespace.
+        # Convert strings to classnames, and qualifierdecls to instance of
+        # wrapper class CIM_QualDeclWrapper to include namespace for each item.
+
         new_objects = []
         # If the object type is string, it is just a classname.
         # Expand to create list of tuples of (ns, classname)
@@ -341,7 +357,9 @@ def _display_objects_as_table(objects, output_format, context,
             if values:
                 if not isinstance(values, list):
                     values = [values]
-                if isinstance(values[0], six.string_types):
+                if isinstance(values[0], CIMQualifierDeclaration):
+                    new_objects.extend([QualDeclWrapper(ns, v) for v in values])
+                elif isinstance(values[0], six.string_types):
                     new_objects.extend([CIMClassName(v, namespace=ns)
                                         for v in sort_cimobjects(values)])
                 else:
@@ -349,11 +367,19 @@ def _display_objects_as_table(objects, output_format, context,
 
         namespace = True
         objects = new_objects
+
     if objects:
         # If single object, cvt to list for further processing
         if not isinstance(objects, (list)):
             objects = [objects]
-        objects = sort_cimobjects(objects)
+
+        # Sort the CIM objects.  QualDeclWrapper for CIMQualifierDeclarations
+        if isinstance(objects[0], QualDeclWrapper):
+            objects = sorted(objects, key=lambda x: x.name())
+        else:
+            objects = sort_cimobjects(objects)
+
+        # Call table display method for each object type
         if isinstance(objects[0], CIMInstance):
             _display_instances_as_table(
                 objects, table_width, output_format,
@@ -364,6 +390,9 @@ def _display_objects_as_table(objects, output_format, context,
                 namespace=namespace)
         elif isinstance(objects[0], CIMClass):
             _display_classes_as_table(objects, table_width, output_format)
+        elif isinstance(objects[0], QualDeclWrapper):
+            _display_qual_decls_as_table(objects, table_width, output_format,
+                                         namespace=namespace)
         elif isinstance(objects[0], CIMQualifierDeclaration):
             _display_qual_decls_as_table(objects, table_width, output_format)
         elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
@@ -577,31 +606,54 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
                                 table_format=table_format))
 
 
-def _display_qual_decls_as_table(qual_decls, table_width, table_format):
+def _display_qual_decls_as_table(qual_decls, table_width, table_format,
+                                 namespace=None):
     """
     Display the elements of qualifier declarations as a table with a
     row for each qualifier declaration and a column for each of the attributes
     of the qualifier declaration (name, type, Value, Array, Scopes, Flavors.
 
-    The function displays all of the qualifier declarations in the
+    qual_decls is a list of the class QualDeclWrapper where each instance is
+    namespace, qualdecl ib multiple namespaces are to be didsplayed or a list
+    of qualdecls if only one namespace is to be displayed
+
+    The function displays all of the qualifier declarations in the the list
+    if a qualdecls is a list of CIMQualifierdecl or or by namespace if
+    qualdecls is a list of tuples
     """
+    def build_row(qdecl, ns):
+        """
+        Build a single row representing a qualifier declaration
+        """
+        scopes = '\n'.join([key for key in qdecl.scopes if qdecl.scopes[key]])
+        flavors = []
+        flavors.append('EnableOverride' if qdecl.overridable
+                       else 'DisableOverride')
+        flavors.append('ToSubclass' if qdecl.tosubclass else 'Restricted')
+        if qdecl.translatable:
+            flavors.append('Translatable')
+        sep = "\n" if sum(map(len, flavors)) >= max_column_width else ", "
+        flavors = sep.join(flavors)
+        row = [qdecl.name, qdecl.type, qdecl.value, qdecl.is_array, scopes,
+               flavors]
+        if ns:
+            row.insert(0, ns)
+        return row
+
+    # Build header line.  Add Namespace column if namespace flag set.
     rows = []
     headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
-    max_column_width = int(table_width / len(headers)) - 4
-    for q in qual_decls:
-        scopes = '\n'.join([key for key in q.scopes if q.scopes[key]])
-        flavors = []
-        flavors.append('EnableOverride' if q.overridable else 'DisableOverride')
-        flavors.append('ToSubclass' if q.tosubclass else 'Restricted')
-        if q.translatable:
-            flavors.append('Translatable')
-        if sum(map(len, flavors)) >= max_column_width:
-            sep = "\n"
-        else:
-            sep = ", "
-        flavors = sep.join(flavors)
+    if namespace:
+        headers.insert(0, "namespace")
 
-        row = [q.name, q.type, q.value, q.is_array, scopes, flavors]
+    # build the data rows
+    max_column_width = int(table_width / len(headers)) - 4
+    rows = []
+    for value in qual_decls:
+        if namespace:
+            row = build_row(value.qualdecl, value.namespace)
+        else:
+            row = build_row(value, None)
         rows.append(row)
 
     click.echo(format_table(rows, headers, title='Qualifier Declarations',

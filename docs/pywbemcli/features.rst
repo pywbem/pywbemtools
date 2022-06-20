@@ -27,41 +27,47 @@ syntactic implementation of the features. This includes:
   with only a change of an option on the commands that request CIM instances or
   classes. The ``--names-only``/``--no`` command option defines whether only the
   name or the complete object will be displayed.
+  See :ref:`Displaying CIM instances/classes or their names`
 
 * The ability to define complete INSTANCE name command arguments or
-  interactively select the instance namesfrom a list presented by
+  interactively select the instance names from a list presented by
   pywbemcli for certain objects rather than typing in long names the full name.
-  see :ref:`Specifying the INSTANCENAME command argument`.
+  See :ref:`Specifying the INSTANCENAME command argument`.
+
+.. index::
+  pair: classes; filter options
+  pair: instances; filter options
 
 * The ability to filter classes and instances returned from a number of the
   enumerate commands filtered by characteristics of the classes. Thus,
   for example, it can for experimental classes, association classes, and
-  deprecated classes.
+  deprecated classes. See :ref:`Filtering responses for specific types of classes`
 
 .. index::
     pair: namespace; multiple namespaces
     pair: --namespace option; command option --namespace
 
 * The ability to view information on multiple namespaces in a single command.
-  Many of the pywbemcli commands target a term:`Namespace` in the WBEM server for
-  as the source of information (ex. enumerate, get, associators, references,
-  create, delete, modify). Commands like create, delete, and modify are
-  restricted to a single namespace which can be either the default namespace
-  defined for the connection or a namespace defined with the ``--namespace``
-  command option. Commands like enumerate, get, associators,
-  and references can be used to get CIM information from multiple namespaces
-  in a single pywbemcli request using the ``--namespace``
-  command option.  Thus, if single namespace is defined (``--namespace root/blah``)
-  that becomes the namespace for the command. However with these particular
-  commands, multiple namespaces can be specified (``--namespace root/cimv2,root/cimv3``
-  or ``--namespace root/cimv2 --namespace root/cimv3) and the CIM objects retrieved
-  from all of the namespaces on this list and displayed.
+  Many of the pywbemcli commands target a term:`Namespace` in the WBEM server
+  for as the source of information (ex. enumerate, get, associators,
+  references). Commands like create, delete, and modify are restricted to a
+  single namespace which can be either the default namespace defined for the
+  connection or a namespace defined with the ``--namespace`` command option.
+  Commands like enumerate, get, associators, and references can be used to get
+  CIM information from multiple namespaces in a single pywbemcli request using
+  the ``--namespace`` command option.  Thus, if single namespace is defined
+  (``--namespace root/blah``) that becomes the namespace for the command.
+  However with these particular commands, multiple namespaces can be specified
+  (``--namespace root/cimv2,root/cimv3`` or ``--namespace root/cimv2
+  --namespace root/cimv3``) and the CIM objects retrieved from all of the
+  namespaces on this list and displayed. See :ref:`Using multiple namespaces
+  with server requests`.
 
 
-.. _`pywbemcli commands to WBEM operations`:
+.. _`pywbemcli command relation to WBEM operations`:
 
-pywbemcli commands to WBEM operations
--------------------------------------
+pywbemcli command relation to WBEM operations
+---------------------------------------------
 
 The following table defines which pywbemcli commands are used for the
 corresponding WBEM operations.
@@ -482,3 +488,92 @@ the root classes).
     $ pywbemcli --name mymock class enumerate --no --deep-inheritance --no-association
     TST_Person
     TST_Lineage
+
+
+.. index::
+    pair: namespace; multiple namespaces
+    pair: --namespace option; command option --namespace
+
+.. _`Using multiple namespaces with server requests`:
+
+Using multiple namespaces with server requests
+----------------------------------------------
+
+This feature was added in pywbemcli version 1.1.0.
+
+Generally the CIM/XML commands defined by the DMTF execute operations on a single
+:term:`CIM namespace` in the WBEM server.  Thus, the command:
+
+    instance enumerate <classname> -n interop
+
+is a request to the WBEM server to return instances of of <classname> from
+namespace ``interop``.
+
+However, pywbemcli expands this to allow some requests to be executed against
+multiple namespaces in a single request.  This was done primarily to allow
+viewing CIM objects in the server across namespaces (ex. comparing classes
+between namespaces).
+
+The commands enumerate, get, associators, and references for the command groups
+class and instance allow issuing requests on multiple namespaces in a single
+pywbemcli command. The qualifiers group enumerate command also handles multiple
+namespaces. Multiple namespace for a command is defined with the
+``--namespace`` option by defining the set of namespaces to be included  rather
+than just a single namespace. If the ``default-namespace`` is not defined is
+the connection default namespace.
+
+The responses are displayed in the same form as with a single namespace except
+that the namespace is included for each type of display to allow the user to
+determine which data is in which namespace.  With MOF, the namespace appears as
+a MOF namespace pragma (commented because not all WBEM server compilers honor the
+namespace pragma). With tables, a namespace column is included.
+
+For example:
+
+.. code-block:: text
+
+    # pywbemcli instance enumerate CIM_Door --namespace root/cimv2, root/cimv3
+
+    # pywbemcli instance get CIM_Subscription.? --namespace root/cimv2 --namespace root/cimv3
+
+
+returns the instances of CIM_Door from two namespaces.
+
+A table output has the following form with table output
+
+.. code-block:: text
+
+    pywbemcli> -o table instance enumerate CIM_Foo -n root/cimv2,root/cimv3
+    Instances: CIM_Foo
+    +-------------+---------------------+---------------+
+    | namespace   | InstanceID          | IntegerProp   |
+    |-------------+---------------------+---------------|
+    | root/cimv2  | "CIM_Foo1"          | 1             |
+    | root/cimv2  | "CIM_Foo2"          | 2             |
+    | root/cimv2  | "CIM_Foo3"          |               |
+    | root/cimv2  | "CIM_Foo30"         |               |
+    | root/cimv2  | "CIM_Foo31"         |               |
+    | root/cimv2  | "CIM_Foo_sub1"      | 4             |
+    | root/cimv2  | "CIM_Foo_sub2"      | 5             |
+    | root/cimv2  | "CIM_Foo_sub3"      | 6             |
+    | root/cimv2  | "CIM_Foo_sub4"      | 7             |
+    | root/cimv3  | "CIM_Foo1"          | 1             |
+    | root/cimv3  | "CIM_Foo2"          | 2             |
+    | root/cimv3  | "CIM_Foo3"          |               |
+    | root/cimv3  | "CIM_Foo3-third-ns" | 3             |
+    | root/cimv3  | "CIM_Foo30"         |               |
+    | root/cimv3  | "CIM_Foo31"         |               |
+    | root/cimv3  | "CIM_Foo_sub1"      | 4             |
+    | root/cimv3  | "CIM_Foo_sub2"      | 5             |
+    | root/cimv3  | "CIM_Foo_sub3"      | 6             |
+    | root/cimv3  | "CIM_Foo_sub4"      | 7             |
+    +-------------+---------------------+---------------+
+
+The --namespace option can be defined either using multiple definitions of the
+option: ``--namespace root/cimv2 --namespace root/cimv3`` or as a single
+options with the namespace names comma-separated: ``--namespace root/cimv2,root/cimv3``.
+
+The :ref:`Class find command` and  also process multiple namespaces in a single
+request but the default if the namespace is not provided is to use all of the
+namespaces defined in the server since the goal of these commands is to execute
+a wide search for the define class or instance entities.

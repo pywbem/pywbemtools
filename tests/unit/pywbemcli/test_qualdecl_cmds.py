@@ -24,11 +24,13 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
-    CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE
+    CMD_OPTION_SUMMARY_HELP_LINE, \
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
 
 PYTHON_GE_38 = sys.version_info > (3, 8)
+THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
 
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
@@ -46,7 +48,7 @@ QD_HELP_LINES = [
 QD_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] qualifier enumerate [COMMAND-OPTIONS]',
     'List the qualifier declarations in a namespace.',
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_SUMMARY_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
@@ -55,7 +57,7 @@ QD_GET_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] qualifier get QUALIFIERNAME '
     '[COMMAND-OPTIONS]',
     "Get a qualifier declaration.",
-    CMD_OPTION_NAMESPACE_HELP_LINE,
+    CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE,
     CMD_OPTION_HELP_HELP_LINE,
 ]
 
@@ -167,6 +169,220 @@ QD_TBL_GET_OUT = """Qualifier Declarations
 |          |         |         |         | INDICATION  |                |
 +----------+---------+---------+---------+-------------+----------------+
 """
+
+# pylint enable=line_too_long
+QD_TBL_ENUM_MULTI_NS_OUT = """Qualifier Declarations
++-------------+------------------+---------+---------+---------+-------------+-----------------+
+| namespace   | Name             | Type    | Value   | Array   | Scopes      | Flavors         |
+|-------------+------------------+---------+---------+---------+-------------+-----------------|
+| root/cimv2  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
+|             |                  |         |         |         | ASSOCIATION | Restricted      |
+|             |                  |         |         |         | INDICATION  |                 |
+| root/cimv3  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
+|             |                  |         |         |         | ASSOCIATION | Restricted      |
+|             |                  |         |         |         | INDICATION  |                 |
+| root/cimv2  | Aggregate        | boolean | False   | False   | REFERENCE   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Aggregate        | boolean | False   | False   | REFERENCE   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Association      | boolean | False   | False   | ASSOCIATION | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Association      | boolean | False   | False   | ASSOCIATION | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Description      | string  |         | False   | ANY         | EnableOverride  |
+|             |                  |         |         |         |             | ToSubclass      |
+|             |                  |         |         |         |             | Translatable    |
+| root/cimv3  | Description      | string  |         | False   | ANY         | EnableOverride  |
+|             |                  |         |         |         |             | ToSubclass      |
+|             |                  |         |         |         |             | Translatable    |
+| root/cimv2  | EmbeddedInstance | string  |         | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | Restricted      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv3  | EmbeddedInstance | string  |         | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | Restricted      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv2  | EmbeddedObject   | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv3  | EmbeddedObject   | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv2  | In               | boolean | True    | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | In               | boolean | True    | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Indication       | boolean | False   | False   | CLASS       | DisableOverride |
+|             |                  |         |         |         | INDICATION  | ToSubclass      |
+| root/cimv3  | Indication       | boolean | False   | False   | CLASS       | DisableOverride |
+|             |                  |         |         |         | INDICATION  | ToSubclass      |
+| root/cimv2  | Key              | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | REFERENCE   | ToSubclass      |
+| root/cimv3  | Key              | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | REFERENCE   | ToSubclass      |
+| root/cimv2  | Out              | boolean | False   | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Out              | boolean | False   | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Override         | string  |         | False   | PROPERTY    | EnableOverride  |
+|             |                  |         |         |         | REFERENCE   | Restricted      |
+|             |                  |         |         |         | METHOD      |                 |
+| root/cimv3  | Override         | string  |         | False   | PROPERTY    | EnableOverride  |
+|             |                  |         |         |         | REFERENCE   | Restricted      |
+|             |                  |         |         |         | METHOD      |                 |
+| root/cimv2  | Static           | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+| root/cimv3  | Static           | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
++-------------+------------------+---------+---------+---------+-------------+-----------------+
+"""  # noqa: E501
+# pylint enable=line_too_long
+
+QD_MOF_ENUM_MULTINS_OUT = """#pragma namespace ("root/cimv2")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv2")
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Description : string,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+#pragma namespace ("root/cimv2")
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter);
+
+#pragma namespace ("root/cimv2")
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Override : string,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv2")
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv3")
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Description : string,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+#pragma namespace ("root/cimv3")
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter);
+
+#pragma namespace ("root/cimv3")
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Override : string,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv3")
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+"""
+# pylint enable=line_too_long
+QD_MOF_GET_MULTINS_OUT = """
+#pragma namespace ("root/cimv2")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv3")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+"""
+
+QD_TBL_GET_MULTINS_OUT = """Qualifier Declarations
++-------------+----------+---------+---------+---------+-------------+----------------+
+| namespace   | Name     | Type    | Value   | Array   | Scopes      | Flavors        |
+|-------------+----------+---------+---------+---------+-------------+----------------|
+| root/cimv2  | Abstract | boolean | False   | False   | CLASS       | EnableOverride |
+|             |          |         |         |         | ASSOCIATION | Restricted     |
+|             |          |         |         |         | INDICATION  |                |
+| root/cimv3  | Abstract | boolean | False   | False   | CLASS       | EnableOverride |
+|             |          |         |         |         | ASSOCIATION | Restricted     |
+|             |          |         |         |         | INDICATION  |                |
++-------------+----------+---------+---------+---------+-------------+----------------+
+"""  # noqa: E501
+# pylint enable=line_too_long
 
 # The following variables are used to control tests executed during
 # development of tests
@@ -374,12 +590,78 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    # TODO: Add testcase for qualifier that is used, once usage checking has
-    #       been implemented.
+    #
+    #  Tests for multiple namespace enumerate
+    #
+    ['Verify qualifier command enumerate table, multiple ns',
+     {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['-o', 'table']},
+     {'stdout': QD_TBL_ENUM_MULTI_NS_OUT,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command enumerate multiple ns MOF out',
+     {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': []},
+     {'stdout': QD_MOF_ENUM_MULTINS_OUT,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command enumerate multiple ns  table output',
+     {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3',
+               '--summary'],
+      'general': ['-o', 'table']},
+     {'stdout': """Summary of CIMQualifierDeclaration(s) returned
++-------------+---------+-------------------------+
+| Namespace   |   Count | CIM Type                |
+|-------------+---------+-------------------------|
+| root/cimv2  |      12 | CIMQualifierDeclaration |
+| root/cimv3  |      12 | CIMQualifierDeclaration |
++-------------+---------+-------------------------+
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command get table, multiple ns',
+     {'args': ['get', 'Abstract', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['-o', 'table']},
+     {'stdout': QD_TBL_GET_MULTINS_OUT,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command get MOF out, multiple ns',
+     {'args': ['get', 'Abstract', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': []},
+     {'stdout': QD_MOF_GET_MULTINS_OUT,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command get MOF out, multiple ns only in one ns',
+     {'args': ['get', 'EmbeddedObject', '--namespace', 'root/cimv2,interop'],
+      'general': []},
+     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Qualifier declaration "
+                "'EmbeddedObject' not found in namespace 'interop'.",
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command get MOF out, multiple ns not found',
+     {'args': ['get', 'Invalid_QD', '--namespace', 'root/cimv2,root/cimv3'],
+      'general': []},
+     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Qualifier "
+                "declaration 'Invalid_QD' not found in namespace 'root/cimv2'.",
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
 ]
 
 
-class TestcmdQualifiers(CLITestsBase):
+class TestcmdQualifiers(CLITestsBase):  # pylint: disable=too-few-public-methods
     """
     Test all of the qualifiers command variations.
     """
