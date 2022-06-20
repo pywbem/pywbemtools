@@ -25,11 +25,14 @@ from __future__ import absolute_import, print_function
 import click
 
 from pywbem import Error
+from pywbem._nocasedict import NocaseDict
 
 from .pywbemcli import cli
 from ._common import sort_cimobjects, pywbem_error_exception
 from ._display_cimobjects import display_cim_objects
-from ._common_options import namespace_option, summary_option
+from ._cmd_class import get_namespaces
+from ._common_options import namespace_option, summary_option, \
+    multiple_namespaces_option_dflt_conn
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option
@@ -63,7 +66,7 @@ def qualifier_group():
                          options_metavar=CMD_OPTS_TXT)
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(help_option)
 @click.pass_obj
 def qualifier_get(context, qualifiername, **options):
@@ -109,7 +112,7 @@ def qualifier_delete(context, qualifiername, **options):
 
 @qualifier_group.command('enumerate', cls=PywbemtoolsCommand,
                          options_metavar=CMD_OPTS_TXT)
-@add_options(namespace_option)
+@add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -117,7 +120,7 @@ def qualifier_enumerate(context, **options):
     """
     List the qualifier declarations in a namespace.
 
-    Enumerate the CIM qualifier declarations in the specified CIM namespace
+    Enumerate the CIM qualifier declarations in the specified CIM namespace(s)
     (--namespace option). If no namespace was specified, the default namespace
     of the connection is used.
 
@@ -134,20 +137,23 @@ def qualifier_enumerate(context, **options):
 
 def cmd_qualifier_get(context, qualifiername, options):
     """
-    Execute the command for get qualifier and display result
+    Execute the command for get qualifier and display result. Displays the
+    instances from single or multiple namespaces based on namespace option.
     """
     conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
-
+    # Request qual decls for all namespaces provided and set to display
+    # as dictionary of <ns>: [qual decls]
+    ns_names = get_namespaces(context, options['namespace'])
     try:
-        qual_decl = conn.GetQualifier(qualifiername,
-                                      namespace=options['namespace'])
-
-        display_cim_objects(context, qual_decl, output_format)
-
+        results = NocaseDict()
+        for ns in ns_names:
+            results[ns] = conn.GetQualifier(qualifiername, namespace=ns)
     except Error as er:
         raise pywbem_error_exception(er)
+
+    display_cim_objects(context, results, output_format)
 
 
 def cmd_qualifier_delete(context, qualifiername, options):
@@ -171,12 +177,16 @@ def cmd_qualifier_enumerate(context, options):
     conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
-
+    # Request qual decls for all namespaces provided and set to display
+    # as dictionary of <ns>: [qual decls]
+    ns_names = get_namespaces(context, options['namespace'])
+    results = NocaseDict()
     try:
-        qual_decls = sort_cimobjects(conn.EnumerateQualifiers(
-            namespace=options['namespace']))
+        for ns in ns_names:
+            results[ns] = sort_cimobjects(
+                conn.EnumerateQualifiers(namespace=ns))
 
-        display_cim_objects(context, qual_decls, output_format,
+        display_cim_objects(context, results, output_format,
                             summary=options['summary'])
 
     except Error as er:

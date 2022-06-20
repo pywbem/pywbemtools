@@ -1507,7 +1507,8 @@ The command options are:
    :term:``current connection``. This option accepts single or multiple namespaces
    and displays the results for the list of namespaces supplied.
    See :ref: `Pywbemcli special command line features` for more information
-   on using multiple namespaces
+   on using multiple namespaces. The instance must exist in all of the defined
+   namespaces.
 
 *  ``--help-instancename``/``--hi`` -  Show help message for specifying
    ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
@@ -2039,6 +2040,12 @@ The qualifier declaration is named with the ``QUALIFIERNAME`` argument and is
 in the namespace specified with the ``-namespace``/``-n`` command option, or
 otherwise in the default namespace of the connection.
 
+The ``-namespace``/``-n`` command option option defines the term:`Namespace` to
+use for this command, instead of the default namespace of the :term:`current
+connection`.  This option accepts single or multiple namespaces and displays
+the results for the list of namespaces supplied. See :ref: `Pywbemcli special
+command line features` for more information on using multiple namespaces
+
 The qualifier declaration is displayed using :term:`CIM object output formats`
 or :term:`Table output formats`.
 
@@ -2107,6 +2114,12 @@ The command format is:
 
 The namespace is specified with the ``-namespace``/``-n`` command option, or
 otherwise is the default namespace of the connection.
+
+The ``-namespace``/``-n`` command option option defines the term:`Namespace` to
+use for this command, instead of the default namespace of the :term:`current
+connection`.  This option accepts single or multiple namespaces and displays
+the results for the list of namespaces supplied. See :ref: `Pywbemcli special
+command line features` for more information on using multiple namespaces
 
 The qualifier declaration is displayed using :term:`CIM object output formats`
 or :term:`Table output formats`.
@@ -2260,8 +2273,6 @@ WBEM server itself:
 
 * :ref:`Server brand command` - Get the brand of the server.
 * :ref:`Server info command` - Get information about the server.
-* :ref:`Server interop command` - Get the Interop namespace of the server.
-* :ref:`Server namespaces command` - List the namespaces of the server.
 * :ref:`Server add-mof command` - Compile the MOF files defined.
 * :ref:`Server remove-mof command` - Remove the MOF objects from the server.
 * :ref:`Server schema command` - List the namespaces of the server.

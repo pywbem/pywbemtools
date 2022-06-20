@@ -87,13 +87,15 @@ CLASS_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class COMMAND [ARGS] [COMMAND-OPTIONS]',
     'Command group for CIM classes.',
     CMD_OPTION_HELP_HELP_LINE,
-    'associators   List the classes associated with a class.',
+    'enumerate     List top classes or subclasses of a class in namespace(s).',
+    'get           Get a class.',
     'delete        Delete a class.',
-    'enumerate     List top classes or subclasses of a class in a namespace.',
     'find          List the classes with matching class names on the server.',
     'get           Get a class.',
     'invokemethod  Invoke a method on a class.',
+    'associators   List the classes associated with a class.',
     'references    List the classes referencing a class.',
+    'find          List the classes with matching class names on the server.',
     'tree          Show the subclass or superclass hierarchy for a class.',
 ]
 
@@ -126,7 +128,7 @@ CLASS_DELETE_HELP_LINES = [
 CLASS_ENUMERATE_HELP_LINES = [
     'Usage: pywbemcli [GENERAL-OPTIONS] class enumerate CLASSNAME '
     '[COMMAND-OPTIONS]',
-    'List top classes or subclasses of a class in a namespace.',
+    'List top classes or subclasses of a class in namespace(s).',
     '--di, --deep-inheritance Include the complete subclass hierarchy',
     CMD_OPTION_LOCAL_ONLY_CLASS_HELP_LINE,
     CMD_OPTION_NO_QUALIFIERS_HELP_LINE,
@@ -609,7 +611,6 @@ CIMFOO_SUB_SUB_NO_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_F
 </CLASS>
 """  # noqa E501
 # pylint: enable=line-too-long
-
 
 OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN

@@ -122,7 +122,7 @@ def class_group():
 @click.pass_obj
 def class_enumerate(context, classname, **options):
     """
-    List top classes or subclasses of a class in a namespace.
+    List top classes or subclasses of a class in namespace(s).
 
     Enumerate CIM classes starting either at the top of the class hierarchy
     in the specified CIM namespace (--namespace option), or at the specified
@@ -1036,11 +1036,11 @@ def cmd_class_associators(context, classname, options):
         raise pywbem_error_exception(er)
 
 
-def get_namespaces(context, namespaces, default_rtn=False):
+def get_namespaces(context, namespaces, default_all_ns=False):
     """
-    Returns either the namespaces defined in namespaces parameter or if
+    Returns either the namespaces defined in --namespaces parameter or if
     namespaces is empty, either all of the namespaces available in the server or
-    the value None depending on the value of the parameter default.
+    the value None depending on the value of the parameter default_all_ns.
 
     Processes either single namespace string, single string containing
     multiple comma-separated,namespace definitions  or combination of string
@@ -1054,20 +1054,22 @@ def get_namespaces(context, namespaces, default_rtn=False):
 
       context context (:class:`ContextObj` provided with command)
 
-      namespaces (list of (:term: str)
-        List of strings where each string is one or more namespace names.
-        Any single string can contain multiple namespaces by comma-separating
-        the namespace names
+      namespaces (tuple of :term:`string` or :term:`string`)
+        tuple of strings where each string is one or more namespace names.
+        Any single string can contain one or multiple namespaces by
+        comma-separating the namespace names.
 
-      default_rtn (:class:`py:bool`):
-        Boolean that determines default return if namespaces is None or []:
+      default_all_ns (:class:`py:bool`):
+        Boolean that determines return value if namespaces is None or []:
           True: Return all namespaces in server
-          False: Return None (default)
+          False: Return default namespace for current conn (default)
 
     Returns:
-        If namespaces is a tuple, returns list of namespaces or empty default
-        [None].
-        If namespaces is string returns the single namespace or None
+        If namespaces is a tuple, returns list of namespaces with comma
+        separated strings separated into single items in the list
+        If namespaces is string returns the single namespace string
+        if namespaces is None return None if default_all_ns is False
+        or all namespaces in environment if default_all_ns is True
 
     Raises:
         CIMError if status code not CIM_ERR_NOT_FOUND
@@ -1076,12 +1078,15 @@ def get_namespaces(context, namespaces, default_rtn=False):
         return default_ns if not isinstance(namespaces, tuple) else [default_ns]
 
     # Return the provided namespace(s) by expanding each entry that has
-    # comma-separated values
+    # comma-separated values add adding those without comma
+
     ns_names = []
     if namespaces:
-        for ns in namespaces:
-            ns_names.extend(ns.split(','))
-        return ns_names
+        if isinstance(namespaces, tuple):
+            for ns in namespaces:
+                ns_names.extend(ns.split(','))
+            return ns_names
+        return namespaces
 
     # If default input param is None, return the default namespace.
     # We set the default namespace here rather than None (where the request
@@ -1089,7 +1094,8 @@ def get_namespaces(context, namespaces, default_rtn=False):
     # attempts to build a dict with namespace and None fails
     conn = context.pywbem_server.conn
     default_ns = conn.default_namespace
-    if not default_rtn:
+    assert default_all_ns is not None
+    if default_all_ns is False:
         return get_default_ns(default_ns)
 
     # Otherwise get all namespaces from server
@@ -1125,7 +1131,7 @@ def cmd_class_find(context, classname_glob, options):
 
     context.spinner_stop()
     namespaces = get_namespaces(context, options['namespace'],
-                                default_rtn=True)
+                                default_all_ns=True)
 
     try:
         # Define sort by namespace name if --sort, or  othersise by count

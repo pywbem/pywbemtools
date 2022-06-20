@@ -1,7 +1,3 @@
-# The previous statement is used by pywbemcli to force this script to be
-# run at pywbemcli startup and not included in the list of --mock-server
-# files that are used to build the repository.  This is a development
-# test aid.
 # (C) Copyright 2019 IBM Corp.
 # (C) Copyright 2019 Inova Development Inc.
 # All Rights Reserved
@@ -31,6 +27,11 @@
 
     This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
     environment variable.
+
+    The environment variable is used by pywbemcli to force this script to be
+    run at pywbemcli startup and not included in the list of --mock-server
+    files that are used to build the repository.  This is a development
+    test aid.
 """
 from mock import Mock
 
