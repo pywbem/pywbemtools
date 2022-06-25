@@ -114,7 +114,7 @@ class ResultsHandler(object):
 
         self.results = NocaseDict()
 
-        # set the requested namespaces into the results dictionary
+        # Set the requested namespaces into the results dictionary
         for ns in self.ns_names:
             self.results[ns] = None
 
@@ -189,11 +189,13 @@ class ResultsHandler(object):
         """
         summary = self.options.get('summary', None)
         ignore_null = not self.options.get('show_null', None)
+        object_order = self.options.get("object_order", None)
 
         display_cim_objects(self.context, self.results, self.output_format,
                             summary=summary,
                             ignore_null_properties=ignore_null,
-                            property_list=self.property_list)
+                            property_list=self.property_list,
+                            object_order=object_order)
 
         if self.result_errors:
             if any(self.result_errors.values()):

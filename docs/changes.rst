@@ -36,7 +36,7 @@ Released: not yet
 * Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for
   new features. Adjusted testcases accordingly.
 
-  Extended class and instance enumerate/get/associators/references to allow
+* Extended class and instance enumerate/get/associators/references to allow
   getting the objects from multiple namespaces with a single request.  This
   extends the command option --namespace to allow multiple namespaces for
   these commands using either comma-separated format
@@ -45,7 +45,13 @@ Released: not yet
   have been extended to include the namespace name for the objects in all
   of the output formats if multiple namespaces are used. As before, the
   namespaces are not shown if only a single or the default namespace is
-  requested.  (see issues # 1058 and #1059)
+  requested.(see issues #1058 and #1059)
+
+* Add a new option (--object-order) to class and instance
+  enumerate/get/associators/references and qualifier enumerate/get to reorder
+  the command results displays by the object name rather than the default of
+  namespace name. This allows the user to more easily compare the objects
+  themselves in different namespaces. (see issues #1058 and #1059)
 
 **Cleanup:**
 

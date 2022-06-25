@@ -231,6 +231,8 @@ Help text for ``pywbemcli class associators`` (see :ref:`class associators comma
       -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
                                       be specified multiple times using either the option multiple times and/or comma
                                       separated list. Default: connection default namespace.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this help message.
 
@@ -354,6 +356,8 @@ Help text for ``pywbemcli class enumerate`` (see :ref:`class enumerate command`)
       --subclass-of CLASSNAME         Filter the returned classes to return only classes that are a subclass of the option
                                       value.
       --leaf-classes                  Filter the returned classes to return only leaf (classes; classes with no subclass.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -h, --help                      Show this help message.
 
 
@@ -558,6 +562,8 @@ Help text for ``pywbemcli class references`` (see :ref:`class references command
       -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
                                       be specified multiple times using either the option multiple times and/or comma
                                       separated list. Default: connection default namespace.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -s, --summary                   Show only a summary (count) of the objects.
       -h, --help                      Show this help message.
 
@@ -1053,6 +1059,8 @@ Help text for ``pywbemcli instance associators`` (see :ref:`instance associators
                                       Null property are displayed
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -h, --help                      Show this help message.
 
 
@@ -1262,6 +1270,8 @@ Help text for ``pywbemcli instance enumerate`` (see :ref:`instance enumerate com
       --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
                                       instances to be displayed. Otherwise only properties at least one instance has a non-
                                       Null property are displayed
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -h, --help                      Show this help message.
 
 
@@ -1306,6 +1316,8 @@ Help text for ``pywbemcli instance get`` (see :ref:`instance get command`):
       -n, --namespace NAMESPACE(s)    Namespace(s) to use for this command, instead of the default connection namespace. May
                                       be specified multiple times using either the option multiple times and/or comma
                                       separated list. Default: connection default namespace.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
       --show-null                     In the TABLE output formats, show properties with no value (i.e. Null) in all of the
@@ -1502,6 +1514,8 @@ Help text for ``pywbemcli instance references`` (see :ref:`instance references c
                                       The filter query language to be used with --filter-query. Default: DMTF:FQL.
       --hi, --help-instancename       Show help message for specifying INSTANCENAME including use of the --key and
                                       --namespace options.
+      --object-order                  Order the objects by object before namespace. Only applies when multiple namespaces
+                                      defined.
       -h, --help                      Show this help message.
 
 
@@ -1908,6 +1922,8 @@ Help text for ``pywbemcli qualifier enumerate`` (see :ref:`qualifier enumerate c
       -n, --namespace NAMESPACE(s)  Namespace(s) to use for this command, instead of the default connection namespace. May
                                     be specified multiple times using either the option multiple times and/or comma
                                     separated list. Default: connection default namespace.
+      --object-order                Order the objects by object before namespace. Only applies when multiple namespaces
+                                    defined.
       -s, --summary                 Show only a summary (count) of the objects.
       -h, --help                    Show this help message.
 
@@ -1937,6 +1953,8 @@ Help text for ``pywbemcli qualifier get`` (see :ref:`qualifier get command`):
       -n, --namespace NAMESPACE(s)  Namespace(s) to use for this command, instead of the default connection namespace. May
                                     be specified multiple times using either the option multiple times and/or comma
                                     separated list. Default: connection default namespace.
+      --object-order                Order the objects by object before namespace. Only applies when multiple namespaces
+                                    defined.
       -h, --help                    Show this help message.
 
 

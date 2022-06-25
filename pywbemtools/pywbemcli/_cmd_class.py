@@ -42,7 +42,7 @@ from ._common_cmd_functions import get_namespaces, enumerate_classes_filtered, \
 from ._common_options import propertylist_option, names_only_option, \
     include_classorigin_class_option, namespace_option, summary_option, \
     multiple_namespaces_option_dflt_conn, multiple_namespaces_option_dflt_all, \
-    class_filter_options
+    class_filter_options, object_order_option
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
@@ -118,6 +118,7 @@ def class_group():
 @add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(class_filter_options)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
@@ -288,6 +289,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -342,6 +344,7 @@ def class_references(context, classname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -486,153 +489,6 @@ def class_tree(context, classname, **options):
 #  are called from the instance and qualifier command processors.
 #
 ####################################################################
-
-
-def handle_multi_ns_exc(exc, ns_names, results, ns, target_object,
-                        obj_type=None):
-    """
-    Handle CIM_Error exceptions from multi-namespace requests.  This method
-    processes an exception from a server request methods and determines if
-    the processing will continue for other namespaces or terminate with an
-    exception. If one of the listed CIMError status codes in being processed,
-    it allows the processing to continue but issues a warning message.
-
-    If all namespaces in the ns_names list have been processed and there
-    are no valid responses in the ns_names list, it raises the error shown
-    by exc.
-
-    Parameters:
-      exc (Exception):
-        The exception caught and being processed being processed.
-
-      ns_names (list of :term:`string`):
-        The list of namespaces being processed by the request
-
-      results (:class:`NocaseDict`):
-        Dictionary of results generated
-
-      ns (:term:`string`):
-        The namespace being processed
-
-      target_object (:term:`string` or CIMInstanceName,):
-        The request target object that caused the exception or None
-
-      obj_type (:term:`string`):
-        Optionsl string defining the type of object that is the target/source.
-        Inserted into warning message.
-    """
-    # If not one of the following status codes, terminate with Click exception
-    if exc.status_code not in (CIM_ERR_NOT_FOUND,
-                               CIM_ERR_INVALID_CLASS,
-                               CIM_ERR_INVALID_NAMESPACE,
-                               CIM_ERR_INVALID_PARAMETER):
-        raise pywbem_error_exception(exc)
-
-    # Otherwise If all commands complete, and none were successful generate
-    #  exception. Otherwise generate a warning message.
-
-    # Add the current namespace to the results with empty results list.
-    # This is important because display_cimobjects depends on list of all
-    # namespaces for formatting.
-    results[ns] = []
-
-    # If all returns were in error, terminate with exception
-    if len(ns_names) == len(results) and not any(results.values()):
-        raise pywbem_error_exception(exc)
-
-    if obj_type is None:
-        obj_type = "class:" if isinstance(target_object, six.string_types) \
-            else "instance:"
-
-    warning_msg("Error: '{0}' {1} '{2}' in namespace: '{3}'. "
-                "Exception: {4}\n".format(exc.status_code_name, obj_type,
-                                          target_object, ns, exc))
-
-
-def get_namespaces(context, namespaces, default_all_ns=False):
-    """
-    Returns either the namespaces defined in --namespaces parameter or if
-    namespaces is empty, either all of the namespaces available in the server or
-    the value None depending on the value of the parameter default_all_ns.
-
-    Processes either single namespace string, single string containing
-    multiple comma-separated,namespace definitions  or combination of string
-    and tuple.
-
-    This allows a single processor for the namespace option that returns
-    namespace or default in a form that matches the type of namespaces
-    (tuple, list) or (string, string)
-
-    Parameters:
-
-      context context (:class:`ContextObj` provided with command)
-
-      namespaces (tuple of :term:`string` or :term:`string`)
-        tuple of strings where each string is one or more namespace names.
-        Any single string can contain one or multiple namespaces by
-        comma-separating the namespace names.
-
-      default_all_ns (:class:`py:bool`):
-        Boolean that determines return value if namespaces is None or []:
-          True: Return all namespaces in server
-          False: Return default namespace for current conn (default)
-
-    Returns:
-        If namespaces is a tuple, returns list of namespaces with
-        comma-separated strings separated into single items in the list
-        If namespaces is string, returns the single namespace string
-        if namespaces is None, returns None if default_all_ns is False
-        or all namespaces in environment if default_all_ns is True
-
-    Raises:
-        CIMError if status code not CIM_ERR_NOT_FOUND
-    """
-    def get_default_ns(default_ns):
-        return default_ns if not isinstance(namespaces, tuple) else [default_ns]
-
-    # Return the provided namespace(s) by expanding each entry that has
-    # comma-separated values add adding those without comma
-
-    ns_names = []
-    if namespaces:
-        if isinstance(namespaces, tuple):
-            for ns in namespaces:
-                ns_names.extend(ns.split(','))
-            return ns_names
-        return namespaces
-
-    # If default input param is None, return the default namespace.
-    # We set the default namespace here rather than None (where the request
-    # would get the default namespace) because the find command
-    # attempts to build a dict with namespace and None fails
-    conn = context.pywbem_server.conn
-    default_ns = conn.default_namespace
-    assert default_all_ns is not None
-    if default_all_ns is False:
-        return get_default_ns(default_ns)
-
-    # Otherwise get all namespaces from server
-    wbem_server = context.pywbem_server.wbem_server
-    try:
-        assert isinstance(namespaces, tuple)
-        ns_names = wbem_server.namespaces
-        ns_names.sort()
-        return ns_names
-
-    except ModelError:
-        return get_default_ns(default_ns)
-
-    except CIMError as ce:
-        # Allow processing to continue if no interop namespace
-        if ce.status_code == CIM_ERR_NOT_FOUND:
-            warning_msg('{}. Using default_namespace {}.'
-                        .format(ce, conn.default_namespace))
-            return get_default_ns(default_ns)
-        raise click.ClickException('Failed to find namespaces. Exception: {} '
-                                   .format(ce))
-
-    except Error as er:
-        raise pywbem_error_exception(er)
 
 
 def get_classnames_in_namespaces(context, options, namespaces, classname_glob):
@@ -809,6 +665,7 @@ def cmd_class_references(context, classname, options):
                              classname)
 
     for ns in results:
+        try:
             cln = CIMClassName(classname, namespace=ns)
             if options['names_only']:
                 results.add(conn.ReferenceNames(
@@ -849,6 +706,7 @@ def cmd_class_associators(context, classname, options):
                              classname)
 
     for ns in results:
+        try:
             cln = CIMClassName(classname, namespace=ns)
             if options['names_only']:
                 results.add(conn.AssociatorNames(
@@ -877,9 +735,6 @@ def cmd_class_associators(context, classname, options):
             raise pywbem_error_exception(er)
 
     results.display()
-
-    display_cim_objects(context, results, output_format,
-                        summary=options['summary'])
 
 
 def cmd_class_find(context, classname_glob, options):

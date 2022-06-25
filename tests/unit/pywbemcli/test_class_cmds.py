@@ -612,7 +612,518 @@ CIMFOO_SUB_SUB_NO_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_F
 """  # noqa E501
 # pylint: enable=line-too-long
 
-OK = True    # mark tests OK when they execute correctly
+ENUMERATE_CLASS_2_NAMESPACE = """
+#pragma namespace ("root/cimv2")
+   [Description ( "Subclass of CIM_Foo" )]
+class CIM_Foo_sub : CIM_Foo {
+
+   string cimfoo_sub;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv2")
+class CIM_Foo_sub2 : CIM_Foo {
+
+   string cimfoo_sub2;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv3")
+   [Description ( "Subclass of CIM_Foo" )]
+class CIM_Foo_sub : CIM_Foo {
+
+   string cimfoo_sub;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv3")
+class CIM_Foo_sub2 : CIM_Foo {
+
+   string cimfoo_sub2;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+};
+"""
+
+ENUMERATE_CLASS_2_NAMESPACE_OBJECT_ORDER = """#pragma namespace ("root/cimv2")
+   [Description ( "Subclass of CIM_Foo" )]
+class CIM_Foo_sub : CIM_Foo {
+
+   string cimfoo_sub;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv3")
+   [Description ( "Subclass of CIM_Foo" )]
+class CIM_Foo_sub : CIM_Foo {
+
+   string cimfoo_sub;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv2")
+class CIM_Foo_sub2 : CIM_Foo {
+
+   string cimfoo_sub2;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv3")
+class CIM_Foo_sub2 : CIM_Foo {
+
+   string cimfoo_sub2;
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+"""
+
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -1310,7 +1821,7 @@ TEST_CASES = [
      ['enumerate', 'InvalidClassname'],
      {'stderr': ["namespace:root/cimv2", "CIM_ERR_INVALID_CLASS",
                  "Description:The class 'InvalidClassname' defined by "
-                 "'ClassName' parameter does not exist in namespace "
+                 "'ClassName' parameter does not exist in namespace "],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -1926,8 +2437,13 @@ TEST_CASES = [
     ['Verify class command enumerate with --leaf-classes & --subclass-of',
      ['enumerate', '--di', '--no', '--leaf-classes', '--subclass-of',
       'TST_Person'],
-     {'stdout': ['TST_PersonClsDep', 'TST_PersonDep', 'TST_PersonExp'
-                 'TST_PersonExpProperty', 'TST_PersonPropDep', 'TST_PersonSub'],
+     {'stdout': """TST_PersonClsDep
+TST_PersonDep
+TST_PersonExp
+TST_PersonExpProperty
+TST_PersonPropDep
+TST_PersonSub
+""",
       'test': 'innows'},
      QUALIFIER_FILTER_MODEL, OK],
 
@@ -2686,9 +3202,130 @@ TEST_CASES = [
 
     ['Verify class get from two namespaces. single namespace/comma option',
      {'args': ['get', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
-     {'stdout': ['#pragma namespace ("root/cimv2")',
-                 '#pragma namespace ("root/cimv3")',
-                 'CIM_Foo {'],
+     {'stdout': ["""#pragma namespace ("root/cimv2")
+   [Description ( "Simple CIM Class" )]
+class CIM_Foo {
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+
+#pragma namespace ("root/cimv3")
+   [Description ( "Simple CIM Class" )]
+class CIM_Foo {
+
+      [Key ( true ),
+       Description ( "This is key property." )]
+   string InstanceID;
+
+      [Description ( "This is Uint32 property." )]
+   uint32 IntegerProp;
+
+      [Description ( "Embedded instance property" ),
+       EmbeddedInstance ( "CIM_FooEmb3" )]
+   string cimfoo_emb3;
+
+      [Description ( "Method with in and out parameters" )]
+   uint32 Fuzzy(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_FooRef1 REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue);
+
+      [Description ( "Static method with in and out parameters" ),
+       Static ( true )]
+   uint32 FuzzyStatic(
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Define data to be returned in output parameter" )]
+      string TestInOutParameter,
+         [IN ( true ),
+          OUT ( true ),
+          Description ( "Test of ref in/out parameter" )]
+      CIM_Foo REF TestRef,
+         [IN ( false ),
+          OUT ( true ),
+          Description ( "Rtns method name if exists on input" )]
+      string OutputParam,
+         [IN ( true ),
+          Description ( "Defines return value if provided." )]
+      uint32 OutputRtnValue,
+         [IN ( true ),
+          Description ( "Embedded instance parameter" ),
+          EmbeddedInstance ( "CIM_FooEmb1" )]
+      string cimfoo_emb1);
+
+      [Description ( "Method with no parameters but embedded instance return" ),
+       EmbeddedInstance ( "CIM_FooEmb2" )]
+   string DeleteNothing();
+
+};
+"""],
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
@@ -2730,18 +3367,24 @@ TEST_CASES = [
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify class enumerate from two namespaces multiple namespace option,'
-     ' no classname',
-     {'args': ['enumerate', '--namespace', 'root/cimv2',
-               '--namespace', 'root/cimv3']},
-     {'stdout': ['#pragma namespace ("root/cimv2")',
-                 '#pragma namespace ("root/cimv3")',
-                 'class CIM_Foo {'],
+    ['Verify class enumerate two namespaces CIM_Foo',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': [ENUMERATE_CLASS_2_NAMESPACE],
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify class enumerate from two namespaces, CIM_Foo',
+
+
+    ['Verify class enumerate two namespaces CIM_Foo --object-order',
+     {'args': ['enumerate', 'CIM_Foo', '-n', 'root/cimv2,root/cimv3',
+               '--object-order']},
+     {'stdout': [ENUMERATE_CLASS_2_NAMESPACE_OBJECT_ORDER],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces, CIM_Foo comma separted',
      {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3']},
      {'stdout': ['#pragma namespace ("root/cimv2")',
                  '#pragma namespace ("root/cimv3")',
@@ -2753,8 +3396,9 @@ TEST_CASES = [
     ['Verify class enumerate from two namespaces summary',
      {'args': ['enumerate', 'CIM_Foo', '--summary',
                '--namespace', 'root/cimv2,root/cimv3']},
-     {'stdout': ['root/cimv2 2 CIMClass(s) returned',
-                 'root/cimv3 2 CIMClass(s) returned'],
+     {'stdout': ["""root/cimv2 2 CIMClass(s) returned
+root/cimv3 2 CIMClass(s) returned
+"""],
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
@@ -2798,6 +3442,19 @@ root/cimv3:CIM_Foo_sub2
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify classnames (--no) enumerate from two namespaces --object-order',
+     {'args': ['enumerate', 'CIM_Foo', '--no', '--object-order',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stdout': """
+root/cimv2:CIM_Foo_sub
+root/cimv3:CIM_Foo_sub
+root/cimv2:CIM_Foo_sub2
+root/cimv3:CIM_Foo_sub2
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
     ['Verify classnames enumerate from two namespaces --no --summary, -o table',
      {'args': ['enumerate', 'CIM_Foo', '--no', '--summary',
                '--namespace', 'root/cimv2,root/cimv3'],
@@ -2828,6 +3485,40 @@ root/cimv3:CIM_Foo_sub2
                'root/cimv3,root/cimv2']},
      {'stderr': ["namespace:root/cimv3", "CIMError:CIM_ERR_INVALID_CLASS"],
       'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate --no from three namespaces',
+     {'args': ['enumerate', '--no', '-n', 'root/cimv2,root/cimv3,interop']},
+     {'stdout': """root/cimv2:CIM_BaseEmb
+root/cimv2:CIM_BaseRef
+root/cimv2:CIM_Foo
+root/cimv2:CIM_FooAssoc
+root/cimv3:CIM_BaseEmb
+root/cimv3:CIM_BaseRef
+root/cimv3:CIM_Foo
+root/cimv3:CIM_FooAssoc
+interop:CIM_Namespace
+interop:CIM_ObjectManager
+""",
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate --no from three namespaces different ns order',
+     {'args': ['enumerate', '--no', '-n', 'root/cimv3,root/cimv2,interop']},
+     {'stdout': """root/cimv3:CIM_BaseEmb
+root/cimv3:CIM_BaseRef
+root/cimv3:CIM_Foo
+root/cimv3:CIM_FooAssoc
+root/cimv2:CIM_BaseEmb
+root/cimv2:CIM_BaseRef
+root/cimv2:CIM_Foo
+root/cimv2:CIM_FooAssoc
+interop:CIM_Namespace
+interop:CIM_ObjectManager
+""",
+      'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
@@ -2870,6 +3561,8 @@ class CIM_FooAssoc {
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
+
+    # TODO: Add tests for reference and reference --no with object-order
 
     ['Verify references classname (--no) from two namespaces',
      {'args': ['references', 'CIM_FooRef1', '--no',
@@ -2947,6 +3640,8 @@ class CIM_FooRef2 : CIM_BaseRef {
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
+
+    # TODO: Add test for associators and associator names with object-order.
 
     # pylint: disable=line-too-long
     ['Verify associators from two namespaces xml output',

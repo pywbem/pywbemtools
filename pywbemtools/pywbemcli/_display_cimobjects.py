@@ -56,7 +56,7 @@ MIN_CELL_WIDTH = 10
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
                         property_list=None, quote_strings=True,
-                        ignore_null_properties=True):
+                        ignore_null_properties=True, object_order=False):
 
     """
     Display CIM objects in form determined by input parameters.
@@ -125,10 +125,13 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         tables.  This allows table output to ignore properties that do not add
         value to the table display.
 
-      namespace  (:term:`string`):
-        The names of a namespace if namespace is to be appended to the
-        display.  Used only when the command is processing multiple
-        namespaces.
+      object_order (:class:`py.bool`):
+        If True sort the objects by classname/objectname rather than by
+        namespace on so that objects of same class in different namespaces
+        appear together.
+
+        Used only when the objects parameter is a dictionary ( i.e. multiple
+        namespaces)
     """
 
     # Note: In the docstring above, the line for parameter 'objects' was too
@@ -137,6 +140,11 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
 
     # Assure that there is output format exists, None not allowed.
     assert output_format
+
+    # Sort valid only for dictionaries.  Single lists are always sorted by
+    # class name
+    if not isinstance(cim_objects, NocaseDict):
+        assert not object_order
 
     # If dictionary of objects in namespaces and there is only one namespace
     # reduce to list of cim objects. Code deals with single namespace request
@@ -173,48 +181,14 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     if output_format_is_table(output_format):
         # Table format output is processed as a group in a single table both
         # for multiple and single namespaces.
-        _display_objects_as_table(cim_objects, output_format, context,
-                                  property_list, quote_strings,
-                                  ignore_null_properties, namespace=None)
+        _display_as_table(context, cim_objects, output_format,
+                          property_list, quote_strings,
+                          ignore_null_properties,
+                          object_order)
         return
 
-    # CIM Object and text output formats are displayed as single objects.
-    # Note: for class associaters/references each object is a tuple of
-    # CIMClassName, CIMClass
-    if isinstance(cim_objects, NocaseDict):
-        for ns, ns_objects in cim_objects.items():
-            if ns_objects:
-                if not isinstance(ns_objects, list):
-                    ns_objects = [ns_objects]
-                ns_objects = sort_cimobjects(ns_objects)
-
-                for obj in ns_objects:
-                    _display_one_cim_object(
-                        context, obj, output_format, property_list,
-                        quote_strings, ignore_null_properties, namespace=ns)
-            if not isinstance(ns_objects, list):
-                ns_objects = [ns_objects]
-            ns_objects = sort_cimobjects(ns_objects)
-
-            for obj in ns_objects:
-                _display_one_cim_object(
-                    context, obj, output_format, property_list, quote_strings,
-                    ignore_null_properties, namespace=ns)
-        return
-
-    # If not NocaseDict, it is list or single object. Sort by classname and
-    # then call _display_one_cim_objects with each item from list
-    if not isinstance(cim_objects, list):
-        cim_objects = [cim_objects]
-
-    if isinstance(cim_objects, list):
-        # Sort the objects by classname and call to display each object
-        cim_objects = sort_cimobjects(cim_objects)
-
-        for obj in cim_objects:
-            _display_one_cim_object(
-                context, obj, output_format, property_list, quote_strings,
-                ignore_null_properties)
+    # pylint: disable=too-many-function-args
+    _display_as_cim_objects(cim_objects, output_format, object_order)
 
 
 ############################################################################
@@ -224,26 +198,214 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
 #
 ############################################################################
 
+def sort_display_objects(cim_objects):
+    """
+    Sort the list of cim_objects and return a sorted list of the objects.
+    Includes QualdeclWrapper as sortable object
+    This method requires that there be at least one object in cim_objects
+    """
+    assert isinstance(cim_objects, list)
+    if isinstance(cim_objects[0], QualDeclWrapper):
+        return sorted(cim_objects, key=lambda x: x.name())
 
-def _display_one_cim_object(context, cim_object, output_format, property_list,
-                            quote_strings, ignore_null_properties,
-                            namespace=None):
+    return sort_cimobjects(cim_objects)
 
+
+def _order_display_objects(cim_objects, object_order):
+    """
+    Orders the objects in cim_objects in object_name, ns order if object order
+    is set.  Otherwise it keeps the original order which is the order objects
+    were inserted for the namespaces and sorts the order of the returned
+    objects.
+    Defines an iterator which is returned. That iterator
+    will return namespace, cim_object for each cim object to be displayed
+    in the order defined by object_order.
+    """
+    if object_order:
+        # Reorder the objects so an iterator returns in object, ns order
+        order_dict = NocaseDict()
+        for ns, ns_objects in cim_objects.items():
+            if ns_objects:
+                if not isinstance(ns_objects, list):
+                    ns_objects = [ns_objects]
+                ns_objects = sort_display_objects(ns_objects)
+
+                # Determine the object name and find all matching objects
+                # in the list
+                for obj in ns_objects:
+                    if isinstance(obj, (CIMClass, CIMClassName)):
+                        obj_name = obj.classname
+                    # Instance name without namespace becomes name for ordering
+                    elif isinstance(obj, CIMInstance):
+                        objpath = obj.path.copy()
+                        objpath.namespace = None
+                        obj_name = objpath.to_wbem_uri(format="canonical")
+                    elif isinstance(obj, CIMInstanceName):
+                        objtmp = obj.copy()
+                        objtmp.namespace = None
+                        obj_name = objtmp.to_wbem_uri(format="canonical")
+                    elif isinstance(obj, CIMQualifierDeclaration):
+                        obj_name = obj.name
+                    elif isinstance(obj, six.string_types):
+                        obj_name = obj
+                    else:
+                        assert False
+
+                    assert obj_name
+
+                    # Add obj_name,ns,objects to order_dict
+                    if obj_name not in order_dict:
+                        order_dict[obj_name] = NocaseDict()
+                    if ns not in order_dict[obj_name]:
+                        order_dict[obj_name][ns] = [obj]
+                    else:
+                        order_dict[obj_name][ns].append(obj)
+
+        for obj_name, namespaces in order_dict.items():
+            for ns in namespaces:
+                # pylint: disable=unnecessary-dict-index-lookup
+                objs = order_dict[obj_name][ns]
+                for obj in objs:
+                    yield ns, obj
+
+    # No reordering required. Return in ns, object name order
+    # iterator returns namespace, object in namespace, object order
+    else:
+        for ns, ns_objects in cim_objects.items():
+            if ns_objects:
+                if not isinstance(ns_objects, list):
+                    ns_objects = [ns_objects]
+                for ns_object in sort_display_objects(ns_objects):
+                    yield ns, ns_object
+
+
+def _display_as_cim_objects(cim_objects, output_format, object_order):
+    """
+    Display the objects in the objects parameter using one of the individual
+    object display formats (MOF, etc.). This parameter may be either a
+    NocaseDictionary (multi-namespace type request) or a list (single namespace
+    type request)
+    """
+    # CIM Object and text output formats are displayed as single objects.
+    # Note: for class associaters/references each object is a tuple of
+    # CIMClassName, CIMClass
+    # If object_order is True, reorganize so the order of display
+    # is class, namespace
+    # Otherwise, the order of display is namespace, class
+
+    # Starts with dict(namespace: list_of_objects)
+    # Want dict (class: namespace: list of objects with this class, namespace)
+
+    if isinstance(cim_objects, NocaseDict):
+        for ns, ns_object in _order_display_objects(cim_objects, object_order):
+            _display_one_cim_object(ns_object, output_format, namespace=ns)
+        return
+
+    # If not NocaseDict, it is list or single object. Sort by classname and
+    # then call _display_one_cim_objects with each item from list
+    if not isinstance(cim_objects, list):
+        cim_objects = [cim_objects]
+
+    for cim_obj in sort_display_objects(cim_objects):
+        _display_one_cim_object(cim_obj, output_format)
+
+
+def _display_as_table(context, cim_objects, output_format, property_list,
+                      quote_strings, ignore_null_properties, object_order):
+    """
+    Display the cim_objects as a table where the table rows are dependent on
+    the cim object type being displayed. Calls a method for each type of object
+    to display that object type information as a table.
+
+    This function processes objects from multiple namespaces in a NocaseDict to
+    produce a single table showing the requested output in one row per
+    namespace/class or from a single list (objects from single namespace) to
+    produce a table that does not show the namespaces
+    """
+    # If NocaseDic reduce cim_objects to a new list of objects for simpler
+    # table processing. String and QualiferDeclaration objects are modified to
+    # include the namespace with each object.
+    if isinstance(cim_objects, NocaseDict):
+        objects = []
+        for ns, ns_object in _order_display_objects(cim_objects, object_order):
+            if isinstance(ns_object, CIMQualifierDeclaration):
+                objects.append(QualDeclWrapper(ns, ns_object))
+            elif isinstance(ns_object, six.string_types):
+                objects.append(CIMClassName(ns_object, namespace=ns))
+            else:
+                objects.append(ns_object)
+
+        # pass ordered object list on to display function for tables
+        _display_list_as_table(context, objects, output_format,
+                               property_list, quote_strings,
+                               ignore_null_properties,
+                               use_namespace=True)
+
+    else:  # original input was a list sort but do not include namespace
+        if not isinstance(cim_objects, (list)):
+            cim_objects = [cim_objects]
+        cim_objects = sort_display_objects(cim_objects)
+        _display_list_as_table(context, cim_objects, output_format,
+                               property_list, quote_strings,
+                               ignore_null_properties,
+                               use_namespace=False)
+
+
+def _display_list_as_table(context, cim_objects, output_format, property_list,
+                           quote_strings, ignore_null_properties,
+                           use_namespace=None):
+    """
+    Display the cim_objects parameter list as a table.  The parameter must be a
+    list. Calls lower level display functions for each object type.
+
+    cim_objects in form of a single list of the objects in the order that
+    they will be displayed in the table.
+    """
+    assert isinstance(cim_objects, list)
+    assert use_namespace is not None
+
+    table_width = get_terminal_width()
+
+    if cim_objects:  # This and the list test probably not necessary
+        # Call table display method for each object type
+        if isinstance(cim_objects[0], CIMInstance):
+            _display_instances_as_table(
+                cim_objects, table_width, output_format, context=context,
+                property_list=property_list, quote_strings=quote_strings,
+                ignore_null_properties=ignore_null_properties,
+                namespace=use_namespace)
+        elif isinstance(cim_objects[0], CIMClass):
+            _display_classes_as_table(cim_objects, table_width, output_format)
+        elif isinstance(cim_objects[0], QualDeclWrapper):
+            _display_qual_decls_as_table(cim_objects, table_width,
+                                         output_format)
+        elif isinstance(cim_objects[0], CIMQualifierDeclaration):
+            _display_qual_decls_as_table(cim_objects, table_width,
+                                         output_format)
+        elif isinstance(cim_objects[0], (CIMClassName, CIMInstanceName,
+                                         six.string_types, tuple)):
+            _display_paths_as_table(cim_objects, table_width, output_format,
+                                    namespace=use_namespace)
+        else:
+            assert False
+
+
+def _display_one_cim_object(cim_object, output_format, namespace=None):
     """
     Display a single CIM object.  This creates and outputs the display for one
     CIM object in  the output formats groups CIM object (MOF, XML, Text).
+
+    NOTE: namespace defines the namespace in which the object exists. It is
+    used in some cases to add namespace information to the display.
+    Specifically it is used if the object is converted to mof, xml to add the
+    # pragama statement and if the object is a string type (i.e. classname)
     """
     assert isinstance(
         cim_object, (CIMClass, CIMClassName, CIMInstance, CIMInstanceName,
                      CIMQualifierDeclaration, tuple, six.string_types))
 
-    if output_format_is_table(output_format):
-        _display_objects_as_table([cim_object], output_format, context,
-                                  property_list, quote_strings,
-                                  ignore_null_properties, namespace)
-
     # Display in the selected CIM object format (mof, xml, repr, txt)
-    elif output_format == 'mof':
+    if output_format == 'mof':
         try:
             mofstr = cim_object.tomof()
             if namespace:
@@ -251,7 +413,8 @@ def _display_one_cim_object(context, cim_object, output_format, property_list,
             click.echo(mofstr)
 
         except AttributeError:
-            # inserting NL between instance names for readability
+            # inserting NL between instance names for readability since the
+            # display is always a single line per display
             if isinstance(cim_object, CIMInstanceName):
                 click.echo("")
                 click.echo(cim_object)
@@ -320,9 +483,9 @@ def _display_one_cim_object(context, cim_object, output_format, property_list,
 
 class QualDeclWrapper():  # pylint: disable=too-few-public-methods
     """
-    Convert qualifier declaractions to instance of this class to be able to
+    Convert qualifier declarations to instance of this class to be able to
     pass the namespace to the display function unambiguously.  This is only
-    a wrapper within the display_cim_objects method and its submethods since
+    a wrapper within the display_cim_objects method and its sub-methods since
     the CIM_QualifierDeclaration has no namespace component.
     """
     def __init__(self, namespace, qual_decl_inst):
@@ -332,91 +495,6 @@ class QualDeclWrapper():  # pylint: disable=too-few-public-methods
     def name(self):
         """Return the qualifier declaration name."""
         return self.qualdecl.name
-
-
-def _display_objects_as_table(objects, output_format, context,
-                              property_list, quote_strings,
-                              ignore_null_properties, namespace=None):
-    """
-    Call the method for each type of object to print that object type
-    information as a table.  This function process objects from multiple
-    namespaces in a NocaseDict to produce a single table showing the
-    requested output in one row per namespace/class.
-
-    Output format is retrieved from context.
-
-    Parameters:
-      objects: list or NocaseDict
-        If objects is a list, it is processing a single namespace.  If it is
-        a dictionary it is processing multiple namespaces.
-
-      namespace (bool or string containing namespace)
-        If bool, indicates that namespace should be included in the output
-        for each object.  If string, it is only for class enumerate where we
-        do not yet have a table output for class.
-
-    """
-    table_width = get_terminal_width()
-
-    if isinstance(objects, NocaseDict):
-        # Everything except classes, classnames, strings (representing
-        # classnames) and qual decls includes namespace.
-        # Convert strings to classnames, and qualifierdecls to instance of
-        # wrapper class CIM_QualDeclWrapper to include namespace for each item.
-
-        new_objects = []
-        # If the object type is string, it is just a classname.
-        # Expand to create list of tuples of (ns, classname)
-        # Otherwise, just map the values to a single list
-        for ns, values in objects.items():
-            if values:
-                if not isinstance(values, list):
-                    values = [values]
-                if isinstance(values[0], CIMQualifierDeclaration):
-                    new_objects.extend([QualDeclWrapper(ns, v) for v in values])
-                elif isinstance(values[0], six.string_types):
-                    new_objects.extend([CIMClassName(v, namespace=ns)
-                                        for v in sort_cimobjects(values)])
-                else:
-                    new_objects.extend(sort_cimobjects(values))
-
-        namespace = True
-        objects = new_objects
-
-    if objects:
-        # If single object, cvt to list for further processing
-        if not isinstance(objects, (list)):
-            objects = [objects]
-
-        # Sort the CIM objects.  QualDeclWrapper for CIMQualifierDeclarations
-        if isinstance(objects[0], QualDeclWrapper):
-            objects = sorted(objects, key=lambda x: x.name())
-        else:
-            objects = sort_cimobjects(objects)
-
-        # Call table display method for each object type
-        if isinstance(objects[0], CIMInstance):
-            _display_instances_as_table(
-                objects, table_width, output_format,
-                context=context,
-                property_list=property_list,
-                quote_strings=quote_strings,
-                ignore_null_properties=ignore_null_properties,
-                namespace=namespace)
-        elif isinstance(objects[0], CIMClass):
-            _display_classes_as_table(objects, table_width, output_format)
-        elif isinstance(objects[0], QualDeclWrapper):
-            _display_qual_decls_as_table(objects, table_width, output_format,
-                                         namespace=namespace)
-        elif isinstance(objects[0], CIMQualifierDeclaration):
-            _display_qual_decls_as_table(objects, table_width, output_format)
-        elif isinstance(objects[0], (CIMClassName, CIMInstanceName,
-                                     six.string_types, tuple)):
-            _display_paths_as_table(objects, table_width, output_format,
-                                    namespace=namespace)
-        else:
-            raise click.ClickException("Cannot print {} as table"
-                                       .format(type(objects[0])))
 
 
 def _get_cimtype(objects):
@@ -501,6 +579,9 @@ def _display_cim_objects_summary(context, objects, output_format):
             click.echo('{} returned'.format(" ".join(row)))
 
 
+#
+# The following functions each display one object type as a table
+#
 def _display_classes_as_table(classes, table_width, table_format):
     """
     Display classes as a table.
@@ -520,17 +601,15 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
     """
     title = None
     if objects:
+        # Strings only for single namespace requests for classnames.
+        # No namespace in result
         if isinstance(objects[0], six.string_types):
             title = 'Classnames:'
-            if namespace:
-                title = title + (" namespace: {}".format(namespace))
             headers = ['Class Name']
-            if namespace:
-                rows = [[namespace, obj] for obj in objects]
-            else:
-                rows = [[obj] for obj in objects]
+            rows = [[obj] for obj in objects]
         # if obj is tuple, this is a tuple of namespace and classname
         elif isinstance(objects[0], tuple):
+            assert False
             title = 'Classnames:'
             headers = ("namespace", 'class')
             rows = [[obj[0], obj[1]] for obj in objects]
@@ -615,15 +694,13 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
             return  # Return to avoid following table output
 
         else:
-            raise click.ClickException("{0} invalid type ({1})for path display".
-                                       format(objects[0], type(objects[0])))
+            assert False
 
         click.echo(format_table(rows, headers, title=title,
                                 table_format=table_format))
 
 
-def _display_qual_decls_as_table(qual_decls, table_width, table_format,
-                                 namespace=None):
+def _display_qual_decls_as_table(qual_decls, table_width, table_format):
     """
     Display the elements of qualifier declarations as a table with a
     row for each qualifier declaration and a column for each of the attributes
@@ -659,24 +736,27 @@ def _display_qual_decls_as_table(qual_decls, table_width, table_format,
     # Build header line.  Add Namespace column if namespace flag set.
     rows = []
     headers = ['Name', 'Type', 'Value', 'Array', 'Scopes', 'Flavors']
-    if namespace:
-        headers.insert(0, "namespace")
 
     # build the data rows
     max_column_width = int(table_width / len(headers)) - 4
     rows = []
-    for value in qual_decls:
-        if namespace:
-            row = build_row(value.qualdecl, value.namespace)
+    add_namespace = False
+    for qdecl in qual_decls:
+        if isinstance(qdecl, QualDeclWrapper):
+            row = build_row(qdecl.qualdecl, qdecl.namespace)
+            add_namespace = True
         else:
-            row = build_row(value, None)
+            row = build_row(qdecl, None)
         rows.append(row)
+
+    if add_namespace:
+        headers.insert(0, "namespace")
 
     click.echo(format_table(rows, headers, title='Qualifier Declarations',
                             table_format=table_format))
 
 
-def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
+def _format_instances_as_rows(insts, max_cell_width, include_classnames=False,
                               context=None, prop_names=None,
                               quote_strings=True, namespace=None):
     """
@@ -690,8 +770,8 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
     is passed in as an optimization. For test convenience, None is permitted
     and causes the properties to again be determined from the instances.
 
-    Include_classes for each instance if True. Sets the classname as the first
-    column.
+    Include_classesnames for each instance if True. Sets the classname as
+    the first (or second if multiple namespaces) column.
 
     max_width if not None folds col entries longer than the defined
     max_cell_width. If max_width is None, the data length is ignored.
@@ -711,6 +791,7 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
     conn = context.pywbem_server.conn if context else None
 
     # Avoid crash deeper in code if max_cell_width is None.
+    # FUTURE: Should move this up to common place
     if max_cell_width is None:
         max_cell_width = DEFAULT_MAX_CELL_WIDTH
     rows = []
@@ -732,9 +813,12 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
         # Note: We use namespace as a flag here ignoring the actual values.
         row = [inst.path.namespace] if namespace else []
 
-        # Insert classname as before properties if flag set
-        if include_classes:
-            row.append([inst.classname])
+        # Insert classname before properties if flag set
+        if include_classnames:
+            if row:
+                row.append(inst.classname)
+            else:
+                row = [inst.classname]
 
         # Get value for each property in this object
         for name in prop_names:
@@ -781,7 +865,7 @@ def _format_instances_as_rows(insts, max_cell_width, include_classes=False,
 
 
 def _display_instances_as_table(insts, table_width, table_format,
-                                include_classes=False, context=None,
+                                include_classnames=False, context=None,
                                 property_list=None, quote_strings=True,
                                 ignore_null_properties=True,
                                 namespace=None):
@@ -807,6 +891,13 @@ def _display_instances_as_table(insts, table_width, table_format,
     for inst in insts:
         assert isinstance(inst, CIMInstance)
 
+    # FUTURE:  include classnames if required: See issue # 1145
+    # Following needs case independence since classnames may have
+    # different case in instances
+    # If multiple classes, display classname
+    # classnames = [inst.classname for inst in insts]
+    # include_classnames = bool(len(set(classnames)) > 1)
+
     # Build list of properties, either all properties in a list or all
     # properties in all instances in list of instances
     if property_list:
@@ -829,10 +920,8 @@ def _display_instances_as_table(insts, table_width, table_format,
     # This allows folding long data. Further, the actual output
     # width of a column involves the tabulate outputter, output_format
     # so this is not deterministic.
-    if prop_names:
-        max_cell_width = int(table_width / len(prop_names))
-    else:
-        max_cell_width = table_width
+    max_cell_width = int(table_width / len(prop_names)) \
+        if prop_names else table_width
 
     # Sets a minimum size for cells so they are at least readable.
     # This means we can build tables wider than the terminal width.
@@ -875,7 +964,7 @@ def _display_instances_as_table(insts, table_width, table_format,
     # If we want to include namespace in table as a row
     if namespace:
         headers.append("namespace")
-    if include_classes:
+    if include_classnames:
         headers.append("classname")
     for pname in prop_names:
         hdr = pname
@@ -899,7 +988,7 @@ def _display_instances_as_table(insts, table_width, table_format,
 
     rows = _format_instances_as_rows(
         insts, max_cell_width,
-        include_classes=include_classes,
+        include_classnames=include_classnames,
         context=context, prop_names=prop_names,
         quote_strings=quote_strings, namespace=namespace)
 
