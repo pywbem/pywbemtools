@@ -109,7 +109,6 @@ class AssociationShrub(object):
           Role (:term:`string):
             See pywbem Associators for the definition of this parameter
 
-
           AssocClass (:term:`string`):
             See pywbem Associators for the definition of this parameter
 
@@ -462,8 +461,7 @@ class AssociationShrub(object):
                             inst_names_tup = self.build_inst_names(
                                 inst_names_tup,
                                 ref_cln,
-                                replacements,
-                                self.fullpath)
+                                replacements)
 
                             assoc_clns_dict[key] = inst_names_tup
 
@@ -622,8 +620,7 @@ class AssociationShrub(object):
 
         return to_wbem_uri_folded(path, uri_format=format, max_len=max_len)
 
-    def build_inst_names(self, inst_names_tuple, ref_cln, replacements,
-                         fullpath=None):
+    def build_inst_names(self, inst_names_tuple, ref_cln, replacements):
         """
         Build a set of displayable instance names from the inst_names. This
         method tries to simplify the instance names by
@@ -644,6 +641,11 @@ class AssociationShrub(object):
         Finally it removes the host and namespace if they are the same as
         the current host and namespace
 
+        If self.fullpath is True, show the full instance paths.  If not True,
+        build the path shortened by modifying selected keys to replace the keys
+        defined by the replacements attribute with `~'. In addition all keys
+        with the same value are replaced if len(inst_names) is gt 1.
+
         Parameters:
 
           inst_names_tuple (:func:`~py:collections.namedtuple` object):
@@ -660,12 +662,6 @@ class AssociationShrub(object):
             '~' independent of its value.  If the value is not None, the
             key will be replaced only if value matches the key value.
 
-          fullpath (boolean):
-            If True, show the full instance paths.  If not True, build the path
-            shortened by modifying selected keys to replace the keys defined
-            by the replacements attribute with `~'. In addition all keys
-            with the same value are replaced if len(inst_names) is gt 1.
-
         Returns:
             OrderedDict of modified key names
         """
@@ -676,7 +672,7 @@ class AssociationShrub(object):
 
         # If path shortening specified, determine which keys can be shortened
         # based on keys with the same value in all instance names
-        if not fullpath:
+        if not self.fullpath:
             first_iname = inst_names_tuple[0][0]
             keys_to_hide = {k: True for k in first_iname.keys()}
 
@@ -706,7 +702,8 @@ class AssociationShrub(object):
         for inst_name_tuple in inst_names_tuple:
             iname = self.simplify_path(inst_name_tuple.Name)
             # Convert path to string and possibly shorten
-            iname_display = shorten_path_str(iname, replacements, fullpath)
+            iname_display = shorten_path_str(iname, replacements,
+                                             self.fullpath)
 
             # If reference class with more than 2 references add indicator
             # to the defining reference instance so the user can match
@@ -752,12 +749,17 @@ class AssociationShrub(object):
           :class:`~pywbem.CIMInstanceName` containing the simplified name
 
         """
+
         simple_path = path.copy()
+        if self.fullpath:
+            return simple_path
+
         if simple_path.host and \
                 simple_path.host.lower() == self.source_host.lower():
             simple_path.host = None
         if simple_path.namespace and \
-                simple_path.namespace.lower() == self.source_namespace.lower():
+                simple_path.namespace.lower() == \
+                self.source_namespace.lower():
             simple_path.namespace = None
         return simple_path
 
