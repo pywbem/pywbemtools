@@ -26,6 +26,9 @@ Released: not yet
 
 * Resolved new issues reported by Pylint 2.13. (issue #1164)
 
+* Fix issue where the instance shrub --fullpath option was not displaying the
+  paths. (see issue #1180)
+
 **Enhancements:**
 
 * Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for
