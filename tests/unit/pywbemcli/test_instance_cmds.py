@@ -582,6 +582,20 @@ SIMPLE_SHRUB_TREE = """TST_Person.name="Mike"
                  +-- /:TST_FamilyCollection.name="Family2"
 """
 
+SIMPLE_SHRUB_FULLPATH_TREE = """root/cimv2:TST_Person.name="Mike"
+ +-- parent(Role)
+ |   +-- //FakedUrl:5988/root/cimv2:TST_Lineage(AssocClass)
+ |       +-- child(ResultRole)
+ |           +-- //FakedUrl:5988/root/cimv2:TST_Person(ResultClass)(2 insts)
+ |               +-- //FakedUrl:5988/root/cimv2:TST_Person.name="Gabi"
+ |               +-- //FakedUrl:5988/root/cimv2:TST_Person.name="Sofi"
+ +-- member(Role)
+     +-- //FakedUrl:5988/root/cimv2:TST_MemberOfFamilyCollection(AssocClass)
+         +-- family(ResultRole)
+             +-- //FakedUrl:5988/root/cimv2:TST_FamilyCollection(ResultClass)(1 insts)
+                 +-- //FakedUrl:5988/root/cimv2:TST_FamilyCollection.name="Family2"
+"""  # noqa: E501
+
 SIMPLE_SHRUB_TREE_ROLE = """TST_Person.name="Mike"
  +-- parent(Role)
      +-- TST_Lineage(AssocClass)
@@ -640,18 +654,51 @@ COMPLEX_SHRUB_TABLE = [
     'Initiator  TST_A3        LogicalUnit   TST_LD         /:TST_LD.InstanceID=3(refinst:0)',  # noqa E501
     '                                                      /:TST_LD.InstanceID=6(refinst:1)',  # noqa E501
     '                                                      /:TST_LD.InstanceID=8(refinst:2)']  # noqa E501
+
+COMPLEX_SHRUB_FULLPATH_TABLE = [
+    'Shrub of root/cimv2:TST_EP.InstanceID=1: paths',
+    'Role       AssocClass    ResultRole    ResultClass    Assoc Inst paths',
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        Target        //FakedUrl:5988/root/cimv2:TST_EP         //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=2(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=5(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=7(refinst:2)',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        Target        //FakedUrl:5988/root/cimv2:TST_EP         //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=2(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=5(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=7(refinst:2)',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        Target        //FakedUrl:5988/root/cimv2:TST_EP         //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=2(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=5(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_EP.InstanceID=7(refinst:2)',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD         //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=3(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=6(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=8(refinst:2)',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD         //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=3(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=6(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=8(refinst:2)',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3        LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD         //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=3(refinst:0)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=6(refinst:1)',  # noqa E501
+    '                                                      //FakedUrl:5988/root/cimv2:TST_LD.InstanceID=8(refinst:2)']  # noqa E501
 # pylint: enable=line-too-long
 
 COMPLEX_SHRUB_TABLE_SUMMARY = [
     'Shrub of root/cimv2:TST_EP.InstanceID=1: summary',
     'Role       AssocClass    ResultRole    ResultClass      Assoc Inst Count',
-    'Initiator  TST_A3        Target        TST_EP                          3',
-    'Initiator  TST_A3        Target        TST_EP                          3',
-    'Initiator  TST_A3        Target        TST_EP                          3',
-    'Initiator  TST_A3        LogicalUnit   TST_LD                          3',
-    'Initiator  TST_A3        LogicalUnit   TST_LD                          3',
-    'Initiator  TST_A3        LogicalUnit   TST_LD                          3']
+    'Initiator  TST_A3   Target        TST_EP  3',
+    'Initiator  TST_A3   Target        TST_EP  3',
+    'Initiator  TST_A3   Target        TST_EP  3',
+    'Initiator  TST_A3   LogicalUnit   TST_LD  3',
+    'Initiator  TST_A3   LogicalUnit   TST_LD  3',
+    'Initiator  TST_A3   LogicalUnit   TST_LD  3']
 
+# pylint: disable=line-too-long
+COMPLEX_SHRUB_FULLPATH_TABLE_SUMMARY = [
+    'Shrub of root/cimv2:TST_EP.InstanceID=1: summary',
+    'Role       AssocClass    ResultRole    ResultClass      Assoc Inst Count',
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   Target        //FakedUrl:5988/root/cimv2:TST_EP  3',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   Target        //FakedUrl:5988/root/cimv2:TST_EP  3',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   Target        //FakedUrl:5988/root/cimv2:TST_EP  3',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD  3',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD  3',  # noqa E501
+    'Initiator  //FakedUrl:5988/root/cimv2:TST_A3   LogicalUnit   //FakedUrl:5988/root/cimv2:TST_LD  3']  # noqa E501
+# pylint: enable=line-too-long
 
 COMPLEX_SHRUB_TREE = [
     'TST_EP.InstanceID=1',
@@ -680,6 +727,18 @@ SIMPLE_SHRUB_TABLE1 = [
     'member  TST_MemberOfFamilyCollection  family   TST_FamilyCollection',
     'TST_FamilyCollection.',
     'name="Family2"']
+
+# pylint: disable=line-too-long
+SIMPLE_SHRUB_FULLPATH_TABLE1 = [
+    'Shrub of root/cimv2:TST_Person.name="Mike": paths',
+    'Role   AssocClass ResultRole ResultClass Assoc Inst paths',
+    'parent //FakedUrl:5988/root/cimv2:TST_Lineage  child  //FakedUrl:5988/root/cimv2:TST_Person',  # noqa: E501
+    '//FakedUrl:5988/root/cimv2:TST_Person.name="Sofi"',
+    '//FakedUrl:5988/root/cimv2:TST_Person.name="Gabi"',
+    'member //FakedUrl:5988/root/cimv2:TST_MemberOfFamilyCollection  family   //FakedUrl:5988/root/cimv2:TST_FamilyCollection',  # noqa: E501
+    '//FakedUrl:5988/root/cimv2:TST_FamilyCollection.',
+    'name="Family2"']
+# pylint: enable=line-too-long
 
 
 # TODO: Add tests for output format xml, repr, txt
@@ -1068,7 +1127,7 @@ TEST_CASES = [
      ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, RUN],
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify instance command enumerate with query, traditional ops fails',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
@@ -3429,9 +3488,39 @@ interop      TST_PersonExp        4
       'test': 'innows'},
      None, OK],
 
-    # Test simple mock association with namespace and host in INSTANCENAME
+    # Test simple mock association
+    ['Verify instance command shrub, INSTANCENAME without host and namespace',
+     ['shrub', 'TST_Person.name="Mike"'],
+     {'stdout': SIMPLE_SHRUB_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, INSTANCENAME with host and namespace, '
+     'fullpath',
+     ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
     ['Verify instance command shrub, INSTANCENAME with host and namespace',
+     ['shrub', '//FakedUrl/root/cimv2:TST_Person.name="Mike"'],
+     {'stdout': SIMPLE_SHRUB_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, INSTANCENAME with host and namespace, '
+     'fullpath',
      ['shrub', '//FakedUrl/root/cimv2:TST_Person.name="Mike"', '--fullpath'],
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, simple tree, namespace in INSTNAME',
+     ['shrub', 'root/cimv2:TST_Person.name="Mike"'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
@@ -3439,14 +3528,7 @@ interop      TST_PersonExp        4
 
     ['Verify instance command shrub, simple tree, namespace in INSTNAME',
      ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
-     {'stdout': SIMPLE_SHRUB_TREE,
-      'rc': 0,
-      'test': 'innows'},
-     ASSOC_MOCK_FILE, OK],
-
-    ['Verify instance command shrub, simple tree no namepace',
-     ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
-     {'stdout': SIMPLE_SHRUB_TREE,
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
@@ -3454,6 +3536,20 @@ interop      TST_PersonExp        4
     ['Verify instance command shrub, simple tree no namepace. short path',
      ['shrub', 'TST_Person.name="Mike"'],
      {'stdout': SIMPLE_SHRUB_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, simple tree no namepace',
+     ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, simple tree no namepace. short path',
+     ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
@@ -3525,10 +3621,17 @@ interop      TST_PersonExp        4
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple table request w ns',
-     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"',
-               '--fullpath'],
+     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"'],
       'general': ['--output-format', 'plain']},
      {'stdout': SIMPLE_SHRUB_TABLE1,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, simple table request w ns, fullpath',
+     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
+      'general': ['--output-format', 'plain']},
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TABLE1,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
@@ -3550,7 +3653,7 @@ interop      TST_PersonExp        4
      ASSOC_MOCK_FILE, OK],
 
     ['Verify instance command shrub, simple tree with namespace',
-     ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
+     ['shrub', 'TST_Person.name="Mike"'],
      {'stdout': SIMPLE_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
@@ -3558,7 +3661,7 @@ interop      TST_PersonExp        4
 
     ['Verify instance command shrub, simple tree without namespace',
      ['shrub', 'TST_Person.name="Mike"', '--fullpath'],
-     {'stdout': SIMPLE_SHRUB_TREE,
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TREE,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
@@ -3566,40 +3669,67 @@ interop      TST_PersonExp        4
     # Test with a complex (ternary) association
 
     ['Verify instance command shrub, complex table',
-     {'args': ['shrub', '/root/cimv2:TST_EP', '--key', 'InstanceID=1',
-               '--fullpath'],
+     {'args': ['shrub', '/root/cimv2:TST_EP', '--key', 'InstanceID=1'],
       'general': ['--output-format', 'plain']},
      {'stdout': COMPLEX_SHRUB_TABLE,
       'rc': 0,
       'test': 'innows'},
      COMPLEX_ASSOC_MODEL, OK],
 
+    ['Verify instance command shrub, complex table, fullpath',
+     {'args': ['shrub', '/root/cimv2:TST_EP', '--key', 'InstanceID=1',
+               '--fullpath'],
+      'general': ['--output-format', 'plain']},
+     {'stdout': COMPLEX_SHRUB_FULLPATH_TABLE,
+      'rc': 0,
+      'test': 'innows'},
+     COMPLEX_ASSOC_MODEL, OK],
+
     ['Verify instance command shrub, complex table, summary',
      {'args': ['shrub', '/root/cimv2:TST_EP', '--key', 'InstanceID=1',
-               '--fullpath', '--summary'],
+               '--summary'],
       'general': ['--output-format', 'plain']},
      {'stdout': COMPLEX_SHRUB_TABLE_SUMMARY,
       'rc': 0,
       'test': 'innows'},
      COMPLEX_ASSOC_MODEL, OK],
 
+    ['Verify instance command shrub, complex table, summary, fullpath',
+     {'args': ['shrub', '/root/cimv2:TST_EP', '--key', 'InstanceID=1',
+               '--fullpath', '--summary'],
+      'general': ['--output-format', 'plain']},
+     {'stdout': COMPLEX_SHRUB_FULLPATH_TABLE_SUMMARY,
+      'rc': 0,
+      'test': 'innows'},
+     COMPLEX_ASSOC_MODEL, OK],
+
     ['Verify instance command shrub, complex tree',
-     {'args': ['shrub', 'TST_EP.InstanceID=1', '--fullpath'],
+     {'args': ['shrub', 'TST_EP.InstanceID=1'],
       'general': []},
      {'stdout': COMPLEX_SHRUB_TREE,
       'rc': 0,
       'test': 'innows'},
      COMPLEX_ASSOC_MODEL, OK],
 
-    ['Verify instance command shrub, with reduced terminal width to trigger '
-     'path folding',
-     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
+    # pylint: disable=line-too-long
+    ['Verify instance command shrub, with reduced terminal width to trigger path folding',  # noqa E501
+     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"'],
       'general': ['--output-format', 'plain'],
       'env': {'PYWBEMTOOLS_TERMWIDTH': '80'}},
      {'stdout': SIMPLE_SHRUB_TABLE1,
       'rc': 0,
       'test': 'innows'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance command shrub, with reduced terminal width to trigger path folding',  # noqa E501
+     {'args': ['shrub', 'root/cimv2:TST_Person.name="Mike"', '--fullpath'],
+      'general': ['--output-format', 'plain'],
+      'env': {'PYWBEMTOOLS_TERMWIDTH': '80'}},
+     {'stdout': SIMPLE_SHRUB_FULLPATH_TABLE1,
+      'rc': 0,
+      'test': 'innows'},
+     ASSOC_MOCK_FILE, OK],
+    # pylint: disable=line-too-long
 
     #
     #  Multiple Namespaces Option tests --namespace a,b and -n a -n b
@@ -3618,7 +3748,7 @@ interop      TST_PersonExp        4
                  'instance of CIM_Foo {'],
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
 
     ['Verify instance get from two namespaces use multiple namespace option',
      {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--namespace',
