@@ -18,6 +18,9 @@ Released: not yet
 
 * Resolved new issues reported by Pylint 2.13. (issue #1164)
 
+* Fix issue where the instance shrub --fullpath option was not displaying the
+  paths. (see issue #1180)
+
 **Enhancements:**
 
 **Cleanup:**
