@@ -46,8 +46,10 @@ _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
-# Create variable that is True if python version ge 3.6
-PYTHON_GE_36 = sys.version_info > (3, 6)
+# Create variable that is True if python ge version 3.8.  This python version
+# was the first to impose ordering on XML attributes. Without ordering
+# XML tests against XML data returned from pywbemcli can fail. See issue #1173
+PYTHON_GE_38 = sys.version_info > (3, 8)
 
 # Mock scripts with setup() function are supported
 MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
@@ -363,8 +365,253 @@ REFERENCES_CLASS_RTN_QUALS2 = [
     '   TST_Person REF member;',
     '};']
 
+# pylint: disable=line-too-long
+# This output only valid for python versin ge 3.8
+ASSOCIATORS_CLASS_XML_GE_38 = """<CLASSPATH>
+    <NAMESPACEPATH>
+        <HOST>FakedUrl:5988</HOST>
+        <LOCALNAMESPACEPATH>
+            <NAMESPACE NAME="root"/>
+            <NAMESPACE NAME="cimv2"/>
+        </LOCALNAMESPACEPATH>
+    </NAMESPACEPATH>
+    <CLASSNAME NAME="TST_Person"/>
+</CLASSPATH>
 
-OK = False     # mark tests OK when they execute correctly
+<CLASS NAME="TST_Person">
+    <PROPERTY NAME="name" TYPE="string" PROPAGATED="false">
+        <QUALIFIER NAME="Key" TYPE="boolean" PROPAGATED="false" OVERRIDABLE="false" TOSUBCLASS="true">
+            <VALUE>TRUE</VALUE>
+        </QUALIFIER>
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>This is key prop</VALUE>
+        </QUALIFIER>
+    </PROPERTY>
+    <PROPERTY NAME="extraProperty" TYPE="string" PROPAGATED="false">
+        <VALUE>defaultvalue</VALUE>
+    </PROPERTY>
+    <PROPERTY NAME="gender" TYPE="uint16" PROPAGATED="false">
+        <QUALIFIER NAME="ValueMap" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true">
+            <VALUE.ARRAY>
+                <VALUE>1</VALUE>
+                <VALUE>2</VALUE>
+            </VALUE.ARRAY>
+        </QUALIFIER>
+        <QUALIFIER NAME="Values" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE.ARRAY>
+                <VALUE>female</VALUE>
+                <VALUE>male</VALUE>
+            </VALUE.ARRAY>
+        </QUALIFIER>
+    </PROPERTY>
+    <PROPERTY.ARRAY NAME="likes" TYPE="uint16" PROPAGATED="false">
+        <QUALIFIER NAME="ValueMap" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true">
+            <VALUE.ARRAY>
+                <VALUE>1</VALUE>
+                <VALUE>2</VALUE>
+            </VALUE.ARRAY>
+        </QUALIFIER>
+        <QUALIFIER NAME="Values" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE.ARRAY>
+                <VALUE>books</VALUE>
+                <VALUE>movies</VALUE>
+            </VALUE.ARRAY>
+        </QUALIFIER>
+    </PROPERTY.ARRAY>
+</CLASS>
+
+"""  # noqa: E501
+
+# This output only for python version ge 3.8. Contains qualifier output
+CIMFOO_SUB_SUB_WITH_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_Foo_sub">
+    <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+        <VALUE>Subclass of CIM_Foo_sub</VALUE>
+    </QUALIFIER>
+    <PROPERTY NAME="cimfoo_sub_sub" TYPE="string" PROPAGATED="false"/>
+    <PROPERTY NAME="cimfoo_sub" TYPE="string" PROPAGATED="true"/>
+    <PROPERTY NAME="InstanceID" TYPE="string" PROPAGATED="true">
+        <QUALIFIER NAME="Key" TYPE="boolean" PROPAGATED="true" OVERRIDABLE="false" TOSUBCLASS="true">
+            <VALUE>TRUE</VALUE>
+        </QUALIFIER>
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>This is key property.</VALUE>
+        </QUALIFIER>
+    </PROPERTY>
+    <PROPERTY NAME="IntegerProp" TYPE="uint32" PROPAGATED="true">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>This is Uint32 property.</VALUE>
+        </QUALIFIER>
+    </PROPERTY>
+    <PROPERTY NAME="cimfoo_emb3" TYPE="string" PROPAGATED="true">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>Embedded instance property</VALUE>
+        </QUALIFIER>
+        <QUALIFIER NAME="EmbeddedInstance" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true">
+            <VALUE>CIM_FooEmb3</VALUE>
+        </QUALIFIER>
+    </PROPERTY>
+    <METHOD NAME="Method1" TYPE="uint32" PROPAGATED="false">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>Sample method with input and output parameters</VALUE>
+        </QUALIFIER>
+        <PARAMETER NAME="OutputParam2" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>FALSE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Response param 2</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+    </METHOD>
+    <METHOD NAME="Fuzzy" TYPE="uint32" PROPAGATED="true">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>Method with in and out parameters</VALUE>
+        </QUALIFIER>
+        <PARAMETER NAME="TestInOutParameter" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Define data to be returned in output parameter</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+        <PARAMETER.REFERENCE NAME="TestRef" REFERENCECLASS="CIM_FooRef1">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Test of ref in/out parameter</VALUE>
+            </QUALIFIER>
+        </PARAMETER.REFERENCE>
+        <PARAMETER NAME="OutputParam" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>FALSE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Rtns method name if exists on input</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+        <PARAMETER NAME="OutputRtnValue" TYPE="uint32">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Defines return value if provided.</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+    </METHOD>
+    <METHOD NAME="FuzzyStatic" TYPE="uint32" PROPAGATED="true">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>Static method with in and out parameters</VALUE>
+        </QUALIFIER>
+        <QUALIFIER NAME="Static" TYPE="boolean" PROPAGATED="true" OVERRIDABLE="false" TOSUBCLASS="true">
+            <VALUE>TRUE</VALUE>
+        </QUALIFIER>
+        <PARAMETER NAME="TestInOutParameter" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Define data to be returned in output parameter</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+        <PARAMETER.REFERENCE NAME="TestRef" REFERENCECLASS="CIM_Foo">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Test of ref in/out parameter</VALUE>
+            </QUALIFIER>
+        </PARAMETER.REFERENCE>
+        <PARAMETER NAME="OutputParam" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>FALSE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="OUT" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Rtns method name if exists on input</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+        <PARAMETER NAME="OutputRtnValue" TYPE="uint32">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Defines return value if provided.</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+        <PARAMETER NAME="cimfoo_emb1" TYPE="string">
+            <QUALIFIER NAME="IN" TYPE="boolean" OVERRIDABLE="false" TOSUBCLASS="true">
+                <VALUE>TRUE</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="Description" TYPE="string" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+                <VALUE>Embedded instance parameter</VALUE>
+            </QUALIFIER>
+            <QUALIFIER NAME="EmbeddedInstance" TYPE="string">
+                <VALUE>CIM_FooEmb1</VALUE>
+            </QUALIFIER>
+        </PARAMETER>
+    </METHOD>
+    <METHOD NAME="DeleteNothing" TYPE="string" PROPAGATED="true">
+        <QUALIFIER NAME="Description" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+            <VALUE>Method with no parameters but embedded instance return</VALUE>
+        </QUALIFIER>
+        <QUALIFIER NAME="EmbeddedInstance" TYPE="string" PROPAGATED="true" OVERRIDABLE="true" TOSUBCLASS="true">
+            <VALUE>CIM_FooEmb2</VALUE>
+        </QUALIFIER>
+    </METHOD>
+</CLASS>
+"""  # noqa: E501
+
+CIMFOO_SUB_SUB_NO_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_Foo_sub">
+    <PROPERTY NAME="cimfoo_sub_sub" TYPE="string" PROPAGATED="false"/>
+    <PROPERTY NAME="cimfoo_sub" TYPE="string" PROPAGATED="true"/>
+    <PROPERTY NAME="InstanceID" TYPE="string" PROPAGATED="true"/>
+    <PROPERTY NAME="IntegerProp" TYPE="uint32" PROPAGATED="true"/>
+    <PROPERTY NAME="cimfoo_emb3" TYPE="string" PROPAGATED="true"/>
+    <METHOD NAME="Method1" TYPE="uint32" PROPAGATED="false">
+        <PARAMETER NAME="OutputParam2" TYPE="string"/>
+    </METHOD>
+    <METHOD NAME="Fuzzy" TYPE="uint32" PROPAGATED="true">
+        <PARAMETER NAME="TestInOutParameter" TYPE="string"/>
+        <PARAMETER.REFERENCE NAME="TestRef" REFERENCECLASS="CIM_FooRef1"/>
+        <PARAMETER NAME="OutputParam" TYPE="string"/>
+        <PARAMETER NAME="OutputRtnValue" TYPE="uint32"/>
+    </METHOD>
+    <METHOD NAME="FuzzyStatic" TYPE="uint32" PROPAGATED="true">
+        <PARAMETER NAME="TestInOutParameter" TYPE="string"/>
+        <PARAMETER.REFERENCE NAME="TestRef" REFERENCECLASS="CIM_Foo"/>
+        <PARAMETER NAME="OutputParam" TYPE="string"/>
+        <PARAMETER NAME="OutputRtnValue" TYPE="uint32"/>
+        <PARAMETER NAME="cimfoo_emb1" TYPE="string"/>
+    </METHOD>
+    <METHOD NAME="DeleteNothing" TYPE="string" PROPAGATED="true"/>
+</CLASS>
+"""  # noqa E501
+# pylint: enable=line-too-long
+
+
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -463,6 +710,7 @@ TEST_CASES = [
 
     ['Verify class command enumerate CIM_Foo -no-qualifiers',
      ['enumerate', 'CIM_Foo_sub', '--no-qualifiers'],
+
      {'stdout': CIMFOO_SUB_SUB_NO_QUALS,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
@@ -605,7 +853,7 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command enumerate with repr output format).',
+    ['Verify class command enumerate with xml output format).',
      {'args': ['enumerate'],
       'general': ['--output-format', 'xml']},
      {'stdout': ['<CLASS( | .+ )NAME="CIM_Foo">',
@@ -614,6 +862,21 @@ TEST_CASES = [
                  '<METHOD( | .+ )NAME="DeleteNothing"'],
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
+
+    # Test output compare of all components but only python v 3.8*
+    ['Verify class command enumerate CIM_Foo with qualifiers, xml',
+     {'args': ['enumerate', 'CIM_Foo_sub'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': CIMFOO_SUB_SUB_WITH_QUALS_XML,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173. Only good for py 3.8+
+
+    ['Verify class command enumerate CIM_Foo with --no qualifiers, xml',
+     {'args': ['enumerate', 'CIM_Foo_sub', '--no-qualifiers'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': CIMFOO_SUB_SUB_NO_QUALS_XML,
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173, Property attributs ordering
 
     ['Verify class command enumerate  --di --no --namespace',
      ['enumerate', '--di', '--no', '-n', 'interop'],
@@ -1271,7 +1534,7 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify class command get with repr output format).',
+    ['Verify class command get with xml output format).',
      {'args': ['get', 'CIM_Foo'],
       'general': ['--output-format', 'xml']},
      {'stdout': ['<CLASS( | .+ )NAME="CIM_Foo">',
@@ -1997,6 +2260,13 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+    ['Verify class command associators simple request, xml output ge py_3.8,',
+     {'args': ['associators', 'TST_Person'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': ASSOCIATORS_CLASS_XML_GE_38,
+      'test': 'lines'},
+     SIMPLE_ASSOC_MOCK_FILE, PYTHON_GE_38],
+
     ['Verify class command associators simple request names only,',
      ['associators', 'TST_Person', '--names-only'],
      {'stdout': [FAKEURL_STR + '/root/cimv2:TST_Person'],
@@ -2594,8 +2864,10 @@ class CIM_FooRef2 : CIM_BaseRef {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    # Test limited to python ge python v 3.8 because qualifier ordering
+    # not determinate with python version lt 3.8.  See issue #1173
     # pylint: disable=line-too-long
-    ['Verify associators from two namespaces xml output',
+    ['Verify associators from two namespaces xml output, version ge 38',
      {'args': ['associators', 'CIM_FooRef1',
                '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'xml']},
@@ -2637,7 +2909,45 @@ class CIM_FooRef2 : CIM_BaseRef {
 ''',  # noqa: E501
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, PYTHON_GE_36],
+     THREE_NS_MOCK_FILE, PYTHON_GE_38],
+
+    # Test all versions by not requesting qualifiers.  see issue #1173
+    # pylint: disable=line-too-long
+    ['Verify associators from two namespaces xml output, no-qualifiers',
+     {'args': ['associators', 'CIM_FooRef1', '--no-qualifiers',
+               '--namespace', 'root/cimv2,root/cimv3'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': '''<!-- Namespace = root/cimv2 -->
+<CLASSPATH>
+    <NAMESPACEPATH>
+        <HOST>FakedUrl:5988</HOST>
+        <LOCALNAMESPACEPATH>
+            <NAMESPACE NAME="root"/>
+            <NAMESPACE NAME="cimv2"/>
+        </LOCALNAMESPACEPATH>
+    </NAMESPACEPATH>
+    <CLASSNAME NAME="CIM_FooRef2"/>
+</CLASSPATH>
+
+<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef"/>
+
+<!-- Namespace = root/cimv3 -->
+<CLASSPATH>
+    <NAMESPACEPATH>
+        <HOST>FakedUrl:5988</HOST>
+        <LOCALNAMESPACEPATH>
+            <NAMESPACE NAME="root"/>
+            <NAMESPACE NAME="cimv3"/>
+        </LOCALNAMESPACEPATH>
+    </NAMESPACEPATH>
+    <CLASSNAME NAME="CIM_FooRef2"/>
+</CLASSPATH>
+
+<CLASS NAME="CIM_FooRef2" SUPERCLASS="CIM_BaseRef"/>
+''',  # noqa: E501
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
 
     # pylint: enable=line-too-long
 ]
