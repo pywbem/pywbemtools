@@ -62,6 +62,10 @@ Released: not yet
 
 * Remove deprecated commands ``server namespaces`` and ``server interop``.
 
+* Fixed tests that fail because XML output of classes and qualifier declarations
+  return attributes not ordered before python version 3.8. (see issue #1173).
+
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -19,6 +19,7 @@ Tests the commands in thequalifier command group
 from __future__ import absolute_import, print_function
 
 import os
+import sys
 import pytest
 
 from .cli_test_extensions import CLITestsBase
@@ -26,6 +27,8 @@ from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
     CMD_OPTION_NAMESPACE_HELP_LINE, CMD_OPTION_SUMMARY_HELP_LINE
 
 TEST_DIR = os.path.dirname(__file__)
+
+PYTHON_GE_38 = sys.version_info > (3, 8)
 
 # A mof file that defines basic qualifier decls, classes, and instances
 # but not tied to the DMTF classes.
@@ -271,6 +274,8 @@ TEST_CASES = [
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
+    # Output test in pieces because qual decl attributes not ordered in python
+    # version lt 3.8
     ['Verify qualifier command get  Description outputformat xml',
      {'args': ['get', 'Description'],
       'general': ['--output-format', 'xml']},
@@ -299,6 +304,18 @@ TEST_CASES = [
                 "type='string', is_array=False, ...)",
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify qualifier command get  Description outputformat xml',
+     {'args': ['get', 'Description'],
+      'general': ['--output-format', 'xml']},
+     {'stdout': '''<QUALIFIER.DECLARATION NAME="Description" TYPE="string" ISARRAY="false" OVERRIDABLE="true" TOSUBCLASS="true" TRANSLATABLE="true">
+<SCOPE ASSOCIATION="true" CLASS="true" INDICATION="true" METHOD="true" PARAMETER="true" PROPERTY="true" REFERENCE="true"/>
+</QUALIFIER.DECLARATION>
+''',  # noqa E501
+      'test': 'linesnows'},
+     SIMPLE_MOCK_FILE, PYTHON_GE_38],
+    # pylint: enable=line-too-long
 
     ['Verify qualifier command -o grid enumerate produces table out',
      {'args': ['enumerate'],
