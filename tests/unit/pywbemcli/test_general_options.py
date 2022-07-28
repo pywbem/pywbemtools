@@ -930,7 +930,8 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Create a server with user but no password. stdin to test for prompt',
+    ['Open non-existent server with user but no password. use stdin to test '
+     'for prompt',
      # NOTE: the class enumerate fails but is required to ask for pw
      {'general': ['--server', "http://blahblah",
                   '--user', 'john'],

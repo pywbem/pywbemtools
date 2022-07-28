@@ -512,15 +512,15 @@ namespace ``interop``.
 However, pywbemcli expands this to allow some requests to be executed against
 multiple namespaces in a single request.  This was done primarily to allow
 viewing CIM objects in the server across namespaces (ex. comparing classes
-between namespaces).
+or instances between namespaces).
 
-The commands enumerate, get, associators, and references for the command groups
-class and instance allow issuing requests on multiple namespaces in a single
-pywbemcli command. The qualifiers group enumerate command also handles multiple
-namespaces. Multiple namespace for a command is defined with the
-``--namespace`` option by defining the set of namespaces to be included  rather
-than just a single namespace. If the ``default-namespace`` is not defined is
-the connection default namespace.
+The commands ``enumerate``, ``get``, ``associators``, and ``references`` for
+the command groups ``class`` and ``instance`` and the ``enumerate`` and ``get``
+for the command group qualifiers allow issuing requests on multiple namespaces
+in a single pywbemcli command. Multiple namespace for a command is defined with
+the ``--namespace`` option by defining the set of namespaces to be included
+rather than just a single namespace. If the ``default-namespace`` is not
+defined is the connection default namespace.
 
 The responses are displayed in the same form as with a single namespace except
 that the namespace is included for each type of display to allow the user to
@@ -532,12 +532,12 @@ For example:
 
 .. code-block:: text
 
-    # pywbemcli instance enumerate CIM_Door --namespace root/cimv2, root/cimv3
+    # pywbemcli instance enumerate CIM_Door --namespace root/cimv2,root/cimv3
 
     # pywbemcli instance get CIM_Subscription.? --namespace root/cimv2 --namespace root/cimv3
 
 
-returns the instances of CIM_Door from two namespaces.
+return the instances of CIM_Door from two namespaces root/cimv2 and root/cimv3.
 
 A table output has the following form with table output
 
@@ -571,9 +571,19 @@ A table output has the following form with table output
 
 The --namespace option can be defined either using multiple definitions of the
 option: ``--namespace root/cimv2 --namespace root/cimv3`` or as a single
-options with the namespace names comma-separated: ``--namespace root/cimv2,root/cimv3``.
+options with comma-separated namespace names : ``--namespace root/cimv2,root/cimv3``.
 
 The :ref:`Class find command` and  also process multiple namespaces in a single
 request but the default if the namespace is not provided is to use all of the
 namespaces defined in the server since the goal of these commands is to execute
 a wide search for the define class or instance entities.
+
+To execute a request for multiple namespaces, pywbemcli executes the
+corresponding server request (ex. GetInstance) once for each namespace defined
+in the ``--namespace`` parameter. If a request for processing a command for
+multiple namespaces gets an exception for some of the requests but not all of
+them (ex. the class for a class get request only exists in some of the
+namespaces) it continues processing until all of the namespaces are processed
+and generates a warning message for each request exception.  If all the
+requests fail, the command fails.  If any of server requests return results,
+those results are displayed.

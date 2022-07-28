@@ -1409,7 +1409,7 @@ Instances: CIM_Foo
      INSTANCE_TABLE_MODEL_FILE, OK],
 
     ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties witho --show-null',
+     'properties with --show-null',
      {'args': ['enumerate', 'CIM_Foo', '--show-null'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
      {'stdout': """
@@ -1428,11 +1428,10 @@ Instances: CIM_Foo
      INSTANCE_TABLE_MODEL_FILE, OK],
 
     ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties witho --show-null',
+     'properties without --show-null',
      {'args': ['enumerate', 'CIM_Foo', '--di', ],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
+     {'stdout': """Instances: CIM_Foo
 +-------------------+----------------------+---------------+
 | InstanceID        | cimfoo_str           | IntegerProp   |
 |-------------------+----------------------+---------------|
@@ -1447,7 +1446,7 @@ Instances: CIM_Foo
      INSTANCE_TABLE_MODEL_FILE, OK],
 
     ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties witho --show-null',
+     'properties without --show-null',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--show-null'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
      {'stdout': """
@@ -2884,8 +2883,8 @@ InstanceID      IntegerProp
 +----------------------------------------+--------------+
 | parent                                 | InstanceID   |
 |----------------------------------------+--------------|
-| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeGabi"   |
-| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeSofi"   |
+| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeGabi" |
+| "/root/cimv2:TST_Person.name=\\"Mike\\"" | "MikeSofi" |
 +----------------------------------------+--------------+
 """],
       'rc': 0,
@@ -3807,6 +3806,27 @@ instance of CIM_Foo {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+
+    ['Verify instance get from two namespaces one without class',
+     {'args': ['get', 'CIM_Foo.?', '--namespace', 'root/cimv3,interop'],
+      'general': [],
+      'env': {MOCK_DEFINITION_ENVVAR: GET_TEST_PATH_STR(MOCK_PROMPT_0_FILE)}},
+     {'stdout': """#pragma namespace ("root/cimv3")
+instance of CIM_Foo {
+   InstanceID = "CIM_Foo1";
+   IntegerProp = 1;
+};
+""",
+      'stderr': ['Target: (instance) root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
+                 'namespace:interop CIMError:CIM_ERR_INVALID_CLASS',
+                 "Description:Class 'CIM_Foo' for GetInstance of instance",
+                 "CIMInstanceName(classname='CIM_Foo', keybindings=NocaseDict(",
+                 " does not exist.",
+                 "Error: Errors encountered on 1 server request(s)"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
     ['Verify instance get from two namespaces table output',
      {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1', '--namespace',
                'root/cimv2', '--namespace', 'root/cimv3'],
@@ -3939,6 +3959,14 @@ root/cimv3:CIM_Foo_sub_sub.InstanceID="CIM_Foo_sub_sub3"
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify instnace command enumerate non-existent svr. fails).',
+     {'args': ['enumerate', 'CIM_Foo'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
     # Get instance multiple request multiple namespaces tests
 
     ['Verify instance get from two namespaces --key option',
@@ -3975,7 +4003,6 @@ instance of CIM_Foo {
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
-
 
     ['Verify instance get from two namespaces pick option.',
      {'args': ['get', 'CIM_Foo.?',
@@ -4056,14 +4083,13 @@ instance of CIM_Foo {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify instance get from two namespaces full instance name, fail ban ns',
-     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
-               '--namespace', 'root/cimv2,root/DoesNotExist']},
-     {'stderr': "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE): Namespace does "
-                "not exist in CIM repository: 'root/DoesNotExist'",
+    ['Verify instance command get non-existent svr. fails).',
+     {'args': ['get', 'root/cimv3:CIM_Foo.InstanceID="CIM_Foo1"'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
       'rc': 1,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, OK],
+     None, OK],
 
     # instance references request multiple namespaces
 
@@ -4185,6 +4211,13 @@ instance of CIM_FooAssoc {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify instance command references non-existent svr. fails).',
+     {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 
     # instance associators request
 
@@ -4260,9 +4293,129 @@ instance of CIM_FooAssoc {
 """,
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, RUN],
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance command associators non-existent svr. fails).',
+     {'args': ['associators', 'CIM_FooRef1', '--key',
+               'InstanceID=CIM_FooRef11'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify instance enumerate from two namespaces, CIM_Foo one ns bad',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/INV']},
+     {'stderr': ['namespace:root/INV', 'CIMError:CIM_ERR_INVALID_NAMESPACE'],
+      'stdout': ['#pragma namespace ("root/cimv2")',
+                 "instance of CIM_Foo {",
+                 'InstanceID = "CIM_Foo1";',
+                 'IntegerProp = 1;'],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance enumerate from one namespace, ns bad',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/INV']},
+     {'stderr': ["namespace:root/INV", "CIMError:CIM_ERR_INVALID_NAMESPACE",
+                 "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE):"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance enumerate from two namespaces, Invalid Classname',
+     {'args': ['enumerate', 'CIM_Foox', '--namespace',
+               'root/cimv2,root/cimv3']},
+     {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_INVALID_CLASS",
+                 "namespace:root/cimv3"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance enumerate from two namespaces --summary, table. ns bad ',
+     {'args': ['enumerate', 'CIM_Foo', '--summary',
+               '--namespace', 'root/cimv2,root/INV'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """Summary of CIMInstance(s) returned
++-------------+---------+-------------+
+| Namespace   |   Count | CIM Type    |
+|-------------+---------+-------------|
+| root/cimv2  |      12 | CIMInstance |
+| root/INV    |       0 | CIMInstance |
++-------------+---------+-------------+
+""",
+      'stderr': ["namespace:root/INV", "CIM_ERR_INVALID_NAMESPACE"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces full instance name, one bad ns',
+     {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"',
+               '--namespace', 'root/cimv2,root/DoesNotExist']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 "instance of CIM_Foo {",
+                 'InstanceID = "CIM_Foo1";',
+                 "IntegerProp = 1;",
+                 "};"],
+      'stderr': ["namespace:root/DoesNotExist"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from one namespace, invalid namespace',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
+               '--namespace', 'root/InvalidNamespace']},
+     {'stderr': ['CIMError: 3 (CIM_ERR_INVALID_NAMESPACE):',
+                 "'root/InvalidNamespace'"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify instance get from two namespaces, invalid instance',
+     {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=INVALID',
+               '--namespace', 'root/cimv2,root/cimv3']},
+     {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_NOT_FOUND",
+                 "namespace:root/cimv3", "CIMError:CIM_ERR_NOT_FOUND",
+                 "CIMError: 6 (CIM_ERR_NOT_FOUND):"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    # pylint: disable=line-too-long
+    ['Verify associators names-only non-default namespaces -o table, invalid '
+     'ns',
+     {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
+               '--no', '--namespace', 'root/cimv3,root/Invalid'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """InstanceNames: CIM_FooRef2
++---------------+-------------+-------------+--------------+
+| host          | namespace   | class       | key=         |
+|               |             |             | InstanceID   |
+|---------------+-------------+-------------+--------------|
+| FakedUrl:5988 | root/cimv3  | CIM_FooRef2 | CIM_FooRef21 |
++---------------+-------------+-------------+--------------+
+""",
+      'stderr': """Request Response Errors for Target: (class) root/Invalid:CIM_FooRef1.InstanceID="CIM_FooRef11"
++--------------+---------------------------+------------------------------------------------------------+
+| namespace    | CIMError                  | Description                                                |
+|--------------+---------------------------+------------------------------------------------------------|
+| root/Invalid | CIM_ERR_INVALID_NAMESPACE | Namespace does not exist in CIM repository: 'root/Invalid' |
++--------------+---------------------------+------------------------------------------------------------+
+Error: Errors encountered on 1 server request(s)
+""", # noqa E501
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+    # pylint: enable=line-too-long
 
     # Test multi-namespace enum/get where there are no instances returned
+
+    # Add tests for multiple-ns Enumerate, get, References, Associators where
+    # for both table and mof output.
+    # 1. one of the targets (class, instancename) is invalid
+    # 2. One of multiple namespaces does not exist
+    # 3. The only target is invalid
+    # 4. The only namespace is invalid
 
 
     # TODO test results if we have keys that get hidden.  This will require
