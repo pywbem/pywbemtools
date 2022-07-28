@@ -612,7 +612,7 @@ CIMFOO_SUB_SUB_NO_QUALS_XML = """<CLASS NAME="CIM_Foo_sub_sub" SUPERCLASS="CIM_F
 """  # noqa E501
 # pylint: enable=line-too-long
 
-OK = True     # mark tests OK when they execute correctly
+OK = True    # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 
@@ -1311,7 +1311,6 @@ TEST_CASES = [
      {'stderr': ["namespace:root/cimv2", "CIM_ERR_INVALID_CLASS",
                  "Description:The class 'InvalidClassname' defined by "
                  "'ClassName' parameter does not exist in namespace "
-                 "'root/cimv2'"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],

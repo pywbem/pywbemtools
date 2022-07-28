@@ -199,3 +199,4 @@ def cmd_qualifier_enumerate(context, options):
             raise pywbem_error_exception(er)
 
     results.display()
+

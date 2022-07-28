@@ -192,6 +192,14 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
                     _display_one_cim_object(
                         context, obj, output_format, property_list,
                         quote_strings, ignore_null_properties, namespace=ns)
+            if not isinstance(ns_objects, list):
+                ns_objects = [ns_objects]
+            ns_objects = sort_cimobjects(ns_objects)
+
+            for obj in ns_objects:
+                _display_one_cim_object(
+                    context, obj, output_format, property_list, quote_strings,
+                    ignore_null_properties, namespace=ns)
         return
 
     # If not NocaseDict, it is list or single object. Sort by classname and

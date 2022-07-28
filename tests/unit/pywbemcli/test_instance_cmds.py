@@ -4306,19 +4306,31 @@ instance of CIM_FooAssoc {
 
     ['Verify instance enumerate from two namespaces, CIM_Foo one ns bad',
      {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/INV']},
+<<<<<<< HEAD
      {'stderr': ['namespace:root/INV', 'CIMError:CIM_ERR_INVALID_NAMESPACE'],
+=======
+     {'stderr': ['Warning', 'CIM_ERR_INVALID_NAMESPACE', 'root/INV'],
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'stdout': ['#pragma namespace ("root/cimv2")',
                  "instance of CIM_Foo {",
                  'InstanceID = "CIM_Foo1";',
                  'IntegerProp = 1;'],
+<<<<<<< HEAD
       'rc': 1,
+=======
+      'rc': 0,
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
     ['Verify instance enumerate from one namespace, ns bad',
      {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/INV']},
+<<<<<<< HEAD
      {'stderr': ["namespace:root/INV", "CIMError:CIM_ERR_INVALID_NAMESPACE",
                  "CIMError: 3 (CIM_ERR_INVALID_NAMESPACE):"],
+=======
+     {'stderr': ["CIMError: 3 (CIM_ERR_INVALID_NAMESPACE):"],
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'rc': 1,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
@@ -4326,8 +4338,13 @@ instance of CIM_FooAssoc {
     ['Verify instance enumerate from two namespaces, Invalid Classname',
      {'args': ['enumerate', 'CIM_Foox', '--namespace',
                'root/cimv2,root/cimv3']},
+<<<<<<< HEAD
      {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_INVALID_CLASS",
                  "namespace:root/cimv3"],
+=======
+     {'stderr': ["CIMError: 5 (CIM_ERR_INVALID_CLASS)", 'CIM_Foox'],
+
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'rc': 1,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
@@ -4344,8 +4361,12 @@ instance of CIM_FooAssoc {
 | root/INV    |       0 | CIMInstance |
 +-------------+---------+-------------+
 """,
+<<<<<<< HEAD
       'stderr': ["namespace:root/INV", "CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
+=======
+      'rc': 0,
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
@@ -4357,8 +4378,12 @@ instance of CIM_FooAssoc {
                  'InstanceID = "CIM_Foo1";',
                  "IntegerProp = 1;",
                  "};"],
+<<<<<<< HEAD
       'stderr': ["namespace:root/DoesNotExist"],
       'rc': 1,
+=======
+      'stderr': ['Warning', "balh"],
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
@@ -4374,14 +4399,21 @@ instance of CIM_FooAssoc {
     ['Verify instance get from two namespaces, invalid instance',
      {'args': ['get', 'CIM_Foo', '--key', 'InstanceID=INVALID',
                '--namespace', 'root/cimv2,root/cimv3']},
+<<<<<<< HEAD
      {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_NOT_FOUND",
                  "namespace:root/cimv3", "CIMError:CIM_ERR_NOT_FOUND",
+=======
+     {'stderr': ["WARNING: Error: 'CIM_ERR_NOT_FOUND'",
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
                  "CIMError: 6 (CIM_ERR_NOT_FOUND):"],
       'rc': 1,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+<<<<<<< HEAD
     # pylint: disable=line-too-long
+=======
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
     ['Verify associators names-only non-default namespaces -o table, invalid '
      'ns',
      {'args': ['associators', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
@@ -4395,6 +4427,7 @@ instance of CIM_FooAssoc {
 | FakedUrl:5988 | root/cimv3  | CIM_FooRef2 | CIM_FooRef21 |
 +---------------+-------------+-------------+--------------+
 """,
+<<<<<<< HEAD
       'stderr': """Request Response Errors for Target: (class) root/Invalid:CIM_FooRef1.InstanceID="CIM_FooRef11"
 +--------------+---------------------------+------------------------------------------------------------+
 | namespace    | CIMError                  | Description                                                |
@@ -4407,6 +4440,13 @@ Error: Errors encountered on 1 server request(s)
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
     # pylint: enable=line-too-long
+=======
+      'stderr': ["Error: 'CIM_ERR_INVALID_NAMESPACE'", "'root/Invalid'",
+                 "'root/Invalid:CIM_FooRef1.InstanceID=\"CIM_FooRef11\"'"],
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
 
     # Test multi-namespace enum/get where there are no instances returned
 

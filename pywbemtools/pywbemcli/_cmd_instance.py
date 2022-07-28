@@ -1240,8 +1240,12 @@ def enumerate_instances(conn, context, options, namespace, classname,
             raise er
         raise pywbem_error_exception(er)
 
+<<<<<<< HEAD
     # Exception from Enumerate and the FilterQuery.  This exception would
     # apply  to all namespaces so just terminate.
+=======
+    # Exception from Enumerate
+>>>>>>> Fix issue #1184 - Multiple namespace commands with errors
     except ValueError as ve:
         raise click.ClickException(
             'Instance enumerate failed because FilterQuery not allowed with '
@@ -1341,7 +1345,6 @@ def cmd_instance_references(context, instancename, options):
                 .format(context.pywbem_server.use_pull, ve.__class__.__name__,
                         ve))
     results.display()
-
 
 def cmd_instance_associators(context, instancename, options):
     """
