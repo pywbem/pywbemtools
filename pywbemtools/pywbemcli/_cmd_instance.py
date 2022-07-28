@@ -29,8 +29,6 @@ import click
 from pywbem import CIMInstanceName, CIMClassName, Error, CIMError, \
     CIM_ERR_NOT_FOUND
 
-from pywbem._nocasedict import NocaseDict
-
 from .pywbemcli import cli
 from ._common import pick_instance, resolve_propertylist, create_ciminstance, \
     filter_namelist, verify_operation, process_invokemethod, \
@@ -48,7 +46,8 @@ from ._cimvalueformatter import mof_escaped
 from ._association_shrub import AssociationShrub
 
 from .config import DEFAULT_QUERY_LANGUAGE
-from ._cmd_class import get_namespaces, enumerate_classes_filtered
+from ._common_cmd_functions import get_namespaces, enumerate_classes_filtered, \
+    ResultsHandler
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option, validate_required_arg
@@ -884,6 +883,9 @@ def get_instancename(context, instancename, options, default_all_ns=False):
                     "namespace in INSTANCENAME: {}".format(options['namespace'],
                                                            instancename))
 
+    # If option is a tuple, expand option to get list of all namespaces
+    # defined. Option may be multiple uses of the option and/or comma-separated
+    # string for any option value
     if isinstance(options['namespace'], tuple):
         ns_names = get_namespaces(context, options['namespace'],
                                   default_all_ns=default_all_ns)
@@ -1021,34 +1023,30 @@ def cmd_instance_get(context, instancename, options):
     # Returns list of namespaces from namespace option
     instancepath = get_instancename(context, instancename, options)
 
-    # If namespace returned from get_instancename in path, put it into
-    # ns_names. path on the instance overrides the use of --namespace and
-    # therefore return from get_namespaces()
-    if instancepath.namespace:
-        ns_names = [instancepath.namespace]
-    else:
-        ns_names = get_namespaces(context, options['namespace'])
-
     property_list = resolve_propertylist(options['propertylist'])
 
-    # NocaseDict insures ordering with old versions of Python
-    results = NocaseDict()
-    try:
-        for ns in ns_names:
+    results = ResultsHandler(context, options, output_fmt, "instance",
+                             instancepath, instpath=instancepath)
+
+    for ns in results:
+        try:
             instancepath.namespace = ns
-            results[ns] = conn.GetInstance(
+            results.add(conn.GetInstance(
                 instancepath,
                 LocalOnly=options['local_only'],
                 IncludeQualifiers=options['include_qualifiers'],
                 IncludeClassOrigin=options['include_classorigin'],
-                PropertyList=property_list)
+                PropertyList=property_list))
 
-        display_cim_objects(
-            context, results, output_fmt, property_list=property_list,
-            ignore_null_properties=not options['show_null'])
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
 
-    except Error as er:
-        raise pywbem_error_exception(er)
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+    results.display()
 
 
 def cmd_instance_delete(context, instancename, options):
@@ -1060,6 +1058,7 @@ def cmd_instance_delete(context, instancename, options):
         Otherwise attempt to delete the instance defined by instancename
     """
     conn = context.pywbem_server.conn
+
     instancepath = get_instancename(context, instancename, options)
 
     try:
@@ -1204,10 +1203,15 @@ def get_filterquerylanguage(options):
 
 
 def enumerate_instances(conn, context, options, namespace, classname,
-                        property_list):
+                        property_list, return_original_err=False):
     """
+    Internal method.
+
     Issue the command to enumerate either the paths or instances for the
     namespace defined by the namespace parameter.
+
+    If the return_original_err is True, reraise any  Error or CIMError
+    exception.
     """
     try:
         if options['names_only']:
@@ -1231,7 +1235,13 @@ def enumerate_instances(conn, context, options, namespace, classname,
             PropertyList=property_list)
 
     except Error as er:
+        # Return either the original exception or the ClickException.
+        if return_original_err:
+            raise er
         raise pywbem_error_exception(er)
+
+    # Exception from Enumerate and the FilterQuery.  This exception would
+    # apply  to all namespaces so just terminate.
     except ValueError as ve:
         raise click.ClickException(
             'Instance enumerate failed because FilterQuery not allowed with '
@@ -1252,18 +1262,24 @@ def cmd_instance_enumerate(context, classname, options):
 
     property_list = resolve_propertylist(options['propertylist'])
 
-    ns_names = get_namespaces(context, options['namespace'])
+    results = ResultsHandler(context, options, output_fmt, "class", classname,
+                             property_list=property_list)
 
-    # NocaseDict insures ordering with old versions of Python
-    results = NocaseDict()
-    for ns in ns_names:
-        results[ns] = enumerate_instances(conn, context, options, ns,
-                                          classname, property_list)
+    for ns in results:
+        try:
+            results.add(enumerate_instances(conn, context, options, ns,
+                                            classname, property_list,
+                                            return_original_err=True))
 
-    display_cim_objects(
-        context, results, output_fmt, summary=options['summary'],
-        property_list=property_list,
-        ignore_null_properties=not options['show_null'])
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
+
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+    results.display()
 
 
 def cmd_instance_references(context, instancename, options):
@@ -1281,28 +1297,25 @@ def cmd_instance_references(context, instancename, options):
 
     instancepath = get_instancename(context, instancename, options)
 
-    if instancepath.namespace:
-        ns_names = [instancepath.namespace]
-    else:
-        ns_names = get_namespaces(context, options['namespace'])
-
     property_list = resolve_propertylist(options['propertylist'])
 
-    # NocaseDict because it insures ordering with old versions of Python
-    results = NocaseDict()
-    try:
-        for ns in ns_names:
+    results = ResultsHandler(context, options, output_fmt, "instance",
+                             instancepath, instpath=instancepath,
+                             property_list=property_list)
+
+    for ns in results:
+        try:
             instancepath.namespace = ns
             if options['names_only']:
-                results[ns] = conn.PyWbemcliReferenceInstancePaths(
+                results.add(conn.PyWbemcliReferenceInstancePaths(
                     instancepath,
                     ResultClass=options['result_class'],
                     Role=options['role'],
                     FilterQuery=options['filter_query'],
                     FilterQueryLanguage=get_filterquerylanguage(options),
-                    MaxObjectCount=context.pywbem_server.pull_max_cnt)
+                    MaxObjectCount=context.pywbem_server.pull_max_cnt))
             else:
-                results[ns] = conn.PyWbemcliReferenceInstances(
+                results.add(conn.PyWbemcliReferenceInstances(
                     instancepath,
                     ResultClass=options['result_class'],
                     Role=options['role'],
@@ -1311,20 +1324,23 @@ def cmd_instance_references(context, instancename, options):
                     FilterQuery=options['filter_query'],
                     FilterQueryLanguage=get_filterquerylanguage(options),
                     MaxObjectCount=context.pywbem_server.pull_max_cnt,
-                    PropertyList=property_list)
+                    PropertyList=property_list))
 
-        display_cim_objects(
-            context, results, output_fmt, summary=options['summary'],
-            property_list=property_list,
-            ignore_null_properties=not options['show_null'])
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
 
-    except Error as er:
-        raise pywbem_error_exception(er)
-    except ValueError as ve:
-        raise click.ClickException(
-            'Instance references failed because FilterQuery not allowed with '
-            'traditional References. --use-pull {}. Exception: {}: {}'
-            .format(context.pywbem_server.use_pull, ve.__class__.__name__, ve))
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+        except ValueError as ve:
+            raise click.ClickException(
+                'Instance references failed because FilterQuery not allowed '
+                'with traditional References. --use-pull {}. Exception: {}: {}'
+                .format(context.pywbem_server.use_pull, ve.__class__.__name__,
+                        ve))
+    results.display()
 
 
 def cmd_instance_associators(context, instancename, options):
@@ -1339,20 +1355,17 @@ def cmd_instance_associators(context, instancename, options):
 
     instancepath = get_instancename(context, instancename, options)
 
-    if instancepath.namespace:
-        ns_names = [instancepath.namespace]
-    else:
-        ns_names = get_namespaces(context, options['namespace'])
-
     property_list = resolve_propertylist(options['propertylist'])
 
-    # NocaseDict because it insures ordering with old versions of Python
-    results = NocaseDict()
-    try:
-        for ns in ns_names:
+    results = ResultsHandler(context, options, output_fmt, "class",
+                             instancepath, instpath=instancepath,
+                             property_list=property_list)
+
+    for ns in results:
+        try:
             instancepath.namespace = ns
             if options['names_only']:
-                results[ns] = conn.PyWbemcliAssociatorInstancePaths(
+                results.add(conn.PyWbemcliAssociatorInstancePaths(
                     instancepath,
                     AssocClass=options['assoc_class'],
                     Role=options['role'],
@@ -1360,9 +1373,9 @@ def cmd_instance_associators(context, instancename, options):
                     ResultRole=options['result_role'],
                     FilterQuery=options['filter_query'],
                     FilterQueryLanguage=get_filterquerylanguage(options),
-                    MaxObjectCount=context.pywbem_server.pull_max_cnt)
+                    MaxObjectCount=context.pywbem_server.pull_max_cnt))
             else:
-                results[ns] = conn.PyWbemcliAssociatorInstances(
+                results.add(conn.PyWbemcliAssociatorInstances(
                     instancepath,
                     AssocClass=options['assoc_class'],
                     Role=options['role'],
@@ -1373,21 +1386,25 @@ def cmd_instance_associators(context, instancename, options):
                     FilterQuery=options['filter_query'],
                     FilterQueryLanguage=get_filterquerylanguage(options),
                     MaxObjectCount=context.pywbem_server.pull_max_cnt,
-                    PropertyList=property_list)
+                    PropertyList=property_list))
 
-        display_cim_objects(
-            context, results, output_fmt, summary=options['summary'],
-            property_list=property_list,
-            ignore_null_properties=not options['show_null'])
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
 
-    except Error as er:
-        raise pywbem_error_exception(er)
+        except Error as er:
+            raise pywbem_error_exception(er)
 
-    except ValueError as ve:
-        raise click.ClickException(
-            'Instance associators failed because FilterQuery not allowed with '
-            'traditional Associators. --use-pull: {}. Exception: {}: {}'
-            .format(context.pywbem_server.use_pull, ve.__class__.__name__, ve))
+        except ValueError as ve:
+            raise click.ClickException(
+                'Instance associators failed because FilterQuery not allowed '
+                'with traditional Associators. --use-pull: {}. Exception: {}: '
+                '{}'
+                .format(context.pywbem_server.use_pull, ve.__class__.__name__,
+                        ve))
+
+    results.display()
 
 
 def cmd_instance_count(context, classname, options):

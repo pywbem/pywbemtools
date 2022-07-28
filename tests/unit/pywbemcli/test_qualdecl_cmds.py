@@ -485,7 +485,7 @@ TEST_CASES = [
 
     ['Verify qualifier command get invalid qual decl name .',
      ['get', 'NoSuchQualDecl'],
-     {'stderr': ["Error: CIMError: 6"],
+     {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_NOT_FOUND"],
       'rc': 1,
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
@@ -551,7 +551,7 @@ TEST_CASES = [
 
     ['Verify qualifier command enumerate invalid namespace Fails',
      ['enumerate', '--namespace', 'root/blah'],
-     {'stderr': ["Error: CIMError: 3", "CIM_ERR_INVALID_NAMESPACE"],
+     {'stderr': ["namespace:root/blah", "CIMError:CIM_ERR_INVALID_NAMESPACE"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
@@ -625,6 +625,14 @@ TEST_CASES = [
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify qualifier command enumerate non-existent svr. fails).',
+     {'args': ['enumerate'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
     ['Verify qualifier command get table, multiple ns',
      {'args': ['get', 'Abstract', '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['-o', 'table']},
@@ -644,8 +652,11 @@ TEST_CASES = [
     ['Verify qualifier command get MOF out, multiple ns only in one ns',
      {'args': ['get', 'EmbeddedObject', '--namespace', 'root/cimv2,interop'],
       'general': []},
-     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Qualifier declaration "
-                "'EmbeddedObject' not found in namespace 'interop'.",
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 'Qualifier EmbeddedObject : boolean = false,'],
+      'stderr': ["namespace:interop", "error:CIM_ERR_NOT_FOUND",
+                 "Description:Qualifier declaration 'EmbeddedObject' not "
+                 "found in namespace 'interop'"],
       'rc': 1,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
@@ -653,11 +664,21 @@ TEST_CASES = [
     ['Verify qualifier command get MOF out, multiple ns not found',
      {'args': ['get', 'Invalid_QD', '--namespace', 'root/cimv2,root/cimv3'],
       'general': []},
-     {'stderr': "CIMError: 6 (CIM_ERR_NOT_FOUND): Qualifier "
-                "declaration 'Invalid_QD' not found in namespace 'root/cimv2'.",
+     {'stderr': ["namespace:root/cimv2", "CIMError:CIM_ERR_NOT_FOUND",
+                 "Description:Qualifier declaration 'Invalid_QD' not found in "
+                 "namespace 'root/cimv2'", "namespace:root/cimv3"],
       'rc': 1,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier get non-existent svr. fails).',
+     {'args': ['get', 'EmbeddedObject'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
 ]
 
 

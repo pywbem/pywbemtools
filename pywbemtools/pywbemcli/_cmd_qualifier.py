@@ -24,13 +24,12 @@ from __future__ import absolute_import, print_function
 
 import click
 
-from pywbem import Error
-from pywbem._nocasedict import NocaseDict
+from pywbem import Error, CIMError
 
 from .pywbemcli import cli
 from ._common import sort_cimobjects, pywbem_error_exception
-from ._display_cimobjects import display_cim_objects
-from ._cmd_class import get_namespaces
+
+from ._common_cmd_functions import ResultsHandler
 from ._common_options import namespace_option, summary_option, \
     multiple_namespaces_option_dflt_conn
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
@@ -143,17 +142,23 @@ def cmd_qualifier_get(context, qualifiername, options):
     conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
-    # Request qual decls for all namespaces provided and set to display
-    # as dictionary of <ns>: [qual decls]
-    ns_names = get_namespaces(context, options['namespace'])
-    try:
-        results = NocaseDict()
-        for ns in ns_names:
-            results[ns] = conn.GetQualifier(qualifiername, namespace=ns)
-    except Error as er:
-        raise pywbem_error_exception(er)
 
-    display_cim_objects(context, results, output_format)
+    results = ResultsHandler(context, options, output_format, "QualDeclName",
+                             qualifiername)
+
+    for ns in results:
+        try:
+            results.add(conn.GetQualifier(qualifiername, namespace=ns))
+
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
+
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+    results.display()
 
 
 def cmd_qualifier_delete(context, qualifiername, options):
@@ -177,17 +182,20 @@ def cmd_qualifier_enumerate(context, options):
     conn = context.pywbem_server.conn
     output_format = validate_output_format(context.output_format, ['CIM',
                                                                    'TABLE'])
-    # Request qual decls for all namespaces provided and set to display
-    # as dictionary of <ns>: [qual decls]
-    ns_names = get_namespaces(context, options['namespace'])
-    results = NocaseDict()
-    try:
-        for ns in ns_names:
-            results[ns] = sort_cimobjects(
-                conn.EnumerateQualifiers(namespace=ns))
 
-        display_cim_objects(context, results, output_format,
-                            summary=options['summary'])
+    results = ResultsHandler(context, options, output_format, "QualDeclName",
+                             None)
 
-    except Error as er:
-        raise pywbem_error_exception(er)
+    for ns in results:
+        try:
+            results.add(sort_cimobjects(conn.EnumerateQualifiers(namespace=ns)))
+
+        except CIMError as ce:
+            # Process error and continue or generate exception
+            results.handle_exception(ns, ce)
+            continue
+
+        except Error as er:
+            raise pywbem_error_exception(er)
+
+    results.display()

@@ -877,7 +877,7 @@ TEST_CASES = [
       'general': ['--output-format', 'xml']},
      {'stdout': CIMFOO_SUB_SUB_NO_QUALS_XML,
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173, Property attributs ordering
+     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173, Property attribute ordering
 
     ['Verify class command enumerate  --di --no --namespace',
      ['enumerate', '--di', '--no', '-n', 'interop'],
@@ -1284,7 +1284,7 @@ TEST_CASES = [
 
     ['Verify class command enumerate nonexistent class name',
      ['enumerate', 'CIM_FClassDoesNotExist'],
-     {'stderr': ['CIMError', 'CIM_ERR_INVALID_CLASS'],
+     {'stderr': ['CIM_ERR_INVALID_CLASS'],
       'rc': 1,
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
@@ -1296,6 +1296,33 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate invalid namespace.',
+     ['enumerate', '-n', 'blah'],
+     {'stderr': ["namespace:blah", "CIMError:CIM_ERR_INVALID_NAMESPACE",
+                 "Description:Namespace does not exist in CIM repository:",
+                 " 'blah'"],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate non-existent class).',
+     ['enumerate', 'InvalidClassname'],
+     {'stderr': ["namespace:root/cimv2", "CIM_ERR_INVALID_CLASS",
+                 "Description:The class 'InvalidClassname' defined by "
+                 "'ClassName' parameter does not exist in namespace "
+                 "'root/cimv2'"],
+      'rc': 1,
+      'test': 'innows'},
+     SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command enumerate non-existent svr. fails).',
+     {'args': ['enumerate'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 
     #
     # Test class get
@@ -1636,6 +1663,14 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
+
+    ['Verify class command get non-existent svr. fails).',
+     {'args': ['get', 'CIM_Foo'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 
     #
     # find command
@@ -2429,6 +2464,14 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
+    ['Verify class command references non-existent svr. fails).',
+     {'args': ['associators', 'CIM_Foo'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
+
     #
     # references command tests
     #
@@ -2485,7 +2528,7 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class command refereces table output fails).',
+    ['Verify class command references table output fails).',
      {'args': ['associators', 'TST_Person'],
       'general': ['--output-format', 'table']},
      {'stderr': ['Output format "table" ', 'not allowed', 'Only CIM formats:'],
@@ -2516,6 +2559,14 @@ TEST_CASES = [
       'rc': 1,
       'test': 'regex'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
+
+    ['Verify class command references non-existent svr. fails).',
+     {'args': ['references', 'CIM_Foo'],
+      'general': ['--server', 'http://NotAValidServer']},
+     {'stderr': ["Error: ConnectionError:"],
+      'rc': 1,
+      'test': 'innows'},
+     None, OK],
 
     #
     # invokemethod command tests
@@ -2653,6 +2704,33 @@ TEST_CASES = [
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify class get from two namespaces 2nd ns no class ',
+     {'args': ['get', 'CIM_Foo', '--namespace', 'root/cimv2,interop']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 'CIM_Foo {'],
+      'stderr': ["Namespace: interop", 'CIMError:CIM_ERR_NOT_FOUND'],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class get from two namespaces first ns no class ',
+     {'args': ['get', 'CIM_Foo', '--namespace', 'interop,root/cimv2']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 'CIM_Foo {'],
+      'stderr': ["Namespace: interop", 'CIMError:CIM_ERR_NOT_FOUND',
+                 "Error: Errors encountered on 1 server request(s)"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class get from two namespaces class not in either namespace ',
+     {'args': ['get', 'CIM_Foox', '--namespace', 'root/cimv3,root/cimv2']},
+     {'stderr': ["namespace:root/cimv3", "CIMError:CIM_ERR_NOT_FOUND",
+                 "namespace:root/cimv2", "CIMError:CIM_ERR_NOT_FOUND"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
     ['Verify class enumerate from two namespaces multiple namespace option,'
      ' no classname',
      {'args': ['enumerate', '--namespace', 'root/cimv2',
@@ -2737,6 +2815,24 @@ root/cimv3:CIM_Foo_sub2
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify class enumerate from two namespaces first ns no class ',
+     {'args': ['enumerate', 'CIM_Foo', '--namespace', 'interop,root/cimv2']},
+     {'stdout': ['#pragma namespace ("root/cimv2")',
+                 'CIM_Foo {'],
+      'stderr': ["namespace:interop", "CIMError:CIM_ERR_INVALID_NAMESPACE"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify class enumerate from two namespaces class not in either ns ',
+     {'args': ['enumerate', 'CIM_Foox', '--namespace',
+               'root/cimv3,root/cimv2']},
+     {'stderr': ["namespace:root/cimv3", "CIMError:CIM_ERR_INVALID_CLASS"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+
     #  References requests with multiple namespaces tests
 
     ['Verify class references classnames from two namespaces',
@@ -2813,6 +2909,17 @@ CIMClass(classname='CIM_FooAssoc',
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, FAIL],  # Fails compare of XML
+
+    ['Verify references classname (--no) from two namespaces, not in one ns',
+     {'args': ['references', 'CIM_FooRef1', '--no',
+               '--namespace', 'interop,root/cimv2'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooAssoc
+
+""",
+      'stderr': ["interop"],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
 
     # Associators requests with multiple namespaces tests
 
@@ -2951,11 +3058,29 @@ class CIM_FooRef2 : CIM_BaseRef {
      THREE_NS_MOCK_FILE, OK],
 
     # pylint: enable=line-too-long
+
+    ['Verify associators classnames from two namespaces --names-only',
+     {'args': ['associators', 'CIM_FooRef1', '--no',
+               '--namespace', 'root/cimv2,interop'], },
+     {'stdout': """//FakedUrl:5988/root/cimv2:CIM_FooRef2
+""",
+      'stderr': ['Error', 'interop'],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify associators classnames from two namespaces class not in either',
+     {'args': ['associators', 'CIM_FooRefX', '--no',
+               '--namespace', 'root/cimv2,root/cimv3'], },
+     {'stderr': ['Error', 'root/cimv2', 'root/cimv3', 'CIM_FooRefX'],
+      'rc': 1,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
 ]
 
 # TODO command class delete. Extend this test to use stdin (delete, test)
 # namespace
-# TODO: add test for  errors: class invalid, namespace invalid
 # other tests.  Test local-only on top level
 # TODO: Test class  REPR outputs
 

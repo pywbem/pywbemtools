@@ -183,22 +183,26 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     # CIMClassName, CIMClass
     if isinstance(cim_objects, NocaseDict):
         for ns, ns_objects in cim_objects.items():
-            if not isinstance(ns_objects, list):
-                ns_objects = [ns_objects]
-            ns_objects = sort_cimobjects(ns_objects)
-            for obj in ns_objects:
-                _display_one_cim_object(
-                    context, obj, output_format, property_list, quote_strings,
-                    ignore_null_properties, namespace=ns)
+            if ns_objects:
+                if not isinstance(ns_objects, list):
+                    ns_objects = [ns_objects]
+                ns_objects = sort_cimobjects(ns_objects)
+
+                for obj in ns_objects:
+                    _display_one_cim_object(
+                        context, obj, output_format, property_list,
+                        quote_strings, ignore_null_properties, namespace=ns)
         return
 
     # If not NocaseDict, it is list or single object. Sort by classname and
     # then call _display_one_cim_objects with each item from list
     if not isinstance(cim_objects, list):
         cim_objects = [cim_objects]
+
     if isinstance(cim_objects, list):
         # Sort the objects by classname and call to display each object
         cim_objects = sort_cimobjects(cim_objects)
+
         for obj in cim_objects:
             _display_one_cim_object(
                 context, obj, output_format, property_list, quote_strings,
@@ -237,6 +241,7 @@ def _display_one_cim_object(context, cim_object, output_format, property_list,
             if namespace:
                 click.echo("#pragma namespace (\"{}\")".format(namespace))
             click.echo(mofstr)
+
         except AttributeError:
             # inserting NL between instance names for readability
             if isinstance(cim_object, CIMInstanceName):
@@ -308,7 +313,9 @@ def _display_one_cim_object(context, cim_object, output_format, property_list,
 class QualDeclWrapper():  # pylint: disable=too-few-public-methods
     """
     Convert qualifier declaractions to instance of this class to be able to
-    pass the namespace to the display function unambiguously.
+    pass the namespace to the display function unambiguously.  This is only
+    a wrapper within the display_cim_objects method and its submethods since
+    the CIM_QualifierDeclaration has no namespace component.
     """
     def __init__(self, namespace, qual_decl_inst):
         self.qualdecl = qual_decl_inst
@@ -455,7 +462,8 @@ def _display_cim_objects_summary(context, objects, output_format):
         for ns, objlist in objects.items():
             if not cim_type:
                 cim_type = _get_cimtype(objlist)
-            rows.append([ns, len(objlist), cim_type])
+            objlistlen = len(objlist) if objlist else 0
+            rows.append([ns, objlistlen, cim_type])
     else:
         headers = ['Count', 'CIM Type']
         if isinstance(objects, list):

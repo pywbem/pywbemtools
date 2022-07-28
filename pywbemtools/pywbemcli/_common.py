@@ -35,8 +35,9 @@ from toposort import toposort_flatten
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
     CIMQualifierDeclaration, CIMProperty, CIMClassName, \
-    cimvalue, Error, ToleratedSchemaIssueWarning, \
-    CIMFloat, CIMInt, CIMDateTime
+    cimvalue, Error, CIMError, ToleratedSchemaIssueWarning, \
+    CIMFloat, CIMInt, CIMDateTime, CIM_ERR_NOT_FOUND, CIM_ERR_INVALID_CLASS, \
+    CIM_ERR_INVALID_NAMESPACE, CIM_ERR_INVALID_PARAMETER
 from pywbem._nocasedict import NocaseDict
 
 from ._cimvalueformatter import cimvalue_to_fmtd_string
@@ -253,11 +254,24 @@ def pick_instance(context, classname, namespaces=None):
     elif isinstance(namespaces, six.string_types):
         namespaces = [namespaces]
 
+    # Get the possible instances from all namespaces defined for the
+    # the request
     instance_names = []
     for ns in namespaces:
         try:
             instance_names.extend(conn.PyWbemcliEnumerateInstancePaths(
                 classname, ns))
+        except CIMError as ce:
+            # When multiple namespaces bypass the following errors. They will
+            # be caught when the requests are processed.
+            if len(namespaces) > 1:
+                if ce.status_code in (CIM_ERR_NOT_FOUND,
+                                      CIM_ERR_INVALID_CLASS,
+                                      CIM_ERR_INVALID_NAMESPACE,
+                                      CIM_ERR_INVALID_PARAMETER):
+                    continue
+            raise pywbem_error_exception(ce)
+
         except Error as ex:
             raise pywbem_error_exception(ex)
 
@@ -1321,7 +1335,9 @@ def pywbem_error_exception(exc, intro=None):
     """
     Return the standard click exception for a pywbem Error exception.  These
     exceptions do not cause interactive mode failure but display the exception
-    class and its str value and return to the repl mode.
+    class and its str value and return to the repl mode: .
+
+    Note: This method returns the exception. It does not raise it.
 
     Parameters:
 

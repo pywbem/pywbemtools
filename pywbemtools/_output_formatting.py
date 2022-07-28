@@ -100,7 +100,7 @@ def output_format_is_cimobject(output_format):
     return output_format in CIM_OBJECT_FORMATS
 
 
-def output_format_is_testgroup(output_format):
+def output_format_is_textgroup(output_format):
     """
     Return boolean indicating whether an output format is a text format.
 
