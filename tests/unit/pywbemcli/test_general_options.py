@@ -224,7 +224,7 @@ The following can be entered in interactive mode:
   a group.
 """
 
-OK = True     # mark tests OK when they execute correctly
+OK = False     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False
@@ -410,7 +410,7 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify valid --pull-max-cnt option parameter.',
+    ['Verify valid --pull-max-cnt option parameter with single command.',
      {'general': ['-s', 'http://blah', '--pull-max-cnt', '2000'],
       'cmdgrp': 'connection',
       'args': ['show']},
@@ -1205,7 +1205,8 @@ TEST_CASES = [
 
     #
     #   The following is a sequence. Creates a server and changes almost all
-    #   parameters interactively.
+    #   parameters interactively. It is run as a sequence so that pywbemcli
+    #   is restarted for each test in the sequence
     #
     ['Verify Create a connection for test of mods through general opts. '
      'Sequence 2,1',
@@ -1710,6 +1711,39 @@ TEST_CASES = [
       'rc': 1,
       'test': 'innows'},
      None, OK],
+
+    # pylint: disable=line-too-long
+
+    ['Verify multiple defs with interactive cmds'
+     'cmd.',
+     {'connections_file_args': (TEST_CONNECTIONS_FILE_PATH,
+                                TEST_CONNECTIONS_FILE_DICT_SERVER),
+      'general': ['-n', 'realsvr', '-v', '-C', TEST_CONNECTIONS_FILE_PATH],
+      'stdin': ['--server http://realsvr1 --user john '         # define 2nd svr
+                '--password john --timeout 45 -d root/cimv4 '
+                '--no-verify --certfile certfile2.pem '
+                '--keyfile keyfile2.pem --ca-certs blah2 '
+                '--use-pull yes --pull-max-cnt 444',
+                'connection save realsvr1',                       # scnd svr
+                '--server http://realsvr2 --user fred --pull-max-cnt 999 '
+                '--timeout 90 -d root/cim5 --use-pull no',
+                'connection save realsvr2',                       # third svr
+                'connection list --full ']},
+     {'stdout': """
+WBEM server connections(full): (#: default, *: current)
+file: tmp_general_options.yaml
+name  server   namespace user  timeout use-pull  pull-max-cnt verify certfile  keyfile  mock-server
+-------- --------------- ----------- ------ --------- ---------- -------------- -------- ------------- ------------ -------------
+*blah     http://realsvr2  root/cim5    fred           90  False                  999  False     certfile2.pem  keyfile2.pem
+*realsvr  http://blah      root/cimv2                  30                        1000  True
+realsvr1  http://realsvr1  root/cimv4   john           45  True                   444  False     certfile2.pem  keyfile2.pem
+realsvr2  http://realsvr2  root/cim5    fred           90  False                  999  False     certfile2.pem  keyfile2.pem
+
+""",  # noqa: E501
+      'test': 'innows'},
+     None, RUN],
+    # pylint: enable=line-too-long
+
 ]
 
 # TODO add test for pull operations with pull ops max size variations
