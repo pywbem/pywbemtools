@@ -29,6 +29,8 @@ Released: not yet
 * Fix issue where the instance shrub --fullpath option was not displaying the
   paths. (see issue #1180)
 
+* Fixed new formatting issues raised by flake8 5.0.
+
 **Enhancements:**
 
 * Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for
