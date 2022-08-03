@@ -21,6 +21,8 @@ Released: not yet
 * Fix issue where the instance shrub --fullpath option was not displaying the
   paths. (see issue #1180)
 
+* Fixed new formatting issues raised by flake8 5.0.
+
 **Enhancements:**
 
 **Cleanup:**
