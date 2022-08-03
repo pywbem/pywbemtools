@@ -337,7 +337,7 @@ class CLITestsBase(object):
                         assert_lines(test_value, rtn_value.splitlines(),
                                      rtn_type, desc)
                     else:
-                        assert(isinstance(test_value, six.string_types))
+                        assert isinstance(test_value, six.string_types)
                         assert_lines(test_value.splitlines(),
                                      rtn_value.splitlines(),
                                      rtn_type, desc)
