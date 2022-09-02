@@ -298,6 +298,8 @@ test_log_file := test_$(python_version_fn).log
 # - 45775 Sphinx 3.0.4 updates jQuery version, cannot upgrade Sphinx on py27
 # - 47833 Click 8.0.0 uses 'mkstemp()', cannot upgrade Click due to incompatibilities
 # - 45185 Pylint 2.13.0 fixes crash with doc_params ext, cannot upgrade on py27/35
+# - SEPT 2022
+# - 50571 dparse (user safety) 0.4.1 -> 0.5.2, 0.5.1 -> 0.5.2.  ReDos issue
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -339,6 +341,7 @@ safety_ignore_opts := \
 	-i 45775 \
 	-i 47833 \
 	-i 45185 \
+	-i 50571 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
