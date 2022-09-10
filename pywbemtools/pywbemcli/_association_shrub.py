@@ -43,7 +43,7 @@ import six
 import click
 
 from asciitree import LeftAligned
-from pywbem import CIMClassName, CIMError
+from pywbem import CIMClassName
 from pywbem._nocasedict import NocaseDict
 
 from ._common import shorten_path_str, sort_cimobjects, to_wbem_uri_folded
@@ -163,25 +163,18 @@ class AssociationShrub(object):
         # Cache the results of conn.ReferenceNames(self.source+path)
         self.reference_names = None
 
+        # Create the ternary reference dictionary
         self.ternary_ref_classes = OrderedDict()
 
         # Build the shrub dictionary for the instance defined by
         # self.source_path
         self._build_instance_shrub()
 
-    @property
-    def reference_classnames(self):
-        """
-        Return a list of the reference class names in the current shrub.
-        This returns a list of objects of the class pywbem:CIMClassname
-        which contains the name, host, and namespace for each class.
-        """
-        # pylint: disable=unnecessary-comprehension
-        return [cln for cln in self.instance_shrub]
-
     def sorted_references(self, source_path):
         """
-        Get reference instances from host sorted by instance name
+        Get reference instances from host sorted by instance name and build
+        the dictionary of ternary references for later use in the
+        shrub build
 
         Parameters:
 
@@ -195,6 +188,7 @@ class AssociationShrub(object):
             Error if Error returned from host
         """
         reference_instances = self.conn.References(source_path)
+        self.define_ternary_references(reference_instances)
         return sort_cimobjects(reference_instances)
 
     def sorted_associator_names(self, source_path, role=None, assoc_class=None,
@@ -237,53 +231,74 @@ class AssociationShrub(object):
             ResultClass=result_class)
         return sort_cimobjects(rtnd_assoc_inames)
 
+    def build_ref_class_roles_dict(self, reference_instnames):
+        """
+        Build a dictionary of the roles of reference classes from a list
+        of reference_instance names
+
+        Returns the dictionary where each key classname and the corresponding
+        value is a list of the roles defined for that class.
+        """
+        ref_class_roles = OrderedDict()
+        for ref in reference_instnames:
+            cln = CIMClassName(ref.classname, ref.host,
+                               ref.namespace)
+            if cln not in ref_class_roles:
+                roles = self._get_reference_roles(ref)
+                if roles:
+                    ref_class_roles[cln] = roles
+        return ref_class_roles
+
     def _build_instance_shrub(self):
         """
-        Build the internal representation of a tree for the shrub as a
-        dictionary of dictionaries representing the tree. This builds the shrub
-        dictionary (self.instance_shrub) from the top of the tree down to
-        the bottom.
+        Build the internal representation of a tree for the association shrub
+        as a dictionary of dictionaries representing the tree of components of
+        the association request and response. This builds the shrub dictionary
+        (self.instance_shrub) from the top of the tree down to the bottom.  It
+        is built by making multiple references and associator calls with
+        variations on the role, association class, result role, and associated
+        class so that the resulting output shows what would be the association
+        response based on values for each of these request components.
+
+        The structure of the resulting instance shrub is
+        <role> : <assoc_clns> : <result_role: : <result_clns> : <assoc_insts>
         """
         # Build CIMClassname with host, namespace and insert if not
         # already in class_roles dictionary. Get the instance from
         # the host and roles from the instance.
         # ref_class_roles dictionary {<cln>:[roles]}
-        ref_insts = self.sorted_references(self.source_path)
-
-        self.define_ternary_references(ref_insts)
+        # Also builds dict of ternary references for use in building shrub
+        reference_instances = self.sorted_references(self.source_path)
 
         # Build list of reference CIMClassName objects and add to a
         # ref_class_roles dict
         # Test for input --AssocClass parameter and limit ref names to this
         # class if it exists and is one of the defined classes
-        reference_instnames = [i.path for i in ref_insts]
 
+        # Get list of reference instance names based on existence of
+        # --ac parameter
         if self.assoc_class:
             # Test if AssocClass parameter represents class in rtnd references
             if self.assoc_class.lower() in {n.classname.lower()
-                                            for n in reference_instnames}:
-                reference_instnames = [rn for rn in reference_instnames if
+                                            for n in reference_instances}:
+                reference_instnames = [ri.path for ri in reference_instances if
                                        self.assoc_class.lower() ==
-                                       rn.classname.lower()]
+                                       ri.classname.lower()]
             else:
-                reference_instnames = [i.path for i in ref_insts]
+                reference_instnames = [ri.path for ri in reference_instances]
                 ref_clns = {n.classname for n in reference_instnames}
                 warning_msg(
                     'Option --assoc-name "{}" not found in associator names '
                     '({})" from server'.format(self.assoc_class,
                                                ", ".join(ref_clns)))
+        else:
+            reference_instnames = [ri.path for ri in reference_instances]
 
-        # Add the reference classes to the ref_class_roles dict
-        ref_class_roles = OrderedDict()
-        for ref in reference_instnames:
-            cln = CIMClassName(ref.classname, ref.host, ref.namespace)
-            if cln not in ref_class_roles:
-                roles = self._get_reference_roles(ref)
-                if roles:
-                    ref_class_roles[cln] = roles
+        # Put the reference classes into ref_class_roles dict
+        ref_class_roles = self.build_ref_class_roles_dict(reference_instnames)
 
-        # Find role parameter and insert into instance_shrub dictionary.
-        # The result is dictionary of form:
+        # Find role parameter for each class and insert into instance_shrub
+        # dictionary. The result is dictionary of form:
         #   {<role>:{<ASSOC_CLASS>:[RESULTROLES]}
         for cln, roles in six.iteritems(ref_class_roles):
             role_dict = self._get_role_result_roles(roles, cln.classname)
@@ -309,11 +324,10 @@ class AssociationShrub(object):
                 warning_msg('Option --role ({}) not found in roles: ({}). '
                             'Ignored'.format(self.role, ', '.join(roles)))
             else:
-                # Remove any roles not defined in self.role
+                # Remove any roles not defined in instance_shrub
                 remove_roles = [r for r in roles if r.lower() != tst_role]
-                if remove_roles:
-                    for role in remove_roles:
-                        del self.instance_shrub[role]
+                for role in remove_roles:
+                    del self.instance_shrub[role]
 
         # Find associated instances/classes for each role
         for role in self.instance_shrub:
@@ -343,12 +357,8 @@ class AssociationShrub(object):
                         result_role=result_role)
 
                     # Build unique associated classnames from returned inames.
-                    # This is full ClassName entities including ns, host with
-                    # a set comprehension so only unique names are kept
-                    rtnd_classnames = list({CIMClassName(iname.classname,
-                                                         iname.host,
-                                                         iname.namespace)
-                                            for iname in rtnd_assoc_inames})
+                    rtnd_assoc_clns = list(set([iname.classname for iname
+                                                in rtnd_assoc_inames]))
 
                     # Discard unwanted assoc classes if --result_class param
                     # defined
@@ -360,15 +370,14 @@ class AssociationShrub(object):
                                               if iname.classname.lower() == rc})
 
                         # Discard unwanted assoc classes
-                        rtnd_classnames = [cln for cln in rtnd_classnames if
-                                           cln.classname.lower()
-                                           in filtered_clns]
+                        rtnd_assoc_clns = [cln for cln in rtnd_assoc_clns if
+                                           cln.lower() in filtered_clns]
 
-                    assoc_clns.extend(rtnd_classnames)
+                    assoc_clns.extend(rtnd_assoc_clns)
 
                     # Extend instance_shrub_dict with returned assoc classnames
                     # pylint: disable=line-too-long
-                    self.instance_shrub[role][ref_classname][result_role].extend(rtnd_classnames)  # noqa: E501
+                    self.instance_shrub[role][ref_classname][result_role].extend(rtnd_assoc_clns)  # noqa: E501
                     # pylint: enable=line-too-long
 
                     # Get associated instance names by AssocClass, role and
@@ -381,7 +390,7 @@ class AssociationShrub(object):
                             role=role,
                             assoc_class=ref_classname.classname,
                             result_role=result_role,
-                            result_class=assoc_cln.classname)
+                            result_class=assoc_cln)
 
                         # Build namedtuple of name, ref_inst  integer.
                         # This ties each output instance to a particular
@@ -389,7 +398,7 @@ class AssociationShrub(object):
                         self.build_assoc_name_tuples(
                             assoc_inames, assoc_cln,
                             disp_result_role, role, ref_classname,
-                            ref_insts, result_role)
+                            reference_instances, result_role)
 
     def display_shrub(self, output_format, summary=None):
         """
@@ -422,9 +431,9 @@ class AssociationShrub(object):
         The levels of the tree are:
             source instance
                 role
-                    reference_classe
+                    reference_class
                         result_role
-                            result_classe
+                            result_class
                                 result_instances
         The dictionaries that define the tree are built from the bottom up
         based on the shrub_dict and use OrderedDict to preserve order
@@ -447,7 +456,8 @@ class AssociationShrub(object):
                         if not inst_names_tup:
                             continue
 
-                        disp_assoc_cln = self.simplify_path(assoc_cln)
+                        disp_assoc_cln = assoc_cln
+
                         key = "{}(ResultClass)({} insts)". \
                             format(disp_assoc_cln, len(inst_names_tup))
 
@@ -534,7 +544,7 @@ class AssociationShrub(object):
                         rows.append([role,
                                      self.simplify_path(ref_cln),
                                      rrole,
-                                     self.simplify_path(assoc_cln),
+                                     assoc_cln,
                                      inst_col])
 
         title = 'Shrub of {}: {}'.format(self.source_path,
@@ -543,14 +553,14 @@ class AssociationShrub(object):
 
     def build_assoc_name_tuples(self, assoc_inames, assoc_cln,
                                 disp_result_role, role, ref_classname,
-                                ref_insts, result_role):
+                                reference_instances, result_role):
         """
         Build the iname tuples for the instance names defined in assoc_inames
         and add to self.assoc_instnames
         """
         aname_tuples = OrderedDict()
         for aname in assoc_inames:
-            for ref_inst_ctr, ref_inst in enumerate(ref_insts):
+            for ref_inst_ctr, ref_inst in enumerate(reference_instances):
                 if role not in ref_inst:
                     continue
                 # If not the reference defined by role,
@@ -696,7 +706,7 @@ class AssociationShrub(object):
                                 iname.classname.lower():
                             replacements["CreationClassName"] = None
 
-        ternary = self.ternary_ref_classes[ref_cln.classname]
+        is_ternary = self.ternary_ref_classes[ref_cln.classname]
 
         modified_inames = OrderedDict()
         for inst_name_tuple in inst_names_tuple:
@@ -708,7 +718,7 @@ class AssociationShrub(object):
             # If reference class with more than 2 references add indicator
             # to the defining reference instance so the user can match
             # the instances to reference instances.
-            if ternary:
+            if is_ternary:
                 iname_display = '{}(refinst:{})'.format(iname_display,
                                                         inst_name_tuple.RefInst)
 
@@ -716,13 +726,18 @@ class AssociationShrub(object):
             modified_inames[iname_display] = OrderedDict()
         return modified_inames
 
-    def define_ternary_references(self, ref_insts):
+    def define_ternary_references(self, reference_instances):
         """
         Build dictionary of reference classes (ternary_ref_classes) in
-        conn.References return with Value True if > 2 reference properties
+        conn.References with Value True if > 2 reference properties
         and False if == 2 reference properties
+
+        Builds instance level dictionary self.ternary_ref_classes where
+        key is classname and vale is True if more than 2 reference properties or
+        False if 2 reference properties.  This is used later to modify
+        display.
         """
-        for ref_inst in ref_insts:
+        for ref_inst in reference_instances:
             count = 0
             if ref_inst.classname not in self.ternary_ref_classes:
                 for v in ref_inst.properties.values():
@@ -775,21 +790,16 @@ class AssociationShrub(object):
             instance for which roles will be returned
 
         Returns:
-          List of :term:`string` containg the classnames (roles) contained
+          List of :term:`string` containingg the classnames (roles) contained
           in the defined instance
 
+        Raises:
+            CIMError if the GetInstance fails
+
         """
-        try:
-            ref_inst = self.conn.GetInstance(inst_name, LocalOnly=False)
-        except CIMError as ce:
-            click.echo('Exception ref {0}, exception: {1}'.format(inst_name,
-                                                                  ce))
-            return None
-        roles = [pname for pname, pvalue in six.iteritems(ref_inst.properties)
-                 if pvalue.type == 'reference']
-        if self.verbose:
-            print('class {0}, roles {1}'.format(inst_name.classname, roles))
-        return roles
+        ref_inst = self.conn.GetInstance(inst_name, LocalOnly=False)
+        return [pname for pname, pvalue in six.iteritems(ref_inst.properties)
+                if pvalue.type == 'reference']
 
     def _get_role_result_roles(self, roles, ref_classname):
         """

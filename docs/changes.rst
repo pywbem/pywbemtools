@@ -31,6 +31,12 @@ Released: not yet
 
 * Fixed new formatting issues raised by flake8 5.0.
 
+* Fixed issue where the instance shrub command duplicated the results instances
+  tree in cases where there was an inter-namespace association and displayed
+  the complete ClassName of the association class rather than just the
+  class name. (see issue #1191)
+
+
 **Enhancements:**
 
 * Increased minimum version of Click to 8.0.1 on Python >= 3.6 to prepare for

@@ -382,7 +382,7 @@ class WbemServerMock(object):
             if er.status_code != CIM_ERR_ALREADY_EXISTS:
                 pass
 
-        # Compile the leaf classes into the CIM repositor
+        # Compile the leaf classes into the CIM repository
         # This test not required to use the class in the test environment.
         # However, if it is ever used as template for code that could
         # execute on pywbem version 0.x, this test is required.
