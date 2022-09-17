@@ -36,6 +36,10 @@ Released: not yet
   the complete ClassName of the association class rather than just the
   class name. (see issue #1191)
 
+* Fix issue where we were not setting the flag to use the general option
+  --max-pull-option when the was defined with an interactive command.  This
+  meant that the option was ignored for the current command. (see issue #
+  1193).
 
 **Enhancements:**
 

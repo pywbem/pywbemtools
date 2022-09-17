@@ -224,7 +224,7 @@ The following can be entered in interactive mode:
   a group.
 """
 
-OK = False     # mark tests OK when they execute correctly
+OK = True     # mark tests OK when they execute correctly
 RUN = True    # Mark OK = False and current test case being created RUN
 FAIL = False  # Any test currently FAILING or not tested yet
 SKIP = False
