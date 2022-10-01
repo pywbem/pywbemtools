@@ -42,7 +42,7 @@ from ._common_cmd_functions import get_namespaces, enumerate_classes_filtered, \
 from ._common_options import propertylist_option, names_only_option, \
     include_classorigin_class_option, namespace_option, summary_option, \
     multiple_namespaces_option_dflt_conn, multiple_namespaces_option_dflt_all, \
-    class_filter_options
+    class_filter_options, object_order_option
 from ._displaytree import display_class_tree
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
@@ -118,6 +118,7 @@ def class_group():
 @add_options(multiple_namespaces_option_dflt_conn)
 @add_options(summary_option)
 @add_options(class_filter_options)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def class_enumerate(context, classname, **options):
@@ -288,6 +289,7 @@ def class_invokemethod(context, classname, methodname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj
@@ -342,6 +344,7 @@ def class_references(context, classname, **options):
 @add_options(propertylist_option)
 @add_options(names_only_option)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj

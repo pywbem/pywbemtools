@@ -491,7 +491,7 @@ the root classes).
 
 
 .. index::
-    pair: namespace; multiple namespaces
+    pair: namespace; multiple namespace commands
     pair: --namespace option; command option --namespace
 
 .. _`Using multiple namespaces with server requests`:
@@ -509,7 +509,7 @@ Generally the CIM/XML commands defined by the DMTF execute operations on a singl
 is a request to the WBEM server to return instances of of <classname> from
 namespace ``interop``.
 
-However, pywbemcli expands this to allow some requests to be executed against
+However, pywbemcli expands this in version 1.1.0  to allow some requests to be executed against
 multiple namespaces in a single request.  This was done primarily to allow
 viewing CIM objects in the server across namespaces (ex. comparing classes
 or instances between namespaces).
@@ -517,25 +517,34 @@ or instances between namespaces).
 The commands ``enumerate``, ``get``, ``associators``, and ``references`` for
 the command groups ``class`` and ``instance`` and the ``enumerate`` and ``get``
 for the command group qualifiers allow issuing requests on multiple namespaces
-in a single pywbemcli command. Multiple namespace for a command is defined with
+in a single pywbemcli command. Multiple namespaces for a command is defined with
 the ``--namespace`` option by defining the set of namespaces to be included
 rather than just a single namespace. If the ``default-namespace`` is not
 defined is the connection default namespace.
 
-The responses are displayed in the same form as with a single namespace except
-that the namespace is included for each type of display to allow the user to
-determine which data is in which namespace.  With MOF, the namespace appears as
+Thus, the requests below command pywbecli to make a request for each of the
+namespaces interop and root/comv2 and to present the results of both requests
+in a single response.
+
+    class enumerate CIM_ManagedElement -n interop, root/cimve
+    class enumerate CIM_ManagedElement -s interop -n root/cimv2 
+
+The responses are displayed in the same form as for a single namespace except
+that the namespace is included for each type of output format to allow the user to
+determine which object is in which namespace.  With MOF, the namespace appears as
 a MOF namespace pragma (commented because not all WBEM server compilers honor the
-namespace pragma). With tables, a namespace column is included.
+namespace pragma). With tables, a namespace column is included in the table.
+
+The order of the objects displayed in responses is controlled by a command
+options ``--object-order``.  The default order is to order the objects by
+namespace but defining this option allows modifying the order to display
+objects ordered by object name which allows comparing objects between namespaces.
 
 For example:
 
 .. code-block:: text
 
     # pywbemcli instance enumerate CIM_Door --namespace root/cimv2,root/cimv3
-
-    # pywbemcli instance get CIM_Subscription.? --namespace root/cimv2 --namespace root/cimv3
-
 
 return the instances of CIM_Door from two namespaces root/cimv2 and root/cimv3.
 

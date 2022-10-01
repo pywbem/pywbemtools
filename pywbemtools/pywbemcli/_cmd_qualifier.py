@@ -31,7 +31,7 @@ from ._common import sort_cimobjects, pywbem_error_exception
 
 from ._common_cmd_functions import ResultsHandler
 from ._common_options import namespace_option, summary_option, \
-    multiple_namespaces_option_dflt_conn
+    multiple_namespaces_option_dflt_conn, object_order_option
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
     CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 from .._options import add_options, help_option
@@ -66,6 +66,7 @@ def qualifier_group():
 @click.argument('qualifiername', type=str, metavar='QUALIFIERNAME',
                 required=True,)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def qualifier_get(context, qualifiername, **options):
@@ -112,6 +113,7 @@ def qualifier_delete(context, qualifiername, **options):
 @qualifier_group.command('enumerate', cls=PywbemtoolsCommand,
                          options_metavar=CMD_OPTS_TXT)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(summary_option)
 @add_options(help_option)
 @click.pass_obj

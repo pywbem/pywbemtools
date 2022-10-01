@@ -178,6 +178,72 @@ QD_TBL_ENUM_MULTI_NS_OUT = """Qualifier Declarations
 | root/cimv2  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
 |             |                  |         |         |         | ASSOCIATION | Restricted      |
 |             |                  |         |         |         | INDICATION  |                 |
+| root/cimv2  | Aggregate        | boolean | False   | False   | REFERENCE   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Association      | boolean | False   | False   | ASSOCIATION | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Description      | string  |         | False   | ANY         | EnableOverride  |
+|             |                  |         |         |         |             | ToSubclass      |
+|             |                  |         |         |         |             | Translatable    |
+| root/cimv2  | EmbeddedInstance | string  |         | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | Restricted      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv2  | EmbeddedObject   | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv2  | In               | boolean | True    | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Indication       | boolean | False   | False   | CLASS       | DisableOverride |
+|             |                  |         |         |         | INDICATION  | ToSubclass      |
+| root/cimv2  | Key              | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | REFERENCE   | ToSubclass      |
+| root/cimv2  | Out              | boolean | False   | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv2  | Override         | string  |         | False   | PROPERTY    | EnableOverride  |
+|             |                  |         |         |         | REFERENCE   | Restricted      |
+|             |                  |         |         |         | METHOD      |                 |
+| root/cimv2  | Static           | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+| root/cimv3  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
+|             |                  |         |         |         | ASSOCIATION | Restricted      |
+|             |                  |         |         |         | INDICATION  |                 |
+| root/cimv3  | Aggregate        | boolean | False   | False   | REFERENCE   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Association      | boolean | False   | False   | ASSOCIATION | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Description      | string  |         | False   | ANY         | EnableOverride  |
+|             |                  |         |         |         |             | ToSubclass      |
+|             |                  |         |         |         |             | Translatable    |
+| root/cimv3  | EmbeddedInstance | string  |         | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | Restricted      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv3  | EmbeddedObject   | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
+|             |                  |         |         |         | PARAMETER   |                 |
+| root/cimv3  | In               | boolean | True    | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Indication       | boolean | False   | False   | CLASS       | DisableOverride |
+|             |                  |         |         |         | INDICATION  | ToSubclass      |
+| root/cimv3  | Key              | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | REFERENCE   | ToSubclass      |
+| root/cimv3  | Out              | boolean | False   | False   | PARAMETER   | DisableOverride |
+|             |                  |         |         |         |             | ToSubclass      |
+| root/cimv3  | Override         | string  |         | False   | PROPERTY    | EnableOverride  |
+|             |                  |         |         |         | REFERENCE   | Restricted      |
+|             |                  |         |         |         | METHOD      |                 |
+| root/cimv3  | Static           | boolean | False   | False   | PROPERTY    | DisableOverride |
+|             |                  |         |         |         | METHOD      | ToSubclass      |
++-------------+------------------+---------+---------+---------+-------------+-----------------+
+"""  # noqa: E501
+
+
+QD_TBL_ENUM_MULTI_NS_OUT_OBJECT_ORDER = """Qualifier Declarations
++-------------+------------------+---------+---------+---------+-------------+-----------------+
+| namespace   | Name             | Type    | Value   | Array   | Scopes      | Flavors         |
+|-------------+------------------+---------+---------+---------+-------------+-----------------|
+| root/cimv2  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
+|             |                  |         |         |         | ASSOCIATION | Restricted      |
+|             |                  |         |         |         | INDICATION  |                 |
 | root/cimv3  | Abstract         | boolean | False   | False   | CLASS       | EnableOverride  |
 |             |                  |         |         |         | ASSOCIATION | Restricted      |
 |             |                  |         |         |         | INDICATION  |                 |
@@ -367,6 +433,126 @@ Qualifier Abstract : boolean = false,
 Qualifier Abstract : boolean = false,
     Scope(class, association, indication),
     Flavor(EnableOverride, Restricted);
+
+"""
+
+QD_MOF_ENUM_MULTINS_OUT_OBJECT_ORDER = """#pragma namespace ("root/cimv2")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv3")
+Qualifier Abstract : boolean = false,
+    Scope(class, association, indication),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv2")
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Aggregate : boolean = false,
+    Scope(reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Association : boolean = false,
+    Scope(association),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Description : string,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+#pragma namespace ("root/cimv3")
+Qualifier Description : string,
+    Scope(any),
+    Flavor(EnableOverride, ToSubclass, Translatable);
+
+#pragma namespace ("root/cimv2")
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter);
+
+#pragma namespace ("root/cimv3")
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter);
+
+#pragma namespace ("root/cimv2")
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier EmbeddedObject : boolean = false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier In : boolean = true,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Indication : boolean = false,
+    Scope(class, indication),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Key : boolean = false,
+    Scope(property, reference),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Out : boolean = false,
+    Scope(parameter),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv2")
+Qualifier Override : string,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv3")
+Qualifier Override : string,
+    Scope(property, reference, method),
+    Flavor(EnableOverride, Restricted);
+
+#pragma namespace ("root/cimv2")
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
+
+#pragma namespace ("root/cimv3")
+Qualifier Static : boolean = false,
+    Scope(property, method),
+    Flavor(DisableOverride, ToSubclass);
 
 """
 
@@ -601,10 +787,28 @@ TEST_CASES = [
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
+    ['Verify qualifier command enumerate table, multiple ns',
+     {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3',
+               '--object-order'],
+      'general': ['-o', 'table']},
+     {'stdout': QD_TBL_ENUM_MULTI_NS_OUT_OBJECT_ORDER,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
     ['Verify qualifier command enumerate multiple ns MOF out',
      {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3'],
       'general': []},
      {'stdout': QD_MOF_ENUM_MULTINS_OUT,
+      'rc': 0,
+      'test': 'innows'},
+     THREE_NS_MOCK_FILE, OK],
+
+    ['Verify qualifier command enumerate multiple ns MOF out',
+     {'args': ['enumerate', '--namespace', 'root/cimv2,root/cimv3',
+               '--object-order'],
+      'general': []},
+     {'stdout': QD_MOF_ENUM_MULTINS_OUT_OBJECT_ORDER,
       'rc': 0,
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],

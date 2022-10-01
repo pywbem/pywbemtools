@@ -39,7 +39,8 @@ from ._display_cimobjects import display_cim_objects
 from ._common_options import propertylist_option, names_only_option, \
     include_classorigin_instance_option, namespace_option, summary_option, \
     verify_option, multiple_namespaces_option_dflt_all, \
-    multiple_namespaces_option_dflt_conn, class_filter_options
+    multiple_namespaces_option_dflt_conn, class_filter_options, \
+    object_order_option
 
 from ._cimvalueformatter import mof_escaped
 
@@ -213,6 +214,7 @@ def instance_group():
 @add_options(filter_query_option)
 @add_options(filter_query_language_option)
 @add_options(show_null_option)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def instance_enumerate(context, classname, **options):
@@ -251,6 +253,7 @@ def instance_enumerate(context, classname, **options):
 @add_options(propertylist_option)
 @add_options(keybinding_key_option)
 @add_options(multiple_namespaces_option_dflt_conn)
+@add_options(object_order_option)
 @add_options(help_instancename_option)
 @add_options(show_null_option)
 @add_options(help_option)
@@ -414,6 +417,7 @@ def instance_modify(context, instancename, **options):
 @add_options(filter_query_language_option)
 @add_options(show_null_option)
 @add_options(help_instancename_option)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def instance_associators(context, instancename, **options):
@@ -468,6 +472,7 @@ def instance_associators(context, instancename, **options):
 @add_options(show_null_option)
 @add_options(filter_query_language_option)
 @add_options(help_instancename_option)
+@add_options(object_order_option)
 @add_options(help_option)
 @click.pass_obj
 def instance_references(context, instancename, **options):

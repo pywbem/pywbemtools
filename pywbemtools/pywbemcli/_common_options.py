@@ -102,6 +102,12 @@ verify_option = [
                       u'Default: Do not prompt for confirmation.'),
 ]
 
+object_order_option = [
+    click.option('--object-order', is_flag=True, required=False,
+                 help=u'Order the objects by object before namespace. Only '
+                      u'applies when multiple namespaces defined.'),
+]
+
 class_filter_options = [
     click.option('--association/--no-association',
                  default=None,
