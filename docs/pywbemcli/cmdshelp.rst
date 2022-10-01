@@ -82,7 +82,7 @@ Help text for ``pywbemcli``:
                                       file. Use "" to set default in interactive mode.Default: EnvVar PYWBEMCLI_KEYFILE, or
                                       none.
       -t, --timeout INT               Client-side timeout (seconds) on data read for operations with the WBEM server. This
-                                      integer is the timeout for a single server request. Pywbem retries reads 2 times so
+                                      integer is the timeout for a single server request. Pywbem retries reads 0 times so
                                       the delay for read timeout failure may be multiple times the timeout value.Default:
                                       EnvVar PYWBEMCLI_TIMEOUT, or 30. Min/max:   [0<=x<=300]
       -U, --use-pull [yes|no|either]  Determines whether pull operations are used for operations with the WBEM server that
