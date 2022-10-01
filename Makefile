@@ -300,6 +300,8 @@ test_log_file := test_$(python_version_fn).log
 # - 45185 Pylint 2.13.0 fixes crash with doc_params ext, cannot upgrade on py27/35
 # - SEPT 2022
 # - 50571 dparse (user safety) 0.4.1 -> 0.5.2, 0.5.1 -> 0.5.2.  ReDos issue
+# - 50885 Pygments 2.7.4 cannot be used on Python 2.7
+# - 50886 Pygments 2.7.4 cannot be used on Python 2.7
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -342,6 +344,8 @@ safety_ignore_opts := \
 	-i 47833 \
 	-i 45185 \
 	-i 50571 \
+	-i 50885 \
+	-i 50886 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)
