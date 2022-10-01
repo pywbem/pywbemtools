@@ -670,7 +670,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # i.e. the options with any defaults applied for non None options.
     # Produces new variables resolved... so that later tests can confirm that
     # original variables were None or not None
-
     if warn:
         warnings.simplefilter('once')
     # else: Leave warning control to the PYTHONWARNINGS env var.
@@ -717,8 +716,6 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # and a ContextObj instance
     if ctx.obj is None:  # No context; cmd line or initial interactive input
 
-        # Create the PywbemServer object (contains all of the info
-        # for the connection defined by the cmd line input)
         connections_repo = ConnectionRepository(
             connections_file or DEFAULT_CONNECTIONS_FILE, verbose)
 
@@ -836,6 +833,7 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
                 modified_server = True
             if pull_max_cnt:
                 pywbem_server.pull_max_cnt = resolved_pull_max_cnt
+                modified_server = True
             if ca_certs:
                 pywbem_server.ca_certs = ca_certs
                 modified_server = True
