@@ -184,7 +184,6 @@ There are multiple types of tests in pywbemtools:
        $ tox                              # Run tests on all supported Python versions
        $ tox -e py27                      # Run tests on Python 2.7
 
-
 .. _`Disabling the spinner when debugging`:
 
 Disabling the spinner when debugging

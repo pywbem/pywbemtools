@@ -951,6 +951,10 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+In the table output format with instances a column ``namespace`` is included if
+the request defines multiple namespaces and a ``classname`` column is included
+if the displayed instances are from multiple classes.
+
 **Note:** This command returns the instance associators, not the class associators.
 The :ref:`Class associators command` returns the class associators.
 
@@ -987,6 +991,11 @@ The command options are:
 *  ``--names-only``/``-no`` - This option determines whether the request to return classes
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
+
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname
 
 index:
     pair --namespace option; command option --namespace
@@ -1323,6 +1332,15 @@ are displayed. Otherwise, the instances are displayed. Depending on other option
 either EnumerateInstances or EnumerateInstanceNames may be executed when
 pywbem is called.
 
+Valid output formats in both cases are :term:`CIM object output formats` or
+:term:`Table output formats`.
+
+The table view displays a single instance per
+row and a column for each property in the instance. If the table display
+of instances includes instances from multiple classes, a column is added to
+the table with the classname. If the request covers multiple namespaces,
+a column is added defining the namespace in which each instance resides.
+
 The command options are:
 
 *  ``--local-only`` / ``--lo`` - option that allows showing only local properties
@@ -1379,9 +1397,10 @@ The command options are:
    (i.e. Null) in all of the instances to be displayed. Otherwise only
    properties at least one instance has a non- Null property are displayed
 
-Valid output formats in both cases are :term:`CIM object output formats` or
-:term:`Table output formats`. The table view displays a single instance per
-row and a column for each property in the instance.
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname.
 
 The following example returns two instances as MOF:
 
@@ -1740,6 +1759,10 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+In the table output format with instances a column ``namespace`` is included if
+the request defines multiple namespaces and a ``classname`` column is included
+if the displayed instances are from multiple classes.
+
 **Note:** This command returns the instance references, not the class references.
 The :ref:`Class references command` returns the class references.
 
@@ -1790,6 +1813,11 @@ The command options are:
 *  ``--show-null`` - In the TABLE output formats, show properties with no value
    (i.e. Null) in all of the instances to be displayed. Otherwise only
    properties at least one instance has a non- Null property are displayed
+
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname
 
 *  ``--help-instancename``/``--hi`` -  Show help message for specifying
    ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
@@ -2879,15 +2907,19 @@ implementations of WBEM servers such as the implementation of OpenPegasus.
 
 The ``connection`` command group includes commands that manage named connection
 definitions that are persisted in a :term:`connections file`.
-This allows maintaining multiple connection definitions and then using any
+This allows maintaining multiple connection :term:`connection definition`s and then using any
 one via the :ref:`--name general option`. Only a single connection is
 active (selected) at any point in time but the connection connection can
 be selected on the pywbemcli command line (:ref:`--name general option`) or
-changed within an interactive session using the :ref:`Connection select command`
+changed within an interactive session using the :ref:`Connection select command`.
 
 .. index:: pair: connections file; persistent connection attributes
 
-The attributes of each connection definition in the :term:`connections file` are:
+-- index: pair: connection definition, connection attributes
+
+.. index pair: connection attributes, persistent connection attributes
+
+The attributes of each :term:`connection definition` in the :term:`connections file` are:
 
 * **name** - name of the connection definition. See :ref:`--name general option`.
 * **server** - URL of the WBEM server, or None if the connection definition is
@@ -2897,6 +2929,8 @@ The attributes of each connection definition in the :term:`connections file` are
 * **password** - password for the WBEM server. See :ref:`--password general option`.
 * **use-pull** - determines whether the pull operations are to be used for
   the WBEM server. See :ref:`--use-pull general option`.
+* **pull-max-cnt** - integer that defines the maximum number of CIM instances the
+  WBEM server may return with a single pull Open or Pull request. See :ref:`--pull-max-cnt general option`.
 * **verify** - a boolean flag controlling whether the pywbem client verifies
   any certificate received from the WBEM server. See :ref:`--verify general option`.
 * **certfile** - path name of the server certificate file. See :ref:`--certfile general option`.
@@ -2928,7 +2962,7 @@ The commands in this group are:
 ``connection delete`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection delete`` command deletes a connection definition from the
+The ``connection delete`` command deletes a :term:`connection definition` from the
 :term:`connections file`.
 
 The format of this command is:
@@ -3012,9 +3046,9 @@ See :ref:`pywbemcli connection export --help` for the exact help output of the c
 ``connection list`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection list`` command lists the connection definitions in the
-:term:`connections file` and the current connection(if it has not been
-saved to the connections file).
+The ``connection list`` command lists the :term:`connection definition`
+definitions in the :term:`connections file` and the current connection (if it
+has not been saved to the connections file).
 
 
 The format of this command is:
@@ -3102,13 +3136,13 @@ See :ref:`pywbemcli connection list --help` for the exact help output of the com
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``connection save`` command saves the current connection in the
-:term:`connections file` as a connection definition with the name specified
+:term:`connections file` as a :term:`connection definition` with the name specified
 in the ``NAME`` argument.
 
 The format is:
     pywbemcli [GENERAL-OPTIONS] connection save ``NAME`` [COMMAND-OPTIONS]
 
-If a connection definition with that ``NAME`` already exists, it will be overwritten
+If a :term:`connection definition` with that ``NAME`` already exists, it will be overwritten
 without notice.
 
 This command includes an option (``set-default``) that sets the default
@@ -3144,19 +3178,19 @@ See :ref:`pywbemcli connection save --help` for the exact help output of the com
 .. index:: single: connection select command
 .. index:: pair: command; connection select
 
-The ``connection select`` command selects a connection definition from the
+The ``connection select`` command selects a :term:`connection definition` from the
 :term:`connections file` to become the :term:`current connection`.
 
 The command format is:
     pywbemcli [GENERAL-OPTIONS] connection select ``NAME`` [COMMAND-OPTIONS]
 
-If the ``NAME`` argument is specified, the connection definition with that name
-is selected. Otherwise, pywbemcl displays the list of connection definitions
-from the connections fileand prompts the user to pick one to be selected.
-If there is only a single connection, that connection is selected without the
-user request.
+If the ``NAME`` argument is specified, the :term:`connection definition` with
+that name is selected. Otherwise, pywbemcli displays the list of names of
+:term:`connection definition` entries from the connections file and prompts the
+user to pick one to be selected. If there is only a single connection, that
+connection is selected without the user request.
 
-If the ``--default``/``-d`` command option is set, the connection definition in
+If the ``--default``/``-d`` command option is set, the :term:`connection definition` in
 addition becomes the default connection, by marking it accordingly in the
 :term:`connections file`.
 
@@ -3216,7 +3250,7 @@ See :ref:`pywbemcli connection select --help` for the exact help output of the c
 .. index:: single: connection show command
 .. index:: pair: command; connection show
 
-The ``connection show`` command shows information about a connection definition:
+The ``connection show`` command shows information about a :term:`connection definition`:
 
 The command format is:
     pywbemcli [GENERAL-OPTIONS] connection show ``NAME`` [COMMAND-OPTIONS]
@@ -3224,7 +3258,7 @@ The command format is:
 * If ``NAME`` is ``?``, pywbemcli prompts the user to select one and shows
   the existing current connection. If there is only a single connection the
   user selection is bypassed.
-* If ``NAME`` is specified, show the connection definition with that name.
+* If ``NAME`` is specified, show the :term:`connection definition` with that name.
 * If ``NAME`` is not specified, show the existing current connection.
 
 .. code-block:: text
@@ -3311,16 +3345,16 @@ The command format is:
     pywbemcli [GENERAL-OPTIONS] connection set-default ``NAME`` [COMMAND-OPTIONS]
 
 The :term:`default-connection-name` attribute in the connection file allows a
-connection definition in a connections file to be loaded on startup without
+:term:`connection definition` in a connections file to be loaded on startup without
 using the :ref:`--name general option`. If pywbemcli is started without
 :ref:`--name general option`, :ref:`--server general option`, or
 :ref:`--mock-server general option`, the ``default-connection-name`` attribute
 is retrieved from the connections file if defined, and the value of this
-attribute used as the name of the connection definition set as current
+attribute used as the name of the :term:`connection definition` set as current
 connection.
 
-Thus, for example, if the default connection definition is ``mytests`` the
-connection definition for ``mytests`` is created each time pywbemcli is started
+Thus, for example, if the default :term:`connection definition` is ``mytests`` the
+:term:`connection definition` for ``mytests`` is created each time pywbemcli is started
 with no :ref:`--server general option`, :ref:`--mock-server general option` or
 the :ref:`--name general option`.
 

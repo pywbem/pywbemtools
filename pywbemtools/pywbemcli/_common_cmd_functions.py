@@ -195,7 +195,8 @@ class ResultsHandler(object):
                             summary=summary,
                             ignore_null_properties=ignore_null,
                             property_list=self.property_list,
-                            object_order=object_order)
+                            object_order=object_order,
+                            ctx_options=self.options)
 
         if self.result_errors:
             if any(self.result_errors.values()):
