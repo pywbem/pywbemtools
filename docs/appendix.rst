@@ -323,6 +323,16 @@ This documentation uses a few special terms to refer to Python types:
       The subscription manager ID is a fixed string (``defaultpywbemcliSubMgr``)
       in pywbemcli
 
+   connection definition
+      The collection of parameters for a single pywbemcli connection to a
+      WBEM server. This includes server location (URI), user/security information for
+      the connection (user name and user password, certificates), pywbemcli connection
+      configuration parameters used by pywbem to execute the connection
+      including timeout, use of pull operations, etc. that are typically
+      defined in the pywbemcli general options. These connection definitions
+      can be persisted in a pywbem connection file and then referenced by
+      name in future pywbemcli calls.
+
 
 .. _`Profile advertisement methodologies`:
 

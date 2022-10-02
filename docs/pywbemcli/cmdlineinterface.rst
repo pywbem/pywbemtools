@@ -394,7 +394,8 @@ find other commands in the history containing the same string.
 
 .. index:: pair: interactive mode; history file
 
-The pywbemcli history is stored in the user home directory, ``~/.pywbemcli_history``.
+The pywbemcli history is stored in the user home directory. In linux systems this is
+, ``~/.pywbemcli_history`` and in windows systems TODO.
 
 .. index::
    pair: interactive mode; auto-suggestion
@@ -475,7 +476,7 @@ Pywbemcli terminates with one of the following program exit codes:
     error. This will mostly be caused by CIM errors returned by the server,
     but can also be caused by the pywbemcli code itself.
 
-  * Programming errors in mock Python scripts (see: :ref:`Mock support overview`);
+  * Programming errors in mock Python scripts (see: :ref:`Mock WBEM server overview`);
     the error message includes a Python traceback of the error.
 
 * **1 - Python traceback**: In such cases, pywbemcli terminates during its

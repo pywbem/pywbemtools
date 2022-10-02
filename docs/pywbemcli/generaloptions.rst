@@ -5,19 +5,175 @@ Using the pywbemcli command line general options
 
 .. index:: single: general options
 
-.. _`Oveview of the general options`:
+.. _`Overview of the general options`:
+
+The following table is an overview of all of the pywbemcli general options with
+a cross-reference to a detailed definition of each opton
+
+
+.. list-table:: pywbemcli general options!
+   :widths: 20 20 20 20 20
+   :header-rows: 1
+
+   * - Option Name
+     - Function(1)
+     - Description
+     - Type
+     - Default Value
+
+   * - :ref:`--server <--server general option>`
+     - Server Definition
+     - Define server URI
+     - String
+     -
+
+   * - :ref:`--name <--name general option>`
+     - Sever Definition
+     - Get server definition by name
+     - String
+     -
+
+   * - :ref:`--mock-server <--mock-server general option>`
+     - Server Definition
+     - Define mock server
+     - String
+     -
+
+   * - :ref:`--user <--user general option>`
+     - Server Attribute
+     - Server user name
+     - String
+     -
+
+   * - :ref:`--password <--password general option>`
+     - Server Attribute
+     - Server user password
+     - String
+     -
+
+   * - :ref:`--use-pull <--use-pull general option>`
+     - Server attribute
+     - Use of pull Operations
+     - Choice
+     - either
+
+   * - :ref:`--pull-max-cnt <--pull-max-cnt general option>`
+     - Server attribute
+     - Max response size
+     - Integer
+     - 1000
+
+   * - :ref:`--certfile <--certfile general option>`
+     - Server attribute
+     - Define server cert
+     - String
+     -
+
+   * - :ref:`--keyfile <--keyfile general option>`
+     - Server attribute
+     - Define Table format
+     - String
+     -
+
+   * - :ref:`--timestats <--timestats general option>`
+     - Client attribute
+     - Control stats
+     - Boolean
+     -
+
+   * - :ref:`--log <--log general option>`
+     - Client attribute
+     - Control stats
+     - String
+     -
+
+   * - :ref:`--verify <--verify general option>`
+     - Client attribute
+     - Verify server cert
+     - Boolean
+     - True
+
+   * - :ref:`--ca-certs <--ca-certs general option>`
+     - Client blah
+     - Define Server ca certs
+     - String
+     -
+
+   * - :ref:`--timeout <--timeout general option>`
+     - Client attribute
+     - Timeout server request
+     - Integer (sec)
+     - 30 sec
+
+   * - :ref:`--default-namespace <--default-namespace general option>`
+     - Client attribute
+     - Connection default namespace
+     - String
+     - root/cimv2
+
+   * - :ref:`--output-format <--output-format general option>`
+     - Client attribute
+     - Define Table format
+     - Choice
+     - MOF
+
+   * - :ref:`--verbose <--verbose general option>`
+     - Client attribute
+     - Display processing details
+     - Boolean
+     - False
+
+   * - :ref:`--version <--version general option>`
+     - Client attribute
+     - Show pywbemtools version
+     -
+     -
+
+   * - :ref:`--warn <--warn general option>`
+     - Client attribute
+     - Control warnings
+     - Boolean
+     -
+
+   * - :ref:`--connections-file <--connections-file general option>`
+     - Client attribute
+     - Define file path
+     - String
+     - Default file
+
+   * - :ref:`--pdb <--pdb general option>`
+     - Client attribute
+     - Run with debugger
+     - Boolean
+     -
+
+   * - :ref:`--helo <--help general option>`
+     - Client attribute
+     - Show help
+     - String
+     -
+
+1. Server definitions and server attributes are attached to a :term:`connection definition`
+   and are used when defined for the current :term:`connection definition` in
+   the interactive mode.  Client attribute exist for the life of an interactive
+   session in the interactive mode. Thus --verbose entered on the command line
+   is used for all commands in the interactive mode.  --user entered on the
+   command line applies to the current server definition only.
 
 Overview of the general options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 General options define:
 
-* The connection to the WBEM server against which the pywbemcli commands are to be
-  executed (i.e url, default CIM namespace, security parameters, etc.)
-  or the alternative mock of a WBEM server.
-  See :ref:`Defining the WBEM server` for details.
+* The server definition (connection) to the WBEM server mock WBEM server
+  (i.e :term:`connection definition`)against which the pywbemcli commands are
+  targeted. See :ref:`Defining the WBEM server` for details.
+* Attributes of the WBEM server which is being targeted. This includes attributes
+  such as the user/password, certificates, etc. pull operations. These attributes
+  are attached to the current WBEM server connection definition and persisted with that
+  :term:`connection definition`.
 * Operation behavior of pywbemcli for requests; i.e. using the pull operations
-  vs the :term:`traditional operations`, or the client side timeout.
+  vs the :term:`traditional operations`, the client side timeout, etc..
   See :ref:`Controlling operation behavior and monitoring operations` for
   details.
 * Execution options to monitor the requests and responses (statistics keeping,
@@ -36,6 +192,7 @@ result in the ``simple`` table format:
 .. code-block:: text
 
     pywbemcli --output-format simple --server http://localhost qualifier enumerate
+
     Qualifier Declarations
     Name         Type     Value    Array    Scopes       Flavors
     -----------  -------  -------  -------  -----------  ---------------
@@ -51,7 +208,6 @@ once and retain their value throughout the execution of the interactive mode.
 General options defined in the command line may be overwritten by specifying
 them on interactive mode commands. The resulting new value is used only for
 that one command, and is not retained for subsequent interactive mode commands.
-
 
 In the following example, the :ref:`--output-format general option` is used
 on an interactive mode command to overwrite the default output format, and the
@@ -85,11 +241,57 @@ Defining the WBEM server
 The target WBEM server can be defined on the command line in several ways with
 the following arguments :
 
-1. Define connection information for a WBEM server by using the
-   :ref:`--server general option` that specifies the URL of the server.
+1. General options that define the WBEM server to be used.
+
+   The following 3 mutually exclusive general options define the WBEM server
+   that wil be the target of pywbem cli server-request commands (ex. class get
+   <class name).
+
+   * The :ref:`--server general option` defines the URI of a real WBEM server.
+     The attributes of the server used by pywbemcli are defined by the
+     connection characteristics general options (ex. --user, etc.)
+
+.. code-block:: text
+
+    pwybmcli -s http:myserver
+
+   * The :ref:`--name general option` defines the name of a :term:`connection definition`
+     in a :term:`connections file`. This name must have been previously created
+     by saving the name of a server definition with the :ref:`Command
+     connection save` command.
+
+.. code-block:: text
+
+    pwybmcli -n mytestserver connection show
+
+    defines the use of the previously defined connection ``mytestserver`` and
+    executes the pywbem command ``connection show``.
+
+   Connection definitions can be stored in a :term:`connections file`
+   and are managed with the :ref:`Connection command group`.
+
+   * The :ref:`--mock-server general option` defines a :ref:`Mock WBEM Server` that
+     is created upon pywbemcli startup.  The MOF or python files that are defined
+     with as values of the option define the characteristics of thes mock WBEM server
+     (The CIM objects that will be build in the mock environment and that can be
+     accesses as if they were a real WBEM server).
+
+     The mock WBEM server allows testing or demonstrating pywbemcli without
+     having access to a real WBEM server.
+
+.. code-block:: text
+
+    pwybmcli -m mytestmof.mof -m mytestscript.py class enumerate
+
+    defines the use of the pywbemcli mock WBEM server script ``myscript.py`` and
+    executes the pywbem command ``class enumerate`` to show the first level
+    of the class hiearchy class names in the default namespace.
+
+2. Define connection characteristics for a WBEM server by using the
 
    The following general options can be used for specifying additional
-   information for the connection:
+   information for the connection and become part of the :term:`connection definition`
+   (i.e. connection) for a WBEM server.
 
    * The :ref:`--default-namespace general option` defines the :term:`default namespace`
      to be used if a command does not specify a namespace.
@@ -99,6 +301,12 @@ the following arguments :
      authenticating with the WBEM server.
    * The :ref:`--verify general option` defines whether the client verifies
      certificates received from the WBEM server.
+   * The :ref:`--use-pull general option` defines whether pywbemcli issues
+     requests like ``instance enumerate`` as pull operations or as the traditional
+     operations. See :ref:`pywbem:Pull operations`.
+   * The :ref:`--pull-max-cnt general option` defines the maximum number of
+     instances the WBEM server can return in a single response to an Open or
+     Pull client request
    * The :ref:`--certfile general option` defines the client certificate file.
    * The :ref:`--keyfile general option` defines the client key file.
    * The :ref:`--ca-certs general option` defines a collection of certificates
@@ -106,18 +314,14 @@ the following arguments :
    * The :ref:`--timeout general option` defines the client side timeout
      for operations.
 
-2. Define a mock WBEM server by using the :ref:`--mock-server general option`.
+   NOTE: Not all of the above general options are used by the mock WBEM server.
+   Thus, since the mock WBEM server has no security layer, the ``--keyfile``,
+   ``--certfile``, and ``--ca-certs`` options will be rejected if a
+   mock WBEM server is specified
 
-   The mock WBEM server is part of pywbemcli and allows testing or
-   demonstrating pywbemcli without having access to a real WBEM server.
-   For details, see :ref:`Mock WBEM server support`.
-
-3. Refer to a persisted connection definition for either a WBEM server or
-   mock WBEM server by using the :ref:`--name general option` that
-   specifies the name of the connection definition.
-
-   Persisted connection definitions are stored in a :term:`connections file`
-   and are managed with the :ref:`Connection command group`.
+   A :term:`connection definition` can be named and persisted in a pywbemcli
+   :term:`connections file` identified by a connection name so that it can
+   be used by pywbem with the :ref:`--name general option`.
 
 
 .. _`Controlling operation behavior and monitoring operations`:
@@ -259,8 +463,8 @@ Examples for the argument value of this option include:
 """""""""""""""""""""""""
 
 The argument value of the ``--name``/``-n`` general option is a string that is
-the name of a connection definition in the :term:`connections file`.
-The parameters for this named connection definition will be loaded from the
+the name of a :term:`connection definition` in the :term:`connections file`.
+The parameters for this named :term:`connection definition` will be loaded from the
 :term:`connections file` to become the current WBEM connection in pywbemcli.
 
 In the interactive mode the connection is not actually established until a
@@ -270,7 +474,7 @@ This option is mutually exclusive with the :ref:`--server general option` and
 the :ref:`--mock-server general option` since each defines a connection to a
 WBEM server.
 
-The following example creates a connection definition named ``myserver``
+The following example creates a :term:`connection definition` named ``myserver``
 in the connections file, and then uses that connection to execute
 ``class get``:
 
@@ -475,7 +679,7 @@ part of the file defined by ``--certfile``.
 .. _`--ca-certs general option`:
 
 ``--ca-certs`` general option
-""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""
 
 The argument value of the ``--ca-certs`` general option specifies which
 X.509 certificates are used on the client side for validating the X.509
@@ -554,9 +758,9 @@ section :ref:`Statistics command group` .
 """"""""""""""""""""""""""""""
 
 The argument value of the ``--use-pull``/``-u`` general option determines
-whether the pull operations or :term:`traditional operations` are used for the
-``instance enumerate``, ``instance references``, ``instance associators``
-and ``instance query`` commands. See
+whether the :ref:`pywbem:Pull Operations` or :term:`traditional operations` are
+used for the ``instance enumerate``, ``instance references``, ``instance
+associators`` and ``instance query`` commands. See
 :ref:`Pywbemcli and the DMTF pull operations` for more information on pull
 operations. The choices for the argument value are as follows:
 
@@ -564,7 +768,8 @@ operations. The choices for the argument value are as follows:
   support pull, the request will fail.
 * ``no`` - forces pywbemcli to try only the traditional non-pull operations.
 * ``either`` - (default) pywbem tries both; first pull operations and then
-  :term:`traditional operations`.
+  :term:`traditional operations`.  This is the recommended setting since it
+  will generate a valid response from any server.
 
 .. index:: triple: --pull-max-cnt; general options; pull-max-cnt
 
@@ -599,7 +804,7 @@ suffix ".mof" for MOF files and ".py" for Python scripts.
 When this option is used, the security options (ex. ``--user``) are irrelevant;
 they may be specified but are not used.
 
-See section :ref:`Mock WBEM server support` for information on the characteristics
+See section :ref:`Mock WBEM server` for information on the characteristics
 of the MOF and Python files that define a mock environment
 
 The following example creates a mock server with two files defining the mock
@@ -618,7 +823,7 @@ connection named ``mymockserver``:
 
     pywbemcli> connection save mymockserver
 
-See chapter :ref:`Mock WBEM server support` for more information on defining
+See chapter :ref:`Mock WBEM server` for more information on defining
 the files for a mock server.
 
 .. index:: triple: --output-format; general options; output-format
@@ -682,10 +887,10 @@ systems including Windows. See :func:`~py3:os.path.expanduser` for details.
 The actually used path name of the connections file is shown in the
 :ref:`connection list command`.
 
-The connection definitions in the connections file are managed with the
-commands in the :ref:`connection command group`.
+The :term:`connection definition` definitions in the connections file are
+managed with the commands in the :ref:`connection command group`.
 
-.. index:: triple: --pdb; general options; pdb
+.. index:: triple: --warn; general options; warn
 
 .. _`--warn general option`:
 
@@ -711,7 +916,7 @@ for details.
 The ``--pdb`` general option is a boolean option that enables debugging
 with the built-in pdb debugger.
 
-If debugging is enabled, execution of the pywbemcli command will pause just
+If debugging is enabled, execution of each pywbemcli command will pause just
 before the command within pywbemcli is executed, and the pdb debugger prompt
 will appear. See `pdb debugger commands`_ for details on how to operate the
 built-in pdb debugger.
@@ -736,7 +941,9 @@ command and the version of the pywbem package used by it, and then exits.
 """""""""""""""""""""""""
 
 The ``--help``/``-h`` general option displays help text which describes the
-command groups and general options, and then exits.
+command groups, commands,  and general options, and then exits. A specific
+help exists for each command group, and command and ``pywbemcli --help``
+presents the help on the general options
 
 .. index:: pair: environment variables; general options
 
@@ -744,6 +951,8 @@ command groups and general options, and then exits.
 
 Environment variables for general options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:: index:: pair: general options; environment variables
 
 Pywbemcli defines environment variables corresponding to its general options
 as follows:
@@ -836,12 +1045,16 @@ The DMTF specifications and pywbem includes two ways to execute the enumerate
 instance type operations (``Associators``, ``References``,
 ``EnumerateInstances``, ``ExecQuery``):
 
-* The :term:`traditional operations` (ex. ``EnumerateInstances``)
-* The pull operations (ex. ``OpenEnumerateInstances``, etc.)
+* The :term:`traditional operations` (ex. ``EnumerateInstances``) where the
+  WBEM server returns all of the response instances as a single response
+* The pull operations (ex. ``OpenEnumerateInstances``, etc.) where the
+  client and the server cooperate with client requests for Open... and subsequent
+  Pull... requests to return groups of response instances.
 
 Pywbem implements an overlay of the above two operations called the ``Iter..``
 operations where each ``Iter..`` operation executes either the traditional or
-pull operation depending on a parameter of the connection.
+pull operation depending on the :ref:`--use-pull general option` of the
+connection.
 
 While the pull operations may not be supported by all WBEM servers they can be
 significantly more efficient for large responses when they are available.

@@ -63,6 +63,10 @@ Released: not yet
   namespace name. This allows the user to more easily compare the objects
   themselves in different namespaces. (see issues #1058 and #1059)
 
+* Extended documentation to better document the use and characteristics
+  of the general options and the creation of the mock WBEM server
+  script (see issue #1190)
+
 **Cleanup:**
 
 * Extend use of general options in interactive mode to allow setting the
