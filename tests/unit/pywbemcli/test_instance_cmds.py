@@ -1019,37 +1019,35 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo include-qualifiers and '
-     ' --use-pull no',
+    ['Verify instance enumerate CIM_Foo include-qualifiers and --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers', '--di'],
       'general': ['--use-pull', 'no']},
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo include-qualifiers and '
-     ' --use-pull no',
+    ['Verify instance enumerate CIM_Foo include-qualifiers and  --use-pull no',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'general': ['--use-pull', 'no']},
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo_sub2, rtns nothing,',
+    ['Verify instance enumerate CIM_Foo_sub2, rtns nothing,',
      {'args': ['enumerate', 'CIM_Foo_sub2'],
       'general': []},
      {'stdout': "",
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo_sub2, w --verbose rtns msg.',
+    ['Verify instance enumerate CIM_Foo_sub2, w --verbose rtns msg.',
      {'args': ['enumerate', 'CIM_Foo_sub2'],
       'general': ['--verbose']},
      {'stdout': 'No objects returned',
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
+    ['Verify instance enumerate CIM_Foo with --use-pull yes and '
      '--pull-max-cnt=2',
      {'args': ['enumerate', 'CIM_Foo', '--include-qualifiers'],
       'general': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
@@ -1061,7 +1059,7 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate CIM_Foo with --use-pull yes and '
+    ['Verify instance enumerate CIM_Foo with --use-pull yes and '
      '--pull-max-cnt=2 and --namesonly',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'general': ['--use-pull', 'yes', '--pull-max-cnt', '2', '--log',
@@ -1073,92 +1071,72 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate deep-inheritance CIM_Foo --di',
+    ['Verify instance enumerate deep-inheritance CIM_Foo --di',
      ['enumerate', 'CIM_Foo', '--di'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate deep-inheritance CIM_Foo '
-     '--deep-inheritance',
+    ['Verify enumerate deep-inheritance CIM_Foo --deep-inheritance',
      ['enumerate', 'CIM_Foo', '--deep-inheritance'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di ',
+    ['Verify enumerate CIM_Foo with pl --di  -o table',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--pl', 'InstanceId', '--pl',
                'IntegerProp'],
-      'general': ['--output-format', 'grid']},
-     {'stdout': """Instances: CIM_Foo
-+--------------------+---------------+
-| InstanceID         | IntegerProp   |
-+====================+===============+
-| "CIM_Foo1"         | 1             |
-+--------------------+---------------+
-| "CIM_Foo2"         | 2             |
-+--------------------+---------------+
-| "CIM_Foo3"         |               |
-+--------------------+---------------+
-| "CIM_Foo30"        |               |
-+--------------------+---------------+
-| "CIM_Foo31"        |               |
-+--------------------+---------------+
-| "CIM_Foo_sub1"     | 4             |
-+--------------------+---------------+
-| "CIM_Foo_sub2"     | 5             |
-+--------------------+---------------+
-| "CIM_Foo_sub3"     | 6             |
-+--------------------+---------------+
-| "CIM_Foo_sub4"     | 7             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub1" | 8             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub2" | 9             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub3" | 10            |
-+--------------------+---------------+
+      'general': ['--output-format', 'table']},
+     {'stdout': """
+Instances: CIM_Foo; deep-inheritance
++-----------------+--------------------+---------------+
+| classname       | InstanceID         | IntegerProp   |
+|-----------------+--------------------+---------------|
+| CIM_Foo         | "CIM_Foo1"         | 1             |
+| CIM_Foo         | "CIM_Foo2"         | 2             |
+| CIM_Foo         | "CIM_Foo3"         |               |
+| CIM_Foo         | "CIM_Foo30"        |               |
+| CIM_Foo         | "CIM_Foo31"        |               |
+| CIM_Foo_sub     | "CIM_Foo_sub1"     | 4             |
+| CIM_Foo_sub     | "CIM_Foo_sub2"     | 5             |
+| CIM_Foo_sub     | "CIM_Foo_sub3"     | 6             |
+| CIM_Foo_sub     | "CIM_Foo_sub4"     | 7             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub1" | 8             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub2" | 9             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub3" | 10            |
++-----------------+--------------------+---------------+
+
 """,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate deep-inheritance CIM_Foo --di '
-     'all properties',
+    ['Verify enumerate -o grid enumerate deep-inheritance CIM_Foo --di all '
+     'properties',
      {'args': ['enumerate', 'CIM_Foo', '--di'],
-      'general': ['--output-format', 'grid']},
-     {'stdout': """Instances: CIM_Foo
-+--------------------+---------------+
-| InstanceID         | IntegerProp   |
-+====================+===============+
-| "CIM_Foo1"         | 1             |
-+--------------------+---------------+
-| "CIM_Foo2"         | 2             |
-+--------------------+---------------+
-| "CIM_Foo3"         |               |
-+--------------------+---------------+
-| "CIM_Foo30"        |               |
-+--------------------+---------------+
-| "CIM_Foo31"        |               |
-+--------------------+---------------+
-| "CIM_Foo_sub1"     | 4             |
-+--------------------+---------------+
-| "CIM_Foo_sub2"     | 5             |
-+--------------------+---------------+
-| "CIM_Foo_sub3"     | 6             |
-+--------------------+---------------+
-| "CIM_Foo_sub4"     | 7             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub1" | 8             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub2" | 9             |
-+--------------------+---------------+
-| "CIM_Foo_sub_sub3" | 10            |
-+--------------------+---------------+
+      'general': ['--output-format', 'table']},
+     {'stdout': """Instances: CIM_Foo; deep-inheritance
++-----------------+--------------------+---------------+
+| classname       | InstanceID         | IntegerProp   |
+|-----------------+--------------------+---------------|
+| CIM_Foo         | "CIM_Foo1"         | 1             |
+| CIM_Foo         | "CIM_Foo2"         | 2             |
+| CIM_Foo         | "CIM_Foo3"         |               |
+| CIM_Foo         | "CIM_Foo30"        |               |
+| CIM_Foo         | "CIM_Foo31"        |               |
+| CIM_Foo_sub     | "CIM_Foo_sub1"     | 4             |
+| CIM_Foo_sub     | "CIM_Foo_sub2"     | 5             |
+| CIM_Foo_sub     | "CIM_Foo_sub3"     | 6             |
+| CIM_Foo_sub     | "CIM_Foo_sub4"     | 7             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub1" | 8             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub2" | 9             |
+| CIM_Foo_sub_sub | "CIM_Foo_sub_sub3" | 10            |
++-----------------+--------------------+---------------+
+
 """,
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate CIM_Foo --di --no',
+    ['Verify instance -o grid enumerate CIM_Foo --di --no',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
@@ -1183,7 +1161,7 @@ TEST_CASES = [
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate di CIM_Foo --di --no',
+    ['Verify instance enumerate-o grid enumerate di CIM_Foo --di --no',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--no'],
       'general': ['--output-format', 'txt']},
      {'stdout': ['root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
@@ -1201,7 +1179,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o txt enumerate CIM_Foo',
+    ['Verify instance enumerate -o txt enumerate CIM_Foo',
      {'args': ['enumerate', 'CIM_Foo'],
       'general': ['--output-format', 'txt']},
      {'stdout': ["CIMInstance(classname='CIM_Foo', "
@@ -1255,11 +1233,11 @@ TEST_CASES = [
       'test': 'lines'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o grid enumerate di alltypes, datetime',
+    ['Verify instance enumerate -o grid enumerate di alltypes, datetime',
      {'args': ['enumerate', 'Pywbem_Alltypes', '--di',
                '--propertylist', 'scalDateTime', '--pl', 'scalTimeDelta'],
       'general': ['--output-format', 'grid']},
-     {'stdout': ["""Instances: PyWBEM_AllTypes
+     {'stdout': ["""Instances: PyWBEM_AllTypes; deep-inheritance
 +-----------------------------+
 | scalDateTime                |
 +=============================+
@@ -1271,7 +1249,7 @@ TEST_CASES = [
 
     # TODO: modify this to output log and test for info in return and log
 
-    ['Verify instance command enumerate with query.',
+    ['Verify instance  enumerate with query.',
      ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
      {'stdout': ENUM_INSTANCE_RESP,
       'test': 'linesnows'},
@@ -1286,7 +1264,7 @@ TEST_CASES = [
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify command enumerate with CIM_Foo inst name table output',
+    ['Verify instance enumerate with CIM_Foo inst name table output',
      {'args': ['enumerate', 'CIM_Foo', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: CIM_Foo
@@ -1312,7 +1290,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify command enumerate with association class inst name table output',
+    ['Verify instance enumerate with association class inst name table output',
      {'args': ['enumerate', 'TST_A3', '--names-only'],
       'general': ['--output-format', 'table']},
      {'stdout': """InstanceNames: TST_A3
@@ -1329,7 +1307,7 @@ TEST_CASES = [
       'test': 'linesnows'},
      COMPLEX_ASSOC_MODEL, OK],
 
-    ['Verify command enumerate with CIM_Foo summary table output',
+    ['Verify instance enumerate with CIM_Foo summary table output',
      {'args': ['enumerate', 'CIM_Foo', '--summary'],
       'general': ['--output-format', 'table']},
      {'stdout': """Summary of CIMInstance(s) returned
@@ -1344,17 +1322,15 @@ TEST_CASES = [
      SIMPLE_MOCK_FILE, OK],
 
     # TODO the following uses deep-inheritance because of issue in pywbem_mock
-    ['Verify command enumerate with PyWBEM_AllTypes table with scalar '
-     'properties returns instance with all property types',
+    ['Verify enumerate PyWBEM_AllTypes scalar props table',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,scalbool,scalsint32,scaluint32'],
-      'general': ['--output-format', 'grid']},
-     {'stdout': """
-Instances: PyWBEM_AllTypes
+      'general': ['--output-format', 'table']},
+     {'stdout': """Instances: PyWBEM_AllTypes; deep-inheritance
 +-----------------+------------+--------------+--------------+
 | InstanceId      | scalBool   |   scalSint32 |   scalUint32 |
-+=================+============+==============+==============+
+|-----------------+------------+--------------+--------------|
 | "test_instance" | true       |        -9999 |         9999 |
 +-----------------+------------+--------------+--------------+
 """,
@@ -1362,67 +1338,63 @@ Instances: PyWBEM_AllTypes
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify command enumerate with PyWBEM_AllTypes with array properties '
-     'returns instance with all property types',
+    ['Verify enumerate PyWBEM_AllTypes array properties returns --pl '
+     'correct property types',
      {'args': ['enumerate', 'PyWBEM_AllTypes', '--deep-inheritance',
                '--propertylist',
                'instanceid,arraybool,arraysint32,arrayuint32'],
-      'general': ['--output-format', 'grid']},
-     {'stdout': """
-Instances: PyWBEM_AllTypes
+      'general': ['--output-format', 'table']},
+     {'stdout': """Instances: PyWBEM_AllTypes; deep-inheritance
 +-----------------+-------------+---------------+---------------+
 | InstanceId      | arrayBool   | arraySint32   | arrayUint32   |
-+=================+=============+===============+===============+
+|-----------------+-------------+---------------+---------------|
 | "test_instance" | true, false | 0, -9999      | 0, 9999       |
 +-----------------+-------------+---------------+---------------+
-
 """,
       'rc': 0,
       'test': 'linesnows'},
      ALLTYPES_MOCK_FILE, OK],
 
-    ['Verify instance enumerate TST_Person shows value-mapped properties in '
-     'table output',
+    ['Verify enumerate TST_Person shows value-mapped properties table output',
      {'args': ['enumerate', 'TST_Person', '--pl', 'name,gender,likes'],
       'general': ['--output-format', 'table']},
-     {'stdout': """
-Instances: TST_Person
-+------------+------------+-----------------------+
-| name       | gender     | likes                 |
-|------------+------------+-----------------------|
-| "Gabi"     | 1 (female) | 2 (movies)            |
-| "Mike"     | 2 (male)   | 1 (books), 2 (movies) |
-| "Saara"    | 1 (female) | 1 (books)             |
-| "Sofi"     | 1 (female) |                       |
-| "Gabisub"  | 1 (female) |                       |
-| "Mikesub"  | 2 (male)   |                       |
-| "Saarasub" | 1 (female) |                       |
-| "Sofisub"  | 1 (female) |                       |
-+------------+------------+-----------------------+
+     {'stdout': """Instances: TST_Person
++---------------+------------+------------+-----------------------+
+| classname     | name       | gender     | likes                 |
+|---------------+------------+------------+-----------------------|
+| TST_Person    | "Gabi"     | 1 (female) | 2 (movies)            |
+| TST_Person    | "Mike"     | 2 (male)   | 1 (books), 2 (movies) |
+| TST_Person    | "Saara"    | 1 (female) | 1 (books)             |
+| TST_Person    | "Sofi"     | 1 (female) |                       |
+| TST_PersonSub | "Gabisub"  | 1 (female) |                       |
+| TST_PersonSub | "Mikesub"  | 2 (male)   |                       |
+| TST_PersonSub | "Saarasub" | 1 (female) |                       |
+| TST_PersonSub | "Sofisub"  | 1 (female) |                       |
++---------------+------------+------------+-----------------------+
 
 """,
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate TST_Person property list order'
-     'order in table output',
+    ['Verify enumerate TST_Person property list order in table output',
      {'args': ['enumerate', 'TST_Person', '--pl', 'Name,Likes,Gender'],
       'general': ['--output-format', 'table']},
      {'stdout': """
 Instances: TST_Person
-+------------+-----------------------+------------+
-| name       | likes                 | gender     |
-|------------+-----------------------+------------|
-| "Gabi"     | 2 (movies)            | 1 (female) |
-| "Mike"     | 1 (books), 2 (movies) | 2 (male)   |
-| "Saara"    | 1 (books)             | 1 (female) |
-| "Sofi"     |                       | 1 (female) |
-| "Gabisub"  |                       | 1 (female) |
-| "Mikesub"  |                       | 2 (male)   |
-| "Saarasub" |                       | 1 (female) |
-| "Sofisub"  |                       | 1 (female) |
-+------------+-----------------------+------------+
++---------------+------------+-----------------------+------------+
+| classname     | name       | likes                 | gender     |
+|---------------+------------+-----------------------+------------|
+| TST_Person    | "Gabi"     | 2 (movies)            | 1 (female) |
+| TST_Person    | "Mike"     | 1 (books), 2 (movies) | 2 (male)   |
+| TST_Person    | "Saara"    | 1 (books)             | 1 (female) |
+| TST_Person    | "Sofi"     |                       | 1 (female) |
+| TST_PersonSub | "Gabisub"  |                       | 1 (female) |
+| TST_PersonSub | "Mikesub"  |                       | 2 (male)   |
+| TST_PersonSub | "Saarasub" |                       | 1 (female) |
+| TST_PersonSub | "Sofisub"  |                       | 1 (female) |
++---------------+------------+-----------------------+------------+
+
 
 """,
       'rc': 0,
@@ -1451,23 +1423,21 @@ Instances: TST_Person
     # Note: In pywbem 1.0, the returned status for this test changed from
     #       NOT_FOUND to INVALID_CLASS because that is the correct one for
     #       instance operations that do not find their class.
-    ['Verify instance command enumerate error, invalid classname fails, '
-     'pywbem 1.0',
+    ['Verify ienumerate error, invalid classname fails pywbem 1.0',
      ['enumerate', 'CIM_Foox'],
      {'stderr': ["CIMError:", "CIM_ERR_INVALID_CLASS"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, PYWBEM_1_0_0],
 
-    ['Verify instance command enumerate error, invalid classname fails, '
-     'pywbem 0.x',
+    ['Verify instance enumerate error, invalid classname fails pywbem 0.x',
      ['enumerate', 'CIM_Foox'],
      {'stderr': ["CIMError:", "CIM_ERR_NOT_FOUND"],
       'rc': 1,
       'test': 'innows'},
      SIMPLE_MOCK_FILE, not PYWBEM_1_0_0],
 
-    ['Verify instance command enumerate error, no classname fails',
+    ['Verify instance enumerate error, no classname fails',
      ['enumerate'],
      {'stderr':
       ['Usage: pywbemcli [GENERAL-OPTIONS] instance enumerate CLASSNAME', ],
@@ -1475,7 +1445,7 @@ Instances: TST_Person
       'test': 'in'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate error, invalid namespace',
+    ['Verify instance enumerate error, invalid namespace',
      ['enumerate', 'CIM_Foo', '--namespace', 'root/blah'],
      {'stderr':
       # NOTE: Partial string becuase output formats differ starting pywbem 1.0.0
@@ -1484,7 +1454,7 @@ Instances: TST_Person
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate fails invalid query language',
+    ['Verify instance enumerate fails invalid query language',
      ['enumerate', 'CIM_Foo', '--filter-query-language', 'blah',
       '--filter-query', 'InstanceID = 3'],
      {'stderr': ['CIMError', '14', 'CIM_ERR_QUERY_LANGUAGE_NOT_SUPPORTED'],
@@ -1492,7 +1462,7 @@ Instances: TST_Person
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate fails using traditional op',
+    ['Verify instance enumerate fails using traditional op',
      {'args': ['enumerate', 'CIM_Foo', '--filter-query', 'InstanceID = 3'],
       'general': ['--use-pull', 'no']},
      {'stderr':
@@ -1501,7 +1471,7 @@ Instances: TST_Person
       'test': 'regex'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command enumerate with -o txt fails',
+    ['Verify instance enumerate with -o txt fails',
      {'args': ['enumerate', 'CIM_Foo'],
       'general': ['--output-format', 'text']},
      {'stderr': ['Output format "text"', 'not allowed', 'Only CIM formats:',
@@ -1510,7 +1480,7 @@ Instances: TST_Person
       'test': 'innows'},
      SIMPLE_MOCK_FILE, OK],
 
-    ['Verify instance command -o simple enumerate alltypes, all array props',
+    ['Verify instance enumerate -o simple enumerate alltypes, all array props',
      {'args': ['enumerate', 'Pywbem_Alltypes', '--di',
                '--pl', 'instanceid,arraybool,arraysint8,arrayuint8,'
                'arraysint16,arrayuint16,arraysint32,arrayuint32,arrayreal32,'
@@ -1535,76 +1505,70 @@ Instances: TST_Person
     #  issue #2739
     #
 
-    ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties for no --show-null',
+    ['Verify enumerate CIM_Foo --how-null as table',
      {'args': ['enumerate', 'CIM_Foo', ],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
-+-------------------+---------------+
-| InstanceID        | IntegerProp   |
-|-------------------+---------------|
-| "CIM_Foo1"        | 1             |
-| "CIM_Foo2"        |               |
-| "CIM_Foostr1"     |               |
-| "CIM_FoostrNull1" |               |
-+-------------------+---------------+
+     {'stdout': """Instances: CIM_Foo
++----------------+-------------------+---------------+
+| classname      | InstanceID        | IntegerProp   |
+|----------------+-------------------+---------------|
+| CIM_Foo        | "CIM_Foo1"        | 1             |
+| CIM_Foo        | "CIM_Foo2"        |               |
+| CIM_Foostr     | "CIM_Foostr1"     |               |
+| CIM_FooStrNull | "CIM_FoostrNull1" |               |
++----------------+-------------------+---------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
      INSTANCE_TABLE_MODEL_FILE, OK],
 
-    ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties with --show-null',
+    ['Verify instance enumerate of CIM_Foo as tablewith --shod-nullct',
      {'args': ['enumerate', 'CIM_Foo', '--show-null'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
-+-------------------+------------------+---------------+
-| InstanceID        | AlwaysNullProp   | IntegerProp   |
-|-------------------+------------------+---------------|
-| "CIM_Foo1"        |                  | 1             |
-| "CIM_Foo2"        |                  |               |
-| "CIM_Foostr1"     |                  |               |
-| "CIM_FoostrNull1" |                  |               |
-+-------------------+------------------+---------------+
+     {'stdout': """Instances: CIM_Foo
++----------------+-------------------+------------------+---------------+
+| classname      | InstanceID        | AlwaysNullProp   | IntegerProp   |
+|----------------+-------------------+------------------+---------------|
+| CIM_Foo        | "CIM_Foo1"        |                  | 1             |
+| CIM_Foo        | "CIM_Foo2"        |                  |               |
+| CIM_Foostr     | "CIM_Foostr1"     |                  |               |
+| CIM_FooStrNull | "CIM_FoostrNull1" |                  |               |
++----------------+-------------------+------------------+---------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
      INSTANCE_TABLE_MODEL_FILE, OK],
 
-    ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties without --show-null',
+    ['Verify instance enumerate of CIM_Foo --di table  w/o --show-null',
      {'args': ['enumerate', 'CIM_Foo', '--di', ],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """Instances: CIM_Foo
-+-------------------+----------------------+---------------+
-| InstanceID        | cimfoo_str           | IntegerProp   |
-|-------------------+----------------------+---------------|
-| "CIM_Foo1"        |                      | 1             |
-| "CIM_Foo2"        |                      |               |
-| "CIM_Foostr1"     | "String in subclass" |               |
-| "CIM_FoostrNull1" |                      |               |
-+-------------------+----------------------+---------------+
+     {'stdout': """Instances: CIM_Foo; deep-inheritance
++----------------+-------------------+----------------------+---------------+
+| classname      | InstanceID        | cimfoo_str           | IntegerProp   |
+|----------------+-------------------+----------------------+---------------|
+| CIM_Foo        | "CIM_Foo1"        |                      | 1             |
+| CIM_Foo        | "CIM_Foo2"        |                      |               |
+| CIM_Foostr     | "CIM_Foostr1"     | "String in subclass" |               |
+| CIM_FooStrNull | "CIM_FoostrNull1" |                      |               |
++----------------+-------------------+----------------------+---------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
      INSTANCE_TABLE_MODEL_FILE, OK],
 
-    ['Verify instance command enumerate of CIM_Foo as table returns correct '
-     'properties without --show-null',
+    ['Verify instance enumerate of CIM_Foo --di as table  w/o --show-null',
      {'args': ['enumerate', 'CIM_Foo', '--di', '--show-null'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
-+-------------------+------------------+---------------------+----------------------+---------------+
-| InstanceID        | AlwaysNullProp   | AnotherAlwaysNull   | cimfoo_str           | IntegerProp   |
-|-------------------+------------------+---------------------+----------------------+---------------|
-| "CIM_Foo1"        |                  |                     |                      | 1             |
-| "CIM_Foo2"        |                  |                     |                      |               |
-| "CIM_Foostr1"     |                  |                     | "String in subclass" |               |
-| "CIM_FoostrNull1" |                  |                     |                      |               |
-+-------------------+------------------+---------------------+----------------------+---------------+
+     {'stdout': """Instances: CIM_Foo; deep-inheritance
++----------------+-------------------+------------------+---------------------+----------------------+---------------+
+| classname      | InstanceID        | AlwaysNullProp   | AnotherAlwaysNull   | cimfoo_str           | IntegerProp   |
+|----------------+-------------------+------------------+---------------------+----------------------+---------------|
+| CIM_Foo        | "CIM_Foo1"        |                  |                     |                      | 1             |
+| CIM_Foo        | "CIM_Foo2"        |                  |                     |                      |               |
+| CIM_Foostr     | "CIM_Foostr1"     |                  |                     | "String in subclass" |               |
+| CIM_FooStrNull | "CIM_FoostrNull1" |                  |                     |                      |               |
++----------------+-------------------+------------------+---------------------+----------------------+---------------+
+
 """,  # noqa: E501
       'rc': 0,
       'test': 'linesnows'},
@@ -1633,38 +1597,32 @@ Instances: CIM_FooAssoc
       'test': 'linesnows'},
      INSTANCE_TABLE_MODEL_FILE, OK],
 
-    ['Verify instance command associators of CIM_Foo as table returns correct '
-     'properties without --show-null option',
+    ['Verify associators CIM_Foo table returns correct props w/o --show-null',
      {'args': ['associators', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
-+---------------+----------------------+
-| InstanceID    | cimfoo_str           |
-|---------------+----------------------|
-| "CIM_Foo2"    |                      |
-| "CIM_Foostr1" | "String in subclass" |
-+---------------+----------------------+
-
+     {'stdout': """Instances: CIM_Foo
++-------------+---------------+----------------------+
+| classname   | InstanceID    | cimfoo_str           |
+|-------------+---------------+----------------------|
+| CIM_Foo     | "CIM_Foo2"    |                      |
+| CIM_Foostr  | "CIM_Foostr1" | "String in subclass" |
++-------------+---------------+----------------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
      INSTANCE_TABLE_MODEL_FILE, OK],
 
-    ['Verify instance command associators of CIM_Foo as table returns correct '
-     'properties with --show-null option',
+    ['Verify associators CIM_Foo table --show-null option',
      {'args': ['associators', 'CIM_Foo', '--key', 'InstanceID=CIM_Foo1',
                '--show-null'],
       'general': ['--output-format', 'table', '--use-pull', 'no']},
-     {'stdout': """
-Instances: CIM_Foo
-+---------------+------------------+----------------------+
-| InstanceID    | AlwaysNullProp   | cimfoo_str           |
-|---------------+------------------+----------------------|
-| "CIM_Foo2"    |                  |                      |
-| "CIM_Foostr1" |                  | "String in subclass" |
-+---------------+------------------+----------------------+
-
+     {'stdout': """Instances: CIM_Foo
++-------------+---------------+------------------+----------------------+
+| classname   | InstanceID    | AlwaysNullProp   | cimfoo_str           |
+|-------------+---------------+------------------+----------------------|
+| CIM_Foo     | "CIM_Foo2"    |                  |                      |
+| CIM_Foostr  | "CIM_Foostr1" |                  | "String in subclass" |
++-------------+---------------+------------------+----------------------+
 """,
       'rc': 0,
       'test': 'linesnows'},
@@ -2238,7 +2196,7 @@ Instances: CIM_Foo
 
 
 
-    ['Verify instance command -o simple get CIM_Foo',
+    ['Verify instance get-o simple get CIM_Foo',
      {'args': ['get', 'CIM_Foo.InstanceID="CIM_Foo1"'],
       'general': ['-o', 'simple']},
      {'stdout': """Instances: CIM_Foo
@@ -2246,7 +2204,7 @@ InstanceID      IntegerProp
 ------------  -------------
 "CIM_Foo1"                1
 """,
-      'test': 'lines'},
+      'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
     # Cannot insure order of the pick and we are using an integer to
@@ -3188,35 +3146,35 @@ InstanceID      IntegerProp
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command associators with --pl in sorted order',
+    ['Verify instance associators with --pl in sorted order',
      {'args': ['associators', 'TST_Person.name="Mike"',
                '--pl', 'Name,Gender,Likes'],
       'general': ['--output-format', 'table']},
      {'stdout': ["""Instances: TST_FamilyCollection
-+-----------+------------+------------+
-| name      | gender     | likes      |
-|-----------+------------+------------|
-| "Family2" |            |            |
-| "Gabi"    | 1 (female) | 2 (movies) |
-| "Sofi"    | 1 (female) |            |
-+-----------+------------+------------+
++----------------------+-----------+------------+------------+
+| classname            | name      | gender     | likes      |
+|----------------------+-----------+------------+------------|
+| TST_FamilyCollection | "Family2" |            |            |
+| TST_Person           | "Gabi"    | 1 (female) | 2 (movies) |
+| TST_Person           | "Sofi"    | 1 (female) |            |
++----------------------+-----------+------------+------------+
 """],
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
 
-    ['Verify instance command associators with --pl in unsorted order',
+    ['Verify instance associators with --pl in unsorted order',
      {'args': ['associators', 'TST_Person.name="Mike"',
                '--pl', 'Name,Likes,Gender'],
       'general': ['--output-format', 'table']},
      {'stdout': ["""Instances: TST_FamilyCollection
-+-----------+------------+------------+
-| name      | likes      | gender     |
-|-----------+------------+------------|
-| "Family2" |            |            |
-| "Gabi"    | 2 (movies) | 1 (female) |
-| "Sofi"    |            | 1 (female) |
-+-----------+------------+------------+
++----------------------+-----------+------------+------------+
+| classname            | name      | likes      | gender     |
+|----------------------+-----------+------------+------------|
+| TST_FamilyCollection | "Family2" |            |            |
+| TST_Person           | "Gabi"    | 2 (movies) | 1 (female) |
+| TST_Person           | "Sofi"    |            | 1 (female) |
++----------------------+-----------+------------+------------+
 """],
       'rc': 0,
       'test': 'linesnows'},
@@ -4021,35 +3979,36 @@ instance of CIM_Foo {
      {'args': ['enumerate', 'CIM_Foo', '--namespace', 'root/cimv2,root/cimv3'],
       'general': ['--output-format', 'table']},
      {'stdout': """Instances: CIM_Foo
-+-------------+---------------------+---------------+
-| namespace   | InstanceID          | IntegerProp   |
-|-------------+---------------------+---------------|
-| root/cimv2  | "CIM_Foo1"          | 1             |
-| root/cimv2  | "CIM_Foo2"          | 2             |
-| root/cimv2  | "CIM_Foo3"          |               |
-| root/cimv2  | "CIM_Foo30"         |               |
-| root/cimv2  | "CIM_Foo31"         |               |
-| root/cimv2  | "CIM_Foo_sub1"      | 4             |
-| root/cimv2  | "CIM_Foo_sub2"      | 5             |
-| root/cimv2  | "CIM_Foo_sub3"      | 6             |
-| root/cimv2  | "CIM_Foo_sub4"      | 7             |
-| root/cimv2  | "CIM_Foo_sub_sub1"  | 8             |
-| root/cimv2  | "CIM_Foo_sub_sub2"  | 9             |
-| root/cimv2  | "CIM_Foo_sub_sub3"  | 10            |
-| root/cimv3  | "CIM_Foo1"          | 1             |
-| root/cimv3  | "CIM_Foo2"          | 2             |
-| root/cimv3  | "CIM_Foo3"          |               |
-| root/cimv3  | "CIM_Foo3-third-ns" | 3             |
-| root/cimv3  | "CIM_Foo30"         |               |
-| root/cimv3  | "CIM_Foo31"         |               |
-| root/cimv3  | "CIM_Foo_sub1"      | 4             |
-| root/cimv3  | "CIM_Foo_sub2"      | 5             |
-| root/cimv3  | "CIM_Foo_sub3"      | 6             |
-| root/cimv3  | "CIM_Foo_sub4"      | 7             |
-| root/cimv3  | "CIM_Foo_sub_sub1"  | 8             |
-| root/cimv3  | "CIM_Foo_sub_sub2"  | 9             |
-| root/cimv3  | "CIM_Foo_sub_sub3"  | 10            |
-+-------------+---------------------+---------------+
++-------------+-----------------+---------------------+---------------+
+| namespace   | classname       | InstanceID          | IntegerProp   |
+|-------------+-----------------+---------------------+---------------|
+| root/cimv2  | CIM_Foo         | "CIM_Foo1"          | 1             |
+| root/cimv2  | CIM_Foo         | "CIM_Foo2"          | 2             |
+| root/cimv2  | CIM_Foo         | "CIM_Foo3"          |               |
+| root/cimv2  | CIM_Foo         | "CIM_Foo30"         |               |
+| root/cimv2  | CIM_Foo         | "CIM_Foo31"         |               |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub1"      | 4             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub2"      | 5             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub3"      | 6             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub4"      | 7             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub1"  | 8             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub2"  | 9             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub3"  | 10            |
+| root/cimv3  | CIM_Foo         | "CIM_Foo1"          | 1             |
+| root/cimv3  | CIM_Foo         | "CIM_Foo2"          | 2             |
+| root/cimv3  | CIM_Foo         | "CIM_Foo3"          |               |
+| root/cimv3  | CIM_Foo         | "CIM_Foo3-third-ns" | 3             |
+| root/cimv3  | CIM_Foo         | "CIM_Foo30"         |               |
+| root/cimv3  | CIM_Foo         | "CIM_Foo31"         |               |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub1"      | 4             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub2"      | 5             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub3"      | 6             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub4"      | 7             |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub1"  | 8             |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub2"  | 9             |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub3"  | 10            |
++-------------+-----------------+---------------------+---------------+
+
 """,
       'rc': 0,
       'test': 'innows'},
@@ -4068,35 +4027,36 @@ instance of CIM_Foo {
                '--object-order'],
       'general': ['--output-format', 'table']},
      {'stdout': """Instances: CIM_Foo
-+-------------+---------------------+---------------+
-| namespace   | InstanceID          | IntegerProp   |
-|-------------+---------------------+---------------|
-| root/cimv2  | "CIM_Foo1"          | 1             |
-| root/cimv3  | "CIM_Foo1"          | 1             |
-| root/cimv2  | "CIM_Foo2"          | 2             |
-| root/cimv3  | "CIM_Foo2"          | 2             |
-| root/cimv2  | "CIM_Foo3"          |               |
-| root/cimv3  | "CIM_Foo3"          |               |
-| root/cimv2  | "CIM_Foo30"         |               |
-| root/cimv3  | "CIM_Foo30"         |               |
-| root/cimv2  | "CIM_Foo31"         |               |
-| root/cimv3  | "CIM_Foo31"         |               |
-| root/cimv2  | "CIM_Foo_sub1"      | 4             |
-| root/cimv3  | "CIM_Foo_sub1"      | 4             |
-| root/cimv2  | "CIM_Foo_sub2"      | 5             |
-| root/cimv3  | "CIM_Foo_sub2"      | 5             |
-| root/cimv2  | "CIM_Foo_sub3"      | 6             |
-| root/cimv3  | "CIM_Foo_sub3"      | 6             |
-| root/cimv2  | "CIM_Foo_sub4"      | 7             |
-| root/cimv3  | "CIM_Foo_sub4"      | 7             |
-| root/cimv2  | "CIM_Foo_sub_sub1"  | 8             |
-| root/cimv3  | "CIM_Foo_sub_sub1"  | 8             |
-| root/cimv2  | "CIM_Foo_sub_sub2"  | 9             |
-| root/cimv3  | "CIM_Foo_sub_sub2"  | 9             |
-| root/cimv2  | "CIM_Foo_sub_sub3"  | 10            |
-| root/cimv3  | "CIM_Foo_sub_sub3"  | 10            |
-| root/cimv3  | "CIM_Foo3-third-ns" | 3             |
-+-------------+---------------------+---------------+
++-------------+-----------------+---------------------+---------------+
+| namespace   | classname       | InstanceID          | IntegerProp   |
+|-------------+-----------------+---------------------+---------------|
+| root/cimv2  | CIM_Foo         | "CIM_Foo1"          | 1             |
+| root/cimv3  | CIM_Foo         | "CIM_Foo1"          | 1             |
+| root/cimv2  | CIM_Foo         | "CIM_Foo2"          | 2             |
+| root/cimv3  | CIM_Foo         | "CIM_Foo2"          | 2             |
+| root/cimv2  | CIM_Foo         | "CIM_Foo3"          |               |
+| root/cimv3  | CIM_Foo         | "CIM_Foo3"          |               |
+| root/cimv2  | CIM_Foo         | "CIM_Foo30"         |               |
+| root/cimv3  | CIM_Foo         | "CIM_Foo30"         |               |
+| root/cimv2  | CIM_Foo         | "CIM_Foo31"         |               |
+| root/cimv3  | CIM_Foo         | "CIM_Foo31"         |               |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub1"      | 4             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub1"      | 4             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub2"      | 5             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub2"      | 5             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub3"      | 6             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub3"      | 6             |
+| root/cimv2  | CIM_Foo_sub     | "CIM_Foo_sub4"      | 7             |
+| root/cimv3  | CIM_Foo_sub     | "CIM_Foo_sub4"      | 7             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub1"  | 8             |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub1"  | 8             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub2"  | 9             |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub2"  | 9             |
+| root/cimv2  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub3"  | 10            |
+| root/cimv3  | CIM_Foo_sub_sub | "CIM_Foo_sub_sub3"  | 10            |
+| root/cimv3  | CIM_Foo         | "CIM_Foo3-third-ns" | 3             |
++-------------+-----------------+---------------------+---------------+
+
 """,
       'rc': 0,
       'test': 'innows'},
@@ -4435,7 +4395,7 @@ instance of CIM_Foo {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify instance command get non-existent svr. fails).',
+    ['Verify instance get non-existent svr. fails).',
      {'args': ['get', 'root/cimv3:CIM_Foo.InstanceID="CIM_Foo1"'],
       'general': ['--server', 'http://NotAValidServer']},
      {'stderr': ["Error: ConnectionError:"],
@@ -4445,7 +4405,7 @@ instance of CIM_Foo {
 
     # instance references request multiple namespaces
 
-    ['Verify classnames references from two namespaces --summary',
+    ['Verify instance references from two namespaces --summary',
      {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11',
                '--no', '-s', '--namespace', 'root/cimv2,root/cimv3']},
      {'stdout': """root/cimv2 1 CIMInstanceName(s) returned
@@ -4603,7 +4563,7 @@ instance of CIM_FooAssoc {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify instance command references non-existent svr. fails).',
+    ['Verify instance references non-existent svr. fails).',
      {'args': ['references', 'CIM_FooRef1', '--key', 'InstanceID=CIM_FooRef11'],
       'general': ['--server', 'http://NotAValidServer']},
      {'stderr': ["Error: ConnectionError:"],
@@ -4687,7 +4647,7 @@ instance of CIM_FooAssoc {
       'test': 'innows'},
      THREE_NS_MOCK_FILE, OK],
 
-    ['Verify instance command associators non-existent svr. fails).',
+    ['Verify instance associators non-existent svr. fails).',
      {'args': ['associators', 'CIM_FooRef1', '--key',
                'InstanceID=CIM_FooRef11'],
       'general': ['--server', 'http://NotAValidServer']},

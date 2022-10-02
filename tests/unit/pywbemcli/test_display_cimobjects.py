@@ -659,7 +659,7 @@ false  true   "201409221"      9999  -2147483648  "Test "   4294967295
         "Verify print of simple array instance to table with col limit",
         dict(
             args=([simple_array_instance2()], 80, 'simple'),
-            kwargs={},
+            kwargs={'ctx_options': None},
             exp_stdout="""\
 Instances: CIM_Foo
 Pbf    Pbt    Pdt            Pint64      Psint32  Pstr1        Puint32
@@ -676,7 +676,7 @@ false  true   "201409221"      9999  -2147483648  "Test "   4294967295
         "Verify print of simple array instance21 to table with col limit",
         dict(
             args=([simple_array_instance21()], 220, 'simple'),
-            kwargs={},
+            kwargs={'ctx_options': None},
             exp_stdout="""\
 Instances: CIM_Foo
 Pbf           Pbt         Pdt                                                       Pint64      Psint32                   Pstr1                         Puint32
@@ -695,7 +695,7 @@ false, false  true, true  "20140922104920.524789+000", "20140922104920.524789+00
         "Verify print of simple array instance21 to table with col limit",
         dict(
             args=([simple_array_instance21()], 80, 'simple'),
-            kwargs={},
+            kwargs={'ctx_options': None},
             exp_stdout="""\
 Instances: CIM_Foo
 Pbf    Pbt    Pdt          Pint64      Psint32  Pstr1        Puint32
@@ -726,7 +726,7 @@ false  true   "2014092"      9999  -2147483648  "Test "   4294967295
                                        keybindings=OrderedDict(k1='v1',
                                                                k2=32)))])],
                   80, 'simple'),
-            kwargs={},
+            kwargs={'ctx_options': None},
             exp_stdout="""\
 Instances: CIM_Foo
 P
@@ -767,6 +767,7 @@ def test_display_instances_as_table(
     _display_instances_as_table(*args, **kwargs_)
 
     stdout, _ = capsys.readouterr()
+
     assert exp_stdout == stdout, \
         "Unexpected output in test case: {}\n" \
         "Actual:\n" \

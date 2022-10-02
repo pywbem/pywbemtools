@@ -56,7 +56,8 @@ MIN_CELL_WIDTH = 10
 
 def display_cim_objects(context, cim_objects, output_format, summary=False,
                         property_list=None, quote_strings=True,
-                        ignore_null_properties=True, object_order=False):
+                        ignore_null_properties=True, object_order=False,
+                        ctx_options=None):
 
     """
     Display CIM objects in form determined by input parameters.
@@ -184,7 +185,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
         _display_as_table(context, cim_objects, output_format,
                           property_list, quote_strings,
                           ignore_null_properties,
-                          object_order)
+                          object_order,
+                          ctx_options)
         return
 
     # pylint: disable=too-many-function-args
@@ -311,7 +313,8 @@ def _display_as_cim_objects(cim_objects, output_format, object_order):
 
 
 def _display_as_table(context, cim_objects, output_format, property_list,
-                      quote_strings, ignore_null_properties, object_order):
+                      quote_strings, ignore_null_properties, object_order,
+                      ctx_options):
     """
     Display the cim_objects as a table where the table rows are dependent on
     the cim object type being displayed. Calls a method for each type of object
@@ -339,7 +342,8 @@ def _display_as_table(context, cim_objects, output_format, property_list,
         _display_list_as_table(context, objects, output_format,
                                property_list, quote_strings,
                                ignore_null_properties,
-                               use_namespace=True)
+                               use_namespace=True,
+                               ctx_options=ctx_options)
 
     else:  # original input was a list sort but do not include namespace
         if not isinstance(cim_objects, (list)):
@@ -348,12 +352,13 @@ def _display_as_table(context, cim_objects, output_format, property_list,
         _display_list_as_table(context, cim_objects, output_format,
                                property_list, quote_strings,
                                ignore_null_properties,
-                               use_namespace=False)
+                               use_namespace=False,
+                               ctx_options=ctx_options)
 
 
 def _display_list_as_table(context, cim_objects, output_format, property_list,
                            quote_strings, ignore_null_properties,
-                           use_namespace=None):
+                           use_namespace=None, ctx_options=None):
     """
     Display the cim_objects parameter list as a table.  The parameter must be a
     list. Calls lower level display functions for each object type.
@@ -373,7 +378,7 @@ def _display_list_as_table(context, cim_objects, output_format, property_list,
                 cim_objects, table_width, output_format, context=context,
                 property_list=property_list, quote_strings=quote_strings,
                 ignore_null_properties=ignore_null_properties,
-                namespace=use_namespace)
+                namespace=use_namespace, ctx_options=ctx_options)
         elif isinstance(cim_objects[0], CIMClass):
             _display_classes_as_table(cim_objects, table_width, output_format)
         elif isinstance(cim_objects[0], QualDeclWrapper):
@@ -868,7 +873,7 @@ def _display_instances_as_table(insts, table_width, table_format,
                                 include_classnames=False, context=None,
                                 property_list=None, quote_strings=True,
                                 ignore_null_properties=True,
-                                namespace=None):
+                                namespace=None, ctx_options=None):
     """
     Print the properties of the instances defined in insts as a table where
     each row is an instance and each column is a property value.
@@ -891,12 +896,10 @@ def _display_instances_as_table(insts, table_width, table_format,
     for inst in insts:
         assert isinstance(inst, CIMInstance)
 
-    # FUTURE:  include classnames if required: See issue # 1145
-    # Following needs case independence since classnames may have
-    # different case in instances
-    # If multiple classes, display classname
-    # classnames = [inst.classname for inst in insts]
-    # include_classnames = bool(len(set(classnames)) > 1)
+    # Include classnames if multiple classes in display: See issue # 1145
+    # If multiple classes, display classname in table, otherwise show in title
+    classnames = [inst.classname.lower() for inst in insts]
+    include_classnames = bool(len(set(classnames)) > 1)
 
     # Build list of properties, either all properties in a list or all
     # properties in all instances in list of instances
@@ -1004,7 +1007,12 @@ def _display_instances_as_table(insts, table_width, table_format,
         else:
             disp_headers.append(header)
 
-    title = 'Instances: {}'.format(insts[0].classname)
+    # Display string if cmd option deep_inheritance exists and is True
+
+    di = ""
+    if ctx_options:   # This is just for test support
+        di = "; deep-inheritance" if ctx_options.get('deep_inheritance') else ""
+    title = 'Instances: {}{}'.format(insts[0].classname, di)
 
     click.echo(format_table(rows, disp_headers, title=title,
                             table_format=table_format))

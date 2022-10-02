@@ -951,6 +951,10 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+In the table output format with instances a column ``namespace`` is included if
+the request defines multiple namespaces and a ``classname`` column is included
+if the displayed instances are from multiple classes.
+
 **Note:** This command returns the instance associators, not the class associators.
 The :ref:`Class associators command` returns the class associators.
 
@@ -987,6 +991,11 @@ The command options are:
 *  ``--names-only``/``-no`` - This option determines whether the request to return classes
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
+
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname
 
 index:
     pair --namespace option; command option --namespace
@@ -1323,6 +1332,15 @@ are displayed. Otherwise, the instances are displayed. Depending on other option
 either EnumerateInstances or EnumerateInstanceNames may be executed when
 pywbem is called.
 
+Valid output formats in both cases are :term:`CIM object output formats` or
+:term:`Table output formats`.
+
+The table view displays a single instance per
+row and a column for each property in the instance. If the table display
+of instances includes instances from multiple classes, a column is added to
+the table with the classname. If the request covers multiple namespaces,
+a column is added defining the namespace in which each instance resides.
+
 The command options are:
 
 *  ``--local-only`` / ``--lo`` - option that allows showing only local properties
@@ -1379,9 +1397,10 @@ The command options are:
    (i.e. Null) in all of the instances to be displayed. Otherwise only
    properties at least one instance has a non- Null property are displayed
 
-Valid output formats in both cases are :term:`CIM object output formats` or
-:term:`Table output formats`. The table view displays a single instance per
-row and a column for each property in the instance.
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname.
 
 The following example returns two instances as MOF:
 
@@ -1740,6 +1759,10 @@ are displayed. Otherwise, the instances are displayed.
 Valid output formats in both cases are :term:`CIM object output formats` or
 :term:`Table output formats`.
 
+In the table output format with instances a column ``namespace`` is included if
+the request defines multiple namespaces and a ``classname`` column is included
+if the displayed instances are from multiple classes.
+
 **Note:** This command returns the instance references, not the class references.
 The :ref:`Class references command` returns the class references.
 
@@ -1790,6 +1813,11 @@ The command options are:
 *  ``--show-null`` - In the TABLE output formats, show properties with no value
    (i.e. Null) in all of the instances to be displayed. Otherwise only
    properties at least one instance has a non- Null property are displayed
+
+*  ``--object-order`` - This option modifies the order of the display of
+   instances when there are multiple namespaces displayed to order by classname
+   and then namespace where the normal display order is  to order by
+   namespace and then classname
 
 *  ``--help-instancename``/``--hi`` -  Show help message for specifying
    ``INSTANCENAME`` including use of the ``--key`` and ``--namespace``
