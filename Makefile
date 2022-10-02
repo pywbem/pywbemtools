@@ -302,6 +302,9 @@ test_log_file := test_$(python_version_fn).log
 # - 50571 dparse (user safety) 0.4.1 -> 0.5.2, 0.5.1 -> 0.5.2.  ReDos issue
 # - 50885 Pygments 2.7.4 cannot be used on Python 2.7
 # - 50886 Pygments 2.7.4 cannot be used on Python 2.7
+# - 51159 cryptography  v 39.0.0 drops support for C library "LibreSSL" < 3.4
+# - 50885 pygments Lexer infinite loop in versions Pygments versions 1.5 to 2.7.3
+# - 50886 pygments regular expressions vulnerable to ReDos, versions >=1.1,<2.7.4
 
 safety_ignore_opts := \
 	-i 38100 \
@@ -346,6 +349,8 @@ safety_ignore_opts := \
 	-i 50571 \
 	-i 50885 \
 	-i 50886 \
+
+#	-i 51159 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)

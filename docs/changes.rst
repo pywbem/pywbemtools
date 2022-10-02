@@ -90,6 +90,9 @@ Released: not yet
 * Fixed tests that fail because XML output of classes and qualifier declarations
   return attributes not ordered before python version 3.8. (see issue #1173).
 
+* Added new entries to Makefile security ignore list for new security
+  issues issued in in September and October 2022 for pywbemclisupport tools
+
 
 **Known issues:**
 
