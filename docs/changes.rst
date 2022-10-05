@@ -90,6 +90,12 @@ Released: not yet
 * Fixed tests that fail because XML output of classes and qualifier declarations
   return attributes not ordered before python version 3.8. (see issue #1173).
 
+* Modify tests/unit/pywbemcli/wbemserver_mock_class.py to remove the
+  CIMInstanceName host lement used in creating a ProfileImplements instance.  That
+  element of CIMInstanceName is not allowed on Create instance of association
+  classes and as of pywbem 1.5.0 that limitation is enforces.  (see issue
+  #1203)
+
 
 **Known issues:**
 
