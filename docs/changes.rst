@@ -100,6 +100,12 @@ Released: not yet
   association class (i.e. reference_class). Even with multi namespace
   environments the reference class must be in the target namespace.
 
+* Extend the pywbemtools documentation to further explain the mock server
+  support, and how to create mock environments using MOF and python scripts
+  including many more references back to the pywbem documentation.
+
+* Clarify the usage of the general options in the documentation.
+  (see issue #1162)
 
 **Known issues:**
 

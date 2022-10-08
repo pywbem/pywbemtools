@@ -464,8 +464,14 @@ Filter option name                          Component filtered
    separated by periods  (ex. 2.14.0). All 3 integers must exist.
 3. The schema component is True if the schema component of classname (characters
    before "_" match <schema_string>). Ex --schema "CIM"
-4. The ``--leaf-classes`` filter can be important because the pywbem MOF compiler
-   can compile all dependent classes given only the leaf classes.
+4. The ``--leaf-classes`` filter can be important because the
+   :ref:`pywbem MOF compiler <pywbem:MOF Compiler>` can compile all dependent
+   classes given only the leaf classes. Thus, if the bottom class in a
+   class hierarchy is specified, a path to schema classes is specified, and
+   all classes are in files defined by the name of the class, the compiler
+   will find and compile all super classes upon which the leaf class depends.
+   NOTE: The user can observe this behavior be enabling the verbose mode
+   :ref:`--verbose general option`.
 
 If multiple filter options are applied, all of the boolean options must be true for
 the class to be displayed and only the classes that pass non-boolean filters
@@ -527,7 +533,7 @@ namespaces interop and root/comv2 and to present the results of both requests
 in a single response.
 
     class enumerate CIM_ManagedElement -n interop, root/cimve
-    class enumerate CIM_ManagedElement -s interop -n root/cimv2 
+    class enumerate CIM_ManagedElement -s interop -n root/cimv2
 
 The responses are displayed in the same form as for a single namespace except
 that the namespace is included for each type of output format to allow the user to

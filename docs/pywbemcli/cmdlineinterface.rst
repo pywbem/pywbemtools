@@ -29,13 +29,24 @@ Pywbemcli provides a command line interface(CLI) interaction with WBEM servers.
 
 The command line can contain the following components:
 
+The pywbemcli command is invoked with a command and arguments/options:
+
+.. code-block:: text
+
+    $ pywbemcli [GENERAL-OPTIONS] COMMAND [COMMAND-OPTIONS] [ARGUMENTSS]
+    or
+    $ pywbemcli [GENERAL-OPTIONS] COMMAND [ARGUMENTS] [COMMAND-OPTIONS]
+
+
+Where the components are:
+
 .. index:: pair: General Options; command components
 
 * **GENERAL-OPTIONS** - General options; they apply to all commands.
   See :ref:`Using the pywbemcli command line general options` for information
   on the pywbemcli general options.
 
-.. index:: pair: command components; command components
+.. index:: pair: commands ; command components
 
 * **COMMAND** - A name of a command which may consist of:
    * <group name> <command name> for commands that are defined within
@@ -47,7 +58,12 @@ The command line can contain the following components:
 
 .. index:: pair: command arguments; command components
 
-* **ARGS** - Arguments for a command.
+* **ARGUMENTSS** - Arguments may be defineda specific command. Arguments
+  are not individually
+  documented in the help and do not have preceeding dashes. In pywbemcli
+  arguments are only used in commands. There are no general arguments.
+  Specifically they are used to specify request object names (ex. class namme
+  or instance name for specifice commands.
 
 .. index:: pair: command interface; Command Options
 
@@ -55,8 +71,8 @@ The command line can contain the following components:
   COMMAND.
 
 Options are prefixed with the characters ``-`` for the short form or ``--`` for
-the long form (ex. ``-n`` or ``--namespace``). The other components do not
-begin with ``-``.
+the long form (ex. ``-n`` or ``--namespace``). The other command line components
+do not begin with ``-``.
 
 .. index:: pair: command groups; command interface
 
@@ -77,7 +93,7 @@ returns the list of command groups under the title `Commands`.
 
 Commands are named after actions on these objects
 (ex. ``get``, ``create``, ``delete``). The list of commands for each group
-is listed with the command `pywbemcli <group name> --help`.
+is displayed with the command `pywbemcli <group name> --help`.
 
 For example, the command:
 
@@ -172,10 +188,12 @@ completion:
     ... <shows the class commands to select from>
 
 Pywbemcli uses the Python
-`click package <https://click.palletsprojects.com/en/7.x/>`_
+`click package <https://click.palletsprojects.com/en/8.x/>`_
 for its command line handling. See
-`Bash Complete in the Click documentation <https://click.palletsprojects.com/en/7.x/bashcomplete/>`_
-for additional features of the Bash tab completion of pywbemcli.
+`Bash Complete in the Click documentation <https://click.palletsprojects.com/en/8.x/bashcomplete/>`_
+for additional features of the Bash tab completion of pywbemcli. This includes
+information on how to enable the auto complete on the command line.
+
 
 .. index:: pair: interactive mode; command modes
 .. index:: pair: interactive mode; modes of operation
@@ -394,8 +412,7 @@ find other commands in the history containing the same string.
 
 .. index:: pair: interactive mode; history file
 
-The pywbemcli history is stored in the user home directory. In linux systems this is
-, ``~/.pywbemcli_history`` and in windows systems TODO.
+The pywbemcli history is stored in the user home directory on linux systems.
 
 .. index::
    pair: interactive mode; auto-suggestion
@@ -432,7 +449,7 @@ To reset selected string type general options in the interactive, the string
 value of ``""`` (an empty string) is provided as the value which causes pywbemcli
 to set the default value of that general option.
 
-The following code defines a server with --user and password in interactive
+The following code defines a server with ``--user`` and ``--password`` in interactive
 mode.  Then it attempts to modify the user and password to their default values
 of None and execute the class enumerate again.  This command would be executed
 without using the user and password because they have been reset for that command.

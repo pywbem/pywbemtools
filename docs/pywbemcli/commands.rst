@@ -2905,9 +2905,9 @@ implementations of WBEM servers such as the implementation of OpenPegasus.
 ``connection`` command group
 ----------------------------
 
-The ``connection`` command group includes commands that manage named connection
-definitions that are persisted in a :term:`connections file`.
-This allows maintaining multiple connection :term:`connection definition`s and then using any
+The ``connection`` command group includes commands that manage named :term:`connection
+definitions <connection definition>` that are persisted in a :term:`connections file`.
+This allows maintaining multiple connection :term:`connection definitionss <connection definition>` and then using any
 one via the :ref:`--name general option`. Only a single connection is
 active (selected) at any point in time but the connection connection can
 be selected on the pywbemcli command line (:ref:`--name general option`) or
