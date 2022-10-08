@@ -7,158 +7,6 @@ Using the pywbemcli command line general options
 
 .. _`Overview of the general options`:
 
-The following table is an overview of all of the pywbemcli general options with
-a cross-reference to a detailed definition of each opton
-
-
-.. list-table:: pywbemcli general options!
-   :widths: 20 20 20 20 20
-   :header-rows: 1
-
-   * - Option Name
-     - Function(1)
-     - Description
-     - Type
-     - Default Value
-
-   * - :ref:`--server <--server general option>`
-     - Server Definition
-     - Define server URI
-     - String
-     -
-
-   * - :ref:`--name <--name general option>`
-     - Sever Definition
-     - Get server definition by name
-     - String
-     -
-
-   * - :ref:`--mock-server <--mock-server general option>`
-     - Server Definition
-     - Define mock server
-     - String
-     -
-
-   * - :ref:`--user <--user general option>`
-     - Server Attribute
-     - Server user name
-     - String
-     -
-
-   * - :ref:`--password <--password general option>`
-     - Server Attribute
-     - Server user password
-     - String
-     -
-
-   * - :ref:`--use-pull <--use-pull general option>`
-     - Server attribute
-     - Use of pull Operations
-     - Choice
-     - either
-
-   * - :ref:`--pull-max-cnt <--pull-max-cnt general option>`
-     - Server attribute
-     - Max response size
-     - Integer
-     - 1000
-
-   * - :ref:`--certfile <--certfile general option>`
-     - Server attribute
-     - Define server cert
-     - String
-     -
-
-   * - :ref:`--keyfile <--keyfile general option>`
-     - Server attribute
-     - Define Table format
-     - String
-     -
-
-   * - :ref:`--timestats <--timestats general option>`
-     - Client attribute
-     - Control stats
-     - Boolean
-     -
-
-   * - :ref:`--log <--log general option>`
-     - Client attribute
-     - Control stats
-     - String
-     -
-
-   * - :ref:`--verify <--verify general option>`
-     - Client attribute
-     - Verify server cert
-     - Boolean
-     - True
-
-   * - :ref:`--ca-certs <--ca-certs general option>`
-     - Client blah
-     - Define Server ca certs
-     - String
-     -
-
-   * - :ref:`--timeout <--timeout general option>`
-     - Client attribute
-     - Timeout server request
-     - Integer (sec)
-     - 30 sec
-
-   * - :ref:`--default-namespace <--default-namespace general option>`
-     - Client attribute
-     - Connection default namespace
-     - String
-     - root/cimv2
-
-   * - :ref:`--output-format <--output-format general option>`
-     - Client attribute
-     - Define Table format
-     - Choice
-     - MOF
-
-   * - :ref:`--verbose <--verbose general option>`
-     - Client attribute
-     - Display processing details
-     - Boolean
-     - False
-
-   * - :ref:`--version <--version general option>`
-     - Client attribute
-     - Show pywbemtools version
-     -
-     -
-
-   * - :ref:`--warn <--warn general option>`
-     - Client attribute
-     - Control warnings
-     - Boolean
-     -
-
-   * - :ref:`--connections-file <--connections-file general option>`
-     - Client attribute
-     - Define file path
-     - String
-     - Default file
-
-   * - :ref:`--pdb <--pdb general option>`
-     - Client attribute
-     - Run with debugger
-     - Boolean
-     -
-
-   * - :ref:`--helo <--help general option>`
-     - Client attribute
-     - Show help
-     - String
-     -
-
-1. Server definitions and server attributes are attached to a :term:`connection definition`
-   and are used when defined for the current :term:`connection definition` in
-   the interactive mode.  Client attribute exist for the life of an interactive
-   session in the interactive mode. Thus --verbose entered on the command line
-   is used for all commands in the interactive mode.  --user entered on the
-   command line applies to the current server definition only.
 
 Overview of the general options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -230,6 +78,160 @@ specified in the command line invocation:
     | Key         | boolean | False   | False   | PROPERTY  | DisableOverride |
     |             |         |         |         | REFERENCE | ToSubclass      |
     +-------------+---------+---------+---------+-----------+-----------------+
+
+The following table is an overview of all of the pywbemcli general options with
+a cross-reference to a detailed definition of each option.
+
+
+.. list-table:: pywbemcli general options
+   :widths: 20 20 20 20 20
+   :header-rows: 1
+
+   * - Option Name
+     - Function(1)
+     - Description
+     - Type
+     - Default Value
+
+   * - :ref:`--server <--server general option>`
+     - Server Definition
+     - Define server URI
+     - String
+     -
+
+   * - :ref:`--name <--name general option>`
+     - Sever Definition
+     - Get server definition by name
+     - String
+     -
+
+   * - :ref:`--mock-server <--mock-server general option>`
+     - Server Definition
+     - Define mock server
+     - String
+     -
+
+   * - :ref:`--user <--user general option>`
+     - Server Attribute
+     - Server user name
+     - String
+     -
+
+   * - :ref:`--password <--password general option>`
+     - Server Attribute
+     - Server user password
+     - String
+     -
+
+   * - :ref:`--use-pull <--use-pull general option>`
+     - Server attribute
+     - Use of pull Operations
+     - Choice
+     - either
+
+   * - :ref:`--pull-max-cnt <--pull-max-cnt general option>`
+     - Server attribute
+     - Max pull response size
+     - Integer
+     - 1000
+
+   * - :ref:`--certfile <--certfile general option>`
+     - Server attribute
+     - Server cert attribute
+     - String
+     -
+
+   * - :ref:`--keyfile <--keyfile general option>`
+     - Server attribute
+     - Private key file attribute
+     - String
+     -
+
+   * - :ref:`--timestats <--timestats general option>`
+     - Client attribute
+     - Control stats
+     - Boolean
+     -
+
+   * - :ref:`--log <--log general option>`
+     - Client attribute
+     - Define log output
+     - String
+     -
+
+   * - :ref:`--verify <--verify general option>`
+     - Client attribute
+     - Verify server cert
+     - Boolean
+     - True
+
+   * - :ref:`--ca-certs <--ca-certs general option>`
+     - Client blah
+     - Define server ca certs
+     - String
+     -
+
+   * - :ref:`--timeout <--timeout general option>`
+     - Client attribute
+     - Timeout server request
+     - Integer (sec)
+     - 30 sec
+
+   * - :ref:`--default-namespace <--default-namespace general option>`
+     - Client attribute
+     - Connection default namespace
+     - String
+     - root/cimv2
+
+   * - :ref:`--output-format <--output-format general option>`
+     - Client attribute
+     - Define Table format
+     - Choice
+     - MOF
+
+   * - :ref:`--verbose <--verbose general option>`
+     - Client attribute
+     - Display processing details
+     - Boolean
+     - False
+
+   * - :ref:`--version <--version general option>`
+     - Client attribute
+     - Show pywbemtools version
+     -
+     -
+
+   * - :ref:`--warn <--warn general option>`
+     - Client attribute
+     - Control warnings display
+     - Boolean
+     -
+
+   * - :ref:`--connections-file <--connections-file general option>`
+     - Client attribute
+     - Define file path
+     - String
+     - Default file
+
+   * - :ref:`--pdb <--pdb general option>`
+     - Client attribute
+     - Run with debugger
+     - Boolean
+     -
+
+   * - :ref:`--helo <--help general option>`
+     - Client attribute
+     - Show help
+     - String
+     -
+
+1. Server definitions and server attributes are attached to a :term:`connection definition`
+   and are used when defined for the current :term:`connection definition` in
+   the interactive mode.  Client attribute exist for the life of an interactive
+   session in the interactive mode. Thus --verbose entered on the command line
+   is used for all commands in the interactive mode.  --user entered on the
+   command line applies to the current server definition only.
+
 
 .. index:: pair: WBEM server; defining the WBEM server
 
@@ -792,24 +794,35 @@ DMTF pull operations` for more information on pull operations.
 ``--mock-server`` general option
 """"""""""""""""""""""""""""""""
 
-The argument value of the ``--mock-server``/``-m`` general option is a file
-path of a MOF file or Python script that loads a mock WBEM server in the
+The argument value of the ``--mock-server``/``-m`` general option is the file
+path of a MOF  or Python script file that loads a mock WBEM server in the
 pywbemcli process with mock data (i.e. CIM objects).
-This allows pywbemcli to be used without access to a real WBEM server.
+
+This allows users to write MOF and scripts that define a Server environment
+including CIM namespaces, CIM qualifier declarations, CIM classes, and CIM instances that
+responds to pywbemcli commands.
 
 This option may be specified multiple times to define multiple MOF and Python
 files that make up the definition of a mock server. The files must have the
 suffix ".mof" for MOF files and ".py" for Python scripts.
 
-When this option is used, the security options (ex. ``--user``) are irrelevant;
-they may be specified but are not used.
+When this option is used, the security options (i.e. ``user``, ``password``,
+etc.) are irrelevant. They are rejected by pywemcli.
 
-See section :ref:`Mock WBEM server` for information on the characteristics
-of the MOF and Python files that define a mock environment
+Section :ref:`Mock WBEM server` defines the characteristics of the MOF and
+Python files that define a mock server environment.
+
+.. index:: server definition cache: cache server definition
+
+A mock server may be saved in the connections file and is cached if saved in
+the default connections file.  This can significantly speed up the loading
+of the mock server definition when pywbemcli is started.
 
 The following example creates a mock server with two files defining the mock
 data, shows what parameters are defined for the connection, and then saves that
-connection named ``mymockserver``:
+connection named ``mymockserver`` where classdefs.mof could contain CIM qualifier
+declarations and CIM class definitions and insts.py could contain CIM
+instance definitions:
 
 .. code-block:: text
 
@@ -822,6 +835,30 @@ connection named ``mymockserver``:
       . . .
 
     pywbemcli> connection save mymockserver
+    pywbemcli> connection show
+    Connection status:
+    name               value  (state)
+    -----------------  ------------------------------------------
+    name               mock1 (current)
+    server
+    default-namespace  root/cimv2
+    user
+    password
+    timeout            30
+    use-pull
+    pull-max-cnt       1000
+    verify             True
+    certfile
+    keyfile
+    mock-server        tests/unit/pywbemcli/simple_mock_model.mof
+    ca-certs
+    pywbemcli>class enumerate --names-only
+    CIM_BaseEmb
+    CIM_BaseRef
+    CIM_Foo
+    CIM_FooAssoc
+    pywbemcli>
+
 
 See chapter :ref:`Mock WBEM server` for more information on defining
 the files for a mock server.
@@ -921,7 +958,14 @@ before the command within pywbemcli is executed, and the pdb debugger prompt
 will appear. See `pdb debugger commands`_ for details on how to operate the
 built-in pdb debugger.
 
+In addition to the ``--pdb`` option,
+
+An alternate debugger such as `pdb++ debugger` can also be used.
+
 .. _`pdb debugger commands`: https://docs.python.org/2.7/library/pdb.html#debugger-commands
+
+.. _`pdb++ debugger`: https://github.com/pdbpp/pdbpp
+
 
 .. index:: triple: --version; general options; version
 
@@ -979,6 +1023,7 @@ PYWBEMCLI_MOCK_SERVER (1)          ``--mock-server``
 PYWBEMCLI_LOG                      ``--log``
 PYWBEMCLI_PDB                      ``--pdb``
 PYWBEMCLI_CONNECTIONS_FILE         ``--connections-file``
+PYWBEMCLI_SPINNER                  No option attached
 =================================  =============================
 
 Notes:
@@ -1015,7 +1060,8 @@ shell commands to set all of the environment variables:
 
 This can be used to set those environment variables and thus to persist
 the connection name in the shell environment, from where it will be used in
-any subsequent pywbemcli commands:
+any subsequent pywbemcli commands until removed. The following shows the
+display of the pywbbemcli environment variables that are set :
 
 .. code-block:: text
 
@@ -1028,6 +1074,11 @@ any subsequent pywbemcli commands:
 
     $ pywbemcli server namespaces
     . . . <list of namespaces for the defined server>
+
+In addition, an environment variable is provided to disable the
+spinner that is displayed when waiting for responses. The environment
+variable is ``PYWBEMCLI_SPINNER`` and the spinner is disabled when
+this environment variable is set.
 
 
 .. index::
@@ -1123,7 +1174,7 @@ output format can be selected with the :ref:`--output-format general option`.
 The allowed output formats are different for the various command groups and
 commands.
 
-The output formats fall into several groups:
+The output formats fall into the following groups:
 
 * **Table formats** - The :ref:`Table formats` format the result as a table
   with rows and columns. Many of the result types allow table formatted
@@ -1354,7 +1405,8 @@ The output of CIM objects allows multiple formats as follows:
 
   :term:`MOF` is the format used to define and document the CIM models released
   by the DMTF and SNIA. It textually defines the components and structure and
-  data of CIM elements such as classes, instances, and qualifier declarations:
+  data of CIM elements such as classes, instances, and qualifier declarations
+  as shown in the following example of a CIM instance:
 
   .. code-block:: text
 
@@ -1362,6 +1414,20 @@ The output of CIM objects allows multiple formats as follows:
          InstanceID = "CIM_Foo1";
          IntegerProp = 1;
       };
+
+  The MOF output of CIM classes, CIM instances or CIM qualifier declaractions
+  is normally compiler ready and can be recompiled by a MOF compiler such
+  as the :ref:`pywbem MOF compiler <pywbem:MOF Compiler>`.
+
+  The :class:`~pywbem.CIMInstanceName` object (i.e. instance path) does not have a
+  MOF format. Rather it is a formatted UNICODE string format as documented in
+  DMTF specifications :term:`DSP0004` and :termL`DSP0207`.
+
+  The following is an example of the output of an instance of
+  :class:`~pywbem.CIMInstanceName`:
+
+    //ACME.com/cimv2/Test:CIM_RegisteredProfile.InstanceID="Acme.1"
+
 
 * ``--output-format xml``: :term:`CIM-XML` format for CIM elements such as classes,
   instances and qualifier declarations. Besides being used as a protocol for WBEM
@@ -1397,7 +1463,7 @@ The output of CIM objects allows multiple formats as follows:
 
 * ``--output-format repr``: Python repr format of the objects.
 
-  This is the structure and data of the pywbem Python objects representing these
+  This is the structure and data of the pywbem Python objects representing each
   CIM objects and can be useful in understanding the pywbem interpretation of the
   CIM objects:
 

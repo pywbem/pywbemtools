@@ -117,10 +117,13 @@ This documentation uses a few special terms to refer to Python types:
 
    MOF
       MOF (Managed Object Format) is the language used by the DMTF to
-      describe in textual form CIM objects including CIM classes,
-      CIM instances, etc.  It is one of the output formats provided for
-      the display of CIM objects in pywbemcli. See DMTF :term:`DSP0004` for more
-      information on the MOF format.
+      describe in textual form CIM objects including CIM qualifier declarations,
+      CIM classes, CIM instances, etc.  MOF is the language used to define CIM
+      objects in the DMTF schemas. It is one of the output formats provided for
+      the display of CIM objects in pywbemcli. See DMTF :term:`DSP0004` for
+      more information on the MOF format.  MOF files can be compiled with the
+      :ref:`pywbem MOF compiler <pywbem:MOF Compiler>` into
+      :ref:`pywbem CIM objects<pywbem:CIM objects>`.
 
    WBEM management profile
    management profile
