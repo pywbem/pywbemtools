@@ -96,6 +96,10 @@ Released: not yet
   classes and as of pywbem 1.5.0 that limitation is enforces.  (see issue
   #1203)
 
+* Modify instance shrub command to only display the classname of the
+  association class (i.e. reference_class). Even with multi namespace
+  environments the reference class must be in the target namespace.
+
 
 **Known issues:**
 

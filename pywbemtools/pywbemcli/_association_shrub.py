@@ -43,7 +43,6 @@ import six
 import click
 
 from asciitree import LeftAligned
-from pywbem import CIMClassName
 from pywbem._nocasedict import NocaseDict
 
 from ._common import shorten_path_str, sort_cimobjects, to_wbem_uri_folded
@@ -241,13 +240,40 @@ class AssociationShrub(object):
         """
         ref_class_roles = OrderedDict()
         for ref in reference_instnames:
-            cln = CIMClassName(ref.classname, ref.host,
-                               ref.namespace)
+            cln = ref.classname
             if cln not in ref_class_roles:
                 roles = self._get_reference_roles(ref)
                 if roles:
                     ref_class_roles[cln] = roles
         return ref_class_roles
+
+    def get_reference_instnames(self, reference_instances):
+        """
+        Get the references (i.e. association class) instance names based
+        in input parameters.
+
+        Returns:
+            list of strings containing classnames of the reference classes
+            found
+        """
+
+        if self.assoc_class:
+            # Test if AssocClass parameter represents class in rtnd references
+            if self.assoc_class.lower() in {n.classname.lower()
+                                            for n in reference_instances}:
+                reference_instnames = [ri.path for ri in reference_instances if
+                                       self.assoc_class.lower() ==
+                                       ri.classname.lower()]
+            else:
+                reference_instnames = [ri.path for ri in reference_instances]
+                ref_clns = {n.classname for n in reference_instnames}
+                warning_msg(
+                    'Option --assoc-name "{}" not found in associator names '
+                    '({})" from server'.format(self.assoc_class,
+                                               ", ".join(ref_clns)))
+        else:
+            reference_instnames = [ri.path for ri in reference_instances]
+        return reference_instnames
 
     def _build_instance_shrub(self):
         """
@@ -277,31 +303,17 @@ class AssociationShrub(object):
 
         # Get list of reference instance names based on existence of
         # --ac parameter
-        if self.assoc_class:
-            # Test if AssocClass parameter represents class in rtnd references
-            if self.assoc_class.lower() in {n.classname.lower()
-                                            for n in reference_instances}:
-                reference_instnames = [ri.path for ri in reference_instances if
-                                       self.assoc_class.lower() ==
-                                       ri.classname.lower()]
-            else:
-                reference_instnames = [ri.path for ri in reference_instances]
-                ref_clns = {n.classname for n in reference_instnames}
-                warning_msg(
-                    'Option --assoc-name "{}" not found in associator names '
-                    '({})" from server'.format(self.assoc_class,
-                                               ", ".join(ref_clns)))
-        else:
-            reference_instnames = [ri.path for ri in reference_instances]
+
+        reference_instnames = self.get_reference_instnames(reference_instances)
 
         # Put the reference classes into ref_class_roles dict
         ref_class_roles = self.build_ref_class_roles_dict(reference_instnames)
 
         # Find role parameter for each class and insert into instance_shrub
         # dictionary. The result is dictionary of form:
-        #   {<role>:{<ASSOC_CLASS>:[RESULTROLES]}
+        #   {<role>:{<ASSOC_CLASSNAME>:[RESULTROLES]}
         for cln, roles in six.iteritems(ref_class_roles):
-            role_dict = self._get_role_result_roles(roles, cln.classname)
+            role_dict = self._get_role_result_roles(roles, cln)
 
             # Insert the role and cln into the shrub_dict
             for role, result_roles in role_dict.items():
@@ -353,7 +365,7 @@ class AssociationShrub(object):
                     rtnd_assoc_inames = self.sorted_associator_names(
                         self.source_path,
                         role=role,
-                        assoc_class=ref_classname.classname,
+                        assoc_class=ref_classname,
                         result_role=result_role)
 
                     # Build unique associated classnames from returned inames.
@@ -388,7 +400,7 @@ class AssociationShrub(object):
                         assoc_inames = self.sorted_associator_names(
                             self.source_path,
                             role=role,
-                            assoc_class=ref_classname.classname,
+                            assoc_class=ref_classname,
                             result_role=result_role,
                             result_class=assoc_cln)
 
@@ -406,7 +418,6 @@ class AssociationShrub(object):
         the output_format.
         The default ouput format is ascii tree
         """
-
         if output_format_is_table(output_format):
             click.echo(self.build_shrub_table(output_format, summary))
 
@@ -481,8 +492,7 @@ class AssociationShrub(object):
 
                 # Add the reference class element. Include namespace if
                 # different than conn default namespace
-                disp_ref_cln = "{}(AssocClass)". \
-                    format(self.simplify_path(ref_cln))
+                disp_ref_cln = "{}(AssocClass)". format(ref_cln)
 
                 elementstree[disp_ref_cln] = rrole_dict
 
@@ -530,7 +540,7 @@ class AssociationShrub(object):
         # assoc_classnames dict struct [role]:[ref_clns]:[rrole]:[assoc_clns]
         for role, ref_clns in six.iteritems(self.instance_shrub):
             for ref_cln in ref_clns:
-                is_ternary = self.ternary_ref_classes[ref_cln.classname]
+                is_ternary = self.ternary_ref_classes[ref_cln]
                 for rrole, assoc_clns in six.iteritems(
                         self.assoc_instnames[role][ref_cln]):
                     for assoc_cln in assoc_clns:
@@ -542,7 +552,7 @@ class AssociationShrub(object):
                                                 is_ternary)
 
                         rows.append([role,
-                                     self.simplify_path(ref_cln),
+                                     ref_cln,
                                      rrole,
                                      assoc_cln,
                                      inst_col])
@@ -706,7 +716,7 @@ class AssociationShrub(object):
                                 iname.classname.lower():
                             replacements["CreationClassName"] = None
 
-        is_ternary = self.ternary_ref_classes[ref_cln.classname]
+        is_ternary = self.ternary_ref_classes[ref_cln]
 
         modified_inames = OrderedDict()
         for inst_name_tuple in inst_names_tuple:
