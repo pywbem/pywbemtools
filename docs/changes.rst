@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 1.0.1.dev1
-----------------------
+pywbemtools 1.0.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2022-10-16
 
 **Bug fixes:**
 
@@ -32,16 +28,6 @@ Released: not yet
 
 * Fixed a flake8 AttributeError when using importlib-metadata 5.0.0 on
   Python>=3.7, by pinning importlib-metadata to <5.0.0 on these Python versions.
-
-**Enhancements:**
-
-**Cleanup:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.0.0
