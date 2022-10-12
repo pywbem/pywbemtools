@@ -23,6 +23,10 @@ Released: not yet
 
 * Fixed new formatting issues raised by flake8 5.0.
 
+* Fixed issue where package tabulate 0.9.0 causes failure of table build
+  by restricting tabulate version to < 0.9.0 for this version of pywbemcli
+  (see issue #1205)
+
 **Enhancements:**
 
 **Cleanup:**
