@@ -27,6 +27,9 @@ Released: not yet
   by restricting tabulate version to < 0.9.0 for this version of pywbemcli
   (see issue #1205)
 
+* Fixed issue that causes failure of tests with pwbem 1.5.0 because of
+  CIMInstanceName host attribute.  (see issue #1203)
+
 **Enhancements:**
 
 **Cleanup:**

@@ -324,7 +324,6 @@ class WbemServerMock(object):
                 central_inst_path = CIMInstanceName(
                     item[1][0],
                     keybindings=item[1][1],
-                    host=conn.host,
                     namespace=ns)
                 prof_insts = self.wbem_server.get_selected_profiles(
                     registered_org=profile_name[0],
