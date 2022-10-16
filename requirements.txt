@@ -34,8 +34,11 @@ click-spinner>=0.1.8
 click-repl>=0.1.6
 asciitree>=0.3.3
 # tabulate 0.8.8 fixes ImportError on Python 3.10.
-tabulate>=0.8.2; python_version <= '3.9'
-tabulate>=0.8.8; python_version >= '3.10'
+# tabulate 0.9.0 no longer uses str() on values. We have fixed that in pywbemtools
+#   1.1.0 but it was too complex to roll that back into 1.0.x, so we just pin tabulate
+#   to <0.9.0.
+tabulate>=0.8.2,<0.9.0; python_version <= '3.9'
+tabulate>=0.8.8,<0.9.0; python_version >= '3.10'
 toposort>=1.6
 # psutil does not install on Python 3.4 on Windows due to missing MS C++ 10.0 on GitHub Actions.
 # psutil 5.8.0 fixes an install error on Python 3.10

@@ -23,6 +23,9 @@ Released: not yet
 
 * Fixed new formatting issues raised by flake8 5.0.
 
+* Fixed pywbemcli TypeError with tabulate 0.9.0 by pinning tabulate to <0.9.0.
+  This fixes issue #1205 in pywbemtools 1.0.x.
+
 **Enhancements:**
 
 **Cleanup:**
