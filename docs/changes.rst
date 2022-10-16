@@ -30,6 +30,9 @@ Released: not yet
 * Fixed issue that causes failure of tests with pwbem 1.5.0 because of
   CIMInstanceName host attribute.  (see issue #1203)
 
+* Fixed a flake8 AttributeError when using importlib-metadata 5.0.0 on
+  Python>=3.7, by pinning importlib-metadata to <5.0.0 on these Python versions.
+
 **Enhancements:**
 
 **Cleanup:**
