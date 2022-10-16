@@ -159,6 +159,8 @@ pluggy==0.13.0
 funcsigs==1.0.2; python_version == '2.7'
 colorama==0.3.9; python_version == '2.7'
 colorama==0.4.0; python_version >= '3.5'
+importlib-metadata==0.22; python_version <= '3.7'
+importlib-metadata==1.1.0; python_version >= '3.8'
 
 # Coverage reporting (no imports, invoked via coveralls script):
 coverage==5.0; python_version == '2.7' or python_version >= '3.5'
@@ -176,8 +178,6 @@ dparse==0.5.2; python_version >= '3.5'
 # Tox
 tox==2.5.0
 # tox 3.17 requires six>=1.14.0
-# tox 3.14 requires importlib-metadata<1,>=0.12 on py<3.8
-importlib-metadata==0.12; python_version <= '3.7'
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx==1.7.6; python_version == '2.7'
@@ -276,7 +276,6 @@ gitdb2==2.0.0
 html5lib==0.999999999
 idna==2.5
 imagesize==0.7.1
-importlib-metadata==0.12
 isort==4.3.5
 Jinja2==2.8.1; python_version <= '3.9'
 Jinja2==2.10.2; python_version >= '3.10'
