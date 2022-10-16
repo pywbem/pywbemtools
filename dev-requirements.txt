@@ -22,6 +22,10 @@ pytest>=4.3.1; python_version >= '3.5'
 pluggy>=0.13.0
 colorama>=0.3.9,<0.4.0; python_version == '2.7'
 colorama>=0.4.0; python_version >= '3.5'
+# flake8 fails with AttributeError in importlib-metadata 5.0.0 on Python >=3.7
+# tox 3.14 requires importlib-metadata<1,>=0.12 on Python <=3.7
+importlib-metadata>=0.22,<5.0.0; python_version <= '3.7'
+importlib-metadata>=1.1.0; python_version >= '3.8'
 
 # more-itertools version 8.11 requires python 3.6, See issue #2796
 more-itertools>=4.0.0,!=8.11.0; python_version < '3.6'
