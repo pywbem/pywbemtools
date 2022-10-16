@@ -7,6 +7,8 @@
 # the minimum versions required in requirements.txt and dev-requirements.txt.
 
 
+-r requirements.txt
+
 # Direct dependencies:
 
 # Unit test (imports into testcases):
