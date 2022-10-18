@@ -4,8 +4,9 @@ Pywbemtools - WBEM command line tools
 
 This package contains WBEM command line tools:
 
-* pywbemcli - a WBEM client CLI for interacting with WBEM servers
-* pywbemlistener - a tool that runs and manages WBEM listeners
+* :ref:`pywbemcli <Pywbemcli pywbemcli>` - a WBEM client CLI for
+  interacting with WBEM servers
+* :ref:`pywbemlistener <Pywbemlistener command>` - a WBEM CLI tool that runs and manages WBEM listeners
 
 The pywbemtools github page is: `https://github.com/pywbem/pywbemtools <https://github.com/pywbem/pywbemtools>`_.
 
