@@ -104,7 +104,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -199,12 +199,12 @@ viewcode_import = True
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.
-# See http://www.sphinx-doc.org/en/stable/theming.html for built-in themes.
+# See https://www.sphinx-doc.org/en/stable/theming.html for built-in themes.
 html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.
-# See http://www.sphinx-doc.org/en/stable/theming.html for the options
+# See https://www.sphinx-doc.org/en/stable/theming.html for the options
 # available for built-in themes.
 # For options of the 'sphinx_rtd_theme', see
 # https://sphinx-rtd-theme.readthedocs.io/en/latest/configuring.html
@@ -320,7 +320,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pywbemcli.tex', _short_description, author, 'manual'),
+    (master_doc, 'pywbemtools.tex', _short_description, author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -382,7 +382,7 @@ texinfo_documents = [
 
 # -- Options for autodoc extension ----------------------------------------
 # For documentation, see
-# http://www.sphinx-doc.org/en/stable/ext/autodoc.html
+# https://www.sphinx-doc.org/en/stable/ext/autodoc.html
 
 # Selects what content will be inserted into a class description.
 # The possible values are:
@@ -425,7 +425,7 @@ autodoc_mock_imports = []
 
 # -- Options for intersphinx extension ------------------------------------
 # For documentation, see
-# http://www.sphinx-doc.org/en/stable/ext/intersphinx.html
+# https://www.sphinx-doc.org/en/stable/ext/intersphinx.html
 
 # Defines the prefixes for intersphinx links, and the targets they resolve to.
 # Example RST source for 'py2' prefix:
@@ -452,7 +452,7 @@ intersphinx_cache_limit = 5
 
 # -- Options for extlinks extension ---------------------------------------
 # For documentation, see
-# http://www.sphinx-doc.org/en/stable/ext/extlinks.html
+# https://www.sphinx-doc.org/en/stable/ext/extlinks.html
 #
 # Defines aliases for external links that can be used as role names.
 #
@@ -490,6 +490,6 @@ intersphinx_cache_limit = 5
 # results in the link caption "this issue".
 
 extlinks = {
-  'nbview': ('http://nbviewer.jupyter.org/github/pywbem/pywbemcli/blob/master/docs/notebooks/%s', ''),
-  'nbdown': ('https://github.com/pywbem/pywbemcli/raw/master/docs/notebooks/%s', '')
+  'nbview': ('http://nbviewer.jupyter.org/github/pywbem/pywbemcli/blob/master/docs/notebooks/%s', None),
+  'nbdown': ('https://github.com/pywbem/pywbemcli/raw/master/docs/notebooks/%s', None)
 }
