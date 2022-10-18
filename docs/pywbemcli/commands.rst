@@ -26,7 +26,8 @@ For the command line syntax of pywbemcli using these command groups and
 commands, see :ref:`Pywbemcli command line interface`.
 
 **NOTE:** Many of the examples below use the :ref:`--mock-server general option`
-with mock files that are located in the pywbemtools ``tests/unit`` subdirectory.
+with mock files that are located in the pywbemtools ``tests/unit`` subdirectory
+and can be viewed in the pywbemtools git repository or by cloning pywbemtools.
 
 The command groups are:
 
@@ -2913,11 +2914,10 @@ active (selected) at any point in time but the connection connection can
 be selected on the pywbemcli command line (:ref:`--name general option`) or
 changed within an interactive session using the :ref:`Connection select command`.
 
-.. index:: pair: connections file; persistent connection attributes
-
--- index: pair: connection definition, connection attributes
-
-.. index pair: connection attributes, persistent connection attributes
+.. index::
+    pair: connections file; persistent connection attributes
+    pair: connection definition; connection attributes
+    pair: connection attributes; persistent connection attributes
 
 The attributes of each :term:`connection definition` in the :term:`connections file` are:
 
