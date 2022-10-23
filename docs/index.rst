@@ -2,6 +2,8 @@
 Pywbemtools - WBEM command line tools
 *************************************
 
+TEST TEST. This doc is not to be committed
+
 This package contains WBEM command line tools:
 
 * pywbemcli - a WBEM client CLI for interacting with WBEM servers
