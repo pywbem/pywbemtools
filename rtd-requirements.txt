@@ -8,8 +8,7 @@ PyYAML>=3.13
 Sphinx>=1.7.6,<2.0.0; python_version == '2.7'
 Sphinx>=3.5.4,!=4.0.0; python_version >= '3.5'
 docutils>=0.13.1,<0.17; python_version == '2.7'
-# Issue #1218, bullets-list
-docutils>=0.13.1,<0.17; python_version >= '3.5'
+docutils>=0.13.1; python_version >= '3.5'
 sphinx-git>=10.1.1
 # Issue #1218, bullet-list failure with v 0.5.2
 sphinx-rtd-theme>0.5.2
