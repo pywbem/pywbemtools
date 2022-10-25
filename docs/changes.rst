@@ -110,6 +110,9 @@ Released: not yet
 * Clarify the usage of the general options in the documentation.
   (see issue #1162)
 
+* Clean up issues in the docs where items in bullet lists do not show the
+  bullets Changes rtd-requirements to avoid suspect versions. (see issue #1218)
+
 **Known issues:**
 
 * See `list of open issues`_.
