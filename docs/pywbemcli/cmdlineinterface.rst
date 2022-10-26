@@ -113,7 +113,10 @@ Pywbemcli supports several modes of tab-completion, auto-completion suggestions
 depending on whether it is in command or interactive mode. This is detailed
 in the following sections.
 
-.. index:: single: Modes of operation
+.. index::
+    pair: Modes of operation; Command mode
+    pair: Modes of operation; Interactive mode
+    pair: Command mode; Interactive mode
 
 .. _`Modes of operation`:
 
@@ -126,18 +129,18 @@ Pywbemcli supports two modes of operation:
 * `Interactive mode`_: Invoking an interactive pywbemcli shell for typing
   pywbemcli commands.
 
-.. index:: pair: interactive mode; command modes
-.. index:: pair: interactive mode; modes of operation
+.. index:: pair: Interactive mode; command modes
+.. index:: pair: Interactive mode; modes of operation
 
 .. _`Command mode`:
 
 Command mode
 ------------
 
-.. index:: command mode
+.. index:: single: Command mode
 
-In command mode, the pywbemcli command performs its task and terminates
-like any other standalone non-interactive command.
+In command mode, the pywbemcli command performs its task defined on the command
+line and terminates like any other standalone non-interactive command.
 
 This mode is used when the pywbemcli command is invoked with a command or
 command group name and arguments/options:
