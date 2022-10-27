@@ -409,8 +409,8 @@ If the mock is to become a named connection and become part of the default
 connection file, all of the startup files should be registered as dependents.
 
 .. index::
-    pair: mock-server cache; cache mock-server
-    pair: register dependent startup files; dependent startup files
+    pair: mock-server; cache
+    pair: register; dependent startup files
 
 Registering dependent startup files used in the startup script using
 :meth:`~pywbem_mock:FakedWBEMConnection.provider_dependent_registry.add_dependents`
@@ -454,7 +454,6 @@ will register one or more file dependencies.  For example:
         assert os.path.exists(this_file_path)
 
     register_dependents(conn, this_file_path, interop_mof_file)
-
 
 
    The following is an example of registering dependent files including the
@@ -509,8 +508,9 @@ should operate on depending on the Python version:
 
 .. index::
     pair: pywbemcli script setup; setup script
-    pair: connection definition cache; cache connection definition
+    pair: connection definition; cache
     pair: mock-server cache; cache mock-server
+    pair: --mock-server; General option
 
 * New-style(Python >=3.5): The mock script has a ``setup()`` function.  This avoids
   the messiness of using globals and also enables the mock environment of a
@@ -954,7 +954,9 @@ examples of pywbemcli startup scripts that are used for testing including:
    association classes for profile traversing.
 
 
-.. index:: pair: mock WBEM server; cache mock WBEM server
+.. index::
+    pair: mock WBEM server; cache mock WBEM server
+    pair: --mock-server; Command option
 
 .. _`Caching mock WBEM servers connection definitions`:
 
@@ -998,9 +1000,11 @@ The following data from a mock WBEM server is cached:
 - its registered providers
 - a list of dependent files registered by its mock scripts
 
+.. index:: pair: .pywbemcli_mockcache; mock cache directory
+
 The caches for the connection definitions are maintained in the
 ``.pywbemcli_mockcache`` directory in the user's home directory in separate
-files with names of the form <guid>.<connection name>
+files with names of the form <guid>.<connection name>.
 
 If a connection definition is used as the wbem server (:ref:`--name general
 option`) , pywbemcli verifies whether its mock WBEM server has been cached, and

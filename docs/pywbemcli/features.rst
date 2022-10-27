@@ -119,6 +119,7 @@ SetQualifier                       Not implemented
 DeleteQualifier                    Not Implemented
 =================================  ==============================================
 
+.. index:: pair: Command Options; --property option
 
 .. _`Specifying CIM property and parameter values`:
 
@@ -195,6 +196,7 @@ For example:
     -p strarray2=\"ab c\",def
 
 
+
 .. _`Displaying CIM instances/classes or their names`:
 
 Displaying CIM instances/classes or their names
@@ -237,14 +239,18 @@ Thus, for example an ``instance enumerate`` command with and without the
     root/cimv2:CIM_Foo.InstanceID="CIM_Foo3"
 
 
+.. index::
+    pair: INSTANCENAME; command argument
+
+
 .. _`Specifying the INSTANCENAME command argument`:
 
 Specifying the INSTANCENAME command argument
 --------------------------------------------
 
-The INSTANCENAME argument used by some pywbemcli commands (e.g ``instance get``)
-specifies the instance path (aka instance name) of a CIM instance in a CIM
-namespace of a WBEM server.
+The INSTANCENAME  command argument used by some pywbemcli commands (e.g
+``instance get``) specifies the instance path (aka instance name) of a CIM
+instance in a CIM namespace of a WBEM server.
 
 The instance name (INSTANCENAME argument) can be specified in two ways:
 
@@ -402,6 +408,8 @@ interactive selection, as shown in the following example:
     };
 
 
+.. index:: pair: INSTANCENAME; --key command argument
+
 .. _`Defining INSTANCENAME command argument with --key option`:
 
 Defining INSTANCENAME command argument with --key option
@@ -436,7 +444,16 @@ significant information on the classes be requested from the server that would
 not be required without the filter. Thus, these commands may take more processing
 time.
 
-.. index:: single: result filters; class enumerate command
+.. index::
+    single: result filters; class enumerate command
+    pair; --association; Command Option
+    pair: --indication; Command Option
+    pair: --experimental; Command Option
+    pair: --deprecated; Command Option
+    pair: --since; Command Option
+    pair: --schema; Command Option
+    pair: --subclasses; Command Option
+    pair: --leaf-classes; Command Option
 
 .. _class filter options table:
 
@@ -498,7 +515,7 @@ the root classes).
 
 .. index::
     pair: namespace; multiple namespace commands
-    pair: --namespace option; command option --namespace
+    pair: --namespace; Command Option
 
 .. _`Using multiple namespaces with server requests`:
 
