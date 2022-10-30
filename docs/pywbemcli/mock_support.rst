@@ -405,8 +405,11 @@ See :ref:`pywbem:User-defined method providers`.
 Registering dependent startup files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If the mock is to become a named connection and become part of the default
-connection file, all of the startup files should be registered as dependents.
+If the mock environment is to become a :term:`named connection` and become part
+of the default connection file, all of the startup files used in creating
+the mock environment should be registered as dependents so that the pywbemcli
+startup can determine whether to load the mock environment from the cache or
+(if any files have changed) recreate the environment.
 
 .. index::
     pair: mock-server; cache
@@ -420,11 +423,13 @@ of the dependent files change.
 Caching significantly increases the install speed of mock servers since
 the CIM objects are already compiled and the repository created. The
 pywbem method :meth:`~pywbem_mock:FakedWBEMConnection.provider_dependent_registry.add_dependents`
-will register one or more file dependencies.  For example:
+will register one or more file dependencies.  The files to be registered
+would logically include any MOF or python files referenced in the startup script
+and the startup script itself.
+
+For example:
 
 .. code-block::
-
-    def _setup(conn, server, verbose):
 
     def register_dependents(conn, this_file_path, dependent_file_names):
         """
@@ -438,23 +443,24 @@ will register one or more file dependencies.  For example:
         for fn in dependent_file_names:
             dep_path = os.path.join(os.path.dirname(this_file_path), fn)
             conn.provider_dependent_registry.add_dependents(this_file_path,
-                                                        dep_path)
+                                                            dep_path)
 
-    ...
+    def _setup(conn, server, verbose):
 
-    interop_mof_file = 'mock_interop.mof'
-    if sys.version_info >= (3, 5):
-        this_file_path = __file__
-    else:
-        # Unfortunately, it does not seem to be possible to find the file path
-        # of the current script when it is executed using exec(), so we hard
-        # code the file path. This requires that the tests are run from the
-        # repo main directory.
-        this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
-        assert os.path.exists(this_file_path)
+        ...
 
-    register_dependents(conn, this_file_path, interop_mof_file)
+        interop_mof_file = 'mock_interop.mof'
+        if sys.version_info >= (3, 5):
+            this_file_path = __file__
+        else:
+            # Unfortunately, it does not seem to be possible to find the file path
+            # of the current script when it is executed using exec(), so we hard
+            # code the file path. This requires that the tests are run from the
+            # repo main directory.
+            this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
+            assert os.path.exists(this_file_path)
 
+        register_dependents(conn, this_file_path, interop_mof_file)
 
    The following is an example of registering dependent files including the
    script file itself.

@@ -24,20 +24,46 @@ Introduction
 Pywbemtools features
 --------------------
 
-Pywbemtools is a collection of command line tools that communicate with WBEM
-servers. The tools are written in pure Python and support Python 2 and Python
-3.
+* :ref:`pywbemcli <Pywbemcli command>` - A command line tool using
+  the :ref:`Pywbemcli command line interface` with a :ref:`Command mode` and
+  and :ref:`Interactive mode` that provides command groups and commands for the
+  pywbemcli client including:
 
-Pywbemtools includes the following tools:
+  - Explore the CIM data of WBEM servers. It can manage/inspect the CIM model
+    components including CIM classes(:ref:`Class command group`), CIM
+    instances(:ref:`Instance command group`), and CIM qualifiers and execute
+    CIM methods and queries on the WBEM server. Thus, for example, the command
+    :ref:`class enumerate <Class enumerate command>` returns CIM classes from
+    the  WBEM server defined by the current :term:`connection definition`.
 
-* ``pywbemcli`` - A command line utility that uses the `pywbem package on Pypi`_
-  to issue operations to a WBEM server using the `CIM/WBEM standards`_ defined
-  by the `DMTF`_ to perform system management tasks.
+  - Execute specific CIM-XML operations on the WBEM server as defined in `DMTF`_
+    standard :term:`DSP0200` (CIM Operations over HTTP).
 
-* ``pywbemlistener`` - A command line utility that manages WBEM indication
-  listeners running as background processes on the local system. These listeners
-  use the `pywbem package on Pypi`_ to receive indications sent by a WBEM
-  server using the `CIM/WBEM standards`_ defined by the `DMTF`_.
+  - Display the responses in a variety of formats (:ref:`Output formats`)
+    including viewing in the MOF, XML, pywbem Python formats and as
+    tables and trees of hierarchical objects such as CIM classes.
+
+    * Inspect and manage WBEM server functionality including:
+
+      * :term:`CIM namespaces <CIM namespace>` (:ref:`Namespace command group`)
+      * Advertised WBEM management profiles (:ref:`Profile command group`)
+      * WBEM server brand and version information (:ref:`Server command group`)
+      * WBEM server indication subscription data (:ref:`Subscription command group`)
+
+  - Capture detailed information on CIM-XML interactions with the WBEM server
+    including time statistics and details of data flow.
+
+  - Maintain a file (:term:`connections file`) with persisted WBEM
+    :term:`connection definitions <connection definition>` so that pywbemcli
+    can access multiple WBEM servers by name. See :ref:`Connection command group`
+
+  - Use an integrated :ref:`Mock WBEM Server` to try out commands or
+    demonstrate server capabilities. The mock server can be loaded with CIM
+    objects defined in MOF files or via Python scripts.
+
+* :ref:`pywbemlistener <Pywbemlistener command>` - A command line utility that
+  manages WBEM indication listeners running as background processes on the
+  local system and displays/logs CIM indications received by these listeners.
 
 CIM/WBEM standards are used for a wide variety of systems management tasks
 in the industry including DMTF management standards and the `SNIA`_
@@ -73,7 +99,6 @@ The pywbemtools package is supported in these environments:
 Installation
 ------------
 
-.. _virtual Python environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 .. _PyPI: http://pypi.python.org/
 
 This section describes the complete installation of pywbemtools with all steps
@@ -83,15 +108,11 @@ The easiest way to install the pywbemtools package is using pip. Pip ensures
 that any dependent Python packages also get installed.
 
 Pip will install the packages into your currently active Python environment
-(your system Python or your predefined `virtual Python environment`_).
-
-It is beneficial to set up a `virtual Python environment`_ for your project,
-because that leaves your system Python installation unchanged, it does not
-require ``sudo`` rights, and gives you better control about the installed
-packages and their versions.
+See section :ref:`Using Python virtual environments` for more information on
+virtual environments.
 
 If you want to contribute to the pywbem project, you need to set up a
-development and test environment for pywbem. That has a larger set of OS-level
+development and test environment for pywbemtools. That has a larger set of OS-level
 prerequisites and its setup is described in the :ref:`Pywbemtools development` chapter.
 
 
@@ -171,6 +192,10 @@ branch of the Git repository of the package:
 
     $ pip install git+https://github.com/pywbem/pywbemtools.git@master#egg=pywbemtools
 
+
+NOTE: pywbemtools may also be installed for development and to include the
+pywbemtools test environment by cloning the pywbemtools git repository as
+documented in :ref:`Pywbemtools development`.
 
 .. _`Verification of the installation`:
 

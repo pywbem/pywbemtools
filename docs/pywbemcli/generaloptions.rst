@@ -13,9 +13,8 @@ Overview of the general options
 
 General options define:
 
-* The server definition (connection) to the WBEM server mock WBEM server
-  (i.e :term:`connection definition`)against which the pywbemcli commands are
-  targeted. See :ref:`Defining the WBEM server` for details.
+* The server definition (i.e. :term:connection definition) to the WBEM server or mock WBEM server
+  against which the pywbemcli commands are targeted. See :ref:`Defining the WBEM server` for details.
 * Attributes of the WBEM server which is being targeted. This includes attributes
   such as the user/password, certificates, etc. pull operations. These attributes
   are attached to the current WBEM server connection definition and persisted with that

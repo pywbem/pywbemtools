@@ -209,24 +209,30 @@ This documentation uses a few special terms to refer to Python types:
       double quotes.
 
    default connection
-      A connection definition in the :term:`connections file` that is used
+      A :term:`connection definition` in the :term:`connections file` that is used
       by pywbemcli as the :term:`current connection` if pywbemcli is started without
       any connection definition (no :ref:`--server general option`,
       :ref:`--mock-server general option`, or :ref:`--name general option`) and
-      the default connection is defined.
+      a defined default connection..
       A connection definition in the :term:`connections file` becomes the
       default connection on pywbemcli startup if it is specified using the
-      :ref:`connection select command` and the
-      ``--default``/``-d`` command option is used.
+      :ref:`connection select command` with the
+      ``--default``/``-d`` command option.
 
    current connection
-      The connection definition in pywbemcli that is currently active; it is the
-      target connection for pywbemcli commands.  The current
+      The :term:`connection definition` in pywbemcli that is currently active;
+      it is the target connection for pywbemcli commands.  The current
       connection is created on pywbemcli startup with the following options
-      :ref:`--server general option`,
-      :ref:`--mock-server general option`, or :ref:`--name general option` or
-      if a :term:`default connection`) has been defined. The current connection can be
-      changed in the interactive mode with the :ref:`connection select command`.
+      :ref:`--server general option`, :ref:`--mock-server general option`, or
+      :ref:`--name general option` or if a :term:`default connection`) has been
+      defined. The current connection can be changed in the interactive mode
+      with the :ref:`connection select command`.
+
+   named connection
+      A :term:`connection definition` that is in a :term:`connections file` and
+      can be used by referencing it by name with the :ref:--name general option`.
+      Named connections can be created, modified, and deleted with the
+      :ref:`Connection command group`.
 
    default namespace
       The :term:`CIM namespace` set as the current namespace for CIM operations

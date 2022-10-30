@@ -31,8 +31,19 @@ https://github.com/pywbem/pywbemtools
 Setting up the development environment
 --------------------------------------
 
+.. _chocolatey: https://https://chocolatey.org/
+.. _winget: https://learn.microsoft.com/en-us/windows/package-manager/winget/
+
 It is recommended to use Linux as the development environment for pywbemtools.
-OS-X should work as well, but Windows requires a number of manual setup steps.
+OS-X should work as well; Windows requires additional manual setup steps.
+
+The pywbemtools development environment is based on a Makefile and therefore
+requires the GNUmake utility to execute most of the build steps. For Linux and
+the Mac environments, the GNU make utility normally exists but that is not the
+case for Windows. GNU make can be installed on native windows from tools such
+as `chocolatey`_  or `winget`_ for native windows or window environments such
+as cygwin or WSL(Windows Subsystem for Linux) enabled to provide a suitable
+GNUmake utility.
 
 1. Clone the Git repo of this project and switch to its working directory:
 
@@ -41,7 +52,8 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
         $ git clone git@github.com:pywbem/pywbemtools.git
         $ cd pywbemtools
 
-2. It is recommended that you set up a `virtual Python environment`_.
+2. It is recommended that you set up a Python virtual environment. See section
+   :ref:`Using Python virtual environments`.
    Have the virtual Python environment active for all remaining steps.
 
 3. Install pywbemtools and its prerequisites for installing and running it
@@ -49,9 +61,9 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
    This will install Python packages into the active Python environment,
    and OS-level packages.
 
-4. Unix-like environments on Windows (such as CygWin, MinGW, Babun, or Gow)
-   bring their own Python, so double check that the active Python environment
-   is the one you want to use.
+4. Unix-like environments on Windows (such as CygWin, MinGW, Babun, Gow, or
+   WSL(Windows subsystem for Linux)) may bring their own Python, so double
+   check that the active Python environment is the one you want to use.
 
 5. Install the prerequisites for pywbemtools development.
    This will install Python packages into the active Python environment,
@@ -61,17 +73,39 @@ OS-X should work as well, but Windows requires a number of manual setup steps.
 
         $ make develop
 
-6. This project uses Make to do things in the currently active Python
+6. This project uses make to do things in the currently active Python
    environment. The command:
 
    .. code-block:: bash
 
         $ make
 
-   displays a list of valid Make targets and a short description of what each
-   target does.
+   displays a list of valid Make targets for pywbemtools installation and test
+   and a short description of what each target does.
 
-.. _virtual Python environment: https://docs.python-guide.org/en/latest/dev/virtualenvs/
+
+.. _`Using Python virtual environments`:
+
+Using Python virtual environments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _virtual Python environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+.. _virtual Python environment tutorial: https://realpython.com/python-virtual-environments-a-primer/
+.. _Python venv: https://docs.python.org/3/library/venv.html
+
+It is beneficial to set up a virtual Python environment for your project,
+because that leaves your system Python installation unchanged, it does not
+require ``sudo`` rights, and gives you better control about the installed
+packages and their versions.  In effect it isolates the environment for your
+pywbemtools installation from the rest of the OS environment.
+
+There are a number of different virtual environment tools available for python
+depending on your OS and Python including venv, virtualenv, etc.  More information
+on virtual environments can be found at sites like `virtual Python environment`_,
+`virtual Python environment tutorial`_ or `Python venv`_
+
+The pywbem development team extensively uses virtualenv and virtualenvwrapper in
+multiple OS and python version environments.
 
 
 .. _`Building the documentation`:
@@ -135,7 +169,7 @@ There are multiple types of tests in pywbemtools:
 
    Generally, the function tests are organized by the command group so that
    for example the function tests for the class command group are in the file
-   ``test_class_subcmd.py``.
+   ``tests\unit\pywbemcli\test_class_subcmd.py``.
 
    Tests are run by executing:
 
@@ -145,6 +179,19 @@ There are multiple types of tests in pywbemtools:
 
    Test execution can be modified by a number of environment variables, as
    documented in the make help (execute ``make help``).
+
+2. Individual test files
+
+   Individual test files in the tests/unit/ environment can be executed by
+   executing pytest <test_file_path>. Note that the tests require some
+   dependencies to locate the pywbemtools code and to set the terminal width
+   for the tests to 120 characters (many command outputs depend on the terminal
+   width to format output). Thus the following would execute the tests on the
+   class command group contained in ``tests\unit\pywbemcli\test_class_cmds.py``.
+
+   ::
+
+       $ PYTHONPATH=. PYWBEMTOOLS_TERMWIDTH=120 pytest tests/unit/pywbemcli/test_class_cmds.py
 
 3. Manual tests
 
