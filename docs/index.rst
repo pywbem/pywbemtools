@@ -5,9 +5,9 @@ Pywbemtools - WBEM command line tools
 This package contains the following Python based WBEM command line tools:
 
 * :ref:`pywbemcli <Pywbemcli command>` - a WBEM client CLI for interacting with
-  WBEM servers to execute both basic CIM/XML requests on the servers and alos
+  WBEM servers to execute both basic CIM/XML requests on the servers and also
   higher level requests such as showing namespaces, indication subscriptions,
-  profilees, etc.
+  profiles, etc.
 * :ref:`pywbemlistener <Pywbemlistener command>` - a WBEM CLI tool that runs
   and manages WBEM listeners to receive and display WBEM indications.
 
