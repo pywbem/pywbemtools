@@ -89,6 +89,7 @@ setuptools==39.0.1; python_version <= '3.6'
 setuptools==40.6.0; python_version == '3.7'
 setuptools==41.5.0; python_version >= '3.8' and python_version <= '3.9'
 setuptools==49.0.0; python_version >= '3.10'
+# Minimum should be set to 0.38.0 when that version released. Issue #1228
 wheel==0.30.0; python_version <= '3.6'
 wheel==0.32.0; python_version == '3.7'
 wheel==0.33.5; python_version >= '3.8'
@@ -107,7 +108,8 @@ nocasedict==1.0.1
 six==1.14.0; python_version <= '3.9'
 six==1.16.0; python_version >= '3.10'
 Click==7.1.1; python_version <= '3.5'
-Click==8.0.1; python_version >= '3.6'
+# Safety package requires click 8.0.2 minimum
+Click==8.0.2; python_version >= '3.6'
 click-spinner==0.1.8
 click-repl==0.1.6; python_version <= '3.5'
 click-repl==0.2; python_version >= '3.6'
@@ -171,10 +173,13 @@ coveralls==2.1.2; python_version >= '3.5'
 
 # Safety CI by pyup.io
 safety==1.8.7; python_version == '2.7'
-safety==1.9.0; python_version >= '3.5'
+# version 2. not compatible with python 3.5
+safety==1.9.0; python_version == '3.5'
+safety==2.2.0; python_version >= '3.6'
 dparse==0.4.1; python_version == '2.7'
-dparse==0.5.2; python_version >= '3.5'
-
+dparse==0.5.2; python_version == '3.5'
+#  version 0.6.2 required by safety 2.2.0
+dparse==0.6.2; python_version >= '3.6'
 # Tox
 tox==2.5.0
 # tox 3.17 requires six>=1.14.0
@@ -290,7 +295,7 @@ pbr==1.8.0
 pexpect==4.2.1
 pickleshare==0.7.4
 ptyprocess==0.5.1
-py==1.10.0
+py==1.11.0
 pytz==2016.10; python_version <= '3.9'
 pytz==2019.1; python_version >= '3.10'
 pyzmq==16.0.4
