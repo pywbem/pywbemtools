@@ -2921,7 +2921,7 @@ changed within an interactive session using the :ref:`Connection select command`
 
 The attributes of each :term:`connection definition` in the :term:`connections file` are:
 
-* **name** - name of the connection definition. See :ref:`--name general option`.
+* **name** - name of the :term:`connection definition`. See :ref:`--name general option`.
 * **server** - URL of the WBEM server, or None if the connection definition is
   for a mock WBEM server. See :ref:`--server general option`.
 * **default-namespace** - default namespace for the WBEM server. See :ref:`--default-namespace general option`.
@@ -2978,7 +2978,7 @@ Example that deletes a connection definition by the specified name:
 
 .. code-block:: text
 
-    $ pywbemcli connection delete me
+    $ pywbemcli connection delete mytestconnection
 
 Example that deletes a connection definition by selecting it:
 
@@ -3135,8 +3135,8 @@ See :ref:`pywbemcli connection list --help` for the exact help output of the com
 ``connection save`` command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``connection save`` command saves the current connection in the
-:term:`connections file` as a :term:`connection definition` with the name specified
+The ``connection save`` command saves the :term:`current connection` in the
+:term:`connections file` as a :term:`named connection` with the name specified
 in the ``NAME`` argument.
 
 The format is:
@@ -3178,7 +3178,7 @@ See :ref:`pywbemcli connection save --help` for the exact help output of the com
 .. index:: single: connection select command
 .. index:: pair: command; connection select
 
-The ``connection select`` command selects a :term:`connection definition` from the
+The ``connection select`` command selects a :term:`named connection` from the current
 :term:`connections file` to become the :term:`current connection`.
 
 The command format is:
@@ -3345,7 +3345,7 @@ The command format is:
     pywbemcli [GENERAL-OPTIONS] connection set-default ``NAME`` [COMMAND-OPTIONS]
 
 The :term:`default-connection-name` attribute in the connection file allows a
-:term:`connection definition` in a connections file to be loaded on startup without
+:term:`named connection` in a connections file to be loaded on startup without
 using the :ref:`--name general option`. If pywbemcli is started without
 :ref:`--name general option`, :ref:`--server general option`, or
 :ref:`--mock-server general option`, the ``default-connection-name`` attribute
