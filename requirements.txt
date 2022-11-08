@@ -58,7 +58,9 @@ PyYAML>=5.3.1; python_version == '2.7'
 PyYAML>=5.3.1; python_version >= '3.5'
 
 yamlloader>=0.5.5
-packaging>=17.0
+packaging>=17.0; python_version == '2.7'
+packaging>=17.0; python_version == '3.5'
+packaging>=21.0; python_version >= '3.6'
 
 # See issue #822 about issue in mock 4.0.3.
 mock>=3.0.0,<4.0.0; python_version < '3.6'

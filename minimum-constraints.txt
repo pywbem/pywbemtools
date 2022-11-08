@@ -252,6 +252,10 @@ pkginfo==1.4.2
 # Address issue that pyparsing 3.0.0b2 gets installed on py27 (used by packaging)
 pyparsing==2.3.1
 
+packaging==17.0; python_version == '2.7'
+packaging==17.0; python_version == '3.5'
+packaging==21.0; python_version >= '3.6'
+
 # Indirect dependencies for develop (not in dev-requirements.txt)
 
 bleach==3.3.0; python_version == '2.7'
@@ -288,7 +292,6 @@ linecache2==1.0.0
 MarkupSafe==1.1.0
 mistune==0.8.1
 more-itertools==5.0.0
-packaging==17.0
 pandocfilters==1.4.1
 pathlib2==2.2.1
 pbr==1.8.0
