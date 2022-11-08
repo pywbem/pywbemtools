@@ -53,12 +53,6 @@ dparse>=0.4.1,<0.5.0; python_version == '2.7'
 dparse>=0.5.2; python_version == '3.5'
 # ver 0.6.2 min requirement by safety 2.2.0
 dparse>=0.6.2; python_version >= '3.6'
-# Safety requires Click>=8.0.2.
-# Repeat the Click requirements from
-# requirements.txt. to keep them in sync.
-Click>=7.1.1,<8.0; python_version <= '3.5'
-# Safety package requires click 8.0.2 minimum
-# Click>=8.0.2; python_version >= '3.6'
 
 # PyYAML is also pulled in by dparse and python-coveralls
 # PyYAML 5.3 fixed narrow build error on Python 2.7
