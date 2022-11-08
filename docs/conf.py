@@ -82,7 +82,7 @@ else:
 
 # General information about the project.
 project = u'pywbemtools'
-#copyright = u''
+copyright = u'2017-2022 IBM Corp., Inova Development Inc.'
 author = u'pywbem team'
 
 # The short description of the package.
@@ -273,7 +273,7 @@ html_theme_options = {
 #html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
