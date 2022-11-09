@@ -5,12 +5,12 @@ Change log
 ==========
 
 
-pywbemtools 1.1.0.dev1
-----------------------
+pywbemtools 1.1.0
+-----------------
 
-This version contains all fixes up to version 1.0.x.
+This version contains all fixes up to version 1.0.1.
 
-Released: not yet
+Released: 2022-11-08
 
 **Incompatible changes:**
 
@@ -19,8 +19,6 @@ Released: not yet
 * Removed deprecated commands (``server namespaces`` and ``server interop``.
   These commands are part of the namespace group ``namespace list`` and
   ``namespace interop``.)
-
-**Deprecations:**
 
 **Bug fixes:**
 
@@ -115,12 +113,6 @@ Released: not yet
 
 * Update to requirements files for new Nov 2022 security issues with wheel,
   safety, and py. (see PR # 1627)
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.0.0
