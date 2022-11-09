@@ -119,7 +119,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 6.  Commit your changes and push the topic branch to the remote repo:
 
-        git status  # Double check the changed files
         git commit -asm "Release ${MNU}"
         git push --set-upstream origin release_${MNU}
 
@@ -143,7 +142,7 @@ local clone of the `pywbem/pywbemtools` Git repo.
         git pull
         git tag -f ${MNU}
         git push -f --tags
-        git branch -d release_${MNU}
+        git branch -D release_${MNU}
 
 11. When releasing based on the master branch, create and push a new stable
     branch for the same minor version:
@@ -254,8 +253,8 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
     and insert the following section before the top-most section:
 
-        Version M.N.U.dev1
-        ^^^^^^^^^^^^^^^^^^
+        pywbemtools M.N.U.dev1
+        ----------------------
 
         This version contains all fixes up to version M.N-1.x.
 
@@ -279,7 +278,6 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
 5.  Commit your changes and push them to the remote repo:
 
-        git status  # Double check the changed files
         git commit -asm "Start ${MNU}"
         git push --set-upstream origin start_${MNU}
 
@@ -306,4 +304,4 @@ local clone of the `pywbem/pywbemtools` Git repo.
 
         git checkout ${BRANCH}
         git pull
-        git branch -d start_${MNU}
+        git branch -D start_${MNU}
