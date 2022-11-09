@@ -56,6 +56,14 @@ else
   endif
 endif
 
+# The following version check must be in sync with the pip versions defined in minimum-constraints.txt
+pip_has_silence_opts := $(shell $(PYTHON_CMD) -c "import sys; print('true' if sys.version_info >= (3,6) else 'false')")
+ifeq ($(pip_has_silence_opts),true)
+  pip_silence_opts := --disable-pip-version-check --no-python-version-warning
+else
+  pip_silence_opts :=
+endif
+
 # Make variables are case sensitive and some native Windows environments have
 # ComSpec set instead of COMSPEC.
 ifndef COMSPEC
@@ -409,7 +417,7 @@ endif
 # This approach for the Pip install command is needed for Windows because
 # pip.exe is locked and thus cannot be upgraded. We use this approach also for
 # the other packages.
-PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
+PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip $(pip_silence_opts) install
 
 ifeq ($(PLATFORM),Windows_native)
   home := $(HOMEDRIVE)$(HOMEPATH)
@@ -484,13 +492,13 @@ platform:
 	@echo "Python version: $(python_version)"
 	@echo "Pip command name: $(PIP_CMD)"
 	@echo "Pip command location: $(shell $(WHICH) $(PIP_CMD))"
-	@echo "Pip command version: $(shell $(PIP_CMD) --version)"
+	@echo "Pip command version: $(shell $(PIP_CMD) $(pip_silence_opts) --version)"
 	@echo "$(package_name) package version: $(package_version)"
 
 .PHONY: pip_list
 pip_list:
 	@echo "Makefile: Python packages as seen by make:"
-	$(PIP_CMD) list
+	$(PIP_CMD) $(pip_silence_opts) list
 
 .PHONY: env
 env:
