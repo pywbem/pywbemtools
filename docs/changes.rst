@@ -16,6 +16,10 @@ Released: not yet
 
 **Bug fixes:**
 
+* Changed the development status of the Python package from "4 - Beta" to
+  "5 - Production/Stable". This actually applies since version 1.1.0.
+  (issue #1237)
+
 **Enhancements:**
 
 **Cleanup:**
