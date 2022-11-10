@@ -5,30 +5,16 @@ Change log
 ==========
 
 
-pywbemtools 1.1.1.dev1
-----------------------
+pywbemtools 1.1.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2022-11-10
 
 **Bug fixes:**
 
 * Changed the development status of the Python package from "4 - Beta" to
   "5 - Production/Stable". This actually applies since version 1.1.0.
   (issue #1237)
-
-**Enhancements:**
-
-**Cleanup:**
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.1.0
