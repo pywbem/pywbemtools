@@ -310,7 +310,7 @@ test_log_file := test_$(python_version_fn).log
 # - 50571 dparse (user safety) 0.4.1 -> 0.5.2, 0.5.1 -> 0.5.2.  ReDos issue
 # - 50885 Pygments 2.7.4 cannot be used on Python 2.7
 # - 50886 Pygments 2.7.4 cannot be used on Python 2.7
-# - 51499 Wheel CVE fix in version 0.38.0 yanked after release
+# - 51499 Wheel CVE fix in version 0.38.1 fixes; cannnot be used on python 2.7
 # - 51358 Safety, before 2.2.0 uses dparse with issue, python 2.7 max is 1.9.0
 # - 51457 py - Latest release has this safety issue i.e. <=1.11.0
 safety_ignore_opts := \
