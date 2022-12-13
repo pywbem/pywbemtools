@@ -175,10 +175,12 @@ coveralls==2.1.2; python_version >= '3.5'
 safety==1.8.7; python_version == '2.7'
 # version 2. not compatible with python 3.5
 safety==1.9.0; python_version == '3.5'
+# safety 2.2.0 resolves safety issue #51358
 safety==2.2.0; python_version >= '3.6'
+
 dparse==0.4.1; python_version == '2.7'
 dparse==0.5.2; python_version == '3.5'
-#  version 0.6.2 required by safety 2.2.0
+#  dparse version 0.6.2 required by safety 2.2.0
 dparse==0.6.2; python_version >= '3.6'
 # Tox
 tox==2.5.0
