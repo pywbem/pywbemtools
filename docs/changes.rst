@@ -26,6 +26,10 @@ Released: not yet
 
 **Cleanup:**
 
+* Use Ubuntu 20.04 for os target for some github CI tests because python setup
+  action does not include Python 3.5 and 3.6 for ubuntu 22.04 (i.e ubuntu-latest as
+  of Nov 2022) which causes scheduled test failure.  See issue #1245
+
 **Known issues:**
 
 * See `list of open issues`_.
