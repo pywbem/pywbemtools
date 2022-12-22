@@ -97,11 +97,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Create local cache directory for Docker images
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: ${{ matrix.os in ('ubuntu-latest', 'ubuntu-20.04') }}
       run: |
         mkdir -p ${{ env.DOCKER_CACHE_DIR }}
     - name: Set up caching for local Docker image cache directory
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: ${{ matrix.os in ('ubuntu-latest', 'ubuntu-20.04') }}
       uses: actions/cache@v1
       with:
         path: ${{ env.DOCKER_CACHE_DIR }}
@@ -109,7 +109,7 @@ jobs:
         restore-keys: |
           docker-cache-
     - name: Get WBEM server image from Docker Hub or local Docker image cache
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: ${{ matrix.os in ('ubuntu-latest', 'ubuntu-20.04') }}
       run: |
         if [[ ! -f ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }} ]]; then \
           echo "Pulling image from Docker Hub"; \
@@ -186,7 +186,7 @@ jobs:
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: ${{ matrix.os in ('ubuntu-latest', 'ubuntu-20.04') }}
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         # Uses TEST_SERVER_IMAGE variable
