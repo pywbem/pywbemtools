@@ -599,11 +599,9 @@ TEST_CASES = [
       'args': ['enumerate'],
       'env': {MOCK_DEFINITION_ENVVAR:
               GET_TEST_PATH_STR(BAD_PY_ERR_STRTUP_FILE)}},
-     {'stderr': ['Python test process-at-startup script',
-                 'Traceback (most recent call last)',
-                 'line ',
+     {'stderr': ['Traceback (most recent call last)',
                  'def mock?prompt(msg):',
-                 'SyntaxError: invalid syntax'],
+                 'SyntaxError:'],
       'rc': 1,
       'test': 'innows'},
      None, OK],
