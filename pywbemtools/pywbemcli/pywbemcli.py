@@ -143,10 +143,13 @@ def _validate_connections_file(connections_repo, abort=False):
 
 def _execute_startup_script(file_path, verbose):
     """
-    Execute the python script. This  executes the script defined in file_path.
+    Execute the python script defined by file_path.  This should be called only
+    if a python file is defined by the PYWBEMCLI_STARTUP_ENVVAR env var and
+    it is intended as a test support tool only to modify pywbemcli operation for
+    functional tests.
+    This compiles and executes the script defined in file_path.
     The purpose of this code is to execute test scripts at startup.
     """
-
     ext = os.path.splitext(file_path)[1]
     if ext not in ['.py']:
         raise click.ClickException(
@@ -156,9 +159,10 @@ def _execute_startup_script(file_path, verbose):
         raise click.ClickException(
             "File '{}' does not exist".format(file_path))
 
+    # Errors in executing the file cause abort
     with io.open(file_path, 'r', encoding='utf-8') as fp:
         file_source = fp.read()
-        # Only verbose is allowed here
+        # Set verbose for maximum information
         globalparams = {'VERBOSE': verbose}
         try:
             # Using compile+exec instead of just exec allows
@@ -169,12 +173,11 @@ def _execute_startup_script(file_path, verbose):
             exec(file_code, globalparams, None)
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            tb = traceback.format_exception(exc_type, exc_value,
-                                            exc_traceback)
+            tb = traceback.format_exception(exc_type, exc_value, exc_traceback)
             click.echo(
-                "Python test process-at-startup script '{}' "
-                "failed:\n{}".format(file_path, "\n".join(tb)),
-                err=True)
+                "Python  script '{}' defined by env var "
+                "PYWBEMCLI_STARTUP_ENVVAR failed:\n{}"
+                .format(file_path, "\n".join(tb)), err=True)
             raise click.Abort()
 
 

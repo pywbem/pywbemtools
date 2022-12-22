@@ -34,6 +34,8 @@ Released: not yet
 * Test: Added new make target 'check_reqs' that uses pip-missing-reqs to check
   for missing dependencies in minimum-constraints.txt.
 
+* Added support for Python 3.11. (issue #1243)
+
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup
