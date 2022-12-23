@@ -47,6 +47,7 @@ coveralls>=2.1.2,<3.0.0; python_version >= '3.5'
 safety>=1.8.7,<1.9.0; python_version == '2.7'
 safety>=1.9.0,<2.0.0; python_version == '3.5'
 safety>=2.2.0; python_version >= '3.6'
+
 # dparse 0.5.0 has an infinite recursion issue on Python 2.7,
 #   see https://github.com/pyupio/dparse/issues/46
 dparse>=0.4.1,<0.5.0; python_version == '2.7'
@@ -99,6 +100,8 @@ platformdirs>=2.2.0; python_version >= '3.6'
 # wrapt 1.13.0 started depending on MS Visual C++ 9.0 on Python 2.7 on Windows,
 #   which is not available by default on GitHub Actions
 wrapt>=1.11.2; python_version >= '3.5'
+# dill is used by pylint >=2.13
+dill>=0.2; python_version >= '3.6'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
 # flake8 4.0.0 fixes an AttributeError on Python 3.10.
@@ -128,6 +131,22 @@ readme-renderer>=23.0; python_version >= '3.5'
 # Jupyter Notebook (no imports, invoked via jupyter script)
 # TODO Future: currently jupyter not used by pywbemtools
 # jupyter>=1.0.0
+
+# Package dependency management tools
+pipdeptree>=2.2.0
+# pip-check-reqs 2.1.1 removed support for Python 2.7 but does not declare that.
+# pip-check-reqs 2.0.4 (last version with Python 2.7 support) still uses
+#   pip._internal.download which was removed in pip 20.0. That pip version does
+#   not yet have proper dependency handling, so we do not install pip-check-reqs
+#   on Python 2.7.
+# pip-check-reqs 2.3.2 is needed to have proper support for pip<=21.3.
+pip-check-reqs>=2.3.2; python_version >= '3.5' and python_version <= '3.10'
+pip-check-reqs>=2.4.0; python_version >= '3.11'
+
+# safety 2.3.5 started pinning packaging to <22.0 and requires >=21.0
+packaging>=17.0; python_version == '2.7'
+packaging>=17.0; python_version == '3.5'
+packaging>=21.0,<22.0; python_version >= '3.6'
 
 
 # Temporary workarounds on indirectly used packages:

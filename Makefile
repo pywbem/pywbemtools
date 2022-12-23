@@ -407,6 +407,9 @@ dist_dependent_files := \
     $(wildcard $(package_name)/*/*.py) \
     $(wildcard $(package_name)/*/*/*.py) \
 
+# Packages whose dependencies are checked using pip-missing-reqs
+check_reqs_packages := pytest coverage coveralls flake8 pylint safety sphinx twine
+
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
   pywbem_os_setup_file := pywbem_os_setup.bat
@@ -438,6 +441,7 @@ help:
 	@echo "Make targets:"
 	@echo "  install    - Install $(package_name) and its installation and runtime prereqs"
 	@echo "  develop    - Install $(package_name) development prereqs"
+	@echo "  check_reqs - Perform missing dependency checks"
 	@echo "  build      - Build the distribution archive files in: $(dist_dir)"
 	@echo "  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)"
 	@echo "  builddoc   - Build documentation in: $(doc_build_dir)"
@@ -616,7 +620,7 @@ todo: todo_$(pymn).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: all
-all: install develop build builddoc check pylint installtest test
+all: install develop check_reqs build builddoc check pylint installtest test
 	@echo "Makefile: Target $@ done."
 
 .PHONY: clobber
@@ -780,6 +784,26 @@ else
 	@echo "Makefile: Done checking for TODOs"
 endif
 endif
+
+.PHONY: check_reqs
+check_reqs: develop_$(pymn).done minimum-constraints.txt requirements.txt
+ifeq ($(python_m_version),2)
+	@echo "Makefile: Warning: Skipping the checking of missing dependencies on Python $(python_version)" >&2
+else
+	@echo "Makefile: Checking missing dependencies of the package"
+	pip-missing-reqs $(package_name) --requirements-file=requirements.txt
+	pip-missing-reqs $(package_name) --requirements-file=minimum-constraints.txt
+	@echo "Makefile: Done checking missing dependencies of the package"
+ifeq ($(PLATFORM),Windows_native)
+# Reason for skipping on Windows is https://github.com/r1chardj0n3s/pip-check-reqs/issues/67
+	@echo "Makefile: Warning: Skipping the checking of missing dependencies of site-packages directory on native Windows" >&2
+else
+	@echo "Makefile: Checking missing dependencies of some development packages"
+	@rc=0; for pkg in $(check_reqs_packages); do dir=$$($(PYTHON_CMD) -c "import $${pkg} as m,os; dm=os.path.dirname(m.__file__); d=dm if not dm.endswith('site-packages') else m.__file__; print(d)"); cmd="pip-missing-reqs $${dir} --requirements-file=minimum-constraints.txt"; echo $${cmd}; $${cmd}; rc=$$(expr $${rc} + $${?}); done; exit $${rc}
+	@echo "Makefile: Done checking missing dependencies of some development packages"
+endif
+endif
+	@echo "Makefile: $@ done."
 
 .PHONY: test
 test: develop_$(pymn).done $(doc_utility_help_files)
