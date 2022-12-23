@@ -159,7 +159,7 @@ jobs:
         mkdir -p ${{ env.DOCKER_CACHE_DIR }}
     - name: Set up caching for local Docker image cache directory
       if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ${{ env.DOCKER_CACHE_DIR }}
         key: docker-cache-{hash}
@@ -178,11 +178,11 @@ jobs:
           docker load -i ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }}; \
         fi
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Display initial Python packages
