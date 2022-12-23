@@ -24,6 +24,16 @@ Released: not yet
 
 **Enhancements:**
 
+* Added a new make target 'check_reqs' that runs pip-missing-reqs on
+  the pywbemtools package itself and on some development commands, and
+  added that to the GitHub Actions test workflow. (issue #1255)
+
+* Added displaying of the package dependency tree via pipdeptree to
+  the GitHub Actions test workflow. (issue #1256)
+
+* Test: Added new make target 'check_reqs' that uses pip-missing-reqs to check
+  for missing dependencies in minimum-constraints.txt.
+
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup

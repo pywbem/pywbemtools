@@ -77,22 +77,33 @@
 #   wheel       0.33.5
 
 # Additional requirements:
+
 # * pip>=9.0.0 to support the --upgrade-strategy option
 # * setuptools>=20.5 to support environment markers
 # * pip 10.0.0 introduced the --exclude-editable option.
 # * pip 18.0 is needed on pypy3 (py36) to support constraints like cffi!=1.11.3,>=1.8.
 # * pip 20.2 introduced a new resolver whose backtracking had issues that were resolved only in 21.2.2.
 # * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
+# * pip 21.0 dropped support for Python 3.5.
+# * pip 22.0 dropped support for Python 3.6.
 pip==10.0.1; python_version <= '3.5'
-pip==21.3; python_version >= '3.6'
-setuptools==39.0.1; python_version <= '3.6'
-setuptools==40.6.0; python_version == '3.7'
-setuptools==41.5.0; python_version >= '3.8' and python_version <= '3.9'
+pip==21.3.1; python_version >= '3.6' and python_version <= '3.10'
+pip==22.2.2; python_version >= '3.11'
+
+# setuptools 41.5.0 fixes build errors with Visual C++ 14.0 on Windows
+# setuptools 41.5.1 fixes a py27 regression introduced by 41.5.0.
+# setuptools 49.0.0 fixes the comparison of Python versions in requirements that was
+#   based on strings and thus ignored certain requirements on Python 3.10.
+setuptools==41.5.1; python_version <= '3.9'
 setuptools==49.0.0; python_version >= '3.10'
-# Minimum should be set to 0.38.0 when that version released. Issue #1228
-wheel==0.30.0; python_version <= '3.6'
-wheel==0.32.0; python_version == '3.7'
-wheel==0.33.5; python_version >= '3.8'
+
+# wheel 0.36.2 fixes empty and invalid tag issues in archive file name
+# wheel 0.38.0 fixes pywbemtools issue #1228
+# wheel 0.38.1 fixes CVE issue 51499
+# wheel 0.38.1 dropped support for py35+py36
+wheel==0.30.0; python_version == '2.7'
+wheel==0.36.2; python_version >= '3.5' and python_version <= '3.7'
+wheel==0.38.1; python_version >= '3.8'
 
 
 # Direct dependencies for install (must be consistent with requirements.txt)
@@ -209,6 +220,8 @@ typed-ast==1.4.0; python_version >= '3.6' and python_version < '3.8' and impleme
 lazy-object-proxy==1.4.3
 platformdirs==2.2.0; python_version >= '3.6'
 wrapt==1.11.2; python_version >= '3.5'
+dill==0.2; python_version >= '3.6'
+tomlkit==0.10.1; python_version >= '3.7'
 
 # Flake8 and dependents (no imports, invoked via flake8 script):
 flake8==3.8.0; python_version <= '3.9'
@@ -251,6 +264,11 @@ pkginfo==1.4.2
 #pywin32==223; sys_platform == 'win32' and python_version == '3.7'
 #pywin32==227; sys_platform == 'win32' and python_version >= '3.8'
 
+# Package dependency management tools
+pipdeptree==2.2.0
+pip-check-reqs==2.3.2; python_version >= '3.5' and python_version <= '3.10'
+pip-check-reqs==2.4.0; python_version >= '3.11'
+
 # Address issue that pyparsing 3.0.0b2 gets installed on py27 (used by packaging)
 pyparsing==2.3.1
 
@@ -277,6 +295,7 @@ chardet==3.0.2
 clint==0.5.1
 configparser==4.0.2; python_version < '3.2'
 contextlib2==0.6.0
+docopt==0.6.1
 enum34==1.1.6; python_version == "2.7"
 filelock==3.0.0
 functools32==3.2.3.post2; python_version < "3.2"
@@ -290,6 +309,7 @@ isort==4.3.5
 Jinja2==2.8.1; python_version <= '3.9'
 Jinja2==2.10.2; python_version >= '3.10'
 jsonschema==2.6.0
+keyring==18.0.0
 linecache2==1.0.0
 MarkupSafe==1.1.0
 mistune==0.8.1
@@ -304,6 +324,7 @@ py==1.11.0
 pytz==2016.10; python_version <= '3.9'
 pytz==2019.1; python_version >= '3.10'
 pyzmq==16.0.4
+rfc3986==1.4.0
 qtconsole==4.2.1
 requests-toolbelt==0.8.0
 rich==12.0.0; python_version >= '3.6'
@@ -323,10 +344,12 @@ sphinxcontrib-serializinghtml==1.1.5; python_version >= '3.5'
 terminado==0.6
 testpath==0.3
 toml==0.10.0
+tomli==2.0.1; python_version >= '3.5'
 tornado==4.4.2
 tqdm==4.28.1
 traceback2==1.4.0
 traitlets==4.3.1
+typing-extensions==3.10.0
 wcwidth==0.1.7
 webencodings==0.5.1
 widgetsnbextension==1.2.6
