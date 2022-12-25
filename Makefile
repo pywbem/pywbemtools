@@ -56,14 +56,6 @@ else
   endif
 endif
 
-# The following version check must be in sync with the pip versions defined in minimum-constraints.txt
-pip_has_silence_opts := $(shell $(PYTHON_CMD) -c "import sys; print('true' if sys.version_info >= (3,6) else 'false')")
-ifeq ($(pip_has_silence_opts),true)
-  pip_silence_opts := --disable-pip-version-check --no-python-version-warning
-else
-  pip_silence_opts :=
-endif
-
 # Make variables are case sensitive and some native Windows environments have
 # ComSpec set instead of COMSPEC.
 ifndef COMSPEC
@@ -179,18 +171,6 @@ python_version := $(shell $(PYTHON_CMD) tools/python_version.py 3)
 python_mn_version := $(shell $(PYTHON_CMD) tools/python_version.py 2)
 python_m_version := $(shell $(PYTHON_CMD) tools/python_version.py 1)
 pymn := py$(python_mn_version)
-
-# pip 20.0 added the --no-python-version-warning option. Keep the following in sync
-# with the pip versions in minimum-constraints.txt.
-ifeq ($(python_mn_version),2.7)
-  pip_version_opts := --disable-pip-version-check
-else
-  ifeq ($(python_mn_version),3.5)
-    pip_version_opts := --disable-pip-version-check
-  else
-    pip_version_opts := --disable-pip-version-check --no-python-version-warning
-  endif
-endif
 
 # Directory for the generated distribution files
 dist_dir := dist
@@ -432,7 +412,7 @@ endif
 # This approach for the Pip install command is needed for Windows because
 # pip.exe is locked and thus cannot be upgraded. We use this approach also for
 # the other packages.
-PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip $(pip_silence_opts) install
+PIP_INSTALL_CMD := $(PYTHON_CMD) -m pip install
 
 ifeq ($(PLATFORM),Windows_native)
   home := $(HOMEDRIVE)$(HOMEPATH)
@@ -508,13 +488,13 @@ platform:
 	@echo "Python version: $(python_version)"
 	@echo "Pip command name: $(PIP_CMD)"
 	@echo "Pip command location: $(shell $(WHICH) $(PIP_CMD))"
-	@echo "Pip command version: $(shell $(PIP_CMD) $(pip_silence_opts) --version)"
+	@echo "Pip command version: $(shell $(PIP_CMD) --version)"
 	@echo "$(package_name) package version: $(package_version)"
 
 .PHONY: pip_list
 pip_list:
 	@echo "Makefile: Python packages as seen by make:"
-	$(PIP_CMD) $(pip_version_opts) $(pip_silence_opts) list
+	$(PIP_CMD) list
 
 .PHONY: env
 env:
@@ -540,7 +520,7 @@ _show_bitsize:
 pip_minimum_$(pymn).done: Makefile minimum-constraints.txt
 	@echo "Makefile: Upgrading/downgrading Pip to minimum version"
 	-$(call RM_FUNC,$@)
-	$(PIP_INSTALL_CMD) $(pip_version_opts) -c minimum-constraints.txt pip
+	$(PIP_INSTALL_CMD) -c minimum-constraints.txt pip
 	echo "done" >$@
 	@echo "Makefile: Done upgrading/downgrading Pip to minimum version"
 
@@ -556,7 +536,7 @@ pywbem_os_setup.bat: Makefile
 install_basic_$(pymn).done: Makefile pip_minimum_$(pymn).done $(pip_constraints_deps)
 	@echo "Makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
 	-$(call RM_FUNC,$@)
-	$(PIP_INSTALL_CMD) $(pip_version_opts) $(pip_level_opts) pip setuptools wheel
+	$(PIP_INSTALL_CMD) $(pip_level_opts) pip setuptools wheel
 	echo "done" >$@
 	@echo "Makefile: Done installing/upgrading basic Python packages"
 
@@ -564,8 +544,8 @@ install_$(package_name)_$(pymn).done: Makefile install_basic_$(pymn).done requir
 	@echo "Makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
-	$(PIP_INSTALL_CMD) $(pip_version_opts) $(pip_level_opts) -r requirements.txt
-	$(PIP_INSTALL_CMD) $(pip_version_opts) $(pip_level_opts) -e .
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -r requirements.txt
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -e .
 	echo "done" >$@
 	@echo "Makefile: Done installing $(package_name) and its Python runtime prerequisites"
 
@@ -603,7 +583,7 @@ develop: develop_$(pymn).done
 develop_$(pymn).done: Makefile install_basic_$(pymn).done install_$(pymn).done develop_os_$(pymn).done dev-requirements.txt $(pip_constraints_deps)
 	@echo "Makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
-	$(PIP_INSTALL_CMD) $(pip_version_opts) $(pip_level_opts) -r dev-requirements.txt
+	$(PIP_INSTALL_CMD) $(pip_level_opts) -r dev-requirements.txt
 	echo "done" >$@
 	@echo "Makefile: Done installing Python development requirements"
 

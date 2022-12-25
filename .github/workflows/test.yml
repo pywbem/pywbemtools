@@ -152,6 +152,9 @@ jobs:
       max-parallel: 20
       matrix: ${{ fromJson(needs.set_matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: 1
+      PIP_NO_PYTHON_VERSION_WARNING: 1
     steps:
     - name: Create local cache directory for Docker images
       if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
