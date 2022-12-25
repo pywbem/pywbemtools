@@ -82,6 +82,7 @@
 # * setuptools>=20.5 to support environment markers
 # * pip 10.0.0 introduced the --exclude-editable option.
 # * pip 18.0 is needed on pypy3 (py36) to support constraints like cffi!=1.11.3,>=1.8.
+# * pip 20.0 introduced the --no-python-version-warning option
 # * pip 20.2 introduced a new resolver whose backtracking had issues that were resolved only in 21.2.2.
 # * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
 # * pip 21.0 dropped support for Python 3.5.
@@ -272,6 +273,7 @@ pip-check-reqs==2.4.0; python_version >= '3.11'
 # Address issue that pyparsing 3.0.0b2 gets installed on py27 (used by packaging)
 pyparsing==2.3.1
 
+# Packaging 21.0 is required by safety 2.2.0
 packaging==17.0; python_version == '2.7'
 packaging==17.0; python_version == '3.5'
 packaging==21.0; python_version >= '3.6'
