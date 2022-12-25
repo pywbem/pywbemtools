@@ -18,7 +18,7 @@ def alltypes_callback(conn, object_name, methodname, **params):
     method_callback_interface which defines the input parameters and returns
     all parameters received.
     """
-    return_params = [params[p] for p in params]
+    return_params = list(params.values())
     return_value = 0
 
     return (return_value, return_params)
