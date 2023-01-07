@@ -1738,6 +1738,38 @@ Instances: CIM_Foo
       'test': 'linesnows'},
      SIMPLE_MOCK_FILE, OK],
 
+    ['Table output with --propertylist correct column order',
+     {'args': ['get', 'TST_PERSON', '-k', 'name=Gabi',
+               '--pl', 'gender,likes,name'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """
+Instances: TST_Person
++------------+------------+--------+
+| gender     | likes      | name   |
+|------------+------------+--------|
+| 1 (female) | 2 (movies) | "Gabi" |
++------------+------------+--------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
+    ['Table output with --propertylist correct column order test 2',
+     {'args': ['get', 'TST_PERSON', '-k', 'name=Gabi',
+               '--pl', 'name,gender,likes'],
+      'general': ['--output-format', 'table']},
+     {'stdout': """
+Instances: TST_Person
++--------+------------+------------+
+| name   | gender     | likes      |
+|--------+------------+------------|
+| "Gabi" | 1 (female) | 2 (movies) |
++--------+------------+------------+
+""",
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, OK],
+
     ['INSTANCENAME with namespace, option --namespace with same ns (error)',
      ['get', 'root/cimv2:CIM_Foo.InstanceID="CIM_Foo1"',
       '--namespace', 'root/cimv2'],
@@ -3162,6 +3194,25 @@ InstanceID      IntegerProp
       'rc': 0,
       'test': 'linesnows'},
      ASSOC_MOCK_FILE, OK],
+
+    ['Verify instance associators with --pl in sorted order test 2',
+     {'args': ['associators', 'TST_Person.name="Mike"',
+               '--pl', 'Name,Likes,Gender'],
+      'general': ['--output-format', 'table']},
+     {'stdout': ["""Instances: TST_FamilyCollection
++----------------------+-----------+------------+------------+
+| classname            | name      | likes      | gender     |
+|----------------------+-----------+------------+------------|
+| TST_FamilyCollection | "Family2" |            |            |
+| TST_Person           | "Gabi"    | 2 (movies) | 1 (female) |
+| TST_Person           | "Sofi"    |            | 1 (female) |
++----------------------+-----------+------------+------------+
+"""],
+      'rc': 0,
+      'test': 'linesnows'},
+     ASSOC_MOCK_FILE, RUN],
+
+
 
     ['Verify instance associators with --pl in unsorted order',
      {'args': ['associators', 'TST_Person.name="Mike"',

@@ -18,6 +18,11 @@ Released: not yet
 
 **Bug fixes:**
 
+* Fix issue where "instance get" was not properly ordering the columns
+  of the table output for commands like "-o table instance get ... --pl p1,p2,p3".
+  The table was not being output in the same order as the list of properties in
+  the property list option. (see issue #1259)
+
 * Changed the development status of the Python package from "4 - Beta" to
   "5 - Production/Stable". This actually applies since version 1.1.0.
   (issue #1237)
