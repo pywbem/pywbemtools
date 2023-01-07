@@ -1031,7 +1031,8 @@ def cmd_instance_get(context, instancename, options):
     property_list = resolve_propertylist(options['propertylist'])
 
     results = ResultsHandler(context, options, output_fmt, "instance",
-                             instancepath, instpath=instancepath)
+                             instancepath, instpath=instancepath,
+                             property_list=property_list)
 
     for ns in results:
         try:
