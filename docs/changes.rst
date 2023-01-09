@@ -42,6 +42,9 @@ Released: not yet
   action does not include Python 3.5 and 3.6 for ubuntu 22.04 (i.e ubuntu-latest as
   of Nov 2022) which causes scheduled test failure.  See issue #1245
 
+* Update to reflect new security issues that were added in Jan 2023. This
+  involved GitPython, safety, setuptools certifi,  and future.
+
 **Known issues:**
 
 * See `list of open issues`_.

@@ -305,6 +305,10 @@ test_log_file := test_$(python_version_fn).log
 # - 51499 Wheel CVE fix in version 0.38.1 fixes; cannnot be used on python 2.7
 # - 51358 Safety, before 2.2.0 uses dparse with issue, python 2.7 max is 1.9.0
 # - 51457 py - Latest release has this safety issue i.e. <=1.11.0
+# - 52322 GitPython - max version for python 2.7 is < 3.0.0
+# - 52510 future - new min >0.18.2 - No new version released Jan 2023. Issue #2976
+# - 52518 GitPython - Python 2.7 uses version 2.1.1
+# - 52365 certifi - 2020.4,5,1 max python 2.7, 22.5.1.18.1 max python 3.5
 safety_ignore_opts := \
 	-i 38100 \
 	-i 38834 \
@@ -351,6 +355,11 @@ safety_ignore_opts := \
 	-i 51499 \
 	-i 51358 \
 	-i 51457 \
+	-i 52322 \
+	-i 52495 \
+	-i 52510 \
+	-i 52518 \
+	-i 52365 \
 
 ifdef TESTCASES
   pytest_opts := $(TESTOPTS) -k $(TESTCASES)

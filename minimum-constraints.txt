@@ -1,4 +1,4 @@
-# Pip constraints file for runtime and development.
+# Pywbemtools Pip constraints file for runtime and development.
 #
 # This constraints file specifies constraints that match the minimum versions
 # specified in the requirements files for runtime and development. The reason
@@ -93,10 +93,12 @@ pip==22.2.2; python_version >= '3.11'
 
 # setuptools 41.5.0 fixes build errors with Visual C++ 14.0 on Windows
 # setuptools 41.5.1 fixes a py27 regression introduced by 41.5.0.
+# setuptools 44.0.0, last version that states py 2.7 requirement
 # setuptools 49.0.0 fixes the comparison of Python versions in requirements that was
 #   based on strings and thus ignored certain requirements on Python 3.10.
+# setuptools 65.5.1 fixes safety issue 52495
 setuptools==41.5.1; python_version <= '3.9'
-setuptools==49.0.0; python_version >= '3.10'
+setuptools==65.1.1; python_version >= '3.10'
 
 # wheel 0.36.2 fixes empty and invalid tag issues in archive file name
 # wheel 0.38.0 fixes pywbemtools issue #1228
@@ -194,6 +196,7 @@ dparse==0.4.1; python_version == '2.7'
 dparse==0.5.2; python_version == '3.5'
 #  dparse version 0.6.2 required by safety 2.2.0
 dparse==0.6.2; python_version >= '3.6'
+
 # Tox
 tox==2.5.0
 # tox 3.17 requires six>=1.14.0
@@ -207,7 +210,9 @@ docutils==0.13.1; python_version >= '3.5' and python_version <= '3.9'
 docutils==0.14; python_version == '3.10'
 docutils==0.16; python_version >= '3.11'
 sphinx-git==10.1.1
-GitPython==2.1.1
+GitPython==2.1.1; python_version == '2.7'
+GitPython==2.1.1; python_version >= '3.5' and python_version <= '3.6'
+GitPython==3.1.27; python_version >= '3.7'
 sphinxcontrib-websupport==1.1.2
 Pygments==2.1.3; python_version == '2.7'
 Pygments==2.7.4; python_version >= '3.5'
@@ -249,29 +254,7 @@ twine==2.0.0; python_version >= '3.6'
 readme-renderer==23.0
 pkginfo==1.4.2
 
-# Jupyter Notebook (no imports, invoked via jupyter script):
-# NOTE: Jupyter Notebooks not currently provided with pywbemcli
-#jupyter==1.0.0
-#ipython==5.1.0; python_version == '2.7'
-#ipython==7.0; python_version == '3.5'
-#ipython==7.10; python_version >= '3.6'
-#ipykernel==4.5.2
-#ipython_genutils==0.1.0
-#ipywidgets==5.2.2
-#jupyter_console==5.0.0; python_version == '2.7'
-#jupyter_console==6.0.0; python_version >= '3.5'
-#jupyter_client==4.4.0
-#jupyter_core==4.2.1
-#nbconvert==5.0.0
-#nbformat==4.2.0
-#notebook==4.3.1
-#pyrsistent==0.14.0
-
-# Pywin32 is used (at least?) by jupyter.
-#pywin32==222; sys_platform == 'win32' and python_version == '2.7'
-#pywin32==222; sys_platform == 'win32' and python_version >= '3.5' and python_version <= '3.6'
-#pywin32==223; sys_platform == 'win32' and python_version == '3.7'
-#pywin32==227; sys_platform == 'win32' and python_version >= '3.8'
+# Jupyter Notebook not used with pywbemtools
 
 # Package dependency management tools
 pipdeptree==2.2.0
@@ -314,7 +297,11 @@ filelock==3.0.0
 functools32==3.2.3.post2; python_version < "3.2"
 future==0.18.2
 futures==3.3.0; python_version < "3.2"
-gitdb2==2.0.0
+# gitdb2 is a mirror Pypi name for certain gitdb versions.
+gitdb2==2.0.0; python_version == '2.7'
+gitdb2==2.0.0; python_version >= '3.5' and python_version <= '3.6'
+gitdb==4.0.8; python_version >= '3.7'
+
 html5lib==0.999999999
 idna==2.5
 imagesize==0.7.1

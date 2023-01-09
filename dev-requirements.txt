@@ -81,7 +81,12 @@ docutils>=0.13.1,<0.17; python_version >= '3.5' and python_version <= '3.9'
 docutils>=0.14,<0.17; python_version == '3.10'
 docutils>=0.16,<0.17; python_version >= '3.11'
 sphinx-git>=10.1.1
-GitPython>=2.1.1;
+# GitPython version 3.0.0 and newer does not support Python 2.7
+# GitPython version 3.1.24 requires Python >=3.7
+# GitPython version 3.1.27 fixes safety issue #52518
+GitPython>=2.1.1,<3.0.0; python_version == '2.7'
+GitPython>=2.1.1; python_version >= '3.5' and python_version <= '3.6'
+GitPython>=3.1.27; python_version >= '3.7'
 Pygments>=2.1.3; python_version == '2.7'
 Pygments>=2.7.4; python_version >= '3.5'
 sphinx-rtd-theme>=1.0.0
@@ -90,10 +95,11 @@ Babel>=2.7.0
 
 # PyLint (no imports, invoked via pylint script)
 # Pylint requires astroid
+# Pylint 1.x / astroid 1.x supports py27 and py34/35/36
 # Pylint 2.0 / astroid 2.0 removed py27, added py37
 # Pylint 2.7 / astroid 2.5 removed support for py35
-# Pylint 2.10/ astroid 2.7 addresses issue https://github.com/PyCQA/pylint/issues/4118
-# Pylint 2.14 / astroid 2.11 support wrapt 1.14 which is required for Python 3.11, but in addition:
+# Pylint 2.7-2.9 had issue https://github.com/PyCQA/pylint/issues/4118 (issues #2672, #2673)
+# Pylint 2.14 / astroid 2.11 support wrapt 1.14 which is required for Python 3.11
 # Pylint 2.15 / astroid 2.12 is needed to circumvent issue https://github.com/PyCQA/pylint/issues/7972 on Python 3.11
 pylint>=2.5.2; python_version == '3.5'
 pylint>=2.10.0; python_version >= '3.6' and python_version <= '3.10'
