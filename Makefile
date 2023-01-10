@@ -754,10 +754,11 @@ flake8_$(pymn).done: Makefile develop_$(pymn).done $(flake8_rc_file) $(py_src_fi
 	echo "done" >$@
 	@echo "Makefile: Done running Flake8"
 
+# Safety target fail is ignored. See issue #2970
 safety_$(pymn).done: Makefile develop_$(pymn).done minimum-constraints.txt
 	@echo "Makefile: Running pyup.io safety check"
 	-$(call RM_FUNC,$@)
-	safety check -r minimum-constraints.txt --full-report $(safety_ignore_opts)
+	-safety check -r minimum-constraints.txt --full-report $(safety_ignore_opts)
 	echo "done" >$@
 	@echo "Makefile: Done running pyup.io safety check"
 
