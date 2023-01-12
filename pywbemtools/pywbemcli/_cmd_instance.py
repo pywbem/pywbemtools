@@ -1264,6 +1264,7 @@ def cmd_instance_enumerate(context, classname, options):
     """
     conn = context.pywbem_server.conn
     output_fmt = validate_output_format(context.output_format, ['CIM', 'TABLE'])
+    breakpoint()
 
     property_list = resolve_propertylist(options['propertylist'])
 

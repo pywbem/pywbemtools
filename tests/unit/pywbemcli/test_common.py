@@ -602,33 +602,37 @@ TESTCASES_RESOLVE_PROPERTYLIST = [
 
     ('Verify simple property list with 2 entries',
      dict(pl_str=("abc,def",), exp_pl=['abc', 'def']),
-     None, None, True),
+     None, None, OK),
 
     ('Verify propertylist with single property entry',
      dict(pl_str=("abc",), exp_pl=['abc']),
-     None, None, True),
+     None, None, OK),
 
     ('Verify multiple properties',
      dict(pl_str=("abc", "def"), exp_pl=['abc', 'def']),
-     None, None, True),
+     None, None, OK),
 
-    ('Verify multiple properties and both multiple in on option and multiple '
+    ('Verify multiple properties and both multiple in one option and multiple '
      'options.',
      dict(pl_str=None, exp_pl=None),
-     None, None, True),
+     None, None, OK),
 
     ('Verify multiple properties and both multiple in on option and multiple '
      'options.',
      dict(pl_str=("ab", "def", "xyz,rst"), exp_pl=['ab', 'def', 'xyz', 'rst']),
-     None, None, True),
+     None, None, OK),
 
     ('Verify empty propertylist',
-     dict(pl_str=("",), exp_pl=[]),
-     None, None, False),
+     dict(pl_str=(""), exp_pl=None),
+     None, None, OK),
 
-    ('Verify empty propertylist',
-     dict(pl_str=(""), exp_pl=[]),
-     None, None, False),
+    ('Verify propertylist with commas and spaces fails',
+     dict(pl_str=("a, b,c",), exp_pl=[]),
+     click.ClickException, None, OK),
+
+    ('Verify propertylist with commas and spaces fails',
+     dict(pl_str=("a, b,c", "abc"), exp_pl=[]),
+     click.ClickException, None, OK),
 ]
 
 
