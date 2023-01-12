@@ -293,7 +293,8 @@ The command options are:
    or just class names is sent to the server. When set, only the object paths (names)
    are requested. The default is to return the class definitions.
 
-index:    pair --namespace option; command option --namespace
+index: pair --namespace option; command option --namespace
+       pair --namespace option; class associators
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -361,6 +362,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option; class delete
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -452,6 +454,7 @@ The command options are:
 .. index::
     pair: namespace; multiple namespaces
     pair: --namespace option; command option --namespace
+    pair --namespace option; class enumerate
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -461,6 +464,9 @@ The command options are:
    on using multiple namespaces
 
 *  ``-s``/``--summary`` - Show only a summary (count) of the objects.
+
+.. index::
+    pair: class enumerate; response filter options
 
 *  The response filter options which further filter the classes to be displayed by
    characteristics such as whether the class is an association or is
@@ -526,6 +532,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option;class find
 
 *  ``--namespace`` ``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
    This option may be specified multiple times or the namespace list may
@@ -535,9 +542,12 @@ index:
 *  ``--sort``/``-s`` - Sort the results by namespace. The default is to sort by
    classname
 
+.. index::
+    pair: class find; response filter options
+
 *  The response filter options which further filter the classes to be displayed by
    characteristics such as whether the class is an association or is
-   experimental, etc. These options are defined in
+   experimental, etc. These options are documented in
    :ref:`Filtering responses for specific types of classes`.
 
 .. code-block:: text
@@ -628,6 +638,8 @@ The command options are:
 
 .. index::
     pair: namespace; multiple namespaces
+    pair --namespace option; command option --namespace
+    pair --namespace option; class get
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -715,6 +727,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option; class invokemethod
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -797,6 +810,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option; class references
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -856,6 +870,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option; class tree
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -1000,6 +1015,7 @@ The command options are:
 
 index:
     pair --namespace option; command option --namespace
+    pair --namespace option; instance associators
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -1061,7 +1077,7 @@ See :ref:`pywbemcli instance associators --help` for the exact help output of th
 Count the instances of one or more classes defined by a :term:`GLOB pattern`
 with matching class name
 
-The ``instance count`` command counts the CIM instances classes that match a
+The ``instance count`` command counts the CIM instances whose classes match a
 :term:`GLOB pattern` in the namespaces specified with the ``-namespace``/``-n``
 command option, or all namespaces in the server.
 
@@ -1071,11 +1087,13 @@ The command format is:
 .. index:: pair: CLASSNAME-GLOB argument; instance count
 
 This command first finds all of the CIM classes that match the CLASSNAME-GLOB and
-``-namespace``/``-n`` command option  and then gets the instance names of all
-instances of these classes.
+``-namespace``/``-n`` command option excluding any classes defined in the
+``ignore-class`` options and then enumerates the instance names of all
+instances of these.
 
 This command displays the count of instances of each CIM class whose class name
-matches the specified wildcard expression (``CLASSNAME-GLOB``) in all CIM
+matches the specified wildcard expression (``CLASSNAME-GLOB``) minus any classes
+defined in the ``--ignore-classes`` option in all CIM
 namespaces of the WBEM server, or in the specified namespaces (``--namespace``
 option).  This differs from instance enumerate, etc. in that it counts the
 instances specifically for the classname of each instance returned (the
@@ -1099,6 +1117,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance count
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - Add a namespace to the search scope.
    May be specified multiple times. If this option is not specified the
@@ -1117,6 +1136,9 @@ The command options are:
    enumeration of some classes. CIM errors on particular classes are ignored.
    Error exceptions cause scan to stop and remaining classes status shown as 'not
    scanned'. Multiple class names are allowed (one per option or comma-separated).
+
+.. index::
+    pair: instance find; response filter options
 
 *  The response filter options which further filter the classes to be displayed by
    characteristics such as whether the class is an association or is
@@ -1238,6 +1260,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance create
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
@@ -1282,6 +1305,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance delete
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
@@ -1374,6 +1398,9 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+.. index::
+    pair --namespace option; command option --namespace
+    pair --namespace option; instance enumerate
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
@@ -1521,6 +1548,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance get
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the
@@ -1617,6 +1645,10 @@ The command options are:
    allows defining keys on the command line without the issues of quotes.
    Default: No keybindings provided.
 
+.. index::
+    pair --namespace option; command option --namespace
+    pair --namespace option; instance invoke method
+
 * ``--namespace``/``-n`` ``NAMESPACE`` - Namespace to use for this command,
     instead of the default namespace of the :term: current connection.
 
@@ -1707,6 +1739,7 @@ The command arguments are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance modify
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -1797,6 +1830,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance references
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the current connection.
@@ -1874,6 +1908,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance query
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -1945,6 +1980,7 @@ The command options are:
 
 .. index::
     pair --namespace option; command option --namespace
+    pair --namespace option; instance shrub
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` - This option defines the term:`Namespace`
    to use for this command, instead of the default namespace of the
@@ -2143,6 +2179,10 @@ The command format is:
 
 The namespace is specified with the ``-namespace``/``-n`` command option, or
 otherwise is the default namespace of the connection.
+
+.. index::
+    pair --namespace option; command option --namespace
+    pair --namespace option; qualifier enumerate
 
 The ``-namespace``/``-n`` command option option defines the term:`Namespace` to
 use for this command, instead of the default namespace of the :term:`current
@@ -2419,7 +2459,8 @@ resulting CIM objects to the target namespace in the WBEM server of the
 The command options are:
 
 .. index::
-    pair --namespace option; command option --namespace
+    pair --namespace option; command option --namespace  .. index::
+    pair --namespace option; server add-mof
 
 *  ``--namespace``/``-n`` ``NAMESPACE`` This option defines the term:`Namespace` to
    use for this command, instead of the default namespace of the current connection.
@@ -2462,6 +2503,10 @@ resulting CIM objects from the target namespace in the WBEM server of the
 :term:`current connection`.
 
 The command options are:
+
+.. index::
+    pair --namespace option; command option --namespace
+    pair --namespace option; server remove-mof
 
 * ``--namespace``/``-n`` ``NAMESPACE`` The namespace to use for this command,
   instead of the default namespace of the connection.

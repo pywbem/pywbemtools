@@ -22,6 +22,9 @@ Released: not yet
   "5 - Production/Stable". This actually applies since version 1.1.0.
   (issue #1237)
 
+* Fix issue in instance count where error reports CIMError code and not
+  the code string. (see #1242)
+
 **Enhancements:**
 
 * Added a new make target 'check_reqs' that runs pip-missing-reqs on

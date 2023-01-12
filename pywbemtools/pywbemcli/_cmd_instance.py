@@ -1487,11 +1487,11 @@ def cmd_instance_count(context, classname, options):
         except CIMError as ce:
             warning_msg("Server CIMError {0} with namepace={1}, class={2}. "
                         "Continuing scan."
-                        .format(ce, ns, cln))
-            display_tuple = (ns, cln, "CIMError {}".format(ce.status_code))
+                        .format(ce.status_code_name, ns, cln))
+            display_tuple = (ns, cln, "CIMError {}".format(ce.status_code_name))
             display_data.append(display_tuple)
             continue
-        # Error exception cause termination of the connection. Add this
+        # Error exception caused termination of the connection. Add this
         # item to the display with Server Fail message instead of count
         except Error as er:
             error = er
