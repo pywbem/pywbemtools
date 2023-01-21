@@ -46,6 +46,8 @@ Released: not yet
 
 * Added support for Python 3.11. (issue #1243)
 
+* Increased the minimum version of pywbem to 1.6.0. (issue #1244)
+
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup
