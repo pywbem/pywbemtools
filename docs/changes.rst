@@ -29,6 +29,9 @@ Released: not yet
 * Fix minor issue where if user input --pl "a, b, c" they would get strange
   error.  Now fails with error stating that space not allowed in property list.
 
+* Fix issue in instance count where error reports CIMError code and not
+  the code string. (see #1242)
+
 **Enhancements:**
 
 * Added a new make target 'check_reqs' that runs pip-missing-reqs on

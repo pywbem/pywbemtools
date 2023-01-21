@@ -66,17 +66,21 @@ def test_instance_count(server_url):
     # produce a line in a report.
     rc, stdout, stderr = execute_command(
         'pywbemcli',
-        ['-s', server_url, '--no-verify', '-o', 'simple', 'instance', 'count',
-         '-n', 'test/EmbeddedInstance/dynamic'])
+        ['-s', server_url, '--verbose', '--no-verify', '-o', 'simple',
+         'instance', 'count', '-n', 'test/TestProvider',
+         '--ignore-class', 'TST_FaultyInstance,TST_FaultyInstanceSub'])
+
+    if rc != 0:
+        print("instance count stderr: {}".format(stderr))
     assert rc == 0
 
     table_lines = create_table(stdout)
-    assert ('test/EmbeddedInstance/dynamic', 'CIM_Error', 'CIMError 1') \
+    assert ('test/TestProvider', 'TEST_Family', 'CIMError CIM_ERR_NOT_FOUND') \
         in table_lines
 
 # FUTURE: Add test that causes Error exception ex. count against PG_Internal
 # namespace. Issue is that the probably breaks test environment since the
-# docker server is down. The only way this could work is to be the last test
-# agains the container assuming that the container is restarted for each tests
-# against a particular environment or having the container automatically #
+# apparently OpenPegasus fails. The only way this could work is to be the last
+# test against the container assuming that the container is restarted for each
+#  testsagainst a particular environment or having the container automatically
 # restart.
