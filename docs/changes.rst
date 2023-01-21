@@ -26,6 +26,8 @@ Released: not yet
 * Changed the development status of the Python package from "4 - Beta" to
   "5 - Production/Stable". This actually applies since version 1.1.0.
   (issue #1237)
+* Fix minor issue where if user input --pl "a, b, c" they would get strange
+  error.  Now fails with error stating that space not allowed in property list.
 
 **Enhancements:**
 

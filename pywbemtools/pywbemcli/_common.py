@@ -88,11 +88,15 @@ def resolve_propertylist(propertylist):
     if len(propertylist) == 1 and not propertylist[0]:
         propertylist = []
 
-    # expand any comma separated entries in the list
+    # Expand any comma separated entries in the list
     else:
         pl = []
         for item in propertylist:
             if ',' in item:
+                if ' ' in item:
+                    raise click.ClickException(
+                        "Spaces not allowed in comma-separated PropertyList: {}"
+                        .format(','.join(propertylist)))
                 pl.extend(item.split(','))
             else:
                 pl.append(item)
