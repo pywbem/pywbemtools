@@ -280,6 +280,7 @@ bleach==3.3.0; python_version >= '3.5'
 # Indirect dependencies for develop (not in dev-requirements.txt)
 
 alabaster==0.7.9
+appdirs==1.4.3
 appnope==0.1.0
 args==0.1.0
 atomicwrites==1.2.1
@@ -291,6 +292,8 @@ chardet==3.0.2
 clint==0.5.1
 configparser==4.0.2; python_version < '3.2'
 contextlib2==0.6.0
+# dataclasses is used by safety>=2.3.1 on (only) py36
+dataclasses==0.8; python_version == '3.6'
 docopt==0.6.1
 enum34==1.1.6; python_version == "2.7"
 filelock==3.0.0
