@@ -63,6 +63,11 @@ jobs:
                 \"os\": \"ubuntu-latest\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"windows-latest\", \
+                \"python-version\": \"3.5\", \
+                \"package_level\": \"minimum\" \
               } \
             ], \
             \"include\": [ \
@@ -84,6 +89,11 @@ jobs:
               { \
                 \"os\": \"ubuntu-20.04\", \
                 \"python-version\": \"3.6\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"windows-2019\", \
+                \"python-version\": \"3.5\", \
                 \"package_level\": \"minimum\" \
               } \
             ] \
