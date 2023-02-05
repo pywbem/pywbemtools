@@ -485,7 +485,7 @@ def pick_connection(name, context, connections_repo):
 
     conn_names = sorted(list(six.iterkeys(connections_repo)))
     if not conn_names:
-        click.ClickException(
+        raise click.ClickException(
             "No connections found in connection repository {0}".
             format(connections_repo.connections_file))
     return pick_one_from_list(context, conn_names,
