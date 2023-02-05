@@ -24,6 +24,12 @@ Released: not yet
   action does not include Python 3.5 and 3.6 for ubuntu 22.04 (i.e ubuntu-latest as
   of Nov 2022) which causes scheduled test failure.  See issue #1245
 
+* Update for new tests in pylint including 1) use-dict-literal which warns about
+  call to dict() when passing keyword arguments vs. using literal (This is a
+  speed issue) 2) overlybroad exceptions. Modified definition of
+  overlybroadexceptions to prefix names with builtins. 3. Fixed issue found
+  by new usless-exception warning. (raise not part of statement)
+
 **Known issues:**
 
 * See `list of open issues`_.
