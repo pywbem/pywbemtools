@@ -1017,14 +1017,32 @@ def repl(ctx):
     Enter the interactive mode where pywbemcli commands can be entered
     interactively. The prompt is changed to 'pywbemcli>'.
 
+    <COMMAND> <COMMAND OPTIONS> - Execute pywbemcli command COMMAND
+
+    <GENERAL_OPTIONS> <COMMAND> <COMMAND_OPTIONS> - Execute command with
+    general options.  General options set here exist only for the current
+    command.
+
+    -h, --help - Show pywbemcli general help message, including a
+                                  list of pywbemcli commands.
+    COMMAND -h, --help - Show help message for pywbemcli command COMMAND.
+
+    !SHELL-CMD - Execute shell command SHELL-CMD
+
+    Pywbemcli termination - <CTRL-D>, :q, :quit, :exit
+
     Command history is supported. The command history is stored in a file
     ~/.pywbemcli_history.
 
-    Pywbemcli may be terminated from this mode by entering
-    <CTRL-D>, :q, :quit, :exit
+    <UP>, <DOWN> - Scroll through pwbemcli command history.
 
-    In the repl mode, <CTRL-r> man be used to initiate an interactive
-    search of the history file.
+    <CTRL-r> <search string> - initiate an interactive
+    search of the pywbemcli history file. Can be used with <UP>, <DOWN>
+    to display commands that match the search string.
+    Editing the search string updates the search.
+
+    <TAB> - tab completion for current command line
+    (can be used anywhere in command)
 
     Interactive mode also includes an autosuggest feature that makes
     suggestions from the command history as the command the user types in the

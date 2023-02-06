@@ -63,6 +63,8 @@ Released: not yet
   overlybroadexceptions to prefix names with builtins. 3. Fixed issue found
   by new usless-exception warning. (raise not part of statement)
 
+* Improve the help description for repl.  It was not complete.
+
 **Known issues:**
 
 * See `list of open issues`_.
