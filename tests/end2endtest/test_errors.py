@@ -66,5 +66,6 @@ stderr:
     assert rc == 0, details('rc')
     assert len(reswarn_lines) == 0, details('stderr', '0 ResourceWarning lines')
     assert len(out_lines) == 2, details('stdout', '2 stdout lines')
-    assert re.match(r"Enter 'help' for help", out_lines[0]), details('stdout')
+    assert re.match(r"Enter 'help repl' for help", out_lines[0]), \
+        details('stdout')
     assert re.match(r"OpenPegasus", out_lines[1]), details('stdout')

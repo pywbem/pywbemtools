@@ -48,6 +48,12 @@ Released: not yet
 
 * Increased the minimum version of pywbem to 1.6.0. (issue #1244)
 
+* Add a new command that will display text on subjects that have been defined
+  for the command.  This allows defining help for subjects that are not
+  specific to a particular command.  This is created specifically to
+  provide help for the setup to activate shell tab completion. The initial
+  subjects are repl and instancename
+
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup

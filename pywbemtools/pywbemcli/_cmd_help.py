@@ -46,7 +46,11 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     """
     Show help for pywbemcli subjects.
 
-    Show help for pywbemcli for specific pywbemcli subjects.
+    Show help for specific pywbemcli subjects.  This is in addition to the
+    help messages that are available with the -h or --help option for every
+    command group and command in pywbemcli. It helps document pywbemcli
+    subjects that are more general than specific commands and configuration
+    subjects that do not have specific commands
 
     If there is no argument provided, outputs a list and summary of the
     existing help subjects.
@@ -55,6 +59,9 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     by the argument.
     """
     subjects = sorted(list(HELP_SUBJECTS_DICT.keys()))
+
+    # If there is no subject argument, output a table of all of the subjects and
+    # short descriptions.
 
     if not subject:
         # max_subject_len = len(max(subjects, key=len))
@@ -70,47 +77,49 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
 
         return
 
+    # If a subject exists, output the help for that subject
     if subject in HELP_SUBJECTS_DICT:
-        click.echo("{0} - {1}\n".format(subject,
-                                        HELP_SUBJECTS_DICT[subject][0]))
-        click.echo(HELP_SUBJECTS_DICT[subject][1])
+        click.echo("{0} - {1}\n{2}".
+                   format(subject,
+                          HELP_SUBJECTS_DICT[subject][0],
+                          HELP_SUBJECTS_DICT[subject][1]))
+    else:
+        raise click.ClickException("{} is not a subject in the subjects help".
+                                   format(subject))
 
 
-def repl_help_msg():
-    """
-    Return the repl help message. Duplicates message in pywbemcli.py because
-    of formatting.
-    """
-    return """
-The interactive (repl) mode is entered when pywbemcli is started without a
-command. General options may be defined on the command line.
+# FUTURE: Move this to new module along with repl command. Every cmd should
+#         be in separate module with its data.
+# pylint: disable=invalid-name
+repl_help_msg = """
+In the interactive mode pywbem returns control to a terminal. General
+options, commands, and command options may be entered. Pywbemcli remains in the
+interactive mode until terminated by <CTRL-D>, :q, :quit,  or :exit.
 
-In the interactive mode control is returned to the terminal and general options
-, commands, and command options may be entered. Pywbemcli remains in the
-interactive mode until terminated.
-
-General entered in the interactive mode are only active for the current
-command whereupon the original general options are restored.
+Pywbemcli enters interactive (repl) mode when started without a command.
+General options entered in the interactive mode are only active for the current
+command where upon the command line general options are restored.
 
 The prompt for the interactive mode is pywbemcli$
 
-In the interactive mode tab-completion <TAB> and autosuggestion help (suggest
-completions based on the pywbemcli history file) are active.
+Tab-completion <TAB> and autosuggestion help (suggest completions based on the
+pywbemcli history file) are always active in the interactive mode.
 
 The following can be entered in interactive (repl) mode:
 
   COMMAND                     Execute pywbemcli command COMMAND.
   !SHELL-CMD                  Execute shell command SHELL-CMD.
   <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
-  <CTRL-r>  <search string>   To search the  command history file.
+  <CTRL-r>  <search string>   Search pywbemcli command history file.
                               Can be used with <UP>, <DOWN>
                               to display commands that match the search string.
                               Editing the search string updates the search.
-  <TAB>                       Tab completion (can be used anywhere).
+  <TAB>                       Tab completion (can be used anywhere on cmd line).
   -h, --help                  Show pywbemcli general help message, including a
                               list of pywbemcli commands.
   COMMAND --help              Show help message for pywbemcli command COMMAND.
-  help                        Show this help message.
+  help                        Show help subjects.
+  help repl                   Show help for the repl mode.
   :?, :h, :help               Show help message about interactive mode.
   <UP>, <DOWN>                Scroll through pwbemcli command history.
 
@@ -121,16 +130,26 @@ The following can be entered in interactive (repl) mode:
 Example:
    pywbemcli -n mock1
 
+   ... pywbemcli is now in the interactive mode
+
    pywbemcli$ class enumerate
       . . .  Returns classes enumerated.
+
+   pywbemcli$ class get blah
+      . . . Returns mof for class blah if it exists.
+
+   pywbemcli$ -v namespace list
+      . . . Gets namespaces for connection named mock1 but with verbose output
+
+      . . . Returns to non-verbose output for next command
    pywbemcli$
-"""
+"""  # pylint: enable=invalid-name
 
 
 # FUTURE: Other subjects: connection file, command structure, checkpointing
 # of mock server definition, arguments and options, etc.
 HELP_SUBJECTS_DICT = {
-    "repl": ("Using the repl command", repl_help_msg()),
+    "repl": ("Using the repl command", repl_help_msg),
     # 'activate': ("Activating shell tab completion",
     #             tab_completion_help_msg),
     'instancename': ('InstanceName parameter in instance cmd group',

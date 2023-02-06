@@ -176,7 +176,7 @@ GENERAL_HELP_LINES = [
       statistics  Command group for WBEM operation statistics.
       subscription  Command group to manage WBEM indication subscriptions.
       connection  Command group for WBEM connection definitions.
-      help        Show help message for interactive mode.
+      help        Show help for pywbemcli subjects.
       repl        Enter interactive mode (default)."""
 ]
 
@@ -222,27 +222,25 @@ Command Options:
 
 """  # noqa: E501
 
-INTERACTIVE_HELP = """
-The following can be entered in interactive mode:
 
-  COMMAND                     Execute pywbemcli command COMMAND.
-  !SHELL-CMD                  Execute shell command SHELL-CMD.
-  <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
-  <CTRL-r>  <search string>   To search the  command history file.
-                              Can be used with <UP>, <DOWN>
-                              to display commands that match the search string.
-                              Editing the search string updates the search.
-  <TAB>                       Tab completion (can be used anywhere).
-  -h, --help                  Show pywbemcli general help message, including a
-                              list of pywbemcli commands.
-  COMMAND --help              Show help message for pywbemcli command COMMAND.
-  help                        Show this help message.
-  :?, :h, :help               Show help message about interactive mode.
-  <UP>, <DOWN>                Scroll through pwbemcli command history.
+SUBJECT_HELP = """Usage: pywbemcli [GENERAL-OPTIONS] help SUBJECT
 
-  COMMAND: May be two words (class enumerate) for commands that are within
-  a group or a single word for special commands like `repl` that are not in
-  a group.
+  Show help for pywbemcli subjects.
+
+  Show help for specific pywbemcli subjects.  This is in addition to the help
+  messages that are available with the -h or --help option for every command
+  group and command in pywbemcli. It helps document pywbemcli subjects that are
+  more general than specific commands and configuration subjects that do not
+  have specific commands
+
+  If there is no argument provided, outputs a list and summary of the existing
+  help subjects.
+
+  If an argument is provided, it outputs the help for the subject(s) defined by
+  the argument.
+
+Command Options:
+  -h, --help  Show this help message.
 """
 
 OK = True     # mark tests OK when they execute correctly
@@ -293,11 +291,11 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],
 
-    ['Verify help response (interactive help)).',
+    ['Verify help response (help command).',
      {'general': [],
       'cmdgrp': 'help',
-      'args': []},
-     {'stdout': INTERACTIVE_HELP,
+      'args': ['--help']},
+     {'stdout': SUBJECT_HELP,
       'rc': 0,
       'test': 'innows'},
      None, OK],
