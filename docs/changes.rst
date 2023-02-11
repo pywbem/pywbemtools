@@ -57,6 +57,12 @@ Released: not yet
 * Update to reflect new security issues that were added in Jan 2023. This
   involved GitPython, safety, setuptools certifi,  and future.
 
+* Update for new tests in pylint including 1) use-dict-literal which warns about
+  call to dict() when passing keyword arguments vs. using literal (This is a
+  speed issue) 2) overlybroad exceptions. Modified definition of
+  overlybroadexceptions to prefix names with builtins. 3. Fixed issue found
+  by new usless-exception warning. (raise not part of statement)
+
 **Known issues:**
 
 * See `list of open issues`_.
