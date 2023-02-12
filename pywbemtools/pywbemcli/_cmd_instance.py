@@ -709,15 +709,9 @@ def instance_shrub(context, instancename, **options):
 #
 ####################################################################
 
+# Subject help used both in instance cmd group and in the help cmd
 
-def show_help_instancename():
-    """
-    Show the help message on how to specify an instance using INSTANCENAME
-    and the --key and --namespace options.
-    """
-    # Note: This help text has a fixed width since it is too complex to
-    # dynamically render it to a given width.
-    click.echo("""
+HELP_INSTANCENAME_MSG = """
 An instance path is specified using the INSTANCENAME argument and optionally the
 --key and --namespace options. It can be specified in three ways:
 
@@ -815,7 +809,18 @@ An instance path is specified using the INSTANCENAME argument and optionally the
      0: cimv2/test:TST_Person.FirstName="Albert",LastName="Einstein"
      1: cimv2/test:TST_Person.FirstName="Marie",LastName="Curie"
      Input integer between 0 and 1 or Ctrl-C to exit selection: _
-""")
+"""
+
+
+def show_help_instancename():
+    """
+    Show the help message on how to specify an instance using INSTANCENAME
+    and the --key and --namespace options.
+    """
+    # Note: This help text has a fixed width since it is too complex to
+    # dynamically render it to a given width.
+
+    click.echo(HELP_INSTANCENAME_MSG)
 
 
 def get_instancename(context, instancename, options, default_all_ns=False):
