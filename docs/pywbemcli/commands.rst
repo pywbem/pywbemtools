@@ -42,7 +42,8 @@ The command groups are:
 * :ref:`Connection command group` - Command group for WBEM connection definitions.
 
 The individual commands (no command group) are:
-* :ref:`help command` - Show help message for interactive mode.
+* :ref:`help command` - Show help for particular pywbemcli subjects
+* :ref:`doc command` - Issue request to web browser to load pywbemcli documentation
 * :ref:`repl command` - Enter interactive mode (default).
 
 
@@ -4775,33 +4776,37 @@ search.
     single: help command
     pair: help; command
 
-The ``help`` command provides information on special commands and controls
-that can be executed in the :ref:`interactive mode` including:
+The ``help`` command provides information on a number of subjects where the
+extra help might be needed on pywbemcli: This includes subjects like
 
-* executing shell commands,
-* exiting pywbemcli,
-* getting help on commands,
-* viewing interactive mode command history.
+* commands in the repl(interactive mode,
+* activating the shell tab-completion,
+
 
 This is different from the ``--help`` option that provides information on
 command groups, and commands.
 
 .. code-block:: text
 
-    $ pywbemcli help
+    Help subjects
+    subject name    subject description
+    --------------  --------------------------------------------
+    instancename    InstanceName parameter in instance cmd group
+    repl            Using the repl command
 
-    The following can be entered in interactive mode:
+The help for each subject is retrieved by entering the subject name for
+the subject of interest as the argument to the help command:
 
-      <pywbemcli-cmd>             Execute pywbemcli command <pywbemcli-cmd>.
-      !<shell-cmd>                Execute shell command <shell-cmd>.
+Thus, for example:
 
-      <CTRL-D>, :q, :quit, :exit  Exit interactive mode.
+.. code-block:: text
 
-      <TAB>                       Tab completion (can be used anywhere).
-      -h, --help                  Show pywbemcli general help message, including a
-                                  list of pywbemcli commands.
-      <pywbemcli-cmd> --help      Show help message for pywbemcli command
-                                  <pywbemcli-cmd>.
-      help                        Show this help message.
-      :?, :h, :help               Show help message about interactive mode.
-      <up-arrow, down-arrow>      View pwbemcli command history:
+    $ pywbemcli help repl
+      . . . returns help on the interactive and commands available in that mode
+
+    in the interactive mode:
+
+    pywbemcli> help repl
+      . . . returns help on the interactive and commands available in that mode
+
+

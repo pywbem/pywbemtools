@@ -457,6 +457,9 @@ mode.  Then it attempts to modify the user and password to their default values
 of None and execute the class enumerate again.  This command would be executed
 without using the user and password because they have been reset for that command.
 
+A summary of help can be viewed by entering ``help repl`` when in the
+interactive mode.
+
 .. code-block:: text
 
     pywbemcli -s https:blah --user fred --pasword blah
