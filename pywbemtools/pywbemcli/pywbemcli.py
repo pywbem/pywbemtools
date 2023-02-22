@@ -26,6 +26,8 @@ import sys
 import warnings
 import traceback
 import six
+import packaging.version
+
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
@@ -63,6 +65,9 @@ from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
 
 __all__ = ['cli']
+
+# Click version as a tuple. Used to control tab-completion features
+CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 
@@ -151,6 +156,16 @@ def get_ctx_attrs(ctx):
 #
 ###########################################################################
 
+def completion_item(name):
+    """
+        Click does not include shell_completion. Not called with click < 8
+    """
+    if CLICK_VERSION[0] >= 8:
+        # pylint: disable=no-member
+        return click.shell_completion.CompletionItem(name)
+
+    return name
+
 
 def connection_name_complete(ctx, param, incomplete):
     # pylint: disable=unused-argument
@@ -158,7 +173,7 @@ def connection_name_complete(ctx, param, incomplete):
     Shell complete function for the general option --name.  This function is
     called if <TAB> is entered from terminal as part of the value of the
     --name general option.  It returns all entries in connection table that
-    starte with the string in incomplete.
+    start with the string in incomplete.
     """
     connections_file = \
         ctx.params['connections_file'] or DEFAULT_CONNECTIONS_FILE
@@ -168,18 +183,15 @@ def connection_name_complete(ctx, param, incomplete):
         connections_repo = ConnectionRepository(connections_file)
         if not connections_repo.file_exists():
             # Abort does not allow a message and FileError does not abort.
-            # Maybe only solution is message in return since abort gets us
-            # nowhere
-            return "ERROR: Connetion file {} does not exist Aborting". \
-                format(connections_file)
+            raise click.ClickException("Connection file: {} does not exist.".
+                                       format(connections_file))
 
         # Returns list of click CompletionItems from list of keys in
         # the repository. This never gets called with Click vers lt 8
         # so the fact the shell_completion does not exist does not matter
         # pylint: disable=no-member
-        return [
-            click.shell_completion.CompletionItem(name) for name in
-            connections_repo if name.startswith(incomplete)]
+        return [completion_item(name) for name in connections_repo
+                if name.startswith(incomplete)]
 
     except ConnectionsFileError as cfe:
         click.echo('Fatal error: {0}: {1}'.

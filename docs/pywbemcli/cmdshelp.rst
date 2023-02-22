@@ -136,6 +136,7 @@ Help text for ``pywbemcli``:
       statistics    Command group for WBEM operation statistics.
       subscription  Command group to manage WBEM indication subscriptions.
       connection    Command group for WBEM connection definitions.
+      docs          Get pywbemtools documentation in web browser.
       help          Show help for pywbemcli subjects.
       repl          Enter interactive mode (default).
 
@@ -927,6 +928,30 @@ Help text for ``pywbemcli connection test`` (see :ref:`connection test command`)
       --test-pull  If set, the connection is tested to determine if theDMTF defined pull operations (ex.
                    OpenEnumerateInstancesare implemented since these are optional.
       -h, --help   Show this help message.
+
+
+.. _`pywbemcli docs --help`:
+
+pywbemcli docs --help
+---------------------
+
+
+
+Help text for ``pywbemcli docs`` (see :ref:`docs command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] docs
+
+      Get pywbemtools documentation in web browser.
+
+      EXPERIMENTAL
+
+      Calls the current default web browser to display the current stable pywbemtools documentation in a new window.
+
+    Command Options:
+      -h, --help  Show this help message.
 
 
 .. _`pywbemcli help --help`:

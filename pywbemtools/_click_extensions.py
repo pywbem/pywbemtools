@@ -122,7 +122,7 @@ class PywbemtoolsTopGroup(click.Group):
         on Windows, when using Click 8.0.1 or higher (that is the version which
         introduced this argument).
         """
-        if CLICK_VERSION >= (8, 0, 1):
+        if CLICK_VERSION[0] >= 8:
             kwargs = dict(kwargs)
             kwargs['windows_expand_args'] = False
         return self.main(*args, **kwargs)

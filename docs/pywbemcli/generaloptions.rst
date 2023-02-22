@@ -1824,7 +1824,7 @@ or:
 .. code-block:: text
 
     $ pywbemcli connection delete
-    Select a connection or CTRL_C to abort.
+    Select a connection or <CTRL-C> to abort.
     0: Ronald
     1: testconn
     Input integer between 0 and 1 or Ctrl-C to exit selection: 0

@@ -216,7 +216,7 @@ def create_help_cmd_list(script_cmd, script_name):
             if script_name == 'pywbemcli':
                 if level == 0:
                     line = 'Help text for ``{}``:'.format(script_name)
-                elif level == 1 and name not in ('repl', 'help'):
+                elif level == 1 and name not in ('repl', 'help', 'docs'):
                     line = 'Help text for ``{}`` (see :ref:`{} command ' \
                     'group`):'.format(command, name)
                 else:

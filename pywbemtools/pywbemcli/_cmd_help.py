@@ -37,7 +37,7 @@ from .._output_formatting import validate_output_format, format_table
 # FUTURE: add the tab-completion function for the subject argument
 
 
-def help_option_subject_shell_complete(ctx, param, incomplete):
+def help_arg_subject_shell_complete(ctx, param, incomplete):
     # pylint: disable=unused-argument
     """
     Shell complete function for the help subjects argument.  This function is
@@ -55,7 +55,7 @@ def help_option_subject_shell_complete(ctx, param, incomplete):
 @click.argument('subject', type=str,
                 metavar='SUBJECT',
                 cls=TabCompleteArgument,
-                shell_complete=help_option_subject_shell_complete,
+                shell_complete=help_arg_subject_shell_complete,
                 required=False)  # pylint: disable=no-member
 @add_options(help_option)
 @click.pass_context
@@ -101,7 +101,8 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
                           HELP_SUBJECTS_DICT[subject][0],
                           HELP_SUBJECTS_DICT[subject][1]))
     else:
-        raise click.ClickException("{} is not a subject in the subjects help".
+        raise click.ClickException("'{}' is not a valid help subject. "
+                                   "Try 'help' for list of subjects.".
                                    format(subject))
 
 

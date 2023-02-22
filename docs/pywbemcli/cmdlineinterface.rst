@@ -350,8 +350,8 @@ information for external and internal commands:
 .. index:: pair: interactive mode; exit
 
 In addition to using one of the internal exit commands shown in the help text
-above, you can also exit the pywbemcli shell by typing `Ctrl-D` (on Linux,
-OS-X and UNIX-like environments on Windows), or `Ctrl-C` (on native Windows).
+above, you can also exit the pywbemcli shell by typing <Ctrl-D> (on Linux,
+OS-X and UNIX-like environments on Windows), or <Ctrl-C> (on native Windows).
 
 .. index:: pair: interactive mode; --help
 
@@ -433,7 +433,7 @@ aut completion which are both always active:
     works with the tab-completion described above. The input is compared to
     the history and when there is another entry starting with the given text,
     the completion will be shown as gray text behind the current input.
-    Pressing the right arrow → or <CTRL>-e will insert this suggestion.
+    Pressing the right arrow → or <CTRL-e> will insert this suggestion.
 
 
 General options can be entered in the interactive mode but they generally only

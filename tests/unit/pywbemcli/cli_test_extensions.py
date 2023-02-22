@@ -58,7 +58,7 @@ class CLITestsBase(object):
           desc (:term:`string`):
             Description of the test
 
-          command_grp (:term:`string`):
+          command_grp (:term:`string` or None):
             Pywbemcli command group for this test. This is the first level of
             the command, e.g. 'class' or 'instance'.
 
@@ -269,7 +269,8 @@ class CLITestsBase(object):
                     .format(mock_files)
 
         if not stdin:
-            cmd_line.append(command_grp)
+            if command_grp:
+                cmd_line.append(command_grp)
 
         if local_args:
             cmd_line.extend(local_args)
