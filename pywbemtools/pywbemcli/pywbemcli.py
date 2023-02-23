@@ -57,7 +57,7 @@ from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
-    SUBCMD_HELP_TXT, MutuallyExclusiveOption
+    SUBCMD_HELP_TXT, MutuallyExclusiveOption, click_completion_item
 from .._utils import pywbemtools_warn, get_terminal_width, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
@@ -156,18 +156,8 @@ def get_ctx_attrs(ctx):
 #
 ###########################################################################
 
-def completion_item(name):
-    """
-        Click does not include shell_completion. Not called with click < 8
-    """
-    if CLICK_VERSION[0] >= 8:
-        # pylint: disable=no-member
-        return click.shell_completion.CompletionItem(name)
 
-    return name
-
-
-def connection_name_complete(ctx, param, incomplete):
+def connection_name_completer(ctx, param, incomplete):
     # pylint: disable=unused-argument
     """
     Shell complete function for the general option --name.  This function is
@@ -187,11 +177,11 @@ def connection_name_complete(ctx, param, incomplete):
                                        format(connections_file))
 
         # Returns list of click CompletionItems from list of keys in
-        # the repository. This never gets called with Click vers lt 8
-        # so the fact the shell_completion does not exist does not matter
-        # pylint: disable=no-member
-        return [completion_item(name) for name in connections_repo
-                if name.startswith(incomplete)]
+        # the repository.
+        returns = [click_completion_item(name) for name in connections_repo
+                   if name.startswith(incomplete)]
+
+        return returns
 
     except ConnectionsFileError as cfe:
         click.echo('Fatal error: {0}: {1}'.
@@ -527,7 +517,7 @@ def _create_server_instance(
               mutually_exclusive=["server", 'mock-server'],
               show_mutually_exclusive=False,
               # shell_complete is ignored with Python 2, See. click changes.
-              shell_complete=connection_name_complete,
+              shell_complete=connection_name_completer,
               # defaulted in code
               envvar=PYWBEMCLI_NAME_ENVVAR,
               help=u'Use the WBEM server defined by the WBEM connection '

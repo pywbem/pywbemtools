@@ -35,16 +35,21 @@ from datetime import datetime
 import click
 import psutil
 import six
+import packaging.version
 
 from pywbem import WBEMListener, ListenerError, CIMInstance, CIMProperty, \
     Uint16, WBEMConnection, Error
 
-from .._click_extensions import PywbemtoolsCommand, CMD_OPTS_TXT
+from .._click_extensions import PywbemtoolsCommand, CMD_OPTS_TXT, \
+    TabCompleteArgument, click_completion_item
 from .._options import add_options, help_option, validate_required_arg
 from .._output_formatting import format_table
 
 from . import _config
 from .pywbemlistener import cli
+
+# Click version as a tuple. Used to control tab-completion features
+CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 # Signals used for having the 'run' command signal startup completion
 # back to its parent 'start' process.
@@ -82,12 +87,15 @@ LISTEN_OPTIONS = [
                  help=u'The port number the listener will open to receive '
                  'indications. This can be any available port. '
                  'Default: {}'.format(DEFAULT_LISTENER_PORT)),
-    click.option('-s', '--scheme', type=click.Choice(['http', 'https']),
+    click.option('-s', '--scheme',
+                 type=click.Choice(['http', 'https']),
                  metavar='SCHEME',
                  required=False, default=DEFAULT_LISTENER_SCHEME,
                  help=u'The scheme used by the listener (http, https). '
                  'Default: {}'.format(DEFAULT_LISTENER_SCHEME)),
-    click.option('-c', '--certfile', type=str, metavar='FILE',
+    click.option('-c', '--certfile',
+                 type=click.Path(exists=False, dir_okay=False),
+                 metavar='FILE',
                  required=False, default=None,
                  envvar=_config.PYWBEMLISTENER_CERTFILE_ENVVAR,
                  help=u'Path name of a PEM file containing the certificate '
@@ -97,7 +105,9 @@ LISTEN_OPTIONS = [
                  'certificate. '
                  'Default: EnvVar {ev}, or no certificate file.'.
                  format(ev=_config.PYWBEMLISTENER_CERTFILE_ENVVAR)),
-    click.option('-k', '--keyfile', type=str, metavar='FILE',
+    click.option('-k', '--keyfile',
+                 type=click.Path(exists=False, dir_okay=False),
+                 metavar='FILE',
                  required=False, default=None,
                  envvar=_config.PYWBEMLISTENER_KEYFILE_ENVVAR,
                  help=u'Path name of a PEM file containing the private key '
@@ -112,7 +122,9 @@ LISTEN_OPTIONS = [
                  'Invoke with --help-call for details on the function '
                  'interface. '
                  'Default: No function is called.'),
-    click.option('--indi-file', type=str, metavar='FILE',
+    click.option('--indi-file',
+                 type=click.Path(exists=False, dir_okay=False),
+                 metavar='FILE',
                  required=False, default=None,
                  help=u'Append received indications to a file. '
                  'The format can be modified using the --indi-format option. '
@@ -134,6 +146,30 @@ LISTEN_OPTIONS = [
                  'each received indication when using the --indi-call option '
                  'and exit.'),
 ]
+
+#############################################################################
+#
+#  tab-completion functions
+#
+#############################################################################
+
+
+def listener_name_completer(ctx, param, incomplete):
+    # pylint: disable=unused-argument
+    """
+    This is a tab-completion function called when pywbemlistener is called
+    back from shell for tab-completion of a name argument.
+
+    Returns listener_names that exist and match the incomplete parameter.
+    """
+    listeners = get_listeners()
+    listener_names = [ltnr.name for ltnr in listeners]
+
+    incompletes_found = [n for n in listener_names if n.startswith(incomplete)]
+
+    # Returns list of click CompletionItems from list of keys in
+    # the repository.
+    return [click_completion_item(name) for name in incompletes_found]
 
 
 def print_out(line):
@@ -344,7 +380,12 @@ def listener_start(context, name, **options):
 
 
 @cli.command('stop', cls=PywbemtoolsCommand, options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=True)
+@click.argument('name',
+                type=str,
+                metavar='NAME',
+                cls=TabCompleteArgument,
+                shell_complete=listener_name_completer,
+                required=True)
 @add_options(help_option)
 @click.pass_obj
 def listener_stop(context, name):
@@ -363,7 +404,12 @@ def listener_stop(context, name):
 
 
 @cli.command('show', cls=PywbemtoolsCommand, options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=True)
+@click.argument('name',
+                type=str,
+                metavar='NAME',
+                cls=TabCompleteArgument,
+                shell_complete=listener_name_completer,
+                required=True)
 @add_options(help_option)
 @click.pass_obj
 def listener_show(context, name):
@@ -393,7 +439,12 @@ def listener_list(context):
 
 
 @cli.command('test', cls=PywbemtoolsCommand, options_metavar=CMD_OPTS_TXT)
-@click.argument('name', type=str, metavar='NAME', required=False)
+@click.argument('name',
+                type=str,
+                metavar='NAME',
+                cls=TabCompleteArgument,
+                shell_complete=listener_name_completer,
+                required=False)
 @click.option('-c', '--count', type=int, metavar='INT',
               required=False, default=1,
               help=u'Count of test indications to send. '

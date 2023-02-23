@@ -1,0 +1,138 @@
+# (C) Copyright 2023 IBM Corp.
+# (C) Copyright 20123Inova Development Inc.
+# All Rights Reserved
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Click command definition for the tab completion group
+
+NOTE: Commands are ordered in help display by their order in this file.
+"""
+
+from __future__ import absolute_import, print_function
+
+import os
+import subprocess
+import click
+
+from .pywbemcli import cli
+from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
+from .._options import add_options, help_option
+
+
+@cli.group('tabcompletion', cls=PywbemtoolsGroup,
+           options_metavar=GENERAL_OPTS_TXT,
+           subcommand_metavar=SUBCMD_HELP_TXT)
+@add_options(help_option)
+def tabcompletion_group():
+    """
+    Command group to activate tab completion.
+
+    This command activates the shell tab completion for selected shells so
+    that <TAB> can be used on the command line to complete pywbemcli options.
+
+    Tab completion provides the option list for all options allows tab
+    completing data input for some options (ex. --name, --mock-server, etc.)
+    """
+    pass  # pylint: disable=unnecessary-pass
+
+
+@tabcompletion_group.command('activate', cls=PywbemtoolsCommand,
+                             options_metavar=CMD_OPTS_TXT)
+@click.argument('shell', metavar='SHELL',
+                type=click.Choice(['bash', 'zsh']))
+@add_options(help_option)
+@click.pass_obj
+def tabcompletion_activate(context, **options):
+    """
+    Activate <TAB> completion for pywbemcli. There is a single optional argument
+    that defines the shell type (bash or zsh) for which <TAB> completion is
+    activated.
+    """
+    # pylint: disable=too-many-function-args
+    context.execute_cmd(lambda: cmd_tabcompletion_activate(context))
+
+
+@tabcompletion_group.command('status', cls=PywbemtoolsCommand,
+                             options_metavar=CMD_OPTS_TXT)
+@add_options(help_option)
+@click.pass_obj
+def tabcompletion_status(context):
+    """
+    Determine if tab-completion is activated and for which shell types.
+    """
+    # pylint: disable=too-many-function-args
+    context.execute_cmd(lambda: cmd_tabcompletion_status(context))
+
+
+#############################################################################
+#
+# tabcompletion action functions defined by the group.command entities above
+#
+#############################################################################
+
+def cmd_tabcompletion_status(context):
+    """
+    Determines if the shell completion has already been activated and for
+    which shell.
+    """
+    result = subprocess.run(['complete'])
+    for line in result.split('/n'):
+        if "pywbemcli" in line:
+            if "-F _pywbemcli_completion pywbemcli" in line:
+                click.echo("complete shows {}".format(line))
+                return True
+
+            click.echo("complete line that failed: {}".format(line))
+            return False
+    click.echo("complete does not show pywbemcli as activated for tab "
+               "completion")
+    return True
+
+
+def generate_completion_file(shell_type, completion_file_path):
+    """
+    Generates a pywbemcli completion file for pywbemcli by calling a function
+    defined for each shell type (ex. for bash "bash_source" and redirecting
+    the result to the completion_file_path.) This statement includes the
+    corresponding complete variable since that is required to activate the
+    tab completion
+    """
+    gen_cmd = "_PYWBEMCLI_COMPLETE={0}_source pywbemcli > {1}". \
+        format(shell_type, completion_file_path)
+
+    click.echo("Gen cmd {}".format(gen_cmd))
+    os.system(gen_cmd)
+
+    click.echo("Generation complete shell_type {0} path {1}".
+               format(shell_type, completion_file_path))
+
+
+def cmd_tabcompletion_activate(context, options):
+    """
+    Determines if the shell completion has already been activated and for
+    which shell.
+    """
+    shell_type = options["shell"]
+    completion_file_name = "pywbemcli-complete.{}".format(options["shell"])
+
+    completion_file_path = os.path.join(os.path.expanduser('~'),
+                                        completion_file_name)
+
+    if os.path.isfile(completion_file_path):
+        click.echo("Completion file {} already exists".
+                   format(completion_file_path))
+    else:
+        generate_completion_file(shell_type, completion_file_path)
+        click.echo("Completion file {} created.".format(completion_file_path))

@@ -70,6 +70,10 @@ Released: not yet
   choice general option to allow the "" choice. so that tab-completion is
   automatically enabled. (See issue #487)
 
+* Modify several pywbemlistener args and options to make enable
+  tab-completion. This includes output-format, keyfile, certfile, keyfile,
+  scheme, output_format, logdir. (see issue # 1278)
+
 
 **Cleanup:**
 
