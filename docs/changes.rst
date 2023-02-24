@@ -52,7 +52,7 @@ Released: not yet
   for the command.  This allows defining help for subjects that are not
   specific to a particular command.  This is created specifically to
   provide help for the setup to activate shell tab completion. The initial
-  subjects are repl and instancename
+  subjects are repl and instancename.
 
 * Add a new command to pywbemcli that calls the current system default web
   browser to view the pywbemtools public documentation.
