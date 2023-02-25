@@ -39,6 +39,7 @@ from ._cmd_profile import *           # noqa: F403,F401
 from ._cmd_statistics import *        # noqa: F403,F401
 from ._cmd_subscription import *      # noqa: F403,F401
 from ._cmd_help import *              # noqa: F403,F401
+from ._cmd_docs import *              # noqa: F403,F401
 
 from ._context_obj import *           # noqa: F403,F401
 from ._connection_repository import *   # noqa: F403,F401

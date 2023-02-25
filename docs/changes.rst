@@ -54,6 +54,9 @@ Released: not yet
   provide help for the setup to activate shell tab completion. The initial
   subjects are repl and instancename
 
+* Add a new command to pywbemcli that calls the current system default web
+  browser to view the pywbemtools public documentation.
+
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup

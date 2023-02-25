@@ -404,7 +404,7 @@ def _create_server_instance(
 # pylint: disable=bad-continuation
 # PywbemtoolsTopGroup sets order commands listed in help output
 @click.group(invoke_without_command=True, cls=PywbemtoolsTopGroup,
-             move_to_end=('connection', 'help', 'repl'),
+             move_to_end=('connection', 'help', 'repl', 'docs'),
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTS_TXT,
              subcommand_metavar=SUBCMD_HELP_TXT)
