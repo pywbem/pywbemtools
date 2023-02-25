@@ -48,7 +48,7 @@ Released: not yet
 
 * Increased the minimum version of pywbem to 1.6.0. (issue #1244)
 
-* Add a new command that will display text on subjects that have been defined
+* Add a new command that will display help on subjects that have been defined
   for the command.  This allows defining help for subjects that are not
   specific to a particular command.  This is created specifically to
   provide help for the setup to activate shell tab completion. The initial
@@ -56,6 +56,20 @@ Released: not yet
 
 * Add a new command to pywbemcli that calls the current system default web
   browser to view the pywbemtools public documentation.
+
+* Added documentation defining activation of tab-complation in shells.
+  Tab-completion must be activated by the user before the <TAB> can be used
+  in cmd mode to complete the terminal input of command and option names. (see
+  issue #1158)
+
+* Add specific tab-completion for the values of the general option --name and
+  command arguments/names values that look up connection name to enable
+  tab_completion for Click 8 and ignore it for Click 7. Modify general options
+  --mock-server, --connection-file, --keyfile, --certfile that are for files to
+  use the click.Path type which enables tab-completion. Modify --use-pull
+  choice general option to allow the "" choice. so that tab-completion is
+  automatically enabled. (See issue #487)
+
 
 **Cleanup:**
 

@@ -23,8 +23,11 @@ from __future__ import absolute_import, print_function
 import os
 import io
 import sys
-import traceback
 import warnings
+import traceback
+import six
+import packaging.version
+
 import click
 import click_repl
 from prompt_toolkit.history import FileHistory
@@ -58,10 +61,13 @@ from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
 from .._utils import pywbemtools_warn, get_terminal_width, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
-from .._output_formatting import OUTPUT_FORMAT_GROUPS
+from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
 
 __all__ = ['cli']
+
+# Click version as a tuple. Used to control tab-completion features
+CLICK_VERSION = packaging.version.parse(click.__version__).release
 
 PYWBEMCLI_STARTUP_ENVVAR = "PYWBEMCLI_STARTUP_SCRIPT"
 
@@ -69,12 +75,19 @@ DEFAULT_DEFINITION_NAME = "not-saved"
 
 # Defaults for some options
 DEFAULT_VERIFY = True  # The default is to verify
+
+# definition of use_pull options
+USE_PULL_OPTIONS = ('yes', 'no', 'either')
 DEFAULT_PULL_CHOICE = 'either'
 USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False, 'default': None}
 
 # Save for general opiton log parameter from the interactive
 # command before the current command in some cases.
 PREV_LOG_OPTION = None
+
+# OUTPUT_FORMATS must be
+OUTPUT_FORMATS_OPTION = list(OUTPUT_FORMATS)
+OUTPUT_FORMATS_OPTION.append("")
 
 #
 # Context variables passed to click
@@ -88,9 +101,108 @@ CONTEXT_SETTINGS = dict(
     terminal_width=get_terminal_width(),
 )
 
+
 ###########################################################################
 #
-# Support functions for the the cli(...) function
+# Debug support for shell completion functions.  Allows capturing
+# information during shell tab completion to a debug file.
+#
+###########################################################################
+
+# The following functions are support for testing completion functions where
+# functions like print cannot easily be used.
+
+def disp_ctx_params(ctx, param, incomplete, verbose=False):
+    """
+    Display parameters used in the call to a completion function
+    """
+    if verbose:
+        shell_debug_str("ctx attrs:{0}\nparam:  {1}\n incomplete:  {2}".
+                        format(get_ctx_attrs(ctx), param, incomplete))
+
+
+def shell_debug_str(strng):
+    """
+    Print the string in strng to the file debug.txt. Used in debugging
+    click completion functionality
+    """
+    if six.PY2:
+        # pylint: disable=unspecified-encoding
+        with open('debug.txt', 'a') as f:
+            print("{}".format(strng), file=f)
+    else:
+        with open('debug.txt', 'a', encoding='utf-8') as f:
+            print("{}".format(strng), file=f, flush=True)
+
+
+def get_ctx_attrs(ctx):
+    """
+    Write to the file debug.txt the ctx, param, and incomplete if verbose
+    is True. This is used to debug the completion functions since the terminal
+    is already in use as a result of the tab.
+    """
+    attrs = vars(ctx)
+    return '{0}'.format(
+        '\n  '.join('{0}: {1}'.format(i, v) for (i, v) in
+                    sorted(attrs.items())))
+
+
+###########################################################################
+#
+#  Tab completion methods to support tab-completion of options and parameters
+#   with click > 8.0. Tab completion for click < 8.0 exists only for
+#  commands and command groups but not for options and parameters. The
+#  shell-complete attribute did not exist in Click 7.
+#
+###########################################################################
+
+def completion_item(name):
+    """
+        Click does not include shell_completion. Not called with click < 8
+    """
+    if CLICK_VERSION[0] >= 8:
+        # pylint: disable=no-member
+        return click.shell_completion.CompletionItem(name)
+
+    return name
+
+
+def connection_name_complete(ctx, param, incomplete):
+    # pylint: disable=unused-argument
+    """
+    Shell complete function for the general option --name.  This function is
+    called if <TAB> is entered from terminal as part of the value of the
+    --name general option.  It returns all entries in connection table that
+    start with the string in incomplete.
+    """
+    connections_file = \
+        ctx.params['connections_file'] or DEFAULT_CONNECTIONS_FILE
+    # Output to stderr since terminal is not available because this only
+    # occurs when shell <TAB> entered to start tab-completion
+    try:
+        connections_repo = ConnectionRepository(connections_file)
+        if not connections_repo.file_exists():
+            # Abort does not allow a message and FileError does not abort.
+            raise click.ClickException("Connection file: {} does not exist.".
+                                       format(connections_file))
+
+        # Returns list of click CompletionItems from list of keys in
+        # the repository. This never gets called with Click vers lt 8
+        # so the fact the shell_completion does not exist does not matter
+        # pylint: disable=no-member
+        return [completion_item(name) for name in connections_repo
+                if name.startswith(incomplete)]
+
+    except ConnectionsFileError as cfe:
+        click.echo('Fatal error: {0}: {1}'.
+                   format(cfe.__class__.__name__, cfe),
+                   err=True)
+        raise click.Abort()
+
+
+###########################################################################
+#
+# cli option support functions
 #
 ###########################################################################
 
@@ -408,10 +520,14 @@ def _create_server_instance(
              context_settings=CONTEXT_SETTINGS,
              options_metavar=GENERAL_OPTS_TXT,
              subcommand_metavar=SUBCMD_HELP_TXT)
-@click.option('-n', '--name', 'connection_name', type=str, metavar='NAME',
+@click.option('-n', '--name', 'connection_name',
+              type=str,
+              metavar='NAME',
               cls=MutuallyExclusiveOption,
               mutually_exclusive=["server", 'mock-server'],
               show_mutually_exclusive=False,
+              # shell_complete is ignored with Python 2, See. click changes.
+              shell_complete=connection_name_complete,
               # defaulted in code
               envvar=PYWBEMCLI_NAME_ENVVAR,
               help=u'Use the WBEM server defined by the WBEM connection '
@@ -420,7 +536,9 @@ def _create_server_instance(
                    u'--mock-server options, since each defines a WBEM server. '
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PYWBEMCLI_NAME_ENVVAR))
-@click.option('-m', '--mock-server', type=str, multiple=True, metavar="FILE",
+@click.option('-m', '--mock-server', multiple=True,
+              type=click.Path(exists=True, dir_okay=False),
+              metavar="FILE",
               # defaulted in code
               cls=MutuallyExclusiveOption,
               mutually_exclusive=["server", 'name'],
@@ -475,7 +593,9 @@ def _create_server_instance(
                    u'handshake. If --no-verify client bypasses verification. '
                    u'Default: EnvVar {ev}, or "--verify".'.
                    format(ev=PYWBEMCLI_VERIFY_ENVVAR))
-@click.option('--ca-certs', type=str, metavar="CACERTS",
+@click.option('--ca-certs',
+              type=str,
+              metavar="CACERTS",
               default=None,  # defaulted in code
               envvar=PYWBEMCLI_CA_CERTS_ENVVAR,
               help=u'Certificates used to validate the certificate presented '
@@ -490,7 +610,10 @@ def _create_server_instance(
                    u'directory from from a system defined list of directories '
                    u'(pywbem before 1.0).'.
                    format(ev=PYWBEMCLI_CA_CERTS_ENVVAR))
-@click.option('-c', '--certfile', type=str, metavar="FILE",
+@click.option('-c', '--certfile',
+              # Ignore missing file. Issue caught in cim_operations
+              type=click.Path(exists=False, dir_okay=False),
+              metavar="FILE",
               # defaulted in code
               envvar=PYWBEMCLI_CERTFILE_ENVVAR,
               help=u'Path name of a PEM file containing a X.509 client '
@@ -500,7 +623,10 @@ def _create_server_instance(
                    u'default in interactive mode. '
                    u'Default: EnvVar {ev}, or none.'.
                    format(ev=PYWBEMCLI_CERTFILE_ENVVAR))
-@click.option('-k', '--keyfile', type=str, metavar='FILE',
+@click.option('-k', '--keyfile',
+              # Ignore missing file. Issue caught later
+              type=click.Path(exists=False, dir_okay=False),
+              metavar='FILE',
               # defaulted in code
               envvar=PYWBEMCLI_KEYFILE_ENVVAR,
               help=u'Path name of a PEM file containing a X.509 private key '
@@ -522,7 +648,7 @@ def _create_server_instance(
                    u'Default: EnvVar {ev}, or {default}. Min/max: '.
                    format(rt=HTTP_READ_RETRIES, ev=PYWBEMCLI_TIMEOUT_ENVVAR,
                           default=DEFAULT_CONNECTION_TIMEOUT))
-@click.option('-U', '--use-pull', type=click.Choice(['yes', 'no', 'either']),
+@click.option('-U', '--use-pull', type=click.Choice(USE_PULL_OPTIONS),
               # defaulted in code
               envvar=PYWBEMCLI_USE_PULL_ENVVAR,
               help=u'Determines whether pull operations are used for '
@@ -564,6 +690,7 @@ def _create_server_instance(
                           default=DEFAULT_NAMESPACE))
 @click.option('-o', '--output-format', metavar='FORMAT',
               default=None,  # There is no default value
+              type=click.Choice(OUTPUT_FORMATS_OPTION),
               help=u'Output format for the command result. '
                    u'The default and allowed output formats are command '
                    u'specific. '
@@ -602,6 +729,7 @@ def _create_server_instance(
               u'Default: False.')
 @click.option('-C', '--connections-file', metavar='FILE PATH',
               default=None,  # default value set in cli function
+              type=click.Path(dir_okay=False),   # file may not exist yet
               envvar=PYWBEMCLI_CONNECTIONS_FILE_ENVVAR,
               # Keep help text in sync with connections file definitions in
               # _connection_repository.py:
@@ -755,7 +883,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         if connections_file:
             connections_repo = ConnectionRepository(connections_file, verbose)
         elif connections_file == "":
-            connections_repo = DEFAULT_CONNECTIONS_FILE
+            connections_repo = ConnectionRepository(DEFAULT_CONNECTIONS_FILE,
+                                                    verbose)
         else:
             connections_repo = ctx.obj.connections_repo
 

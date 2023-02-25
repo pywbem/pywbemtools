@@ -136,6 +136,7 @@ Help text for ``pywbemcli``:
       statistics    Command group for WBEM operation statistics.
       subscription  Command group to manage WBEM indication subscriptions.
       connection    Command group for WBEM connection definitions.
+      docs          Get pywbemtools documentation in web browser.
       help          Show help for pywbemcli subjects.
       repl          Enter interactive mode (default).
 
@@ -929,6 +930,30 @@ Help text for ``pywbemcli connection test`` (see :ref:`connection test command`)
       -h, --help   Show this help message.
 
 
+.. _`pywbemcli docs --help`:
+
+pywbemcli docs --help
+---------------------
+
+
+
+Help text for ``pywbemcli docs`` (see :ref:`docs command`):
+
+
+::
+
+    Usage: pywbemcli [GENERAL-OPTIONS] docs
+
+      Get pywbemtools documentation in web browser.
+
+      EXPERIMENTAL
+
+      Calls the current default web browser to display the current stable pywbemtools documentation in a new window.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
 .. _`pywbemcli help --help`:
 
 pywbemcli help --help
@@ -941,11 +966,13 @@ Help text for ``pywbemcli help`` (see :ref:`help command`):
 
 ::
 
-    Usage: pywbemcli [GENERAL-OPTIONS] help CLASSNAME
+    Usage: pywbemcli [GENERAL-OPTIONS] help SUBJECT
 
       Show help for pywbemcli subjects.
 
-      Show help for pywbemcli for specific pywbemcli subjects.
+      Show help for specific pywbemcli subjects.  This is in addition to the help messages that are available with the -h or
+      --help option for every command group and command in pywbemcli. It helps document pywbemcli subjects that are more
+      general than specific commands and configuration subjects that do not have specific commands
 
       If there is no argument provided, outputs a list and summary of the existing help subjects.
 
@@ -1983,11 +2010,26 @@ Help text for ``pywbemcli repl`` (see :ref:`repl command`):
       Enter the interactive mode where pywbemcli commands can be entered interactively. The prompt is changed to
       'pywbemcli>'.
 
+      <COMMAND> <COMMAND OPTIONS> - Execute pywbemcli command COMMAND
+
+      <GENERAL_OPTIONS> <COMMAND> <COMMAND_OPTIONS> - Execute command with general options.  General options set here exist
+      only for the current command.
+
+      -h, --help - Show pywbemcli general help message, including a                               list of pywbemcli
+      commands. COMMAND -h, --help - Show help message for pywbemcli command COMMAND.
+
+      !SHELL-CMD - Execute shell command SHELL-CMD
+
+      Pywbemcli termination - <CTRL-D>, :q, :quit, :exit
+
       Command history is supported. The command history is stored in a file ~/.pywbemcli_history.
 
-      Pywbemcli may be terminated from this mode by entering <CTRL-D>, :q, :quit, :exit
+      <UP>, <DOWN> - Scroll through pwbemcli command history.
 
-      In the repl mode, <CTRL-r> man be used to initiate an interactive search of the history file.
+      <CTRL-r> <search string> - initiate an interactive search of the pywbemcli history file. Can be used with <UP>, <DOWN>
+      to display commands that match the search string. Editing the search string updates the search.
+
+      <TAB> - tab completion for current command line (can be used anywhere in command)
 
       Interactive mode also includes an autosuggest feature that makes suggestions from the command history as the command
       the user types in the command and options.

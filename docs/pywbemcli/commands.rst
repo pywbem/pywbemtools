@@ -43,7 +43,7 @@ The command groups are:
 
 The individual commands (no command group) are:
 * :ref:`help command` - Show help for particular pywbemcli subjects
-* :ref:`doc command` - Issue request to web browser to load pywbemcli documentation
+* :ref:`docs command` - Issue request to web browser to load pywbemcli documentation
 * :ref:`repl command` - Enter interactive mode (default).
 
 
@@ -4808,5 +4808,25 @@ Thus, for example:
 
     pywbemcli> help repl
       . . . returns help on the interactive and commands available in that mode
+
+.. index::
+    pair: help; command
+
+.. _`docs command`:
+
+``docs`` command
+----------------
+
+.. index::
+    single: docs command
+    pair: docs; command
+
+The ``docs`` command provides a simple way to access the pywbemtools
+documentation  publically available on the WEB.  This command calls the
+system default WEB browser with the URL of the pywbemtools documentation
+to open a new browser window with the top level page of that documentation and
+immediatly terminates or returns to the repl command line.
+
+This is ``experimental`` as of pywbemtools 1.2.0.
 
 

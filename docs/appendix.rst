@@ -342,6 +342,23 @@ This documentation uses a few special terms to refer to Python types:
       can be persisted in a pywbem connection file and then referenced by
       name in future pywbemcli calls.
 
+   tab-completion
+      Also known as comand-line completion or autocompletion, is a feature where
+      the an underlying service fills in partially typed commands when the user
+      hits <TAB> or <TAB><TAB>. Tab-completion is available with pywbemcli
+      command line mode when a terminal shell that enables tab-completion is
+      being used (ex. bash, zsh) and tab-completion has been activated for
+      pywbemcli/pywbemlistener or when in the interactive mode.
+
+   auto-suggestion
+      Auto-suggestion is a way to propose input on the command line based on
+      the history of previous commands. The input is compared to the history
+      and when there is an entry in the history file with the given text the
+      proposed completion is show as gray text behind the current input.
+      Pressing the right arrow → or <CTRL-e> will insert this suggestion,
+      <ALT-f> will insert the first word of the suggestion.  This capability is
+      implemented only in the interactive mode of pywbemcli.
+
 
 .. _`Profile advertisement methodologies`:
 
@@ -351,12 +368,12 @@ Profile advertisement methodologies
 This section briefly explains the profile advertisement methodologies defined
 by DMTF. A full description can be found in :term:`DSP1033`.
 
-These methodologies describe how a client can discover the central instances
-of a management profile. Discovering the :term:`central instances` through a
-:term:`management profile` is the recommended approach for clients, over simply enumerating a CIM
-class of choice. The reason is that this approach enables clients to work
-seamlessly with different server implementations, even when they have
-implemented a different set of management profiles.
+These methodologies describe how a client can discover the central instances of
+a management profile. Discovering the :term:`central instances` through a
+:term:`management profile` is the recommended approach for clients, over simply
+enumerating a CIM class of choice. The reason is that this approach enables
+clients to work seamlessly with different server implementations, even when
+they have implemented a different set of management profiles.
 
 The DMTF defines three profile advertisement methodologies in :term:`DSP1033`:
 
