@@ -88,6 +88,8 @@ Released: not yet
 
 * Improve the help description for repl.  It was not complete.
 
+* Update Pegasus docker image version to 0.1.2
+
 **Known issues:**
 
 * See `list of open issues`_.
