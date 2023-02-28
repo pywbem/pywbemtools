@@ -75,6 +75,18 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     If an argument is provided, it outputs the help for the subject(s) defined
     by the argument.
     """
+    minimum_title = "\nHelp Subjects:"
+
+    def display_subjects_summary_as_table(subjects, title=None):
+        """Display subjects in subjects list as table"""
+        rows = [[name, HELP_SUBJECTS_DICT[name][0]] for name in subjects]
+        if not title:
+            title = minimum_title
+        output_format = validate_output_format(ctx.obj.output_format, 'TABLE')
+        click.echo(format_table(rows, ("Subject name", "Subject description"),
+                                title=title,
+                                table_format=output_format))
+
     def display_complete_subject(subject):
         """Display the subject with key subject"""
         click.echo("{0} - {1}\n{2}".
@@ -82,87 +94,68 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
                           HELP_SUBJECTS_DICT[subject][0],
                           HELP_SUBJECTS_DICT[subject][1]))
 
-    subjects = sorted(list(HELP_SUBJECTS_DICT.keys()))
+    all_subjects = sorted(list(HELP_SUBJECTS_DICT.keys()))
 
-    # If there is no subject argument, output a table of all of the subjects and
-    # short descriptions.
-
+    # If there is no subject argument, output a table of all of the subjects
+    # and short descriptions.
     if not subject:
-        # max_subject_len = len(max(subjects, key=len))
-        rows = []
-        for name in subjects:
-            subject = HELP_SUBJECTS_DICT[name]
-            rows.append([name, subject[0]])
-
-        output_format = validate_output_format(ctx.obj.output_format, 'TABLE')
-        click.echo(format_table(rows, ("subject name", "subject description"),
-                                title='Help subjects',
-                                table_format=output_format))
-
+        display_subjects_summary_as_table(all_subjects)
         return
 
     # If a subject text exists, output the help for that subject
     if subject in HELP_SUBJECTS_DICT:
         display_complete_subject(subject)
+        return
 
-    # Try search for single subject exists that matches startswith
+    # Try search for single subject exists that matches startswith on subject
     subjects = HELP_SUBJECTS_DICT.keys()
-    partial_subjects = [subj for subj in subjects
-                        if subj.startswith(subject)]
+    partial_subjects = [subj for subj in subjects if subj.startswith(subject)]
 
     # Return if startswith matches a single subject
     if len(partial_subjects) == 1:
         display_complete_subject(partial_subjects[0])
 
-    # If multiple matches, multiple possible subjects, rtn msg
+    # If multiple matches, return summary of all that match
     elif len(partial_subjects) > 1:
-        click.echo("Multiple possible subjects {}".
-                   format(', '.join(subjects)))
+        title = "{0} Input: `{1}` matches multiple subjects:` `{2}`". \
+            format(minimum_title, subject, ', '.join(partial_subjects))
+
+        display_subjects_summary_as_table(partial_subjects, title=title)
     else:
         raise click.ClickException("'{}' is not a valid help subject. "
-                                   "Try 'help' for list of subjects.".
+                                   "Try  cooamd:'help' for list of subjects.".
                                    format(subject))
 
 
 # pylint: disable=invalid-name
 activate_shell_help_msg = '''
-Pywbemcli includes tab-completion capability for all commands for certain
-shell types program being used by the command line terminal.
+Pywbemcli shell tab-completion must be activated after installation by notifying
+the shell before the <TAB> becomes active when entering a pywbemcli command in
+the shell.
 
-In the command mode tab-completion is active only when it is activated by
-notifying the command shell of the pywbemcli tab-completion characteristics.
-Further, it is only usable with those shells that include tab-completion as
-part of the shell functionality.  On Linux based systems this includes shells
-like bash (version 4.0 or greater), zsh, and fish.
+Tab-completion is only available for certain shells including: bash (version
+4.4 or greater), zsh, and fish shells since pywbemcli defines the completer
+script specifically for each shell.
 
 Activation of pywbemcli involves the following but with different formats for
 each shell type:
 
-* Getting from pywbemcli the body of a completion script for the shell to be
-  activated. This is done by executing a script statement of form
-  ``_PYWBEMCLI_COMPLETE=bash_source pywbemcli``.
-* Notifying the shell of this completion script with an eval statement or
-  saving the script and notifying the shell later by sourcing the resulting
-  completion script file.
+1. Getting from pywbemcli the body of a completion script that defines
+   activation for the shell. This is done by executing the script statement
+     '_PYWBEMCLI_COMPLETE=<shell>_source pywbemcli'
+     where <shell> can be 'bash', 'zsh', or 'fish'.
+    This causes the shell to call back to pywbemcli with '_PYEBEMCLI_COMPLETE'
+    and '<shell>_source' arguments wherein pywbemcli returns the completion
+    script.
+2. Setting up the shell of this completion script by either:
+   * an 'eval' statement in the terminal startup
+     (ex. .bashrc ) that defines the completion script or,
+   * Creating a completion script file and sourcing that file later to activate.
 
-Tab-completion can be activated either by:
-
-* Installing the activation script with an eval statement into .bashrc
-* Creating a completion script file and sourcing that file at a later time.
-
-The ``eval`` statement for each of the shells supported is as follows and can
+The 'eval' statement for each of the shells supported is as follows and can
 be inserted into the corresponding shell startup script defined below.
 
-  bash shell    startup file = ~/.bashrc
-  eval "$(_PYWBEMCLI_COMPLETE=bash_source pywbemcli)"
-
-  zsh shell     startup file =~/.zshrc
-  eval "$(_PYWBEMCLI_COMPLETE=zsh_source pywbemcli)"
-
-  fish shell    startup file =~/.config/fish/completions/foo-bar.fish
-  eval (env _PYWBEMCLI_COMPLETE=fish_source pywbemcli)
-
-NOTE: For Python 2, replace the <shell-name>_source with source_<shell-name>
+NOTE: For Python 2, replace '<shell-name>_source' with 'source_<shell-name>`.
 
 =====  ============  ===========================================================
 shell  startup file  eval command
@@ -173,44 +166,40 @@ fish  ~/.config/fish/completions/foo-bar.fish
                      eval "$(env _PYWBEMCLI_COMPLETE=fish_source pywbemcli)"
 =====  ===========  ===========================================================
 
-To activate pywbemcli tab-completion by:
+To activate pywbemcli tab-completion by evaluating the startup on terminal open:
 
-  1. Edit the eval command in the startup file or
-  2. Close the file and restart the terminal or
-  3. Test existence of tab-completion by:
-     a. Test completion with a command such as "pywbemcli cl<TAB> which should
-        complete the "class" command group name.
-     b. In bash executing "complete -p pywbemcli". An entry for pywbemcli must
-        exist for pywbemcli as follows:
+  1. Edit the 'eval' command into the startup file.
+  2. Close the file and restart the terminal.
+  3. Test activation of tab-completion by:
+     a. a command such as 'pywbemcli cl<TAB>' which should complete 'class' or,
+     b. In bash executing "complete -p pywbemcli". Bash must return:
         complete -o nosort -F _pywbemcli_completion pywbemcli
 
-Executing the eval directly in the shell startup file has the issue that the
+Executing the 'eval' directly in the shell startup file has the issue that the
 pywbemcli executable location must be known when opening a terminal . This may
-no be consistend with executing pywbemcli in virtual environments.
+not be consistent with executing pywbemcli in virtual environments.
 
-to activate tab-completion using a completion file execute the command defined
-below for the desired shell. This  creates the
-completion script for pywbemcli in ~/pywbemcli-complete.bash. This command
-requires that that pywbemcli is available:
-
-  bash shell
-  _PYWBEMCLI_COMPLETE=bash_source pywbemcli > ~/.pywbemcli-complete.bash
-
-  zsh shell
-  _PYWBEMCLI_COMPLETE=zsh_source pywbemcli > ~/.pywbemcli-complete.zsh
-
-  fish shell
-  _PYWBEMCLI_COMPLETE=fish_source pywbemcli >
+To activate tab-completion using a completion file execute the command defined
+below for the desired shell to create the completion script for pywbemcli
+in  a file (ex.~/pywbemcli-complete.bash). This command requires that that
+pywbemcli be available. The file name is arbitrary.
+=====  =====================================================================
+shell  completion file creating command
+=====  =====================================================================
+bash   _PYWBEMCLI_COMPLETE=bash_source pywbemcli > ~/.pywbemcli-complete.bash
+zsh    _PYWBEMCLI_COMPLETE=zsh_source pywbemcli > ~/.pywbemcli-complete.zsh
+fish   _PYWBEMCLI_COMPLETE=fish_source pywbemcli >
           ~/.config/fish/completions/pywbemcli.fish
+=====  =====================================================================
 
 Once the completion script file is created, pywbemcli tab-completion can be
-activated by sourcing this script (ex ''source ~/.pywbemcli-complete.bash'')
-This does not actually call pywbemcli.  This can be done a number of
-different means, for example:
+activated by sourcing this script (ex 'source ~/.pywbemcli-complete.bash')
+upon shell startup. This does not actually call pywbemcli.  This can be done a
+number of different ways, for example:
 
 * Include the sourcing statement in the shell startup script (ex. ~/.bashrc)
-* Execute the statement as part of the startup of virtual envrionments.
-* Manually executing the sourcing statement when required.
+* Execute the statement as part of the startup of a virtual envrionment.
+* Manually execute the sourcing statement when required before calling pywbemcli
 '''
 # pylint: enable=invalid-name
 
@@ -315,6 +304,5 @@ HELP_SUBJECTS_DICT = {
     'instancename': ('InstanceName parameter in instance cmd group',
                      HELP_INSTANCENAME_MSG),
     'tab-completion': ("Where tab completion is provided by pywbemcli",
-                       tab_completion_help_msg)
-
+                       tab_completion_help_msg),
 }
