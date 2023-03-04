@@ -25,7 +25,7 @@ import click
 
 from .._click_extensions import GENERAL_OPTS_TXT
 
-from .pywbemcli import cli
+from .pywbemlistener import cli
 from .._options import add_options, help_option
 from .._common_cmd_actions import docs_cmd_action
 

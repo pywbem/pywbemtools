@@ -176,9 +176,9 @@ GENERAL_HELP_LINES = [
       statistics  Command group for WBEM operation statistics.
       subscription  Command group to manage WBEM indication subscriptions.
       connection  Command group for WBEM connection definitions.
-      docs        Get pywbemtools documentation in web browser.
+      repl        Enter interactive mode (default).
       help        Show help for pywbemcli subjects.
-      repl        Enter interactive mode (default)."""
+      docs        Get pywbemtools documentation in web browser."""
 ]
 
 # pylint: disable=line-too-long
