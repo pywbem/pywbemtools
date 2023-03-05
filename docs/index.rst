@@ -35,6 +35,7 @@ The pywbemtools github page is: `https://github.com/pywbem/pywbemtools <https://
    introduction.rst
    pywbemcli/index.rst
    pywbemlistener/index.rst
+   settingsandconfiguration.rst
    development.rst
    appendix.rst
    changes.rst
