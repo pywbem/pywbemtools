@@ -37,7 +37,7 @@ from .._output_formatting import validate_output_format, format_table
 # FUTURE: add the tab-completion function for the subject argument
 
 
-def help_arg_subject_shell_complete(ctx, param, incomplete):
+def help_arg_subject_shell_completer(ctx, param, incomplete):
     # pylint: disable=unused-argument
     """
     Shell complete function for the help subjects argument.  This function is
@@ -55,7 +55,7 @@ def help_arg_subject_shell_complete(ctx, param, incomplete):
 @click.argument('subject', type=str,
                 metavar='SUBJECT',
                 cls=TabCompleteArgument,
-                shell_complete=help_arg_subject_shell_complete,
+                shell_complete=help_arg_subject_shell_completer,
                 required=False)  # pylint: disable=no-member
 @add_options(help_option)
 @click.pass_context

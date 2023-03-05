@@ -15,7 +15,12 @@
 # limitations under the License.
 
 """
-Unit tests for the completer functions implemented in pywbemcli.
+Unit tests for the tab-completer functions implemented in pywbemcli that are
+executed when the user does <TAB> and the shell or repl calls back to pywbemcli
+with a partial entity (argument or option value) to get possible completion.
+
+These unit tests just test the completer functions themselves in isolation but
+not in a command line environment.
 """
 
 from __future__ import absolute_import, print_function
@@ -26,9 +31,8 @@ import packaging.version
 import pytest
 import click
 
-
-from pywbemtools.pywbemcli._cmd_help import help_arg_subject_shell_complete
-from pywbemtools.pywbemcli.pywbemcli import connection_name_complete
+from pywbemtools.pywbemcli._cmd_help import help_arg_subject_shell_completer
+from pywbemtools.pywbemcli.pywbemcli import connection_name_completer
 # pylint: disable=relative-beyond-top-level
 from ..pytest_extensions import simplified_test_function
 # pylint: enable=relative-beyond-top-level
@@ -216,7 +220,7 @@ def test_connection_name_complete(testcase, ctx, yaml, file, file_exists,
 
     param = None  # The method being tested ignores param
 
-    rtn_items = connection_name_complete(context, param, incomplete)
+    rtn_items = connection_name_completer(context, param, incomplete)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions
@@ -277,7 +281,7 @@ def test_help_arg_subject_shell_complete(testcase, incomplete, exp_rtn):
     ctx = None
     param = None
     # Note: Must return a list of click CompletionItem object.
-    rtn_items = help_arg_subject_shell_complete(ctx, param, incomplete)
+    rtn_items = help_arg_subject_shell_completer(ctx, param, incomplete)
 
     # Ensure that exceptions raised in the remainder of this function
     # are not mistaken as expected exceptions

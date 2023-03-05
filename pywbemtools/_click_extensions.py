@@ -294,3 +294,20 @@ class MutuallyExclusiveOption(TabCompleteOption):
         """Format/sort list for display."""
         return ', '.join(
             sorted(["--{0}".format(i) for i in self.mutually_exclusive]))
+
+
+def click_completion_item(name):
+    """
+        Function to convert a string to a click.shell_completion.CompletionItem
+        object.  This is the click class that must be returned by user
+        tab-completion functions for each string that is proposed as a
+        tab completion.
+
+        Click does not include shell_completion in click versions less that
+        v 8 so this method should not be called when click versions lt 8 are
+        used.
+    """
+    assert CLICK_VERSION[0] >= 8
+
+    # pylint: disable=no-member
+    return click.shell_completion.CompletionItem(name)

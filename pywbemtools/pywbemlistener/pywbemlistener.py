@@ -31,7 +31,7 @@ from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT
 from .._utils import pywbemtools_warn, get_terminal_width
 from .._options import add_options, help_option
-from .._output_formatting import OUTPUT_FORMAT_GROUPS
+from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
 __all__ = ['cli']
 
@@ -65,11 +65,14 @@ CONTEXT_SETTINGS = dict(
              subcommand_metavar=SUBCMD_HELP_TXT,
              move_to_end='run')
 @click.option('-o', '--output-format', metavar='FORMAT',
+              type=click.Choice(OUTPUT_FORMATS),
               default=None,
               help=u'Output format for the command result. '
                    u'FORMAT is one of the table formats: [{tb}].'.
                    format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0])))
-@click.option('-l', '--logdir', type=str, metavar='DIR',
+@click.option('-l', '--logdir',
+              type=click.Path(exists=False, dir_okay=True),
+              metavar='DIR',
               default=None,
               envvar=_config.PYWBEMLISTENER_LOGDIR_ENVVAR,
               help=u"Enable logging of the 'pywbemlistener run' command output "
