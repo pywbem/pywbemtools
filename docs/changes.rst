@@ -32,6 +32,10 @@ Released: not yet
 * Fix issue in instance count where error reports CIMError code and not
   the code string. (see #1242)
 
+* Fix issue with invalid --connections-file general option and interactive
+  mode. Will abort entering interactive mode if the file does not
+  exist. (See issue #1275)
+
 **Enhancements:**
 
 * Added a new make target 'check_reqs' that runs pip-missing-reqs on

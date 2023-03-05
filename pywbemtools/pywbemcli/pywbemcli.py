@@ -66,6 +66,14 @@ from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
 __all__ = ['cli']
 
+
+class InvalidConnectionFile(Warning):
+    """
+    Indicates that invalid connection file in startup of interactive mode.
+    """
+    pass
+
+
 # Click version as a tuple. Used to control tab-completion features
 CLICK_VERSION = packaging.version.parse(click.__version__).release
 
@@ -1143,6 +1151,13 @@ def repl(ctx):
 
     click.echo("Enter 'help repl' for help, <CTRL-D> or ':q' "
                "to exit pywbemcli or <CTRL-r> to search history, ")
+
+    if not ctx.obj.connections_repo.file_exists():
+        pywbemtools_warn(
+            "Connections file: '{}' does not exist. Server and connection "
+            "commands will not work.".
+            format(ctx.obj.connections_repo.connections_file),
+            InvalidConnectionFile, stacklevel=0)
 
     prompt_kwargs = {
         'message': PYWBEMCLI_PROMPT,

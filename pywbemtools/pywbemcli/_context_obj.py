@@ -207,8 +207,8 @@ class ContextObj(object):
                              ctx.invoked_subcommand or "")
         raise click.ClickException(
             'No current server for command "{}" that requires a WBEM server. '
-            'Specify a server with the "--server", "--mock-server", or"--name" '
-            'general option, by setting the corresponding environment '
+            'Specify a server with the "--server", "--mock-server", or  '
+            '"--name" general option, by setting the corresponding environment '
             'variables, or in interactive mode '
             'use "connection select" to define a target server'.
             format(cmd))
