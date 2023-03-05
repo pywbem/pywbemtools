@@ -75,6 +75,13 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     If an argument is provided, it outputs the help for the subject(s) defined
     by the argument.
     """
+    def display_complete_subject(subject):
+        """Display the subject with key subject"""
+        click.echo("{0} - {1}\n{2}".
+                   format(subject,
+                          HELP_SUBJECTS_DICT[subject][0],
+                          HELP_SUBJECTS_DICT[subject][1]))
+
     subjects = sorted(list(HELP_SUBJECTS_DICT.keys()))
 
     # If there is no subject argument, output a table of all of the subjects and
@@ -94,12 +101,23 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
 
         return
 
-    # If a subject exists, output the help for that subject
+    # If a subject text exists, output the help for that subject
     if subject in HELP_SUBJECTS_DICT:
-        click.echo("{0} - {1}\n{2}".
-                   format(subject,
-                          HELP_SUBJECTS_DICT[subject][0],
-                          HELP_SUBJECTS_DICT[subject][1]))
+        display_complete_subject(subject)
+
+    # Try search for single subject exists that matches startswith
+    subjects = HELP_SUBJECTS_DICT.keys()
+    partial_subjects = [subj for subj in subjects
+                        if subj.startswith(subject)]
+
+    # Return if startswith matches a single subject
+    if len(partial_subjects) == 1:
+        display_complete_subject(partial_subjects[0])
+
+    # If multiple matches, multiple possible subjects, rtn msg
+    elif len(partial_subjects) > 1:
+        click.echo("Multiple possible subjects {}".
+                   format(', '.join(subjects)))
     else:
         raise click.ClickException("'{}' is not a valid help subject. "
                                    "Try 'help' for list of subjects.".
@@ -186,7 +204,7 @@ requires that that pywbemcli is available:
           ~/.config/fish/completions/pywbemcli.fish
 
 Once the completion script file is created, pywbemcli tab-completion can be
-activated by sourcing this script (ex ``source ~/.pywbemcli-complete.bash``)
+activated by sourcing this script (ex ''source ~/.pywbemcli-complete.bash'')
 This does not actually call pywbemcli.  This can be done a number of
 different means, for example:
 
@@ -195,7 +213,6 @@ different means, for example:
 * Manually executing the sourcing statement when required.
 '''
 # pylint: enable=invalid-name
-
 
 # FUTURE: Move this to new module along with repl command. Every cmd should
 #         be in separate module with its data.

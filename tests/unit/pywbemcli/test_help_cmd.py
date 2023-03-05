@@ -58,13 +58,12 @@ SKIP = False
 
 
 TEST_CASES = [
-    # List of testcases for test help <subject>.
+    # List of testcases for command help <subject>.
     # Each testcase is a list with the following items:
     # * desc: Description of testcase.
-    # * inputs: String, or tuple/list of strings, or dict of 'env', 'args',
-    #     'general', and 'stdin'. See the 'inputs' parameter of
-    #     CLITestsBase.command_test() in cli_test_extensions.py for detailed
-    #     documentation.
+    # * inputs:
+    # * inputs.subject: argument (i.e. subject for the help command)
+    # *
     # * exp_response: Dictionary of expected responses (stdout, stderr, rc) and
     #     test definition (test: <testname>). See the 'exp_response' parameter
     #     of CLITestsBase.command_test() in cli_test_extensions.py for
@@ -80,31 +79,36 @@ TEST_CASES = [
       'test': 'innows'},
      None, RUN],
 
-    ['Verify help command repl',
+    ['Verify help command  arg repl',
      {'args': ['help', 'repl']},
      {'stdout': REPL_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify help command instancename',
+    ['Verify help command  arg instancename',
      {'args': ['help', 'instancename']},
      {'stdout': INSTANCENAME_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify help command tab-completion',
+    ['Verify help command arg tab-completion',
      {'args': ['help', 'tab-completion']},
      {'stdout': TABCOMPLETION_HELP_LINES,
       'test': 'innows'},
      None, OK],
 
-    ['Verify help command tab-completion',
+    ['Verify help command arg tab-completion unique partial input',
+     {'args': ['help', 'tab-c']},
+     {'stdout': TABCOMPLETION_HELP_LINES,
+      'test': 'innows'},
+     None, OK],
+
+    ['Verify help command arg tab-completion',
      {'args': ['help', 'blah']},
      {'stderr': ["'blah' is not a valid help subject."],
       'rc': 1,
       'test': 'innows'},
      None, OK],
-
 ]
 
 
