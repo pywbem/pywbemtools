@@ -136,9 +136,9 @@ Help text for ``pywbemcli``:
       statistics    Command group for WBEM operation statistics.
       subscription  Command group to manage WBEM indication subscriptions.
       connection    Command group for WBEM connection definitions.
-      docs          Get pywbemtools documentation in web browser.
-      help          Show help for pywbemcli subjects.
       repl          Enter interactive mode (default).
+      help          Show help for pywbemcli subjects.
+      docs          Get pywbemtools documentation in web browser.
 
 
 .. _`pywbemcli class --help`:

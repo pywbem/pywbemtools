@@ -1,5 +1,5 @@
-# (C) Copyright 2017 IBM Corp.
-# (C) Copyright 2017 Inova Development Inc.
+# (C) Copyright 2023 IBM Corp.
+# (C) Copyright 2023 Inova Development Inc.
 # All Rights Reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,8 +116,7 @@ TEST_CASES = [
 
 class TestCmdHelp(CLITestsBase):  # pylint: disable=too-few-public-methods
     """
-    Test the general options including statistics,  --server,
-    --timeout, --use-pull, --pull-max-cnt, --output-format
+    Test the help command
     """
 
     command_group = None
@@ -126,13 +125,7 @@ class TestCmdHelp(CLITestsBase):  # pylint: disable=too-few-public-methods
         "desc, inputs, exp_response, mock, condition", TEST_CASES)
     def test_help_cmd(self, desc, inputs, exp_response, mock, condition):
         """
-        Common test method for those commands and options in the
-        class command that can be tested.  This includes:
-
-          * Subcommands like help that do not require access to a server
-
-          * Subcommands that can be tested with a single execution of a
-            pywbemcli command.
+       Test the help command
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
                           mock, condition)
