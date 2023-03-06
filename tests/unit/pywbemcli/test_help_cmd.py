@@ -23,8 +23,9 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 
-DEFAULT_HELP_LINES = """Help subjects
-subject name    subject description
+DEFAULT_HELP_LINES = """
+Help Subjects:
+Subject name    Subject description
 --------------  ---------------------------------------------
 activate        Activating shell tab completion
 instancename    InstanceName parameter in instance cmd group
