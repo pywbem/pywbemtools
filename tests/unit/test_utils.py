@@ -31,6 +31,7 @@ import pywbemtools._utils
 
 from .pytest_extensions import simplified_test_function
 
+# pylint: disable=use-dict-literal
 
 TESTCASES_ENSURE_BYTES = [
 

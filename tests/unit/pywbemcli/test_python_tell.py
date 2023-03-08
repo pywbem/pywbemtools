@@ -14,6 +14,8 @@ import os
 import io
 import pytest
 
+# pylint: disable=use-dict-literal
+
 
 @pytest.fixture()
 def file_path():

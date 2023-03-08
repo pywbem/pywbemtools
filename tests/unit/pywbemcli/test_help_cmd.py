@@ -16,12 +16,13 @@
 """
 Test the help command that displays help text on specific pywbemcli
 subjects. This command is not part of any command group.
-
 """
 
 import pytest
 
 from .cli_test_extensions import CLITestsBase
+
+# pylint: disable=use-dict-literal
 
 DEFAULT_HELP_LINES = """
 Help Subjects:
@@ -134,4 +135,4 @@ class TestCmdHelp(CLITestsBase):  # pylint: disable=too-few-public-methods
             pywbemcli command.
         """
         self.command_test(desc, self.command_group, inputs, exp_response,
-                          mock, condition, verbose=True)
+                          mock, condition)

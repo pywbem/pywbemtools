@@ -36,6 +36,8 @@ from ..pytest_extensions import simplified_test_function
 from .cli_test_extensions import ensure_no_listeners, start_listeners, \
     RUN, RUN_NOWIN
 
+# pylint: disable=use-dict-literal
+
 # Click version as a tuple. Used to control tab-completion features
 CLICK_VERSION = packaging.version.parse(click.__version__).release
 # boolean True if click version 8 or greater.

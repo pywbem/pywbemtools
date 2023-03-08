@@ -42,6 +42,8 @@ from .common_options_help_lines import CMD_OPTION_NAMES_ONLY_HELP_LINE, \
     CMD_OPTION_SUBCLASSOF_FILTER_HELP_LINE, \
     CMD_OPTION_LEAFCLASSES_FILTER_HELP_LINE
 
+# pylint: disable=use-dict-literal
+
 _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)

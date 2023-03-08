@@ -39,6 +39,8 @@ from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 from ..pytest_extensions import simplified_test_function
 
+# pylint: disable=use-dict-literal
+
 # Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
 # the pytest capsys fixture is used. That happens only on Windows.
 # See Click issue https://github.com/pallets/click/issues/1590. This

@@ -27,6 +27,8 @@ from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
     CMD_OPTION_SUMMARY_HELP_LINE, \
     CMD_OPTION_MULTIPLE_NAMESPACE_DFLT_CONN_HELP_LINE
 
+# pylint: disable=use-dict-literal
+
 TEST_DIR = os.path.dirname(__file__)
 
 PYTHON_GE_38 = sys.version_info > (3, 8)

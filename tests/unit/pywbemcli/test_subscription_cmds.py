@@ -37,6 +37,8 @@ import pytest
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
+# pylint: disable=use-dict-literal
+
 TEST_DIR = os.path.dirname(__file__)
 TEST_DIR_REL = os.path.relpath(TEST_DIR)
 

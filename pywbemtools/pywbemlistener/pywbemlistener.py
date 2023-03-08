@@ -39,14 +39,14 @@ __all__ = ['cli']
 #
 # Context variables passed to click
 #
-CONTEXT_SETTINGS = dict(
+
+CONTEXT_SETTINGS = {
 
     # Enable -h as additional help option:
-    help_option_names=['-h', '--help'],
+    "help_option_names": ['-h', '--help'],
 
     # Default the output width properly:
-    terminal_width=get_terminal_width(),
-)
+    "terminal_width": get_terminal_width()}
 
 
 ############################################################################

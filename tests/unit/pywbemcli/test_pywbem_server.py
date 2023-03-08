@@ -28,6 +28,8 @@ from pywbemtools.pywbemcli._pywbem_server import PywbemServer
 
 from tests.unit.pytest_extensions import simplified_test_function
 
+# pylint: disable=use-dict-literal
+
 OK = True
 RUN = True
 FAIL = False

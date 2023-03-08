@@ -23,6 +23,7 @@ import pytest
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
+# pylint: disable=use-dict-literal
 
 # The mock files used for testing
 TEST_INTEROP_MOCK_FILE = 'simple_interop_mock_script.py'

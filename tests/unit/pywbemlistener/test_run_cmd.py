@@ -25,6 +25,8 @@ from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
 from .test_start_cmd import START_HELP_CALL_PATTERNS, \
     START_HELP_FORMAT_PATTERNS
 
+# pylint: disable=use-dict-literal
+
 # Output patterns for 'pywbemlistener run --help'
 RUN_HELP_PATTERNS = [
     r"^Usage: pywbemlistener \[GENERAL-OPTIONS\] run NAME "

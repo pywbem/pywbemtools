@@ -50,6 +50,8 @@ from pywbemtools.pywbemcli._common import parse_wbemuri_str, \
 from .cli_test_extensions import setup_mock_connection
 from ..pytest_extensions import simplified_test_function
 
+# pylint: disable=use-dict-literal
+
 # from tests.unit.utils import assert_lines
 
 OK = True     # mark tests OK when they execute correctly

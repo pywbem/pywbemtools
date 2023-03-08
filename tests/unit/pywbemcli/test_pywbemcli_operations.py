@@ -40,6 +40,8 @@ from pywbemtools.pywbemcli.mockscripts import DeprecatedSetupWarning, \
 from ..pytest_extensions import simplified_test_function
 from ..utils import captured_output
 
+# pylint: disable=use-dict-literal
+
 OK = True
 FAIL = False
 PDB = "pdb"

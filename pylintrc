@@ -183,8 +183,6 @@ confidence=
 #       any code issues we will ignore this warning.
 # Note: "consider-using-set-comprehension" not allowed in python 2.6 so we
 #       ignore it as long as we are using 2.7
-# Note: "use-dict-literal" ignore for now because it is only a speed issue
-#       with the dict() and it is used extensively throughout code
 disable=I0011, bad-option-value,
         too-many-locals, too-many-branches, too-many-statements,
         too-many-lines, too-many-public-methods,
@@ -193,7 +191,7 @@ disable=I0011, bad-option-value,
         locally-enabled, superfluous-parens, useless-object-inheritance,
         consider-using-set-comprehension, unnecessary-pass, useless-return,
         raise-missing-from, super-with-arguments, redundant-u-string-prefix,
-        consider-using-f-string, use-dict-literal
+        consider-using-f-string
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

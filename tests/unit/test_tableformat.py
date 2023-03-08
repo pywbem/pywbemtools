@@ -29,6 +29,7 @@ import pytest
 
 from pywbemtools._output_formatting import format_table, fold_strings
 
+# pylint: disable=use-dict-literal
 
 # A simple table
 TABLE1_HEADERS = ['col1', 'col2', 'col3']
