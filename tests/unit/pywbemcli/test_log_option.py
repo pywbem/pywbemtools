@@ -24,6 +24,8 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 
+# pylint: disable=use-dict-literal
+
 TEST_DIR = os.path.dirname(__file__)
 
 SIMPLE_MOCK_MODEL_FILE = 'simple_mock_model.mof'

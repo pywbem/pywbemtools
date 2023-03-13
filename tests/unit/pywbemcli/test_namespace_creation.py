@@ -20,6 +20,7 @@ import pytest
 
 from .cli_test_extensions import CLITestsBase
 
+# pylint: disable=use-dict-literal
 
 # Mock environment #1: Namespace-neutral MOF, no Interop namespace
 MOCK1_MOF_FILE = 'simple_mock_model.mof'

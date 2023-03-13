@@ -24,6 +24,7 @@ import pytest
 from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
 from ..utils import CLICK_VERSION
 
+# pylint: disable=use-dict-literal
 
 # Default indication format (must be in sync with actual default format)
 DEFAULT_INDI_FORMAT = '{dt} {h} {i_mof}'

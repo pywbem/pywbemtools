@@ -31,6 +31,8 @@ from pywbemtools._utils import CONNECTIONS_FILENAME
 from .cli_test_extensions import CLITestsBase
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
+# pylint: disable=use-dict-literal
+
 SCRIPT_DIR = os.path.dirname(__file__)
 
 # A mof file that defines basic qualifier decls, classes, and instances

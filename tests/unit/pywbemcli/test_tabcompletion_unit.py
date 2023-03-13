@@ -37,6 +37,8 @@ from pywbemtools.pywbemcli.pywbemcli import connection_name_completer
 from ..pytest_extensions import simplified_test_function
 # pylint: enable=relative-beyond-top-level
 
+# pylint: disable=use-dict-literal
+
 # Click version as a tuple. Used to control tab-completion features
 CLICK_VERSION = packaging.version.parse(click.__version__).release
 # boolean True if click version 8 or greater.

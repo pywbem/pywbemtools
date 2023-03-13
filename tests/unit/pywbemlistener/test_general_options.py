@@ -27,6 +27,8 @@ import pytest
 
 from .cli_test_extensions import pywbemlistener_test, RUN
 
+# pylint: disable=use-dict-literal
+
 # Output patterns for 'pywbemlistener --help'
 HELP_PATTERNS = [
     r"^Usage: pywbemlistener \[GENERAL-OPTIONS\] COMMAND \[ARGS\] "

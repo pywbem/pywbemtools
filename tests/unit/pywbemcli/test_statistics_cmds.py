@@ -26,6 +26,8 @@ from .cli_test_extensions import CLITestsBase
 
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 
+# pylint: disable=use-dict-literal
+
 TEST_DIR = os.path.dirname(__file__)
 SIMPLE_MOCK_FILE = 'simple_mock_model.mof'
 SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_FILE)

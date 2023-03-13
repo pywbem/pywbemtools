@@ -600,11 +600,10 @@ class BuildMockenvMixin(object):
         # We construct a single object, because the CIM repository is
         # referenced from each provider, and pickle properly handles
         # multiple references to the same object.
-        mockenv = dict(
-            cimrepository=self.cimrepository,
-            # pylint: disable=protected-access
-            provider_registry=self._provider_registry,
-        )
+        mockenv = {"cimrepository": self.cimrepository,
+                   # pylint: disable=protected-access
+                   "provider_registry": self._provider_registry}
+
         with io.open(mockenv_pickle_file, 'wb') as fp:
             pickle.dump(mockenv, fp)
 

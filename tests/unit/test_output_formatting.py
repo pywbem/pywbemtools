@@ -37,6 +37,8 @@ from pywbemtools._output_formatting import validate_output_format, \
 
 from .pytest_extensions import simplified_test_function
 
+# pylint: disable=use-dict-literal
+
 _PYWBEM_VERSION = parse_version(__version__)
 # pywbem 1.0.0 (dev, beta, final) or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)

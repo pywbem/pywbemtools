@@ -715,13 +715,11 @@ def format_indication(indication, host, indi_format=None):
         pass
     tz = dt.tzname() or ''
     i_mof = indication.tomof().replace('\n', ' ')
-    format_kwargs = dict(
-        dt=dt,
-        tz=tz,
-        h=host,
-        i_mof=i_mof,
-        i=indication,
-    )
+    format_kwargs = {"dt": dt,
+                     "tz": tz,
+                     "h": host,
+                     "i_mof": i_mof,
+                     "i": indication}
     if indi_format is None:
         indi_format = DEFAULT_INDI_FORMAT
     indi_str = indi_format.format(**format_kwargs)
@@ -1210,7 +1208,7 @@ def cmd_listener_start(context, name, options):
 
     prepare_startup_completion()
 
-    popen_kwargs = dict(shell=False)
+    popen_kwargs = {"shell": False}
     if six.PY3:
         popen_kwargs['start_new_session'] = True
 

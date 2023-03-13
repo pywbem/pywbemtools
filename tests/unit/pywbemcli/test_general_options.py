@@ -33,6 +33,8 @@ from .cli_test_extensions import CLITestsBase, PYWBEM_0, PYWBEM_1
 from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE
 from ..utils import CLICK_VERSION
 
+# pylint: disable=use-dict-literal
+
 TEST_DIR = os.path.dirname(__file__)
 
 # Test connections file used in some testcases
