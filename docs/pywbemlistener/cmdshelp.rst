@@ -53,12 +53,37 @@ Help text for ``pywbemlistener``:
       -h, --help                  Show this help message.
 
     Commands:
+      docs   Get pywbemtools documentation in web browser.
       list   List the currently running named WBEM indication listeners.
       show   Show a named WBEM indication listener.
       start  Start a named WBEM indication listener in the background.
       stop   Stop a named WBEM indication listener.
       test   Send a test indication to a named WBEM indication listener.
       run    Run as a named WBEM indication listener.
+
+
+.. _`pywbemlistener docs --help`:
+
+pywbemlistener docs --help
+--------------------------
+
+
+
+Help text for ``pywbemlistener docs`` (see :ref:`pywbemlistener docs command`):
+
+
+::
+
+    Usage: pywbemlistener docs [GENERAL-OPTIONS]
+
+      Get pywbemtools documentation in web browser.
+
+      EXPERIMENTAL
+
+      Calls the current default web browser to display the current stable pywbemtools documentation in a new window.
+
+    Command Options:
+      -h, --help  Show this help message.
 
 
 .. _`pywbemlistener list --help`:

@@ -20,9 +20,11 @@ interface. It is written in pure Python and supports Python 2 and Python 3.
 
 from __future__ import absolute_import, print_function
 
-from .._version import __version__  # noqa: F401
-from .._utils import *              # noqa: F403,F401
-from .._click_extensions import *   # noqa: F403,F401
-from ._context_obj import *         # noqa: F403,F401
-from ._cmd_listener import *        # noqa: F403,F401
-from .pywbemlistener import *       # noqa: F403,F401
+from .._version import __version__   # noqa: F401
+from .._utils import *               # noqa: F403,F401
+from .._click_extensions import *    # noqa: F403,F401
+from .._common_cmd_actions import *  # noqa: F403,F401
+from ._context_obj import *          # noqa: F403,F401
+from ._cmd_listener import *         # noqa: F403,F401
+from ._cmd_docs import *             # noqa: F403,F401
+from .pywbemlistener import *        # noqa: F403,F401

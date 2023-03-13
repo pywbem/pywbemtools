@@ -58,8 +58,9 @@ Released: not yet
   provide help for the setup to activate shell tab completion. The initial
   subjects are repl and instancename.
 
-* Add a new command to pywbemcli that calls the current system default web
-  browser to view the pywbemtools public documentation.
+* Add a new command to pywbemcli (docs) that calls the current system default
+  web browser to view the pywbemtools public documentation that is in
+  ReadTheDocs.
 
 * Added documentation defining activation of tab-complation in shells.
   Tab-completion must be activated by the user before the <TAB> can be used
@@ -77,6 +78,10 @@ Released: not yet
 * Modify several pywbemlistener args and options to make enable
   tab-completion. This includes output-format, keyfile, certfile, keyfile,
   scheme, output_format, logdir. (see issue # 1278)
+
+* Add docs command to pywbemlistener. This is the same as the docs command
+  in pywbemcli and calls the system default browser to load the pywbemtools
+  documentation in ReadTheDocs.
 
 
 **Cleanup:**

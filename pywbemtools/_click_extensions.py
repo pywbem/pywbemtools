@@ -97,19 +97,25 @@ class PywbemtoolsTopGroup(click.Group):
     def list_commands(self, ctx):
         """
         Order the top level commands by sorting and then moving any commands
-        defined in move_to_end list to the end of the list.
+        defined in move_to_end list to the end of the list in the order that
+        they are in the move-to-end list.
 
         This happens only for the top level commands/groups because this is the
         class override for click.Group ONLY with the top group.
         """
         # Sort because thier is no particular order for the groups
         cmd_list = sorted(self.commands.keys())
-        pop_count = 0
-        # reorder list so the move_to_end list commands are at bottom
-        for i in range(len(cmd_list)):
-            if cmd_list[i - pop_count] in self.move_to_end:
-                cmd_list.append(cmd_list.pop(i - pop_count))
-                pop_count += 1
+        # Reorder commands list so the move_to_end list commands are at bottom
+        #  of list. This displays them at the bottom of the list of commands in
+        # help output the order of the move_to_end list.
+        tmp_list = []
+        for move_name in self.move_to_end:
+            for i, cmd_name in enumerate(cmd_list):
+                if cmd_name == move_name:
+                    tmp_list.append(cmd_list.pop(i))
+                    break
+        cmd_list.extend(tmp_list)
+
         return cmd_list
 
     def __call__(self, *args, **kwargs):
