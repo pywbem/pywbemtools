@@ -32,9 +32,7 @@ from .._click_extensions import GENERAL_OPTS_TXT, TabCompleteArgument
 from .pywbemcli import cli
 from .._options import add_options, help_option
 from ._cmd_instance import HELP_INSTANCENAME_MSG
-from .._output_formatting import validate_output_format, format_table
-
-# FUTURE: add the tab-completion function for the subject argument
+from .._common_cmd_actions import help_subjects_action
 
 
 def help_arg_subject_shell_completer(ctx, param, incomplete):
@@ -45,7 +43,7 @@ def help_arg_subject_shell_completer(ctx, param, incomplete):
     -help <subject>.  It returns all subject names that
     start with the string in incomplete.
     """
-    subject_keys = HELP_SUBJECTS_DICT.keys()
+    subject_keys = PYWBEMCLI_HELP_SUBJECTS_DICT.keys()
     # pylint: disable=no-member
     return [click.shell_completion.CompletionItem(name) for name in
             subject_keys if name.startswith(incomplete)]
@@ -75,56 +73,8 @@ def help_subjects(ctx, subject):   # pylint: disable=unused-argument
     If an argument is provided, it outputs the help for the subject(s) defined
     by the argument.
     """
-    minimum_title = "\nHelp Subjects:"
-
-    def display_subjects_summary_as_table(subjects, title=None):
-        """Display subjects in subjects list as table"""
-        rows = [[name, HELP_SUBJECTS_DICT[name][0]] for name in subjects]
-        if not title:
-            title = minimum_title
-        output_format = validate_output_format(ctx.obj.output_format, 'TABLE')
-        click.echo(format_table(rows, ("Subject name", "Subject description"),
-                                title=title,
-                                table_format=output_format))
-
-    def display_complete_subject(subject):
-        """Display the subject with key subject"""
-        click.echo("{0} - {1}\n{2}".
-                   format(subject,
-                          HELP_SUBJECTS_DICT[subject][0],
-                          HELP_SUBJECTS_DICT[subject][1]))
-
-    all_subjects = sorted(list(HELP_SUBJECTS_DICT.keys()))
-
-    # If there is no subject argument, output a table of all of the subjects
-    # and short descriptions.
-    if not subject:
-        display_subjects_summary_as_table(all_subjects)
-        return
-
-    # If a subject text exists, output the help for that subject
-    if subject in HELP_SUBJECTS_DICT:
-        display_complete_subject(subject)
-        return
-
-    # Try search for single subject exists that matches startswith on subject
-    subjects = HELP_SUBJECTS_DICT.keys()
-    partial_subjects = [subj for subj in subjects if subj.startswith(subject)]
-
-    # Return if startswith matches a single subject
-    if len(partial_subjects) == 1:
-        display_complete_subject(partial_subjects[0])
-
-    # If multiple matches, return summary of all that match
-    elif len(partial_subjects) > 1:
-        title = "{0} Input: `{1}` matches multiple subjects:` `{2}`". \
-            format(minimum_title, subject, ', '.join(partial_subjects))
-
-        display_subjects_summary_as_table(partial_subjects, title=title)
-    else:
-        raise click.ClickException("'{}' is not a valid help subject. "
-                                   "Try  cooamd:'help' for list of subjects.".
-                                   format(subject))
+    click.echo(help_subjects_action(ctx.obj, subject,
+                                    PYWBEMCLI_HELP_SUBJECTS_DICT))
 
 
 # pylint: disable=invalid-name
@@ -166,16 +116,19 @@ fish  ~/.config/fish/completions/foo-bar.fish
                      eval "$(env _PYWBEMCLI_COMPLETE=fish_source pywbemcli)"
 =====  ===========  ===========================================================
 
-To activate pywbemcli tab-completion by evaluating the startup on terminal open:
+Activate pywbemcli tab-completion as follows:
 
-  1. Edit the 'eval' command into the startup file.
-  2. Close the file and restart the terminal.
-  3. Test activation of tab-completion by:
-     a. a command such as 'pywbemcli cl<TAB>' which should complete 'class' or,
-     b. In bash executing "complete -p pywbemcli". Bash must return:
-        complete -o nosort -F _pywbemcli_completion pywbemcli
+  1. Edit the eval command in the startup file or
+  2. Close the file and restart the terminal or
+  3. Test existence of tab-completion by:
+     a. Test completion with a command such as "pywbemcli cl<TAB> which should
+        complete the "class" command group name.
+     b. In bash executing "complete -p pywbemcli". An entry for pywbemcli must
+        exist for pywbemcli as follows:
 
-Executing the 'eval' directly in the shell startup file has the issue that the
+          ``complete -o nosort -F _pywbemcli_completion pywbemcli``
+
+Executing ``eval`` directly in the shell startup file has the issue that the
 pywbemcli executable location must be known when opening a terminal . This may
 not be consistent with executing pywbemcli in virtual environments.
 
@@ -281,11 +234,12 @@ Tab completion  is available for:
     * --connections-file
     * --keyfile
     * --certfile
+    * --outputformat
 * the values of some arguements
     * help <subject> argument
 
 When tab completion is not available for an argument or option value, entering
-<TAB> simply does nothing.
+<TAB> does nothing.
 """
 
 
@@ -297,7 +251,7 @@ When tab completion is not available for an argument or option value, entering
 
 # FUTURE: Other subjects: connection file, command structure, checkpointing
 # of mock server definition, arguments and options, etc.
-HELP_SUBJECTS_DICT = {
+PYWBEMCLI_HELP_SUBJECTS_DICT = {
     "repl": ("Using the repl command", repl_help_msg),
     'activate': ("Activating shell tab completion",
                  activate_shell_help_msg),

@@ -28,7 +28,8 @@ The pywbemlistener commands are:
 * :ref:`pywbemlistener stop command` -  Stop a named WBEM indication listener.
 * :ref:`pywbemlistener test command` -  Send a test indication to a named WBEM indication listener.
 * :ref:`pywbemlistener run command` - Run as a named WBEM indication listener.
-
+* :ref:`pywbemlistener help command` - Show help for particular pywbemcli subjects
+* :ref:`pywbemlistener docs command` - Issue request to web browser to load pywbemcli documentation
 
 .. _`pywbemlistener list command`:
 
@@ -273,3 +274,65 @@ users do that directly. Instead, users should use the
 command as a background process.
 
 See :ref:`pywbemlistener run --help` for the exact help output of the command.
+
+.. index::
+    pair: help; command
+
+.. _`pywbemlistener help command`:
+
+pywbemlistener ``help`` command
+-------------------------------
+
+.. index::
+    single: pywbemlistener help command
+    pair: help; pywbemlistener command
+
+The ``help`` command provides information on a number of subjects where the
+extra help might be needed on pywbemlistener: This includes subjects like
+
+* activating the shell tab-completion,
+
+
+This is different from the ``--help`` option that provides information on
+command groups, and commands.
+
+.. code-block:: text
+
+    $ pywbemcli help
+
+    Help subjects:
+    Subject name    ubject description
+    --------------  --------------------------------------------
+    activate        How to activate tab-completion
+    tab-completion  Using tab-completion
+
+The help for each subject is retrieved by entering the subject name for
+the subject of interest as the argument to the help command:
+
+Thus, for example:
+
+.. code-block:: text
+
+    $ pywbemcli help activate
+      . . . returns help on activating tab-completion
+
+.. index::
+    pair: help; command
+
+.. _`pywbemlistener docs command`:
+
+pywbemlistener ``docs`` command
+-------------------------------
+
+.. index::
+    single: pywbemlistener docs command
+    pair: docs; pywbemlistener command
+
+The ``docs`` command provides a simple way to access the pywbemtools
+documentation  publically available on the WEB.  This command calls the
+system default WEB browser with the URL of the pywbemtools documentation
+to open a new browser window with the top level page of that documentation and
+immediatly terminates or returns to the repl command line.
+
+This is ``experimental`` as of pywbemtools 1.2.0.
+

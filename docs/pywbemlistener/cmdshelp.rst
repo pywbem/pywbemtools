@@ -53,13 +53,14 @@ Help text for ``pywbemlistener``:
       -h, --help                  Show this help message.
 
     Commands:
-      docs   Get pywbemtools documentation in web browser.
+      help   Show help for pywbemlistener subjects.
       list   List the currently running named WBEM indication listeners.
       show   Show a named WBEM indication listener.
       start  Start a named WBEM indication listener in the background.
       stop   Stop a named WBEM indication listener.
       test   Send a test indication to a named WBEM indication listener.
       run    Run as a named WBEM indication listener.
+      docs   Get pywbemtools documentation in web browser.
 
 
 .. _`pywbemlistener docs --help`:
@@ -81,6 +82,34 @@ Help text for ``pywbemlistener docs`` (see :ref:`pywbemlistener docs command`):
       EXPERIMENTAL
 
       Calls the current default web browser to display the current stable pywbemtools documentation in a new window.
+
+    Command Options:
+      -h, --help  Show this help message.
+
+
+.. _`pywbemlistener help --help`:
+
+pywbemlistener help --help
+--------------------------
+
+
+
+Help text for ``pywbemlistener help`` (see :ref:`pywbemlistener help command`):
+
+
+::
+
+    Usage: pywbemlistener help [GENERAL-OPTIONS] SUBJECT
+
+      Show help for pywbemlistener subjects.
+
+      Show help for specific pywbemlistener subjects.  This is in addition to the help messages that are available with the
+      -h or --help option for every command group and command in pywbemlistener. It helps document pywbemlistener subjects
+      that are more general than specific commands and configuration subjects that do not have specific commands
+
+      If there is no argument provided, outputs a list and summary of the existing help subjects.
+
+      If an argument is provided, it outputs the help for the subject(s) defined by the argument.
 
     Command Options:
       -h, --help  Show this help message.

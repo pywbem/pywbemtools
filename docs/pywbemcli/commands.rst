@@ -42,9 +42,9 @@ The command groups are:
 * :ref:`Connection command group` - Command group for WBEM connection definitions.
 
 The individual commands (no command group) are:
+* :ref:`repl command` - Enter interactive mode (default).
 * :ref:`help command` - Show help for particular pywbemcli subjects
 * :ref:`docs command` - Issue request to web browser to load pywbemcli documentation
-* :ref:`repl command` - Enter interactive mode (default).
 
 
 .. index::
@@ -4788,11 +4788,13 @@ command groups, and commands.
 
 .. code-block:: text
 
-    Help subjects
-    subject name    subject description
+    $ pywbemcli help
+
+    Help subjects:
+    Subject name    Subject description
     --------------  --------------------------------------------
-    instancename    InstanceName parameter in instance cmd group
     repl            Using the repl command
+    . . .
 
 The help for each subject is retrieved by entering the subject name for
 the subject of interest as the argument to the help command:

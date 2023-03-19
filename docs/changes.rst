@@ -83,6 +83,11 @@ Released: not yet
   in pywbemcli and calls the system default browser to load the pywbemtools
   documentation in ReadTheDocs.
 
+* Add help command to pywbemlistener. This is the same as the help command
+  in which defines a set of general subjects for pywbemlistener about which
+  help can be requested.  The subjects are generally about tab-completion
+  and tab-completion activation.
+
 
 **Cleanup:**
 

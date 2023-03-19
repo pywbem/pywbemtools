@@ -27,4 +27,5 @@ from .._common_cmd_actions import *  # noqa: F403,F401
 from ._context_obj import *          # noqa: F403,F401
 from ._cmd_listener import *         # noqa: F403,F401
 from ._cmd_docs import *             # noqa: F403,F401
+from ._cmd_help import *             # noqa: F403,F401
 from .pywbemlistener import *        # noqa: F403,F401
