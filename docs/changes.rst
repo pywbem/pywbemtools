@@ -5,16 +5,12 @@ Change log
 ==========
 
 
-pywbemtools 1.2.0.dev1
-----------------------
+pywbemtools 1.2.0
+-----------------
 
-This version contains all fixes up to version 1.1.x.
+This version contains all fixes up to version 1.1.1.
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2023-03-20
 
 **Bug fixes:**
 
@@ -88,7 +84,6 @@ Released: not yet
   help can be requested.  The subjects are generally about tab-completion
   and tab-completion activation.
 
-
 **Cleanup:**
 
 * Use Ubuntu 20.04 for os target for some github CI tests because python setup
@@ -107,12 +102,6 @@ Released: not yet
 * Improve the help description for repl.  It was not complete.
 
 * Update Pegasus docker image version to 0.1.2
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.1.0
