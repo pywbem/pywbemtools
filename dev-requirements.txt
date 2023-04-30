@@ -41,7 +41,7 @@ coverage>=5.0
 pytest-cov>=2.7.0
 # coveralls 2.0 has removed support for Python 2.7
 git+https://github.com/andy-maier/coveralls-python.git@andy/add-py27#egg=coveralls; python_version == '2.7'
-coveralls>=2.1.2,<3.0.0; python_version >= '3.5'
+coveralls>=3.3.0; python_version >= '3.5'
 
 # Safety CI by pyup.io
 # safety 1.9.0 removed support for Python 2.7 (and now also enforces that)
@@ -56,7 +56,7 @@ dparse>=0.5.2; python_version == '3.5'
 # ver 0.6.2 min requirement by safety 2.2.0
 dparse>=0.6.2; python_version >= '3.6'
 
-# PyYAML is also pulled in by dparse and python-coveralls
+# PyYAML is also pulled in by dparse
 # PyYAML 5.3 fixed narrow build error on Python 2.7
 # PyYAML 5.3.1 addressed issue 38100 reported by safety
 # PyYAML 5.2 addressed issue 38639 reported by safety
