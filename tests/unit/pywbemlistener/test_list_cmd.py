@@ -93,8 +93,8 @@ LIST_TESTCASES = [
         ),
         dict(
             stdout=[
-                r"^Name +Port +Scheme +PID +Created$",
-                r"^lis1 +50001 +http +[0-9]+ +[0-9\- :\.]+$",
+                r"^Name +Port +Scheme +Bind addr +PID +Created$",
+                r"^lis1 +50001 +http +none +[0-9]+ +[0-9\- :\.]+$",
             ],
             test='all',
         ),
@@ -107,13 +107,16 @@ LIST_TESTCASES = [
             listeners=[
                 ['lis1', '--scheme', 'http', '--port', '50001'],
                 ['lis2', '--scheme', 'http', '--port', '50002'],
+                ['lis3', '--scheme', 'http', '--port', '50003',
+                 '--bind-addr', 'localhost'],
             ]
         ),
         dict(
             stdout=[
-                r"^Name +Port +Scheme +PID +Created$",
-                r"^lis1 +50001 +http +[0-9]+ +[0-9\- :\.]+$",
-                r"^lis2 +50002 +http +[0-9]+ +[0-9\- :\.]+$",
+                r"^Name +Port +Scheme +Bind addr +PID +Created$",
+                r"^lis1 +50001 +http +none +[0-9]+ +[0-9\- :\.]+$",
+                r"^lis2 +50002 +http +none +[0-9]+ +[0-9\- :\.]+$",
+                r"^lis3 +50003 +http +localhost +[0-9]+ +[0-9\- :\.]+$",
             ],
             test='all',
         ),

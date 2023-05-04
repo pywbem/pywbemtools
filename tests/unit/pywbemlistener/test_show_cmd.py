@@ -99,6 +99,36 @@ SHOW_TESTCASES = [
                 r"^Name +lis1$",
                 r"^Port +50001$",
                 r"^Scheme +http$",
+                r"^Bind addr +none",
+                r"^Certificate file *$",
+                r"^Key file *$",
+                r"^Indication call *$",
+                r"^Indication file *$",
+                r"^Log file *$",
+                r"^PID +[0-9]+$",
+                r"^Start PID +[0-9]+$",
+                r"^Created +[0-9\- :\.]+$",
+            ],
+            test='all',
+        ),
+        RUN_NOWIN,
+    ),
+    (
+        "Verify output of 'show' on existing listener with bind-addr set",
+        dict(
+            args=['-o', 'plain', 'show', 'lis1'],
+            listeners=[
+                ['lis1', '--scheme', 'http', '--port', '50001',
+                 '--bind-addr', 'localhost'],
+            ]
+        ),
+        dict(
+            stdout=[
+                r"^Attribute +Value$",
+                r"^Name +lis1$",
+                r"^Port +50001$",
+                r"^Scheme +http$",
+                r"^Bind addr +localhost",
                 r"^Certificate file *$",
                 r"^Key file *$",
                 r"^Indication call *$",
