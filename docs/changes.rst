@@ -48,6 +48,22 @@ Released: not yet
   requesting test indications from the wbem server and uses OpenPegasus 
   2.14.4 or greater. This change will allow end2end indication testing.
 
+* Fix issue where localhost was always assigned as the pywbemlistener bind
+  address. This limited the listener to only receiving indications from the
+  same system as the listener itself and only on the local network interface.
+  This change was part of extending the options to allow the user to define 
+  the bind address as part of the start and run commands. (see issue #1296)
+
+* Add pywbemlistener run/start command option --bind-addr to allow the user to
+  define a bind address to a listener. This replaces the use of the fixed
+  bind-address of localhost. This also changes the default bind address to
+  allow receiving indications on any local system network interrface and
+  not testing for the indication destination IP address. (see issue #1296)
+
+* Add an option to pywbemlistener to allow testing with a listener on a
+  different address/system than the system where pywbemlistener test is being
+  executed. This will allow testing across multiple systems.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue

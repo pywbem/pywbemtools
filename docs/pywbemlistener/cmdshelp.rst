@@ -175,6 +175,10 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
       -p, --port PORT              The port number the listener will open to receive indications. This can be any available
                                    port. Default: 25989
       -s, --scheme SCHEME          The scheme used by the listener (http, https). Default: https
+      -b, --bind-addr HOST         A host name or IP address to which this listener will be bound. Binding the listener
+                                   defines the indication destination host name or IP address for which this listener will
+                                   accept indications. The default accepts indications addressed to any network interfaces
+                                   on the listener system.
       -c, --certfile FILE          Path name of a PEM file containing the certificate that will be presented as a server
                                    certificate during SSL/TLS handshake. Required when using https. The file may in addition
                                    contain the private key of the certificate. Default: EnvVar PYWBEMLISTENER_CERTFILE, or
@@ -249,6 +253,10 @@ Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`)
       -p, --port PORT              The port number the listener will open to receive indications. This can be any available
                                    port. Default: 25989
       -s, --scheme SCHEME          The scheme used by the listener (http, https). Default: https
+      -b, --bind-addr HOST         A host name or IP address to which this listener will be bound. Binding the listener
+                                   defines the indication destination host name or IP address for which this listener will
+                                   accept indications. The default accepts indications addressed to any network interfaces
+                                   on the listener system.
       -c, --certfile FILE          Path name of a PEM file containing the certificate that will be presented as a server
                                    certificate during SSL/TLS handshake. Required when using https. The file may in addition
                                    contain the private key of the certificate. Default: EnvVar PYWBEMLISTENER_CERTFILE, or
@@ -321,6 +329,8 @@ Help text for ``pywbemlistener test`` (see :ref:`pywbemlistener test command`):
         pywbemlistener test lis1
 
     Command Options:
-      -c, --count INT  Count of test indications to send. Default: 1
-      -h, --help       Show this help message.
+      -c, --count INT      Count of test indications to send. Default: 1
+      -l, --listener HOST  Listener host name or IP address. The indications are sent to this host name or IP address.
+                           Default: localhost
+      -h, --help           Show this help message.
 

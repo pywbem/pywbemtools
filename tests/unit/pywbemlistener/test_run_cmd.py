@@ -34,6 +34,7 @@ RUN_HELP_PATTERNS = [
     r"^Command Options:$",
     r"^ *-p, --port PORT ?",
     r"^ *-s, --scheme SCHEME ?",
+    r"^ *-b, --bind-addr HOST ?",
     r"^ *-c, --certfile FILE ?",
     r"^ *-k, --keyfile FILE ?",
     r"^ *--indi-call MODULE.FUNCTION ?",

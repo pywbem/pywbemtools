@@ -36,6 +36,7 @@ START_HELP_PATTERNS = [
     r"^Command Options:$",
     r"^ *-p, --port PORT ?",
     r"^ *-s, --scheme SCHEME ?",
+    r"^ *-b, --bind-addr HOST ?",
     r"^ *-c, --certfile FILE ?",
     r"^ *-k, --keyfile FILE ?",
     r"^ *--indi-call MODULE.FUNCTION ?",
@@ -169,6 +170,47 @@ START_TESTCASES = [
         RUN_NOWIN,
     ),
     (
+        "Verify success of 'start' on non-existing listener with http and "
+        "bind addr",
+        dict(
+            args=['start', 'lis1', '--scheme', 'http', '--bind-addr', '0.0.0.0',
+                  '--port', '50001'],
+        ),
+        dict(
+            stdout=[''],
+            test='all',
+        ),
+        RUN_NOWIN,
+    ),
+    (
+        "Verify failure of 'start' with invalid bind host name and http,",
+        dict(
+            args=['start', 'lis1', '--scheme', 'http', '--bind-addr',
+                  'nosuchserver', '--port', '50001'],
+        ),
+        dict(
+            rc=1,
+            # Note: Text returned is implementation dependent
+            stderr=[r"Cannot start listener .+: .*"],
+            test='all',
+        ),
+        RUN_NOWIN,
+    ),
+    (
+        "Verify failure of 'start' with invalid bind addr ip address",
+        dict(
+            args=['start', 'lis1', '--scheme', 'http', '--bind-addr',
+                  '99.99.99.99', '--port', '50001'],
+        ),
+        dict(
+            rc=1,
+            # Note: Text of error is system dependent. word assign is common
+            stderr=[r"Cannot start listener .+: .*assign.*"],
+            test='all',
+        ),
+        RUN_NOWIN,
+    ),
+    (
         "Verify failure of 'start' on non-existing listener with https without "
         "specifying a certificate or key file",
         dict(
@@ -246,8 +288,8 @@ START_TESTCASES = [
         "Verify success of 'start' with --indi-call on valid module.function, "
         "no log",
         dict(
-            args=['-v', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
+            args=['-v', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
+                  'localhost', '--port', '50001', '--indi-call',
                   'tests.unit.pywbemlistener.indicall_display.display'],
         ),
         dict(
@@ -258,10 +300,10 @@ START_TESTCASES = [
     ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
-        "with log",
+        "with log and localhost bint addr",
         dict(
             args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-call',
+                  '--bind-addr', 'localhost', '--port', '50001', '--indi-call',
                   'tests.unit.pywbemlistener.indicall_display.display'],
         ),
         dict(
@@ -287,6 +329,38 @@ START_TESTCASES = [
         ),
         RUN_NOWIN,
     ),
+    (
+        "Verify success of 'start' with --indi-call on valid module.function, "
+        "with log and default bind addr",
+        dict(
+            args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
+                  '--port', '50001', '--indi-call',
+                  'tests.unit.pywbemlistener.indicall_display.display'],
+        ),
+        dict(
+            stdout=START_SUCCESS_LOG_PATTERNS,
+            log=(
+                'pywbemlistener_lis1.log',
+                [
+                    r"Opening 'run' output log file at .+",
+
+                    r"Inserting current directory into front of Python module "
+                    r"search path",
+                    r"Added indication handler for calling function "
+                    r"display\(\) in module tests\.unit\.pywbemlistener\."
+                    r"indicall_display",
+
+                    r"Running listener lis1 at http://:50001",
+                    r"Shut down listener lis1 running at "
+                    r"http://:50001",
+                    r"Closing 'run' output log file at .+",
+                ],
+            ),
+            test='all',
+        ),
+        RUN_NOWIN,
+    ),
+
     (
         "Verify failure of 'start' with --indi-call on non-existing module",
         dict(
@@ -349,10 +423,11 @@ START_TESTCASES = [
     ),
     (
         "Verify success of 'start' with --indi-file on non-existing file, with "
-        "log",
+        "log bind to localhost",
         dict(
             args=['-v', '-l', '.', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001', '--indi-file', 'new.log'],
+                  '--bind-addr', 'localhost', '--port', '50001', '--indi-file',
+                  'new.log'],
         ),
         dict(
             stdout=START_SUCCESS_LOG_PATTERNS,
@@ -375,18 +450,20 @@ START_TESTCASES = [
         RUN_NOWIN,
     ),
 
-    # Test starting listeners with -vv
+    # Test starting listeners with -vv and bind to localhost
     (
         "Verify success of 'start' with --vv",
         dict(
-            args=['-vv', 'start', 'lis1', '--scheme', 'http',
-                  '--port', '50001'],
+            args=['-vv', 'start', 'lis1', '--scheme', 'http', '--bind-addr',
+                  'localhost', '--port', '50001'],
         ),
         dict(
             stdout=[
                 r"Start process( [0-9]+)?: Starting run process as: "
                 r"\['pywbemlistener', '-vv', 'run', u?'lis1', '--port', "
-                r"'50001', '--scheme', 'http', '--start-pid', '[0-9]+', "
+                r"'50001', '--scheme', 'http', "
+                r"'--start-pid', '[0-9]+', "
+                r"'--bind-addr', u?'localhost', "
                 r"'--indi-format', u?'{df}'\]".format(df=DEFAULT_INDI_FORMAT),
                 r"Start process( [0-9]+)?: Waiting for run process [0-9]+ to "
                 r"complete startup",

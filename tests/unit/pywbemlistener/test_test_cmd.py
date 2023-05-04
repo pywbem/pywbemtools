@@ -31,6 +31,7 @@ TEST_HELP_PATTERNS = [
     r"\[COMMAND-OPTIONS\]$",
     r"^Command Options:$",
     r"^ *-c, --count INT ?",
+    r"^ *-l, --listener HOST?",
     r"^ *-h, --help ?",
 ]
 

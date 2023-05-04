@@ -93,6 +93,17 @@ LISTEN_OPTIONS = [
                  required=False, default=DEFAULT_LISTENER_SCHEME,
                  help=u'The scheme used by the listener (http, https). '
                  'Default: {}'.format(DEFAULT_LISTENER_SCHEME)),
+    click.option('-b', '--bind-addr',
+                 type=str,
+                 metavar='HOST',
+                 required=False,
+                 default=None,
+                 help=u'A host name or IP address to which this listener '
+                      'will be bound. Binding the listener defines the '
+                      'indication destination host name or IP address for '
+                      'which this listener will accept indications. The '
+                      'default accepts indications addressed to any '
+                      'network interfaces on the listener system.'),
     click.option('-c', '--certfile',
                  type=click.Path(exists=False, dir_okay=False),
                  metavar='FILE',
@@ -185,12 +196,13 @@ class ListenerProperties(object):
     The properties of a running named listener.
     """
 
-    def __init__(self, name, port, scheme, certfile, keyfile,
+    def __init__(self, name, port, bind_addr, scheme, certfile, keyfile,
                  indi_call, indi_file, indi_format,
                  logfile, pid, start_pid, created):
         self._name = name
         self._port = port
         self._scheme = scheme
+        self._bind_addr = bind_addr
         self._certfile = certfile
         self._keyfile = keyfile
         self._indi_call = indi_call
@@ -207,6 +219,7 @@ class ListenerProperties(object):
             self.name,
             str(self.port),
             self.scheme,
+            self.bind_addr or 'none',
             self.certfile,
             self.keyfile,
             self.indi_call,
@@ -224,6 +237,7 @@ class ListenerProperties(object):
             'Name',
             'Port',
             'Scheme',
+            'Bind addr',
             'Certificate file',
             'Key file',
             'Indication call',
@@ -240,6 +254,7 @@ class ListenerProperties(object):
             self.name,
             str(self.port),
             self.scheme,
+            self.bind_addr or 'none',
             str(self.pid),
             self.created.strftime("%Y-%m-%d %H:%M:%S"),
         )
@@ -251,6 +266,7 @@ class ListenerProperties(object):
             'Name',
             'Port',
             'Scheme',
+            'Bind addr',
             'PID',
             'Created',
         )
@@ -264,6 +280,11 @@ class ListenerProperties(object):
     def port(self):
         """int: Port number of the listener"""
         return self._port
+
+    @property
+    def bind_addr(self):
+        """int: bind address of the listener"""
+        return self._bind_addr
 
     @property
     def scheme(self):
@@ -449,6 +470,11 @@ def listener_list(context):
               required=False, default=1,
               help=u'Count of test indications to send. '
               'Default: 1')
+@click.option('-l', '--listener', type=str, metavar='HOST',
+              required=False, default='localhost',
+              help=u'Listener host name or IP address. The indications '
+                   'are sent to this host name or IP address. '
+              'Default: localhost')
 @add_options(help_option)
 @click.pass_obj
 def listener_test(context, name, **options):
@@ -527,7 +553,8 @@ def get_listeners(name=None):
                 # Python 3.9 (see issue #1001)
                 logfile = get_logfile(args.logdir, args.name)
                 lis = ListenerProperties(
-                    name=args.name, port=args.port, scheme=args.scheme,
+                    name=args.name, port=args.port, bind_addr=args.bind_addr,
+                    scheme=args.scheme,
                     certfile=args.certfile, keyfile=args.keyfile,
                     indi_call=args.indi_call, indi_file=args.indi_file,
                     indi_format=args.indi_format,
@@ -852,7 +879,7 @@ def parse_listener_args(listener_args):
 
     parser = SilentArgumentParser()
 
-    # Note: The following options must ne in sync with the Click general options
+    # Note: The following options must be in sync with the Click general options
     parser.add_argument('--output-format', '-o', type=str, default=None)
     parser.add_argument('--logdir', '-l', type=str, default=None)
     parser.add_argument('--verbose', '-v', action='count', default=0)
@@ -866,6 +893,8 @@ def parse_listener_args(listener_args):
     parser.add_argument('--start-pid', type=int, default=None)
     parser.add_argument('--port', '-p', type=int,
                         default=DEFAULT_LISTENER_PORT)
+    parser.add_argument('--bind-addr', '-b', type=str,
+                        default=None)
     parser.add_argument('--scheme', '-s', type=str,
                         default=DEFAULT_LISTENER_SCHEME)
     parser.add_argument('--certfile', type=str, default=None)
@@ -959,7 +988,7 @@ def cmd_listener_run(context, name, options):
     """
     port = options['port']
     scheme = options['scheme']
-    host = 'localhost'
+    bind_addr = options['bind_addr']
 
     start_pid = options['start_pid']
     if start_pid is not None:
@@ -1035,7 +1064,7 @@ def cmd_listener_run(context, name, options):
     listeners = get_listeners(name)
     if len(listeners) > 1:  # This upcoming listener and a previous one
         lis = listeners[0]
-        url = '{}://{}:{}'.format(lis.scheme, host, lis.port)
+        url = '{}://{}:{}'.format(lis.scheme, bind_addr, lis.port)
         raise click.ClickException(
             "Listener {} already running at {}".format(name, url))
 
@@ -1050,13 +1079,20 @@ def cmd_listener_run(context, name, options):
         http_port = None
         certfile = options['certfile']
         keyfile = options['keyfile'] or certfile
-    url = '{}://{}:{}'.format(scheme, host, port)
+
+    # If there is no defined bind address, set it to the default value
+    # for a listener that receives indications on any network address.
+    # This allows using None as the default bind_addr elsewhere in the code
+    if not bind_addr:
+        bind_addr = ''
+
+    url = '{}://{}:{}'.format(scheme, bind_addr, port)
 
     context.spinner_stop()
 
     try:
         listener = WBEMListener(
-            host=host, http_port=http_port, https_port=https_port,
+            host=bind_addr, http_port=http_port, https_port=https_port,
             certfile=certfile, keyfile=keyfile)
     except ValueError as exc:
         raise click.ClickException(
@@ -1071,13 +1107,14 @@ def cmd_listener_run(context, name, options):
     indi_file = options['indi_file']
     indi_format = options['indi_format'] or DEFAULT_INDI_FORMAT
 
-    def file_func(indication, host):
+    def file_func(indication, indication_host):
         """
         Indication callback function that appends the indication to a file
         using the specified format.
         """
         try:
-            display_str = format_indication(indication, host, indi_format)
+            display_str = format_indication(indication, indication_host,
+                                            indi_format)
         except Exception as exc:  # pylint: disable=broad-except
             display_str = ("Error: Cannot format indication using format "
                            "\"{}\": {}: {}".
@@ -1164,12 +1201,12 @@ def cmd_listener_start(context, name, options):
     indi_call = options['indi_call']
     indi_file = options['indi_file']
     indi_format = options['indi_format']
-    host = 'localhost'
+    bind_addr = options['bind_addr']
 
     listeners = get_listeners(name)
     if listeners:
         lis = listeners[0]
-        url = '{}://{}:{}'.format(lis.scheme, host, lis.port)
+        url = '{}://{}:{}'.format(lis.scheme, bind_addr, lis.port)
         raise click.ClickException(
             "Listener {} already running at {}".format(name, url))
 
@@ -1188,6 +1225,9 @@ def cmd_listener_start(context, name, options):
         '--scheme', scheme,
         '--start-pid', str(pid),
     ])
+
+    if bind_addr:
+        run_args.extend(['--bind-addr', bind_addr])
     if certfile:
         run_args.extend(['--certfile', certfile])
     if keyfile:
@@ -1325,14 +1365,16 @@ def cmd_listener_test(context, name, options):
 
         indication['MessageID'] = 'TEST{:04d}'.format(i)
 
+        listener_host = options['listener']
+
         conn_kwargs = {}
         conn_kwargs['creds'] = None
         if listener.scheme == 'https':
-            url = 'https://localhost:{}'.format(listener.port)
+            url = 'https://{0}:{1}'.format(listener_host, listener.port)
             conn_kwargs['x509'] = None
             conn_kwargs['no_verification'] = True
         else:  # http
-            url = 'http://localhost:{}'.format(listener.port)
+            url = 'http://{0}:{1}'.format(listener_host, listener.port)
 
         conn = WBEMConnection(url, **conn_kwargs)
 

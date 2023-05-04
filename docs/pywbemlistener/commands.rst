@@ -45,11 +45,12 @@ Example:
 .. code-block:: text
 
     $ pywbemlistener list
-    +--------+--------+----------+-------+---------------------+
-    | Name   |   Port | Scheme   |   PID | Created             |
-    |--------+--------+----------+-------+---------------------|
-    | lis1   |  25989 | https    | 59327 | 2021-07-03 15:31:55 |
-    +--------+--------+----------+-------+---------------------+
+    +--------+--------+----------+-------------+--------+---------------------+
+    | Name   |   Port | Scheme   | Bind addr   |    PID | Created             |
+    |--------+--------+----------+-------------+--------+---------------------|
+    | lis1   |  25989 | http     | none        | 131870 | 2023-06-07 12:17:55 |
+    +--------+--------+----------+-------------+--------+---------------------+
+
 
 The ``-o, --output-format`` general option can be used to control the format of
 the table that is displayed, for example:
@@ -85,21 +86,23 @@ Example:
 .. code-block:: text
 
     $ pywbemlistener show lis1
-    +--------------------+---------------------------+
-    | Attribute          | Value                     |
-    |--------------------+---------------------------|
-    | Name               | lis1                      |
-    | Port               | 25989                     |
-    | Scheme             | https                     |
-    | Certificate file   | .../certs/server_cert.pem |
-    | Key file           | .../certs/server_key.pem  |
-    | Indication call    |                           |
-    | Indication display | False                     |
-    | Indication file    |                           |
-    | Log file           |                           |
-    | PID                | 59327                     |
-    | Created            | 2021-07-03 15:31:55       |
-    +--------------------+---------------------------+
+    +------------------+---------------------+
+    | Attribute        | Value               |
+    |------------------+---------------------|
+    | Name             | lis1                |
+    | Port             | 25989               |
+    | Scheme           | http                |
+    | Bind addr        | none                |
+    | Certificate file |                     |
+    | Key file         |                     |
+    | Indication call  |                     |
+    | Indication file  |                     |
+    | Log file         |                     |
+    | PID              | 131870              |
+    | Start PID        | 131868              |
+    | Created          | 2023-06-07 12:17:55 |
+    +------------------+---------------------+
+
 
 See :ref:`pywbemlistener show --help` for the exact help output of the command.
 
@@ -127,9 +130,23 @@ The previous example started a listener for HTTPS (the default) on the default
 port 25989. Because HTTPS was used, it was necessary to specify an X.509 server
 certificate and its key file.
 
-The port can be specified using the ``-p, --port`` option.
+The ``-p, --port`` option specifies the port on which the listener will
+receive indicaitons.
+
 The use of HTTP instead of the default HTTPS can be used by specifying it with
-the ``-s, --scheme`` option.
+the ``-s, --scheme`` option defines whether HTTP or HTTPS schema will be used
+as the bind url on which the listener is expecting indications. The default is
+HTTPS.
+
+The ``-b, --bind-addr`` option specifies that the listener will be bound to a
+single network interface and on linux systems, typically, to a single IP
+address on that interface. When a listener is bound to a single network
+interface/IP address it can receive indications only addressed to that network
+interface/IP address. Thus if the listener is bound to ``localhost`` (i.e. the
+local network interface) it will be able to only receive indications addressed
+to that network interface. The default when --bind-addr is not set is for the
+the listener to received indications addressed to any valid IPV4 or IPV6 IP
+address defined on the local system. (New in pywbemtools version 1.3.0).
 
 When the listener receives an indication, by default it drops it and does nothing
 else.
@@ -236,6 +253,14 @@ See :ref:`pywbemlistener stop --help` for the exact help output of the command.
 The ``pywbemlistener test`` command sends a test indication to a running WBEM
 indication listener on the local system.
 
+This command has two options:
+
+The ``-c, --count`` option that defines the number of indications to set where
+the default is to send a single indication.
+
+The ``-l, --listener`` option that defines a host name or IP address to which
+the indications will be sent.  The default ``--listener`` is ``localhost``.
+
 Example:
 
 .. code-block:: text
@@ -271,7 +296,16 @@ in a loop that never ends. It is possible to start this command in the
 background or even run it in the foreground, but it is not recommended that
 users do that directly. Instead, users should use the
 :ref:`pywbemlistener start command`, which starts the ``pywbemlistener run``
-command as a background process.
+command as a background process. Use the  ``pywbemlistener run`` command only
+when you need to have control over how exactly the process runs in the
+background.
+
+The argument and options for the run command are the same as for the
+``pywbemlistener start11 command.
+
+Note: The --start-pid option is needed because on Windows, the ``pywbemlistener
+  run`` command is not the direct child process of the `pywbemlistener start`
+  command starting it.
 
 See :ref:`pywbemlistener run --help` for the exact help output of the command.
 
