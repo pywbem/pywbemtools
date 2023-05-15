@@ -48,6 +48,8 @@ PDB = "pdb"
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
+URLLIB3_VERSION = packaging.version.parse(urllib3.__version__)
+
 # Click (as of 7.1.2) raises UnsupportedOperation in click.echo() when
 # the pytest capsys fixture is used. That happens only on Windows.
 # See Click issue https://github.com/pallets/click/issues/1590. This
@@ -74,7 +76,8 @@ NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 5)
 with warnings.catch_warnings():
     warnings.filterwarnings('error')
     try:
-        urllib3.Retry(method_whitelist={})
+        if URLLIB3_VERSION.release < (2):
+            urllib3.Retry(method_whitelist={})
     except (DeprecationWarning, TypeError):
         RETRY_DEPRECATION = PYWBEM_VERSION.release < (1, 1)
     else:
