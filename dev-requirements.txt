@@ -28,6 +28,16 @@ colorama>=0.4.5; python_version >= '3.5'
 importlib-metadata>=0.22,<5.0.0; python_version <= '3.7'
 importlib-metadata>=1.1.0; python_version >= '3.8'
 
+# urllib3 version < 2.0.0 required for python < 3.7
+urllib3>=1.25.9,<2.0.0; python_version == '2.7'
+urllib3>=1.25.9,<2.0.0;  python_version == '3.5'
+urllib3>=1.25.9,<2.0.0;  python_version == '3.6'
+# TODO: Following limits use of urllib3 <= 2.0  for python < 3.7 until issues
+# about upgrade resolved. Issue #1302 filed updates urllib3 to version 2.0.
+# Python <= 3.7 required for urllib3 <= 2.0.0
+urllib3>=1.25.9,<2.0.0; python_version >= '3.7' and python_version <= '3.9'
+urllib3>=1.26.5,<2.0.0; python_version >= '3.10'
+
 # more-itertools version 8.11 requires python 3.6, See issue #2796
 more-itertools>=4.0.0,!=8.11.0; python_version < '3.6'
 more-itertools>=4.0.0; python_version >= '3.6'
@@ -176,6 +186,9 @@ packaging>=17.0; python_version == '2.7'
 packaging>=17.0; python_version == '3.5'
 packaging>=21.0,<22.0; python_version >= '3.6'
 
+# urllib3 2.0 requires py>=3.7
+urllib3>=1.25.9,<2.0.0; python_version == '2.7' and python_version >= '3.5'
+urllib3>=1.26.5,<2.0.0; python_version >= '3.10'
 
 # Temporary workarounds on indirectly used packages:
 
