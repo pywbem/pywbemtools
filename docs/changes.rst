@@ -24,6 +24,13 @@ Released: not yet
 
 **Cleanup:**
 
+* Change to used safety-policy-file .safety-policy-yml to keep the safety issue
+  ignore list in place of the list in the Makefile.
+
+* Add several new safety ignore entries into .safety-policy.yml from the
+  new issues that were added to list May 2023.
+
+
 **Known issues:**
 
 * See `list of open issues`_.
