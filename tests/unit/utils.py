@@ -57,7 +57,7 @@ CLICK_VERSION = packaging.version.parse(click.__version__).release
 # all Python versions except 3.4. It turns out that the circumvention is also
 # needed on Python 2.7, even though Click 7.1 is used there (not clear why).
 # The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
-CLICK_ISSUE_1231 = sys.version_info[0:2] <= (3, 4) and sys.platform == 'win32'
+CLICK_ISSUE_1231 = sys.version_info[0:2] == (2, 7) and sys.platform == 'win32'
 
 
 def execute_command(cmdname, args, env=None, stdin=None, verbose=False,

@@ -54,7 +54,7 @@ PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 PYTHON_GE_38 = sys.version_info > (3, 8)
 
 # Mock scripts with setup() function are supported
-MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 5)
+MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 6)
 
 TEST_DIR = os.path.dirname(__file__)
 

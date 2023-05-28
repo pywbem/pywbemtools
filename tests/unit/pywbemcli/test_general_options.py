@@ -471,14 +471,14 @@ TEST_CASES = [
       'test': 'innows'},
      None, OK],  # Only tests that the option is accepted
 
-    ['Verify --warn general option where warning is generated. Python 3.4',
+    ['Verify --warn general option where warning is generated. Python <=3.4',
      {'general': ['-s', 'http://blah', '--warn'],
       'cmdgrp': 'connection',
       'args': ['show']},
      {'stderr': ["Pywbemcli support for Python", "is deprecated"],
       'rc': 0,
       'test': 'innows'},
-     None, sys.version_info[0:2] <= (3, 4)],
+     None, sys.version_info[0:2] == (2, 7)],
 
     ['Verify --warn general option where warning is generated with stdin.',
      {'general': ['-s', 'http://blah'],
@@ -496,7 +496,7 @@ TEST_CASES = [
      {'stderr': [""],
       'rc': 0,
       'test': 'innows'},
-     None, sys.version_info[0:2] >= (3, 5)],
+     None, sys.version_info[0:2] >= (3, 6)],
 
     ['Verify --version general option.',
      {'general': ['-s', 'http://blah', '--version'],

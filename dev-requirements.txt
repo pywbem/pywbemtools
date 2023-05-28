@@ -15,14 +15,14 @@
 # pytest 5.0.0 requires Python version 3.5
 # pytest 4.3.1 solves an issue on Python 3 with minimum package levels
 pytest>=4.3.1,<5.0.0; python_version == '2.7'
-pytest>=4.3.1; python_version >= '3.5'
+pytest>=4.3.1; python_version >= '3.6'
 # funcsigs is already specified in requirements.txt due to a dependency issue.
 # funcsigs>=1.0.2; python_version == '2.7'
 # Pluggy 0.12.0 has a bug causing pytest plugins to fail loading on py38
 pluggy>=0.13.0
 # pylint>=2.15 requires colorama>=0.4.5
 colorama>=0.3.9,<0.4.0; python_version == '2.7'
-colorama>=0.4.5; python_version >= '3.5'
+colorama>=0.4.5; python_version >= '3.6'
 # flake8 fails with AttributeError in importlib-metadata 5.0.0 on Python >=3.7
 # tox 3.14 requires importlib-metadata<1,>=0.12 on Python <=3.7
 importlib-metadata>=0.22,<5.0.0; python_version <= '3.7'
@@ -30,7 +30,6 @@ importlib-metadata>=1.1.0; python_version >= '3.8'
 
 # urllib3 < 2.0.0 required for python < 3.7
 urllib3>=1.25.9,<2.0.0; python_version == '2.7'
-urllib3>=1.25.9,<2.0.0;  python_version == '3.5'
 urllib3>=1.25.9,<2.0.0;  python_version == '3.6'
 # TODO: Following limits use of urllib3 <= 2.0  for python < 3.7 until issues
 # about upgrade resolved. Issue #1302 updates urllib3 to version 2.0.
@@ -51,18 +50,16 @@ coverage>=5.0
 pytest-cov>=2.7.0
 # coveralls 2.0 has removed support for Python 2.7
 git+https://github.com/andy-maier/coveralls-python.git@andy/add-py27#egg=coveralls; python_version == '2.7'
-coveralls>=3.3.0; python_version >= '3.5'
+coveralls>=3.3.0; python_version >= '3.6'
 
 # Safety CI by pyup.io
 # safety 1.9.0 removed support for Python 2.7 (and now also enforces that)
 safety>=1.8.7,<1.9.0; python_version == '2.7'
-safety>=1.9.0,<2.0.0; python_version == '3.5'
 safety>=2.2.0; python_version >= '3.6'
 
 # dparse 0.5.0 has an infinite recursion issue on Python 2.7,
 #   see https://github.com/pyupio/dparse/issues/46
 dparse>=0.4.1,<0.5.0; python_version == '2.7'
-dparse>=0.5.2; python_version == '3.5'
 # ver 0.6.2 min requirement by safety 2.2.0
 dparse>=0.6.2; python_version >= '3.6'
 
@@ -72,7 +69,7 @@ dparse>=0.6.2; python_version >= '3.6'
 # PyYAML 5.2 addressed issue 38639 reported by safety
 # PyYAML 5.4.1 fixed install error on Python 3.10
 PyYAML>=5.3.1; python_version == '2.7'
-PyYAML>=5.3.1; python_version >= '3.5' and python_version <= '3.9'
+PyYAML>=5.3.1; python_version >= '3.6' and python_version <= '3.9'
 PyYAML>=5.4.1; python_version >= '3.10'
 
 # Sphinx (no imports, invoked via sphinx-build script):
@@ -84,10 +81,10 @@ PyYAML>=5.4.1; python_version >= '3.10'
 # Sphinx pins docutils to <0.18 (some versions even to <0.17) but the package
 #   version resolver in the pip version used on py27 ignores package dependencies
 Sphinx>=1.7.6,<2.0.0; python_version == '2.7'
-Sphinx>=3.5.4,!=4.0.0; python_version >= '3.5' and python_version <= '3.9'
+Sphinx>=3.5.4,!=4.0.0; python_version >= '3.6' and python_version <= '3.9'
 Sphinx>=4.2.0; python_version >= '3.10'
 docutils>=0.13.1,<0.17; python_version == '2.7'
-docutils>=0.13.1,<0.17; python_version >= '3.5' and python_version <= '3.9'
+docutils>=0.13.1,<0.17; python_version >= '3.6' and python_version <= '3.9'
 docutils>=0.14,<0.17; python_version == '3.10'
 docutils>=0.16,<0.17; python_version >= '3.11'
 sphinx-git>=10.1.1
@@ -95,15 +92,15 @@ sphinx-git>=10.1.1
 # GitPython version 3.1.24 requires Python >=3.7
 # GitPython version 3.1.27 fixes safety issue #52518
 GitPython>=2.1.1,<3.0.0; python_version == '2.7'
-GitPython>=2.1.1; python_version >= '3.5' and python_version <= '3.6'
+GitPython>=2.1.1; python_version == '3.6'
 GitPython>=3.1.27; python_version >= '3.7'
 Pygments>=2.1.3; python_version == '2.7'
-Pygments>=2.7.4; python_version >= '3.5'
+Pygments>=2.7.4; python_version >= '3.6'
 sphinx-rtd-theme>=1.0.0
 # Babel 2.7.0 fixes an ImportError for MutableMapping which starts failing on Python 3.10
 Babel>=2.7.0; python_version == '2.7'
 # Safety issue #42203 affected < 2.9.1
-Babel>=2.9.1; python_version >= '3.5'
+Babel>=2.9.1; python_version >= '3.6'
 
 # PyLint (no imports, invoked via pylint script)
 # Pylint requires astroid
@@ -113,22 +110,20 @@ Babel>=2.9.1; python_version >= '3.5'
 # Pylint 2.7-2.9 had issue https://github.com/PyCQA/pylint/issues/4118 (issues #2672, #2673)
 # Pylint 2.14 / astroid 2.11 support wrapt 1.14 which is required for Python 3.11
 # Pylint 2.15 / astroid 2.12 is needed to circumvent issue https://github.com/PyCQA/pylint/issues/7972 on Python 3.11
-pylint>=2.5.2; python_version == '3.5'
 pylint>=2.10.0; python_version >= '3.6' and python_version <= '3.10'
 pylint>=2.15.0; python_version >= '3.11'
-astroid>=2.4.0; python_version == '3.5'
 astroid>=2.7.2; python_version >= '3.6' and python_version <= '3.10'
 astroid>=2.12.4; python_version >= '3.11'
 # astroid 2.13.0 uses typing-extensions on Python<3.11 but misses to require it on 3.10. See https://github.com/PyCQA/astroid/issues/1942
 typing-extensions>=3.10; python_version <= '3.10'
 # typed-ast is used by astroid on py34..py37
-typed-ast>=1.4.0,<1.5.0; python_version >= '3.5' and python_version < '3.8' and implementation_name=='cpython'
+typed-ast>=1.4.0,<1.5.0; python_version >= '3.6' and python_version < '3.8' and implementation_name=='cpython'
 # lazy-object-proxy is used by astroid
-lazy-object-proxy>=1.4.3; python_version >= '3.5'
+lazy-object-proxy>=1.4.3; python_version >= '3.6'
 # wrapt 1.13.0 started depending on MS Visual C++ 9.0 on Python 2.7 on Windows,
 #   which is not available by default on GitHub Actions
 # wrapt 1.14.0 started supporting Python 3.11 by accomodating the removed inspect.formatargspec
-wrapt>=1.12; python_version >= '3.5' and python_version <= '3.10'
+wrapt>=1.12; python_version >= '3.6' and python_version <= '3.10'
 wrapt>=1.14; python_version >= '3.11'
 # isort 5.0.0 removed support for py27,py35
 # isort 4.2.8 fixes a pylint issue with false positive on import order of ssl on Windows
@@ -146,26 +141,26 @@ platformdirs>=2.2.0; python_version >= '3.6'
 # flake8 4.0.0 fixes an AttributeError on Python 3.10.
 # flake8 4.0.1 fixes a TypeError on files with incorrect syntax.
 flake8>=3.8.0; python_version == '2.7'
-flake8>=3.8.0; python_version >= '3.5' and python_version <= '3.9'
+flake8>=3.8.0; python_version >= '3.6' and python_version <= '3.9'
 flake8>=4.0.1; python_version >= '3.10'
 mccabe>=0.6.0; python_version == '2.7'
-mccabe>=0.6.0; python_version >= '3.5'
+mccabe>=0.6.0; python_version >= '3.6'
 pycodestyle>=2.6.0,<2.8.0; python_version == '2.7'
-pycodestyle>=2.6.0; python_version >= '3.5' and python_version <= '3.9'
+pycodestyle>=2.6.0; python_version >= '3.6' and python_version <= '3.9'
 pycodestyle>=2.8.0; python_version >= '3.10'
 pyflakes>=2.2.0,<2.4.0; python_version == '2.7'
-pyflakes>=2.2.0; python_version >= '3.5' and python_version <= '3.9'
+pyflakes>=2.2.0; python_version >= '3.6' and python_version <= '3.9'
 pyflakes>=2.4.0; python_version >= '3.10'
 entrypoints>=0.3.0
 functools32>=3.2.3.post2; python_version == '2.7'  # technically: python_version < '3.2'
 
 # Twine (no imports, invoked via twine script):
 # twine 2.0.0 has removed support for Python 2.7, 3.5
-twine>=1.15.0,<2.0.0; python_version <= '3.5'
+twine>=1.15.0,<2.0.0; python_version == '2.7'
 twine>=2.0.0; python_version >= '3.6'
 # readme-renderer 23.0 has made cmarkgfm part of extras (it fails on Cygwin)
 readme-renderer>=23.0; python_version == '2.7'
-readme-renderer>=23.0; python_version >= '3.5'
+readme-renderer>=23.0; python_version >= '3.6'
 
 # Jupyter Notebook (no imports, invoked via jupyter script)
 # TODO Future: currently jupyter not used by pywbemtools
@@ -180,17 +175,13 @@ pipdeptree>=2.2.0
 #   on Python 2.7.
 # pip-check-reqs 2.3.2 is needed to have proper support for pip<=21.3.
 # pip-check-reqs 2.4.3 fixes a speed issue on Python 3.11.
-pip-check-reqs>=2.3.2; python_version >= '3.5' and python_version <= '3.10'
+pip-check-reqs>=2.3.2; python_version >= '3.6' and python_version <= '3.10'
 pip-check-reqs>=2.4.3; python_version >= '3.11'
 
 # safety 2.3.5 started pinning packaging to <22.0 and requires >=21.0
 packaging>=17.0; python_version == '2.7'
-packaging>=17.0; python_version == '3.5'
 packaging>=21.0,<22.0; python_version >= '3.6'
 
-# urllib3 2.0 requires py>=3.7
-urllib3>=1.25.9,<2.0.0; python_version == '2.7' and python_version >= '3.5'
-urllib3>=1.26.5,<2.0.0; python_version >= '3.10'
 
 # Temporary workarounds on indirectly used packages:
 
@@ -210,6 +201,6 @@ urllib3>=1.26.5,<2.0.0; python_version >= '3.10'
 # Jinja2 is used by Sphinx, and pip needs explicit versions for this
 # otherwise indirect dependency.
 Jinja2>=2.8.1; python_version == '2.7'
-Jinja2>=2.8.1; python_version >= '3.5'
+Jinja2>=2.8.1; python_version >= '3.6'
 # Safety issue #51358, affected <2.2
 Jinja2>=2.10.2; python_version >= '3.10'

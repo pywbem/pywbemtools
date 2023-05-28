@@ -100,7 +100,7 @@ def setup_script(file_path, conn, server, verbose):
       NotCacheable (py<3.5): Mock environment is not cacheable.
     """
     modpath = get_modpath(file_path)
-    if sys.version_info[0:2] >= (3, 5):
+    if sys.version_info[0:2] >= (3, 6):
         spec = importlib.util.spec_from_file_location(modpath, file_path)
         module = importlib.util.module_from_spec(spec)
 
@@ -179,9 +179,9 @@ def import_script(file_path):
     Raises:
       NotCacheable
     """
-    if sys.version_info[0:2] < (3, 5):
+    if sys.version_info[0:2] == (2, 7):
         raise NotCacheable(
-            "On Python <3.5, mock scripts cannot be cached")
+            "On Python 2.7, mock scripts cannot be cached")
 
     modpath = get_modpath(file_path)
     spec = importlib.util.spec_from_file_location(modpath, file_path)

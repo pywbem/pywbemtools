@@ -110,7 +110,7 @@ GENERAL_OPTIONS_TESTCASES = [
             stderr=[r"Pywbemlistener support for Python .* is deprecated"],
             test='contains',
         ),
-        sys.version_info[0:2] <= (3, 4),
+        sys.version_info[0:2] == (2, 7),
     ),
     (
         "Verify that '--verbose' option is valid",

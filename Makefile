@@ -660,11 +660,8 @@ flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).
 	@echo "Makefile: Done running Flake8"
 
 safety_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints.txt
-# Python 2.7 and 3.5 safety do not support the policy file
+# Python 2.7 safety do not support the policy file
 ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping Safety on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.5)
 	@echo "Makefile: Warning: Skipping Safety on Python $(python_version)" >&2
 else
 	@echo "Makefile: Running pyup.io safety check"
@@ -672,7 +669,6 @@ else
 	safety check --policy-file $(safety_policy_file) -r minimum-constraints.txt --full-report
 	echo "done" >$@
 	@echo "Makefile: Done running pyup.io safety check"
-endif
 endif
 
 todo_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
