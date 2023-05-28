@@ -55,14 +55,6 @@
 #   pip         ?
 #   setuptools  ? / 45.0.0
 #   wheel       ?
-# * Python 3.4 support:
-#   pip         ? / 19.2
-#   setuptools  ? / 44.0.0
-#   wheel       ? / 0.34.0
-# * Python 3.5 support:
-#   pip         8.0
-#   setuptools  18.3
-#   wheel       0.30.0
 # * Python 3.6 support:
 #   pip         10.0.0
 #   setuptools  34.0.0
@@ -85,9 +77,8 @@
 # * pip 20.0 introduced the --no-python-version-warning option
 # * pip 20.2 introduced a new resolver whose backtracking had issues that were resolved only in 21.2.2.
 # * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
-# * pip 21.0 dropped support for Python 3.5.
 # * pip 22.0 dropped support for Python 3.6.
-pip==10.0.1; python_version <= '3.5'
+pip==10.0.1; python_version == '2.7'
 pip==21.3.1; python_version >= '3.6' and python_version <= '3.10'
 pip==22.2.2; python_version >= '3.11'
 
@@ -105,7 +96,7 @@ setuptools==65.1.1; python_version >= '3.10'
 # wheel 0.38.1 fixes CVE issue 51499
 # wheel 0.38.1 dropped support for py35+py36
 wheel==0.30.0; python_version == '2.7'
-wheel==0.36.2; python_version >= '3.5' and python_version <= '3.7'
+wheel==0.36.2; python_version >= '3.6' and python_version <= '3.7'
 wheel==0.38.1; python_version >= '3.8'
 
 
@@ -121,20 +112,20 @@ nocaselist==1.0.3
 nocasedict==1.0.1
 six==1.14.0; python_version <= '3.9'
 six==1.16.0; python_version >= '3.10'
-Click==7.1.1; python_version <= '3.5'
+Click==7.1.1; python_version == '2.7'
 # Safety package requires click 8.0.2 minimum
 Click==8.0.2; python_version >= '3.6'
 click-spinner==0.1.8
-click-repl==0.1.6; python_version <= '3.5'
+click-repl==0.1.6; python_version == '2.7'
 click-repl==0.2; python_version >= '3.6'
 asciitree==0.3.3
 tabulate==0.8.2; python_version <= '3.9'
 tabulate==0.8.8; python_version >= '3.10'
 prompt-toolkit==1.0.15; python_version == '2.7'
-prompt-toolkit==2.0.1; python_version >= '3.5'
+prompt-toolkit==2.0.1; python_version >= '3.6'
 # PyYAML is also pulled in by dparse
 PyYAML==5.3.1; python_version == '2.7'
-PyYAML==5.3.1; python_version >= '3.5' and python_version <= '3.9'
+PyYAML==5.3.1; python_version >= '3.6' and python_version <= '3.9'
 PyYAML==5.4.1; python_version >= '3.10'
 yamlloader==0.5.5
 mock==3.0.0
@@ -152,16 +143,14 @@ virtualenv==20.0.0; python_version >= '3.8'  # requires six<2,>=1.12.0
 # Additional indirect dependencies from pywbem
 # ordereddict==1.1
 ply==3.10
-# typing==3.6.1; python_version < '3.5'  # from M2Crypto
 requests==2.22.0; python_version == '2.7'
-requests==2.22.0; python_version >= '3.5' and python_version <= '3.9'
+requests==2.22.0; python_version >= '3.6' and python_version <= '3.9'
 requests==2.25.0; python_version >= '3.10'
 # httpretty==0.9.5
 # lxml==4.2.4
 # decorator==4.0.11
 # yamlordereddictloader==0.4.0
 urllib3==1.25.9; python_version == '2.7'
-urllib3==1.25.9; python_version == '3.5'
 urllib3==1.25.9; python_version == '3.6'
 # urllib3 < 2.0.0 required for python < 3.7
 urllib3==1.25.9; python_version >= '3.7' and python_version <= '3.9'
@@ -178,26 +167,23 @@ pytest==6.2.5; python_version >= '3.10'
 pluggy==0.13.0
 funcsigs==1.0.2; python_version == '2.7'
 colorama==0.3.9; python_version == '2.7'
-colorama==0.4.5; python_version >= '3.5'
+colorama==0.4.5; python_version >= '3.6'
 importlib-metadata==0.22; python_version <= '3.7'
 importlib-metadata==1.1.0; python_version >= '3.8'
 
 # Coverage reporting (no imports, invoked via coveralls script):
-coverage==5.0; python_version == '2.7' or python_version >= '3.5'
-pytest-cov==2.7.0; python_version == '2.7' or python_version >= '3.5'
+coverage==5.0; python_version == '2.7' or python_version >= '3.6'
+pytest-cov==2.7.0; python_version == '2.7' or python_version >= '3.6'
 # Links are not allowed in constraint files - minimum ensured by dev-requirements.txt:
 # git+https://github.com/andy-maier/coveralls-python.git@andy/add-py27#egg=coveralls; python_version == '2.7'
-coveralls==3.3.0; python_version >= '3.5'
+coveralls==3.3.0; python_version >= '3.6'
 
 # Safety CI by pyup.io
 safety==1.8.7; python_version == '2.7'
-# version 2. not compatible with python 3.5
-safety==1.9.0; python_version == '3.5'
 # safety 2.2.0 resolves safety issue #51358
 safety==2.2.0; python_version >= '3.6'
 
 dparse==0.4.1; python_version == '2.7'
-dparse==0.5.2; python_version == '3.5'
 #  dparse version 0.6.2 required by safety 2.2.0
 dparse==0.6.2; python_version >= '3.6'
 
@@ -207,35 +193,33 @@ tox==2.5.0
 
 # Sphinx (no imports, invoked via sphinx-build script):
 Sphinx==1.7.6; python_version == '2.7'
-Sphinx==3.5.4; python_version >= '3.5' and python_version <= '3.9'
+Sphinx==3.5.4; python_version >= '3.6' and python_version <= '3.9'
 Sphinx==4.2.0; python_version >= '3.10'
 docutils==0.13.1; python_version == '2.7'
-docutils==0.13.1; python_version >= '3.5' and python_version <= '3.9'
+docutils==0.13.1; python_version >= '3.6' and python_version <= '3.9'
 docutils==0.14; python_version == '3.10'
 docutils==0.16; python_version >= '3.11'
 sphinx-git==10.1.1
 GitPython==2.1.1; python_version == '2.7'
-GitPython==2.1.1; python_version >= '3.5' and python_version <= '3.6'
+GitPython==2.1.1; python_version == '3.6'
 GitPython==3.1.27; python_version >= '3.7'
 sphinxcontrib-websupport==1.1.2
 Pygments==2.1.3; python_version == '2.7'
-Pygments==2.7.4; python_version >= '3.5'
+Pygments==2.7.4; python_version >= '3.6'
 sphinx-rtd-theme==1.0.0
 Babel==2.7.0; python_version == '2.7'
 # Safety issue #42203  affected < 2.9.1
-Babel==2.9.1; python_version >= '3.5'
+Babel==2.9.1; python_version >= '3.6'
 
 # PyLint (no imports, invoked via pylint script)
-pylint==2.5.2; python_version == '3.5'
 pylint==2.10.0; python_version >= '3.6' and python_version <= '3.10'
 pylint==2.15.0; python_version >= '3.11'
-astroid==2.4.0; python_version == '3.5'
 astroid==2.7.2; python_version >= '3.6' and python_version <= '3.10'
 astroid==2.12.4; python_version >= '3.11'
 typing-extensions==3.10; python_version <= '3.10'
 typed-ast==1.4.0; python_version >= '3.6' and python_version < '3.8' and implementation_name=='cpython'
-lazy-object-proxy==1.4.3; python_version >= '3.5'
-wrapt==1.12; python_version >= '3.5' and python_version <= '3.10'
+lazy-object-proxy==1.4.3; python_version >= '3.6'
+wrapt==1.12; python_version >= '3.6' and python_version <= '3.10'
 wrapt==1.14; python_version >= '3.11'
 isort==4.3.8
 tomlkit==0.10.1; python_version >= '3.7'
@@ -255,7 +239,7 @@ entrypoints==0.3.0
 functools32==3.2.3.post2; python_version == '2.7'  # technically: python_version < '3.2'
 
 # Twine (no imports, invoked via twine script):
-twine==1.15.0; python_version <= '3.5'
+twine==1.15.0; python_version == '2.7'
 twine==2.0.0; python_version >= '3.6'
 readme-renderer==23.0
 pkginfo==1.4.2
@@ -264,7 +248,7 @@ pkginfo==1.4.2
 
 # Package dependency management tools
 pipdeptree==2.2.0
-pip-check-reqs==2.3.2; python_version >= '3.5' and python_version <= '3.10'
+pip-check-reqs==2.3.2; python_version >= '3.6' and python_version <= '3.10'
 pip-check-reqs==2.4.3; python_version >= '3.11'
 
 # pyzmq is used (at least?) by jupyter.
@@ -275,13 +259,12 @@ pyparsing==2.3.1
 
 # Packaging 21.0 is required by safety 2.2.0
 packaging==17.0; python_version == '2.7'
-packaging==17.0; python_version == '3.5'
 packaging==21.0; python_version >= '3.6'
 
 # Indirect dependencies for develop (not in dev-requirements.txt)
 
 bleach==3.3.0; python_version == '2.7'
-bleach==3.3.0; python_version >= '3.5'
+bleach==3.3.0; python_version >= '3.6'
 
 # Indirect dependencies for develop (not in dev-requirements.txt)
 
@@ -309,7 +292,7 @@ future==0.18.3
 futures==3.3.0; python_version < "3.2"
 # gitdb2 is a mirror Pypi name for certain gitdb versions.
 gitdb2==2.0.0; python_version == '2.7'
-gitdb2==2.0.0; python_version >= '3.5' and python_version <= '3.6'
+gitdb2==2.0.0; python_version == '3.6'
 gitdb==4.0.8; python_version >= '3.7'
 
 html5lib==0.999999999
@@ -343,17 +326,17 @@ simplegeneric==0.8.1
 singledispatch==3.4.0.3; python_version == "2.7"
 smmap2==2.0.1
 snowballstemmer==1.2.1
-sphinxcontrib-applehelp==1.0.0; python_version >= '3.5'
-sphinxcontrib-devhelp==1.0.0; python_version >= '3.5'
-sphinxcontrib-htmlhelp==1.0.0; python_version >= '3.5' and python_version <= '3.9'
+sphinxcontrib-applehelp==1.0.0; python_version >= '3.6'
+sphinxcontrib-devhelp==1.0.0; python_version >= '3.6'
+sphinxcontrib-htmlhelp==1.0.0; python_version >= '3.6' and python_version <= '3.9'
 sphinxcontrib-htmlhelp==2.0.0; python_version >= '3.10'
-sphinxcontrib-jsmath==1.0.0; python_version >= '3.5'
-sphinxcontrib-qthelp==1.0.0; python_version >= '3.5'
-sphinxcontrib-serializinghtml==1.1.5; python_version >= '3.5'
+sphinxcontrib-jsmath==1.0.0; python_version >= '3.6'
+sphinxcontrib-qthelp==1.0.0; python_version >= '3.6'
+sphinxcontrib-serializinghtml==1.1.5; python_version >= '3.6'
 terminado==0.6
 testpath==0.3
 toml==0.10.0
-tomli==2.0.1; python_version >= '3.5'
+tomli==2.0.1; python_version >= '3.6'
 tornado==4.4.2
 tqdm==4.28.1
 traceback2==1.4.0

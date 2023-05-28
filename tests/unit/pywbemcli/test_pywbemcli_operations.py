@@ -65,7 +65,7 @@ DEFAULT_CONNECTIONS_FILE_BAK = DEFAULT_CONNECTIONS_FILE + \
 
 # Flag indicating that the new-style setup approach() with a setup() function
 # is supported.
-NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 5)
+NEWSTYLE_SUPPORTED = sys.version_info[0:2] >= (3, 6)
 
 # RETRY_DEPRECATION: Flag indicating that pywbem raises a DeprecationWarning
 # for urllib3.Retry.

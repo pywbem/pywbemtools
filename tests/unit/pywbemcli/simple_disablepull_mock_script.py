@@ -49,7 +49,7 @@ def _setup(conn, server, verbose):
 
     conn.disable_pull_operations  # pylint: disable=pointless-statement
 
-    if sys.version_info >= (3, 5):
+    if sys.version_info >= (3, 6):
         this_file_path = __file__
     else:
         # Unfortunately, it does not seem to be possible to find the file path
@@ -86,7 +86,7 @@ def _setup(conn, server, verbose):
     conn.disable_pull_operations = True
 
 
-if sys.version_info >= (3, 5):
+if sys.version_info >= (3, 6):
     # New-style setup
 
     # If the function is defined directly, it will be detected and refused
