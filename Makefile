@@ -422,7 +422,7 @@ _show_bitsize:
 # not support python_requires yet, and thus would update Pip beyond the last
 # supported version. This rule ensures we have a minimum version of Pip that
 # supports what this project needs.
-pip_minimum_$(pymn).done: Makefile minimum-constraints.txt
+pip_minimum_$(pymn)_$(PACKAGE_LEVEL).done: Makefile minimum-constraints.txt
 	@echo "Makefile: Upgrading/downgrading Pip to minimum version"
 	-$(call RM_FUNC,$@)
 	$(PIP_INSTALL_CMD) -c minimum-constraints.txt pip
@@ -438,14 +438,14 @@ pywbem_os_setup.sh: Makefile
 pywbem_os_setup.bat: Makefile
 	curl -s -o pywbem_os_setup.bat https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
 
-install_basic_$(pymn).done: Makefile pip_minimum_$(pymn).done $(pip_constraints_deps)
+install_basic_$(pymn)_$(PACKAGE_LEVEL).done: Makefile pip_minimum_$(pymn)_$(PACKAGE_LEVEL).done $(pip_constraints_deps)
 	@echo "Makefile: Installing/upgrading basic Python packages with PACKAGE_LEVEL=$(PACKAGE_LEVEL)"
 	-$(call RM_FUNC,$@)
 	$(PIP_INSTALL_CMD) $(pip_level_opts) pip setuptools wheel
 	echo "done" >$@
 	@echo "Makefile: Done installing/upgrading basic Python packages"
 
-install_$(package_name)_$(pymn).done: Makefile install_basic_$(pymn).done requirements.txt setup.py MANIFEST.in $(pip_constraints_deps)
+install_$(package_name)_$(pymn)_$(PACKAGE_LEVEL).done: Makefile install_basic_$(pymn)_$(PACKAGE_LEVEL).done requirements.txt setup.py MANIFEST.in $(pip_constraints_deps)
 	@echo "Makefile: Installing $(package_name) (editable) and its Python runtime prerequisites (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	-$(call RMDIR_FUNC,build $(package_name).egg-info .eggs)
@@ -455,10 +455,10 @@ install_$(package_name)_$(pymn).done: Makefile install_basic_$(pymn).done requir
 	@echo "Makefile: Done installing $(package_name) and its Python runtime prerequisites"
 
 .PHONY: install
-install: install_$(pymn).done
+install: install_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
-install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name)_$(pymn).done
+install_$(pymn)_$(PACKAGE_LEVEL).done: Makefile install_basic_$(pymn)_$(PACKAGE_LEVEL).done install_$(package_name)_$(pymn)_$(PACKAGE_LEVEL).done
 	-$(call RM_FUNC,$@)
 	$(PYTHON_CMD) -c "import $(package_name).$(command1)"
 	$(PYTHON_CMD) -c "import $(package_name).$(command2)"
@@ -470,7 +470,7 @@ install_$(pymn).done: Makefile install_basic_$(pymn).done install_$(package_name
 # 'pylint' needs 'typed-ast' which depends on the OS-level packages
 # 'libcrypt-devel' and 'python3-devel'. These packages happen to also be used
 # by pywbem for development.
-develop_os_$(pymn).done: Makefile install_basic_$(pymn).done $(pywbem_os_setup_file)
+develop_os_$(pymn)_$(PACKAGE_LEVEL).done: Makefile install_basic_$(pymn)_$(PACKAGE_LEVEL).done $(pywbem_os_setup_file)
 	@echo "Makefile: Installing OS-level development requirements"
 	-$(call RM_FUNC,$@)
 ifeq ($(PLATFORM),Windows_native)
@@ -482,10 +482,10 @@ endif
 	@echo "Makefile: Done installing OS-level development requirements"
 
 .PHONY: develop
-develop: develop_$(pymn).done
+develop: develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
-develop_$(pymn).done: Makefile install_basic_$(pymn).done install_$(pymn).done develop_os_$(pymn).done dev-requirements.txt $(pip_constraints_deps)
+develop_$(pymn)_$(PACKAGE_LEVEL).done: Makefile install_basic_$(pymn)_$(PACKAGE_LEVEL).done install_$(pymn)_$(PACKAGE_LEVEL).done develop_os_$(pymn)_$(PACKAGE_LEVEL).done dev-requirements.txt $(pip_constraints_deps)
 	@echo "Makefile: Installing Python development requirements (with PACKAGE_LEVEL=$(PACKAGE_LEVEL))"
 	-$(call RM_FUNC,$@)
 	$(PIP_INSTALL_CMD) $(pip_level_opts) -r dev-requirements.txt
@@ -501,19 +501,19 @@ builddoc: html
 	@echo "Makefile: Target $@ done."
 
 .PHONY: flake8
-flake8: flake8_$(pymn).done
+flake8: flake8_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo 'Makefile: Target $@ done.'
 
 .PHONY: check
-check: flake8_$(pymn).done safety_$(pymn).done
+check: flake8_$(pymn)_$(PACKAGE_LEVEL).done safety_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: pylint
-pylint: pylint_$(pymn).done
+pylint: pylint_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: todo
-todo: todo_$(pymn).done
+todo: todo_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: all
@@ -552,14 +552,14 @@ upload: _check_version $(dist_files)
 html: $(doc_build_dir)/html/index.html
 	@echo "Kakefile: Target $@ done."
 
-$(doc_build_dir)/html/index.html: develop_$(pymn).done Makefile $(doc_dependent_files)
+$(doc_build_dir)/html/index.html: develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Creating the documentation as HTML pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b html $(doc_opts) $(doc_build_dir)/html
 	@echo "Makefile: Done creating the documentation as HTML pages; top level file: $@"
 
 .PHONY: pdf
-pdf: develop_$(pymn).done Makefile $(doc_dependent_files)
+pdf: develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Creating the documentation as PDF file"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b latex $(doc_opts) $(doc_build_dir)/pdf
@@ -569,7 +569,7 @@ pdf: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Target $@ done."
 
 .PHONY: man
-man: develop_$(pymn).done Makefile $(doc_dependent_files)
+man: develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Creating the documentation as man pages"
 	-$(call RM_FUNC,$@)
 	$(doc_cmd) -b man $(doc_opts) $(doc_build_dir)/man
@@ -577,7 +577,7 @@ man: develop_$(pymn).done Makefile $(doc_dependent_files)
 	@echo "Makefile: Target $@ done."
 
 .PHONY: docchanges
-docchanges: develop_$(pymn).done
+docchanges: develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Creating the doc changes overview file"
 	$(doc_cmd) -b changes $(doc_opts) $(doc_build_dir)/changes
 	@echo
@@ -585,7 +585,7 @@ docchanges: develop_$(pymn).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: doclinkcheck
-doclinkcheck: develop_$(pymn).done
+doclinkcheck: develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Creating the doc link errors file"
 	$(doc_cmd) -b linkcheck $(doc_opts) $(doc_build_dir)/linkcheck
 	@echo
@@ -593,7 +593,7 @@ doclinkcheck: develop_$(pymn).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: doccoverage
-doccoverage: develop_$(pymn).done
+doccoverage: develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Creating the doc coverage results file"
 	$(doc_cmd) -b coverage $(doc_opts) $(doc_build_dir)/coverage
 	@echo "Makefile: Done creating the doc coverage results file: $(doc_build_dir)/coverage/python.txt"
@@ -635,7 +635,7 @@ $(bdist_file) $(sdist_file): Makefile setup.py MANIFEST.in $(doc_utility_help_fi
 # * 32 on usage error
 # Status 1 to 16 will be bit-ORed.
 # The make command checks for statuses: 1,2,32
-pylint_$(pymn).done: Makefile develop_$(pymn).done $(pylint_rc_file) $(py_src_files)
+pylint_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
 ifeq ($(python_m_version),2)
 	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
 else
@@ -651,7 +651,7 @@ else
 endif
 endif
 
-flake8_$(pymn).done: Makefile develop_$(pymn).done $(flake8_rc_file) $(py_src_files)
+flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done $(flake8_rc_file) $(py_src_files)
 	@echo "Makefile: Running Flake8"
 	-$(call RM_FUNC,$@)
 	flake8 --version
@@ -659,7 +659,7 @@ flake8_$(pymn).done: Makefile develop_$(pymn).done $(flake8_rc_file) $(py_src_fi
 	echo "done" >$@
 	@echo "Makefile: Done running Flake8"
 
-safety_$(pymn).done: Makefile develop_$(pymn).done minimum-constraints.txt
+safety_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints.txt
 # Python 2.7 and 3.5 safety do not support the policy file
 ifeq ($(python_m_version),2)
 	@echo "Makefile: Warning: Skipping Safety on Python $(python_version)" >&2
@@ -675,7 +675,7 @@ else
 endif
 endif
 
-todo_$(pymn).done: Makefile develop_$(pymn).done $(pylint_rc_file) $(py_src_files)
+todo_$(pymn)_$(PACKAGE_LEVEL).done: Makefile develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
 ifeq ($(python_m_version),2)
 	@echo "Makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
 else
@@ -692,7 +692,7 @@ endif
 endif
 
 .PHONY: check_reqs
-check_reqs: develop_$(pymn).done minimum-constraints.txt requirements.txt
+check_reqs: develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints.txt requirements.txt
 ifeq ($(python_m_version),2)
 	@echo "Makefile: Warning: Skipping the checking of missing dependencies on Python $(python_version)" >&2
 else
@@ -712,7 +712,7 @@ endif
 	@echo "Makefile: $@ done."
 
 .PHONY: test
-test: develop_$(pymn).done $(doc_utility_help_files)
+test: develop_$(pymn)_$(PACKAGE_LEVEL).done $(doc_utility_help_files)
 	@echo "Makefile: Running unit and function tests"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & py.test --color=yes $(pytest_cov_opts) $(pytest_warning_opts) $(pytest_opts) tests/unit -s"
@@ -732,7 +732,7 @@ endif
 	@echo "Makefile: Done running install tests"
 
 .PHONY: end2endtest
-end2endtest: develop_$(pymn).done
+end2endtest: develop_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Running end2end tests"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set TEST_SERVER_IMAGE=$(TEST_SERVER_IMAGE) & py.test --color=yes $(pytest_end2end_warning_opts) $(pytest_end2end_opts) tests/end2endtest -s"
@@ -741,7 +741,7 @@ else
 endif
 	@echo "Makefile: Done running end2end tests"
 
-$(doc_conf_dir)/$(command1)/cmdshelp.rst: $(package_name)/$(command1)/$(command1).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
+$(doc_conf_dir)/$(command1)/cmdshelp.rst: $(package_name)/$(command1)/$(command1).py install_$(pymn)_$(PACKAGE_LEVEL).done tools/click_help_capture.py $(doc_help_source_files)
 	@echo "Makefile: Creating $@ for documentation"
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command1) >$@"
@@ -750,7 +750,7 @@ else
 endif
 	@echo 'Done: Created help command info for cmds: $@'
 
-$(doc_conf_dir)/$(command2)/cmdshelp.rst: $(package_name)/$(command2)/$(command2).py install_$(pymn).done tools/click_help_capture.py $(doc_help_source_files)
+$(doc_conf_dir)/$(command2)/cmdshelp.rst: $(package_name)/$(command2)/$(command2).py install_$(pymn)_$(PACKAGE_LEVEL).done tools/click_help_capture.py $(doc_help_source_files)
 	@echo 'Makefile: Creating $@ for documentation'
 ifeq ($(PLATFORM),Windows_native)
 	cmd /c "set PYWBEMTOOLS_TERMWIDTH=$(pywbemtools_termwidth) & $(PYTHON_CMD) -u tools/click_help_capture.py $(command2) >$@"
