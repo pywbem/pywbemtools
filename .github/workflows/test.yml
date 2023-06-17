@@ -16,9 +16,9 @@ on:
 env:
   # WBEM server image on Docker Hub as repository:tag.
   # Keep the version in sync with the Makefile.
-  TEST_SERVER_IMAGE: kschopmeyer/openpegasus-server:0.1.1
+  TEST_SERVER_IMAGE: kschopmeyer/openpegasus-server:0.1.3
   # Base file name of local tarball created from WBEM server image
-  TEST_SERVER_IMAGE_TAR: openpegasus-server:0.1.1.tar.gz
+  TEST_SERVER_IMAGE_TAR: openpegasus-server:0.1.3.tar.gz
   # Local Docker image cache directory
   DOCKER_CACHE_DIR: ~/docker-cache
 
