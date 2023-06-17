@@ -21,9 +21,8 @@ from __future__ import absolute_import, print_function
 import re
 
 # pylint: disable=unused-import
-from .utils import server_url  # noqa: F401
+from .utils import server_url, exec_pywbemcli_cmd  # noqa: F401
 # pylint: enable=unused-import
-from ..unit.utils import execute_command
 
 
 def create_table(stdout):
@@ -49,12 +48,9 @@ def test_instance_count(server_url):
 
     # Check the instance count operation that will return a success and
     # valid data
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', '-o', 'simple', 'instance', 'count',
          '-n', 'root/cimv2'])
-    assert rc == 0
-    assert stderr == ''
 
     table_lines = create_table(stdout)
     # Why this not in rslt assert ('Namespace', 'Class', 'count') in table_lines
@@ -64,15 +60,11 @@ def test_instance_count(server_url):
     # Test instance count against OpenPegasus with option that produces
     # CIMError from the server but from which pywbemcli should simply
     # produce a line in a report.
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--verbose', '--no-verify', '-o', 'simple',
          'instance', 'count', '-n', 'test/TestProvider',
-         '--ignore-class', 'TST_FaultyInstance,TST_FaultyInstanceSub'])
-
-    if rc != 0:
-        print("instance count stderr: {}".format(stderr))
-    assert rc == 0
+         '--ignore-class', 'TST_FaultyInstance,TST_FaultyInstanceSub'],
+        ignore_stderr=True)
 
     table_lines = create_table(stdout)
     assert ('test/TestProvider', 'TEST_Family', 'CIMError CIM_ERR_NOT_FOUND') \

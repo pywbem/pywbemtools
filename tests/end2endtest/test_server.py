@@ -21,9 +21,8 @@ from __future__ import absolute_import, print_function
 import re
 
 # pylint: disable=unused-import
-from .utils import server_url  # noqa: F401
+from .utils import server_url, exec_pywbemcli_cmd  # noqa: F401
 # pylint: enable=unused-import
-from ..unit.utils import execute_command
 
 
 def test_server_is_pegasus(server_url):
@@ -40,39 +39,27 @@ def test_server_is_pegasus(server_url):
     """
 
     # Check the server brand
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', 'server', 'brand'])
-    assert rc == 0
-    assert stderr == ''
     brand = stdout.strip('\n')
     assert brand == 'OpenPegasus'
 
     # Check the expected Interop namespace
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', 'namespace', 'interop'])
-    assert rc == 0
-    assert stderr == ''
     interop = stdout.strip('\n')
     assert interop == 'root/interop'
 
     # Check the namespaces our tests will use
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', 'namespace', 'list'])
-    assert rc == 0
-    assert stderr == ''
     namespaces = stdout.strip('\n').split('\n')[2:]
     assert 'root/interop' in namespaces
     assert 'test/TestProvider' in namespaces
 
     # Check the profiles our tests will use
-    rc, stdout, stderr = execute_command(
-        'pywbemcli',
+    stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', 'profile', 'list'])
-    assert rc == 0
-    assert stderr == ''
     profile_lines = stdout.strip('\n').split('\n')[3:]
     profiles = []
     for line in profile_lines:
