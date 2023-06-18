@@ -22,6 +22,10 @@ Released: not yet
 
 * Fixed coveralls issues with KeyError and HTTP 422 Unprocessable Entity.
 
+* Disallow the use of the click_repl version 3.0 because it cannot
+  process general options and causes a significant number of CLI tests to
+  fail. (issue #1312)
+
 **Enhancements:**
 
 **Cleanup:**
