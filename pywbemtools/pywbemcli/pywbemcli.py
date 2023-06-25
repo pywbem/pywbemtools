@@ -25,7 +25,6 @@ import io
 import sys
 import warnings
 import traceback
-import six
 import packaging.version
 
 import click
@@ -59,20 +58,14 @@ from ._connection_repository import ConnectionRepository, \
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT, MutuallyExclusiveOption, click_completion_item
 from .._utils import pywbemtools_warn, get_terminal_width, \
-    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
+    CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE, debug_log
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
+from ._warnings import InvalidConnectionFile, TabCompletionError
+
 
 __all__ = ['cli']
-
-
-class InvalidConnectionFile(Warning):
-    """
-    Indicates that invalid connection file in startup of interactive mode.
-    """
-    pass
-
 
 # Click version as a tuple. Used to control tab-completion features
 CLICK_VERSION = packaging.version.parse(click.__version__).release
@@ -124,22 +117,8 @@ def disp_ctx_params(ctx, param, incomplete, verbose=False):
     Display parameters used in the call to a completion function
     """
     if verbose:
-        shell_debug_str("ctx attrs:{0}\nparam:  {1}\n incomplete:  {2}".
-                        format(get_ctx_attrs(ctx), param, incomplete))
-
-
-def shell_debug_str(strng):
-    """
-    Print the string in strng to the file debug.txt. Used in debugging
-    click completion functionality
-    """
-    if six.PY2:
-        # pylint: disable=unspecified-encoding
-        with open('debug.txt', 'a') as f:
-            print("{}".format(strng), file=f)
-    else:
-        with open('debug.txt', 'a', encoding='utf-8') as f:
-            print("{}".format(strng), file=f, flush=True)
+        debug_log("ctx attrs:{0}\nparam:  {1}\n incomplete:  {2}".
+                  format(get_ctx_attrs(ctx), param, incomplete))
 
 
 def get_ctx_attrs(ctx):
@@ -171,30 +150,36 @@ def connection_name_completer(ctx, param, incomplete):
     called if <TAB> is entered from terminal as part of the value of the
     --name general option.  It returns all entries in connection table that
     start with the string in incomplete.
+
+    If there is an issue with the connections file, a warning is issued and
+    an empty string returned.  This method must not generate an exception
+    because it could pass that back to the shell.
     """
-    connections_file = \
-        ctx.params['connections_file'] or DEFAULT_CONNECTIONS_FILE
-    # Output to stderr since terminal is not available because this only
-    # occurs when shell <TAB> entered to start tab-completion
+    if 'connections_file' in ctx.params:
+        connections_file = \
+            ctx.params['connections_file'] or DEFAULT_CONNECTIONS_FILE
+    else:
+        connections_file = DEFAULT_CONNECTIONS_FILE
     try:
         connections_repo = ConnectionRepository(connections_file)
+        # Test for file exists because defining repo or iteration ignore
+        # not-existent file.
         if not connections_repo.file_exists():
-            # Abort does not allow a message and FileError does not abort.
-            raise click.ClickException("Connection file: {} does not exist.".
-                                       format(connections_file))
+            raise ConnectionsFileError(
+                "Connections file: '{}' does not exist.".
+                format(connections_file))
 
         # Returns list of click CompletionItems from list of keys in
         # the repository.
-        returns = [click_completion_item(name) for name in connections_repo
-                   if name.startswith(incomplete)]
-
-        return returns
+        return [click_completion_item(name) for name in connections_repo
+                if name.startswith(incomplete)]
 
     except ConnectionsFileError as cfe:
-        click.echo('Fatal error: {0}: {1}'.
-                   format(cfe.__class__.__name__, cfe),
-                   err=True)
-        raise click.Abort()
+        pywbemtools_warn(
+            "Connection file: {0},  Fatal Error: {1}: {2}.".
+            format(connections_file, cfe.__class__.__name__, cfe),
+            TabCompletionError)
+        return ""
 
 
 ###########################################################################

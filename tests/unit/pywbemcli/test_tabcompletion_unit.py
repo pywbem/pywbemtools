@@ -33,6 +33,7 @@ import click
 
 from pywbemtools.pywbemcli._cmd_help import help_arg_subject_shell_completer
 from pywbemtools.pywbemcli.pywbemcli import connection_name_completer
+from pywbemtools.pywbemcli._warnings import TabCompletionError
 # pylint: disable=relative-beyond-top-level
 from ..pytest_extensions import simplified_test_function
 # pylint: enable=relative-beyond-top-level
@@ -169,25 +170,25 @@ TESTCASES_CONNECTION_NAME_COMPLETE = [
           exp_rtn=[]),
      None, None, OK),
 
-    ('Verify with  invalid connections file, generates exception',
+    ('Verify with invalid connections file, warning',
      dict(ctx="CONNECTION_REPO_TEST_FILE_PATH",
           yaml=TEST_CONNECTION_YAML,
           file=CONNECTION_REPO_TEST_FILE_PATH,
           file_exists=False,
           incomplete="",
-          exp_rtn=["testconn", 'tmp1']),
-     click.ClickException, None, CLICK_V_8),
+          exp_rtn=[]),
+     None, TabCompletionError, CLICK_V_8),
 
     # Needs click version as condition to avoid unwanted exception because
     # of the exception expected.
-    ('Verify with  invalid connections file, generates exception',
+    ('Verify with  invalid connections file, generates warning',
      dict(ctx="CONNECTION_REPO_TEST_FILE_PATH",
           yaml=TEST_CONNECTION_YAML,
           file=None,
           file_exists=False,
           incomplete="",
           exp_rtn=[]),
-     click.ClickException, None, CLICK_V_8),
+     None, TabCompletionError, CLICK_V_8),
 ]
 
 
