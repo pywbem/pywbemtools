@@ -27,9 +27,11 @@ from .._click_extensions import *     # noqa: F403,F401
 from .._options import *              # noqa: F403,F401
 from .._output_formatting import *    # noqa: F403,F401
 from .._common_cmd_actions import *   # noqa: F403,F401
+
 from ._cmd_namespace import *         # noqa: F403,F401
 from ._common import *                # noqa: F403,F401
 from ._pywbem_server import *         # noqa: F403,F401
+from ._warnings import *              # noqa: F403,F401
 
 from ._cmd_class import *             # noqa: F403,F401
 from ._cmd_instance import *          # noqa: F403,F401

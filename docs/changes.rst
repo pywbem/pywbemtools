@@ -32,7 +32,14 @@ Released: not yet
 * Fixed issue with PyYAML 5.4 installation on Python>=3.10 that fails since
   the recent release of Cython 3.
 
+* Correct issue in tab completion for --name argument and option where
+  invalid co:nnection file could cause exception.  Changes messages issued
+  for error to warning. (see issue #1316)
+
 **Enhancements:**
+
+* Extend tab completion to include connection show, connection delete,
+  connection save. (see issue # 1315)
 
 **Cleanup:**
 
