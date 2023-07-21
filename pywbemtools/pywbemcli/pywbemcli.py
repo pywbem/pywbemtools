@@ -29,9 +29,6 @@ import six
 import packaging.version
 
 import click
-import click_repl
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 from pywbem import LOGGER_SIMPLE_NAMES, \
     LOG_DESTINATIONS, DEFAULT_LOG_DESTINATION, LOG_DETAIL_LEVELS, \
@@ -51,9 +48,8 @@ from .config import PYWBEMCLI_NAME_ENVVAR, PYWBEMCLI_SERVER_ENVVAR, \
     PYWBEMCLI_LOG_ENVVAR, PYWBEMCLI_PDB_ENVVAR
 from ._context_obj import ContextObj, display_click_context
 from ._pywbem_server import PywbemServer
-from .config import DEFAULT_NAMESPACE, PYWBEMCLI_PROMPT, \
-    PYWBEMCLI_HISTORY_FILE, DEFAULT_MAXPULLCNT, DEFAULT_CONNECTION_TIMEOUT, \
-    MAX_TIMEOUT, USE_AUTOSUGGEST
+from .config import DEFAULT_NAMESPACE, DEFAULT_MAXPULLCNT, \
+    DEFAULT_CONNECTION_TIMEOUT, MAX_TIMEOUT
 from ._connection_repository import ConnectionRepository, \
     ConnectionsFileError
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
@@ -62,7 +58,6 @@ from .._utils import pywbemtools_warn, get_terminal_width, \
     CONNECTIONS_FILENAME, DEFAULT_CONNECTIONS_FILE
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
-
 
 __all__ = ['cli']
 
@@ -1094,6 +1089,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     # causes us to start interactive mode
     if ctx.invoked_subcommand is None:
         ctx.obj.interactive_mode = True
+        # import here to avoid circular imports
+        from  ._cmd_repl import repl
         ctx.invoke(repl)
 
         # Exit interactive mode and exit Pywbemcli. Disconnect any connected
@@ -1102,69 +1099,70 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
             ctx.obj.pywbem_server.disconnect()
 
 
-# FUTURE: Move repl to its own module in pywbemcli.
-@cli.command('repl', options_metavar=GENERAL_OPTS_TXT)
-@add_options(help_option)
-@click.pass_context
-def repl(ctx):
-    """
-    Enter interactive mode (default).
+# TODO Remove this code when new repl cmd works
+# # FUTURE: Move repl to its own module in pywbemcli.
+# @cli.command('repl', options_metavar=GENERAL_OPTS_TXT)
+# @add_options(help_option)
+# @click.pass_context
+# def repl(ctx):
+    # """
+    # Enter interactive mode (default).
 
-    Enter the interactive mode where pywbemcli commands can be entered
-    interactively. The prompt is changed to 'pywbemcli>'.
+    # Enter the interactive mode where pywbemcli commands can be entered
+    # interactively. The prompt is changed to 'pywbemcli>'.
 
-    <COMMAND> <COMMAND OPTIONS> - Execute pywbemcli command COMMAND
+    # <COMMAND> <COMMAND OPTIONS> - Execute pywbemcli command COMMAND
 
-    <GENERAL_OPTIONS> <COMMAND> <COMMAND_OPTIONS> - Execute command with
-    general options.  General options set here exist only for the current
-    command.
+    # <GENERAL_OPTIONS> <COMMAND> <COMMAND_OPTIONS> - Execute command with
+    # general options.  General options set here exist only for the current
+    # command.
 
-    -h, --help - Show pywbemcli general help message, including a
-                                  list of pywbemcli commands.
-    COMMAND -h, --help - Show help message for pywbemcli command COMMAND.
+    # -h, --help - Show pywbemcli general help message, including a
+                                  # list of pywbemcli commands.
+    # COMMAND -h, --help - Show help message for pywbemcli command COMMAND.
 
-    !SHELL-CMD - Execute shell command SHELL-CMD
+    # !SHELL-CMD - Execute shell command SHELL-CMD
 
-    Pywbemcli termination - <CTRL-D>, :q, :quit, :exit
+    # Pywbemcli termination - <CTRL-D>, :q, :quit, :exit
 
-    Command history is supported. The command history is stored in a file
-    ~/.pywbemcli_history.
+    # Command history is supported. The command history is stored in a file
+    # ~/.pywbemcli_history.
 
-    <UP>, <DOWN> - Scroll through pwbemcli command history.
+    # <UP>, <DOWN> - Scroll through pwbemcli command history.
 
-    <CTRL-r> <search string> - initiate an interactive
-    search of the pywbemcli history file. Can be used with <UP>, <DOWN>
-    to display commands that match the search string.
-    Editing the search string updates the search.
+    # <CTRL-r> <search string> - initiate an interactive
+    # search of the pywbemcli history file. Can be used with <UP>, <DOWN>
+    # to display commands that match the search string.
+    # Editing the search string updates the search.
 
-    <TAB> - tab completion for current command line
-    (can be used anywhere in command)
+    # <TAB> - tab completion for current command line
+    # (can be used anywhere in command)
 
-    Interactive mode also includes an autosuggest feature that makes
-    suggestions from the command history as the command the user types in the
-    command and options.
-    """
+    # Interactive mode also includes an autosuggest feature that makes
+    # suggestions from the command history as the command the user types in the
+    # command and options.
+    # """
 
-    history_file = PYWBEMCLI_HISTORY_FILE
-    if history_file.startswith('~'):
-        history_file = os.path.expanduser(history_file)
+    # history_file = PYWBEMCLI_HISTORY_FILE
+    # if history_file.startswith('~'):
+        # history_file = os.path.expanduser(history_file)
 
-    click.echo("Enter 'help repl' for help, <CTRL-D> or ':q' "
-               "to exit pywbemcli or <CTRL-r> to search history, ")
+    # click.echo("Enter 'help repl' for help, <CTRL-D> or ':q' "
+               # "to exit pywbemcli or <CTRL-r> to search history, ")
 
-    if not ctx.obj.connections_repo.file_exists():
-        pywbemtools_warn(
-            "Connections file: '{}' does not exist. Server and connection "
-            "commands will not work.".
-            format(ctx.obj.connections_repo.connections_file),
-            InvalidConnectionFile, stacklevel=0)
+    # if not ctx.obj.connections_repo.file_exists():
+        # pywbemtools_warn(
+            # "Connections file: '{}' does not exist. Server and connection "
+            # "commands will not work.".
+            # format(ctx.obj.connections_repo.connections_file),
+            # InvalidConnectionFile, stacklevel=0)
 
-    prompt_kwargs = {
-        'message': PYWBEMCLI_PROMPT,
-        'history': FileHistory(history_file),
-    }
+    # prompt_kwargs = {
+        # 'message': PYWBEMCLI_PROMPT,
+        # 'history': FileHistory(history_file),
+    # }
 
-    if USE_AUTOSUGGEST:
-        prompt_kwargs['auto_suggest'] = AutoSuggestFromHistory()
+    # if USE_AUTOSUGGEST:
+        # prompt_kwargs['auto_suggest'] = AutoSuggestFromHistory()
 
-    click_repl.repl(ctx, prompt_kwargs=prompt_kwargs)
+    # click_repl.repl(ctx, prompt_kwargs=prompt_kwargs)

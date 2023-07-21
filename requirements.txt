@@ -32,7 +32,10 @@ Click>=8.0.2; python_version >= '3.6'
 click-spinner>=0.1.8
 # click-repl 0.2 is needed for compatibility with Click 8.0.
 click-repl>=0.1.6; python_version <= '3.5'
-click-repl>=0.2; python_version >= '3.6'
+#click-repl>=0.2; python_version >= '3.6'
+git+https://github.com/GhostOps77/click-repl.git@GhostOps77-patch-1#click-repl
+
+
 asciitree>=0.3.3
 # tabulate 0.8.8 fixes ImportError on Python 3.10.
 tabulate>=0.8.2; python_version <= '3.9'

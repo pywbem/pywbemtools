@@ -41,6 +41,7 @@ from ._cmd_statistics import *        # noqa: F403,F401
 from ._cmd_subscription import *      # noqa: F403,F401
 from ._cmd_help import *              # noqa: F403,F401
 from ._cmd_docs import *              # noqa: F403,F401
+from ._cmd_repl import *              # noqa: F403,F401
 
 from ._context_obj import *           # noqa: F403,F401
 from ._connection_repository import *   # noqa: F403,F401
@@ -51,5 +52,6 @@ from ._association_shrub import *     # noqa: F403,F401
 from ._cimvalueformatter import *     # noqa: F403,F401
 from ._display_cimobjects import *    # noqa: F403,F401
 from ._common_cmd_functions import *  # noqa: F403,F401
+
 
 from .._version import __version__    # noqa: F401
