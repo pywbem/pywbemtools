@@ -41,7 +41,7 @@ jobs:
         if [[ "${{ github.event_name }}" == "schedule" || "${{ github.head_ref }}" =~ ^release_ ]]; then \
           echo "matrix={ \
             \"os\": [ \"ubuntu-latest\", \"macos-latest\", \"windows-latest\" ], \
-            \"python-version\": [ \"2.7\", \"3.6\", \"3.7\", \"3.8\", \"3.9\", \"3.10\", \"3.11\" ], \
+            \"python-version\": [ \"3.6\", \"3.7\", \"3.8\", \"3.9\", \"3.10\", \"3.11\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"exclude\": [ \
               { \
@@ -58,6 +58,18 @@ jobs:
             \"include\": [ \
               { \
                 \"os\": \"ubuntu-20.04\", \
+                \"python-version\": \"2.7\", \
+                \"package_level\": \"minimum\", \
+                \"container\": {\"image\": \"python:2.7.18-buster\"} \
+              }, \
+              { \
+                \"os\": \"ubuntu-20.04\", \
+                \"python-version\": \"2.7\", \
+                \"package_level\": \"latest\", \
+                \"container\": {\"image\": \"python:2.7.18-buster\"} \
+              }, \
+              { \
+                \"os\": \"ubuntu-20.04\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"latest\" \
               }, \
@@ -71,9 +83,21 @@ jobs:
         else \
           echo "matrix={ \
             \"os\": [ \"ubuntu-latest\" ], \
-            \"python-version\": [ \"2.7\", \"3.11\" ], \
+            \"python-version\": [ \"3.11\" ], \
             \"package_level\": [ \"minimum\", \"latest\" ], \
             \"include\": [ \
+              { \
+                \"os\": \"ubuntu-20.04\", \
+                \"python-version\": \"2.7\", \
+                \"package_level\": \"minimum\", \
+                \"container\": {\"image\": \"python:2.7.18-buster\"} \
+              }, \
+              { \
+                \"os\": \"ubuntu-20.04\", \
+                \"python-version\": \"2.7\", \
+                \"package_level\": \"latest\", \
+                \"container\": {\"image\": \"python:2.7.18-buster\"} \
+              }, \
               { \
                 \"os\": \"ubuntu-20.04\", \
                 \"python-version\": \"3.6\", \
@@ -96,11 +120,6 @@ jobs:
               }, \
               { \
                 \"os\": \"macos-latest\", \
-                \"python-version\": \"2.7\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"minimum\" \
               }, \
@@ -112,11 +131,6 @@ jobs:
               { \
                 \"os\": \"macos-latest\", \
                 \"python-version\": \"3.11\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"2.7\", \
                 \"package_level\": \"latest\" \
               }, \
               { \
@@ -142,16 +156,17 @@ jobs:
       max-parallel: 20
       matrix: ${{ fromJson(needs.set_matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     env:
       PIP_DISABLE_PIP_VERSION_CHECK: 1
       PIP_NO_PYTHON_VERSION_WARNING: 1
     steps:
     - name: Create local cache directory for Docker images
-      if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
+      if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       run: |
         mkdir -p ${{ env.DOCKER_CACHE_DIR }}
     - name: Set up caching for local Docker image cache directory
-      if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
+      if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       uses: actions/cache@v3
       with:
         path: ${{ env.DOCKER_CACHE_DIR }}
@@ -159,7 +174,7 @@ jobs:
         restore-keys: |
           docker-cache-
     - name: Get WBEM server image from Docker Hub or local Docker image cache
-      if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
+      if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       run: |
         if [[ ! -f ${{ env.DOCKER_CACHE_DIR }}/${{ env.TEST_SERVER_IMAGE_TAR }} ]]; then \
           echo "Pulling image from Docker Hub"; \
@@ -175,6 +190,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
+      if: ${{ matrix.python-version != '2.7' }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
@@ -245,7 +261,7 @@ jobs:
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image
-      if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
+      if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         # Uses TEST_SERVER_IMAGE variable
