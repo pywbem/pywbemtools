@@ -22,6 +22,9 @@ Released: not yet
   process general options and causes a significant number of CLI tests to
   fail. (issue #1312)
 
+* Circumvented the removal of Python 2.7 from the Github Actions plugin
+  setup-python, by using the Docker container python:2.7.18-buster instead.
+
 **Enhancements:**
 
 **Cleanup:**
