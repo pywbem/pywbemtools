@@ -29,6 +29,9 @@ Released: not yet
 * Circumvented the removal of Python 2.7 from the Github Actions plugin
   setup-python, by using the Docker container python:2.7.18-buster instead.
 
+* Fixed issue with PyYAML 5.4 installation on Python>=3.10 that fails since
+  the recent release of Cython 3.
+
 **Enhancements:**
 
 **Cleanup:**
