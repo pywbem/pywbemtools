@@ -66,14 +66,7 @@ dparse>=0.5.2; python_version == '3.5'
 # ver 0.6.2 min requirement by safety 2.2.0
 dparse>=0.6.2; python_version >= '3.6'
 
-# PyYAML is also pulled in by dparse
-# PyYAML 5.3 fixed narrow build error on Python 2.7
-# PyYAML 5.3.1 addressed issue 38100 reported by safety
-# PyYAML 5.2 addressed issue 38639 reported by safety
-# PyYAML 5.4.1 fixed install error on Python 3.10
-PyYAML>=5.3.1; python_version == '2.7'
-PyYAML>=5.3.1; python_version >= '3.5' and python_version <= '3.9'
-PyYAML>=5.4.1; python_version >= '3.10'
+# PyYAML is covered in requirements.txt
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Keep in sync with rtd-requirements.txt

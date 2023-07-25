@@ -58,8 +58,14 @@ prompt-toolkit>=2.0.1; python_version >= '3.6'
 # PyYAML 5.3 fixed narrow build error on Python 2.7
 # PyYAML 5.3.1 addressed issue 38100 reported by safety
 # PyYAML 5.2 addressed issue 38639 reported by safety
-PyYAML>=5.3.1; python_version == '2.7'
-PyYAML>=5.3.1; python_version >= '3.5'
+# PyYAML 5.3 has wheel archives for Python 2.7, 3.5 - 3.9
+# PyYAML 5.4 has wheel archives for Python 2.7, 3.6 - 3.9
+# PyYAML 6.0 has wheel archives for Python 3.6 - 3.11
+# PyYAML 5.4 and 6.0.0 fails install since Cython 3 was released, see issue
+#   https://github.com/yaml/pyyaml/issues/724.
+PyYAML>=5.3.1; python_version <= '3.5'
+PyYAML>=5.3.1,!=5.4.0,!=5.4.1; python_version >= '3.6' and python_version <= '3.11'
+PyYAML>=5.3.1,!=5.4.0,!=5.4.1,!=6.0.0; python_version >= '3.12'
 
 yamlloader>=0.5.5
 packaging>=17.0; python_version == '2.7'
