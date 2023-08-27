@@ -28,6 +28,8 @@ Released: not yet
 * Fixed issue with PyYAML 5.4 installation on Python>=3.10 that fails since
   the recent release of Cython 3.
 
+* Fixed safety issues as of 2023-08-27.
+
 **Enhancements:**
 
 **Cleanup:**
