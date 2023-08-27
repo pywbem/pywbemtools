@@ -36,6 +36,8 @@ Released: not yet
   invalid co:nnection file could cause exception.  Changes messages issued
   for error to warning. (see issue #1316)
 
+* Fixed safety issues as of 2023-08-27.
+
 **Enhancements:**
 
 * Extend tab completion to include connection show, connection delete,
