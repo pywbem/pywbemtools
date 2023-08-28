@@ -51,6 +51,8 @@ Released: not yet
 * Add several new safety ignore entries into .safety-policy.yml from the
   new issues that were added to list May 2023.
 
+* Clean up several documentation syntax issues in the pywbemcli documentation.
+
 
 **Known issues:**
 
