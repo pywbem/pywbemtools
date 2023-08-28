@@ -43,6 +43,11 @@ Released: not yet
 * Extend tab completion to include connection show, connection delete,
   connection save. (see issue # 1315)
 
+* Changed version of OpenPegasus-wbemserver container for end2end tests
+  from version 0.1.2 to 0.1.3.  This version corrects OpenPegasus issues in 
+  requesting test indications from the wbem server and uses OpenPegasus 
+  2.14.4 or greater. This change will allow end2end indication testing.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
