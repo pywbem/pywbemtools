@@ -76,6 +76,10 @@ Released: not yet
   different address/system than the system where pywbemlistener test is being
   executed. This will allow testing across multiple systems.
 
+* Added new directory ``examples`` that is available when the repository id
+  cloned and provides a first example of indication subscriptions and
+  indication testing using an OpenPegasus indication generating provider.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
