@@ -298,7 +298,7 @@ the CIM classes CIM_ObjectManager and CIM_Namespace as well as all their
 dependencies, after downloading the schema from the DMTF schema version
 2.49.0 from the DMTF web site if it was not already on the local system).
 
-.. code-block::
+.. code-block:: python
 
        VERBOSE = False
        namespace = 'Interop'          # Namespace where interop components to be installed
@@ -339,7 +339,7 @@ providers will be active. See :meth:`~pywbem_mock:FakedWBEMConnection.register_p
 The namespace provider which is already a part of pywbem can be installed using
 a the following statements in the python script:
 
-.. code-block::
+.. code-block:: python
 
     # Create the interop namespace and compile the required files into the
     # namespace
@@ -429,7 +429,7 @@ and the startup script itself.
 
 For example:
 
-.. code-block::
+.. code-block:: python
 
     def register_dependents(conn, this_file_path, dependent_file_names):
         """
@@ -501,8 +501,8 @@ For example:
 
 .. _`Defining up the startup script interface from pywbemcli`:
 
-Defining up the startup script interface from pywbemcli
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining the startup script interface from pywbemcli
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Mock scripts can be used for any kind of setup of the mock WBEM server, for
 example for creating namespaces, implementing and registering providers, or
@@ -518,70 +518,71 @@ should operate on depending on the Python version:
     pair: mock-server cache; cache mock-server
     pair: --mock-server; General option
 
-* New-style(Python >=3.5): The mock script has a ``setup()`` function.  This avoids
-  the messiness of using globals and also enables the mock environment of a
-  connection definition to be cached.
+1. New-style(Python >=3.5): The mock script has a ``setup()`` function.  This avoids
+   the messiness of using globals and also enables the mock environment of a
+   connection definition to be cached.
 
- New-style mock scripts are imported as a Python module into Python namespace
- ``pywbemtools.pywbemcli.mockscripts.<mock-script-name>`` and their
- ``setup()`` function is called. That function has the following interface:
+   New-style mock scripts are imported as a Python module into Python namespace
+   ``pywbemtools.pywbemcli.mockscripts.<mock-script-name>`` and their
+   ``setup()`` function is called. That function has the following interface:
 
-.. code-block::
+   .. code-block:: python
 
-    def setup(conn, server, verbose):
+      def setup(conn, server, verbose):
 
-where:
+   where:
 
- * ``conn`` (:class:`~pywbem_mock.FakedWBEMConnection`):
-   This object provides a connection to the mock WBEM server and is a
-   subclass of :class:`~pywbem/WBEMConnection`. The methods
-   of this object can be used to create and modify CIM objects in the
-   mock repository and to register providers.
+   * ``conn`` (:class:`~pywbem_mock.FakedWBEMConnection`):
+     This object provides a connection to the mock WBEM server and is a
+     subclass of :class:`~pywbem/WBEMConnection`. The methods
+     of this object can be used to create and modify CIM objects in the
+     mock repository and to register providers.
 
- * ``server`` (:class:`~pywbem.WBEMServer`):
-   This [ywbem ]object is layered on top of the ``CONN`` object and
-   provides access to higher level features of the mock WBEM server, such
-   as getting the Interop namespace, adding namespaces, or building more
-   complex objects for the mock repository.
+   * ``server`` (:class:`~pywbem.WBEMServer`):
+     This [ywbem ]object is layered on top of the ``CONN`` object and
+     provides access to higher level features of the mock WBEM server, such
+     as getting the Interop namespace, adding namespaces, or building more
+     complex objects for the mock repository.
 
- * ``verbose`` (:class:`py:bool`):
-   A boolean flag that contains the value of the boolean
-   :ref:`--verbose general option` of pywbemcli.
+   * ``verbose`` (:class:`py:bool`):
+     A boolean flag that contains the value of the boolean
+     :ref:`--verbose general option` of pywbemcli.
 
-* Old-style(all Python versions(*Deprecated*)):  The mock script does not have a
-  ``setup()`` function. This approach is not recommended, but it is supported
-  on all supported Python versions. Using old-style mock scripts in a
-  connection definition prevents caching of its mock environment.
+2. Old-style(all Python versions(*Deprecated*)):  The mock script does not have a
+   ``setup()`` function. This approach is not recommended, but it is supported
+   on all supported Python versions. Using old-style mock scripts in a
+   connection definition prevents caching of its mock environment.
 
-  Old-style mock scripts are executed as Python scripts in Python namespace
-  ``__builtin__``, with the following Python global variables made available:
+   Old-style mock scripts are executed as Python scripts in Python namespace
+   ``__builtin__``, with the following Python global variables made available:
 
-     * ``CONN`` (:class:`pywbem_mock.FakedWBEMConnection`):
-       This object provides a connection to the mock WBEM server. The methods
-       of this object can be used to create and modify CIM objects in the
-       mock repository and to register providers.
+   * ``CONN`` (:class:`pywbem_mock.FakedWBEMConnection`):
+     This object provides a connection to the mock WBEM server. The methods
+     of this object can be used to create and modify CIM objects in the
+     mock repository and to register providers.
 
-     * ``SERVER`` (:class:`pywbem.WBEMServer`):
-       This object is layered on top of the ``CONN`` object and provides access
-       to higher level features of the mock WBEM server, such as getting the
-       Interop namespace, adding namespaces, or building more complex objects
-       for the mock repository.
+   * ``SERVER`` (:class:`pywbem.WBEMServer`):
+     This object is layered on top of the ``CONN`` object and provides access
+     to higher level features of the mock WBEM server, such as getting the
+     Interop namespace, adding namespaces, or building more complex objects
+     for the mock repository.
 
-     * ``VERBOSE`` (bool):
-       A flag that contains the value of the boolean
-       :ref:`--verbose general option` of pywbemcli.
+   * ``VERBOSE`` (bool):
+     A flag that contains the value of the boolean
+     :ref:`--verbose general option` of pywbemcli.
 
-Thus the structure of a setup script might be as shown in the following example
-that creates an :term:`Interop namespace`, CIM_Namespace and indication subscription
-providers, and MOF in the default_namespace from a MOF file.
+The structure of a setup script shown in the following example works for both
+the old style and new style. This script creates an :term:`Interop namespace`,
+CIM_Namespace and indication subscription providers, and compiles MOF in the
+default_namespace from a MOF file.
 
 .. code-block:: python
 
     def register_dependents(conn, this_file_path, dependent_file_names):
         """
-        Register a dependent file name with the pywbemcli dependent file api.
-        This insures that any change to a dependent file will cause the
-        script to be recompiled.
+        Register one or more dependent file names with the pywbemcli dependent
+        file api. This insures that any change to a dependent file will cause
+        the script to be recompiled.
         """
         if isinstance(dependent_file_names, six.string_types):
             dependent_file_names = [dependent_file_names]
@@ -592,18 +593,22 @@ providers, and MOF in the default_namespace from a MOF file.
                                                         dep_path)
 
     def _setup(conn, server, verbose):
+        """
+        Common setup function that works for all versions of python supported
+        by pywbemcli.
+        """
 
         if sys.version_info >= (3, 5):
             this_file_path = __file__
         else:
             # Unfortunately, it does not seem to be possible to find the file path
             # of the current script when it is executed using exec(), so we hard
-            # code the file path. This requires that the tests are run from the
-            # repo main directory.
+            # code the file path.
             this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
             assert os.path.exists(this_file_path)
 
-    # Prepare an Interop namespace and namespace provider a DMTF schema
+    # Prepare an Interop namespace and namespace provider and compile a
+    # DMTF schema
 
     INTEROP_NAMESPACE = 'interop'
 
@@ -629,7 +634,6 @@ providers, and MOF in the default_namespace from a MOF file.
 
 
     # Interface from pywbemcli for both old and new interfaces
-
     if sys.version_info >= (3, 5):
         # New-style setup
 
