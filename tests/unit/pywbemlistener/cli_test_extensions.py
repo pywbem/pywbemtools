@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 import sys
 import os
 import io
+import signal
 try:
     from collections.abc import Sequence
 except ImportError:
@@ -216,6 +217,14 @@ def start_listeners(input_listeners, verbose, situation):
         check_output(cmd_args, situation, "Starting listener failed", verbose)
 
 
+def restore_signals():
+    """Fix"""
+    signals = ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ')
+    for sig in signals:
+        if hasattr(signal, sig):
+            signal.signal(getattr(signal, sig), signal.SIG_DFL)
+
+
 def check_output(cmd_args, situation, msg, verbose):
     """
     Improved replacement for subprocess.check_output() with a reduced interface.
@@ -230,33 +239,83 @@ def check_output(cmd_args, situation, msg, verbose):
     if sys.platform == 'win32' and six.PY2:
         os.putenv('PYTHONIOENCODING', 'UTF-8')
     try:
+        if verbose:
+            print("{}: Command (shell): {}".format(situation, cmd_args))
+            sys.stdout.flush()
         # pylint: disable=consider-using-with
-        p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
+        # pylint: disable=subprocess-popen-preexec-fn
+        p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE,
+                             preexec_fn=restore_signals)
         if six.PY2:
             try:
-                out, _ = p.communicate()
-            except Exception:
+                if verbose:
+                    print("Debug: {}: Calling p.communicate()".
+                          format(situation))
+                    sys.stdout.flush()
+                out, err = p.communicate()
+                if verbose:
+                    print("Debug: {}: Returned from p.communicate() with "
+                          "{!r} B on stdout, {!r} B on stderr".
+                          format(situation, len(out) if out else None,
+                                 len(err) if err else None))
+                    sys.stdout.flush()
+            except Exception as exc:
+                if verbose:
+                    print("Debug: {}: p.communicate() raised {}: {}".
+                          format(situation, exc.__class__.__name__, exc))
+                    sys.stdout.flush()
                 p.kill()
                 p.wait()
                 raise
+            if verbose:
+                print("Debug: {}: Calling p.poll()".
+                      format(situation))
+                sys.stdout.flush()
             rc = p.poll()
+            if verbose:
+                print("Debug: {}: Returned from p.poll() with rc={}".
+                      format(situation, rc))
+                sys.stdout.flush()
             if rc:
                 raise subprocess.CalledProcessError(
                     rc, cmd_args, output=out)
         else:
             try:
+                if verbose:
+                    print("Debug: {}: Calling p.communicate(timeout=30)".
+                          format(situation))
+                    sys.stdout.flush()
                 out, err = p.communicate(timeout=30)
-            except subprocess.TimeoutExpired:
+                if verbose:
+                    print("Debug: {}: Returned from p.communicate() with "
+                          "{!r} B on stdout, {!r} B on stderr".
+                          format(situation, len(out) if out else None,
+                                 len(err) if err else None))
+                    sys.stdout.flush()
+            except subprocess.TimeoutExpired as exc:
+                if verbose:
+                    print("Debug: {}: p.communicate() raised {}: {}".
+                          format(situation, exc.__class__.__name__, exc))
+                    sys.stdout.flush()
                 p.kill()
                 p.wait()
                 raise
+            if verbose:
+                print("Debug: {}: Calling p.poll()".
+                      format(situation))
+                sys.stdout.flush()
             rc = p.poll()
+            if verbose:
+                print("Debug: {}: Returned from p.poll() with rc={}".
+                      format(situation, rc))
+                sys.stdout.flush()
             if rc:
                 raise subprocess.CalledProcessError(
                     rc, cmd_args, output=out, stderr=err)
     except Exception as exc:
         # Note: The exception message contains the command line
         print("{}: Error: {}: {}".format(situation, msg, exc))
+        sys.stdout.flush()
         if hasattr(exc, 'output'):
             out = exc.output
             if isinstance(out, six.binary_type):
@@ -264,6 +323,7 @@ def check_output(cmd_args, situation, msg, verbose):
             print("Begin of command output (stdout):")
             print(out)
             print("End of command output")
+            sys.stdout.flush()
         if hasattr(exc, 'stderr'):
             err = exc.stderr
             if isinstance(err, six.binary_type):
@@ -271,6 +331,7 @@ def check_output(cmd_args, situation, msg, verbose):
             print("Begin of command output (stderr):")
             print(err)
             print("End of command output")
+            sys.stdout.flush()
         if verbose:
             # We do not have the listener name at this point, but there
             # should be only one log file, if any.
@@ -283,6 +344,7 @@ def check_output(cmd_args, situation, msg, verbose):
                 print("Begin of log file {}:".format(log_file))
                 print(log_data)
                 print("End of log file")
+                sys.stdout.flush()
         raise
     return out
 

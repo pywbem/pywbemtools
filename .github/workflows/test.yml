@@ -257,7 +257,8 @@ jobs:
     - name: Run test
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
-        # TESTCASES: test_class_cmds.py
+        TESTOPTS: '-vv'
+        TESTCASES: test_list_cmd.py
       run: |
         make test
     - name: Run end2end test with WBEM server Docker image

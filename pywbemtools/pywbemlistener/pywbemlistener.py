@@ -128,7 +128,7 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
-
+    # debug_log("CLI call")
     if warn:
         warnings.simplefilter('once')
     # else: Leave warning control to the PYTHONWARNINGS env var.

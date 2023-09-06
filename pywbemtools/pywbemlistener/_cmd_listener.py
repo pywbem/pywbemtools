@@ -47,6 +47,7 @@ from .._output_formatting import format_table
 
 from . import _config
 from .pywbemlistener import cli
+# from .._utils import debug_log
 
 # Click version as a tuple. Used to control tab-completion features
 CLICK_VERSION = packaging.version.parse(click.__version__).release
@@ -525,6 +526,7 @@ def get_listeners(name=None):
     Returns:
       list of ListenerProperties
     """
+    # debug_log("Enter get_listeners {}".format(name))
     if sys.platform == 'win32':
         cmdname = 'pywbemlistener-script.py'
     else:
@@ -1277,6 +1279,7 @@ def cmd_listener_stop(context, name):
     """
     Stop a named listener.
     """
+    # debug_log("cmd_listener_stop - enter {}".format(name))
     listeners = get_listeners(name)
     if not listeners:
         raise click.ClickException(
@@ -1284,17 +1287,20 @@ def cmd_listener_stop(context, name):
     listener = listeners[0]
 
     context.spinner_stop()
-
+    # debug_log("cmd_listener_stop. before pusutil.Process {}".format(
+    #          listener.pid))
     p = psutil.Process(listener.pid)
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Terminating run process {}".format(listener.pid))
     p.terminate()
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Waiting for run process {} to complete".format(listener.pid))
+    # debug_log("cmd_listener_stop. before wait {}".format(listener.pid))
     p.wait()
 
     # A message about the successful shutdown has already been displayed by
     # the child process.
+    # debug_log("cmd_listener_stop. after wait {}".format(listener.pid))
 
 
 def cmd_listener_show(context, name):
