@@ -16,6 +16,9 @@ Released: not yet
 
 * Dropped support for Python 3.5 (issue #1308)
 
+* Installation of this package using "setup.py" is no longer supported.
+  Use "pip" instead.
+
 **Deprecations:**
 
 **Bug fixes:**

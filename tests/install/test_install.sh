@@ -432,29 +432,6 @@ function test1()
   cleanup_egg_file
 }
 
-function test2()
-{
-  testcase="test2"
-  info "Testcase $testcase: setup.py install from repo root directory: $ROOT_DIR"
-  make_virtualenv "$testcase"
-
-  if [[ "$PYWBEM_FROM_REPO" == "true" ]]; then
-    warning "Skipping pywbemcli check because pywbem is installed from repo"
-  elif [[ $(python --version 2>&1) =~ (2\.7\.) ]]; then
-    warning "Skipping pywbemcli check due to issue with backports.functools-lru-cache on Python 2.7"
-  else
-    call "cd $ROOT_DIR; python setup.py install" "Installing with setup.py from repo root directory (latest package levels)"
-
-    verbose "Packages before running pywbemcli:"
-    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
-
-    assert_run_ok "pywbemcli --version"
-  fi
-
-  remove_virtualenv "$testcase"
-  cleanup_egg_file
-}
-
 function test3()
 {
   testcase="test3"
@@ -497,30 +474,6 @@ function test4()
   cleanup_egg_file
 }
 
-function test5()
-{
-  testcase="test5"
-  info "Testcase $testcase: setup.py install from unpacked source distribution archive: $SRC_DISTFILE"
-  make_virtualenv "$testcase"
-  run "tar -x -v -f $SRC_DISTFILE -C $SRC_DISTFILE_UNPACK_DIR" "Unpacking source distribution archive to: $SRC_DISTFILE_UNPACK_DIR"
-
-  if [[ "$PYWBEM_FROM_REPO" == "true" ]]; then
-    warning "Skipping pywbemcli check because pywbem is installed from repo"
-  elif [[ $(python --version 2>&1) =~ (2\.7\.) ]]; then
-    warning "Skipping pywbemcli check due to issue with backports.functools-lru-cache on Python 2.7"
-  else
-    call "cd $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR; python setup.py install" "Installing with setup.py from unpack directory: $SRC_DISTFILE_UNPACK_DIR/$SRC_DISTFILE_TOP_DIR (latest package levels)"
-
-    verbose "Packages before running pywbemcli:"
-    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
-
-    assert_run_ok "pywbemcli --version"
-  fi
-
-  remove_virtualenv "$testcase"
-  cleanup_egg_file
-}
-
 #----- main
 
 WHL_DISTFILE="$1"  # absolute or relative to caller's cwd
@@ -547,10 +500,8 @@ fi
 prep
 
 test1
-test2
 test3
 test4
-test5
 
 cleanup
 
