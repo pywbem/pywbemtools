@@ -38,14 +38,16 @@ Released: not yet
 
 * Fixed safety issues as of 2023-08-27.
 
+* Test: Circumvented a pip-check-reqs issue by excluding its version 2.5.0.
+
 **Enhancements:**
 
 * Extend tab completion to include connection show, connection delete,
   connection save. (see issue # 1315)
 
 * Changed version of OpenPegasus-wbemserver container for end2end tests
-  from version 0.1.2 to 0.1.3.  This version corrects OpenPegasus issues in 
-  requesting test indications from the wbem server and uses OpenPegasus 
+  from version 0.1.2 to 0.1.3.  This version corrects OpenPegasus issues in
+  requesting test indications from the wbem server and uses OpenPegasus
   2.14.4 or greater. This change will allow end2end indication testing.
 
 **Cleanup:**

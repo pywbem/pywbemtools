@@ -246,8 +246,8 @@ pkginfo==1.4.2
 
 # Package dependency management tools
 pipdeptree==2.2.0
-pip-check-reqs==2.3.2; python_version >= '3.6' and python_version <= '3.10'
-pip-check-reqs==2.4.3; python_version >= '3.11'
+pip-check-reqs==2.3.2; python_version >= '3.6' and python_version <= '3.7'
+pip-check-reqs==2.4.3; python_version >= '3.8'
 
 # pyzmq is used (at least?) by jupyter.
 #pyzmq==16.0.4
