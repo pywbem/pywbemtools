@@ -56,7 +56,7 @@ Released: not yet
 * Fix issue where localhost was always assigned as the pywbemlistener bind
   address. This limited the listener to only receiving indications from the
   same system as the listener itself and only on the local network interface.
-  This change was part of extending the options to allow the user to define 
+  This change was part of extending the options to allow the user to define
   the bind address as part of the start and run commands. (see issue #1296)
 
 * Add pywbemlistener run/start command option --bind-addr to allow the user to
@@ -78,6 +78,8 @@ Released: not yet
   new issues that were added to list May 2023.
 
 * Clean up several documentation syntax issues in the pywbemcli documentation.
+
+* New safety issue(GitPython) Sept 2023, check-reqs issue  ruamel-yaml.
 
 
 **Known issues:**
