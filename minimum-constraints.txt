@@ -353,3 +353,5 @@ ruamel-yaml==0.13.6; python_version == '2.7'
 ruamel-yaml==0.17.21; python_version == '3.6'
 ruamel-yaml==0.17.21; python_version >= '3.7'
 
+subprocess32==3.5.4; python_version == '2.7'
+

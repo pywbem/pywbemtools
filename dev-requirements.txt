@@ -199,3 +199,5 @@ Jinja2>=2.8.1; python_version == '2.7'
 Jinja2>=2.8.1; python_version >= '3.6'
 # Safety issue #51358, affected <2.2
 Jinja2>=2.10.2; python_version >= '3.10'
+
+subprocess32>=3.5.4; python_version == '2.7'

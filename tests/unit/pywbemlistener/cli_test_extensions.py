@@ -24,19 +24,26 @@ import sys
 import os
 import io
 import signal
+import glob
+import six
+import pytest
+
 try:
     from collections.abc import Sequence
 except ImportError:
     # pylint: disable=deprecated-class
     from collections import Sequence
-import subprocess
-import glob
-import six
-import pytest
 
+if os.name == 'posix' and six.PY2:
+    # pylint: disable=import-error
+    import subprocess32 as subprocess
+else:
+    import subprocess
+
+# pylint: disable=wrong-import-position
 from ..utils import execute_command, assert_rc, assert_patterns, \
     assert_patterns_in_lines
-
+# pylint: enable=wrong-import-position
 
 # The boolean conditions, for better readability
 RUN = True
@@ -129,6 +136,7 @@ def pywbemlistener_test(desc, inputs, exp_results, condition):
 
     if verbose:
         print("\nExecuting testcase: {}".format(desc))
+        sys.stdout.flush()
 
     ensure_no_listeners(verbose, 'test setup')
     start_listeners(input_listeners, verbose, 'test setup')
@@ -184,6 +192,7 @@ def ensure_no_listeners(verbose, situation):
     cmd_args = 'pywbemlistener -o plain list'
     if verbose:
         print("{}: Listing listeners: {}".format(situation, cmd_args))
+        sys.stdout.flush()
     out = check_output(cmd_args, situation, "Listing listeners failed", verbose)
     lis_lines = out.decode('utf-8').rstrip('\n').split('\n')
     for lis_line in lis_lines[1:]:
@@ -191,6 +200,7 @@ def ensure_no_listeners(verbose, situation):
         cmd_args = 'pywbemlistener stop {}'.format(lis_name)
         if verbose:
             print("{}: Stopping listener: {}".format(situation, cmd_args))
+            sys.stdout.flush()
         check_output(cmd_args, situation, "Stopping listener failed", verbose)
 
 
@@ -214,11 +224,14 @@ def start_listeners(input_listeners, verbose, situation):
             format(verbose_opts, ' '.join(lis_args))
         if verbose:
             print("{}: Starting listener: {}".format(situation, cmd_args))
+            sys.stdout.flush()
         check_output(cmd_args, situation, "Starting listener failed", verbose)
 
 
+# https://bugs.python.org/issue1652
+# https://stackoverflow.com/questions/23064636/python-subprocess-popen-blocks-with-shell-and-pipe
 def restore_signals():
-    """Fix"""
+    """Fix for issue with signals in python 2.7 and linux"""
     signals = ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ')
     for sig in signals:
         if hasattr(signal, sig):
@@ -243,25 +256,43 @@ def check_output(cmd_args, situation, msg, verbose):
             print("{}: Command (shell): {}".format(situation, cmd_args))
             sys.stdout.flush()
         # pylint: disable=consider-using-with
-        # pylint: disable=subprocess-popen-preexec-fn
-        p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE,
-                             preexec_fn=restore_signals)
         if six.PY2:
+            # if (sys.platform == 'linux'):
+            # p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE,
+            #                         preexec_fn=restore_signals)
+            # else:
+            p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
             try:
                 if verbose:
-                    print("Debug: {}: Calling p.communicate()".
+                    print("Debug: {}: Calling p.communicate".
                           format(situation))
-                    sys.stdout.flush()
-                out, err = p.communicate()
+                sys.stdout.flush()
+                out, err = p.communicate(timeout=30)
+                err = None
                 if verbose:
                     print("Debug: {}: Returned from p.communicate() with "
-                          "{!r} B on stdout, {!r} B on stderr".
+                          "{!r} B on out, {!r} B on stderr".
                           format(situation, len(out) if out else None,
                                  len(err) if err else None))
                     sys.stdout.flush()
-            except Exception as exc:
+            except subprocess.TimeoutExpired as exc:
                 if verbose:
                     print("Debug: {}: p.communicate() raised {}: {}".
+                          format(situation, exc.__class__.__name__, exc))
+                    sys.stdout.flush()
+                p.kill()
+                p.wait()
+                debug_log = "debug.log"
+                if os.path.exists(debug_log):
+                    with io.open(debug_log, 'r', encoding='utf-8') as log_fp:
+                        log_lines = log_fp.readlines()
+                        print("{}".format(log_lines))
+                    os.remove(debug_log)
+
+                raise
+            except Exception as exc:
+                if verbose:
+                    print("Debug: {}: p.checkoutput() raised {}: {}".
                           format(situation, exc.__class__.__name__, exc))
                     sys.stdout.flush()
                 p.kill()
@@ -277,9 +308,9 @@ def check_output(cmd_args, situation, msg, verbose):
                       format(situation, rc))
                 sys.stdout.flush()
             if rc:
-                raise subprocess.CalledProcessError(
-                    rc, cmd_args, output=out)
+                raise p.CalledProcessError(rc, cmd_args, output=out)
         else:
+            p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
             try:
                 if verbose:
                     print("Debug: {}: Calling p.communicate(timeout=30)".

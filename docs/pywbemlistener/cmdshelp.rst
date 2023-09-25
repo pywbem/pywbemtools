@@ -18,8 +18,8 @@ Help text for ``pywbemlistener``:
 
       The pywbemlistener command can run and manage WBEM listeners.
 
-      Each listener is a process that executes the 'pywbemlistener run' command to receive WBEM indications sent from a WBEM
-      server.
+      Each listener is a process that executes the 'pywbemlistener run' command to receive WBEM indications sent from a
+      WBEM server.
 
       A listener process can be started with the 'pywbemlistener start' command and stopped with the 'pywbemlistener stop'
       command.
@@ -40,15 +40,20 @@ Help text for ``pywbemlistener``:
     General Options:
       -o, --output-format FORMAT  Output format for the command result. FORMAT is one of the table formats:
                                   [table|plain|simple|grid|psql|rst|html].
+
       -l, --logdir DIR            Enable logging of the 'pywbemlistener run' command output to a file in a log directory.
                                   The file will be named 'pywbemlistener_NAME.log' where NAME is the listener name. Default:
                                   EnvVar PYWBEMLISTENER_LOGDIR, or no logging.
+
       -v, --verbose               Verbosity level. Can be specified multiple times: -v: Display indication processing
                                   settings; -vv: Display interactions between start and run commands.
+
       --pdb                       Pause execution in the built-in pdb debugger just before executing the command within
                                   pywbemlistener. Default: EnvVar PYWBEMLISTENER_PDB, or no debugger.
+
       --warn                      Enable display of all Python warnings. Default: Leave warning control to the
                                   PYTHONWARNINGS EnvVar, which by default displays no warnings.
+
       --version                   Show the version of this command and the pywbem package.
       -h, --help                  Show this help message.
 
@@ -103,9 +108,9 @@ Help text for ``pywbemlistener help`` (see :ref:`pywbemlistener help command`):
 
       Show help for pywbemlistener subjects.
 
-      Show help for specific pywbemlistener subjects.  This is in addition to the help messages that are available with the
-      -h or --help option for every command group and command in pywbemlistener. It helps document pywbemlistener subjects
-      that are more general than specific commands and configuration subjects that do not have specific commands
+      Show help for specific pywbemlistener subjects.  This is in addition to the help messages that are available with
+      the -h or --help option for every command group and command in pywbemlistener. It helps document pywbemlistener
+      subjects that are more general than specific commands and configuration subjects that do not have specific commands
 
       If there is no argument provided, outputs a list and summary of the existing help subjects.
 
@@ -172,30 +177,40 @@ Help text for ``pywbemlistener run`` (see :ref:`pywbemlistener run command`):
     Command Options:
       --start-pid PID              PID of the "pywbemlistener start" process to be notified about the startup of the run
                                    command. Default: No such notification will happen.
+
       -p, --port PORT              The port number the listener will open to receive indications. This can be any available
                                    port. Default: 25989
+
       -s, --scheme SCHEME          The scheme used by the listener (http, https). Default: https
       -b, --bind-addr HOST         A host name or IP address to which this listener will be bound. Binding the listener
                                    defines the indication destination host name or IP address for which this listener will
                                    accept indications. The default accepts indications addressed to any network interfaces
                                    on the listener system.
+
       -c, --certfile FILE          Path name of a PEM file containing the certificate that will be presented as a server
                                    certificate during SSL/TLS handshake. Required when using https. The file may in addition
                                    contain the private key of the certificate. Default: EnvVar PYWBEMLISTENER_CERTFILE, or
                                    no certificate file.
+
       -k, --keyfile FILE           Path name of a PEM file containing the private key of the server certificate. Required
                                    when using https and when the certificate file does not contain the private key. Default:
                                    EnvVar PYWBEMLISTENER_KEYFILE, or no key file.
+
       --indi-call MODULE.FUNCTION  Call a Python function for each received indication. Invoke with --help-call for details
                                    on the function interface. Default: No function is called.
+
       --indi-file FILE             Append received indications to a file. The format can be modified using the --indi-format
                                    option. Default: Not appended.
+
       --indi-format FORMAT         Sets the format to be used when displaying received indications. Invoke with --help-
                                    format for details on the format specification. Default: "{dt} {h} {i_mof}".
+
       --help-format                Show help message for the format specification used with the --indi-format option and
                                    exit.
+
       --help-call                  Show help message for calling a Python function for each received indication when using
                                    the --indi-call option and exit.
+
       -h, --help                   Show this help message.
 
 
@@ -252,28 +267,37 @@ Help text for ``pywbemlistener start`` (see :ref:`pywbemlistener start command`)
     Command Options:
       -p, --port PORT              The port number the listener will open to receive indications. This can be any available
                                    port. Default: 25989
+
       -s, --scheme SCHEME          The scheme used by the listener (http, https). Default: https
       -b, --bind-addr HOST         A host name or IP address to which this listener will be bound. Binding the listener
                                    defines the indication destination host name or IP address for which this listener will
                                    accept indications. The default accepts indications addressed to any network interfaces
                                    on the listener system.
+
       -c, --certfile FILE          Path name of a PEM file containing the certificate that will be presented as a server
                                    certificate during SSL/TLS handshake. Required when using https. The file may in addition
                                    contain the private key of the certificate. Default: EnvVar PYWBEMLISTENER_CERTFILE, or
                                    no certificate file.
+
       -k, --keyfile FILE           Path name of a PEM file containing the private key of the server certificate. Required
                                    when using https and when the certificate file does not contain the private key. Default:
                                    EnvVar PYWBEMLISTENER_KEYFILE, or no key file.
+
       --indi-call MODULE.FUNCTION  Call a Python function for each received indication. Invoke with --help-call for details
                                    on the function interface. Default: No function is called.
+
       --indi-file FILE             Append received indications to a file. The format can be modified using the --indi-format
                                    option. Default: Not appended.
+
       --indi-format FORMAT         Sets the format to be used when displaying received indications. Invoke with --help-
                                    format for details on the format specification. Default: "{dt} {h} {i_mof}".
+
       --help-format                Show help message for the format specification used with the --indi-format option and
                                    exit.
+
       --help-call                  Show help message for calling a Python function for each received indication when using
                                    the --indi-call option and exit.
+
       -h, --help                   Show this help message.
 
 
@@ -332,5 +356,6 @@ Help text for ``pywbemlistener test`` (see :ref:`pywbemlistener test command`):
       -c, --count INT      Count of test indications to send. Default: 1
       -l, --listener HOST  Listener host name or IP address. The indications are sent to this host name or IP address.
                            Default: localhost
+
       -h, --help           Show this help message.
 

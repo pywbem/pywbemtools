@@ -29,7 +29,7 @@ from ._context_obj import ContextObj
 from . import _config
 from .._click_extensions import PywbemtoolsTopGroup, GENERAL_OPTS_TXT, \
     SUBCMD_HELP_TXT
-from .._utils import pywbemtools_warn, get_terminal_width
+from .._utils import pywbemtools_warn, get_terminal_width, debug_log
 from .._options import add_options, help_option
 from .._output_formatting import OUTPUT_FORMAT_GROUPS, OUTPUT_FORMATS
 
@@ -128,7 +128,13 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
 
         https://pywbemtools.readthedocs.io/en/stable/
     """
-    # debug_log("CLI call")
+    def get_ctx_info():
+        ctx = click.get_current_context()
+        return 'info_name={!r}, subcommand={!r}, ' \
+               'command={!r}, params={!r}'. \
+               format(ctx.info_name, ctx.invoked_subcommand,
+                      ctx.command, ctx.params)
+    debug_log("CLI call {}".format(get_ctx_info()))
     if warn:
         warnings.simplefilter('once')
     # else: Leave warning control to the PYTHONWARNINGS env var.

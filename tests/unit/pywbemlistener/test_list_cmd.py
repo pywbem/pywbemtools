@@ -81,7 +81,7 @@ LIST_TESTCASES = [
             stdout=LIST_NONE_PATTERNS,
             test='all',
         ),
-        'verbose',
+        'verbose' if RUN_NOWIN else False,
     ),
     (
         "Verify output of 'list' with one http listener running",

@@ -170,4 +170,4 @@ def debug_log(msg):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     caller = inspect.stack()[1][3]
     with io.open("debug.log", "a", encoding='utf-8') as fp:
-        fp.write("{} {}: {}\n".format(timestamp, caller, msg))
+        fp.write(ensure_unicode("{} {}: {}\n".format(timestamp, caller, msg)))

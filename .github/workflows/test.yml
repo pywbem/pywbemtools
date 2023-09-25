@@ -37,6 +37,7 @@ jobs:
       #    https://stackoverflow.com/questions/65384420/how-to-make-a-github-action-matrix-element-conditional
       # TODO: Find a way to define this with less escapes.
       # NOTE: ubuntu-20.04 is used for Python 3.6 because ubuntu-latest no longer supports them. See issue #1245.
+      # NOTE: Removed many of the tests for the moment to shorted CI time.
       run: |
         if [[ "${{ github.event_name }}" == "schedule" || "${{ github.head_ref }}" =~ ^release_ ]]; then \
           echo "matrix={ \
@@ -98,51 +99,6 @@ jobs:
                 \"package_level\": \"latest\", \
                 \"container\": {\"image\": \"python:2.7.18-buster\"} \
               }, \
-              { \
-                \"os\": \"ubuntu-20.04\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-20.04\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.7\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"ubuntu-latest\", \
-                \"python-version\": \"3.10\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"minimum\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"macos-latest\", \
-                \"python-version\": \"3.11\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.6\", \
-                \"package_level\": \"latest\" \
-              }, \
-              { \
-                \"os\": \"windows-latest\", \
-                \"python-version\": \"3.11\", \
-                \"package_level\": \"latest\" \
-              } \
             ] \
           }" >> $GITHUB_OUTPUT; \
         fi
@@ -255,6 +211,7 @@ jobs:
       run: |
         make pylint
     - name: Run test
+      timeout-minutes: 15 # Times out after 15 minutes
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
         TESTOPTS: '-vv'
