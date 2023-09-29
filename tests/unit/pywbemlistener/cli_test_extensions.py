@@ -261,7 +261,7 @@ def check_output(cmd_args, situation, msg, verbose):
             # p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE,
             #                         preexec_fn=restore_signals)
             # else:
-            p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
+            p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE)
             try:
                 if verbose:
                     print("Debug: {}: Calling p.communicate".
