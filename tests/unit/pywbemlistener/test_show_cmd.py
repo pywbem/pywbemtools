@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
+from .cli_test_extensions import pywbemlistener_test, RUN
 
 # pylint: disable=use-dict-literal
 
@@ -110,7 +110,7 @@ SHOW_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN,
     ),
 ]
 

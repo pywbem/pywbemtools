@@ -371,3 +371,4 @@ ruamel-yaml==0.13.6; python_version == '2.7'
 #safety 2.2.0 depends on ruamel.yaml>=0.17.21
 ruamel-yaml==0.17.21; python_version == '3.6'
 ruamel-yaml==0.17.21; python_version >= '3.7'
+subprocess32==3.5.4; python_version == '2.7'

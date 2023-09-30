@@ -156,6 +156,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         print('\nEnvironment: {}'.format(display_envvars))
         if stdin is not None:
             print('Stdin: {!r}'.format(stdin))
+        sys.stdout.flush()
 
     if capture:
         stdin_stream = PIPE
@@ -168,6 +169,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         if stdin is not None:
             if verbose:
                 print('Suppressing stdin because not capturing')
+                sys.stdout.flush()
             stdin = None
 
     if CLICK_ISSUE_1231:
@@ -198,6 +200,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
 
         if verbose:
             print('Command (shell): {}'.format(cmd_args))
+            sys.stdout.flush()
 
         # pylint: disable=consider-using-with
         proc = Popen(cmd_args, shell=True, stdin=None,
@@ -215,6 +218,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                 print("Error: Timeout ({} sec) when waiting for command to "
                       "complete; Killed process and setting rc={}".
                       format(cmd_timeout, rc))
+                sys.stdout.flush()
         else:
             # Python < 3.3
             proc.wait()
@@ -228,6 +232,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     else:
         if verbose:
             print('Command (direct): {}'.format(cmd_args))
+            sys.stdout.flush()
 
         # pylint: disable=consider-using-with
         proc = Popen(cmd_args, shell=False, stdin=stdin_stream,
@@ -251,6 +256,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                       "complete; Killed process and setting rc={}; Stdout "
                       "produced so far: {!r}; Stderr produced so far: {!r}".
                       format(cmd_timeout, rc, stdout_str, stderr_str))
+                sys.stdout.flush()
         else:
             # Python < 3.3
             stdout_str, stderr_str = proc.communicate(input=stdin)
@@ -268,6 +274,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         if capture:
             print('Stdout: {!r}'.format(stdout_str))
             print('Stderr: {!r}'.format(stderr_str))
+        sys.stdout.flush()
 
     if stdout_str is not None:
         if isinstance(stdout_str, six.binary_type):

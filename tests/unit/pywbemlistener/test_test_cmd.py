@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
+from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN_NO_PY27
 
 # pylint: disable=use-dict-literal
 
@@ -100,7 +100,7 @@ TEST_TESTCASES = [
             ],
             test='contains',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify 'test' with one http listener running and -c 2",
@@ -119,7 +119,7 @@ TEST_TESTCASES = [
             ],
             test='contains',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify 'test' with one http listener running and --count 2",
@@ -138,7 +138,7 @@ TEST_TESTCASES = [
             ],
             test='contains',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify 'test' with one http listener running and invalid --count 0",
@@ -155,7 +155,7 @@ TEST_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
 ]
 
