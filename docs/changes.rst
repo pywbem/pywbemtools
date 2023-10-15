@@ -34,6 +34,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Split safety run out of "check" make target ino a separate "safety" make target
+  and moved its run to the end of the test workflow.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
