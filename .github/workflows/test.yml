@@ -318,6 +318,11 @@ jobs:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
       run: |
         make installtest
+    - name: Run safety
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+      run: |
+        make safety
 
   test_finish:
     needs: test
