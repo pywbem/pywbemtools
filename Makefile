@@ -342,11 +342,12 @@ help:
 	@echo "  build      - Build the distribution archive files in: $(dist_dir)"
 	@echo "  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)"
 	@echo "  builddoc   - Build documentation in: $(doc_build_dir)"
-	@echo "  check      - Run PyLint and Flake8 on sources and save results in: pylint.log and flake8.log"
+	@echo "  check      - Run Flake8 on sources"
 	@echo "  pylint     - Run PyLint on sources"
 	@echo "  test       - Run unit and function tests"
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
 	@echo "  installtest - Run install tests"
+	@echo "  safety     - Run Safety on sources"
 	@echo "  end2endtest - Run end2end tests (in tests/end2endtest)"
 	@echo "               Env.var TEST_SERVER_IMAGE can be used to specify the Docker image with the WBEM server"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
@@ -505,11 +506,15 @@ flake8: flake8_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo 'Makefile: Target $@ done.'
 
 .PHONY: check
-check: flake8_$(pymn)_$(PACKAGE_LEVEL).done safety_$(pymn)_$(PACKAGE_LEVEL).done
+check: flake8_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: pylint
 pylint: pylint_$(pymn)_$(PACKAGE_LEVEL).done
+	@echo "Makefile: Target $@ done."
+
+.PHONY: safety
+safety: safety_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: todo
