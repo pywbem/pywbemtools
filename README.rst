@@ -1,21 +1,21 @@
 pywbemtools: Python tools for communicating with WBEM servers
 =============================================================
 
-.. image:: https://badge.fury.io/py/pywbemtools.svg
+.. image:: https://img.shields.io/pypi/v/pywbemtools.svg
     :target: https://pypi.python.org/pypi/pywbemtools/
-    :alt: PyPI version
+    :alt: Version on Pypi
 
-.. image:: https://github.com/pywbem/pywbemtools/workflows/test/badge.svg?branch=master
-    :target: https://github.com/pywbem/pywbemtools/actions/
-    :alt: Actions status
+.. image:: https://github.com/pywbem/pywbemtools/actions/workflows/test.yml/badge.svg?branch=master
+    :target: https://github.com/pywbem/pywbemtools/actions/workflows/test.yml?query=branch%3Amaster
+    :alt: Test status (master)
 
 .. image:: https://readthedocs.org/projects/pywbemtools/badge/?version=latest
     :target: https://readthedocs.org/projects/pywbemtools/builds/
-    :alt: ReadTheDocs status
+    :alt: Docs status (master)
 
 .. image:: https://coveralls.io/repos/github/pywbem/pywbemtools/badge.svg?branch=master
     :target: https://coveralls.io/github/pywbem/pywbemtools?branch=master
-    :alt: Coveralls result
+    :alt: Test coverage (master)
 
 .. image:: https://img.shields.io/pypi/pyversions/pywbemtools.svg?color=brightgreen
     :target: https://pypi.python.org/pypi/pywbemtools/
