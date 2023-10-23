@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN
+from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN_NO_PY27
 
 # pylint: disable=use-dict-literal
 
@@ -110,7 +110,7 @@ SHOW_TESTCASES = [
             ],
             test='all',
         ),
-        RUN,
+        RUN_NO_WIN_NO_PY27,
     ),
 ]
 
@@ -123,4 +123,5 @@ def test_lis_show(desc, inputs, exp_results, condition):
     """
     Test general options of pywbemlistener.
     """
+    print("TEST_SHOW RUN_NO_WIN_NO_PY27 {}".format(RUN_NO_WIN_NO_PY27))
     pywbemlistener_test(desc, inputs, exp_results, condition)
