@@ -23,24 +23,36 @@ from __future__ import absolute_import, print_function
 import sys
 import os
 import io
+import glob
+import pytest
+import six
+
 try:
     from collections.abc import Sequence
 except ImportError:
     # pylint: disable=deprecated-class
     from collections import Sequence
-import subprocess
-import glob
-import six
-import pytest
 
+if os.name == 'posix' and six.PY2:
+    # pylint: disable=import-error
+    import subprocess32 as subprocess
+else:
+    import subprocess  # pylint: disable=reimport
+
+# pylint: disable=wrong-import-position
 from ..utils import execute_command, assert_rc, assert_patterns, \
     assert_patterns_in_lines
-
+# pylint: enable=wrong-import-position
 
 # The boolean conditions, for better readability
 RUN = True
 SKIP = False
 RUN_NOWIN = sys.platform != 'win32'
+# See issue #1327 Disable all tests that fail because of this issue
+RUN_NO_PY27 = six.PY3
+
+# Do not run tests that use either windows or python 2.7
+RUN_NO_WIN_NO_PY27 = RUN_NOWIN and RUN_NO_PY27
 
 
 def pywbemlistener_test(desc, inputs, exp_results, condition):
@@ -128,6 +140,7 @@ def pywbemlistener_test(desc, inputs, exp_results, condition):
 
     if verbose:
         print("\nExecuting testcase: {}".format(desc))
+        sys.stdout.flush()
 
     ensure_no_listeners(verbose, 'test setup')
     start_listeners(input_listeners, verbose, 'test setup')
@@ -183,6 +196,7 @@ def ensure_no_listeners(verbose, situation):
     cmd_args = 'pywbemlistener -o plain list'
     if verbose:
         print("{}: Listing listeners: {}".format(situation, cmd_args))
+        sys.stdout.flush()
     out = check_output(cmd_args, situation, "Listing listeners failed", verbose)
     lis_lines = out.decode('utf-8').rstrip('\n').split('\n')
     for lis_line in lis_lines[1:]:
@@ -190,6 +204,7 @@ def ensure_no_listeners(verbose, situation):
         cmd_args = 'pywbemlistener stop {}'.format(lis_name)
         if verbose:
             print("{}: Stopping listener: {}".format(situation, cmd_args))
+            sys.stdout.flush()
         check_output(cmd_args, situation, "Stopping listener failed", verbose)
 
 
@@ -234,7 +249,7 @@ def check_output(cmd_args, situation, msg, verbose):
         p = subprocess.Popen(cmd_args, shell=True, stdout=subprocess.PIPE)
         if six.PY2:
             try:
-                out, _ = p.communicate()
+                out, _ = p.communicate(timeout=15)
             except Exception:
                 p.kill()
                 p.wait()
@@ -257,6 +272,7 @@ def check_output(cmd_args, situation, msg, verbose):
     except Exception as exc:
         # Note: The exception message contains the command line
         print("{}: Error: {}: {}".format(situation, msg, exc))
+        sys.stdout.flush()
         if hasattr(exc, 'output'):
             out = exc.output
             if isinstance(out, six.binary_type):
@@ -264,6 +280,7 @@ def check_output(cmd_args, situation, msg, verbose):
             print("Begin of command output (stdout):")
             print(out)
             print("End of command output")
+            sys.stdout.flush()
         if hasattr(exc, 'stderr'):
             err = exc.stderr
             if isinstance(err, six.binary_type):
@@ -271,6 +288,7 @@ def check_output(cmd_args, situation, msg, verbose):
             print("Begin of command output (stderr):")
             print(err)
             print("End of command output")
+            sys.stdout.flush()
         if verbose:
             # We do not have the listener name at this point, but there
             # should be only one log file, if any.
@@ -283,6 +301,7 @@ def check_output(cmd_args, situation, msg, verbose):
                 print("Begin of log file {}:".format(log_file))
                 print(log_data)
                 print("End of log file")
+                sys.stdout.flush()
         raise
     return out
 

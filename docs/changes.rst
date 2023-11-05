@@ -28,9 +28,20 @@ Released: not yet
 * Fixed issue with PyYAML 5.4 installation on Python>=3.10 that fails since
   the recent release of Cython 3.
 
+* Correct issue in tab completion for --name argument and option where
+  invalid co:nnection file could cause exception.  Changes messages issued
+  for error to warning. This eliminates most tests of pywbemlistener but
+  only with Python 2.7 and that version of Python is deprecated
+  (see issue #1316)
+
 * Fixed safety issues as of 2023-08-27.
 
 * Test: Circumvented a pip-check-reqs issue by excluding its version 2.5.0.
+
+* Test: cicumvented a test failure with pywbemlistener and python 2.7 by
+  disabling a significant number of pywbemlistener tests for python 2.7 and
+  modifying the packages to use subprocess32 in place of subprocess with
+  python 2.7 in case any tests fail.  (see issue #1327)
 
 **Enhancements:**
 

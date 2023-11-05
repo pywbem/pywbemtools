@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NOWIN
+from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN_NO_PY27
 from ..utils import CLICK_VERSION
 
 # pylint: disable=use-dict-literal
@@ -140,7 +140,7 @@ START_TESTCASES = [
                     r"'badscheme' is not one of 'http', 'https'"],
             test='contains',
         ),
-        RUN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' on existing listener",
@@ -155,7 +155,7 @@ START_TESTCASES = [
             stderr=START_EXISTS_PATTERNS,
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' on non-existing listener with http",
@@ -166,7 +166,7 @@ START_TESTCASES = [
             stdout=[''],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https without "
@@ -180,7 +180,7 @@ START_TESTCASES = [
                     r"https_port requires certfile"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https with "
@@ -195,7 +195,7 @@ START_TESTCASES = [
                     r"Issue opening certificate/key file"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' on non-existing listener with https and "
@@ -211,7 +211,7 @@ START_TESTCASES = [
                     r"certificate file"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' on non-existing listener with https and "
@@ -224,7 +224,7 @@ START_TESTCASES = [
             stdout=[''],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' on non-existing listener with https and "
@@ -238,7 +238,7 @@ START_TESTCASES = [
             stdout=[''],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
 
     # Test starting listeners with indication processing options and -v
@@ -254,7 +254,7 @@ START_TESTCASES = [
             stdout=[''],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' with --indi-call on valid module.function, "
@@ -285,7 +285,7 @@ START_TESTCASES = [
             ),
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' with --indi-call on non-existing module",
@@ -300,7 +300,7 @@ START_TESTCASES = [
                     r"No module named .?nomodule.?"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' with --indi-call on existing module with "
@@ -316,7 +316,7 @@ START_TESTCASES = [
                     r"tests\.unit\.pywbemlistener\.indicall_display"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' with --indi-call on existing module that "
@@ -332,7 +332,7 @@ START_TESTCASES = [
                     r"indicall_importerror: ImportError"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' with --indi-file on non-existing file, no "
@@ -345,7 +345,7 @@ START_TESTCASES = [
             stdout=[''],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify success of 'start' with --indi-file on non-existing file, with "
@@ -372,7 +372,7 @@ START_TESTCASES = [
             ),
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
 
     # Test starting listeners with -vv
@@ -397,7 +397,7 @@ START_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
     (
         "Verify failure of 'start' with --vv and same port as existing "
@@ -415,7 +415,7 @@ START_TESTCASES = [
                     r"WBEM listener port 50001 is already in use"],
             test='all',
         ),
-        RUN_NOWIN,
+        RUN_NO_WIN_NO_PY27,
     ),
 ]
 
