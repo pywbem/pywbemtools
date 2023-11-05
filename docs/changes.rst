@@ -16,6 +16,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Addressed safety issues up to 2023-11-05.
+
 * Fixed coveralls issues with KeyError and HTTP 422 Unprocessable Entity.
 
 * Disallow the use of the click_repl version 3.0 because it cannot
@@ -33,8 +35,6 @@ Released: not yet
   for error to warning. This eliminates most tests of pywbemlistener but
   only with Python 2.7 and that version of Python is deprecated
   (see issue #1316)
-
-* Fixed safety issues as of 2023-08-27.
 
 * Test: Circumvented a pip-check-reqs issue by excluding its version 2.5.0.
 
