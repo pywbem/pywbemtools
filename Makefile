@@ -532,6 +532,7 @@ clobber: clean
 	-$(call RM_FUNC,*.done epydoc.log $(dist_files) pywbem_os_setup.*)
 	-$(call RMDIR_FUNC,$(doc_build_dir) .tox $(coverage_html_dir))
 	-$(call RM_R_FUNC,*cover)
+	-$(call RM_R_FUNC,*.done)
 	@echo "Makefile: Done removing everything for a fresh start"
 	@echo "Makefile: Target $@ done."
 
