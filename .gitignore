@@ -18,6 +18,7 @@ MANIFEST
 /AUTHORS
 /ChangeLog
 /*.done
+/done/*.done
 pylint_done
 wbemcli.log
 .coverage
