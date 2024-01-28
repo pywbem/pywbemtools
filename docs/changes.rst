@@ -16,7 +16,7 @@ Released: not yet
 
 **Bug fixes:**
 
-* Addressed safety issues up to 2023-11-26.
+* Addressed safety issues up to 2024-01-28.
 
 * Fixed coveralls issues with KeyError and HTTP 422 Unprocessable Entity.
 
