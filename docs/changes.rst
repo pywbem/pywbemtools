@@ -43,6 +43,8 @@ Released: not yet
   modifying the packages to use subprocess32 in place of subprocess with
   python 2.7 in case any tests fail.  (see issue #1327)
 
+* Development: Fixed dependency issue with safety 3.0.0 by pinning it.
+
 **Enhancements:**
 
 * Split safety run out of "check" make target ino a separate "safety" make target
