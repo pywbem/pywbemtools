@@ -102,6 +102,8 @@ security:
             reason: Fixed tornado version 6.3.3 requires Python>=3.8 and is used there
         62044:
             reason: Fixed pip version 23.3 requires Python>=3.7 and is used there
+        62817:
+            reason: Fixed prompt-toolkit version 3.0.13 requires Python>=3.6 and is used there
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False
