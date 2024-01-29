@@ -56,6 +56,8 @@ Released: not yet
 
 **Enhancements:**
 
+* Added support for Python 3.12.
+
 * Extend tab completion to include connection show, connection delete,
   connection save. (see issue # 1315)
 
