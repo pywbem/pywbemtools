@@ -87,7 +87,7 @@ The pywbemtools package is supported in these environments:
 
 * Operating systems: Linux, Windows (native and Unix-like environments
   (ex. Cygwin), OS-X
-* Python versions: 2.7, 3.4, and greater
+* Python versions: 2.7, 3.6, and greater
 * WBEM servers: Any WBEM server that conforms to the DMTF specifications listed
   in :ref:`Standards conformance`. WBEM servers supporting older versions of
   these standards are also supported, but may have limitations.

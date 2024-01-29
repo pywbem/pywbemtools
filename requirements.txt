@@ -29,7 +29,8 @@ six>=1.16.0; python_version >= '3.10'
 Click>=7.1.1,<8.0; python_version == '2.7'
 # Safety package requires click 8.0.2 minimum
 Click>=8.0.2; python_version >= '3.6'
-click-spinner>=0.1.8
+click-spinner>=0.1.8; python_version <= '3.11'
+click-spinner>=0.1.10; python_version >= '3.12'
 # click-repl 0.2 is needed for compatibility with Click 8.0.
 # click-repl version 3.0 causes test failures. See issue #1312
 click-repl>=0.1.6,<0.3.0; python_version == '2.7'
