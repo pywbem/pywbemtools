@@ -301,11 +301,11 @@ when you need to have control over how exactly the process runs in the
 background.
 
 The argument and options for the run command are the same as for the
-``pywbemlistener start11 command.
+``pywbemlistener start`` command.
 
-Note: The --start-pid option is needed because on Windows, the ``pywbemlistener
-  run`` command is not the direct child process of the `pywbemlistener start`
-  command starting it.
+Note: The --start-pid option is needed because on Windows, the
+``pywbemlistener run`` command is not the direct child process of the
+``pywbemlistener start`` command starting it.
 
 See :ref:`pywbemlistener run --help` for the exact help output of the command.
 
@@ -369,4 +369,3 @@ to open a new browser window with the top level page of that documentation and
 immediatly terminates or returns to the repl command line.
 
 This is ``experimental`` as of pywbemtools 1.2.0.
-
