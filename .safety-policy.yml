@@ -107,7 +107,7 @@ security:
         63687:
             reason: Fixed GitPython version 3.1.41 requires Python>=3.7 and is used there
         64227:
-            reason: Fixed Jinja2 version 3.1.3 requires Python>=3.7 and is used there
+            reason: Fixed Jinja2 version 3.1.3 requires Python>=3.7 and is used on Python>=3.10
 
     # Continue with exit code 0 when vulnerabilities are found.
     continue-on-vulnerability-error: False
