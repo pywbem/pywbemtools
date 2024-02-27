@@ -496,8 +496,7 @@ def cmd_server_schema(context, options):
                 # update the namespace max version if this schema is a
                 # DMTF schema and not previously found
                 if schema in possible_dmtf_schemas:
-                    if version > ns_max_dmtf_version:
-                        ns_max_dmtf_version = version
+                    ns_max_dmtf_version = max(ns_max_dmtf_version, version)
 
                 # update the version in the schema_max_ver dictionary
                 if schema not in schema_max_ver or \
