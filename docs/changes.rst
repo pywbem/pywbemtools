@@ -47,6 +47,9 @@ Released: not yet
 
 * Test: Upgraded GitHub Actions plugins to use node.js 20.
 
+* Test: Fixed issues resulting from removal of support for pytest.warns(None)
+  in pytest version 8.
+
 **Enhancements:**
 
 * Split safety run out of "check" make target ino a separate "safety" make target
