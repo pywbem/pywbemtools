@@ -54,6 +54,9 @@ Released: not yet
 
 * Test: Upgraded GitHub Actions plugins to use node.js 20.
 
+* Test: Fixed issues resulting from removal of support for pytest.warns(None)
+  in pytest version 8.
+
 **Enhancements:**
 
 * Added support for Python 3.12.
