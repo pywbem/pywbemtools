@@ -1,15 +1,12 @@
-# Additional pip requirements file for pywbemtools development dependencies.
-#
-# The order of packages is significant, because pip processes them in the order
-# of appearance.
-
-# Make sure that the package versions in minimum-constraints.txt are also
-# the minimum versions required in requirements.txt and dev-requirements.txt.
+# Pip requirements file for development dependencies.
 
 
+# Include install dependencies
 -r requirements.txt
 
-# Direct dependencies:
+
+# Direct dependencies for development and indirect dependencies for development
+# that are needed for some reason (must be consistent with minimum-constraints.txt)
 
 # Unit test (imports into testcases):
 # pytest 5.0.0 requires Python version 3.5
@@ -28,23 +25,6 @@ colorama>=0.4.5; python_version >= '3.6'
 importlib-metadata>=2.1.3,<5.0.0; python_version <= '3.5'
 importlib-metadata>=4.8.3,<5.0.0; python_version >= '3.6'
 
-# urllib3 < 2.0.0 required for python < 3.7
-# TODO: Following limits use of urllib3 <= 2.0  for python < 3.7 until issues
-# about upgrade resolved. Issue #1302 updates urllib3 to version 2.0.
-# Python <= 3.7 required for urllib3 <= 2.0.0
-urllib3>=1.26.18,<2.0.0; python_version == '2.7'
-urllib3>=1.26.18,<2.0.0; python_version == '3.6'
-urllib3>=1.26.18; python_version >= '3.7'
-
-# more-itertools version 8.11 requires python 3.6, See issue #2796
-more-itertools>=4.0.0,!=8.11.0; python_version < '3.6'
-more-itertools>=4.0.0; python_version >= '3.6'
-
-# Virtualenv
-virtualenv>=16.1.0,!=20.0.19,!=20.0.32; python_version <= '3.7'
-virtualenv>=20.15.0; python_version >= '3.8' and python_version <= '3.11'  # requires six<2,>=1.12.0
-virtualenv>=20.23.0; python_version >= '3.12'
-
 # Coverage reporting (no imports, invoked via coveralls script):
 coverage>=5.0
 pytest-cov>=2.7.0
@@ -58,7 +38,6 @@ coveralls>=3.3.0; python_version >= '3.6'
 #   (see issue https://github.com/pyupio/safety/issues/496)
 #   TODO: Unpin safety<3.0.0 once the exact version issue is resolved.safety>=1.8.7,<1.9.0; python_version == '2.7'
 safety>=2.2.0,!=2.3.5,<3.0.0; python_version >= '3.6'
-
 # dparse 0.5.0 has an infinite recursion issue on Python 2.7,
 #   see https://github.com/pyupio/dparse/issues/46
 dparse>=0.4.1,<0.5.0; python_version == '2.7'
@@ -67,7 +46,18 @@ dparse>=0.6.2; python_version >= '3.6'
 ruamel.yaml>=0.17.21,<0.17.22; python_version == '3.6'
 ruamel.yaml>=0.17.21; python_version >= '3.7'
 
-# PyYAML is covered in requirements.txt
+# Tox
+tox==2.5.0
+# tox 3.17 requires six>=1.14.0
+
+# more-itertools version 8.11 requires python 3.6, See issue #2796
+more-itertools>=4.0.0,!=8.11.0; python_version < '3.6'
+more-itertools>=4.0.0; python_version >= '3.6'
+
+# Virtualenv
+virtualenv>=16.1.0,!=20.0.19,!=20.0.32; python_version <= '3.7'
+virtualenv>=20.15.0; python_version >= '3.8' and python_version <= '3.11'  # requires six<2,>=1.12.0
+virtualenv>=20.23.0; python_version >= '3.12'
 
 # Sphinx (no imports, invoked via sphinx-build script):
 # Keep in sync with rtd-requirements.txt
@@ -162,10 +152,6 @@ twine>=2.0.0; python_version >= '3.6'
 readme-renderer>=23.0; python_version == '2.7'
 readme-renderer>=23.0; python_version >= '3.6'
 
-# Jupyter Notebook (no imports, invoked via jupyter script)
-# TODO Future: currently jupyter not used by pywbemtools
-# jupyter>=1.0.0
-
 # Package dependency management tools
 pipdeptree>=2.2.0
 # pip-check-reqs 2.1.1 removed support for Python 2.7 but does not declare that.
@@ -180,26 +166,6 @@ pipdeptree>=2.2.0
 pip-check-reqs>=2.3.2; python_version >= '3.6' and python_version <= '3.7'
 pip-check-reqs>=2.4.3,!=2.5.0; python_version >= '3.8' and python_version <= '3.11'
 pip-check-reqs>=2.5.1; python_version >= '3.12'
-
-# safety 2.3.5 started pinning packaging to <22.0 and requires >=21.0
-packaging>=17.0; python_version == '2.7'
-packaging>=21.0,<22.0; python_version >= '3.6'
-
-
-# Temporary workarounds on indirectly used packages:
-
-# The tornado package is used by ipykernel which is used by jupyter.
-# Tornado 5.0.0 and 5.0.1 rejects installation if the Python ssl module
-# does not have certain symbols required by Tornado. This issue exists for
-# example with Python 2.7.6 on Ubuntu 14.04, but not with Python 2.7.5 on
-# RHEL 7.4. This can be checked with:
-#   python -c "import ssl; ssl.SSLContext; ssl.create_default_context; ssl.match_hostname"
-# Other projects have the same issue:
-#   https://github.com/floydhub/dl-docker/issues/84
-# The following is a circumvention of this issue that nails the tornado
-# version to below 5.0 on Python 2.
-# TODO: Follow up on resolution of this issue.
-# TODO Future: enable with ipythontornado<5.0; python_version <= '2.7'
 
 # Jinja2 is used by Sphinx, and pip needs explicit versions for this
 # otherwise indirect dependency.

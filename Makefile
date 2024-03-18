@@ -56,6 +56,11 @@ else
   endif
 endif
 
+# Run type (normal, scheduled, release)
+ifndef RUN_TYPE
+  RUN_TYPE := normal
+endif
+
 # Make variables are case sensitive and some native Windows environments have
 # ComSpec set instead of COMSPEC.
 ifndef COMSPEC
@@ -241,8 +246,9 @@ pylint_opts := --disable=fixme --ignore=$(pylint_ignore)
 # Flake8 config file
 flake8_rc_file := .flake8
 
-# Safety policy file
-safety_policy_file := .safety-policy.yml
+# Safety policy files
+safety_install_policy_file := .safety-policy-install.yml
+safety_all_policy_file := .safety-policy-all.yml
 
 # Python source files to be checked by PyLint and Flake8
 py_src_files := \
@@ -348,7 +354,7 @@ help:
 	@echo "  test       - Run unit and function tests"
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
 	@echo "  installtest - Run install tests"
-	@echo "  safety     - Run Safety on sources"
+	@echo "  safety     - Run Safety for install and all"
 	@echo "  end2endtest - Run end2end tests (in tests/end2endtest)"
 	@echo "               Env.var TEST_SERVER_IMAGE can be used to specify the Docker image with the WBEM server"
 	@echo "  all        - Do all of the above (except buildwin when not on Windows)"
@@ -515,7 +521,7 @@ pylint: $(done_dir)/pylint_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: safety
-safety: $(done_dir)/safety_$(pymn)_$(PACKAGE_LEVEL).done
+safety: $(done_dir)/safety_all_$(pymn)_$(PACKAGE_LEVEL).done $(done_dir)/safety_install_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: todo
@@ -666,16 +672,26 @@ $(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$
 	echo "done" >$@
 	@echo "Makefile: Done running Flake8"
 
-$(done_dir)/safety_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints.txt
-# Python 2.7 safety do not support the policy file
+$(done_dir)/safety_all_$(pymn)_$(PACKAGE_LEVEL).done: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(safety_all_policy_file) minimum-constraints.txt minimum-constraints-install.txt
 ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping Safety on Python $(python_version)" >&2
+	@echo "Makefile: Warning: Skipping Safety for all packages on Python $(python_version)" >&2
 else
-	@echo "Makefile: Running pyup.io safety check"
+	@echo "Makefile: Running Safety for all packages"
 	-$(call RM_FUNC,$@)
-	safety check --policy-file $(safety_policy_file) -r minimum-constraints.txt --full-report
+	bash -c "safety check --policy-file $(safety_all_policy_file) -r minimum-constraints.txt --full-report || test '$(RUN_TYPE)' != 'release' || exit 1"
 	echo "done" >$@
-	@echo "Makefile: Done running pyup.io safety check"
+	@echo "Makefile: Done running Safety for all packages"
+endif
+
+$(done_dir)/safety_install_$(pymn)_$(PACKAGE_LEVEL).done: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(safety_install_policy_file) minimum-constraints-install.txt
+ifeq ($(python_m_version),2)
+	@echo "Makefile: Warning: Skipping Safety for install packages on Python $(python_version)" >&2
+else
+	@echo "Makefile: Running Safety for install packages"
+	-$(call RM_FUNC,$@)
+	safety check --policy-file $(safety_install_policy_file) -r minimum-constraints-install.txt --full-report
+	echo "done" >$@
+	@echo "Makefile: Done running Safety for install packages"
 endif
 
 $(done_dir)/todo_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
