@@ -161,6 +161,22 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: 1
       PIP_NO_PYTHON_VERSION_WARNING: 1
     steps:
+    - name: Set run type (normal, scheduled, release)
+      id: set-run-type
+      uses: actions/github-script@v6
+      with:
+        result-encoding: string
+        script: |
+          var result
+          if ("${{ github.event_name }}" == "schedule") {
+            result = "scheduled"
+          } else if ("${{ github.head_ref }}".match(/^release_/)) {
+            result = "release"
+          } else {
+            result = "normal"
+          }
+          console.log(result)
+          return result
     - name: Create local cache directory for Docker images
       if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       run: |
@@ -195,34 +211,42 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Display initial Python packages
+      env:
+        PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         echo "Installed Python packages:"
         make pip_list
     - name: Install the package and its dependents
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make install
     - name: Display Python packages
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         echo "Installed Python packages:"
         make pip_list
     - name: Development setup
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make develop
     - name: Display Python packages
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         echo "Installed Python packages:"
         make pip_list
     - name: Display platform and env vars
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make platform env
     - name: Show package dependency tree
@@ -232,31 +256,37 @@ jobs:
     - name: Run check_reqs
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make check_reqs
     - name: Run build
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make build
     - name: Run builddoc
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make builddoc
     - name: Run check
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make check
     - name: Run pylint
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make pylint
     - name: Run test
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
         # TESTCASES: test_class_cmds.py
       run: |
         make test
@@ -264,6 +294,7 @@ jobs:
       if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04') && matrix.python-version != '2.7' }}
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
         # Uses TEST_SERVER_IMAGE variable
       run: |
         make end2endtest
@@ -281,11 +312,13 @@ jobs:
     - name: Run installtest
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make installtest
     - name: Run safety
       env:
         PACKAGE_LEVEL: ${{ matrix.package_level }}
+        RUN_TYPE: ${{ steps.set-run-type.outputs.result }}
       run: |
         make safety
 
