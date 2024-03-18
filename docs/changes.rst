@@ -57,6 +57,8 @@ Released: not yet
 * Test: Fixed issues resulting from removal of support for pytest.warns(None)
   in pytest version 8.
 
+* Test: Fixed invocation of pipdeptree in test workflow to use python -m.
+
 **Enhancements:**
 
 * Added support for Python 3.12.
