@@ -90,6 +90,14 @@ Released: not yet
 * Split safety run out of "check" make target ino a separate "safety" make target
   and moved its run to the end of the test workflow.
 
+* Split safety runs into an 'install' and an 'all' run. The install run
+  uses a new minimum-constraints-install.txt file that contains just the
+  direct and indirect install dependencies and must succeed. The 'all' run
+  uses the minimum-constraints.txt file which includes the
+  minimum-constraints-install.txt file and that run may fail.
+  This reduces the burden of fixing safety issues that affect only development
+  packages.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
