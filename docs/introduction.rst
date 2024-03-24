@@ -198,9 +198,16 @@ setuptools, as explained in
 `Why you shouldn't invoke setup.py directly <https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html>`_.
 Installation with ``setup.py install`` is no longer supported by this package.
 
+
 NOTE: pywbemtools may also be installed for development and to include the
 pywbemtools test environment by cloning the pywbemtools git repository as
 documented in :ref:`Pywbemtools development`.
+
+.. index:: pair: troubleshooting: pywbem
+Support for correcting a number of installation issues can be found in the
+pywbem documentation troubleshooting section at:
+
+https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting
 
 .. _`Verification of the installation`:
 
