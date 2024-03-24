@@ -68,7 +68,7 @@ system as background processes. It provides functionality to:
 
 Requirements:
 
-1.  Python 2.7, 3.4 and higher
+1.  Python 2.7, 3.6 and higher
 2.  Operating Systems: Linux, OS-X, native Windows, UNIX-like
     environments on Windows (e.g. Cygwin)
 3.  On Python 2, the following OS-level packages are needed:

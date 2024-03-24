@@ -202,6 +202,12 @@ NOTE: pywbemtools may also be installed for development and to include the
 pywbemtools test environment by cloning the pywbemtools git repository as
 documented in :ref:`Pywbemtools development`.
 
+.. index:: pair; troubleshooting: pywbem
+
+Support for correcting a number of installation issues can be found in the
+`pywbem troubleshooting documentation. <https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting>`_
+
+
 .. _`Verification of the installation`:
 
 Verification of the installation

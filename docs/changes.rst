@@ -19,6 +19,17 @@ Released: not yet
 * Installation of this package using "setup.py" is no longer supported.
   Use "pip" instead.
 
+* Update to pywbemtools version 1.3.0 requires pywbem version >= 1.7.2
+  which allows urllib3 version >= 2.0. This may result in issues with SSL because
+  urllib3 may require support of TLS protocol version >= 1.2 possibly
+  resulting in exceptions such as the following:
+
+    SSLError(1, '[SSL: UNSUPPORTED_PROTOCOL] unsupported protocol . . .)  or
+    NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+
+
+  See `pywbem troubleshooting documentation. <https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting>`_
+  for help resolving such issues.
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -104,6 +115,8 @@ Released: not yet
   in the test workflow which allowed removing the step to update it.
 
 * Added support for running 'ruff', a new lint tool.
+
+* Indroduces a troubleshooting section to the pywbemtools documentation.
 
 **Cleanup:**
 

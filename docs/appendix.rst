@@ -471,6 +471,34 @@ path can often be determined from the class diagram in the specification for
 the profile.
 Many times, ``CIM_System`` or ``CIM_ComputerSystem`` is the scoping class.
 
+.. _`Troubleshooting`:
+
+Troubleshooting
+---------------
+
+.. index:: pair; installation fail: troubleshooting
+
+This section describes some trouble shooting hints for the installation and
+execution of pywbemtools.  See also the
+`pywbem troubleshooting documentation. <https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting>`_
+for information on specific pywbem issues.
+
+Issues with pywbemtools verson 1.3+, Urllib3 package version 2, and SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. index:: pair; SSL fail: troubleshooting
+.. index:: pair; TLS fail: troubleshooting
+.. index:: pair; urllib fail: troubleshooting
+
+Pywbemtools version 1.3.0 introduces the possibility of TLS protocol version
+issues with pywbemtools or between pywbemtools and WBEM severs. These can be
+introduced with the pywbem package version 1.7.0 which allows change of the minimum
+TLS protocol version required to TLS >= 1.2.
+
+Support for  understanding the issues and correcting a number of these possible
+installation and run exceptions involving SSL and TLS is in the
+`pywbem SSL troubleshooting documentation. <https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting/Issues with pywbem verson 1.7+, Urllib3 package version 2, and SSL>`_
+
 
 .. _`References`:
 
