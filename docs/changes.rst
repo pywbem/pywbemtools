@@ -19,6 +19,29 @@ Released: not yet
 * Installation of this package using "setup.py" is no longer supported.
   Use "pip" instead.
 
+* Update to pywbem version 1.7.0 may cause issues with SSL because Python
+  packages may now require support of TLS version GE 1.2. Because the the
+  minimum version of the TLS is determined by the version of SSL actually
+  installed with the OS (Ex. OpenSSL) in which the pywbemtools package is
+  installed and by the TLS requirements of the WBEM Server that the user is
+  communicating with, errors such as:
+
+    SSLError(1, '[SSL: UNSUPPORTED_PROTOCOL] unsupported protocol . . .)
+
+    NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+
+
+    or
+
+    NotOpenSSLWarning: urllib3 v2.0 only supports OpenSSL 1.1.1+, currently the
+           'ssl' module is compiled with 'LibreSSL 2.8.3'
+
+  may occur. If exceptions such as this occur see the documentation for pywbem
+  troubleshooting at:
+
+  https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting
+
+  for help resolving such issues.
+
 **Deprecations:**
 
 **Bug fixes:**
