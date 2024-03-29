@@ -22,16 +22,12 @@ security:
     ignore-vulnerabilities:
         37765:
             reason: Psutil, found in; 5.6.5, affected; <=5.6.5,
-        38765:
-            reason: Pip, found in; 10.0.1, affected; <19.2, Python 2.7 requires this version
         39611:
             reason: PyYAML full_load method or FullLoader is not used
         40291:
             reason: Pip, found in;10.0.1, affected; <19.2, Fixed Pip version requires Python>=3.6 and is used there
         42559:
             reason: Fixed Pip version requires Python>=3.6 and is used there; Pip is not shipped with this package
-        43975:
-            reason: Fixed Urllib3 versions are excluded by requests
         47833:
             reason: Fixed Click version requires Python>=3.6 and is used there
         51499:
@@ -40,8 +36,6 @@ security:
             reason: Fixed Certifi version requires Python>=3.6 and is used there
         52495:
             reason: Fixed Setuptools version requires Python>=3.7 and is used there; Risk is on Pypi side
-        52510:
-            reason: Future, found in; 0.18.2; affected; <=0.18.2
         58755:
             reason: Fixed requests version 2.31.0 requires Python>=3.7 and is used there
         59956:
