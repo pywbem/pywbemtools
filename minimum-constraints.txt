@@ -115,7 +115,7 @@ wheel==0.38.1; python_version >= '3.7'
 # Direct dependencies for install (must be consistent with requirements.txt)
 
 
-pywbem==1.6.0
+pywbem==1.6.3
 # When using the GitHub master branch of pywbem, simply comment out the line
 # above, since links are not allowed in constraint files - the minimum will be
 # ensured by requirements.txt then.
