@@ -16,6 +16,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Increased minimum version of pywbem to 1.6.3 to pick up fixes.
+
 * Addressed safety issues up to 2024-03-25.
 
 * Fixed coveralls issues with KeyError and HTTP 422 Unprocessable Entity.
