@@ -5,14 +5,10 @@ Change log
 ==========
 
 
-pywbemtools 1.2.1.dev1
-----------------------
+pywbemtools 1.2.1
+-----------------
 
-Released: not yet
-
-**Incompatible changes:**
-
-**Deprecations:**
+Released: 2024-03-29
 
 **Bug fixes:**
 
@@ -64,13 +60,6 @@ Released: not yet
 
 * Add several new safety ignore entries into .safety-policy.yml from the
   new issues that were added to list May 2023.
-
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.2.0
