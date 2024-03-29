@@ -98,6 +98,9 @@ Released: not yet
   This reduces the burden of fixing safety issues that affect only development
   packages.
 
+* Dev: Improved release procedure by generalizing the stable branch name
+  in the test workflow which allowed removing the step to update it.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
