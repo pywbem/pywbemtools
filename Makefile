@@ -294,8 +294,8 @@ endif
 # as specified, without being expanded.
 dist_manifest_in_files := \
     LICENSE.txt \
-    README.rst \
-    README_PYPI.rst \
+    README.md \
+    README_PYPI.md \
     requirements.txt \
     *.py \
     $(package_name)/*.py \
@@ -306,8 +306,8 @@ dist_manifest_in_files := \
 # Keep in sync with dist_manifest_in_files.
 dist_dependent_files := \
     LICENSE.txt \
-    README.rst \
-    README_PYPI.rst \
+    README.md \
+    README_PYPI.md \
     requirements.txt \
     $(wildcard *.py) \
     $(wildcard $( package_name)/*.py) \
