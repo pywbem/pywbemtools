@@ -21,7 +21,7 @@ MANIFEST
 /done/*.done
 pylint_done
 wbemcli.log
-.coverage
+.coverage*
 /coverage_html/
 *.py,cover
 /build/
