@@ -103,7 +103,7 @@ class TestOperations(CLITestsBase):  # pylint: disable=too-few-public-methods
     @pytest.mark.parametrize(
         "desc, inputs, exp_response, condition", TEST_CASES)
     def test_execute_pywbemcli(self, desc, inputs, exp_response, condition,
-                               server_url):
+                               server_url):  # noqa: F811
         # pylint: disable=redefined-outer-name
 
         """

@@ -40,7 +40,7 @@ def create_table(stdout):
     return table
 
 
-def test_instance_count(server_url):
+def test_instance_count(server_url):  # noqa: F811
     # pylint: disable=redefined-outer-name
     """
     Test instance count command against OpenPegasus server.

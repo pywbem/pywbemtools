@@ -250,15 +250,19 @@ flake8_rc_file := .flake8
 safety_install_policy_file := .safety-policy-install.yml
 safety_all_policy_file := .safety-policy-all.yml
 
-# Python source files to be checked by PyLint and Flake8
+# Python source files to be checked by PyLint and Flake8 and ruff
 py_src_files := \
     setup.py \
     $(package_py_files) \
     $(wildcard tests/*.py) \
     $(wildcard tests/*/*.py) \
-    $(wildcard tests/*/*/*.py) \
-    $(wildcard tests/*/*/*/*.py) \
+		$(wildcard tests/*/*/*.py) \
+    $(wildcard tests/unit/pywbemcli/testmock/*.py) \
     $(wildcard $(doc_conf_dir)/notebooks/*.py) \
+
+# Python source files with Syntax errors (cannot be suppressed in ruff)
+py_err_src_files := \
+    $(wildcard tests/unit/pywbemcli/error/*.py) \
 
 # Test log
 test_log_file := test_$(python_version_fn).log
@@ -350,6 +354,7 @@ help:
 	@echo "  buildwin   - Build the Windows installable in: $(dist_dir) (requires Windows 64-bit)"
 	@echo "  builddoc   - Build documentation in: $(doc_build_dir)"
 	@echo "  check      - Run Flake8 on sources"
+	@echo "  ruff       - Run Ruff (an alternate lint tool) on sources"
 	@echo "  pylint     - Run PyLint on sources"
 	@echo "  test       - Run unit and function tests"
 	@echo "               Env.var TESTCASES can be used to specify a py.test expression for its -k option"
@@ -516,6 +521,10 @@ flake8: $(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done
 check: $(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
+.PHONY: ruff
+ruff: $(done_dir)/ruff_$(pymn)_$(PACKAGE_LEVEL).done
+	@echo "Makefile: Target $@ done."
+
 .PHONY: pylint
 pylint: $(done_dir)/pylint_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
@@ -529,7 +538,7 @@ todo: $(done_dir)/todo_$(pymn)_$(PACKAGE_LEVEL).done
 	@echo "Makefile: Target $@ done."
 
 .PHONY: all
-all: install develop check_reqs build builddoc check pylint installtest test
+all: install develop check_reqs build builddoc check ruff pylint installtest test
 	@echo "Makefile: Target $@ done."
 
 .PHONY: clobber
@@ -648,7 +657,7 @@ $(bdist_file) $(sdist_file): Makefile setup.py MANIFEST.in $(doc_utility_help_fi
 # * 32 on usage error
 # Status 1 to 16 will be bit-ORed.
 # The make command checks for statuses: 1,2,32
-$(done_dir)/pylint_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
+$(done_dir)/pylint_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files) $(py_err_src_files)
 ifeq ($(python_m_version),2)
 	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
 else
@@ -658,19 +667,35 @@ else
 	@echo "Makefile: Running Pylint"
 	-$(call RM_FUNC,$@)
 	pylint --version
-	pylint $(pylint_opts) --rcfile=$(pylint_rc_file) $(py_src_files)
+	pylint $(pylint_opts) --rcfile=$(pylint_rc_file) $(py_src_files) $(py_err_src_files)
 	echo "done" >$@
 	@echo "Makefile: Done running Pylint"
 endif
 endif
 
-$(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(flake8_rc_file) $(py_src_files)
+$(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(flake8_rc_file) $(py_src_files) $(py_err_src_files)
 	@echo "Makefile: Running Flake8"
 	-$(call RM_FUNC,$@)
 	flake8 --version
-	flake8 --statistics --config=$(flake8_rc_file) --filename='*' $(py_src_files)
+	flake8 --statistics --config=$(flake8_rc_file) --filename='*' $(py_src_files) $(py_err_src_files)
 	echo "done" >$@
 	@echo "Makefile: Done running Flake8"
+
+$(done_dir)/ruff_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(py_src_files)
+ifeq ($(python_mn_version),2.7)
+	@echo "Makefile: Warning: Skipping Ruff on Python $(python_version)" >&2
+else
+ifeq ($(python_mn_version),3.6)
+	@echo "Makefile: Warning: Skipping Ruff on Python $(python_version)" >&2
+else
+	@echo "Makefile: Running Ruff"
+	-$(call RM_FUNC,$@)
+	ruff --version
+	ruff check --unsafe-fixes $(py_src_files)
+	echo "done" >$@
+	@echo "Makefile: Done running Ruff"
+endif
+endif
 
 $(done_dir)/safety_all_$(pymn)_$(PACKAGE_LEVEL).done: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(safety_all_policy_file) minimum-constraints.txt minimum-constraints-install.txt
 ifeq ($(python_m_version),2)

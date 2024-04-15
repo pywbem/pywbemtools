@@ -25,7 +25,7 @@ from .utils import server_url  # noqa: F401
 from ..unit.utils import execute_command
 
 
-def test_resourcewarning_interactive(server_url):
+def test_resourcewarning_interactive(server_url):  # noqa: F811
     # pylint: disable=redefined-outer-name
     """
     Test that ending an interactive session to a real WBEM server does not

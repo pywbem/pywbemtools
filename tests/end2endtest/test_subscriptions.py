@@ -30,7 +30,7 @@ from .utils import server_url, validate_namespace_exists, \
 # pylint: enable=unused-import
 
 
-def test_subscriptions(server_url):
+def test_subscriptions(server_url):  # noqa: F811
     # pylint: disable=redefined-outer-name
     """
     The test.  This function is called because server_url is a pytest

@@ -94,7 +94,7 @@ def GET_TEST_PATH_STR(filename):  # pylint: disable=invalid-name
 
 SIMPLE_MOCK_MODEL_FILE = "simple_mock_model.mof"
 MOCK_DEFINITION_ENVVAR = 'PYWBEMCLI_STARTUP_SCRIPT'
-BAD_PY_ERR_STRTUP_FILE = 'py_err_processatstartup.py'
+BAD_PY_ERR_STRTUP_FILE = 'error/py_err_processatstartup.py'
 MOCK_PW_PROMPT_FILE = 'mock_password_prompt.py'
 
 SIMPLE_MOCK_FILE_PATH = os.path.join(TEST_DIR, SIMPLE_MOCK_MODEL_FILE)

@@ -81,7 +81,8 @@ def exec_pywbemlistener_cmd(request_params, expected_rc=0, ignore_stderr=False,
 def execute_indication_test(
         svr_url, ind_dest_scheme, ind_dest_addr,
         listener_scheme, listener_bind_addr, listener_port,
-        indication_send_count, verbose):  # pylint: disable=redefined-outer-name
+        indication_send_count, verbose):  # noqa: F811
+    # pylint: disable=redefined-outer-name
     """
     Execute the indication test with the parameters provided. The test includes
     creating the subscription, creating the listener, requesting a defined
@@ -234,7 +235,8 @@ def wait_for_indications(indication_send_count, indication_count_file,
     return test_result or None
 
 
-def test_indications(server_url):  # pylint: disable=redefined-outer-name
+def test_indications(server_url):  # noqa: F811
+    # pylint: disable=redefined-outer-name
     """
     The indication test.  This function is called because server_url is a pytest
     fixture.
