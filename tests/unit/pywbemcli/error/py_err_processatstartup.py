@@ -8,6 +8,7 @@ extension for the test environment.
 
 
 # Note: pylint issue "syntax-error" cannot be suppressed.
+# Note: ruff issue E999 (Syntax Error) cannot be suppressed.
 def mock?prompt(msg):  # noqa: E999
     """Mock function to replace pywbemcli_prompt and return a value"""
     # pylint: disable=undefined-variable

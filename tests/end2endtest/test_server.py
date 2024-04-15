@@ -25,7 +25,7 @@ from .utils import server_url, exec_pywbemcli_cmd  # noqa: F401
 # pylint: enable=unused-import
 
 
-def test_server_is_pegasus(server_url):
+def test_server_is_pegasus(server_url):  # noqa: F811
     # pylint: disable=redefined-outer-name
     """
     Test that this WBEM server is OpenPegasus and that it provides the

@@ -101,6 +101,8 @@ Released: not yet
 * Dev: Improved release procedure by generalizing the stable branch name
   in the test workflow which allowed removing the step to update it.
 
+* Added support for running 'ruff', a new lint tool.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
