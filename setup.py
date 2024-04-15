@@ -98,8 +98,8 @@ setuptools.setup(
 
     description='Python client tools to work with WBEM Servers using the '
     'PyWBEM API.',
-    long_description=read_file('README_PYPI.rst'),
-    long_description_content_type='text/x-rst',
+    long_description=read_file('README_PYPI.md'),
+    long_description_content_type='text/markdown',
     license='Apache License, Version 2.0',
     author='Karl Schopmeyer, Andreas Maier',
     author_email='k.schopmeyer@swbell.net, maiera@de.ibm.com',

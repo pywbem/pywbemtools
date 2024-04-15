@@ -117,6 +117,8 @@ Released: not yet
 
 * New safety issue(GitPython) Sept 2023, check-reqs issue  ruamel-yaml.
 
+* Changed the format of the README and README_PYPI files from RST to Markdown,
+  to address formatting issues with badges on the Github site (issue #1376).
 
 **Known issues:**
 
