@@ -77,7 +77,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings('error')
     try:
         if URLLIB3_VERSION.release < (2):
-            urllib3.Retry(method_whitelist={})
+            urllib3.Retry(allowed_methods={})
     except (DeprecationWarning, TypeError):
         RETRY_DEPRECATION = PYWBEM_VERSION.release < (1, 1)
     else:
