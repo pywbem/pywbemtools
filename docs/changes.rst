@@ -23,6 +23,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Increased pywbem to 1.7.2 to pick up fixes. (issue #1304)
+
 * Addressed safety issues up to 2024-03-25.
 
 * Fixed coveralls issues with KeyError and HTTP 422 Unprocessable Entity.
