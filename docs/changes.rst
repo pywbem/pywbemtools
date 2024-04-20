@@ -72,6 +72,11 @@ Released: not yet
 
 * Test: Fixed invocation of pipdeptree in test workflow to use python -m.
 
+* Fixed pywbemtools install tests to perform the import test in a directory
+  where it does not import from the repo main directory. Removed the temporary
+  disablement of the install tests that was put in place during development of
+  pywbem 1.2.0.
+
 **Enhancements:**
 
 * Added support for Python 3.12.
