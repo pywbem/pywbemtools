@@ -34,11 +34,10 @@ VERBOSE="true"
 # Indicates that pywbem is installed from a repository. This will disable
 # some install tests because they don't support this. Keep in sync with
 # the installation of pywbem from repo vs package in requirements.txt.
-# TODO: Set to false once pywbem 1.2.0 is released.
-PYWBEM_FROM_REPO="true"
+PYWBEM_FROM_REPO="false"
 
 MYNAME=$(basename "$0")
-MYDIR=$(dirname "$0")    # Directory of this script, as seen by caller
+MYDIR=$(abspath $(dirname "$0")) # Absolute path of directory of this script
 
 # Repo root dir, as seen by caller
 # Using MYDIR makes the script run with any caller's CWD.
@@ -104,6 +103,15 @@ function verbose()
   if [[ "$VERBOSE" == "true" ]]; then
     echo "${msg}"
   fi
+}
+
+function heading()
+{
+  local msg
+  msg="$1"
+  echo ""
+  echo -e "${green}${msg}${endcolor}"
+  echo ""
 }
 
 function info()
@@ -192,11 +200,6 @@ function make_virtualenv()
   run "pip install pip $PIP_OPTS" "Reinstalling pip with PACKAGE_LEVEL=$PACKAGE_LEVEL"
   run "pip install setuptools $PIP_OPTS" "Reinstalling setuptools with PACKAGE_LEVEL=$PACKAGE_LEVEL"
   run "pip install wheel $PIP_OPTS" "Reinstalling wheel with PACKAGE_LEVEL=$PACKAGE_LEVEL"
-
-  verbose "Virtualenv before actual install test:"
-  verbose "Pip version: $(pip --version 2>&1)"
-  verbose "Packages:"
-  pip list --format=columns 2>/dev/null || pip list 2>/dev/null
 }
 
 function remove_virtualenv()
@@ -218,6 +221,15 @@ function remove_virtualenv()
   else
     unset VIRTUAL_ENV
   fi
+}
+
+function list_virtualenv()
+{
+  local dir msg
+  dir="$1"
+  msg="$2"
+  echo "$msg"
+  sh -c "cd $dir; pip list --format=columns || pip list"
 }
 
 function assert_eq()
@@ -245,11 +257,12 @@ function run()
     verbose "$msg"
   fi
   if [[ "$DEBUG" == "true" ]]; then
-    echo "Debug: running in this shell: $cmd"
+    echo "Debug: Command: $cmd"
     eval "$cmd"
     rc=$?
-    echo "Debug: command returns: rc=$rc"
+    echo "Debug: Command returns: rc=$rc"
   else
+    verbose "Command: $cmd"
     eval "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -270,11 +283,12 @@ function call()
     verbose "$msg"
   fi
   if [[ "$DEBUG" == "true" ]]; then
-    echo "Debug: running in sub-shell: $cmd"
+    echo "Debug: Command (in subshell): $cmd"
     sh -c "$cmd"
     rc=$?
+    echo "Debug: Command returns: rc=$rc"
   else
-    verbose "$cmd"
+    verbose "Command (in subshell): $cmd"
     sh -c "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -292,11 +306,12 @@ function assert_run_ok()
   cmd="$1"
   msg="$2"
   if [[ "$DEBUG" == "true" ]]; then
-    echo "Debug: running in this shell: $cmd"
+    echo "Debug: Command: $cmd"
     eval "$cmd"
     rc=$?
+    echo "Debug: Command returns: rc=$rc"
   else
-    verbose "$cmd"
+    verbose "Command: $cmd"
     eval "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -317,10 +332,12 @@ function assert_run_fails()
   cmd="$1"
   msg="$2"
   if [[ "$DEBUG" == "true" ]]; then
-    echo "Debug: running in this shell: $cmd"
+    echo "Debug: Command: $cmd"
     eval "$cmd"
     rc=$?
+    echo "Debug: Command returns: rc=$rc"
   else
+    verbose "Command: $cmd"
     eval "$cmd" >$CMD_LOG_FILE 2>&1
     rc=$?
   fi
@@ -341,32 +358,34 @@ function ensure_uninstalled()
   pkg="$1"
   cmd="pip uninstall -y -q $pkg"
   if [[ "$DEBUG" == "true" ]]; then
-    echo "Debug: running: $cmd"
+    echo "Debug: Command: $cmd"
   fi
   eval $cmd >/dev/null 2>/dev/null
 }
 
 function assert_import_ok()
 {
-  local module
+  local module dir
   module="$1"
-  verbose "Checking for successful import of module: $module"
-  assert_run_ok "python -c \"import ${module}\"" "Python module '${module}' cannot be imported"
+  dir="$2"
+  verbose "Checking for successful import of module $module in directory $dir"
+  assert_run_ok "cd ${dir}; python -c \"import ${module}\"" "Python module '${module}' cannot be imported in directory $dir"
 }
 
 function assert_import_fails()
 {
-  local module
+  local module dir
   module="$1"
-  verbose "Checking for failing import of module: $module"
-  assert_run_fails "python -c \"import ${module}\"" "Python module '${module}' can be imported but should have failed"
+  dir="$2"
+  verbose "Checking for failing import of module $module in directory $dir"
+  assert_run_fails "cd ${dir}; python -c \"import ${module}\"" "Python module '${module}' can be imported in directory $dir but should have failed"
 }
 
 #-------------------------------------------------
 
 function prep()
 {
-  info "Preparing for the tests"
+  heading "Preparing for the tests"
 
   if [[ -d $TMP_TEST_DIR ]]; then
     echo "Removing test directory: $TMP_TEST_DIR"
@@ -388,7 +407,7 @@ function prep()
 
 function cleanup()
 {
-  info "Cleaning up from the tests"
+  heading "Cleaning up from the tests"
 
   if [[ "$DEBUG" == "true" ]]; then
     echo "Debug: Not removing $TMP_TEST_DIR for debug inspection"
@@ -414,16 +433,15 @@ function cleanup_egg_file()
 function test1()
 {
   testcase="test1"
-  info "Testcase $testcase: Pip install from repo root directory: $ROOT_DIR"
+  heading "Testcase $testcase: Pip install from repo root directory: $ROOT_DIR"
   make_virtualenv "$testcase"
+  list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv before installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
   if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
     call "cd $ROOT_DIR; pip install . $PIP_OPTS" "Installing with pip from repo root directory (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-    verbose "Packages before running pywbemcli:"
-    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
-
-    assert_run_ok "pywbemcli --version"
+    list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv after installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+    assert_run_ok "cd ${TMP_TEST_DIR}; pywbemcli --version"
   else
     warning "Skipping pywbemcli check because pywbem is installed from repo"
   fi
@@ -435,16 +453,15 @@ function test1()
 function test3()
 {
   testcase="test3"
-  info "Testcase $testcase: Pip install from wheel distribution archive: $WHL_DISTFILE"
+  heading "Testcase $testcase: Pip install from wheel distribution archive: $WHL_DISTFILE"
   make_virtualenv "$testcase"
+  list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv before installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
   if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
     call "cd $TMP_TEST_DIR; pip install $(abspath $WHL_DISTFILE) $PIP_OPTS" "Installing with pip from wheel distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-    verbose "Packages before running pywbemcli:"
-    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
-
-    assert_run_ok "pywbemcli --version"
+    list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv after installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+    assert_run_ok "cd ${TMP_TEST_DIR}; pywbemcli --version"
   else
     warning "Skipping pywbemcli check because pywbem is installed from repo"
   fi
@@ -456,16 +473,15 @@ function test3()
 function test4()
 {
   testcase="test4"
-  info "Testcase $testcase: Pip install from source distribution archive: $SRC_DISTFILE"
+  heading "Testcase $testcase: Pip install from source distribution archive: $SRC_DISTFILE"
   make_virtualenv "$testcase"
+  list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv before installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
   if [[ "$PYWBEM_FROM_REPO" == "false" ]]; then
     call "cd $TMP_TEST_DIR; pip install $(abspath $SRC_DISTFILE) $PIP_OPTS" "Installing with pip from source distribution archive (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
 
-    verbose "Packages before running pywbemcli:"
-    pip list --format=columns 2>/dev/null || pip list 2>/dev/null
-
-    assert_run_ok "pywbemcli --version"
+    list_virtualenv "$TMP_TEST_DIR" "Python packages in virtualenv after installation (PACKAGE_LEVEL=$PACKAGE_LEVEL)"
+    assert_run_ok "cd ${TMP_TEST_DIR}; pywbemcli --version"
   else
     warning "Skipping pywbemcli check because pywbem is installed from repo"
   fi
@@ -476,8 +492,8 @@ function test4()
 
 #----- main
 
-WHL_DISTFILE="$1"  # absolute or relative to caller's cwd
-SRC_DISTFILE="$2"  # absolute or relative to caller's cwd
+WHL_DISTFILE=$(abspath "$1")  # absolute or relative to caller's cwd
+SRC_DISTFILE=$(abspath "$2")  # absolute or relative to caller's cwd
 PYTHON_CMD="$3"    # Python command to use (outside of the created virtualenvs)
 
 if [[ -z $PYTHON_CMD ]]; then
@@ -505,4 +521,4 @@ test4
 
 cleanup
 
-info "All testcases succeeded."
+heading "All testcases succeeded."
