@@ -5,12 +5,12 @@ Change log
 ==========
 
 
-pywbemtools 1.3.0.dev1
-----------------------
+pywbemtools 1.3.0
+-----------------
 
-This version contains all fixes up to version 1.2.x.
+This version contains all fixes up to version 1.2.1.
 
-Released: not yet
+Released: 2024-04-20
 
 **Incompatible changes:**
 
@@ -29,8 +29,6 @@ Released: not yet
 
   See `pywbem troubleshooting documentation. <https://pywbem.readthedocs.io/en/latest/appendix.html#troubleshooting>`_
   for help resolving such issues.
-
-**Deprecations:**
 
 **Bug fixes:**
 
@@ -141,12 +139,6 @@ Released: not yet
 
 * Changed the format of the README and README_PYPI files from RST to Markdown,
   to address formatting issues with badges on the Github site (issue #1376).
-
-**Known issues:**
-
-* See `list of open issues`_.
-
-.. _`list of open issues`: https://github.com/pywbem/pywbemtools/issues
 
 
 pywbemtools 1.2.0
