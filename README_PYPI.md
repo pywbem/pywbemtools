@@ -62,7 +62,7 @@ $ pywbemcli connection save --help
 The following examples build on each other and show a typical sequence
 of exploration of a WBEM server. For simplicity, they all operate
 against the default namespace of the server, and use a persistent
-connection definition for the server:
+connection definition for the WBEM server:
 
 -   Add a persistent connection definition named `conn1` for the WBEM
     server to be used, so that the subsequent commands can refer to it:
@@ -80,7 +80,7 @@ connection definition for the server:
     $ pywbemcli -m tests/unit/simple_assoc_mock_model.mof connection save assoc1
     ```
 
--   List the persistent connection definitions:
+-   List the persistent WBEM server connection definitions:
 
     ``` text
     $ pywbemcli connection list
@@ -91,7 +91,7 @@ connection definition for the server:
     conn1   https://localhost
     ```
 
--   List the persistent connection definitions with full information:
+-   List the persistent WBEM server connection definitions with full information:
 
     ``` text
     $ pywbemcli connection list --full
@@ -102,8 +102,8 @@ connection definition for the server:
     conn1   https://localhost  root/cimv2   user           30  True        False
     ```
 
--   Show the class tree, using the previously added connection
-    definition `assoc1`:
+-   Show the class tree, using the previously added WBEM server connection
+    definition `assoc1` (specified with the `-n` option):
 
     ``` text
     $ pywbemcli -n assoc1 class tree
