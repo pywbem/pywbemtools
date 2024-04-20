@@ -118,6 +118,10 @@ Released: not yet
 
 * Indroduces a troubleshooting section to the pywbemtools documentation.
 
+* Dev: Pinned coverage to <7.0 to speed up installation of development
+  environment. coveralls 3.3 also pins coverage to <7.0, so that is not
+  a unique restriction of pywbem.
+
 **Cleanup:**
 
 * Change to used safety-policy-file .safety-policy-yml to keep the safety issue
