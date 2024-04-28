@@ -53,6 +53,26 @@ jobs:
                 \"os\": \"ubuntu-latest\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-latest\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-latest\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-latest\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-latest\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"minimum\" \
               } \
             ], \
             \"include\": [ \
@@ -76,6 +96,26 @@ jobs:
               { \
                 \"os\": \"ubuntu-20.04\", \
                 \"python-version\": \"3.6\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-12\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-12\", \
+                \"python-version\": \"3.6\", \
+                \"package_level\": \"minimum\" \
+              }, \
+              { \
+                \"os\": \"macos-12\", \
+                \"python-version\": \"3.7\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-12\", \
+                \"python-version\": \"3.7\", \
                 \"package_level\": \"minimum\" \
               } \
             ] \
@@ -119,13 +159,18 @@ jobs:
                 \"package_level\": \"latest\" \
               }, \
               { \
-                \"os\": \"macos-latest\", \
+                \"os\": \"macos-12\", \
                 \"python-version\": \"3.6\", \
                 \"package_level\": \"minimum\" \
               }, \
               { \
-                \"os\": \"macos-latest\", \
+                \"os\": \"macos-12\", \
                 \"python-version\": \"3.6\", \
+                \"package_level\": \"latest\" \
+              }, \
+              { \
+                \"os\": \"macos-latest\", \
+                \"python-version\": \"3.8\", \
                 \"package_level\": \"latest\" \
               }, \
               { \
