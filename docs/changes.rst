@@ -18,6 +18,8 @@ Released: not yet
 
 **Bug fixes:**
 
+* Addressed safety issues up to 2024-05-21.
+
 * Fixed new issues reported by Pylint 3.2.
 
 * For Python 3.6 and 3.7, changed macos-latest back to macos-12 because
