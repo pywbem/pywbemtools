@@ -586,6 +586,7 @@ def _filter_classes(classes, filters, names_only, iq):
 
     # Build a list of leaf class names that will be used later as a filter on
     # the classes to be returned.
+    leafclass_names = None  # avoid pylint issue
     if 'leaf_classes' in filters:
         try:
             if subclass_names:
