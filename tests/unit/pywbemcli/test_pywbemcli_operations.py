@@ -1117,6 +1117,7 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
         assert conn._provider_registry.get_registered_provider(ns, pt, cln)
 
     if exp_stdout_lines_all:
+        # pylint: disable=possibly-used-before-assignment
         if captured.stdout == '':
             stdout_lines = []
         else:
