@@ -28,6 +28,9 @@ Released: not yet
 
 **Enhancements:**
 
+* Development: Changed release process to use a GitHub Actions workflow
+  add as documented in DEVELOP.md. (issue #1395)
+
 **Cleanup:**
 
 **Known issues:**
