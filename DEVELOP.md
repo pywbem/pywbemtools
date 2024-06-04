@@ -125,58 +125,60 @@ local clone of the `pywbem/pywbemtools` Git repo.
     ``master`` branch. When releasing based on a stable branch, you need to
     change the target branch of the Pull Request to ``stable_M.N``.
 
+    Set the milestone of that PR to version M.N.U.
+
+    The PR creation will cause the "test" workflow to run. That workflow runs
+    tests for all defined environments, since it discovers by the branch name
+    that this is a PR for a release.
+
 8.  On GitHub, close milestone ``M.N.U``.
+
+    Verify that the milestone has no open items anymore. If it does have open
+    items, investigate why and fix.
 
 9.  On GitHub, once the checks for the Pull Request for branch ``start_M.N.U``
     have succeeded, merge the Pull Request (no review is needed). This
     automatically deletes the branch on GitHub.
 
-10. Add a new tag for the version that is being released and push it to
-    the remote repo. Clean up the local repo:
+    If the PR did not succeed, fix the issues.
+
+10. Publish the package
 
         git checkout ${BRANCH}
         git pull
+        git branch -D release_${MNU}
+        git branch -D -r origin/release_${MNU}
         git tag -f ${MNU}
         git push -f --tags
-        git branch -D release_${MNU}
 
-11. When releasing based on the master branch, create and push a new stable
-    branch for the same minor version:
+    Pushing the new tag will cause the "publish" workflow to run. That workflow
+    builds the package, publishes it on PyPI, creates a release for it on Github,
+    and finally creates a new stable branch on Github if the master branch was
+    released.
 
-        git checkout -b stable_${MN}
-        git push --set-upstream origin stable_${MN}
-        git checkout ${BRANCH}
+11. Verify the publishing
 
-    Note that no GitHub Pull Request is created for any ``stable_*`` branch.
+    Wait for the "publish" workflow for the new release to have completed:
+    https://github.com/pywbem/pywbemtools/actions/workflows/publish.yml
 
-12. When releasing based on the master branch, activate the new stable branch
-    ``stable_M.N`` on ReadTheDocs:
+    Then, perform the following verifications:
 
-    * Go to https://readthedocs.org/projects/pywbemtools/versions/
-      and log in.
+    * Verify that the new version is available on PyPI at
+      https://pypi.python.org/pypi/pywbemtools/
 
-    * Activate the new version ``stable_M.N``.
+    * Verify that the new version has a release on Github at
+      https://github.com/pywbem/pywbemtools/releases
 
-      This triggers a build of that version. Verify that the build succeeds
-      and that new version is shown in the version selection popup at
-      https://pywbemtools.readthedocs.io/
+    * Verify that the new version has documentation on ReadTheDocs at
+      https://pywbemtools.readthedocs.io/en/stable/changes.html
 
-13. On GitHub, edit the new tag ``M.N.U``, and create a release description on
-    it. This will cause it to appear in the Release tab.
+      The new version M.N.U should be automatically active on ReadTheDocs,
+      causing the documentation for the new version to be automatically built
+      and published.
 
-    You can see the tags in GitHub via Code -> Releases -> Tags.
-
-14. Upload the package to PyPI:
-
-        make upload
-
-    This will show the package version and will ask for confirmation.
-
-    **Attention!** This only works once for each version. You cannot release
-    the same version twice to PyPI.
-
-    Verify that the released version arrived on PyPI at
-    https://pypi.python.org/pypi/pywbemtools/
+      If you cannot see the new version after some minutes, log in to
+      https://readthedocs.org/projects/pywbemtools/versions/ and activate
+      the new version.
 
 
 Starting a new version
