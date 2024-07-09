@@ -99,7 +99,8 @@ urllib3==1.26.18; python_version >= '3.7'
 ply==3.10
 requests==2.25.0; python_version == '2.7'
 requests==2.26.0; python_version == '3.6'
-requests==2.31.0; python_version >= '3.7'
+requests==2.31.0; python_version == '3.7'
+requests==2.32.2; python_version >= '3.8'
 certifi==2019.11.28; python_version == '2.7'
 certifi==2023.07.22; python_version >= '3.6'
 
