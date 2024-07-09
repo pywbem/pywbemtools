@@ -582,7 +582,7 @@ TEST_CASES = [
      {'general': ['--mock-server', 'invalidfilename.mofx'],
       'cmdgrp': 'connection',
       'args': ['show']},
-     {'stderr': "Invalid value for '-m' / '--mock-server': File " \
+     {'stderr': "Invalid value for '-m' / '--mock-server': File "
                 "'invalidfilename.mofx' does not exist.",
       'rc': 2,
       'test': 'innows'},
