@@ -75,8 +75,9 @@ PyYAML==5.3.1
 
 yamlloader==0.5.5
 # Packaging 21.0 is required by safety 2.2.0
-packaging==17.0; python_version == '2.7'
-packaging==21.0; python_version >= '3.6'
+packaging==19.0; python_version == '2.7'
+packaging==21.0; python_version == '3.6'
+packaging==22.0; python_version >= '3.7'
 
 mock==3.0.0
 
@@ -107,8 +108,10 @@ certifi==2023.07.22; python_version >= '3.6'
 # prompt-toolkit 3.0 requires wcwidth
 wcwidth==0.1.7
 
-# nocaselist 2.0 requires typing-extensions>=3.10
-typing-extensions==3.10.0
+# nocaselist 2.0 requires typing-extensions>=3.10 (on py>=3.6,py<=3.9)
+# safety 3.0 requires typing-extensions>=4.7.1 (used on py>=3.7)
+typing-extensions==3.10.0; python_version == '3.6'
+typing-extensions==4.7.1; python_version >= '3.7'
 
 # requests 2.31 requires idna>=2.5,<4
 # idna>3 requires using requests >=2.26.0
