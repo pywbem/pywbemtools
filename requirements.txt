@@ -93,6 +93,6 @@ pyparsing>=2.3.1; python_version >= '3.6'
 # TODO: Following limits use of urllib3 <= 2.0  for python < 3.7 until issues
 # about upgrade resolved. Issue #1302 updates urllib3 to version 2.0.
 # Python <= 3.7 required for urllib3 <= 2.0.0
-urllib3>=1.26.18,<2.0.0; python_version == '2.7'
-urllib3>=1.26.18,<2.0.0; python_version == '3.6'
-urllib3>=1.26.18; python_version >= '3.7'
+urllib3>=1.26.19,<2.0.0; python_version == '2.7'
+urllib3>=1.26.19,<2.0.0; python_version == '3.6'
+urllib3>=1.26.19; python_version >= '3.7'

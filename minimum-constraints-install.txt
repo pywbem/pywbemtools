@@ -90,9 +90,9 @@ funcsigs==1.0.2; python_version == '2.7'
 pyparsing==2.3.1
 
 # urllib3 < 2.0.0 required for python < 3.7
-urllib3==1.26.18; python_version == '2.7'
-urllib3==1.26.18; python_version == '3.6'
-urllib3==1.26.18; python_version >= '3.7'
+urllib3==1.26.19; python_version == '2.7'
+urllib3==1.26.19; python_version == '3.6'
+urllib3==1.26.19; python_version >= '3.7'
 
 
 # All other indirect dependencies for install that are not in requirements.txt
