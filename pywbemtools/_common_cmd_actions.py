@@ -20,7 +20,6 @@ a click command decorator.  These methods processing the parsed command.
 
 """
 
-from __future__ import print_function, absolute_import
 
 import webbrowser
 import click
@@ -38,7 +37,7 @@ def docs_cmd_action(docs_url):
     try:
         webbrowser.open_new(docs_url)
     except webbrowser.Error as we:
-        raise click.ClickException("Web Browser failed {}".format(we))
+        raise click.ClickException(f"Web Browser failed {we}")
 
 
 def help_subjects_action(obj, subject, help_subjects_dict):
@@ -81,9 +80,7 @@ def help_subjects_action(obj, subject, help_subjects_dict):
 
     def get_complete_subject(subject_name, subject_value):
         """Returnthe subject with key subject"""
-        return "{0} - {1}\n{2}".format(subject_name,
-                                       subject_value[0],
-                                       subject_value[1])
+        return f"{subject_name} - {subject_value[0]}\n{subject_value[1]}"
 
     def get_subjects_summary_as_table(subject_names, obj, title=None):
         """get subjects in subjects list as table"""

@@ -28,7 +28,7 @@
     This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
     environment variable.
 """
-from mock import Mock
+from unittest.mock import Mock
 
 import pywbemtools
 RETURN_VALUE = "5"
@@ -36,7 +36,7 @@ RETURN_VALUE = "5"
 
 def mock_prompt(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT {}'.format(msg))
+    print(f'MOCK_CLICK_PROMPT {msg}')
     return RETURN_VALUE
 
 

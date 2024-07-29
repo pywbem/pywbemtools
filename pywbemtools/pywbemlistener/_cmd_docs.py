@@ -18,8 +18,6 @@ Click Command definition for a docs command that calls a web browser with
 the uri of the pywbemcli documentation.
 """
 
-from __future__ import absolute_import, print_function
-
 
 import click
 

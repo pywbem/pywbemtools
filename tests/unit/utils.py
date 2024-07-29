@@ -16,30 +16,18 @@
 Utilities to execute a pywbemtools command and for comparing expected results.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import sys
 import re
-try:
-    from collections.abc import Mapping, Sequence
-except ImportError:
-    # pylint: disable=deprecated-class
-    from collections import Mapping, Sequence
-try:
-    from StringIO import StringIO  # Python 2
-except ImportError:
-    from io import StringIO  # Python 3
+from collections.abc import Mapping, Sequence
+from io import StringIO
 from copy import copy
-from subprocess import Popen, PIPE
-try:
-    from subprocess import TimeoutExpired
-except ImportError:
-    TimeoutExpired = None
+from subprocess import Popen, PIPE, TimeoutExpired
+import shlex
+
 import packaging.version
 import click
-import six
-from six.moves import shlex_quote
 
 
 # Click version as a tuple
@@ -124,24 +112,24 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
             os.environ[name] = value
 
     assert isinstance(args, Sequence)
-    if not isinstance(cmdname, six.text_type):
+    if not isinstance(cmdname, str):
         cmdname = cmdname.decode('utf-8')
     cmd_args = [cmdname]
     for arg in args:
-        if not isinstance(arg, six.text_type):
+        if not isinstance(arg, str):
             arg = arg.decode('utf-8')
         cmd_args.append(arg)
 
-    if stdin is not None and not isinstance(stdin, six.text_type):
+    if stdin is not None and not isinstance(stdin, str):
         stdin = stdin.decode('utf-8')
 
     if verbose:
         display_envvars = ', '.join(
-            ['{}={}'.format(var, os.environ[var])
+            [f'{var}={os.environ[var]}'
              for var in os.environ if 'PYWBEM' in var])
-        print('\nEnvironment: {}'.format(display_envvars))
+        print(f'\nEnvironment: {display_envvars}')
         if stdin is not None:
-            print('Stdin: {!r}'.format(stdin))
+            print(f'Stdin: {stdin!r}')
         sys.stdout.flush()
 
     if capture:
@@ -176,11 +164,11 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         assert stdin is None
         out_log = 'out.log'
         err_log = 'err.log'
-        redirect = ' >{} 2>{}'.format(out_log, err_log)
-        cmd_args = ' '.join([shlex_quote(a) for a in cmd_args]) + redirect
+        redirect = f' >{out_log} 2>{err_log}'
+        cmd_args = ' '.join([shlex.quote(a) for a in cmd_args]) + redirect
 
         if verbose:
-            print('Command (shell): {}'.format(cmd_args))
+            print(f'Command (shell): {cmd_args}')
             sys.stdout.flush()
 
         # pylint: disable=consider-using-with
@@ -188,22 +176,16 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                      stdout=None, stderr=None,
                      universal_newlines=universal_newlines)
 
-        if TimeoutExpired:
-            # Python >= 3.3
-            try:
-                proc.wait(timeout=cmd_timeout)
-                rc = proc.returncode
-            except TimeoutExpired:
-                proc.kill()
-                rc = 255
-                print("Error: Timeout ({} sec) when waiting for command to "
-                      "complete; Killed process and setting rc={}".
-                      format(cmd_timeout, rc))
-                sys.stdout.flush()
-        else:
-            # Python < 3.3
-            proc.wait()
+        try:
+            proc.wait(timeout=cmd_timeout)
             rc = proc.returncode
+        except TimeoutExpired:
+            proc.kill()
+            rc = 255
+            print("Error: Timeout ({} sec) when waiting for command to "
+                  "complete; Killed process and setting rc={}".
+                  format(cmd_timeout, rc))
+            sys.stdout.flush()
 
         with open(out_log, 'rb') as fp:
             stdout_str = fp.read()
@@ -212,7 +194,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
 
     else:
         if verbose:
-            print('Command (direct): {}'.format(cmd_args))
+            print(f'Command (direct): {cmd_args}')
             sys.stdout.flush()
 
         # pylint: disable=consider-using-with
@@ -220,28 +202,22 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                      stdout=stdout_stream, stderr=stderr_stream,
                      universal_newlines=universal_newlines)
 
-        if TimeoutExpired:
-            # Python >= 3.3
-            try:
-                stdout_str, stderr_str = proc.communicate(
-                    input=stdin, timeout=cmd_timeout)
-                rc = proc.returncode
-            except TimeoutExpired:
-                proc.kill()
-                rc = 255
-                try:
-                    stdout_str, stderr_str = proc.communicate(timeout=10)
-                except TimeoutExpired:
-                    stdout_str = stderr_str = None
-                print("Error: Timeout ({} sec) when waiting for command to "
-                      "complete; Killed process and setting rc={}; Stdout "
-                      "produced so far: {!r}; Stderr produced so far: {!r}".
-                      format(cmd_timeout, rc, stdout_str, stderr_str))
-                sys.stdout.flush()
-        else:
-            # Python < 3.3
-            stdout_str, stderr_str = proc.communicate(input=stdin)
+        try:
+            stdout_str, stderr_str = proc.communicate(
+                input=stdin, timeout=cmd_timeout)
             rc = proc.returncode
+        except TimeoutExpired:
+            proc.kill()
+            rc = 255
+            try:
+                stdout_str, stderr_str = proc.communicate(timeout=10)
+            except TimeoutExpired:
+                stdout_str = stderr_str = None
+            print("Error: Timeout ({} sec) when waiting for command to "
+                  "complete; Killed process and setting rc={}; Stdout "
+                  "produced so far: {!r}; Stderr produced so far: {!r}".
+                  format(cmd_timeout, rc, stdout_str, stderr_str))
+            sys.stdout.flush()
 
     # Restore environment of current process
     for name, value in saved_env.items():
@@ -251,14 +227,14 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
             os.environ[name] = value
 
     if verbose:
-        print('Exit code: {}'.format(rc))
+        print(f'Exit code: {rc}')
         if capture:
-            print('Stdout: {!r}'.format(stdout_str))
-            print('Stderr: {!r}'.format(stderr_str))
+            print(f'Stdout: {stdout_str!r}')
+            print(f'Stderr: {stderr_str!r}')
         sys.stdout.flush()
 
     if stdout_str is not None:
-        if isinstance(stdout_str, six.binary_type):
+        if isinstance(stdout_str, bytes):
             stdout_str = stdout_str.decode('utf-8')
         # Note: The CRs were originally only fixed for Click issue #1231, but
         # with the pywbemlistener testing, it became necessary on all Python
@@ -269,7 +245,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                                    .replace('\r', '')
 
     if stderr_str is not None:
-        if isinstance(stderr_str, six.binary_type):
+        if isinstance(stderr_str, bytes):
             stderr_str = stderr_str.decode('utf-8')
         # Note: The CRs were originally only fixed for Click issue #1231, but
         # with the pywbemlistener testing, it became necessary on all Python
@@ -471,7 +447,7 @@ def assert_lines(exp_lines, act_lines, source, desc):
             format(i, source, desc, exp_line, act_line)
 
 
-class captured_output(object):
+class captured_output:
     # pylint: disable=invalid-name
     """
     Context manager that captures any data written to sys.stdout and sys.stderr

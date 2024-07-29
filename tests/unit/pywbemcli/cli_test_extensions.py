@@ -1,17 +1,14 @@
 """
 The class in this file defines a common base for the pytests executed
 through pywbemcli execution
-
 """
 
-from __future__ import absolute_import, print_function
+
 import re
 import os
-import io
 from contextlib import contextmanager
 import yaml
 import pytest
-import six
 
 # import pkgs to determine pywbem version
 import packaging.version
@@ -37,7 +34,7 @@ PYWBEM_0 = not PYWBEM_1
 FAKEURL_STR = '//FakedUrl:5988' if PYWBEM_1 else '//FakedUrl'
 
 
-class CLITestsBase(object):
+class CLITestsBase:
     # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
         Defines methods to execute tests on pywbemcli.
@@ -208,7 +205,7 @@ class CLITestsBase(object):
         # pylint: enable=line-too-long
 
         if not condition:
-            pytest.skip('Condition for test case {} not met'.format(desc))
+            pytest.skip(f'Condition for test case {desc} not met')
 
         env = None
         stdin = None
@@ -224,7 +221,7 @@ class CLITestsBase(object):
             if stdin:
                 if isinstance(stdin, (tuple, list)):
                     stdin = '\n'.join(stdin)
-        elif isinstance(inputs, six.string_types):
+        elif isinstance(inputs, str):
             local_args = inputs
         elif isinstance(inputs, (list, tuple)):
             local_args = inputs
@@ -236,11 +233,11 @@ class CLITestsBase(object):
             assert False, "Condition 'pdb' cannot be used on testcases that " \
                 "specify stdin"
 
-        if isinstance(local_args, six.string_types):
+        if isinstance(local_args, str):
             # Is not split into words anymore
             local_args = [local_args]
 
-        if isinstance(general_args, six.string_types):
+        if isinstance(general_args, str):
             # Is not split into words anymore
             general_args = [general_args]
 
@@ -260,7 +257,7 @@ class CLITestsBase(object):
                 for item in mock_files:
                     cmd_line.extend(['--mock-server',
                                      os.path.join(TEST_DIR, item)])
-            elif isinstance(mock_files, six.string_types):
+            elif isinstance(mock_files, str):
                 cmd_line.extend(['--mock-server',
                                  os.path.join(TEST_DIR, mock_files)])
             else:
@@ -308,7 +305,7 @@ class CLITestsBase(object):
                 test_definition = exp_response['test']
                 # test that rtn_value starts with test_value
                 if test_definition == 'startswith':
-                    assert isinstance(test_value, six.string_types)
+                    assert isinstance(test_value, str)
                     assert rtn_value.startswith(test_value), \
                         "Unexpected start of line on {} in test:\n" \
                         "{}\n" \
@@ -324,7 +321,7 @@ class CLITestsBase(object):
                 # test that lines match between test_value and rtn_value
                 # base on regex match
                 elif test_definition == 'patterns':
-                    if isinstance(test_value, six.string_types):
+                    if isinstance(test_value, str):
                         test_value = test_value.splitlines()
                     assert isinstance(test_value, (list, tuple))
                     assert_patterns(test_value, rtn_value.splitlines(),
@@ -332,13 +329,13 @@ class CLITestsBase(object):
                 # test that each line in the test value matches the
                 # corresponding line in the rtn_value exactly
                 elif test_definition == 'lines':
-                    if isinstance(test_value, six.string_types):
+                    if isinstance(test_value, str):
                         test_value = test_value.splitlines()
                     if isinstance(test_value, (list, tuple)):
                         assert_lines(test_value, rtn_value.splitlines(),
                                      rtn_type, desc)
                     else:
-                        assert isinstance(test_value, six.string_types)
+                        assert isinstance(test_value, str)
                         assert_lines(test_value.splitlines(),
                                      rtn_value.splitlines(),
                                      rtn_type, desc)
@@ -353,11 +350,11 @@ class CLITestsBase(object):
                 # the return. Build rtn_value into single string and do
                 # re.search against it for each test_value
                 elif test_definition == 'regex':
-                    assert isinstance(rtn_value, six.string_types)
-                    if isinstance(test_value, six.string_types):
+                    assert isinstance(rtn_value, str)
+                    if isinstance(test_value, str):
                         test_value = [test_value]
                     for regex in test_value:
-                        assert isinstance(regex, six.string_types)
+                        assert isinstance(regex, str)
                         match_result = re.search(regex, rtn_value, re.MULTILINE)
                         assert match_result, \
                             "Missing pattern on {} in test:\n" \
@@ -372,7 +369,7 @@ class CLITestsBase(object):
                             "------------\n". \
                             format(rtn_type, desc, regex, rtn_value)
                 elif test_definition == 'in':
-                    if isinstance(test_value, six.string_types):
+                    if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert test_str in rtn_value, \
@@ -388,7 +385,7 @@ class CLITestsBase(object):
                             "------------\n". \
                             format(rtn_type, desc, test_str, rtn_value)
                 elif test_definition == 'innows':
-                    if isinstance(test_value, six.string_types):
+                    if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str, join=True) in \
@@ -405,7 +402,7 @@ class CLITestsBase(object):
                             "------------\n". \
                             format(rtn_type, desc, test_str, rtn_value)
                 elif test_definition == 'not-innows':
-                    if isinstance(test_value, six.string_types):
+                    if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str, join=True) not in \
@@ -447,7 +444,7 @@ def remove_ws(inputs, join=False):
         removed, as one string if joined, or as a list of strings is not joined.
     """
 
-    if isinstance(inputs, six.string_types):
+    if isinstance(inputs, str):
         inputs = [inputs]
 
     input_lines = []
@@ -487,7 +484,7 @@ def setup_mock_connection(mock_items, namespace):
     conn = FakedWBEMConnection()
     conn.add_namespace(namespace)
     for mock_item in mock_items:
-        if isinstance(mock_item, six.string_types):
+        if isinstance(mock_item, str):
             if mock_item.endswith('.mof'):
                 conn.compile_mof_file(mock_item, namespace=namespace)
             else:
@@ -544,13 +541,13 @@ def connections_file(conn_file, conn_content):
 
         # Create the new connections file.
         if conn_content is not None:
-            with io.open(conn_file, 'w', encoding='utf-8') as fp:
+            with open(conn_file, 'w', encoding='utf-8') as fp:
                 if isinstance(conn_content, dict):
                     conn_content = yaml.dump(conn_content)
-                if isinstance(conn_content, six.binary_type):
+                if isinstance(conn_content, bytes):
                     conn_content = conn_content.decode('utf-8')
                 fp.write(conn_content)
-                fp.write(u'\n')
+                fp.write('\n')
 
     yield None
 

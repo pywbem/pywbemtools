@@ -17,12 +17,10 @@
 Common Functions applicable across multiple components of pywbemcli
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 import re
 from collections import OrderedDict
-import six
 import click
 
 import pywbem
@@ -43,8 +41,8 @@ def _raise_typeerror(name, value, rqd_type):
     Generate a TypeError for a property in pywbem_server setter that has an
     invalid type
     """
-    raise TypeError('Property "{0}" value: {1} must be type: "{2}", not type: '
-                    '"{3}"'.format(name, value, rqd_type, type(value)))
+    raise TypeError('Property "{}" value: {} must be type: "{}", not type: '
+                    '"{}"'.format(name, value, rqd_type, type(value)))
 
 
 def _validate_server_url(server):
@@ -81,7 +79,7 @@ def _validate_server_url(server):
     return url
 
 
-class PywbemServer(object):
+class PywbemServer:
     # pylint: disable=too-many-instance-attributes, useless-object-inheritance
     """
     Envelope for connections with WBEM Server incorporates both the
@@ -175,10 +173,10 @@ class PywbemServer(object):
     def mock_server(self, mock_server):
         """Setter method; for a description see the getter method."""
         if mock_server:
-            if not isinstance(mock_server, (list, six.string_types)):
+            if not isinstance(mock_server, (list, (str,))):
                 _raise_typeerror("mock_server", mock_server, 'list, string')
             for ms in mock_server:
-                if not isinstance(ms, six.string_types):
+                if not isinstance(ms, str):
                     _raise_typeerror("mock_server item", mock_server, 'string')
         # assure this is list type in yaml output
         if mock_server is None:
@@ -197,7 +195,7 @@ class PywbemServer(object):
     def name(self, name):
         """Setter method; for a description see the getter method."""
         if name:
-            if not isinstance(name, six.string_types):
+            if not isinstance(name, str):
                 _raise_typeerror("name", name, 'string')
 
         # pylint: disable=attribute-defined-outside-init
@@ -214,7 +212,7 @@ class PywbemServer(object):
     def user(self, user):
         """Setter method; for a description see the getter method."""
 
-        if user and not isinstance(user, six.string_types):
+        if user and not isinstance(user, str):
             _raise_typeerror("user", user, 'string')
 
         # pylint: disable=attribute-defined-outside-init
@@ -230,7 +228,7 @@ class PywbemServer(object):
     @password.setter
     def password(self, password):
         """Setter method; for a description see the getter method."""
-        if password and not isinstance(password, six.string_types):
+        if password and not isinstance(password, str):
             _raise_typeerror("password", password, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._password = password
@@ -246,7 +244,7 @@ class PywbemServer(object):
     def default_namespace(self, default_namespace):
         """Setter method; for a description see the getter method."""
         if default_namespace and not isinstance(default_namespace,
-                                                six.string_types):
+                                                str):
             _raise_typeerror("default-namespace", default_namespace, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._default_namespace = default_namespace
@@ -268,7 +266,7 @@ class PywbemServer(object):
         if not isinstance(timeout, int):
             _raise_typeerror("timeout", timeout, 'integer')
         if not 0 < timeout <= MAX_TIMEOUT:
-            raise ValueError('Timeout option "{0}" out of range {1} to {2} sec'
+            raise ValueError('Timeout option "{}" out of range {} to {} sec'
                              .format(timeout, 0, MAX_TIMEOUT))
         # pylint: disable=attribute-defined-outside-init
         self._timeout = timeout
@@ -306,7 +304,7 @@ class PywbemServer(object):
         if pull_max_cnt is None:
             self._pull_max_cnt = DEFAULT_MAXPULLCNT
 
-        elif isinstance(pull_max_cnt, six.integer_types):
+        elif isinstance(pull_max_cnt, int):
             # pylint: disable=attribute-defined-outside-init
             self._pull_max_cnt = pull_max_cnt
         else:
@@ -335,13 +333,13 @@ class PywbemServer(object):
         provided on input
         """
         if self._certfile:
-            assert isinstance(self._certfile, six.string_types)
+            assert isinstance(self._certfile, str)
         return self._certfile
 
     @certfile.setter
     def certfile(self, certfile):
         """Setter method; for a description see the getter method."""
-        if certfile and not isinstance(certfile, six.string_types):
+        if certfile and not isinstance(certfile, str):
             _raise_typeerror("certfile", certfile, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._certfile = certfile
@@ -352,13 +350,13 @@ class PywbemServer(object):
         :term:`string`: keyfile or None if no keyfile parameter input
         """
         if self._keyfile:
-            assert isinstance(self._keyfile, six.string_types)
+            assert isinstance(self._keyfile, str)
         return self._keyfile
 
     @keyfile.setter
     def keyfile(self, keyfile):
         """Setter method; for a description see the getter method."""
-        if keyfile and not isinstance(keyfile, six.string_types):
+        if keyfile and not isinstance(keyfile, str):
             _raise_typeerror("keyfile", keyfile, 'string')
 
         # pylint: disable=attribute-defined-outside-init
@@ -370,13 +368,13 @@ class PywbemServer(object):
         :term:`string`: String that defines certs for server validation"
         """
         if self._ca_certs:
-            assert isinstance(self._ca_certs, six.string_types)
+            assert isinstance(self._ca_certs, str)
         return self._ca_certs
 
     @ca_certs.setter
     def ca_certs(self, ca_certs):
         """Setter method; for a description see the getter method."""
-        if ca_certs and not isinstance(ca_certs, six.string_types):
+        if ca_certs and not isinstance(ca_certs, str):
             _raise_typeerror("ca_certs", ca_certs, 'string')
         # pylint: disable=attribute-defined-outside-init
         self._ca_certs = ca_certs
@@ -559,10 +557,10 @@ class PywbemServer(object):
         if ctx.obj:
             if ctx.obj.verbose:
                 if self._mock_server:
-                    server_txt = "mock environment {}".format(self._mock_server)
+                    server_txt = f"mock environment {self._mock_server}"
                 else:
-                    server_txt = "WBEM server {}".format(self._server)
-                click.echo("Disconnecting from {}".format(server_txt))
+                    server_txt = f"WBEM server {self._server}"
+                click.echo(f"Disconnecting from {server_txt}")
 
         self._wbem_server.conn.close()
         self._wbem_server = None
@@ -608,10 +606,10 @@ class PywbemServer(object):
         if ctx.obj:
             if ctx.obj.verbose:
                 if self._mock_server:
-                    server_txt = "mock environment {}".format(self._mock_server)
+                    server_txt = f"mock environment {self._mock_server}"
                 else:
-                    server_txt = "WBEM server {}".format(self._server)
-                click.echo("Connecting to {}".format(server_txt))
+                    server_txt = f"WBEM server {self._server}"
+                click.echo(f"Connecting to {server_txt}")
 
         if self._mock_server:
             conn = PYWBEMCLIFakedConnection(
@@ -647,10 +645,10 @@ class PywbemServer(object):
 
         if verbose:
             if self._mock_server:
-                server_txt = "mock environment {}".format(self._mock_server)
+                server_txt = f"mock environment {self._mock_server}"
             else:
-                server_txt = "WBEM server {}".format(self._server)
-            click.echo("Connecting to {}".format(server_txt))
+                server_txt = f"WBEM server {self._server}"
+            click.echo(f"Connecting to {server_txt}")
 
     def set_logger_config(self, log):
         """
@@ -717,7 +715,7 @@ class PywbemServer(object):
                 timeout=self.timeout,
                 use_pull_operations=use_pull,
                 stats_enabled=True)
-        except IOError as exc:
+        except OSError as exc:
             raise click.ClickException(
                 'Cannot create connection to {}: {}'.
                 format(self.server, exc))

@@ -7,11 +7,10 @@ Windows and Unix-like platforms on Python 2.7.
 They document these differences, and verify that the approach used in
 test_build_mockenv() works on all platforms.
 """
+# TODO: Eliminate this module.
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import pytest
 
 # pylint: disable=use-dict-literal
@@ -26,8 +25,8 @@ def file_path():
     """
 
     _file_path = 'tmp_file.txt'
-    with io.open(_file_path, 'w', encoding='utf-8') as fp:
-        fp.write(u'first line\n')
+    with open(_file_path, 'w', encoding='utf-8') as fp:
+        fp.write('first line\n')
 
     # The yield causes the remainder of this fixture to be executed at the
     # end of the test.
@@ -46,13 +45,13 @@ def test_tell_append_diff(file_path):
     size = os.stat(file_path).st_size
 
     # Get the stream position via tell() and append a line
-    with io.open(file_path, 'a', encoding='utf-8') as fp:
+    with open(file_path, 'a', encoding='utf-8') as fp:
         pos = fp.tell()
-        fp.write(u'second line\n')
+        fp.write('second line\n')
 
     # Remove the line again by truncating the file to the previous stream
     # position.
-    with io.open(file_path, 'a', encoding='utf-8') as fp:
+    with open(file_path, 'a', encoding='utf-8') as fp:
         fp.seek(pos)
         fp.truncate()
 
@@ -75,11 +74,11 @@ def test_truncate_append_same(file_path):
     size = os.stat(file_path).st_size
 
     # Append a line
-    with io.open(file_path, 'a', encoding='utf-8') as fp:
-        fp.write(u'second line\n')
+    with open(file_path, 'a', encoding='utf-8') as fp:
+        fp.write('second line\n')
 
     # Remove the line again by truncating the file using truncate() with size.
-    with io.open(file_path, 'a', encoding='utf-8') as fp:
+    with open(file_path, 'a', encoding='utf-8') as fp:
         fp.truncate(size)
 
     new_size = os.stat(file_path).st_size

@@ -40,8 +40,6 @@ pywbem==1.7.2
 
 nocaselist==1.0.3
 nocasedict==1.0.1
-six==1.14.0; python_version <= '3.9'
-six==1.16.0; python_version >= '3.10'
 # Safety package requires click 8.0.2 minimum
 Click==8.0.2
 click-spinner==0.1.8; python_version <= '3.11'

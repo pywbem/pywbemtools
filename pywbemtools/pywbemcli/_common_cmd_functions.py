@@ -19,7 +19,6 @@ apply across multiple command groups (ex. they are used by both _cmd_class
 and _cmd_instance).
 """
 
-from __future__ import absolute_import, print_function
 
 from collections import namedtuple
 import click
@@ -40,7 +39,7 @@ from .._output_formatting import output_format_is_table, \
     output_format_is_textgroup
 
 
-class ResultsHandler(object):
+class ResultsHandler:
     """
     Class that manages the handling of the namespaces, interim results, and
     errors in those request action methods that use multiple namespaces.
@@ -223,14 +222,14 @@ class ResultsHandler(object):
                                     table_format=self.output_format))
 
         elif output_format_is_cimobject(self.output_format):
-            click.echo("\n{}".format(title))
+            click.echo(f"\n{title}")
             for row in rows:
                 click.echo(
                     "namespace:{} CIMError:{} Description:{}".
                     format(row[0], row[1], row[2]), err=True)
 
         elif output_format_is_textgroup(self.output_format):
-            click.echo("\n{}".format(title))
+            click.echo(f"\n{title}")
             for row in rows:
                 click.echo(
                     "namespace:{} CIMError:{} Description:{}".

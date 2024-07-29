@@ -21,7 +21,6 @@ commands for create, delete, list, etc. of the CIM namespaces on a WBEM server.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 
@@ -109,13 +108,13 @@ def namespace_create(context, namespace):
                          options_metavar=CMD_OPTS_TXT)
 @click.argument('namespace', type=str, metavar='NAMESPACE', required=True,)
 @click.option('--include-objects', is_flag=True, default=False,
-              help=u'Delete any objects in the namespace as well. '
+              help='Delete any objects in the namespace as well. '
                    'WARNING: Deletion of instances will cause the removal of '
                    'corresponding resources in the managed environment (i.e. '
                    'in the real world). '
                    'Default: Reject command if the namespace has any objects.')
 @click.option('--dry-run', is_flag=True, required=False,
-              help=u'Enable dry-run mode: Do not actually delete the objects, '
+              help='Enable dry-run mode: Do not actually delete the objects, '
                    'but display what would be done.')
 @add_options(help_option)
 @click.pass_obj
@@ -204,7 +203,7 @@ def cmd_namespace_list(context):
         else:
             display_text("\n".join(namespaces))
     except Error as er:
-        raise click.ClickException('{}: {}'.format(er.__class__.__name__, er))
+        raise click.ClickException(f'{er.__class__.__name__}: {er}')
 
 
 def cmd_namespace_create(context, namespace):
@@ -215,7 +214,7 @@ def cmd_namespace_create(context, namespace):
     try:
         wbem_server.create_namespace(namespace)
         context.spinner_stop()
-        click.echo('Created namespace {}'.format(namespace))
+        click.echo(f'Created namespace {namespace}')
     except Error as er:
         raise pywbem_error_exception(er)
 
@@ -291,7 +290,7 @@ def cmd_namespace_delete(context, namespace, options):
                         conn.DeleteInstance(inst_path)
                     except Error as exc:
                         raise pywbem_error_exception(
-                            exc, "Cannot delete instance {}".format(inst_path))
+                            exc, f"Cannot delete instance {inst_path}")
                 click.echo('{}Deleted instance {}'.
                            format(dry_run_prefix, inst_path))
         for classname in classnames_depsorted:
@@ -327,8 +326,8 @@ def cmd_namespace_delete(context, namespace, options):
             wbem_server.delete_namespace(namespace)
         except Error as exc:
             raise pywbem_error_exception(
-                exc, "Cannot delete namespace {}".format(namespace))
-    click.echo('{}Deleted namespace {}'.format(dry_run_prefix, namespace))
+                exc, f"Cannot delete namespace {namespace}")
+    click.echo(f'{dry_run_prefix}Deleted namespace {namespace}')
 
 
 def cmd_namespace_interop(context):

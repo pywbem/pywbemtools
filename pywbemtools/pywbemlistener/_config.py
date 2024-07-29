@@ -22,8 +22,8 @@ VERBOSE_SETTINGS = 1
 VERBOSE_PROCESSES = 2
 
 # Verbosity help text, by level
-VERBOSE_1_HELP = u'Display indication processing settings'
-VERBOSE_2_HELP = u'Display interactions between start and run commands'
+VERBOSE_1_HELP = 'Display indication processing settings'
+VERBOSE_2_HELP = 'Display interactions between start and run commands'
 
 # Global flag that is set if verbosity >= VERBOSE_PROCESSES
 VERBOSE_PROCESSES_ENABLED = False

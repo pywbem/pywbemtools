@@ -20,7 +20,6 @@ used in pywbemcli.py and show up in the help output from pywbemcli --help.
 NOTE: The --log options are tested in a separate file.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import sys
@@ -1471,7 +1470,7 @@ TEST_CASES = [
      {'general': [],
       'stdin': ['--server http://blah --user fred --password fred '
                 'connection save fred',
-                '--mock-server {} class enumerate'.format(BAD_MOF_FILE_PATH),
+                f'--mock-server {BAD_MOF_FILE_PATH} class enumerate',
                 'connection select fred',
                 'connection show',
                 'connection delete fred'],

@@ -24,10 +24,8 @@ registering the pieces of the model as a dependent because we don't really
 know what changes in the model.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import sys
 
 from tests.unit.pywbemcli.testmock.wbemserver_mock_class import \
     WbemServerMock  # noqa: F403
@@ -43,15 +41,7 @@ def _setup(conn, server, verbose):
       server (PywbemServer): Server
       verbose (bool): Verbose flag
     """
-    if sys.version_info >= (3, 6):
-        this_file_path = __file__
-    else:
-        # Unfortunately, it does not seem to be possible to find the file path
-        # of the current script when it is executed using exec(), so we hard
-        # code the file path. This requires that the tests are run from the
-        # repo main directory.
-        this_file_path = 'tests/unit/pywbemcli/simple_interop_mock_script.py'
-        assert os.path.exists(this_file_path)
+    this_file_path = __file__
     fn = "wbemserver_mock_class.py"
     dep_path = os.path.join(os.path.dirname(this_file_path), fn)
     conn.provider_dependent_registry.add_dependents(this_file_path, dep_path)
@@ -59,25 +49,13 @@ def _setup(conn, server, verbose):
     WbemServerMock(conn, server, verbose=verbose)
 
 
-if sys.version_info >= (3, 6):
-    # New-style setup
+# New-style setup
 
-    # If the function is defined directly, it will be detected and refused
-    # by the check for setup() functions on Python <3.5, despite being defined
-    # only conditionally. The indirect approach with exec() addresses that.
-    # pylint: disable=exec-used
-    exec("""
+# If the function is defined directly, it will be detected and refused
+# by the check for setup() functions on Python <3.5, despite being defined
+# only conditionally. The indirect approach with exec() addresses that.
+# pylint: disable=exec-used
+exec("""
 def setup(conn, server, verbose):
     _setup(conn, server, verbose=verbose)
 """)
-
-else:
-    # Old-style setup
-    # pylint: disable=undefined-variable
-
-    global CONN  # pylint: disable=global-at-module-level
-    global SERVER  # pylint: disable=global-at-module-level
-    global VERBOSE  # pylint: disable=global-at-module-level
-
-    # pylint: disable=undefined-variable
-    _setup(CONN, SERVER, VERBOSE)  # noqa: F821, F405

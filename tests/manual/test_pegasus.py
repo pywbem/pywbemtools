@@ -20,15 +20,13 @@
 Execute and test the validity of the help output from pywbemcli
 """
 
-from __future__ import print_function, absolute_import
 
 import re
 from subprocess import Popen, PIPE
-import six
 import pytest
 
 
-class Base(object):
+class Base:
     """
     Base class for all tests.
     """
@@ -44,18 +42,17 @@ class Base(object):
     def execute_cmd(self, cmd_str):  # pylint: disable=no-self-use
         """Execute the command defined by cmd_str and return results."""
         if self.verbose:
-            print('cmd {}'.format(cmd_str))
+            print(f'cmd {cmd_str}')
         # Disable python warnings for pywbemcli call.See issue #42
-        command = 'export PYTHONWARNINGS="" && {}'.format(cmd_str)
+        command = f'export PYTHONWARNINGS="" && {cmd_str}'
         # pylint: disable=consider-using-with
         proc = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
         std_out, std_err = proc.communicate()
         exitcode = proc.returncode
-        if six.PY3:
-            std_out = std_out.decode()
-            std_err = std_err.decode()
+        std_out = std_out.decode()
+        std_err = std_err.decode()
         if self.verbose:
-            print('rtn {}\n{}\n{}'.format(std_out, std_err, exitcode))
+            print(f'rtn {std_out}\n{std_err}\n{exitcode}')
 
         # return tuple of exitcode, stdout, stderr
         return exitcode, std_out, std_err
@@ -101,7 +98,7 @@ class TestClassGroup(Base):
 
     def class_cmd(self, params):
         """Adds the cmd name prefix and executes"""
-        cmd = 'pywbemcli -s {} class {}'.format(self.host, params)
+        cmd = f'pywbemcli -s {self.host} class {params}'
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
@@ -185,7 +182,7 @@ class TestInstanceGroup(Base):
 
     def instance_cmd(self, params):
         """Adds the instance cmd name prefix and executes"""
-        cmd = 'pywbemcli -s {} instance {}'.format(self.host, params)
+        cmd = f'pywbemcli -s {self.host} instance {params}'
         exitcode, std_out_str, std_err_str = self.execute_cmd(cmd)
         return exitcode, std_out_str, std_err_str
 
@@ -293,7 +290,7 @@ class TestInstanceGroup(Base):
             'create pywbem_alltypes --property InstanceId=ArrayBool '
             '--property BlahBool=True,False')
 
-        print('err {}'.format(err))
+        print(f'err {err}')
         assert exitcode == 1
 
     def test_references(self):

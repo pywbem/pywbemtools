@@ -164,7 +164,7 @@ def import_script(file_path):
     # Note that variables from the mock script are set only after exec_module()
     if not hasattr(module, 'setup'):
         raise NotCacheable(
-            "Mock script {} does not have a setup() function".format(file_path))
+            f"Mock script {file_path} does not have a setup() function")
 
 
 def script_error(file_path, exc):

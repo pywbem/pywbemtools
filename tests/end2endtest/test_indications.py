@@ -23,7 +23,6 @@ execute_indication_test(...) multiple times.
 
 """
 
-from __future__ import absolute_import, print_function
 
 import socket
 import os
@@ -55,17 +54,17 @@ def exec_pywbemlistener_cmd(request_params, expected_rc=0, ignore_stderr=False,
     rc == 0. the ingore_stderr parameter allows bypassing this.
     """
     if verbose:
-        print("Exec_listener_cmd {}".format(request_params))
+        print(f"Exec_listener_cmd {request_params}")
     rc, stdout, stderr = execute_command('pywbemlistener', request_params)
     if verbose:
-        print("Listener startup result rc={}, stderr={}".format(rc, stderr))
+        print(f"Listener startup result rc={rc}, stderr={stderr}")
 
     if expected_rc == 0:
         assert rc == 0, "pywbemlistener failed: params={}, rc={}, stderr={}" \
                         .format(request_params, rc, stderr)
         if not ignore_stderr:
             assert stderr == '', \
-                "pywbemlistener stderr={}, rc={}".format(stderr, rc)
+                f"pywbemlistener stderr={stderr}, rc={rc}"
         return stdout
 
     # expected rc not 0
@@ -115,7 +114,7 @@ def execute_indication_test(
     # Create listener that writes to a file
     listener_name = 'lis1-end2endtest'
     if verbose:
-        print("Create listener named {}".format(listener_name))
+        print(f"Create listener named {listener_name}")
 
     # Define file name,remove existing, create empty indication count file
     # line count from this file is number of indications received.
@@ -151,7 +150,7 @@ def execute_indication_test(
          format(indication_send_count)])
 
     if verbose:
-        print("Debug: invoke method result {}".format(result))
+        print(f"Debug: invoke method result {result}")
 
     test_result = wait_for_indications(indication_send_count,
                                        indication_count_file,
@@ -196,7 +195,7 @@ def wait_for_indications(indication_send_count, indication_count_file,
         time.sleep(1)
 
         # Count indications received in file by counting lines
-        with open(indication_count_file, 'r', encoding='UTF-8') as fp:
+        with open(indication_count_file, encoding='UTF-8') as fp:
             rcvd_lines = len(fp.readlines())
             if verbose:
                 print("rcvd {} indications, loop {}".format(rcvd_lines,
@@ -252,7 +251,7 @@ def test_indications(server_url):  # noqa: F811
     sock.close()
 
     if verbose:
-        print("Indication_dest_host {}".format(indication_dest_host))
+        print(f"Indication_dest_host {indication_dest_host}")
 
     interop = validate_namespace_exists(server_url, 'interop', 'root/interop')
 

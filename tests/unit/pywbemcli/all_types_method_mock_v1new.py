@@ -25,7 +25,7 @@ class CIM_AllTypesMethodProvider(pywbem_mock.MethodProvider):
     provider_classnames = 'PyWBEM_AllTypes'
 
     def __init__(self, cimrepository):
-        super(CIM_AllTypesMethodProvider, self).__init__(cimrepository)
+        super().__init__(cimrepository)
 
     def InvokeMethod(self, methodname, localobject, params):
         """
@@ -48,8 +48,8 @@ class CIM_AllTypesMethodProvider(pywbem_mock.MethodProvider):
         if not self.class_exists(namespace, classname):
             raise pywbem.CIMError(
                 pywbem.CIM_ERR_NOT_FOUND,
-                "class {0} does not exist in CIM repository, "
-                "namespace {1}".format(classname, namespace))
+                "class {} does not exist in CIM repository, "
+                "namespace {}".format(classname, namespace))
 
         # Return the input parameters as output parameters
         out_params = params

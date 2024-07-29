@@ -25,10 +25,8 @@ everywhere xa WBEMConnection possible pull operation is called.
 It also adds a method to FakeWBEMConnection to build the repository.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import errno
 import glob
 import hashlib
@@ -49,7 +47,7 @@ PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
 
 # pylint: disable=useless-object-inheritance
-class PYWBEMCLIConnectionMixin(object):
+class PYWBEMCLIConnectionMixin:
     """
     Mixin class to extend WBEMConnection with a set of methods that use the
     iter<...> methods as the basis for getting Instances, etc. but add the
@@ -293,7 +291,7 @@ class PYWBEMCLIConnectionMixin(object):
         return list(result)
 
 
-class BuildMockenvMixin(object):
+class BuildMockenvMixin:
     # pylint: disable=too-few-public-methods
     """
     Mixin class for pywbem_mock.FakedWBEMConnection that adds the ability to
@@ -377,7 +375,7 @@ class BuildMockenvMixin(object):
         for file_path in file_path_list:
             if not os.path.exists(file_path):
                 raise mockscripts.MockFileError(
-                    "Mock file does not exist: {}".format(file_path))
+                    f"Mock file does not exist: {file_path}")
 
         # The connections file is set if a named connection is used, i.e.
         # when specifying the -n general option. It is not set when the -s or -m
@@ -430,7 +428,7 @@ class BuildMockenvMixin(object):
 
             try:
                 depreg = self._load_depreg(depreg_pickle_file)
-            except (IOError, OSError) as exc:
+            except OSError as exc:
                 if exc.errno == errno.ENOENT:
                     depreg = pywbem_mock.ProviderDependentRegistry()
                 else:
@@ -439,7 +437,7 @@ class BuildMockenvMixin(object):
             # Calculate the MD5 hash value of the content of the input files
             md5 = hashlib.md5()
             for file_path in file_path_list:
-                with io.open(file_path, 'rb') as fp:
+                with open(file_path, 'rb') as fp:
                     file_source = fp.read()
                     md5.update(file_source)
 
@@ -447,7 +445,7 @@ class BuildMockenvMixin(object):
                 if file_path.endswith('.py'):
                     dep_files = depreg.iter_dependents(file_path)
                     for dep_file in dep_files:
-                        with io.open(dep_file, 'rb') as fp:
+                        with open(dep_file, 'rb') as fp:
                             file_source = fp.read()
                             md5.update(file_source)
 
@@ -460,7 +458,7 @@ class BuildMockenvMixin(object):
             # Determine whether the mock environment needs to be rebuilt based
             # on the MD5 hash value of the input file content.
             if not need_rebuild:
-                with io.open(md5_file, 'r', encoding='utf-8') as fp:
+                with open(md5_file, encoding='utf-8') as fp:
                     cached_md5_value = fp.read()
                 if new_md5_value != cached_md5_value:
                     if verbose:
@@ -505,7 +503,7 @@ class BuildMockenvMixin(object):
                     self._dump_mockenv(mockenv_pickle_file)
                     self._dump_depreg(
                         self.provider_dependent_registry, depreg_pickle_file)
-                    with io.open(md5_file, 'w', encoding='utf-8') as fp:
+                    with open(md5_file, 'w', encoding='utf-8') as fp:
                         fp.write(new_md5_value)
                     if verbose:
                         click.echo("Mock environment for connection "
@@ -563,15 +561,15 @@ class BuildMockenvMixin(object):
 
                     if PYWBEM_VERSION.release >= (1, 0, 0):
                         # display just the exception.
-                        msg = "MOF compile failed:\n{0}".format(er)
+                        msg = f"MOF compile failed:\n{er}"
                     else:
                         # display file name.  Error text displayed already.
                         if isinstance(er, pywbem.MOFParseError):
-                            msg = "MOF compile failed: File: '{0}'" \
+                            msg = "MOF compile failed: File: '{}'" \
                                 "(see above)".format(file_path)
                         else:  # not parse error, display exception
-                            msg = "MOF compile failed: File: {0} " \
-                                "Error: {1}".format(file_path, er)
+                            msg = "MOF compile failed: File: {} " \
+                                "Error: {}".format(file_path, er)
                     new_exc = mockscripts.MockMOFCompileError(msg)
                     new_exc.__cause__ = None
                     raise new_exc
@@ -604,7 +602,7 @@ class BuildMockenvMixin(object):
                    # pylint: disable=protected-access
                    "provider_registry": self._provider_registry}
 
-        with io.open(mockenv_pickle_file, 'wb') as fp:
+        with open(mockenv_pickle_file, 'wb') as fp:
             pickle.dump(mockenv, fp)
 
     def _load_mockenv(self, mockenv_pickle_file, file_path_list):
@@ -638,7 +636,7 @@ class BuildMockenvMixin(object):
                 mockscripts.import_script(file_path)
 
         # Restore the provider registry and the CIM repository
-        with io.open(mockenv_pickle_file, 'rb') as fp:
+        with open(mockenv_pickle_file, 'rb') as fp:
             mockenv = pickle.load(fp)
 
         # Others have references to the self._cimrepository object, so we are
@@ -666,7 +664,7 @@ class BuildMockenvMixin(object):
 
           depreg_pickle_file (string): Path name of the pickle file.
         """
-        with io.open(depreg_pickle_file, 'wb') as fp:
+        with open(depreg_pickle_file, 'wb') as fp:
             pickle.dump(depreg, fp)
 
     @staticmethod
@@ -682,7 +680,7 @@ class BuildMockenvMixin(object):
         Returns:
           pywbem_mock.ProviderDependentRegistry: Provider dependent registry.
         """
-        with io.open(depreg_pickle_file, 'rb') as fp:
+        with open(depreg_pickle_file, 'rb') as fp:
             depreg = pickle.load(fp)
         return depreg
 
@@ -697,7 +695,7 @@ class PYWBEMCLIConnection(pywbem.WBEMConnection, PYWBEMCLIConnectionMixin):
         """
         ctor passes all input parameters to superclass
         """
-        super(PYWBEMCLIConnection, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class PYWBEMCLIFakedConnection(BuildMockenvMixin,
@@ -711,7 +709,7 @@ class PYWBEMCLIFakedConnection(BuildMockenvMixin,
         """
         ctor passes all input parameters to superclass
         """
-        super(PYWBEMCLIFakedConnection, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 def mockcache_rootdir():
@@ -738,7 +736,7 @@ def mockcache_cachedir(rootdir, connections_file, connection_name):
         pass
     md5 = hashlib.md5()
     md5.update(connections_file.encode("utf-8"))
-    cache_id = "{}.{}".format(md5.hexdigest(), connection_name)
+    cache_id = f"{md5.hexdigest()}.{connection_name}"
     dir_path = os.path.join(rootdir, cache_id)
     return dir_path
 

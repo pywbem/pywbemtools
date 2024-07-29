@@ -19,9 +19,6 @@ strings that have defined folding rules and can fit into specific spaces like
 table cells
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
-
-import six
 
 from pywbem import CIMInstance, CIMClass, CIMFloat, CIMInt
 
@@ -33,15 +30,6 @@ except ImportError:  # py2
 
 
 DEFAULT_MAX_CELL_WIDTH = 100
-
-# Same as in pwbem.cimtypes.py
-if six.PY2:
-    # pylint: disable=invalid-name,undefined-variable
-    _Longint = long  # noqa: F821
-else:
-    # pylint: disable=invalid-name
-    _Longint = int
-
 
 # Constants for string formatting
 DEFAULT_INDENT = 3
@@ -67,7 +55,7 @@ def _indent_str(indent):
     Return a MOF indent pad unicode string from the indent integer variable
     that defines number of spaces to indent. Used to format MOF output.
     """
-    return u''.ljust(indent, u' ')
+    return ''.ljust(indent, ' ')
 
 
 def _mofval(value, indent, maxline, line_pos=0, end_space=0):
@@ -106,7 +94,7 @@ def _mofval(value, indent, maxline, line_pos=0, end_space=0):
         * new line_pos
     """
 
-    assert isinstance(value, six.text_type)
+    assert isinstance(value, str)
 
     # Check for output on current line
     # if fits or this is first entry on the line
@@ -115,7 +103,7 @@ def _mofval(value, indent, maxline, line_pos=0, end_space=0):
         line_pos += len(value)
         return value, line_pos
 
-    mof_str = u'\n' + _indent_str(indent) + value
+    mof_str = '\n' + _indent_str(indent) + value
     line_pos = indent + len(value)
     return mof_str, line_pos
 
@@ -166,7 +154,7 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
     """  # noqa: E501
 
     if type == 'string':  # pylint: disable=no-else-raise
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             quote_char = '"' if quote_strings else ""
             return _mofstr(value, indent, maxline, line_pos, end_space,
                            avoid_splits, quote_char=quote_char)
@@ -175,30 +163,30 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
             # embedded instance or class
             return _mofstr(value.tomof(), indent, maxline, line_pos, end_space,
                            avoid_splits)
-        raise TypeError("Scalar value of CIM type {0} has invalid Python type "
-                        "type {1} for conversion to a MOF string".format
+        raise TypeError("Scalar value of CIM type {} has invalid Python type "
+                        "type {} for conversion to a MOF string".format
                         (type, builtin_type(value)))
 
     elif type == 'char16':
         return _mofstr(value, indent, maxline, line_pos, end_space,
-                       avoid_splits, quote_char=u"'")
+                       avoid_splits, quote_char="'")
     elif type == 'boolean':
-        val = u'true' if value else u'false'
+        val = 'true' if value else 'false'
         return _mofval(val, indent, maxline, line_pos, end_space)
     elif type == 'datetime':
-        val = six.text_type(value)
+        val = str(value)
         # Always quote datetime strings
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
     elif type == 'reference':
         val = value.to_wbem_uri(format='standard')
         # Always quote reference strings
         return _mofstr(val, indent, maxline, line_pos, end_space, avoid_splits)
-    elif isinstance(value, (CIMFloat, CIMInt, int, _Longint)):
-        val = six.text_type(value)
+    elif isinstance(value, (CIMFloat, CIMInt, int)):
+        val = str(value)
         return _mofval(val, indent, maxline, line_pos, end_space)
     else:
         assert isinstance(value, float), \
-            "Scalar value of CIM type {0} has invalid Python type {1} " \
+            "Scalar value of CIM type {} has invalid Python type {} " \
             "for conversion to a MOF string".format(type, builtin_type(value))
         val = repr(value)
         return _mofval(val, indent, maxline, line_pos, end_space)
@@ -284,32 +272,32 @@ def mof_escaped(strvalue):
     #         esc = '\\x{0:04X}'.format(cp)
     #         escaped_str = escaped_str.replace(c, esc)
     escaped_str = escaped_str.\
-        replace(u'\u0001', '\\x0001').\
-        replace(u'\u0002', '\\x0002').\
-        replace(u'\u0003', '\\x0003').\
-        replace(u'\u0004', '\\x0004').\
-        replace(u'\u0005', '\\x0005').\
-        replace(u'\u0006', '\\x0006').\
-        replace(u'\u0007', '\\x0007').\
-        replace(u'\u000B', '\\x000B').\
-        replace(u'\u000E', '\\x000E').\
-        replace(u'\u000F', '\\x000F').\
-        replace(u'\u0010', '\\x0010').\
-        replace(u'\u0011', '\\x0011').\
-        replace(u'\u0012', '\\x0012').\
-        replace(u'\u0013', '\\x0013').\
-        replace(u'\u0014', '\\x0014').\
-        replace(u'\u0015', '\\x0015').\
-        replace(u'\u0016', '\\x0016').\
-        replace(u'\u0017', '\\x0017').\
-        replace(u'\u0018', '\\x0018').\
-        replace(u'\u0019', '\\x0019').\
-        replace(u'\u001A', '\\x001A').\
-        replace(u'\u001B', '\\x001B').\
-        replace(u'\u001C', '\\x001C').\
-        replace(u'\u001D', '\\x001D').\
-        replace(u'\u001E', '\\x001E').\
-        replace(u'\u001F', '\\x001F')
+        replace('\u0001', '\\x0001').\
+        replace('\u0002', '\\x0002').\
+        replace('\u0003', '\\x0003').\
+        replace('\u0004', '\\x0004').\
+        replace('\u0005', '\\x0005').\
+        replace('\u0006', '\\x0006').\
+        replace('\u0007', '\\x0007').\
+        replace('\u000B', '\\x000B').\
+        replace('\u000E', '\\x000E').\
+        replace('\u000F', '\\x000F').\
+        replace('\u0010', '\\x0010').\
+        replace('\u0011', '\\x0011').\
+        replace('\u0012', '\\x0012').\
+        replace('\u0013', '\\x0013').\
+        replace('\u0014', '\\x0014').\
+        replace('\u0015', '\\x0015').\
+        replace('\u0016', '\\x0016').\
+        replace('\u0017', '\\x0017').\
+        replace('\u0018', '\\x0018').\
+        replace('\u0019', '\\x0019').\
+        replace('\u001A', '\\x001A').\
+        replace('\u001B', '\\x001B').\
+        replace('\u001C', '\\x001C').\
+        replace('\u001D', '\\x001D').\
+        replace('\u001E', '\\x001E').\
+        replace('\u001F', '\\x001F')
 
     # Escape single and double quote
     escaped_str = escaped_str.replace('"', '\\"')
@@ -319,7 +307,7 @@ def mof_escaped(strvalue):
 
 
 def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
-            quote_char=u'"'):
+            quote_char='"'):
     """
     Low level function that returns the MOF representation of a string value
     (i.e. a value that can be split into multiple parts, for example a string,
@@ -383,7 +371,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
         * new line_pos
     """
 
-    assert isinstance(value, six.text_type)
+    assert isinstance(value, str)
 
     value = mof_escaped(value)
 
@@ -392,7 +380,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
         quote_len = len(quote_char) * 2
     else:
         quote_len = 0
-    new_line = u'\n' + _indent_str(indent)
+    new_line = '\n' + _indent_str(indent)
 
     mof = []
     while True:
@@ -412,7 +400,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
                 avl_len = maxline - indent - quote_len
             else:
                 # Find last fitting blank
-                blank_pos = value.rfind(u' ', 0, avl_len)
+                blank_pos = value.rfind(' ', 0, avl_len)
                 if blank_pos < 0:
                     # We cannot split at a blank -> start a new line
                     if mof:
@@ -431,7 +419,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
             break
 
         # Split the string and output the next part
-        split_pos = value.rfind(u' ', 0, avl_len)
+        split_pos = value.rfind(' ', 0, avl_len)
         if split_pos < 0:
             # We have to split within a word
             split_pos = avl_len - 1
@@ -444,7 +432,7 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
             mof.append(quote_char)
         line_pos += quote_len + len(part_value)
 
-        if value == u'':
+        if value == '':
             break
 
         # A safety check for endless loops
@@ -452,9 +440,9 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
             "Endless loop in _mofstr() with state: " \
             "mof_str={0}, value={1}, avl_len={2}, end_space={3}, " \
             "split_pos={4} with maxline={5} input". \
-            format(u''.join(mof), value, avl_len, end_space, split_pos, maxline)
+            format(''.join(mof), value, avl_len, end_space, split_pos, maxline)
 
-    mof_str = u''.join(mof)
+    mof_str = ''.join(mof)
     return mof_str, line_pos
 
 
@@ -524,25 +512,25 @@ def cimvalue_to_fmtd_string(value, type, indent=0,
                 v, type, indent, maxline, line_pos, end_space + 2, avoid_splits,
                 quote_strings=quote_strings)
             if valuemapping:
-                val_str = "{} ({})".format(val_str, valuemapping.tovalues(v))
+                val_str = f"{val_str} ({valuemapping.tovalues(v)})"
 
             if i > 0:
                 # Add the actual separator
-                mof.append(u',')
+                mof.append(',')
                 if val_str[0] != '\n':
-                    mof.append(u' ')
+                    mof.append(' ')
                 else:
                     # Adjust by the space we did not need
                     line_pos -= 1
 
             mof.append(val_str)
 
-        mof_str = u''.join(mof)
+        mof_str = ''.join(mof)
 
     else:
         mof_str, line_pos = _scalar_value_tomof(
             value, type, indent, maxline, line_pos, end_space, avoid_splits,
             quote_strings=quote_strings)
         if valuemapping:
-            mof_str = "{} ({})".format(mof_str, valuemapping.tovalues(value))
+            mof_str = f"{mof_str} ({valuemapping.tovalues(value)})"
     return mof_str, line_pos

@@ -15,9 +15,6 @@ pywbem>=1.7.2
 
 nocaselist>=1.0.3
 nocasedict>=1.0.1
-# six 1.16.0 removes the ImportWarning raised by Python 3.10
-six>=1.14.0; python_version <= '3.9'
-six>=1.16.0; python_version >= '3.10'
 # Click 7.0 has issue #1231 on Windows which we circumvent in the test code
 # Click 7.1 has a bug with output capturing
 # Click 8.0 is incompatible with python <3.0. See issues #816 (python 2.7 not

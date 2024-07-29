@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017-2021 Inova Development Inc.
 # All Rights Reserved
@@ -20,7 +19,6 @@ Tests for _output_formatting.py functions, except for format_table and
 fold_strings which is in test_tableformat.py.
 """
 
-from __future__ import absolute_import, print_function
 
 from packaging.version import parse as parse_version
 import click
@@ -286,19 +284,19 @@ TESTCASES_FORMAT_KEYS = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify simple keybinding',
-     dict(kb=[('kEY1', u'Ham')],
+     dict(kb=[('kEY1', 'Ham')],
           width=100,
           exp_rtn='kEY1="Ham"'),
      None, None, True),
 
     ('Verify multiple keys keybinding',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
           width=100,
           exp_rtn='kEY1="Ham",key2=3'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
+     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
           width=100,
           exp_rtn='kEY1="Ham and eggs",key2="More eggs"'),
      None, None, True),
@@ -326,13 +324,13 @@ TESTCASES_FORMAT_KEYS = [
      None, None, not PYWBEM_1_0_0),
 
     ('Verify mutliple keys that fold into multiple lines',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
           width=14,
           exp_rtn='kEY1="Ham"\nkey2=3'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys that fold',
-     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
+     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
           width=25,
           exp_rtn='kEY1="Ham and eggs"\nkey2="More eggs"'),
      None, None, True),
@@ -788,8 +786,7 @@ def test_fold_strings(testcase, input_str, max_width, brk_long_wds, brk_hyphen,
     assert testcase.exp_exc_types is None
 
     if act_rtn != exp_rtn:
-        print('IN\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(input_str, exp_rtn,
-                                                     act_rtn))
+        print(f'IN\n{input_str}\nEXP\n{exp_rtn}\nACT\n{act_rtn}\n')
     assert act_rtn == exp_rtn
 
 

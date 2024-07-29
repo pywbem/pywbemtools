@@ -20,7 +20,6 @@ cmds for get and enumerate for CIM qualifier types.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 
@@ -172,7 +171,7 @@ def cmd_qualifier_delete(context, qualifiername, options):
         conn.DeleteQualifier(qualifiername, namespace=options['namespace'])
         if context.verbose:
             context.spinner_stop()
-            click.echo('Deleted qualifier type {}.'.format(qualifiername))
+            click.echo(f'Deleted qualifier type {qualifiername}.')
     except Error as er:
         raise pywbem_error_exception(er)
 

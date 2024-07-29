@@ -17,13 +17,12 @@
 Click context object for the pybemlistener command.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 import click_spinner
 
 
-class ContextObj(object):
+class ContextObj:
     # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
     Click context object for the pybemlistener command.
@@ -120,7 +119,7 @@ class ContextObj(object):
         This attribute can be modified.
 
         The initial state of the spinner is enabled, but it can be disabled by
-        setting the {0} environment variable to 'false', '0', or the empty
+        setting the {} environment variable to 'false', '0', or the empty
         value.
         """.format(self.spinner_envvar)
 

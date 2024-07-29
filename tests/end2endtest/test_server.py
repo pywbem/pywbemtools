@@ -16,7 +16,6 @@
 Basic server tests.
 """
 
-from __future__ import absolute_import, print_function
 
 import re
 
@@ -64,7 +63,7 @@ def test_server_is_pegasus(server_url):  # noqa: F811
     profiles = []
     for line in profile_lines:
         m = re.match(r'^(.+?) {2,}(.+?) {2,}(.+)$', line)
-        assert m, "Cannot parse 'profile list' output line: {!r}".format(line)
+        assert m, f"Cannot parse 'profile list' output line: {line!r}"
         profiles.append(m.groups())
     assert ('SNIA', 'Array', '1.1.0') in profiles
     assert ('SNIA', 'Indication', '1.2.0') in profiles

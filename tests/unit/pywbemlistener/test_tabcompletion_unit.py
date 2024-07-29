@@ -23,7 +23,6 @@ These unit tests just test the completer functions themselves in isolation but
 not in a command line environment.
 """
 
-from __future__ import absolute_import, print_function
 
 import packaging.version
 import pytest

@@ -20,10 +20,8 @@ was called.  If there is a connections file at the start of the test it is
 renamed for the test and restored at the end of the test.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import pytest
 
 from pywbemtools._utils import CONNECTIONS_FILENAME
@@ -1382,16 +1380,16 @@ class TestSubcmdClass(CLITestsBase):
             if file_test == 'exists':
                 assert os.path.isfile(connections_file) and \
                     os.path.getsize(connections_file) > 0, \
-                    'Fail. File {} should exist'.format(connections_file)
+                    f'Fail. File {connections_file} should exist'
             elif file_test.lower() == 'none':
                 if os.path.isfile(connections_file):
                     print('FILE THAT SHOULD NOT EXIST')
-                    with io.open(connections_file, 'r', encoding='utf-8') \
+                    with open(connections_file, encoding='utf-8') \
                             as fin:
                         print(fin.read())
 
                 assert not os.path.isfile(connections_file), \
-                    'Fail. File {} should not exist'.format(connections_file)
+                    f'Fail. File {connections_file} should not exist'
 
             else:
                 assert False, 'File test option name {} invalid' \
@@ -1430,7 +1428,7 @@ class TestSubcmdClass(CLITestsBase):
 #
 
 
-YAML_NO_CONNECTIONS_KEY = u"""tst1:
+YAML_NO_CONNECTIONS_KEY = """tst1:
         name: tst1
         server: http://blah
         user: fred
@@ -1447,7 +1445,7 @@ YAML_NO_CONNECTIONS_KEY = u"""tst1:
 default_connection_name: null
 """
 
-YAML_BAD_ATTRIBUTE_NAME = u"""connection_definitions:
+YAML_BAD_ATTRIBUTE_NAME = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -1465,7 +1463,7 @@ YAML_BAD_ATTRIBUTE_NAME = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_BAD_DEFAULT_NAME = u"""connection_definitions:
+YAML_BAD_DEFAULT_NAME = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -1590,7 +1588,7 @@ class TestSubcmdClassError(CLITestsBase):
         restore it after the test.
         """
         # Create the connection file from the yaml
-        with io.open(CONNECTION_REPO_TEST_FILE_PATH, "w", encoding='utf-8') \
+        with open(CONNECTION_REPO_TEST_FILE_PATH, "w", encoding='utf-8') \
                 as repo_file:
             repo_file.write(inputs['yaml'])
 
@@ -1603,16 +1601,16 @@ class TestSubcmdClassError(CLITestsBase):
             if file_test == 'exists':
                 assert os.path.isfile(connections_file) and \
                     os.path.getsize(connections_file) > 0, \
-                    'Fail. File {} should exist'.format(connections_file)
+                    f'Fail. File {connections_file} should exist'
             elif file_test.lower() == 'none':
                 if os.path.isfile(connections_file):
                     print('FILE THAT SHOULD NOT EXIST')
-                    with io.open(connections_file, 'r', encoding='utf-8') \
+                    with open(connections_file, encoding='utf-8') \
                             as fin:
                         print(fin.read())
 
                 assert not os.path.isfile(connections_file), \
-                    'Fail. File {} should not exist'.format(connections_file)
+                    f'Fail. File {connections_file} should not exist'
 
             else:
                 assert False, 'File test option name {} invalid' \

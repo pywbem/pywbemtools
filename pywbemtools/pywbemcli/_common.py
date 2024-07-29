@@ -18,17 +18,11 @@
 Common functions applicable across multiple components of pywbemcli
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import fnmatch
 import re
-try:
-    from collections.abc import Sequence
-except ImportError:
-    # pylint: disable=deprecated-class
-    from collections import Sequence
+from collections.abc import Sequence
 
-import six
 import click
 from nocaselist import NocaseList
 from toposort import toposort_flatten
@@ -43,14 +37,6 @@ from pywbem._nocasedict import NocaseDict
 from ._cimvalueformatter import cimvalue_to_fmtd_string
 from .._output_formatting import DEFAULT_MAX_CELL_WIDTH
 from .._utils import pywbemtools_warn, ensure_unicode, to_unicode
-
-# Same as in pwbem.cimtypes.py
-if six.PY2:
-    # pylint: disable=invalid-name,undefined-variable
-    _Longint = long  # noqa: F821
-else:
-    # pylint: disable=invalid-name
-    _Longint = int
 
 
 ######################################################################
@@ -197,7 +183,7 @@ def pick_one_index_from_list(context, options, title, pick_always=None):
 
     click.echo(title)
     for index, str_ in enumerate(options):
-        click.echo('{}: {}'.format(index, str_))
+        click.echo(f'{index}: {str_}')
     max_option = len(options) - 1
     selection = None
     msg = 'Input integer between 0 and {} or Ctrl-C to exit selection' \
@@ -219,8 +205,8 @@ def pick_one_index_from_list(context, options, title, pick_always=None):
             raise click.ClickException("Pick Aborted. CTRL-C")
         except Exception as ex:
             raise click.ClickException(
-                'Selection exception: {} Command Aborted'.format(ex))
-        click.echo('"{}" Invalid response {}'.format(selection_txt, msg))
+                f'Selection exception: {ex} Command Aborted')
+        click.echo(f'"{selection_txt}" Invalid response {msg}')
 
 
 def pick_instance(context, classname, namespaces=None):
@@ -251,11 +237,11 @@ def pick_instance(context, classname, namespaces=None):
     """
     conn = context.pywbem_server.conn
     if not is_classname(classname):
-        raise click.ClickException('{} must be a classname'.format(classname))
+        raise click.ClickException(f'{classname} must be a classname')
 
     if namespaces is None:
         namespaces = [conn.default_namespace]
-    elif isinstance(namespaces, six.string_types):
+    elif isinstance(namespaces, str):
         namespaces = [namespaces]
 
     # Get the possible instances from all namespaces defined for the
@@ -286,7 +272,7 @@ def pick_instance(context, classname, namespaces=None):
         return pick_one_from_list(context, sort_cimobjects(instance_names),
                                   'Pick Instance name to process')
     except Exception as ex:
-        raise click.ClickException('Command Aborted. Exception {}'.format(ex))
+        raise click.ClickException(f'Command Aborted. Exception {ex}')
 
 
 def pick_multiple_from_list(context, options, title):
@@ -354,7 +340,7 @@ def pick_multiple_indexes_from_list(context, options, title):
     index = -1
     for str_ in options:
         index += 1
-        click.echo('{}: {}'.format(index, str_))
+        click.echo(f'{index}: {str_}')
     selection = None
     selection_list = []
     msg = 'Select entry by index or hit enter to end selection>'
@@ -387,7 +373,7 @@ def is_classname(astring):
     Returns:
         True if classname. Otherwise it returns False
     """
-    assert isinstance(astring, six.string_types)
+    assert isinstance(astring, str)
     return not re.match(r'[a-zA_Z0-9_].*\.', astring)
 
 
@@ -531,7 +517,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
 
     last_fold = 0
     if uri_format not in ('standard', 'canonical', 'cimobject', 'historical'):
-        raise ValueError('Invalid format argument: {0}'.format(uri_format))
+        raise ValueError(f'Invalid format argument: {uri_format}')
 
     if path.host is not None and uri_format != 'cimobject':
         # The CIMObject format assumes there is no host component
@@ -566,7 +552,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
         ret.append('\n')
         last_fold = len(ret)
 
-    for key in case_sorted(six.iterkeys(path.keybindings)):
+    for key in case_sorted(path.keybindings.keys()):
         # Fold for each key where sum of last line exceeds max_len
         line_len = sum(map(len, ret[last_fold:]))
         if line_len > max_len:
@@ -583,10 +569,10 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             ret.append('\n')
             last_fold = len(ret)
 
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             value = to_unicode(value)
 
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             # string, char16
             ret.append('"')
             ret.append(value.
@@ -599,14 +585,14 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             ret.append(str(value).upper())
         elif isinstance(value, (CIMFloat, float)):
             # realNN
-            # Since Python 2.7 and Python 3.1, repr() prints float numbers
+            # repr() prints float numbers
             # with the shortest representation that does not change its
             # value. When needed, it shows up to 17 significant digits,
             # which is the precision needed to round-trip double precision
             # IEE-754 floating point numbers between decimal and binary
             # without loss.
             ret.append(repr(value))
-        elif isinstance(value, (CIMInt, int, _Longint)):
+        elif isinstance(value, (CIMInt, int)):
             # intNN
             ret.append(str(value))
         elif isinstance(value, CIMInstanceName):
@@ -623,7 +609,7 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             ret.append('"')
         else:
             raise TypeError(
-                "Invalid type {0} in keybinding value: {1}={2}"
+                "Invalid type {} in keybinding value: {}={}"
                 .format(type(value), key, value))
 
     return ensure_unicode(''.join(ret))
@@ -668,12 +654,12 @@ def str_2_bool(value):
     """
     if isinstance(value, bool):
         return value
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         if value.lower() == 'true':
             return True
         if value.lower() == 'false':
             return False
-    raise ValueError('Invalid boolean value: "{}"'.format(value))
+    raise ValueError(f'Invalid boolean value: "{value}"')
 
 
 def create_cimvalue(cim_type, value_str, is_array):
@@ -834,10 +820,10 @@ def compare_instances(inst1, inst2):
         keys2 = set(inst2.keys())
         if keys1 != keys2:
             diff = keys1.symmetric_difference(keys2)
-            click.echo('Property Name differences {}'.format(diff))
+            click.echo(f'Property Name differences {diff}')
             return False
 
-        for n1, v1 in six.iteritems(inst1):
+        for n1, v1 in inst1.items():
             if v1 != inst2[n1]:
                 msg = 'property ' + n1
                 if not compare_obj(inst1.get(n1), inst2.get(n1), msg):
@@ -966,7 +952,7 @@ def process_invokemethod(context, objectname, methodname, namespace,
     classname = objectname.classname
 
     # if this is a string convert to a CIMClassname
-    if isinstance(objectname, six.string_types):
+    if isinstance(objectname, str):
         objectname = CIMClassName(objectname)
 
     if namespace:
@@ -986,7 +972,7 @@ def process_invokemethod(context, objectname, methodname, namespace,
     rtn = conn.InvokeMethod(methodname, objectname, params)
 
     # Output results, both ReturnValue and all output parameters
-    click.echo('ReturnValue={}'.format(rtn[0]))
+    click.echo(f'ReturnValue={rtn[0]}')
 
     if rtn[1]:
         cl_params = cim_method.parameters
@@ -996,7 +982,7 @@ def process_invokemethod(context, objectname, methodname, namespace,
             val = cimvalue_to_fmtd_string(
                 pvalue, ptype, maxline=DEFAULT_MAX_CELL_WIDTH,
                 avoid_splits=False)
-            click.echo('{}={}'.format(pname, val[0]))
+            click.echo(f'{pname}={val[0]}')
 
 
 def sort_cimobjects(cim_objects):
@@ -1047,7 +1033,7 @@ def sort_cimobjects(cim_objects):
     tst_obj = cim_objects[0]
 
     # Result of 'class enumerate':
-    if isinstance(tst_obj, six.string_types):
+    if isinstance(tst_obj, str):
         return sorted(cim_objects)
 
     if isinstance(tst_obj, CIMClass):
@@ -1087,7 +1073,7 @@ def sort_cimobjects(cim_objects):
         return sorted(cim_objects,
                       key=lambda tup: tup[0].to_wbem_uri(format="canonical"))
 
-    raise TypeError("Items of type {} cannot be sorted".format(type(tst_obj)))
+    raise TypeError(f"Items of type {type(tst_obj)} cannot be sorted")
 
 
 def parse_version_value(version_str, cln):
@@ -1119,8 +1105,8 @@ def parse_version_value(version_str, cln):
         if isinstance(new_value, list):
             new_value = ".".join([str(v) for v in new_value])
         pywbemtools_warn(
-            "Invalid Version qualifier value {0}, class {1}. {2}. Set to "
-            "{3}".format(version_str, cln, txt, new_value),
+            "Invalid Version qualifier value {}, class {}. {}. Set to "
+            "{}".format(version_str, cln, txt, new_value),
             ToleratedSchemaIssueWarning)
 
     try:
@@ -1209,7 +1195,7 @@ def get_leafclass_names(classes):
                 classname_dict[c.superclass] = [c.classname]
 
     # get list of all classnames with no value (i.e. no subclasses)
-    rtn_list = [key for key, value in six.iteritems(classname_dict)
+    rtn_list = [key for key, value in classname_dict.items()
                 if not value]
     return NocaseList(rtn_list)
 
@@ -1248,7 +1234,7 @@ def get_subclass_names(classes, classname=None, deep_inheritance=None):
     Exceptions: ValueError if classname not in classes
     """
 
-    assert isinstance(classname, six.string_types)
+    assert isinstance(classname, str)
 
     # Build dictionary of superclassname: classnames
     classname_dict = NocaseDict()
@@ -1262,7 +1248,7 @@ def get_subclass_names(classes, classname=None, deep_inheritance=None):
                 classname_dict[c.superclass] = [c.classname]
 
     if classname not in classname_dict:
-        raise ValueError("Classname {} not found in classes".format(classname))
+        raise ValueError(f"Classname {classname} not found in classes")
 
     # Recurse the classname_dict hierarchy to get subclass names
     rtn_classnames = classname_dict[classname]
@@ -1330,7 +1316,7 @@ def shorten_path_str(path, replacements, fullpath):
         name_str = path.to_wbem_uri()
         # replace each key binding in repl_list with ~ char
         for key, value in repl_list:
-            name_str = name_str.replace("{}={}".format(key, magicvalue), "~", 1)
+            name_str = name_str.replace(f"{key}={magicvalue}", "~", 1)
 
     return name_str
 
@@ -1355,9 +1341,9 @@ def pywbem_error_exception(exc, intro=None):
         click.ClickException: Click exception for the pywbem Error exception.
     """
     if intro:
-        msg = "{}: {}: {}".format(intro, exc.__class__.__name__, exc)
+        msg = f"{intro}: {exc.__class__.__name__}: {exc}"
     else:
-        msg = "{}: {}".format(exc.__class__.__name__, exc)
+        msg = f"{exc.__class__.__name__}: {exc}"
     return click.ClickException(msg)
 
 
@@ -1469,7 +1455,7 @@ def depending_classnames(classname, namespace, conn):
             IncludeQualifiers=True, DeepInheritance=True, LocalOnly=True)
     except Error as exc:
         raise pywbem_error_exception(
-            exc, "Cannot enumerate classes in namespace {}".format(namespace))
+            exc, f"Cannot enumerate classes in namespace {namespace}")
 
     depending_cln_list = NocaseList()
     for cls in all_classes:
@@ -1514,7 +1500,7 @@ def all_classnames_depsorted(namespace, conn):
             IncludeQualifiers=True, DeepInheritance=True, LocalOnly=True)
     except Error as exc:
         raise pywbem_error_exception(
-            exc, "Cannot enumerate classes in namespace {}".format(namespace))
+            exc, f"Cannot enumerate classes in namespace {namespace}")
 
     all_deps = {}
     for cls in all_classes:

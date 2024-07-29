@@ -19,13 +19,12 @@ Functions that help defining command line options with Click, and options that
 are common across pywbemtools commands.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 
 
 help_option = [  # pylint: disable=invalid-name
-    click.help_option('-h', '--help', help=u'Show this help message.'),
+    click.help_option('-h', '--help', help='Show this help message.'),
 ]
 
 
@@ -66,5 +65,5 @@ def validate_required_arg(value, metavar):
     """
     if not value:
         raise click.UsageError(
-            "Missing argument '{}'.".format(metavar),
+            f"Missing argument '{metavar}'.",
             click.get_current_context())

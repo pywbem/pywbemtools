@@ -22,7 +22,6 @@ WBEM management functionality the server supports.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 
@@ -70,10 +69,10 @@ def profile_group():
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
-              help=u'Filter by the defined organization. (ex. -o DMTF')
+              help='Filter by the defined organization. (ex. -o DMTF')
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
-              help=u'Filter by the profile name. (ex. -p Array')
+              help='Filter by the profile name. (ex. -p Array')
 @add_options(help_option)
 @click.pass_obj
 def profile_list(context, **options):
@@ -99,27 +98,27 @@ def profile_list(context, **options):
                        options_metavar=CMD_OPTS_TXT)
 @click.option('-o', '--organization', type=str, metavar='ORG-NAME',
               required=False,
-              help=u'Filter by the defined organization. (ex. -o DMTF')
+              help='Filter by the defined organization. (ex. -o DMTF')
 @click.option('-p', '--profile', type=str, metavar='PROFILE-NAME',
               required=False,
-              help=u'Filter by the profile name. (ex. -p Array')
+              help='Filter by the profile name. (ex. -p Array')
 @click.option('--cc', '--central-class', 'central_class', type=str,
               metavar='CLASSNAME', required=False,
-              help=u'Optional. Required only if profiles supports only '
-              u'scoping methodology')
+              help='Optional. Required only if profiles supports only '
+              'scoping methodology')
 @click.option('--sc', '--scoping-class', 'scoping_class', type=str,
               metavar='CLASSNAME', required=False,
-              help=u'Optional. Required only if profiles supports only '
-              u'scoping methodology')
+              help='Optional. Required only if profiles supports only '
+              'scoping methodology')
 @click.option('--sp', '--scoping-path', 'scoping_path', type=str,
               metavar='CLASSLIST', required=False, multiple=True,
-              help=u'Optional. Required only if profiles supports only '
-              u'scoping methodology. Multiples allowed')
+              help='Optional. Required only if profiles supports only '
+              'scoping methodology. Multiples allowed')
 @click.option('--rd', '--reference-direction', 'reference_direction',
               type=click.Choice(['snia', 'dmtf']),
               default='dmtf',
               show_default=True,
-              help=u'Navigation direction for association.')
+              help='Navigation direction for association.')
 @add_options(help_option)
 @click.pass_obj
 def centralinsts(context, **options):
@@ -213,9 +212,9 @@ def cmd_profile_list(context, options):
         title = 'Advertised management profiles:'
 
         if organization:
-            title += " org={}".format(organization)
+            title += f" org={organization}"
         if profile_name:
-            title += " name={}".format(profile_name)
+            title += f" name={profile_name}"
 
         click.echo(format_table(rows, headers,
                                 title=title,

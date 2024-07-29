@@ -27,7 +27,7 @@ Used to mock response from commmon_verify_operation
     environment variable.
 """
 
-from mock import Mock
+from unittest.mock import Mock
 import pywbemtools
 
 RETURN_VALUE = "mypw"
@@ -37,7 +37,7 @@ def mock_prompt(msg, hide_input=True,
                 confirmation_prompt=False, type=str, err=True):
     # pylint: disable=unused-argument,redefined-builtin
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT {}'.format(msg))
+    print(f'MOCK_CLICK_PROMPT {msg}')
     return RETURN_VALUE
 
 

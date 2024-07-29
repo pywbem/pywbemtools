@@ -21,7 +21,6 @@ a WBEM server.
 
 This command group is based on the  pywbem WBEMSubscriptionManager class.
 """
-from __future__ import absolute_import
 
 import re
 
@@ -57,25 +56,25 @@ ALL_STR = 'all'
 
 ownedadd_flag_option = [              # pylint: disable=invalid-name
     click.option("--owned/--permanent", default=True,
-                 help=u"Defines whether an owned or permanent filter, "
-                      u"destination, or subscription is to be added.  "
-                      u"Default: owned"),
+                 help="Defines whether an owned or permanent filter, "
+                      "destination, or subscription is to be added.  "
+                      "Default: owned"),
 ]
 
 ownedremove_flag_option = [              # pylint: disable=invalid-name
     click.option("--owned/--permanent", default=True,
-                 help=u"Defines whether an owned or permanent filter, "
-                      u"destination, or subscription is to be removed.  "
-                      u"Default: owned"),
+                 help="Defines whether an owned or permanent filter, "
+                      "destination, or subscription is to be removed.  "
+                      "Default: owned"),
 ]
 
 ownedlist_choice_option = [              # pylint: disable=invalid-name
     click.option("--type", default='all',
                  type=click.Choice(['owned', 'permanent', 'all'],
                                    case_sensitive=False),
-                 help=u"Defines whether the command filters owned, "
-                      u" permanent, or all objects for the response.  "
-                      u"Default: all"),
+                 help="Defines whether the command filters owned, "
+                      " permanent, or all objects for the response.  "
+                      "Default: all"),
 ]
 
 names_only_option = [              # pylint: disable=invalid-name
@@ -83,9 +82,9 @@ names_only_option = [              # pylint: disable=invalid-name
                  cls=MutuallyExclusiveOption,
                  mutually_exclusive=["summary", 'detail'],
                  show_mutually_exclusive=True,
-                 help=u'Show the CIMInstanceName elements of the instances. '
-                      u'This only applies when the --output-format is one '
-                      u'of the CIM object options (ex. mof.')
+                 help='Show the CIMInstanceName elements of the instances. '
+                      'This only applies when the --output-format is one '
+                      'of the CIM object options (ex. mof.')
 ]
 
 detail_option = [             # pylint: disable=invalid-name
@@ -93,9 +92,9 @@ detail_option = [             # pylint: disable=invalid-name
                  cls=MutuallyExclusiveOption,
                  mutually_exclusive=["summary", 'names-only'],
                  show_mutually_exclusive=True,
-                 help=u"Show more detailed information. Otherwise only "
-                 u"non-null or predefined property values are displayed. It "
-                 u"applies to both MOF and TABLE output formats.")
+                 help="Show more detailed information. Otherwise only "
+                 "non-null or predefined property values are displayed. It "
+                 "applies to both MOF and TABLE output formats.")
 ]
 
 detail_subscription_option = [             # pylint: disable=invalid-name
@@ -103,11 +102,11 @@ detail_subscription_option = [             # pylint: disable=invalid-name
                  cls=MutuallyExclusiveOption,
                  mutually_exclusive=["summary", 'names-only'],
                  show_mutually_exclusive=True,
-                 help=u"Show more detailed information including MOF of "
+                 help="Show more detailed information including MOF of "
                  "referenced listeners and filters. Otherwise only "
-                 u"non-null or predefined property values are displayed. The "
-                 u"extra properties applies to both MOF and TABLE output "
-                 u"formats.")
+                 "non-null or predefined property values are displayed. The "
+                 "extra properties applies to both MOF and TABLE output "
+                 "formats.")
 ]
 
 summary_option = [             # pylint: disable=invalid-name
@@ -115,21 +114,21 @@ summary_option = [             # pylint: disable=invalid-name
                  cls=MutuallyExclusiveOption,
                  mutually_exclusive=["detail", 'names-only'],
                  show_mutually_exclusive=True,
-                 help=u'Show only summary count of instances.')
+                 help='Show only summary count of instances.')
 ]
 
 verify_remove_option = [       # pylint: disable=invalid-name
     click.option('-v', '--verify', is_flag=True, default=False,
-                 help=u'Prompt user to verify instances to be removed before '
-                      u'request is sent to WBEM server.')
+                 help='Prompt user to verify instances to be removed before '
+                      'request is sent to WBEM server.')
 ]
 
 select_option = [             # pylint: disable=invalid-name
     click.option('--select', is_flag=True, default=False,
-                 help=u'Prompt user to select from multiple objects '
-                      u'that match the IDENTITY. Otherwise, if the command '
-                      u'finds multiple instance that match the IDENTITY, the '
-                      u'operation fails.')
+                 help='Prompt user to select from multiple objects '
+                      'that match the IDENTITY. Otherwise, if the command '
+                      'finds multiple instance that match the IDENTITY, the '
+                      'operation fails.')
 ]
 
 ##################################################################
@@ -160,11 +159,11 @@ def subscription_group():
                             options_metavar=CMD_OPTS_TXT)
 @click.argument('identity', type=str, metavar='IDENTITY', required=True,)
 @click.option('-l', '--listener-url', type=str, metavar='URL',
-              help=u'Defines the URL of the target listener in the format: '
-                   u'[SCHEME://]HOST:PORT. SCHEME must be "https" (default) '
-                   u'or "http". HOST is a short or long hostname or literal '
-                   u'IPV4/v6 address. PORT is a positive integer and is '
-                   u'required')
+              help='Defines the URL of the target listener in the format: '
+                   '[SCHEME://]HOST:PORT. SCHEME must be "https" (default) '
+                   'or "http". HOST is a short or long hostname or literal '
+                   'IPV4/v6 address. PORT is a positive integer and is '
+                   'required')
 @add_options(ownedadd_flag_option)
 @add_options(help_option)
 @click.pass_obj
@@ -208,25 +207,25 @@ def subscription_add_destination(context, identity, **options):
 @click.argument('identity', type=str, metavar='IDENTITY', required=True,)
 @click.option('-q', '--query', type=str, metavar='FILTER',
               required=True,
-              help=u'Filter query definition. This is a SELECT '
-                   u'statement in the query language defined in the '
-                   u'filter-query-language parameter')
+              help='Filter query definition. This is a SELECT '
+                   'statement in the query language defined in the '
+                   'filter-query-language parameter')
 @click.option('--query-language', type=str, metavar='TEXT',
               required=False,
               default=DEFAULT_QUERY_LANGUAGE,
-              help=u"Filter query language for this subscription The query "
-                   u"languages normally implemented are 'DMTF:CQL' and 'WQL' . "
-                   u" Default: {0}".format(DEFAULT_QUERY_LANGUAGE))
+              help="Filter query language for this subscription The query "
+                   "languages normally implemented are 'DMTF:CQL' and 'WQL' . "
+                   " Default: {}".format(DEFAULT_QUERY_LANGUAGE))
 @click.option('--source-namespaces', type=str, metavar='TEXT',
               required=False, default=None,
               multiple=True,
-              help=u"The namespace(s) for which the query is defined. Multiple "
-                   u"values may be defined with a single comma-separated "
-                   u"string of namespaces or multiple options. If defined the "
-                   u"namespaces will be inserted into the SourceNamespaces "
-                   u"property. Otherwise the property will not be created and "
-                   u"the WBEM server typically use the Interop namespace for "
-                   u"the indication filter.")
+              help="The namespace(s) for which the query is defined. Multiple "
+                   "values may be defined with a single comma-separated "
+                   "string of namespaces or multiple options. If defined the "
+                   "namespaces will be inserted into the SourceNamespaces "
+                   "property. Otherwise the property will not be created and "
+                   "the WBEM server typically use the Interop namespace for "
+                   "the indication filter.")
 @add_options(ownedadd_flag_option)
 @add_options(help_option)
 @click.pass_obj
@@ -518,9 +517,9 @@ def subscription_remove_filter(context, identity, **options):
 @add_options(verify_remove_option)
 @click.option('--remove-associated-instances', is_flag=True,
               default=False,
-              help=u'Attempt to remove the instances associated with this '
-                   u'subscription. They will only be removed if they do not '
-                   u'participate in any other associations.')
+              help='Attempt to remove the instances associated with this '
+                   'subscription. They will only be removed if they do not '
+                   'participate in any other associations.')
 @add_options(select_option)
 @add_options(help_option)
 @click.pass_obj
@@ -592,7 +591,7 @@ def owned_flag_str(owned_flag):
     return "owned" if owned_flag else "permanent"
 
 
-class CmdSubscriptionManager(object):
+class CmdSubscriptionManager:
     """
     Encapsulate the initial parsing and common variables of subscriptions in
     a single class and provide a set of methods that mirror the
@@ -643,13 +642,13 @@ class CmdSubscriptionManager(object):
         # Define the Name property prefix and search pattern for owned filters,
         # etc. This is determined by a constant and the submgr_id string.
         self.owned_destination_prefix = \
-            "pywbemdestination:{0}".format(self.submgr_id)
-        self.owned_filter_prefix = "pywbemfilter:{0}".format(self.submgr_id)
+            f"pywbemdestination:{self.submgr_id}"
+        self.owned_filter_prefix = f"pywbemfilter:{self.submgr_id}"
 
         self.filter_name_pattern = re.compile(
-            r'^pywbemfilter:{0}:([^:]*)$'.format(self.submgr_id))
+            fr'^pywbemfilter:{self.submgr_id}:([^:]*)$')
         self.destination_name_pattern = re.compile(
-            r'^pywbemdestination:{0}:([^:]*)$'.format(self.submgr_id))
+            fr'^pywbemdestination:{self.submgr_id}:([^:]*)$')
 
     @property
     def server_id(self):
@@ -795,7 +794,7 @@ class CmdSubscriptionManager(object):
         # Invalid input parameters exception
         except ValueError as ve:
             raise click.ClickException(
-                "add-destination failed: {0}".format(ve))
+                f"add-destination failed: {ve}")
         except Error as er:
             raise click.ClickException(
                 self.err_msg("add-destination {0} failed".
@@ -859,7 +858,7 @@ class CmdSubscriptionManager(object):
         except ValueError as ex:
             raise click.ClickException(
                 "add-subscription failed. pybwem SubscriptionManager "
-                "exception: {0}.".format(ex))
+                "exception: {}.".format(ex))
         except Error as er:
             raise click.ClickException(
                 self.err_msg("add-subscription failed", er))
@@ -1058,9 +1057,9 @@ class CmdSubscriptionManager(object):
         """
         Create a text message from the inputs and return it to the caller.
         """
-        return "{0}; {1}: Exception :{2}. Subscription mgr id: '{3}', " \
-               "server id: '{4}', " .format(er, text, er.__class__.__name__,
-                                            self.submgr, self.server_id)
+        return (f"{er}; {text}: Exception :{er.__class__.__name__}. "
+                f"Subscription mgr id: '{self.submgr}', "
+                f"server id: '{self.server_id}', ")
 
 ##########################################################################
 #
@@ -1069,7 +1068,7 @@ class CmdSubscriptionManager(object):
 ##########################################################################
 
 
-class BaseIndicationObjectInstance(object):
+class BaseIndicationObjectInstance:
     """
     Base class for the Indication Instances. Common attributes and methods.
     These classes encapsulate the processing for a single indication
@@ -1107,7 +1106,7 @@ class IndicationDestination(BaseIndicationObjectInstance):
         """
         Initialize the object and parse the identity for components
         """
-        super(IndicationDestination, self).__init__(csm, destination_instance)
+        super().__init__(csm, destination_instance)
 
         m = re.match(csm.destination_name_pattern,
                      self.instance.path.keybindings['Name'])
@@ -1138,7 +1137,7 @@ class IndicationFilter(BaseIndicationObjectInstance):
     procesing indication filter instances
     """
     def __init__(self, csm, filter_instance):
-        super(IndicationFilter, self).__init__(csm, filter_instance)
+        super().__init__(csm, filter_instance)
 
         path_ = filter_instance.path
         m = re.match(csm.filter_name_pattern, path_.keybindings['Name'])
@@ -1168,7 +1167,7 @@ class IndicationSubscription(BaseIndicationObjectInstance):
     other identity characteristics.
     """
     def __init__(self, csm, subscription_instance):
-        super(IndicationSubscription, self).__init__(csm, subscription_instance)
+        super().__init__(csm, subscription_instance)
         self._owned_flag = csm.is_owned_subscription(subscription_instance)
 
     def select_id_str(self):
@@ -1188,7 +1187,7 @@ class IndicationSubscription(BaseIndicationObjectInstance):
         destinst = IndicationDestination(self.csm, dest_inst)
         dest_str = destinst.select_id_str()
 
-        return '{0} {1} {2}'.format(self._owned_flag, dest_str, filter_str)
+        return f'{self._owned_flag} {dest_str} {filter_str}'
 
 
 def display_inst_nonnull_props(context, options, instances, output_format):
@@ -1344,8 +1343,7 @@ def get_insts_for_subscription_identities(csm, destination_identity,
     # the full owned name
     if not destination_id_owned:
         d2 = csm.find_destinations_for_name(
-            "{0}:{1}".format(csm.owned_destination_prefix,
-                             destination_identity))
+            f"{csm.owned_destination_prefix}:{destination_identity}")
         if d2:
             destination_instances.extend(d2)
 
@@ -1361,7 +1359,7 @@ def get_insts_for_subscription_identities(csm, destination_identity,
     # If Identity not specifically owned, look also in owned with the owned
     # prefix. This may result  in multiples that must be resolved
     if not filter_id_owned:
-        f2 = csm.find_filters_for_name("{0}:{1}".format(
+        f2 = csm.find_filters_for_name("{}:{}".format(
             csm.owned_filter_prefix, filter_identity))
         if f2:
             filter_instances.extend(f2)
@@ -1436,7 +1434,7 @@ def cmd_subscription_add_destination(context, identity, options):
     # If the URL, etc. of this owned add matches an existing owned destination
     # pywbem returns the existing destination which has different name.
     if owned_flag_opt and not destination_result['Name'].endswith(
-            ":{}".format(destination_id)):
+            f":{destination_id}"):
         rslt_info = IndicationDestination(csm, destination_result)
         raise click.ClickException(
             "{0} destination: Name={1} Not added. Duplicates URL of "
@@ -1537,20 +1535,20 @@ def cmd_subscription_add_subscription(context, destination_identity,
         raise click.ClickException(
             "Permanent subscriptions cannot be created with owned filters "
             "or destinations. Create an owned subscription or use a "
-            "permanent filter and destination. Destination Name={0}, "
-            "Filter Name={1}".format(sub_dest_inst['Name'],
-                                     sub_filter_inst['Name']))
+            "permanent filter and destination. Destination "
+            f"Name={sub_dest_inst['Name']}, "
+            f"Filter Name={sub_filter_inst['Name']}")
 
     rslt = csm.add_subscriptions(sub_filter_inst.path,
                                  sub_dest_inst.path, owned_flag_opt)
 
     context.spinner_stop()
-    click.echo("Added {0} subscription: DestinationName={1}, FilterName={2}".
-               format(owned_flag_str(owned_flag_opt),
-                      sub_dest_inst.path['Name'],
-                      sub_filter_inst.path["Name"]))
+    click.echo(
+        f"Added {owned_flag_str(owned_flag_opt)} subscription: "
+        f"DestinationName={sub_dest_inst.path['Name']}, "
+        f"FilterName={sub_filter_inst.path['Name']}")
     if context.verbose:
-        click.echo("\n\n{0}".format(rslt[0].tomof()))
+        click.echo(f"\n\n{rslt[0].tomof()}")
 
 
 def cmd_subscription_list(context, options):
@@ -1623,13 +1621,14 @@ def cmd_subscription_list(context, options):
 
     else:  # output in TEXT format
         if summary_opt:
-            click.echo("{0} subscriptions, {1} filters, {2} destinations".
-                       format(len(all_subscriptions), len(all_filters),
-                              len(all_destinations)))
+            click.echo(
+                f"{len(all_subscriptions)} subscriptions, "
+                f"{len(all_filters)} filters, "
+                f"{len(all_destinations)} destinations")
         else:
             for row in rows:
-                click.echo("{0}: {1}, {2}, {3}".format(row[0], row[1], row[2],
-                                                       row[3]))
+                click.echo(
+                    f"{row[0]}: {row[1]}, {row[2]}, {row[3]}")
 
 
 def get_reference_count(subscription_paths, inst_name, role):
@@ -1867,7 +1866,7 @@ def cmd_subscription_list_subscriptions(context, options):
                 filter_inst = conn.GetInstance(subscription.path['Filter'])
                 dest_inst = conn.GetInstance(subscription.path['Handler'])
             except Error as er:
-                raise click.ClickException("GetInstance Failed {0}".format(er))
+                raise click.ClickException(f"GetInstance Failed {er}")
 
             id_ = IndicationDestination(csm, dest_inst)
             if_ = IndicationFilter(csm, filter_inst)
@@ -1877,8 +1876,8 @@ def cmd_subscription_list_subscriptions(context, options):
                 else ""
 
             row = [is_.owned_flag_str,
-                   "{0}({1})".format(id_.identity, id_.owned_flag_str),
-                   "{0}({1})".format(if_.identity, if_.owned_flag_str),
+                   f"{id_.identity}({id_.owned_flag_str})",
+                   f"{if_.identity}({if_.owned_flag_str})",
                    dest_inst['Destination'],
                    fold_strings(if_.instance_property('query'), 30),
                    filter_inst['QueryLanguage'],
@@ -1889,8 +1888,8 @@ def cmd_subscription_list_subscriptions(context, options):
                     is_.instance_property('SystemCreationClassName')])
             rows.append(row)
 
-        title = "Indication Subscriptions: submgr-id={0}, svr-id={1}, " \
-            "type={2}".format(csm.submgr_id, csm.server_id, options['type'])
+        title = "Indication Subscriptions: submgr-id={}, svr-id={}, " \
+            "type={}".format(csm.submgr_id, csm.server_id, options['type'])
 
         context.spinner_stop()
         click.echo(format_table(rows, headers, title=title,
@@ -1924,7 +1923,7 @@ def cmd_subscription_remove_destination(context, identity, options):
     owned_flag_opt = options['owned']
 
     if owned_flag_opt and not identity.startswith(csm.owned_destination_prefix):
-        target_name = "{0}:{1}".format(csm.owned_destination_prefix, identity)
+        target_name = f"{csm.owned_destination_prefix}:{identity}"
     else:
         target_name = identity
 
@@ -1968,7 +1967,7 @@ def cmd_subscription_remove_destination(context, identity, options):
     click.echo("Removed {0} indication destination: identity={1}, Name={2}.".
                format(owned_flag_str(owned_flag_opt), identity, name_property))
     if context.verbose:
-        click.echo("indication destination path: {0}.".format(destination_path))
+        click.echo(f"indication destination path: {destination_path}.")
 
     return
 
@@ -1985,7 +1984,7 @@ def cmd_subscription_remove_filter(context, identity, options):
     # Determine if name should include owned identity components.
     # Search depends on correct definition of owned option.
     if owned_flag_opt and not identity.startswith(csm.owned_filter_prefix):
-        target_name = "{0}:{1}".format(csm.owned_filter_prefix, identity)
+        target_name = f"{csm.owned_filter_prefix}:{identity}"
     else:
         target_name = identity
 
@@ -2029,7 +2028,7 @@ def cmd_subscription_remove_filter(context, identity, options):
     click.echo("Removed {0} indication filter: identity={1}, Name={2}.".
                format(owned_flag_str(owned_flag_opt), identity, name_property))
     if context.verbose:
-        click.echo("Indication filter path: {0}.".format(filter_path))
+        click.echo(f"Indication filter path: {filter_path}.")
 
     return
 
@@ -2064,7 +2063,7 @@ def cmd_subscription_remove_subscription(context, destination_identity,
 
     if not remove_list:
         raise click.ClickException(
-            "Arguments destination_id={0} and filter_id={1} did not locate "
+            "Arguments destination_id={} and filter_id={} did not locate "
             "any subscriptions to remove."
             .format(destination_identity, filter_identity))
 
@@ -2111,7 +2110,7 @@ def cmd_subscription_remove_subscription(context, destination_identity,
                     Role='Filter')
                 if not filter_refs:
                     csm.remove_filter(filter_path)
-                    click.echo("Removed filter: {0}".format(filter_path))
+                    click.echo(f"Removed filter: {filter_path}")
 
 
 def cmd_subscription_remove_server(context, options):

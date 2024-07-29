@@ -25,7 +25,6 @@ NOTE: This unit test is only in pywbemcli because the same code is used
 in both pywbemcli and pywbemlistener.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 import pytest
@@ -136,6 +135,6 @@ def test_help(testcase, subject, exp_rtn):
     assert testcase.exp_exc_types is None
 
     if result != exp_rtn:
-        print("Expected:\n{}\nReturned:\n{}".format(exp_rtn, result))
+        print(f"Expected:\n{exp_rtn}\nReturned:\n{result}")
 
     assert result == exp_rtn

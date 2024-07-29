@@ -3,7 +3,6 @@
 This is a simple tool to execute pywbemcli and capture the results
 
 """
-from __future__ import absolute_import, print_function
 import shlex
 import os
 from subprocess import Popen, PIPE
@@ -52,7 +51,7 @@ def md_headline(title, level):
     except IndexError:
         level_char = '='
 
-    return '\n{0}\n{1}\n'.format(title, (level_char * len(title)))
+    return f'\n{title}\n{(level_char * len(title))}\n'
 
 
 def headline(title, level):
@@ -61,7 +60,7 @@ def headline(title, level):
     if USE_MD:
         md_headline(title, level)
     else:
-        print('{0}\n**{1}**\n'.format(title, ('-' * len(title))))
+        print('{}\n**{}**\n'.format(title, ('-' * len(title))))
 
 
 def print_md_verbatum_text(text_str):
@@ -83,11 +82,11 @@ def execute_pywbemcli_cmd(cmd_str, general_options=''):
         for cmd in cmd_str:
             execute_pywbemcli_cmd(cmd)
     else:
-        command = 'pywbemcli {0} {1}'.format(general_options, cmd_str)
+        command = f'pywbemcli {general_options} {cmd_str}'
         if USE_MD:
             print(md_headline(command, 1))
         else:
-            print('{0}\nPYWBEMCLI COMMAND: {1}'.format(('=' * 50), command))
+            print('{}\nPYWBEMCLI COMMAND: {}'.format(('=' * 50), command))
 
         exitcode, out, err = execute_cmd(command)
 
@@ -96,11 +95,11 @@ def execute_pywbemcli_cmd(cmd_str, general_options=''):
         else:
             print(out)
         if err:
-            print('**STDER:** {0}'.format(err))
+            print(f'**STDER:** {err}')
 
         if exitcode != 0:
             ERRORS += 1
-            print('**ERROR:** cmd `{0}`'.format(command))
+            print(f'**ERROR:** cmd `{command}`')
 
 
 #

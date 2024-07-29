@@ -1,4 +1,3 @@
-
 # (C) Copyright 2019 IBM Corp.
 # (C) Copyright 2019 Inova Development Inc.
 # All Rights Reserved
@@ -34,7 +33,7 @@
     files that are used to build the repository.  This is a development
     test aid.
 """
-from mock import Mock
+from unittest.mock import Mock
 
 import pywbemtools
 RETURN_VALUE = "1"
@@ -42,7 +41,7 @@ RETURN_VALUE = "1"
 
 def mock_prompt(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT {}'.format(msg))
+    print(f'MOCK_CLICK_PROMPT {msg}')
     return RETURN_VALUE
 
 

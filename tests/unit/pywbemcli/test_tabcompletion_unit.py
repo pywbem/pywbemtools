@@ -23,10 +23,8 @@ These unit tests just test the completer functions themselves in isolation but
 not in a command line environment.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import packaging.version
 import pytest
 import click
@@ -206,7 +204,7 @@ def test_connection_name_complete(testcase, ctx, yaml, file, file_exists,
         return
 
     # Create a fake click context object that contains param "connections_file"
-    class ClickContextMock(object):  # pylint: disable=too-few-public-methods
+    class ClickContextMock:  # pylint: disable=too-few-public-methods
         """ Create a mock click context object containing param attribute """
         def __init__(self):
             self.params = {"connections_file": None}
@@ -218,7 +216,7 @@ def test_connection_name_complete(testcase, ctx, yaml, file, file_exists,
     # Conditionally create connections file by writing YAML text to the file
     if file_exists:
         if yaml:
-            with io.open(file, "w", encoding='utf-8') as repo_file:
+            with open(file, "w", encoding='utf-8') as repo_file:
                 repo_file.write(yaml)
 
     param = None  # The method being tested ignores param

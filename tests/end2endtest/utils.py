@@ -17,16 +17,10 @@ Utilities for end2end testing. Includes both fixtures and non-fixture common
 functions.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import re
-
-from subprocess import call, check_call
-try:
-    from subprocess import DEVNULL  # Python 3
-except ImportError:
-    DEVNULL = open(os.devnull, 'wb')  # pylint: disable=consider-using-with
+from subprocess import call, check_call, DEVNULL
 
 import pytest
 
@@ -62,7 +56,7 @@ def server_url(request):
     host_port_http = '15988'
     host_port_https = '15989'
 
-    host_uri = 'https://localhost:{}'.format(host_port_https)
+    host_uri = f'https://localhost:{host_port_https}'
 
     # Flag to use an existing running container for the test.  This is
     # a debug mechanism in that the WBEM Server must be already running in
@@ -83,8 +77,8 @@ def server_url(request):
 
         check_call(['docker', 'create',
                     '--name', container,
-                    '--publish', '{}:5988'.format(host_port_http),
-                    '--publish', '{}:5989'.format(host_port_https),
+                    '--publish', f'{host_port_http}:5988',
+                    '--publish', f'{host_port_https}:5989',
                     '--net', 'bridge',
                     image],
                    stdout=DEVNULL)
@@ -118,7 +112,7 @@ def exec_pywbemcli_cmd(request_params, expected_rc=0, ignore_stderr=False):
         assert rc == 0, "pywbemcli failed: params={}, rc={}, stderr={}" \
                         .format(request_params, rc, stderr)
         if not ignore_stderr:
-            assert stderr == '', "pywbemcli stderr={}, rc={}".format(stderr, rc)
+            assert stderr == '', f"pywbemcli stderr={stderr}, rc={rc}"
         return stdout
 
     # expected rc not 0
@@ -158,12 +152,12 @@ def validate_indication_profile(server_url, expected_profile):
     profiles = []
     for line in profile_lines:
         m = re.match(r'^(.+?) {2,}(.+?) {2,}(.+)$', line)
-        assert m, "Cannot parse 'profile list' output line: {!r}".format(line)
+        assert m, f"Cannot parse 'profile list' output line: {line!r}"
         profiles.append(m.groups())
 
     # validate versions of indication profile
-    assert expected_profile in profiles, "Expected profile {0} not found in " \
-        "{1}".format(expected_profile, profiles)
+    assert expected_profile in profiles, "Expected profile {} not found in " \
+        "{}".format(expected_profile, profiles)
 
 
 def validate_required_classes(server_url, required_classes_dict):
@@ -232,7 +226,7 @@ def create_indication_subscription(server_url, listener_scheme, listener_host,
     good_response = stdout.strip('\n')
     assert re.search("Added owned subscription:", good_response)
     assert re.search(
-        'pywbemdestination:defaultpywbemcliSubMgr:{}'.format(dest_id),
+        f'pywbemdestination:defaultpywbemcliSubMgr:{dest_id}',
         good_response)
 
 

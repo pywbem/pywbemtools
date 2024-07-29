@@ -20,9 +20,7 @@ information on the Association, Indication, Abstract, and Version qualifiers to
 each classname (see show_detail parameter).
 """
 
-from __future__ import absolute_import, print_function
 
-import six
 from asciitree import LeftAligned
 import click
 
@@ -83,7 +81,7 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
             if q is None:
                 return None
             v = q.value
-            return "{}={}".format(qname, v) if v else None
+            return f"{qname}={v}" if v else None
 
         # Build the rtn_values string from the following qualifiers and their
         # values
@@ -102,7 +100,7 @@ def display_class_tree(classes, top_classname=None, show_detail=None):
         if cln in classes_dict and show_detail:
             klass = classes_dict[cln]
             details = build_details(klass)
-            new_cln = "{0} ({1})".format(cln, details)
+            new_cln = f"{cln} ({details})"
             return new_cln
 
         return cln
@@ -200,7 +198,7 @@ def build_subcln_in_cln(cln_to_supercln):
     subcln_in_cln = NocaseDict()
     # pylint: disable=bad-continuation, expression-not-assigned
     [subcln_in_cln.setdefault(v, []).append(k) for (k, v) in
-        six.iteritems(cln_to_supercln)]  # noqa: F841
+        cln_to_supercln.items()]  # noqa: F841
 
     return subcln_in_cln
 

@@ -17,13 +17,12 @@
 Tests for _utils.py module
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import shutil
-import mock
+from unittest import mock
+
 import click
-import six
 import pytest
 from pywbemtools._utils import ensure_bytes, ensure_unicode, \
     to_unicode, get_terminal_width
@@ -99,7 +98,7 @@ TESTCASES_ENSURE_BYTES = [
     (
         "Input object is an empty Unicode string",
         dict(
-            obj=u'',
+            obj='',
             exp_result=b'',
         ),
         None, None, True
@@ -107,7 +106,7 @@ TESTCASES_ENSURE_BYTES = [
     (
         "Input object is a Unicode string with 7-bit ASCII chars",
         dict(
-            obj=u'abc',
+            obj='abc',
             exp_result=b'abc',
         ),
         None, None, True
@@ -116,7 +115,7 @@ TESTCASES_ENSURE_BYTES = [
         "Input object is a Unicode string with UCS-2 chars",
         dict(
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj=u'a\u00E9b',
+            obj='a\u00E9b',
             exp_result=b'a\xC3\xA9b',
         ),
         None, None, True
@@ -125,7 +124,7 @@ TESTCASES_ENSURE_BYTES = [
         "Input object is a Unicode string with UCS-4 chars",
         dict(
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj=u'a\U00010142b',
+            obj='a\U00010142b',
             exp_result=b'a\xF0\x90\x85\x82b',
         ),
         None, None, True
@@ -185,7 +184,7 @@ TESTCASES_ENSURE_UNICODE = [
         "Input object is an empty Byte string",
         dict(
             obj=b'',
-            exp_result=u'',
+            exp_result='',
         ),
         None, None, True
     ),
@@ -193,7 +192,7 @@ TESTCASES_ENSURE_UNICODE = [
         "Input object is a Byte string with 7-bit ASCII chars",
         dict(
             obj=b'abc',
-            exp_result=u'abc',
+            exp_result='abc',
         ),
         None, None, True
     ),
@@ -202,7 +201,7 @@ TESTCASES_ENSURE_UNICODE = [
         dict(
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
             obj=b'a\xC3\xA9b',
-            exp_result=u'a\u00E9b',
+            exp_result='a\u00E9b',
         ),
         None, None, True
     ),
@@ -211,23 +210,23 @@ TESTCASES_ENSURE_UNICODE = [
         dict(
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
             obj=b'a\xF0\x90\x85\x82b',
-            exp_result=u'a\U00010142b',
+            exp_result='a\U00010142b',
         ),
         None, None, True
     ),
     (
         "Input object is an empty Unicode string",
         dict(
-            obj=u'',
-            exp_result=u'',
+            obj='',
+            exp_result='',
         ),
         None, None, True
     ),
     (
         "Input object is a Unicode string with 7-bit ASCII chars",
         dict(
-            obj=u'abc',
-            exp_result=u'abc',
+            obj='abc',
+            exp_result='abc',
         ),
         None, None, True
     ),
@@ -235,8 +234,8 @@ TESTCASES_ENSURE_UNICODE = [
         "Input object is a Unicode string with UCS-2 chars",
         dict(
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
-            obj=u'a\u00E9b',
-            exp_result=u'a\u00E9b',
+            obj='a\u00E9b',
+            exp_result='a\u00E9b',
         ),
         None, None, True
     ),
@@ -244,8 +243,8 @@ TESTCASES_ENSURE_UNICODE = [
         "Input object is a Unicode string with UCS-4 chars",
         dict(
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
-            obj=u'a\U00010142b',
-            exp_result=u'a\U00010142b',
+            obj='a\U00010142b',
+            exp_result='a\U00010142b',
         ),
         None, None, True
     ),
@@ -303,16 +302,16 @@ TESTCASES_TO_UNICODE = [
     (
         "Input object is a Unicode string",
         dict(
-            obj=u'abc',
-            exp_result=u'abc',
+            obj='abc',
+            exp_result='abc',
         ),
-        AttributeError if six.PY3 else None, None, True
+        AttributeError, None, True
     ),
     (
         "Input object is an empty Byte string",
         dict(
             obj=b'',
-            exp_result=u'',
+            exp_result='',
         ),
         None, None, True
     ),
@@ -320,7 +319,7 @@ TESTCASES_TO_UNICODE = [
         "Input object is a Byte string with 7-bit ASCII chars",
         dict(
             obj=b'abc',
-            exp_result=u'abc',
+            exp_result='abc',
         ),
         None, None, True
     ),
@@ -329,7 +328,7 @@ TESTCASES_TO_UNICODE = [
         dict(
             # UCS-2 char U+00E9: LATIN SMALL LETTER E WITH ACUTE
             obj=b'a\xC3\xA9b',
-            exp_result=u'a\u00E9b',
+            exp_result='a\u00E9b',
         ),
         None, None, True
     ),
@@ -338,7 +337,7 @@ TESTCASES_TO_UNICODE = [
         dict(
             # UCS-4 char U+010142: GREEK ACROPHONIC ATTIC ONE DRACHMA
             obj=b'a\xF0\x90\x85\x82b',
-            exp_result=u'a\U00010142b',
+            exp_result='a\U00010142b',
         ),
         None, None, True
     ),

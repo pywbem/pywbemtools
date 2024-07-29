@@ -36,10 +36,7 @@ association.
 """
 
 
-from __future__ import absolute_import, print_function, unicode_literals
-
 from collections import defaultdict, OrderedDict, namedtuple
-import six
 import click
 
 from asciitree import LeftAligned
@@ -49,14 +46,6 @@ from ._common import shorten_path_str, sort_cimobjects, to_wbem_uri_folded
 from .._utils import get_terminal_width
 from .._output_formatting import output_format_is_table, format_table, \
     warning_msg
-
-# Same as in pwbem.cimtypes.py
-if six.PY2:
-    # pylint: disable=invalid-name,undefined-variable
-    _Longint = long  # noqa: F821
-else:
-    # pylint: disable=invalid-name
-    _Longint = int
 
 # Named tuple defining an Association class name and corresponding
 # integer representing the Reference instance for that association. Used
@@ -77,7 +66,7 @@ def _match_instname_wo_host(instance_name1, instance_name2):
     return in1 == in2
 
 
-class AssociationShrub(object):
+class AssociationShrub:
     # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
     This class provides tools for the acquisition and display of an association
@@ -312,7 +301,7 @@ class AssociationShrub(object):
         # Find role parameter for each class and insert into instance_shrub
         # dictionary. The result is dictionary of form:
         #   {<role>:{<ASSOC_CLASSNAME>:[RESULTROLES]}
-        for cln, roles in six.iteritems(ref_class_roles):
+        for cln, roles in ref_class_roles.items():
             role_dict = self._get_role_result_roles(roles, cln)
 
             # Insert the role and cln into the shrub_dict
@@ -369,8 +358,8 @@ class AssociationShrub(object):
                         result_role=result_role)
 
                     # Build unique associated classnames from returned inames.
-                    rtnd_assoc_clns = list(set([iname.classname for iname
-                                                in rtnd_assoc_inames]))
+                    rtnd_assoc_clns = list({iname.classname for iname
+                                            in rtnd_assoc_inames})
 
                     # Discard unwanted assoc classes if --result_class param
                     # defined
@@ -455,15 +444,15 @@ class AssociationShrub(object):
         # For now we always hide the following independent of key value
         replacements = NocaseDict((("SystemCreationClassName", None),
                                    ("SystemName", None)))
-        for role, ref_clns in six.iteritems(self.instance_shrub):
+        for role, ref_clns in self.instance_shrub.items():
             elementstree = OrderedDict()
             for ref_cln in ref_clns:
                 rrole_dict = OrderedDict()
-                for rrole, assoc_clns in six.iteritems(
-                        self.assoc_instnames[role][ref_cln]):
+                for rrole, assoc_clns in \
+                        self.assoc_instnames[role][ref_cln].items():
                     assoc_clns_dict = OrderedDict()
 
-                    for assoc_cln, inst_names_tup in six.iteritems(assoc_clns):
+                    for assoc_cln, inst_names_tup in assoc_clns.items():
                         if not inst_names_tup:
                             continue
 
@@ -487,7 +476,7 @@ class AssociationShrub(object):
                             assoc_clns_dict[key] = inst_names_tup
 
                     # Add the role tree element
-                    rrole_disp = "{}(ResultRole)".format(rrole)
+                    rrole_disp = f"{rrole}(ResultRole)"
                     rrole_dict[rrole_disp] = assoc_clns_dict
 
                 # Add the reference class element. Include namespace if
@@ -497,7 +486,7 @@ class AssociationShrub(object):
                 elementstree[disp_ref_cln] = rrole_dict
 
             # Add the role component to the tree
-            disp_role = "{}(Role)".format(role)
+            disp_role = f"{role}(Role)"
             assoctree[disp_role] = elementstree
 
         # Attach the top of the tree, the source instance path for the
@@ -538,14 +527,14 @@ class AssociationShrub(object):
         # Build the rows of the table
         rows = []
         # assoc_classnames dict struct [role]:[ref_clns]:[rrole]:[assoc_clns]
-        for role, ref_clns in six.iteritems(self.instance_shrub):
+        for role, ref_clns in self.instance_shrub.items():
             for ref_cln in ref_clns:
                 is_ternary = self.ternary_ref_classes[ref_cln]
-                for rrole, assoc_clns in six.iteritems(
-                        self.assoc_instnames[role][ref_cln]):
+                for rrole, assoc_clns in \
+                        self.assoc_instnames[role][ref_cln].items():
                     for assoc_cln in assoc_clns:
                         # pylint: disable=line-too-long
-                        inst_names = self.assoc_instnames[role][ref_cln][rrole][assoc_cln]  # noqa E501
+                        inst_names = self.assoc_instnames[role][ref_cln][rrole][assoc_cln]  # noqa: E501
                         # pylint: enable=line-too-long
                         ml = get_terminal_width() - 65
                         inst_col = fmt_inst_col(inst_names, ml, summary,
@@ -808,7 +797,7 @@ class AssociationShrub(object):
 
         """
         ref_inst = self.conn.GetInstance(inst_name, LocalOnly=False)
-        return [pname for pname, pvalue in six.iteritems(ref_inst.properties)
+        return [pname for pname, pvalue in ref_inst.properties.items()
                 if pvalue.type == 'reference']
 
     def _get_role_result_roles(self, roles, ref_classname):
@@ -829,6 +818,6 @@ class AssociationShrub(object):
             if refs:
                 rtn_roles[tst_role] = [r for r in roles if r != tst_role]
         if self.verbose:
-            print('ResultRoles: class={0} ResultClass={1} ResultRoles={2}'
+            print('ResultRoles: class={} ResultClass={} ResultRoles={}'
                   .format(self.source_path.classname, ref_classname, rtn_roles))
         return rtn_roles

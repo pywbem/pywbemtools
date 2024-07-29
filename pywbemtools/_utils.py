@@ -18,16 +18,13 @@
 Utility functions applicable across multiple pywbemtools commands.
 """
 
-from __future__ import print_function, absolute_import
 
 import os
-import io
 import shutil
 import warnings
 import inspect
 from datetime import datetime
-import mock
-import six
+from unittest import mock
 
 __all__ = []
 
@@ -75,7 +72,7 @@ def ensure_bytes(obj):
       using the UTF-8 encoding.
     * Otherwise, the input object was not a string and is returned unchanged.
     """
-    if isinstance(obj, six.text_type):
+    if isinstance(obj, str):
         return obj.encode("utf-8")
     return obj
 
@@ -90,7 +87,7 @@ def ensure_unicode(obj):
       using the UTF-8 encoding.
     * Otherwise, the input object was not a string and is returned unchanged.
     """
-    if isinstance(obj, six.binary_type):
+    if isinstance(obj, bytes):
         return obj.decode("utf-8")
     return obj
 
@@ -109,7 +106,7 @@ def _formatwarning(message, category, filename, lineno, line=None):
     """
     Replacement for warnings.formatwarning() that is monkey patched in.
     """
-    return "{}: {}\n".format(category.__name__, message)
+    return f"{category.__name__}: {message}\n"
 
 
 def pywbemtools_warn(*args, **kwargs):
@@ -160,5 +157,5 @@ def debug_log(msg):
     """
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     caller = inspect.stack()[1][3]
-    with io.open("debug.log", "a", encoding='utf-8') as fp:
-        fp.write(ensure_unicode("{} {}: {}\n".format(timestamp, caller, msg)))
+    with open("debug.log", "a", encoding='utf-8') as fp:
+        fp.write(ensure_unicode(f"{timestamp} {caller}: {msg}\n"))

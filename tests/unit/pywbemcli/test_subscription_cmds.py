@@ -29,7 +29,6 @@ NOTE: We used long lines in the test definitions to make the tests more
 readable.
 """
 
-from __future__ import absolute_import, print_function
 import os
 import sys
 import pytest
@@ -1661,7 +1660,7 @@ class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
         # Create the connection file from the 'yaml' input
         if 'yaml' in inputs:
             # pylint: disable=unspecified-encoding
-            with open(TEST_SUBSCRIPTIONS_FILE_PATH, "wt") as repo_file:
+            with open(TEST_SUBSCRIPTIONS_FILE_PATH, "w") as repo_file:
                 repo_file.write(inputs['yaml'])
 
         # All tests in for subscriptions will use the subscriptions

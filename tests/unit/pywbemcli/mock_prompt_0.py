@@ -32,7 +32,7 @@
     This file is enabled during testing through the PYWBEMCLI_STARTUP_SCRIPT
     environment variable.
 """
-from mock import Mock
+from unittest.mock import Mock
 
 import pywbemtools
 RETURN_VALUE = "0"

@@ -16,7 +16,6 @@
 Basic server tests.
 """
 
-from __future__ import absolute_import, print_function
 
 import re
 
@@ -35,7 +34,7 @@ def create_table(stdout):
     for line in table_lines:
         # match 3 groups of characters separated by spaces
         m = re.match(r'^(\S+) *(\S+) *(.+?)$', line)
-        assert m, "Cannot parse output line: {!r}".format(line)
+        assert m, f"Cannot parse output line: {line!r}"
         table.append(m.groups())
     return table
 
