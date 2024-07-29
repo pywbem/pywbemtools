@@ -5,18 +5,13 @@ that code, please update this code also. It should have no differences from
 that code.
 """
 
-from __future__ import absolute_import
 
 import functools
 from collections import namedtuple
 import warnings
-import six
+from inspect import Signature, Parameter
+
 import pytest
-if six.PY3:
-    # pylint: disable=no-name-in-module
-    from inspect import Signature, Parameter
-else:
-    from funcsigs import Signature, Parameter  # pylint: disable=import-error
 
 __all__ = ['simplified_test_function']
 
@@ -27,6 +22,7 @@ __all__ = ['simplified_test_function']
 # the wrapper function to its correct signature. To do that, we cannot use
 # signature() because its follow_wrapped parameter was introduced only in
 # Python 3.5. Instead, we build the signature manually.
+# TODO: Simplify this.
 TESTFUNC_SIGNATURE = Signature(
     parameters=[
         Parameter('desc', Parameter.POSITIONAL_OR_KEYWORD),

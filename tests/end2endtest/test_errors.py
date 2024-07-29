@@ -15,7 +15,6 @@
 Test some errors with real servers.
 """
 
-from __future__ import absolute_import, print_function
 
 import re
 

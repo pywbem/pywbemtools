@@ -16,10 +16,8 @@
 Tests the server command group
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import pytest
 
 from .cli_test_extensions import CLITestsBase
@@ -45,7 +43,7 @@ SIMPLE_MOCK_MODEL = 'simple_mock_model.mof'
 SIMPLE_MOCK_MODEL_FILEPATH = os.path.join(
     os.path.dirname(__file__), SIMPLE_MOCK_MODEL)
 SIMPLE_MOCK_MODEL_FILEPATH_REL = os.path.relpath(SIMPLE_MOCK_MODEL_FILEPATH)
-with io.open(SIMPLE_MOCK_MODEL_FILEPATH, 'r', encoding='utf-8') as fp:
+with open(SIMPLE_MOCK_MODEL_FILEPATH, encoding='utf-8') as fp:
     SIMPLE_MOCK_MODEL_CONTENT = fp.read()
 
 MOF_WITH_ERROR_FILEPATH = os.path.join(

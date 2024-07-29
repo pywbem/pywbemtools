@@ -18,13 +18,9 @@
 Tests for table formatting.
 """
 
-from __future__ import print_function, absolute_import
 
 import sys
-try:
-    from StringIO import StringIO  # Python 2
-except ImportError:
-    from io import StringIO  # Python 3
+from io import StringIO
 import pytest
 
 from pywbemtools._output_formatting import format_table, fold_strings

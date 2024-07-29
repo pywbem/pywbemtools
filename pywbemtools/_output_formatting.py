@@ -19,7 +19,6 @@ Functions that help defining or validating output formats, and that perform
 output formatting.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 from textwrap import fill
 from operator import itemgetter
@@ -29,7 +28,6 @@ try:
 except ImportError:
     from ordereddict import OrderedDict  # pylint: disable=import-error
 
-import six
 import click
 import tabulate
 
@@ -180,7 +178,7 @@ def validate_output_format(output_format, valid_format_groups,
           format group.
     """
 
-    if isinstance(valid_format_groups, six.string_types):
+    if isinstance(valid_format_groups, str):
         valid_format_groups = [valid_format_groups]
 
     if valid_format_groups:
@@ -206,7 +204,7 @@ def validate_output_format(output_format, valid_format_groups,
             if name in valid_format_groups:
                 if valid_formats:
                     valid_formats += "; "
-                valid_formats += '{0} formats: "({1})"'.format(
+                valid_formats += '{} formats: "({})"'.format(
                     name, '", "'.join(fmt_list))
         raise click.ClickException('Output format "{}" not allowed for this '
                                    'command. Only {} allowed.'.
@@ -236,7 +234,7 @@ def validate_output_format(output_format, valid_format_groups,
 
 def warning_msg(msg):
     """Issue the msg param as warning prefixed by WARNING: to stderr"""
-    click.echo('WARNING: {}'.format(msg), err=True)
+    click.echo(f'WARNING: {msg}', err=True)
 
 
 def display_text(text, output_format=None):  # pylint: disable=unused-argument
@@ -284,13 +282,13 @@ def format_keys(obj, max_width):
         wbem_uri_keys = ''
         line_len = 0
         for key, value in myobj.keybindings.items():
-            one_key_obj = get_wbemurikeys((CIMInstanceName('x', {key: value})))
+            one_key_obj = get_wbemurikeys(CIMInstanceName('x', {key: value}))
             if wbem_uri_keys:
                 if line_len + len(one_key_obj) > max_width:
-                    wbem_uri_keys += '\n{}'.format(one_key_obj)
+                    wbem_uri_keys += f'\n{one_key_obj}'
                     line_len = 0
                 else:
-                    wbem_uri_keys += ',{}'.format(one_key_obj)
+                    wbem_uri_keys += f',{one_key_obj}'
                     line_len += len(one_key_obj) + 1
 
             else:  # must put on first line even if too long
@@ -324,7 +322,7 @@ def hide_empty_columns(headers, rows):
         Returns True if all are empty. Otherwise returns False
         """
         for row in rows:
-            if isinstance(row[column], six.integer_types) and \
+            if isinstance(row[column], int) and \
                     row[column] is not None:
                 return False
             if row[column]:
@@ -434,10 +432,10 @@ def format_table(rows, headers, title=None, table_format='simple',
         if table_format == 'html':
             # Insert caption element immediatly after table
             assert result.startswith("<table>")
-            replacement = "<table>\n<caption>{0}</caption>".format(title)
+            replacement = f"<table>\n<caption>{title}</caption>"
             result = result.replace("<table>", replacement, 1)
         else:
-            result = '{0}\n{1}'.format(title, result)
+            result = f'{title}\n{result}'
     return result
 
 
@@ -502,7 +500,7 @@ def fold_strings(input_strings, max_width, break_long_words=False,
         """
         if indent is None:
             return ""
-        if isinstance(indent, six.string_types):
+        if isinstance(indent, str):
             return indent
         return ' ' * indent
 
@@ -531,7 +529,7 @@ def fold_strings(input_strings, max_width, break_long_words=False,
 
     # process single string
     input_string = input_strings
-    assert isinstance(input_string, six.string_types)
+    assert isinstance(input_string, str)
 
     if len(input_string) <= max_width:
         return input_string

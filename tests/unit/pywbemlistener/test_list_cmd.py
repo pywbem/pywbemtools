@@ -17,7 +17,6 @@
 Test the 'pywbemlistener list' command.
 """
 
-from __future__ import absolute_import, print_function
 
 import pytest
 

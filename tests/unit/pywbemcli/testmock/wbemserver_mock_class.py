@@ -38,7 +38,6 @@
     the corresponding mock WBEM server for tests.
 """
 
-from __future__ import print_function, absolute_import
 
 import os
 
@@ -191,7 +190,7 @@ DEFAULT_WBEM_SERVER_MOCK_DEFAULT_DICT = {
 }
 
 
-class WbemServerMock(object):
+class WbemServerMock:
     # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
     Class that mocks the classes and methods used by the pywbem
@@ -488,7 +487,7 @@ class WbemServerMock(object):
         rtn_ominsts = self.conn.EnumerateInstances("CIM_ObjectManager",
                                                    namespace=self.interop_ns)
         assert len(rtn_ominsts) == 1, \
-            "Expected 1 ObjetManager instance, got {!r}".format(rtn_ominsts)
+            f"Expected 1 ObjetManager instance, got {rtn_ominsts!r}"
 
         return ominst
 
@@ -514,7 +513,7 @@ class WbemServerMock(object):
             org_vm_dict[org_vm.tovalues(value)] = value
 
         for profile in profiles:
-            instance_id = '{}+{}+{}'.format(profile[0], profile[1], profile[2])
+            instance_id = f'{profile[0]}+{profile[1]}+{profile[2]}'
             reg_prof_dict = {'RegisteredOrganization': org_vm_dict[profile[0]],
                              'RegisteredName': profile[1],
                              'RegisteredVersion': profile[2],
@@ -575,9 +574,9 @@ class WbemServerMock(object):
                 registered_version=dependent[2])
 
             assert len(antecedent_inst) == 1, \
-                "Antecedent: {0}".format(antecedent)
+                f"Antecedent: {antecedent}"
             assert len(dependent_inst) == 1, \
-                "Dependent: {0}".format(dependent)
+                f"Dependent: {dependent}"
 
             ref_profile_dict = {'Antecedent': antecedent_inst[0].path,
                                 'Dependent': dependent_inst[0].path}

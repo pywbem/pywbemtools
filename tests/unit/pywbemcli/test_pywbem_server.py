@@ -18,10 +18,8 @@
 Unit tests for PywbemServer class methods.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
-import io
 import pytest
 
 from pywbemtools.pywbemcli._pywbem_server import PywbemServer
@@ -64,7 +62,7 @@ TESTCASES_PYSVR_INIT = [
                 server='http://localhost',
             ),
             exp_attrs=dict(
-                server=u'http://localhost',
+                server='http://localhost',
                 default_namespace='root/cimv2',
                 name='default',
                 user=None,
@@ -92,7 +90,7 @@ TESTCASES_PYSVR_INIT = [
                 password='blah',
             ),
             exp_attrs=dict(
-                server=u'http://localhost',
+                server='http://localhost',
                 default_namespace='interop',
                 name='default',
                 user='fred',
@@ -127,7 +125,7 @@ TESTCASES_PYSVR_INIT = [
                 ca_certs='blah'
             ),
             exp_attrs=dict(
-                server=u'http://localhost',
+                server='http://localhost',
                 default_namespace='root/cimv3',
                 name='default',
                 user='fred',
@@ -499,7 +497,7 @@ TESTCASES_PYSVR_CONNECT_ATTRS = [
                 server='http://localhost',
             ),
             exp_attrs=dict(
-                server=u'http://localhost',
+                server='http://localhost',
                 default_namespace='root/cimv2',
                 user=None,
                 password=None,
@@ -524,7 +522,7 @@ TESTCASES_PYSVR_CONNECT_ATTRS = [
                 keyfile=FAKE_PEM_PATH,
             ),
             exp_attrs=dict(
-                server=u'http://localhost',
+                server='http://localhost',
                 default_namespace='root/cimv2',
                 user='fred',
                 password='blah',
@@ -552,7 +550,7 @@ def test_pysvr_connect_attrs(testcase, init_kwargs, exp_attrs):
 
     # Create temp fake file.
     # NOTE: We cannot use fixtures because we are using simplified_test_function
-    with io.open(FAKE_PEM_PATH, 'a', encoding='utf-8'):
+    with open(FAKE_PEM_PATH, 'a', encoding='utf-8'):
         pass
 
     # connect and test connection results. Try block insures finally is

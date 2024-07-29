@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (C) Copyright 2020 IBM Corp.
 # (C) Copyright 2020 Inova Development Inc.
 # All Rights Reserved
@@ -20,7 +19,6 @@ Tests for _common.py functions.  This is a unit test of the function and its
 API, not a test of pywbemcli commands.
 """
 
-from __future__ import absolute_import, print_function
 
 import sys
 from datetime import datetime
@@ -86,7 +84,7 @@ def simple_instance(pvalue=None):
             CIMProperty("Pdt", DATETIME1_OBJ),
             CIMProperty("Pint32", Uint32(99)),
             CIMProperty("Pint64", Uint64(9999)),
-            CIMProperty("Pstr1", u"Test String"),
+            CIMProperty("Pstr1", "Test String"),
         ]
     inst = CIMInstance("CIM_Foo", properties)
     return inst
@@ -121,7 +119,7 @@ def simple_instance_unsorted(pvalue=None):
             CIMProperty("pdt", DATETIME1_OBJ),  # lower cased
             CIMProperty("PInt64", Uint64(9999)),  # out of order when case ins.
             CIMProperty("Pint32", Uint32(99)),
-            CIMProperty("Pstr1", u"Test String"),
+            CIMProperty("Pstr1", "Test String"),
         ]
     inst = CIMInstance("CIM_Foo", properties)
     return inst
@@ -144,7 +142,7 @@ def simple_instance2(pvalue=None):
             CIMProperty("Pdt", DATETIME1_OBJ),
             CIMProperty("Pint64", Uint64(9999)),
             CIMProperty("Psint32", Sint32(-2147483648)),
-            CIMProperty("Pstr1", u"Test String"),
+            CIMProperty("Pstr1", "Test String"),
             CIMProperty("Puint32", Uint32(4294967295)),
         ]
     inst = CIMInstance("CIM_Foo", properties)
@@ -167,7 +165,7 @@ def simple_array_instance2(pvalue=None):
             CIMProperty("Pdt", is_array=True, value=[DATETIME1_OBJ]),
             CIMProperty("Pint64", is_array=True, value=[Uint64(9999)]),
             CIMProperty("Psint32", is_array=True, value=[Sint32(-2147483648)]),
-            CIMProperty("Pstr1", is_array=True, value=[u"Test String"]),
+            CIMProperty("Pstr1", is_array=True, value=["Test String"]),
             CIMProperty("Puint32", is_array=True, value=[Uint32(4294967295)]),
         ]
     inst = CIMInstance("CIM_Foo", properties)
@@ -193,8 +191,8 @@ def simple_array_instance21(pvalue=None):
                                                         Uint64(9999)]),
             CIMProperty("Psint32", is_array=True, value=[Sint32(-2147483648),
                                                          Sint32(-2147483648)]),
-            CIMProperty("Pstr1", is_array=True, value=[u"Test String",
-                                                       u"Test String"]),
+            CIMProperty("Pstr1", is_array=True, value=["Test String",
+                                                       "Test String"]),
             CIMProperty("Puint32", is_array=True, value=[Uint32(4294967295),
                                                          Uint32(4294967295)]),
         ]
@@ -231,7 +229,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
-                 u'"Test String"']],
+                 '"Test String"']],
         ),
         None, None, OK),
 
@@ -245,7 +243,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                 quote_strings=False),
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
-                 u'Test String']],
+                 'Test String']],
         ),
         None, None, OK),
 
@@ -325,7 +323,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
-                 u'"Test String"']],
+                 '"Test String"']],
         ),
         None, None, OK),
 
@@ -337,7 +335,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
             kwargs={},
             exp_rtn=[
                 ["false", "true", DATETIME1_STR, "99", "9999",
-                 u'"Test String"']],
+                 '"Test String"']],
         ),
         None, None, OK),
 
@@ -539,7 +537,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                                                  value='f')])],
                   4),
             kwargs={},
-            exp_rtn=[[u"'f'"]],
+            exp_rtn=[["'f'"]],
         ),
         None, None, OK),
 
@@ -554,7 +552,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                                                  type='string'), ])],
                   4),
             kwargs={},
-            exp_rtn=[[u'', u'', u'']],
+            exp_rtn=[['', '', '']],
         ),
         None, None, OK),
 
@@ -572,7 +570,7 @@ TESTCASES_FORMAT_INSTANCES_AS_ROWS = [
                   30),
             kwargs={},
             exp_rtn=[
-                [u'"/:REF_CLN.k1=\\"v1\\""']],
+                ['"/:REF_CLN.k1=\\"v1\\""']],
         ),
         None, None, OK),
 ]

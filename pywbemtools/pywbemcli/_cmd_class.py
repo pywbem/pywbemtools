@@ -21,7 +21,6 @@ CIMClass on a WBEM server.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import copy
 import click
@@ -62,22 +61,22 @@ from .._output_formatting import output_format_is_table, \
 no_qualifiers_class_option = [              # pylint: disable=invalid-name
     click.option('--nq', '--no-qualifiers', 'no_qualifiers', is_flag=True,
                  default=True,
-                 help=u'Do not include qualifiers in the returned class(es). '
+                 help='Do not include qualifiers in the returned class(es). '
                       'Default: Include qualifiers.')]
 
 deep_inheritance_class_option = [              # pylint: disable=invalid-name
     click.option('--di', '--deep-inheritance', 'deep_inheritance', is_flag=True,
                  default=False,
-                 help=u'Include the complete subclass hierarchy of the '
+                 help='Include the complete subclass hierarchy of the '
                       'requested classes in the result set. '
                       'Default: Do not include subclasses.')]
 
 local_only_class_option = [              # pylint: disable=invalid-name
     click.option('--lo', '--local-only', 'local_only', is_flag=True,
                  default=False,
-                 help=u'Do not include superclass properties and methods in '
-                      u'the returned class(es). '
-                      u'Default: Include superclass properties and methods.')]
+                 help='Do not include superclass properties and methods in '
+                      'the returned class(es). '
+                      'Default: Include superclass properties and methods.')]
 
 
 ##########################################################################
@@ -189,13 +188,13 @@ def class_get(context, classname, **options):
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True,)
 @click.option('--include-instances', is_flag=True, default=False,
-              help=u'Delete any instances of the class as well. '
+              help='Delete any instances of the class as well. '
                    'WARNING: Deletion of instances will cause the removal '
                    'of corresponding resources in the managed environment '
                    '(i.e. in the real world).'
                    'Default: Reject command if the class has any instances.')
 @click.option('--dry-run', is_flag=True, required=False,
-              help=u'Enable dry-run mode: Do not actually delete the objects, '
+              help='Enable dry-run mode: Do not actually delete the objects, '
                    'but display what would be done.')
 @add_options(namespace_option)
 @add_options(help_option)
@@ -241,7 +240,7 @@ def class_delete(context, classname, **options):
 @click.argument('methodname', type=str, metavar='METHODNAME', required=True)
 @click.option('-p', '--parameter', type=str, metavar='PARAMETERNAME=VALUE',
               required=False, multiple=True,
-              help=u'Specify a method input parameter with its value. '
+              help='Specify a method input parameter with its value. '
                    'May be specified multiple times. '
                    'Default: No input parameters.')
 @add_options(namespace_option)
@@ -279,11 +278,11 @@ def class_invokemethod(context, classname, methodname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help=u'Filter the result set by result class name. '
+              help='Filter the result set by result class name. '
                    'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help=u'Filter the result set by source end role name.')
+              help='Filter the result set by source end role name.')
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
@@ -327,18 +326,18 @@ def class_references(context, classname, **options):
 @click.argument('classname', type=str, metavar='CLASSNAME', required=True)
 @click.option('--ac', '--assoc-class', 'assoc_class', type=str, required=False,
               metavar='CLASSNAME',
-              help=u'Filter the result set by association class name. '
+              help='Filter the result set by association class name. '
                    'Subclasses of the specified class also match.')
 @click.option('--rc', '--result-class', 'result_class', type=str,
               required=False, metavar='CLASSNAME',
-              help=u'Filter the result set by result class name. '
+              help='Filter the result set by result class name. '
                    'Subclasses of the specified class also match.')
 @click.option('-r', '--role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help=u'Filter the result set by source end role name.')
+              help='Filter the result set by source end role name.')
 @click.option('--rr', '--result-role', 'result_role', type=str, required=False,
               metavar='PROPERTYNAME',
-              help=u'Filter the result set by far end role name.')
+              help='Filter the result set by far end role name.')
 @add_options(no_qualifiers_class_option)
 @add_options(include_classorigin_class_option)
 @add_options(propertylist_option)
@@ -383,7 +382,7 @@ def class_associators(context, classname, **options):
                 required=True)
 @add_options(multiple_namespaces_option_dflt_all)
 @click.option('-s', '--sort', is_flag=True, required=False,
-              help=u'Sort by namespace. Default is to sort by classname')
+              help='Sort by namespace. Default is to sort by classname')
 @add_options(class_filter_options)
 @add_options(help_option)
 @click.pass_obj
@@ -425,10 +424,10 @@ def class_find(context, classname_glob, **options):
                      options_metavar=CMD_OPTS_TXT)
 @click.argument('classname', type=str, metavar='CLASSNAME', required=False)
 @click.option('-s', '--superclasses', is_flag=True, default=False,
-              help=u'Show the superclass hierarchy. '
+              help='Show the superclass hierarchy. '
                    'Default: Show the subclass hierarchy.')
 @click.option('-d', '--detail', is_flag=True, default=False,
-              help=u'Show details about the class: the Version, '
+              help='Show details about the class: the Version, '
                    ' Association, Indication, and Abstact qualifiers.')
 @add_options(namespace_option)
 @add_options(help_option)
@@ -791,13 +790,13 @@ def cmd_class_find(context, classname_glob, options):
             headers = ['Namespace', 'Classname']
             click.echo(
                 format_table(rows, headers,
-                             title='Find class {}'.format(classname_glob),
+                             title=f'Find class {classname_glob}',
                              table_format=output_format))
         else:
             # Display function to display classnames returned with
             # their namespaces in the form <namespace>:<classname>
             for row in rows:
-                click.echo('  {}: {}'.format(row[0], row[1]))
+                click.echo(f'  {row[0]}: {row[1]}')
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -934,8 +933,8 @@ def cmd_class_delete(context, classname, options):
                     conn.DeleteInstance(instname)
                 except Error as exc:
                     raise pywbem_error_exception(
-                        exc, "Cannot delete instance {}".format(instname))
-            click.echo('{}Deleted instance {}'.format(dry_run_prefix, instname))
+                        exc, f"Cannot delete instance {instname}")
+            click.echo(f'{dry_run_prefix}Deleted instance {instname}')
 
     if not dry_run:
         try:
@@ -944,4 +943,4 @@ def cmd_class_delete(context, classname, options):
             raise pywbem_error_exception(
                 exc, "Cannot delete class {} in namespace {}".
                 format(classname, namespace))
-    click.echo('{}Deleted class {}'.format(dry_run_prefix, classname))
+    click.echo(f'{dry_run_prefix}Deleted class {classname}')

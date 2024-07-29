@@ -1,4 +1,3 @@
-
 """
 Tests of errors that are common across a wide group of pywbemcli groups and
 commands.
@@ -13,8 +12,6 @@ since all tests should fail with connection error.
    wbem server.
 """
 
-
-from __future__ import absolute_import, print_function
 
 import os
 import pytest
@@ -85,7 +82,7 @@ class TestConnectionFail(CLITestsBase):
         This tests builds the inputs dictionary nad exp_response dictionary
         from the cmd line inputs.
         """
-        desc = "Verify {} args {} fails with connection error".format(grp, cmd)
+        desc = f"Verify {grp} args {cmd} fails with connection error"
 
         # Build inputs dictionary for the test with bad svr name and cmd/args
         inputs = {'general': ['--server', 'http://blahblah', '--timeout', '1'],
@@ -144,7 +141,7 @@ class TestNamespaceError(CLITestsBase):
         This tests builds the inputs dictionary nad exp_response dictionary
         from the cmd line inputs.
         """
-        desc = "Verify {} args {} fails with namespace error".format(grp, cmd)
+        desc = f"Verify {grp} args {cmd} fails with namespace error"
 
         # Build inputs dictionary for the test with bad svr name and cmd/args
         inputs = {'args': cmd.split(' ')}

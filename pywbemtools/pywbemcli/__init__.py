@@ -16,11 +16,9 @@
 
 """
 Pywbemcli is a command line WBEM client that uses pywbem as its communication
-interface with WBEM Servers. It is written in pure Python and supports Python 2
-and Python 3.
+interface with WBEM Servers. It is written in pure Python.
 """
 
-from __future__ import absolute_import, print_function
 
 from .._utils import *                # noqa: F403,F401
 from .._click_extensions import *     # noqa: F403,F401

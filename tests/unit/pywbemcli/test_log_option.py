@@ -17,7 +17,6 @@ Tests the general log option. This tests the --log general option value
 for valid and invalid strings.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import pytest

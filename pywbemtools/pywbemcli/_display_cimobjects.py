@@ -23,11 +23,9 @@ defined by output_format (as CIM objects (mof, etc.) as one or more tables
 or as text.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import re
 
-import six
 import click
 
 from pywbem import CIMInstanceName, CIMInstance, CIMClass, \
@@ -248,7 +246,7 @@ def _order_display_objects(cim_objects, object_order):
                         obj_name = objtmp.to_wbem_uri(format="canonical")
                     elif isinstance(obj, CIMQualifierDeclaration):
                         obj_name = obj.name
-                    elif isinstance(obj, six.string_types):
+                    elif isinstance(obj, str):
                         obj_name = obj
                     else:
                         assert False
@@ -333,7 +331,7 @@ def _display_as_table(context, cim_objects, output_format, property_list,
         for ns, ns_object in _order_display_objects(cim_objects, object_order):
             if isinstance(ns_object, CIMQualifierDeclaration):
                 objects.append(QualDeclWrapper(ns, ns_object))
-            elif isinstance(ns_object, six.string_types):
+            elif isinstance(ns_object, str):
                 objects.append(CIMClassName(ns_object, namespace=ns))
             else:
                 objects.append(ns_object)
@@ -388,7 +386,7 @@ def _display_list_as_table(context, cim_objects, output_format, property_list,
             _display_qual_decls_as_table(cim_objects, table_width,
                                          output_format)
         elif isinstance(cim_objects[0], (CIMClassName, CIMInstanceName,
-                                         six.string_types, tuple)):
+                                         (str,), tuple)):
             _display_paths_as_table(cim_objects, table_width, output_format,
                                     namespace=use_namespace)
         else:
@@ -407,14 +405,14 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
     """
     assert isinstance(
         cim_object, (CIMClass, CIMClassName, CIMInstance, CIMInstanceName,
-                     CIMQualifierDeclaration, tuple, six.string_types))
+                     CIMQualifierDeclaration, tuple, (str,)))
 
     # Display in the selected CIM object format (mof, xml, repr, txt)
     if output_format == 'mof':
         try:
             mofstr = cim_object.tomof()
             if namespace:
-                click.echo("#pragma namespace (\"{}\")".format(namespace))
+                click.echo(f"#pragma namespace (\"{namespace}\")")
             click.echo(mofstr)
 
         except AttributeError:
@@ -430,9 +428,9 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
                 assert isinstance(cim_object[1], CIMClass)
                 click.echo(cim_object[0])
                 click.echo(cim_object[1].tomof())
-            elif isinstance(cim_object, six.string_types):
+            elif isinstance(cim_object, str):
                 if namespace:
-                    click.echo("{}:{}".format(namespace, cim_object))
+                    click.echo(f"{namespace}:{cim_object}")
                 else:
                     click.echo(cim_object)
             else:
@@ -445,18 +443,18 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
                           (CIMClass, CIMInstance, CIMQualifierDeclaration,
                            CIMInstanceName, CIMClassName)):
                 if namespace:
-                    click.echo("<!-- Namespace = {} -->".format(namespace))
+                    click.echo(f"<!-- Namespace = {namespace} -->")
                 click.echo(cim_object.tocimxmlstr(indent=4))
             elif isinstance(cim_object, tuple):
                 if namespace:
-                    click.echo("<!-- Namespace = {} -->".format(namespace))
+                    click.echo(f"<!-- Namespace = {namespace} -->")
                 assert isinstance(cim_object[0], CIMClassName)
                 assert isinstance(cim_object[1], CIMClass)
                 click.echo(cim_object[0].tocimxmlstr(indent=4))
                 click.echo(cim_object[1].tocimxmlstr(indent=4))
-            elif isinstance(cim_object, six.string_types):
+            elif isinstance(cim_object, str):
                 if namespace:
-                    click.echo("{}:{}".format(namespace, cim_object))
+                    click.echo(f"{namespace}:{cim_object}")
                 else:
                     click.echo(cim_object)
             else:
@@ -534,7 +532,7 @@ def _get_cimtype(objects):
         cim_type = test_object.__class__.__name__
 
     # account for fact the enumerate class name operation returns uniicode.
-    if isinstance(test_object, six.string_types):
+    if isinstance(test_object, str):
         cim_type = 'CIMClassName'
     return cim_type
 
@@ -566,7 +564,7 @@ def _display_cim_objects_summary(context, objects, output_format):
         else:
             rows = [[0, cim_type]]
 
-    title = 'Summary of {}(s) returned'.format(cim_type)
+    title = f'Summary of {cim_type}(s) returned'
     if output_format_is_table(output_format):
         click.echo(format_table(rows, headers, title=title,
                                 table_format=output_format))
@@ -579,7 +577,7 @@ def _display_cim_objects_summary(context, objects, output_format):
             if row[len_pos] == 0:
                 row[cim_type_pos] = "objects"
             else:
-                row[cim_type_pos] = "{}(s)".format(row[cim_type_pos])
+                row[cim_type_pos] = f"{row[cim_type_pos]}(s)"
             row[len_pos] = str(row[len_pos])
             click.echo('{} returned'.format(" ".join(row)))
 
@@ -608,7 +606,7 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
     if objects:
         # Strings only for single namespace requests for classnames.
         # No namespace in result
-        if isinstance(objects[0], six.string_types):
+        if isinstance(objects[0], str):
             title = 'Classnames:'
             headers = ['Class Name']
             rows = [[obj] for obj in objects]
@@ -681,15 +679,15 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
                 # are multiples.
                 if len(objs_by_key_set) > 1:
                     table_number += 1
-                    table_number_str = ", (table #{})".format(table_number)
+                    table_number_str = f", (table #{table_number})"
                 else:
                     table_number_str = ''
 
                 headers = ['host', 'namespace', 'class'] + \
-                    ["key=\n{0}".format(kn) for kn in inst_keys]
+                    [f"key=\n{kn}" for kn in inst_keys]
 
-                title = 'InstanceNames: {0}{1}'.format(inst_names[0].classname,
-                                                       table_number_str)
+                title = 'InstanceNames: {}{}'.format(inst_names[0].classname,
+                                                     table_number_str)
 
                 # Generate multiple tables, one for each key_name and
                 # return local to this scope.
@@ -812,7 +810,7 @@ def _format_instances_as_rows(insts, max_cell_width, include_classnames=False,
 
     for inst in insts:
         assert isinstance(inst, CIMInstance), \
-            "Invalid CIM Type {}".format(type(inst))
+            f"Invalid CIM Type {type(inst)}"
 
         # Setup row list and set namespace if this is multi-namespace
         # Note: We use namespace as a flag here ignoring the actual values.
@@ -857,7 +855,7 @@ def _format_instances_as_rows(insts, max_cell_width, include_classnames=False,
                     valuemapping = None
 
                 if value is None:
-                    val_str = u''
+                    val_str = ''
                 else:
                     val_str, _ = cimvalue_to_fmtd_string(
                         prop.value, prop.type, indent=0, maxline=max_cell_width,
@@ -986,7 +984,7 @@ def _display_instances_as_table(insts, table_width, table_format,
                 if siunit is not None and siunit not in siunits:
                     siunits.append(siunit)
             for siunit in siunits:
-                hdr += " [{}]".format(siunit)
+                hdr += f" [{siunit}]"
         headers.append(hdr)
 
     rows = _format_instances_as_rows(
@@ -1012,7 +1010,7 @@ def _display_instances_as_table(insts, table_width, table_format,
     di = ""
     if ctx_options:   # This is just for test support
         di = "; deep-inheritance" if ctx_options.get('deep_inheritance') else ""
-    title = 'Instances: {}{}'.format(insts[0].classname, di)
+    title = f'Instances: {insts[0].classname}{di}'
 
     click.echo(format_table(rows, disp_headers, title=title,
                             table_format=table_format))

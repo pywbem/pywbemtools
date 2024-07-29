@@ -18,7 +18,6 @@ indication filters, listener destinations, and subscriptions, displays them
 and removes them from the server.
 """
 
-from __future__ import absolute_import, print_function
 
 import re
 

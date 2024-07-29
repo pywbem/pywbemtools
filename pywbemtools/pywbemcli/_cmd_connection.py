@@ -22,11 +22,9 @@ disk which is kept in sync with changes made with the add/delete commands.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 from copy import deepcopy
 import click
-import six
 
 from pywbem import Error, CIMError, CIM_ERR_NOT_SUPPORTED
 
@@ -110,8 +108,8 @@ def connection_export(context):
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--show-password', is_flag=True,
               default=False,
-              help=u'If set, show existing password in results. Otherwise, '
-                   u'password is masked')
+              help='If set, show existing password in results. Otherwise, '
+                   'password is masked')
 @add_options(help_option)
 @click.pass_obj
 def connection_show(context, name, **options):
@@ -179,9 +177,9 @@ def connection_delete(context, name):
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('-d', '--set-default', is_flag=True,
               default=False,
-              help=u'If set, the connection is set to be the default '
-                   u'connection in the connections file in addition to setting '
-                   u'it as the current connection.')
+              help='If set, the connection is set to be the default '
+                   'connection in the connections file in addition to setting '
+                   'it as the current connection.')
 @add_options(help_option)
 @click.pass_obj
 def connection_select(context, name, **options):
@@ -228,9 +226,9 @@ def connection_select(context, name, **options):
                           options_metavar=CMD_OPTS_TXT)
 @click.option('--test-pull', is_flag=True,
               default=False,
-              help=u'If set, the connection is tested to determine if the'
-                   u'DMTF defined pull operations (ex. OpenEnumerateInstances'
-                   u'are implemented since these are optional.')
+              help='If set, the connection is tested to determine if the'
+                   'DMTF defined pull operations (ex. OpenEnumerateInstances'
+                   'are implemented since these are optional.')
 @add_options(help_option)
 @click.pass_obj
 def connection_test(context, **options):
@@ -253,7 +251,7 @@ def connection_test(context, **options):
 @click.argument('name', type=str, metavar='NAME', required=True)
 @click.option('-f', '--set-default', is_flag=True,
               default=False,
-              help=u"Set this definition as the default definition "
+              help="Set this definition as the default definition "
               "that will be loaded upon pywbemcli startup if no server or name "
               "is included on the command line.")
 @add_options(help_option)
@@ -281,8 +279,8 @@ def connection_save(context, name, **options):
                           options_metavar=CMD_OPTS_TXT)
 @click.option('-f', '--full', is_flag=True,
               default=False,
-              help=u'If set, display the full table. Otherwise display '
-                   u'a brief view(name, server, mock_server columns).')
+              help='If set, display the full table. Otherwise display '
+                   'a brief view(name, server, mock_server columns).')
 @add_options(help_option)
 @click.pass_obj
 def connection_list(context, **options):
@@ -306,9 +304,9 @@ def connection_list(context, **options):
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--clear', is_flag=True, default=False,
-              help=u'Clear default connection name.')
+              help='Clear default connection name.')
 @click.option('-v', '--verify', is_flag=True, default=False,
-              help=u'Prompt user to verify change before changing the '
+              help='Prompt user to verify change before changing the '
               'default connection definition).')
 @add_options(help_option)
 @click.pass_obj
@@ -341,9 +339,9 @@ def export_statement(name, value):
         export name=value. We do not actually export but output the
         exprot definition.
     """
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         value = str(value)
-    click.echo('export {}={}'.format(name, value))
+    click.echo(f'export {name}={value}')
 
 
 def if_export_statement(name, value):
@@ -419,7 +417,7 @@ def show_connection_information(context, connection,
     else:
         ca_certs = None
 
-    rows = [['name', "{}{}".format(connection.name, state_str)],
+    rows = [['name', f"{connection.name}{state_str}"],
             ['server', connection.server],
             ['default-namespace', connection.default_namespace],
             ['user', connection.user],
@@ -488,7 +486,7 @@ def pick_connection(name, context, connections_repo):
             'Connection definition "{0}" not found in connections file "{1}"'.
             format(name, connections_repo.connections_file))
 
-    conn_names = sorted(list(six.iterkeys(connections_repo)))
+    conn_names = sorted(list(connections_repo.keys()))
     if not conn_names:
         raise click.ClickException(
             "No connections found in connection repository {0}".
@@ -616,16 +614,15 @@ def _set_default_connection(connections_repo, connection_name, verify=None):
     if old_default is None:
         old_default = ""
     else:
-        old_default = " replacing '{0}'".format(old_default)
+        old_default = f" replacing '{old_default}'"
 
     connections_repo.default_connection_name = connection_name
     if connection_name is None:
-        click.echo("Connection default name cleared{0}".format(
-            old_default))
+        click.echo(f"Connection default name cleared{old_default}")
     else:
-        click.echo("Connection name '{0}' set as default{1}, connections "
-                   "file {2}".format(connection_name, old_default,
-                                     connections_repo.connections_file))
+        click.echo(
+            f"Connection name '{connection_name}' set as default{old_default}, "
+            f"connections file {connections_repo.connections_file}")
 
 ################################################################
 #
@@ -695,8 +692,8 @@ def cmd_connection_show(context, name, options):
     if connections_repo.file_exists():
         if name not in connections_repo:
             raise click.ClickException(
-                'Connection definition "{0}" not found in connections file '
-                '"{1}"'.format(name, connections_repo.connections_file))
+                'Connection definition "{}" not found in connections file '
+                '"{}"'.format(name, connections_repo.connections_file))
         connection = connections_repo[name]
     else:   # no connections file
         raise click.ClickException(
@@ -761,13 +758,13 @@ def cmd_connection_test(context, options):
                 format(conn.host),
                 table_format=output_format))
         else:
-            click.echo('Connection OK: {}'.format(conn.host))
+            click.echo(f'Connection OK: {conn.host}')
 
             for row in result:
-                click.echo("{}: {}".format(row[0], row[1]))
+                click.echo(f"{row[0]}: {row[1]}")
 
     else:
-        click.echo('Connection OK: {}'.format(conn.host))
+        click.echo(f'Connection OK: {conn.host}')
 
 
 def cmd_connection_select(context, name, options):
@@ -804,9 +801,9 @@ def cmd_connection_select(context, name, options):
     context.spinner_stop()
     if options['set_default']:
         connections_repo.default_connection_name = name
-        click.echo('"{}" default and current'.format(name))
+        click.echo(f'"{name}" default and current')
     else:
-        click.echo('"{}" current'.format(name))
+        click.echo(f'"{name}" current')
 
 
 def cmd_connection_delete(context, name):
@@ -831,7 +828,7 @@ def cmd_connection_delete(context, name):
     connections_repo.delete(name)
 
     default = 'default ' if current_name and current_name == name else ''
-    click.echo('Deleted {} connection "{}".'.format(default, name))
+    click.echo(f'Deleted {default} connection "{name}".')
 
 
 def cmd_connection_save(context, name, options):
@@ -855,7 +852,7 @@ def cmd_connection_save(context, name, options):
     try:
         connections.add(save_connection)
     except ConnectionsFileError as cfe:
-        click.echo('Fatal error: {0}: {1}'.format(cfe.__class__.__name__, cfe),
+        click.echo(f'Fatal error: {cfe.__class__.__name__}: {cfe}',
                    err=True)
         raise click.Abort()
 
@@ -894,7 +891,7 @@ def cmd_connection_list(context, options):
         for name, svr in connections_repo.items():
             cc = cur_sym if is_current_connection(context, svr) else ''
             dc = dflt_sym if is_default_connection(context, svr) else ''
-            name = '{}{}{}'.format(cc, dc, name)
+            name = f'{cc}{dc}{name}'
             rows.append(build_row(options, name, svr))
 
     # add current connection if not in persistent connections
@@ -928,8 +925,8 @@ def cmd_connection_list(context, options):
     click.echo(format_table(
         sorted(rows),
         headers,
-        title='WBEM server connections({0}): ({1}: default, {2}: '
-              'current)\nfile: {3}'.format(
+        title='WBEM server connections({}): ({}: default, {}: '
+              'current)\nfile: {}'.format(
                   table_type, dflt_sym, cur_sym,
                   connections_repo.connections_file),
         table_format=output_format))

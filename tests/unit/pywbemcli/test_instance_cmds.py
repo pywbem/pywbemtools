@@ -16,7 +16,6 @@
 Tests the commands in the server command group.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 from packaging.version import parse as parse_version

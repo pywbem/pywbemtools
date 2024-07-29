@@ -8,9 +8,7 @@ On Python <3.5, the tests using this script must be run from the repo main
 directory.
 """
 
-import sys
 import os
-import six
 import pywbem_mock
 
 # interop namespace used by this mock environment
@@ -23,7 +21,7 @@ def register_dependents(conn, this_file_path, dependent_file_names):
     This insures that any change to a dependent file will cause the
     script to be recompiled.
     """
-    if isinstance(dependent_file_names, six.string_types):
+    if isinstance(dependent_file_names, str):
         dependent_file_names = [dependent_file_names]
 
     for fn in dependent_file_names:
@@ -43,15 +41,7 @@ def _setup(conn, server, verbose):
       verbose (bool): Verbose flag
     """
 
-    if sys.version_info >= (3, 6):
-        this_file_path = __file__
-    else:
-        # Unfortunately, it does not seem to be possible to find the file path
-        # of the current script when it is executed using exec(), so we hard
-        # code the file path. This requires that the tests are run from the
-        # repo main directory.
-        this_file_path = 'tests/unit/pywbemcli/simple_foo_mock_script.py'
-        assert os.path.exists(this_file_path)
+    this_file_path = __file__
 
     # Prepare an Interop namespace and namespace provider
 
@@ -77,24 +67,13 @@ def _setup(conn, server, verbose):
     register_dependents(conn, this_file_path, foo_mof_file)
 
 
-if sys.version_info >= (3, 6):
-    # New-style setup
+# New-style setup
 
-    # If the function is defined directly, it will be detected and refused
-    # by the check for setup() functions on Python <3.5, despite being defined
-    # only conditionally. The indirect approach with exec() addresses that.
-    # pylint: disable=exec-used
-    exec("""
+# If the function is defined directly, it will be detected and refused
+# by the check for setup() functions on Python <3.5, despite being defined
+# only conditionally. The indirect approach with exec() addresses that.
+# pylint: disable=exec-used
+exec("""
 def setup(conn, server, verbose):
     _setup(conn, server, verbose)
 """)
-
-else:
-    # Old-style setup
-
-    global CONN  # pylint: disable=global-at-module-level
-    global SERVER  # pylint: disable=global-at-module-level
-    global VERBOSE  # pylint: disable=global-at-module-level
-
-    # pylint: disable=undefined-variable
-    _setup(CONN, SERVER, VERBOSE)  # noqa: F821

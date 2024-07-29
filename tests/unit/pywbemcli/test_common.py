@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (C) Copyright 2017 IBM Corp.
 # (C) Copyright 2017 Inova Development Inc.
 # All Rights Reserved
@@ -19,14 +18,13 @@
 Tests for _common.py functions.
 """
 
-from __future__ import absolute_import, print_function
 
 import sys
 import os
-import six
+from unittest.mock import patch
+
 from packaging.version import parse as parse_version
 import click
-from mock import patch
 from nocaselist import NocaseList
 import pytest
 
@@ -90,11 +88,11 @@ TESTCASES_ISCLASSNAME = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify is a classname',
-     dict(name=u"CIM_Blah", exp_rtn=True),
+     dict(name="CIM_Blah", exp_rtn=True),
      None, None, True),
 
     ('Verify is instance name',
-     dict(name=u"CIM_Blah.px=3", exp_rtn=True),
+     dict(name="CIM_Blah.px=3", exp_rtn=True),
      None, None, True),
 ]
 
@@ -132,35 +130,35 @@ TESTCASES_SHORTEN_PATH_STR = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify simple keybinding replacement',
-     dict(kb=[('kEY1', u'Ham')],
-          rpl={'kEY1': u'Ham'},
+     dict(kb=[('kEY1', 'Ham')],
+          rpl={'kEY1': 'Ham'},
           fp=False,
           exp_rtn='/:cln.~'),
      None, None, True),
 
     ('Verify multiple keys keybinding, replace all',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
-          rpl={'kEY1': u'Ham', 'key2': 3},
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
+          rpl={'kEY1': 'Ham', 'key2': 3},
           fp=False,
           exp_rtn='/:cln.~,~'),
      None, None, True),
 
     ('Verify multiple keys keybinding, one replacement',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
-          rpl={'kEY1': u'Ham', },
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
+          rpl={'kEY1': 'Ham', },
           fp=False,
           exp_rtn='/:cln.~,key2=3'),
      None, None, True),
 
     ('Verify multiple keys keybinding, no replacement because value different',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
-          rpl={'kEY1': u'Hamxxxx', },
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
+          rpl={'kEY1': 'Hamxxxx', },
           fp=False,
           exp_rtn='/:cln.kEY1="Ham",key2=3'),
      None, None, True),
 
     ('Verify multiple keys keybinding, replacement because value None',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
           rpl={'kEY1': None, },
           fp=False,
           exp_rtn='/:cln.~,key2=3'),
@@ -168,7 +166,7 @@ TESTCASES_SHORTEN_PATH_STR = [
 
     ('Verify multiple keys keybinding, replaced with tilde because values '
      'match',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
           rpl={'kEY1': None, 'key2': None},
           fp=False,
           exp_rtn='/:cln.~,~'),
@@ -176,22 +174,22 @@ TESTCASES_SHORTEN_PATH_STR = [
 
     ('Verify multiple keys keybinding, replaced with tilde because values '
      'match',
-     dict(kb=[('kEY1', u'Ham'), ('key2', 3)],
-          rpl={'kEY1': u'xxx', 'key2': 3},
+     dict(kb=[('kEY1', 'Ham'), ('key2', 3)],
+          rpl={'kEY1': 'xxx', 'key2': 3},
           fp=False,
           exp_rtn='/:cln.kEY1="Ham",~'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
-          rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
+     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+          rpl={'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
           fp=False,
           exp_rtn='/:cln.~,~'),
      None, None, True),
 
     ('Verify multiple keys binding with spaces in keys',
-     dict(kb=[('kEY1', u'Ham and eggs'), ('key2', 'More eggs')],
-          rpl={'kEY1': u'Ham and eggs', 'key2': 'More eggs'},
+     dict(kb=[('kEY1', 'Ham and eggs'), ('key2', 'More eggs')],
+          rpl={'kEY1': 'Ham and eggs', 'key2': 'More eggs'},
           fp=True,
           exp_rtn='/:cln.kEY1="Ham and eggs",key2="More eggs"'),
      None, None, True),
@@ -334,41 +332,41 @@ TESTCASES_PICK_ONE_INDEX_FROM_LIST = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify returns correct choice, in this case, ZERO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], pa=False,
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0'], pa=False,
           exp_rtn=0),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], pa=None,
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1'], pa=None,
           exp_rtn=1),
      None, None, OK),
 
     ('Verify returns correct choice, in this case TWO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], pa=None,
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['2'], pa=None,
           exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'], pa=False,
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '1'], pa=False,
           exp_rtn=1),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['3', '2'], pa=False,
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['3', '2'], pa=False,
           exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after multiple inputs',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '-1', 'a', '2'],
           pa=False, exp_rtn=2),
      None, None, OK),
 
     ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=[u'ZERO'], choices=None, pa=False, exp_rtn=0),
+     dict(options=['ZERO'], choices=None, pa=False, exp_rtn=0),
      None, None, OK),
 
     ('Verify returns correct choice with only single choice pick_always set',
-     dict(options=[u'ZERO'], choices=['0'], pa=True, exp_rtn=0),
+     dict(options=['ZERO'], choices=['0'], pa=True, exp_rtn=0),
      None, None, OK),
 
     ('Verify exception with empty options',
@@ -441,37 +439,37 @@ TESTCASES_PICK_ONE_FROM_LIST = [
     # * condition: Boolean condition for testcase to run, or 'pdb' for debugger
 
     ('Verify returns correct choice, in this case, ZERO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0'], exp_rtn=u'ZERO',
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0'], exp_rtn='ZERO',
           pa=False),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1'], exp_rtn=u'ONE',
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1'], exp_rtn='ONE',
           pa=False),
      None, None, OK),
 
     ('Verify returns correct choice, in this case TWO',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['2'], exp_rtn=u'TWO',
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['2'], exp_rtn='TWO',
           pa=False),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '1'],
-          exp_rtn=u'ONE', pa=False),
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '1'],
+          exp_rtn='ONE', pa=False),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after one error',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['3', '2'],
-          exp_rtn=u'TWO', pa=False),
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['3', '2'],
+          exp_rtn='TWO', pa=False),
      None, None, OK),
 
     ('Verify returns correct choice, in this case ONE after multiple inputs',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['9', '-1', 'a', '2'],
-          exp_rtn=u'TWO', pa=False),
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['9', '-1', 'a', '2'],
+          exp_rtn='TWO', pa=False),
      None, None, OK),
 
     ('Verify returns correct choice with only single choice so no usr request',
-     dict(options=[u'ZERO'], choices=['0'], exp_rtn=u'ZERO', pa=True),
+     dict(options=['ZERO'], choices=['0'], exp_rtn='ZERO', pa=True),
      None, None, OK),
 
     ('Verify returns None with empty list input',
@@ -541,19 +539,19 @@ TESTCASES_PICK_MULTIPLE_FROM_LIST = [
     #       pick_multiple_from_list function.
 
     ('Verify good choice ZERO made',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['0', ''],
-          exp_rtn=[u'ZERO']),
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['0', ''],
+          exp_rtn=['ZERO']),
      None, None, OK),
 
     ('Verify good choice ONE made',
-     dict(options=[u'ZERO', u'ONE', u'TWO'], choices=['1', ''],
-          exp_rtn=[u'ONE']),
+     dict(options=['ZERO', 'ONE', 'TWO'], choices=['1', ''],
+          exp_rtn=['ONE']),
      None, None, OK),
 
     ('Verify good choice TWO after bad choices',
-     dict(options=[u'ZERO', u'ONE', u'TWO'],
+     dict(options=['ZERO', 'ONE', 'TWO'],
           choices=['-1', '9', '3', 'a', '2', ''],
-          exp_rtn=[u'TWO']),
+          exp_rtn=['TWO']),
      None, None, OK),
 ]
 
@@ -586,7 +584,7 @@ def test_pick_multiple_from_list(testcase, options, choices, exp_rtn):
             assert mock_prompt.call_count == len(choices)
 
     if act_rtn != exp_rtn:
-        print('act {0}\nexp {1}'.format(act_rtn, exp_rtn))
+        print(f'act {act_rtn}\nexp {exp_rtn}')
     assert act_rtn == exp_rtn
 
 
@@ -869,7 +867,7 @@ TESTCASES_PARSE_WBEMURI_STR = [
         dict(
             url='/root/cimv2:CIM_Foo.k1="v1"',
             exp_result=dict(
-                classname=u'CIM_Foo',
+                classname='CIM_Foo',
                 namespace='root/cimv2',
                 keys={'k1': 'v1'},
                 host=None),
@@ -882,10 +880,10 @@ TESTCASES_PARSE_WBEMURI_STR = [
         dict(
             url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1="v1"',
             exp_result=dict(
-                classname=u'CIM_Foo',
-                namespace=u'root/cimv2',
+                classname='CIM_Foo',
+                namespace='root/cimv2',
                 keys={'k1': 'v1'},
-                host=u'10.11.12.13:5989'),
+                host='10.11.12.13:5989'),
         ),
         None, None, True
     ),
@@ -895,7 +893,7 @@ TESTCASES_PARSE_WBEMURI_STR = [
         dict(
             url='CIM_Foo.k1="v1"',
             exp_result=dict(
-                classname=u'CIM_Foo',
+                classname='CIM_Foo',
                 namespace=None,
                 keys={'k1': 'v1'},
                 host=None,),
@@ -908,10 +906,10 @@ TESTCASES_PARSE_WBEMURI_STR = [
         dict(
             url='https://10.11.12.13:5989/root/cimv2:CIM_Foo.k1=v1',
             exp_result=dict(
-                classname=u'CIM_Foo',
-                namespace=u'root/cimv2',
+                classname='CIM_Foo',
+                namespace='root/cimv2',
                 keys={'k1': 'v1'},
-                host=u'10.11.12.13:5989'),
+                host='10.11.12.13:5989'),
         ),
         click.ClickException, None, True
     ),
@@ -1677,7 +1675,7 @@ def test_split_array_value(testcase, input_, exp_rslt):
     assert testcase.exp_exc_types is None
 
     assert exp_rslt == act_rslt,  \
-        'Failed split test exp {!r}, act {!r}'.format(exp_rslt, act_rslt)
+        f'Failed split test exp {exp_rslt!r}, act {act_rslt!r}'
 
 
 # Class definitions for _common.create_ciminstance()
@@ -2290,8 +2288,7 @@ def test_get_subclassnames(testcase, classes, classname, deep_inheritance,
     assert testcase.exp_exc_types is None
 
     if act_rtn != exp_rtn:
-        print('MOF\n{0}\nEXP\n{1}\nACT\n{2}\n'.format(classes, exp_rtn,
-                                                      act_rtn))
+        print(f'MOF\n{classes}\nEXP\n{exp_rtn}\nACT\n{act_rtn}\n')
     assert act_rtn == exp_rtn
 
 
@@ -3099,7 +3096,7 @@ def test_to_wbemuri_folded(testcase, path, uri_format, max_lens, exp_rtns):
     """
     # setup to allow multiple maxlen and exprtn items.
     if isinstance(max_lens, int):
-        assert isinstance(exp_rtns, six.string_types)
+        assert isinstance(exp_rtns, str)
         max_lens = [max_lens]
         exp_rtns = [exp_rtns]
         assert len(exp_rtns) == len(max_lens)

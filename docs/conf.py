@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for Sphinx builds, created by
 # sphinx-quickstart on Wed Mar  2 11:33:06 2016.
@@ -26,7 +25,7 @@ def get_version(version_file):
     requirements list of this package (otherwise it cannot be executed in
     a fresh Python environment).
     """
-    with open(version_file, 'r') as fp:
+    with open(version_file) as fp:
         version_source = fp.read()
     globals = {}
     exec(version_source, globals)
@@ -81,12 +80,12 @@ else:
     master_doc = 'index'
 
 # General information about the project.
-project = u'pywbemtools'
-copyright = u'2017-2022 IBM Corp., Inova Development Inc.'
-author = u'pywbem team'
+project = 'pywbemtools'
+copyright = '2017-2022 IBM Corp., Inova Development Inc.'
+author = 'pywbem team'
 
 # The short description of the package.
-_short_description = u'Pywbemtools - A set of tools using pywbem'
+_short_description = 'Pywbemtools - A set of tools using pywbem'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

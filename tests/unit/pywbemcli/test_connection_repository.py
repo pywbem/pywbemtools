@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # (C) Copyright 2020 IBM Corp.
 # (C) Copyright 2020 Inova Development Inc.
 # All Rights Reserved
@@ -21,13 +20,11 @@ modify good repositories and to catch load errors for repositories that have
 errors in the data.
 """
 
-from __future__ import absolute_import, print_function
 
 import sys
 import os
-import io
 from contextlib import contextmanager
-from mock import patch
+from unittest.mock import patch
 import pytest
 
 import pywbemtools.pywbemcli._connection_repository
@@ -51,7 +48,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 CONNECTION_REPO_TEST_FILE_PATH = os.path.join(SCRIPT_DIR,
                                               'tst_connection_repository.yaml')
 
-YAML_GOOD_TWO_DEFS = u"""connection_definitions:
+YAML_GOOD_TWO_DEFS = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -83,11 +80,11 @@ YAML_GOOD_TWO_DEFS = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_GOOD_NO_DEF = u"""connection_definitions: {}
+YAML_GOOD_NO_DEF = """connection_definitions: {}
 default_connection_name: null
 """
 
-YAML_MISSING_DEFAULT = u"""connection_definitions:
+YAML_MISSING_DEFAULT = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -104,7 +101,7 @@ YAML_MISSING_DEFAULT = u"""connection_definitions:
         mock-server: []
 """
 
-YAML_MISSING_CONNDEFS = u"""tst1:
+YAML_MISSING_CONNDEFS = """tst1:
         name: tst1
         server: http://blah
         user: fred
@@ -121,7 +118,7 @@ YAML_MISSING_CONNDEFS = u"""tst1:
 default_connection_name: null
 """
 
-YAML_INVALID_ATTR_NAME = u"""connection_definitions:
+YAML_INVALID_ATTR_NAME = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -139,19 +136,19 @@ YAML_INVALID_ATTR_NAME = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_INVALID_SYNTAX = u"""connection_definitions:
+YAML_INVALID_SYNTAX = """connection_definitions:
     *+&%:
 default_connection_name: null
 """
 
-YAML_INVALID_MOCKSERVER_TYPE = u"""connection_definitions:
+YAML_INVALID_MOCKSERVER_TYPE = """connection_definitions:
     tst1:
         name: tst1
         mock-server: 42
 default_connection_name: null
 """
 
-YAML_INVALID_TIMEOUT_VALUE = u"""connection_definitions:
+YAML_INVALID_TIMEOUT_VALUE = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -159,7 +156,7 @@ YAML_INVALID_TIMEOUT_VALUE = u"""connection_definitions:
 default_connection_name: null
 """
 
-YAML_SERVER_AND_MOCKSERVER = u"""connection_definitions:
+YAML_SERVER_AND_MOCKSERVER = """connection_definitions:
     tst1:
         name: tst1
         server: http://blah
@@ -443,7 +440,7 @@ def test_create_connection_repository(testcase, file, svrs, default, exp_rtn):
     repr_repo = repr(repo)
     assert repr(file) in repr_repo
     for key in exp_rtn['keys']:
-        assert "{!r}:".format(key) in repr_repo
+        assert f"{key!r}:" in repr_repo
 
     # validate __len__()
     len_repo = len(repo)
@@ -532,7 +529,7 @@ TESTCASES_CONNECTION_FILE_LOAD_ERROR = [
         "Verify load fails when file is completely empty",
         dict(
             file=CONNECTION_REPO_TEST_FILE_PATH,
-            yaml=u'',
+            yaml='',
             exp_rtn=None,
         ),
         ConnectionsFileLoadError, None, OK,
@@ -596,7 +593,7 @@ def test_connection_file_load_error(testcase, file, yaml, exp_rtn):
     exceptions generated.
     """
     # Write the YAML text to the file
-    with io.open(file, "w", encoding='utf-8') as repo_file:
+    with open(file, "w", encoding='utf-8') as repo_file:
         repo_file.write(yaml)
 
     # This does not load the file yet, so it succeeds even for a bad file
@@ -713,7 +710,7 @@ def test_connection_repository_add(testcase, file, yaml, svrs, default,
     """
     # Write the YAML text to the file
     if yaml:
-        with io.open(file, "w", encoding='utf-8') as repo_file:
+        with open(file, "w", encoding='utf-8') as repo_file:
             repo_file.write(yaml)
 
     repo = ConnectionRepository(file)

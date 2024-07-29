@@ -17,7 +17,6 @@
 Tests for _context_obj.py module
 """
 
-from __future__ import absolute_import, print_function
 
 from pywbemtools.pywbemlistener._context_obj import ContextObj
 

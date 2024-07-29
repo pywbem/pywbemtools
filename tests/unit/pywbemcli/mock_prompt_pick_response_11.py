@@ -33,7 +33,7 @@
     files that are used to build the repository.  This is a development
     test aid.
 """
-from mock import Mock
+from unittest.mock import Mock
 
 import pywbemtools
 RETURN_VALUE = "11"
@@ -41,7 +41,7 @@ RETURN_VALUE = "11"
 
 def mock_prompt(msg):
     """Mock function to replace pywbemcli_prompt and return a value"""
-    print('MOCK_CLICK_PROMPT {}'.format(msg))
+    print(f'MOCK_CLICK_PROMPT {msg}')
     return RETURN_VALUE
 
 

@@ -19,11 +19,9 @@ Click definitions for the pywbemlistener commands.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import sys
 import os
-import io
 import subprocess
 import signal
 import atexit
@@ -34,7 +32,6 @@ from time import sleep
 from datetime import datetime
 import click
 import psutil
-import six
 import packaging.version
 
 from pywbem import WBEMListener, ListenerError, CIMInstance, CIMProperty, \
@@ -84,21 +81,21 @@ DEFAULT_INDI_FORMAT = '{dt} {h} {i_mof}'
 LISTEN_OPTIONS = [
     click.option('-p', '--port', type=int, metavar='PORT',
                  required=False, default=DEFAULT_LISTENER_PORT,
-                 help=u'The port number the listener will open to receive '
+                 help='The port number the listener will open to receive '
                  'indications. This can be any available port. '
                  'Default: {}'.format(DEFAULT_LISTENER_PORT)),
     click.option('-s', '--scheme',
                  type=click.Choice(['http', 'https']),
                  metavar='SCHEME',
                  required=False, default=DEFAULT_LISTENER_SCHEME,
-                 help=u'The scheme used by the listener (http, https). '
+                 help='The scheme used by the listener (http, https). '
                  'Default: {}'.format(DEFAULT_LISTENER_SCHEME)),
     click.option('-b', '--bind-addr',
                  type=str,
                  metavar='HOST',
                  required=False,
                  default=None,
-                 help=u'A host name or IP address to which this listener '
+                 help='A host name or IP address to which this listener '
                       'will be bound. Binding the listener defines the '
                       'indication destination host name or IP address for '
                       'which this listener will accept indications. The '
@@ -109,7 +106,7 @@ LISTEN_OPTIONS = [
                  metavar='FILE',
                  required=False, default=None,
                  envvar=_config.PYWBEMLISTENER_CERTFILE_ENVVAR,
-                 help=u'Path name of a PEM file containing the certificate '
+                 help='Path name of a PEM file containing the certificate '
                  'that will be presented as a server certificate during '
                  'SSL/TLS handshake. Required when using https. '
                  'The file may in addition contain the private key of the '
@@ -121,7 +118,7 @@ LISTEN_OPTIONS = [
                  metavar='FILE',
                  required=False, default=None,
                  envvar=_config.PYWBEMLISTENER_KEYFILE_ENVVAR,
-                 help=u'Path name of a PEM file containing the private key '
+                 help='Path name of a PEM file containing the private key '
                  'of the server certificate. '
                  'Required when using https and when the certificate file '
                  'does not contain the private key. '
@@ -129,7 +126,7 @@ LISTEN_OPTIONS = [
                  format(ev=_config.PYWBEMLISTENER_KEYFILE_ENVVAR)),
     click.option('--indi-call', type=str, metavar='MODULE.FUNCTION',
                  required=False, default=None,
-                 help=u'Call a Python function for each received indication. '
+                 help='Call a Python function for each received indication. '
                  'Invoke with --help-call for details on the function '
                  'interface. '
                  'Default: No function is called.'),
@@ -137,23 +134,23 @@ LISTEN_OPTIONS = [
                  type=click.Path(exists=False, dir_okay=False),
                  metavar='FILE',
                  required=False, default=None,
-                 help=u'Append received indications to a file. '
+                 help='Append received indications to a file. '
                  'The format can be modified using the --indi-format option. '
                  'Default: Not appended.'),
     click.option('--indi-format', type=str, metavar='FORMAT',
                  required=False, default=DEFAULT_INDI_FORMAT,
-                 help=u'Sets the format to be used when displaying received '
+                 help='Sets the format to be used when displaying received '
                  'indications. '
                  'Invoke with --help-format for details on the format '
                  'specification. '
                  'Default: "{dif}".'.format(dif=DEFAULT_INDI_FORMAT)),
     click.option('--help-format', is_flag=True,
                  required=False, default=False, is_eager=True,
-                 help=u'Show help message for the format specification used '
+                 help='Show help message for the format specification used '
                  'with the --indi-format option and exit.'),
     click.option('--help-call', is_flag=True,
                  required=False, default=False, is_eager=True,
-                 help=u'Show help message for calling a Python function for '
+                 help='Show help message for calling a Python function for '
                  'each received indication when using the --indi-call option '
                  'and exit.'),
 ]
@@ -191,7 +188,7 @@ def print_out(line):
     sys.stdout.flush()
 
 
-class ListenerProperties(object):
+class ListenerProperties:
     """
     The properties of a running named listener.
     """
@@ -341,7 +338,7 @@ class ListenerProperties(object):
 @click.argument('name', type=str, metavar='NAME', required=False)
 @click.option('--start-pid', type=str, metavar='PID',
               required=False, default=None,
-              help=u'PID of the "pywbemlistener start" process to be '
+              help='PID of the "pywbemlistener start" process to be '
               'notified about the startup of the run command. '
               'Default: No such notification will happen.')
 @add_options(LISTEN_OPTIONS)
@@ -468,11 +465,11 @@ def listener_list(context):
                 required=False)
 @click.option('-c', '--count', type=int, metavar='INT',
               required=False, default=1,
-              help=u'Count of test indications to send. '
+              help='Count of test indications to send. '
               'Default: 1')
 @click.option('-l', '--listener', type=str, metavar='HOST',
               required=False, default='localhost',
-              help=u'Listener host name or IP address. The indications '
+              help='Listener host name or IP address. The indications '
                    'are sent to this host name or IP address. '
               'Default: localhost')
 @add_options(help_option)
@@ -509,7 +506,7 @@ def get_logfile(logdir, name):
     """
     if logdir is None:
         return None
-    return os.path.join(logdir, 'pywbemlistener_{}.log'.format(name))
+    return os.path.join(logdir, f'pywbemlistener_{name}.log')
 
 
 def get_listeners(name=None):
@@ -631,13 +628,11 @@ def wait_startup_completion(child_pid):
     with RUN_STARTUP_COND:
         rc = RUN_STARTUP_COND.wait(RUN_STARTUP_TIMEOUT)
 
-    # Before Python 3.2, wait() always returns None. Since 3.2, it returns
-    # a boolean indicating whether the timeout expired (False) or the
-    # condition was triggered (True).
-    if rc is None or rc is True:
+    # wait() returns a boolean indicating whether the timeout expired (False)
+    # or the condition was triggered (True).
+    if rc:
         status = RUN_STARTUP_STATUS
     else:
-        # Only since Python 3.2
         status = 'timeout'
 
     if status == 'success':
@@ -677,7 +672,7 @@ def wait_startup_completion(child_pid):
         try:
             child_ps.terminate()
             child_ps.wait()
-        except (IOError, OSError) as exc:
+        except OSError as exc:
             raise click.ClickException(
                 "Cannot clean up 'run' child process with PID {}: {}: {}".
                 format(child_pid, type(exc), exc))
@@ -712,8 +707,7 @@ def run_exit_handler(start_pid, log_fp):
         try:
             os.kill(start_pid, SIGNAL_RUN_STARTUP_FAILURE)  # Sends the signal
         except OSError:
-            # Note: ProcessLookupError is a subclass of OSError but was
-            # introduced only in Python 3.3.
+            # Note: ProcessLookupError is a subclass of OSError.
 
             # The original start parent no longer exists.
             # This can only happen if the process goes away in the short time
@@ -724,7 +718,7 @@ def run_exit_handler(start_pid, log_fp):
                           "not exist anymore".format(start_pid))
 
     if log_fp:
-        print_out("Closing 'run' output log file at {}".format(datetime.now()))
+        print_out(f"Closing 'run' output log file at {datetime.now()}")
         log_fp.close()
 
 
@@ -734,12 +728,7 @@ def format_indication(indication, host, indi_format=None):
     given format.
     """
     dt = datetime.now()
-    try:
-        dt = dt.astimezone()
-    except TypeError:
-        # Below Python 3.6, it cannot determine the local timezone, and its
-        # tzinfo argument is required.
-        pass
+    dt = dt.astimezone()
     tz = dt.tzname() or ''
     i_mof = indication.tomof().replace('\n', ' ')
     format_kwargs = {"dt": dt,
@@ -926,7 +915,7 @@ def run_term_signal_handler(sig, frame):
     gets control and can gracefully stop the listener.
     """
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Run process: Received termination signal ({})".format(sig))
+        print_out(f"Run process: Received termination signal ({sig})")
 
     # This triggers the registered exit handler run_exit_handler()
     raise SystemExit(1)
@@ -1017,7 +1006,7 @@ def cmd_listener_run(context, name, options):
                   format(pid, logfile))
 
         # pylint: disable=consider-using-with
-        log_fp = io.open(logfile, 'a', encoding='utf-8')
+        log_fp = open(logfile, 'a', encoding='utf-8')
 
         if sys.platform == 'win32':
             # On Windows, the standard file descriptors are not inherited
@@ -1031,11 +1020,11 @@ def cmd_listener_run(context, name, options):
             os.dup2(log_fp.fileno(), sys.stdout.fileno())
 
         # This message is the first one of this run in the log file (appended)
-        print_out("Opening 'run' output log file at {}".format(datetime.now()))
+        print_out(f"Opening 'run' output log file at {datetime.now()}")
     else:
 
         # pylint: disable=consider-using-with
-        log_fp = io.open(os.devnull, 'w', encoding='utf-8')
+        log_fp = open(os.devnull, 'w', encoding='utf-8')
 
         if sys.platform == 'win32':
             # On Windows, the standard file descriptors are not inherited
@@ -1064,9 +1053,9 @@ def cmd_listener_run(context, name, options):
     listeners = get_listeners(name)
     if len(listeners) > 1:  # This upcoming listener and a previous one
         lis = listeners[0]
-        url = '{}://{}:{}'.format(lis.scheme, bind_addr, lis.port)
+        url = f'{lis.scheme}://{bind_addr}:{lis.port}'
         raise click.ClickException(
-            "Listener {} already running at {}".format(name, url))
+            f"Listener {name} already running at {url}")
 
     if scheme == 'http':
         http_port = port
@@ -1086,7 +1075,7 @@ def cmd_listener_run(context, name, options):
     if not bind_addr:
         bind_addr = ''
 
-    url = '{}://{}:{}'.format(scheme, bind_addr, port)
+    url = f'{scheme}://{bind_addr}:{port}'
 
     context.spinner_stop()
 
@@ -1096,12 +1085,12 @@ def cmd_listener_run(context, name, options):
             certfile=certfile, keyfile=keyfile)
     except ValueError as exc:
         raise click.ClickException(
-            "Cannot create listener {}: {}".format(name, exc))
+            f"Cannot create listener {name}: {exc}")
     try:
         listener.start()
-    except (IOError, OSError, ListenerError) as exc:
+    except (OSError, ListenerError) as exc:
         raise click.ClickException(
-            "Cannot start listener {}: {}".format(name, exc))
+            f"Cannot start listener {name}: {exc}")
 
     indi_call = options['indi_call']
     indi_file = options['indi_file']
@@ -1119,9 +1108,9 @@ def cmd_listener_run(context, name, options):
             display_str = ("Error: Cannot format indication using format "
                            "\"{}\": {}: {}".
                            format(indi_format, exc.__class__.__name__, exc))
-        with io.open(indi_file, 'a', encoding='utf-8') as fp:
+        with open(indi_file, 'a', encoding='utf-8') as fp:
             fp.write(display_str)
-            fp.write(u'\n')
+            fp.write('\n')
 
     if indi_call:
         mod_func = indi_call.rsplit('.', 1)
@@ -1166,7 +1155,7 @@ def cmd_listener_run(context, name, options):
             click.echo("Added indication handler for appending to file {} "
                        "with format \"{}\"".format(indi_file, indi_format))
 
-    click.echo("Running listener {} at {}".format(name, url))
+    click.echo(f"Running listener {name} at {url}")
 
     # Signal successful startup completion to the parent 'start' process.
     if start_pid:
@@ -1187,7 +1176,7 @@ def cmd_listener_run(context, name, options):
         # that was registered.
 
         listener.stop()
-        click.echo("Shut down listener {} running at {}".format(name, url))
+        click.echo(f"Shut down listener {name} running at {url}")
 
 
 def cmd_listener_start(context, name, options):
@@ -1206,9 +1195,9 @@ def cmd_listener_start(context, name, options):
     listeners = get_listeners(name)
     if listeners:
         lis = listeners[0]
-        url = '{}://{}:{}'.format(lis.scheme, bind_addr, lis.port)
+        url = f'{lis.scheme}://{bind_addr}:{lis.port}'
         raise click.ClickException(
-            "Listener {} already running at {}".format(name, url))
+            f"Listener {name} already running at {url}")
 
     pid = os.getpid()
 
@@ -1249,8 +1238,7 @@ def cmd_listener_start(context, name, options):
     prepare_startup_completion()
 
     popen_kwargs = {"shell": False}
-    if six.PY3:
-        popen_kwargs['start_new_session'] = True
+    popen_kwargs['start_new_session'] = True
 
     if _config.VERBOSE_PROCESSES_ENABLED:
         print_out("Start process {}: Starting run process as: {}".
@@ -1280,17 +1268,17 @@ def cmd_listener_stop(context, name):
     listeners = get_listeners(name)
     if not listeners:
         raise click.ClickException(
-            "No running listener found with name {}".format(name))
+            f"No running listener found with name {name}")
     listener = listeners[0]
 
     context.spinner_stop()
 
     p = psutil.Process(listener.pid)
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Terminating run process {}".format(listener.pid))
+        print_out(f"Terminating run process {listener.pid}")
     p.terminate()
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Waiting for run process {} to complete".format(listener.pid))
+        print_out(f"Waiting for run process {listener.pid} to complete")
     p.wait()
 
     # A message about the successful shutdown has already been displayed by
@@ -1304,7 +1292,7 @@ def cmd_listener_show(context, name):
     listeners = get_listeners(name)
     if not listeners:
         raise click.ClickException(
-            "No running listener found with name {}".format(name))
+            f"No running listener found with name {name}")
 
     context.spinner_stop()
     display_show_listener(listeners[0], table_format=context.output_format)
@@ -1329,13 +1317,13 @@ def cmd_listener_test(context, name, options):
     listeners = get_listeners(name)
     if not listeners:
         raise click.ClickException(
-            "No running listener found with name {}".format(name))
+            f"No running listener found with name {name}")
     listener = listeners[0]
 
     count = options['count']  # optional but defaulted
     if count < 1:
         raise click.ClickException(
-            "Invalid count specified: {}".format(count))
+            f"Invalid count specified: {count}")
 
     # Construct an alert indication
     indication = CIMInstance("CIM_AlertIndication")
@@ -1363,18 +1351,18 @@ def cmd_listener_test(context, name, options):
 
     for i in range(1, count + 1):
 
-        indication['MessageID'] = 'TEST{:04d}'.format(i)
+        indication['MessageID'] = f'TEST{i:04d}'
 
         listener_host = options['listener']
 
         conn_kwargs = {}
         conn_kwargs['creds'] = None
         if listener.scheme == 'https':
-            url = 'https://{0}:{1}'.format(listener_host, listener.port)
+            url = f'https://{listener_host}:{listener.port}'
             conn_kwargs['x509'] = None
             conn_kwargs['no_verification'] = True
         else:  # http
-            url = 'http://{0}:{1}'.format(listener_host, listener.port)
+            url = f'http://{listener_host}:{listener.port}'
 
         conn = WBEMConnection(url, **conn_kwargs)
 

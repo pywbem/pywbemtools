@@ -21,10 +21,8 @@ and the WBEM server can gather on the WBEM operations
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
-import six
 
 from pywbem import Error, ValueMapping, CIMDateTime
 
@@ -224,7 +222,7 @@ def get_objmgr_inst(context):
         interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
     except Error as er:
         raise click.ClickException(
-            'Cannot access interop namespace. Exception: {}'.format(er))
+            f'Cannot access interop namespace. Exception: {er}')
 
     try:
         objmanager_insts = conn.EnumerateInstances(OBJMGR_CLN,
@@ -234,13 +232,13 @@ def get_objmgr_inst(context):
         # failure and more than 1 causes warning
         if not objmanager_insts:
             raise click.ClickException(
-                'No instances of class {} found on server'.format(OBJMGR_CLN))
+                f'No instances of class {OBJMGR_CLN} found on server')
 
         # Use warning_msg here rather than python Warnings class since this
         # is to be always output.
         if len(objmanager_insts) > 1:
             warning_msg(
-                "Server returned multiple  ObjectManager {0} instances. Using "
+                "Server returned multiple  ObjectManager {} instances. Using "
                 "first instance.".format(objmanager_insts[0].classname))
 
     except Error as er:
@@ -362,9 +360,9 @@ def cmd_statistics_status(context):
             svr_status = objmgr[OBJMGR_STAT_PROPERTY_NAME]
             svr_status = to_on_off(svr_status)
         except KeyError:
-            svr_status = "No property {}".format(OBJMGR_STAT_PROPERTY_NAME)
+            svr_status = f"No property {OBJMGR_STAT_PROPERTY_NAME}"
     except Error as er:
-        svr_status = "Not settable {}".format(er)
+        svr_status = f"Not settable {er}"
 
     context.spinner_stop()
 
@@ -466,11 +464,11 @@ def cmd_statistics_server_show(context):
     try:
         svr_status = objmgr[OBJMGR_STAT_PROPERTY_NAME]
     except KeyError:
-        svr_status = "No property {}".format(OBJMGR_STAT_PROPERTY_NAME)
+        svr_status = f"No property {OBJMGR_STAT_PROPERTY_NAME}"
     except Error as er:
-        svr_status = "Not settable {}".format(er)
+        svr_status = f"Not settable {er}"
 
-    if isinstance(svr_status, six.string_types):
+    if isinstance(svr_status, str):
         raise click.ClickException("ObjectManager config setting not found {}".
                                    format(svr_status))
 
@@ -579,10 +577,10 @@ def cmd_statistics_server_show(context):
                                 reverse=True):
             rows.append(
                 (row_tuple[operation_idx], row_tuple[count_idx],
-                 "{:.3f}".format(row_tuple[server_time_idx]),
-                 "{:.3f}".format(row_tuple[provider_time_idx]),
-                 "{:.0f}".format(row_tuple[request_size_idx]),
-                 "{:.0f}".format(row_tuple[response_size_idx])))
+                 f"{row_tuple[server_time_idx]:.3f}",
+                 f"{row_tuple[provider_time_idx]:.3f}",
+                 f"{row_tuple[request_size_idx]:.0f}",
+                 f"{row_tuple[response_size_idx]:.0f}"))
 
         headers = ['Operation', 'Count', 'Server Time\n[ms]',
                    'Provider Time\n[ms]', 'Request Size\n[B]',

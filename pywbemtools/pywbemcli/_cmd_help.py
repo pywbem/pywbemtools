@@ -23,7 +23,6 @@ The help text for each subject may be in this file or in the file associated
 with the particular subject.
 """
 
-from __future__ import absolute_import, print_function
 
 import click
 
@@ -104,8 +103,6 @@ each shell type:
 
 The 'eval' statement for each of the shells supported is as follows and can
 be inserted into the corresponding shell startup script defined below.
-
-NOTE: For Python 2, replace '<shell-name>_source' with 'source_<shell-name>`.
 
 =====  ============  ===========================================================
 shell  startup file  eval command

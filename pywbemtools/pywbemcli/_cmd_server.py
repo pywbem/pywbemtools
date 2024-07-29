@@ -22,12 +22,10 @@ information.
 NOTE: Commands are ordered in help display by their order in this file.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import sys
 import click
-import six
 
 from pywbem import Error, MOFCompiler, ModelError
 from pywbem._mof_compiler import MOFWBEMConnection, MOFCompileError
@@ -61,12 +59,12 @@ from .._output_formatting import validate_output_format, format_table, \
 
 mof_include_option = [              # pylint: disable=invalid-name
     click.option('--include', '-I', metavar='INCLUDEDIR', multiple=True,
-                 help=u'Path name of a MOF include directory. '
+                 help='Path name of a MOF include directory. '
                  'May be specified multiple times.')]
 
 mof_dry_run_option = [              # pylint: disable=invalid-name
     click.option('--dry-run', '-d', is_flag=True, default=False,
-                 help=u'Enable dry-run mode: Don\'t actually modify the '
+                 help='Enable dry-run mode: Don\'t actually modify the '
                  'server. Connection to the server is still required for '
                  'reading.')]
 
@@ -192,8 +190,8 @@ def server_remove_mof(context, **options):
                       options_metavar=CMD_OPTS_TXT)
 @add_options(namespace_option)
 @click.option('-d', '--detail', is_flag=True, default=False,
-              help=u'Display details about each schema in the namespace rather '
-                   u'than accumulated for the namespace.')
+              help='Display details about each schema in the namespace rather '
+                   'than accumulated for the namespace.')
 @add_options(help_option)
 @click.pass_obj
 def server_schema(context, **options):
@@ -315,7 +313,7 @@ def cmd_server_add_mof(context, options):
                 if not os.path.isabs(moffile):
                     moffile = os.path.abspath(moffile)
                 if context.verbose:
-                    print('Compiling MOF file {0}'.format(moffile))
+                    print(f'Compiling MOF file {moffile}')
                 # The defaulting to the connection default namespace is handled
                 # inside of the MOF compiler.
                 mofcomp.compile_file(moffile, options['namespace'])
@@ -379,7 +377,7 @@ def cmd_server_remove_mof(context, options):
                 if not os.path.isabs(moffile):
                     moffile = os.path.abspath(moffile)
                 if context.verbose:
-                    print('Compiling MOF file {0} into cache'.format(moffile))
+                    print(f'Compiling MOF file {moffile} into cache')
                 # The defaulting to the connection default namespace is handled
                 # inside of the MOF compiler.
                 mofcomp.compile_file(moffile, options['namespace'])
@@ -533,7 +531,7 @@ def cmd_server_schema(context, options):
             # namespace
             headers = ['Namespace', 'schemas', 'classes\ncount',
                        'CIM schema\nversion', 'experimental']
-            schemas_str = ", ".join(sorted(list(six.iterkeys(schemas))))
+            schemas_str = ", ".join(sorted(list(schemas.keys())))
             schemas_str = schemas_str.replace('~~~', '(no-schema)')
             folded_schemas = fold_strings(schemas_str, 45,
                                           fold_list_items=False)
@@ -546,7 +544,7 @@ def cmd_server_schema(context, options):
                          ])
 
     # if output_format_is_table(context.output_format):
-    title = "Schema information{0} namespaces: {1};".format(
+    title = "Schema information{} namespaces: {};".format(
         '; detail;' if detail else ";", namespace_opt or "all")
 
     context.spinner_stop()

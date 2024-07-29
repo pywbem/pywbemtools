@@ -41,7 +41,7 @@ class PywbemtoolsGroup(click.Group):
         Must be set after calling superclass __inits_ because click forces
         {} for this variable even if user were to set commands to OrderedDict
         """
-        super(PywbemtoolsGroup, self).__init__(name, commands, **attrs)
+        super().__init__(name, commands, **attrs)
 
         if sys.version_info < (3, 6):
             self.commands = commands or OrderedDict()
@@ -89,7 +89,7 @@ class PywbemtoolsTopGroup(click.Group):
             moving any.
         """
         self.move_to_end = move_to_end or []
-        super(PywbemtoolsTopGroup, self).__init__(name, commands, **attrs)
+        super().__init__(name, commands, **attrs)
 
         # Replace Click.Command.format_options with local version
         click.core.Command.format_options = pywbemtools_format_options
@@ -208,7 +208,7 @@ class TabCompleteArgument(click.Argument):
         if CLICK_VERSION[0] < 8:
             kwargs.pop('shell_complete', [])
 
-        super(TabCompleteArgument, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class TabCompleteOption(click.Option):
@@ -225,7 +225,7 @@ class TabCompleteOption(click.Option):
         # Remove the shell_complete option which is not defined in click 7
         if CLICK_VERSION[0] < 8:
             kwargs.pop('shell_complete', [])
-        super(TabCompleteOption, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 # The following MutuallyExclusiveOption originated with a number of
@@ -277,15 +277,14 @@ class MutuallyExclusiveOption(TabCompleteOption):
                 "options: ({1}).". \
                 format(help_txt, self._mutually_exclusive_display())
 
-        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
         """
         If this is mutually exclusive opt and the list intersects with
         the options in the command, generate click.UsageError
         """
-        me_internal = set([i.replace('-', '_') for i in
-                           self.mutually_exclusive])
+        me_internal = {i.replace('-', '_') for i in self.mutually_exclusive}
         if me_internal.intersection(opts) and self.name in opts:
             raise click.UsageError(
                 "Conflicting options: `{0}` is mutually exclusive with "
@@ -293,13 +292,13 @@ class MutuallyExclusiveOption(TabCompleteOption):
                 format(self.name.replace('_', '-'),
                        self._mutually_exclusive_display()))
 
-        return super(MutuallyExclusiveOption, self).handle_parse_result(
+        return super().handle_parse_result(
             ctx, opts, args)
 
     def _mutually_exclusive_display(self):
         """Format/sort list for display."""
         return ', '.join(
-            sorted(["--{0}".format(i) for i in self.mutually_exclusive]))
+            sorted([f"--{i}" for i in self.mutually_exclusive]))
 
 
 def click_completion_item(name):

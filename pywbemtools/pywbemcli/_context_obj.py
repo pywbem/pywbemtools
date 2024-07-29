@@ -22,7 +22,6 @@ It contains data that is set in the top level and used in command calls
 This object is attached to the Click Context in pywbemcli.py
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 import click
@@ -31,7 +30,7 @@ import click_spinner
 from .._output_formatting import format_table, validate_output_format
 
 
-class ContextObj(object):
+class ContextObj:
     # pylint: disable=useless-object-inheritance, too-many-instance-attributes
     """
         Manage the pywbemcli context that is carried within the Click
@@ -230,7 +229,7 @@ class ContextObj(object):
         This attribute can be modified.
 
         The initial state of the spinner is enabled, but it can be disabled by
-        setting the {0} environment variable to 'false', '0', or the empty
+        setting the {} environment variable to 'false', '0', or the empty
         value.
         """.format(self.spinner_envvar)
 
@@ -354,10 +353,10 @@ class ContextObj(object):
         rows = []
         for name, stats in snapshot:
             row = [name, stats.count, stats.exception_count,
-                   '{:.3f}'.format(stats.avg_time * 1000),
-                   '{:.3f}'.format(stats.avg_server_time * 1000),
-                   '{:.0f}'.format(stats.avg_request_len),
-                   '{:.0f}'.format(stats.avg_reply_len)]
+                   f'{stats.avg_time * 1000:.3f}',
+                   f'{stats.avg_server_time * 1000:.3f}',
+                   f'{stats.avg_request_len:.0f}',
+                   f'{stats.avg_reply_len:.0f}']
             rows.append(row)
 
         click.echo(format_table(
@@ -395,10 +394,10 @@ def display_click_context(ctx, msg=None, display_attrs=True):
     if not display_attrs:
         click.echo(ctx.obj)
     else:
-        click.echo('{0} {1}, attrs:\n    {2}'.format(
+        click.echo('{} {}, attrs:\n    {}'.format(
             msg, ctx,
             '\n    '.join(
-                '{0}: {1}'.format(i, v)
+                f'{i}: {v}'
                 for (i, v) in sorted(attrs.items()))))
 
 

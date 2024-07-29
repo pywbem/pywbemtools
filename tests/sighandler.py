@@ -35,7 +35,7 @@ def signal_handler(signal_number, frame):
     print("handler: Received signal {} ({})".
           format(signal_number, sigstr(signal_number)))
     raise SignalIndication(
-        "signal {} ({})".format(signal_number, sigstr(signal_number)))
+        f"signal {signal_number} ({sigstr(signal_number)})")
 
 
 def register_handler(signal_name, condition=True):
@@ -47,8 +47,8 @@ def register_handler(signal_name, condition=True):
 
 
 print("main: Python: {}".format(sys.version.replace('\n', '')))
-print("main: Platform: {} / {}".format(sys.platform, platform.platform()))
-print("main: Process: {}".format(os.getpid()))
+print(f"main: Platform: {sys.platform} / {platform.platform()}")
+print(f"main: Process: {os.getpid()}")
 register_handler('SIGINT')
 register_handler('SIGILL')
 register_handler('SIGABRT')
@@ -57,8 +57,8 @@ register_handler('SIGSEGV')
 register_handler('SIGTERM')
 register_handler('SIGBREAK', sys.platform == 'win32')
 while True:
-    print("main: Sleeping for {} sec".format(SLEEP_TIME))
+    print(f"main: Sleeping for {SLEEP_TIME} sec")
     try:
         time.sleep(SLEEP_TIME)
     except Exception as exc:  # pylint: disable=broad-except
-        print("main: Caught {}: {}".format(exc.__class__.__name__, exc))
+        print(f"main: Caught {exc.__class__.__name__}: {exc}")

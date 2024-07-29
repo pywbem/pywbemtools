@@ -17,7 +17,6 @@
 Tests the profile command group
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import pytest

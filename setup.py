@@ -21,7 +21,6 @@ Setup script for pywbemtools project.
 """
 
 import os
-import io
 import re
 import setuptools
 
@@ -35,7 +34,7 @@ def get_version(version_file):
     requirements list of this package (otherwise it cannot be executed in
     a fresh Python environment).
     """
-    with io.open(version_file, 'r', encoding='utf-8') as fp:
+    with open(version_file, encoding='utf-8') as fp:
         version_source = fp.read()
     _globals = {}
     exec(version_source, _globals)  # pylint: disable=exec-used
@@ -48,7 +47,7 @@ def get_requirements(requirements_file):
     non-comment lines. The returned lines are without any trailing newline
     characters.
     """
-    with io.open(requirements_file, 'r', encoding='utf-8') as fp:
+    with open(requirements_file, encoding='utf-8') as fp:
         lines = fp.readlines()
     reqs = []
     for line in lines:
@@ -62,7 +61,7 @@ def read_file(a_file):
     """
     Read the specified file and return its content as one string.
     """
-    with io.open(a_file, 'r', encoding='utf-8') as fp:
+    with open(a_file, encoding='utf-8') as fp:
         content = fp.read()
     return content
 

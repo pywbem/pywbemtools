@@ -19,7 +19,6 @@ with mock and to confirm general results.  This includes both class and
 instance enumerations.
 """
 
-from __future__ import absolute_import, print_function
 
 import pytest
 

@@ -22,21 +22,16 @@ are provided to create, delete, and view existing connections. A set method
 allows setting the current active connection into the repository.
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 from contextlib import contextmanager
 import yaml
-import six
 import yamlloader
 import click
 
 from ._pywbem_server import PywbemServer
 from ._pywbemcli_operations import delete_mock_cache
 from .._utils import DEFAULT_CONNECTIONS_FILE, B08_DEFAULT_CONNECTIONS_FILE
-
-if six.PY2:
-    import codecs  # pylint: disable=wrong-import-order
 
 BAK_FILE_SUFFIX = 'bak'
 
@@ -54,7 +49,7 @@ class ConnectionsFileError(Exception):
           message (:term:`string`): Message text for the exception.
         """
         # pylint: disable=useless-super-delegation
-        super(ConnectionsFileError, self).__init__(message)
+        super().__init__(message)
 
 
 class ConnectionsFileWriteError(ConnectionsFileError):
@@ -75,7 +70,7 @@ class ConnectionsFileWriteError(ConnectionsFileError):
         """
         msg = 'Cannot write connections file "{0}": {1}'. \
             format(connections_file, message)
-        super(ConnectionsFileWriteError, self).__init__(msg)
+        super().__init__(msg)
 
 
 class ConnectionsFileLoadError(ConnectionsFileError):
@@ -95,19 +90,16 @@ class ConnectionsFileLoadError(ConnectionsFileError):
           message (:term:`string`): Text describing just the error
             (without text like 'Cannot load connection file {file}').
         """
-        msg = 'Cannot load connections file "{0}": {1}'.format(connections_file,
-                                                               message)
-        super(ConnectionsFileLoadError, self).__init__(msg)
+        msg = f'Cannot load connections file "{connections_file}": {message}'
+        super().__init__(msg)
 
 
+# TODO: Eliminate this function and adjust the tests using it.
 @contextmanager
 def open_text_file(filename, file_mode):
     """
     Context manager that opens the specified file in text mode with UTF-8
     encoding and closes it upon exit.
-
-    This method encapsulates a difference between Python 2 and Python 3
-    when opening files in text mode with UTF-8 encoding.
 
     Parameters:
 
@@ -126,20 +118,15 @@ def open_text_file(filename, file_mode):
 
     Raises:
       OSError
-      IOError (on Python 2, and possibly for lower level errors)
     """
     assert 'b' not in file_mode
-    if six.PY2:
-        # pylint: disable=consider-using-with
-        fp = codecs.open(filename, mode=file_mode, encoding='utf-8')
-    else:
-        # pylint: disable=consider-using-with
-        fp = open(filename, file_mode, encoding='utf8')
+    # pylint: disable=consider-using-with
+    fp = open(filename, file_mode, encoding='utf8')
     yield fp
     fp.close()
 
 
-class ConnectionRepository(object):
+class ConnectionRepository:
     # pylint: disable=useless-object-inheritance
     """
     A connection repository that contains the named connection definitions
@@ -328,8 +315,8 @@ class ConnectionRepository(object):
         """
         exists = 'exists' if self.file_exists() else "does not exist"
         self._load_connections_file()
-        items = ["{0!r}: {1}".format(k, v)
-                 for k, v in six.iteritems(self._pywbemcli_servers)]
+        items = [f"{k!r}: {v}"
+                 for k, v in self._pywbemcli_servers.items()]
         items_str = ', '.join(items)
         return ("{0}({{{1}}}, connections_file={2!r} ({3}), loaded={4!r})".
                 format(self.__class__.__name__, items_str,
@@ -391,7 +378,7 @@ class ConnectionRepository(object):
           ConnectionsFileLoadError
         """
         self._load_connections_file()
-        return six.iterkeys(self._pywbemcli_servers)
+        return iter(self._pywbemcli_servers.keys())
 
     def items(self):
         """
@@ -429,7 +416,7 @@ class ConnectionRepository(object):
           ConnectionsFileLoadError
         """
         self._load_connections_file()
-        return six.iteritems(self._pywbemcli_servers)
+        return iter(self._pywbemcli_servers.items())
 
     def iterkeys(self):
         """
@@ -441,7 +428,7 @@ class ConnectionRepository(object):
           ConnectionsFileLoadError
         """
         self._load_connections_file()
-        return six.iterkeys(self._pywbemcli_servers)
+        return iter(self._pywbemcli_servers.keys())
 
     def _load_connections_file(self):
         """
@@ -467,7 +454,7 @@ class ConnectionRepository(object):
             try:
                 os.rename(B08_DEFAULT_CONNECTIONS_FILE,
                           DEFAULT_CONNECTIONS_FILE)
-            except (OSError, IOError) as exc:
+            except OSError as exc:
                 raise ConnectionsFileLoadError(
                     self._connections_file,
                     'Error migrating old connections file "{0}": {1}'.
@@ -490,7 +477,7 @@ class ConnectionRepository(object):
                 except (TypeError, yaml.YAMLError) as exc:
                     raise ConnectionsFileLoadError(
                         self._connections_file,
-                        'Invalid YAML syntax: {0}'.format(exc))
+                        f'Invalid YAML syntax: {exc}')
 
                 # Try building dictionary of server definitions
                 try:
@@ -519,7 +506,7 @@ class ConnectionRepository(object):
                             ConnectionRepository.default_connection_grp_name))
 
                 # Build the PywbemServer object for each connection definition
-                for name, svr in six.iteritems(connections_dict):
+                for name, svr in connections_dict.items():
                     try:
                         server = PywbemServer.create(
                             replace_underscores=True,
@@ -529,22 +516,22 @@ class ConnectionRepository(object):
                         raise ConnectionsFileLoadError(
                             self._connections_file,
                             'Invalid attribute type in connection '
-                            'definition "{0}": {1}'.format(name, te))
+                            'definition "{}": {}'.format(name, te))
                     except ValueError as ve:
                         raise ConnectionsFileLoadError(
                             self._connections_file,
                             'Invalid attribute value in connection '
-                            'definition "{0}": {1}'.format(name, ve))
+                            'definition "{}": {}'.format(name, ve))
                     self._pywbemcli_servers[name] = server
                 self._loaded = True
                 if self._verbose:
                     click.echo("Connections file loaded: {}".
                                format(self._connections_file))
 
-        except (OSError, IOError) as exc:
+        except OSError as exc:
             raise ConnectionsFileLoadError(
                 self._connections_file,
-                'Error opening the file: {0}'.format(exc))
+                f'Error opening the file: {exc}')
 
     def add(self, svr_definition):
         """
@@ -566,7 +553,7 @@ class ConnectionRepository(object):
           ConnectionsFileLoadError
           ConnectionsFileWriteError
         """
-        assert isinstance(svr_definition.name, six.string_types)
+        assert isinstance(svr_definition.name, str)
 
         # If the file exists load it. Otherwise the write will create it
         if os.path.isfile(self._connections_file):
@@ -629,7 +616,7 @@ class ConnectionRepository(object):
 
             # Write to tmpfile and if successful create backup file and
             # move the tmpfile to be the new connections file contents.
-            tmpfile = '{}.tmp'.format(self._connections_file)
+            tmpfile = f'{self._connections_file}.tmp'
 
             try:
                 with open_text_file(tmpfile, 'w') as _fp:
@@ -643,35 +630,32 @@ class ConnectionRepository(object):
                     _fp.write(data)
                     # Data gets flushed to disk when closing the file upon exit
                     # from the 'with' clause.
-            except (OSError, IOError) as exc:
+            except OSError as exc:
                 raise ConnectionsFileWriteError(
                     self._connections_file,
-                    'Error writing temporary file "{0}": {1}'.
-                    format(tmpfile, exc))
+                    f'Error writing temporary file "{tmpfile}": {exc}')
 
         # Create bak file and then rename tmp file
         try:
             if os.path.isfile(self._connections_file):
-                bakfile = '{0}.{1}'.format(self._connections_file,
-                                           BAK_FILE_SUFFIX)
+                bakfile = f'{self._connections_file}.{BAK_FILE_SUFFIX}'
                 if os.path.isfile(bakfile):
                     os.remove(bakfile)
                 if os.path.isfile(self._connections_file):
                     os.rename(self._connections_file, bakfile)
-        except (OSError, IOError) as exc:
+        except OSError as exc:
             raise ConnectionsFileWriteError(
                 self._connections_file,
-                'Error renaming connections file "{0}" to backup file "{1}": '
-                '{2}'.format(tmpfile, bakfile, exc))
+                f'Error renaming connections file "{tmpfile}" to backup '
+                f'file "{bakfile}": {exc}')
 
         try:
             if self._pywbemcli_servers:
                 os.rename(tmpfile, self._connections_file)
-        except (OSError, IOError) as exc:
+        except OSError as exc:
             raise ConnectionsFileWriteError(
                 self._connections_file,
-                'Error renaming temporary file "{0}" to connections file '
-                '"{1}": {2}'.format(tmpfile, self._connections_file, exc))
+                f'Error renaming temporary file "{tmpfile}" to connections '
+                f'file "{self._connections_file}": {exc}')
         if self._verbose:
-            click.echo("Connections file saved: {}".
-                       format(self._connections_file))
+            click.echo(f"Connections file saved: {self._connections_file}")

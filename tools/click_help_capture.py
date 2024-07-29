@@ -19,31 +19,18 @@ This tool is useable with different click generated apps by passing the script
 name as a command line parameter.
 """
 
-from __future__ import print_function, absolute_import
 
 import sys
 import subprocess
-try:
-    import textwrap
-    textwrap.indent  # pylint: disable=pointless-statement
-except AttributeError:  # undefined function (wasn't added until Python 3.3)
-    def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
-        """Indent locally define"""
-        padding = amount * ch
-        return ''.join(padding + line for line in text.splitlines(True))
-else:
-    def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
-        """Wrap textwrap function"""
-        return textwrap.indent(text, amount * ch)
+import textwrap
 
-import six
 
 # Flag that controls the output format. If True, generates .rst output.
 # Otherwise it generates pure formatted text.
 USE_RST = True
 
 if len(sys.argv) != 2:
-    print("Usage: {} SCRIPT_NAME".format(sys.argv[0]))
+    print(f"Usage: {sys.argv[0]} SCRIPT_NAME")
     sys.exit(2)
 
 SCRIPT_NAME = sys.argv[1]
@@ -51,6 +38,11 @@ SCRIPT_CMD = SCRIPT_NAME
 
 ERRORS = 0
 VERBOSE = False
+
+
+def indent(text, amount, ch=' '):  # pylint: disable=invalid-name
+    """Wrap textwrap function"""
+    return textwrap.indent(text, amount * ch)
 
 
 def rst_headline(title, level):
@@ -68,13 +60,13 @@ def rst_headline(title, level):
         level_char = '='
 
     # output anchor in form .. _`smicli commands`:
-    anchor = '.. _`{}`:'.format(title)
+    anchor = f'.. _`{title}`:'
     title_marker = level_char * len(title)
     if level == 0:
         return '\n{}\n\n{}\n{}\n{}\n'.format(anchor, title_marker, title,
                                              title_marker)
 
-    return '\n{}\n\n{}\n{}\n'.format(anchor, title, title_marker)
+    return f'\n{anchor}\n\n{title}\n{title_marker}\n'
 
 
 def print_rst_verbatum_text(text_str):
@@ -126,12 +118,12 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
 
     returns list of command groups/commands
     """
-    command = '{} {} --help'.format(script_cmd, cmd)
+    command = f'{script_cmd} {cmd} --help'
     # Disable python warnings for script call.
     if sys.platform != 'win32':
-        command = 'export PYTHONWARNINGS="" && {}'.format(command)
+        command = f'export PYTHONWARNINGS="" && {command}'
     if VERBOSE:
-        print('command {}'.format(command))
+        print(f'command {command}')
     proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     std_out, std_err = proc.communicate()
@@ -139,9 +131,8 @@ def get_subcmd_group_names(script_cmd, script_name, cmd):
 
     HELP_DICT[cmd] = std_out
 
-    if six.PY3:
-        std_out = std_out.decode()
-        std_err = std_err.decode()
+    std_out = std_out.decode()
+    std_err = std_err.decode()
 
     if exitcode:
         raise RuntimeError('Error: Shell execution of command {!r} failed with '
@@ -176,7 +167,7 @@ def get_subgroup_names(group_name, script_cmd, script_name):
     subcmds_list = get_subcmd_group_names(script_cmd, script_name, group_name)
     space = ' ' if group_name else ''
 
-    return ['{}{}{}'.format(group_name, space, name) for name in subcmds_list]
+    return [f'{group_name}{space}{name}' for name in subcmds_list]
 
 
 def create_help_cmd_list(script_cmd, script_name):
@@ -199,7 +190,7 @@ def create_help_cmd_list(script_cmd, script_name):
     # sort to match order of click
     help_groups_result.sort()
     if USE_RST:
-        print(rst_headline("{} Help Command Details".format(script_name), 2))
+        print(rst_headline(f"{script_name} Help Command Details", 2))
         if script_name == 'pywbemcli':
             print('\nThis section shows the help text for each {} '
                   'command group and command.\n'.format(script_name))
@@ -208,14 +199,14 @@ def create_help_cmd_list(script_cmd, script_name):
                   'command.\n'.format(script_name))
 
     for name in help_groups_result:
-        command = '{} {}'.format(script_name, name)
-        command_help = '{} {} --help'.format(script_name, name)
+        command = f'{script_name} {name}'
+        command_help = f'{script_name} {name} --help'
         out = HELP_DICT[name]
         if USE_RST:
             level = len(name.split())  # 0: top, 1: group, 2: command
             if script_name == 'pywbemcli':
                 if level == 0:
-                    line = 'Help text for ``{}``:'.format(script_name)
+                    line = f'Help text for ``{script_name}``:'
                 elif level == 1 and name not in ('repl', 'help', 'docs'):
                     line = 'Help text for ``{}`` (see :ref:`{} command ' \
                     'group`):'.format(command, name)
@@ -224,14 +215,14 @@ def create_help_cmd_list(script_cmd, script_name):
                         .format(command, name)
             else:  # 'pywbemlistener'
                 if level == 0:
-                    line = 'Help text for ``{}``:'.format(script_name)
+                    line = f'Help text for ``{script_name}``:'
                 else:  # level == 1
                     line = 'Help text for ``{}`` (see :ref:`{} {} command`):'. \
                     format(command, script_name, name)
             if level > 0:
                 # Don't generate section header for top level
                 print(rst_headline(command_help, 2 + level))
-            print('\n\n{}\n\n'.format(line))
+            print(f'\n\n{line}\n\n')
             print_rst_verbatum_text(out.decode())
         else:
             print('{}\n{} command: {}'
@@ -244,7 +235,7 @@ def create_help_cmd_list(script_cmd, script_name):
 if __name__ == '__main__':
     # Verify that the script exists. Executing with --help loads click
     # script generates help and exits.
-    check_cmd = '{} --help'.format(SCRIPT_CMD)
+    check_cmd = f'{SCRIPT_CMD} --help'
     rc, msg = cmd_exists(check_cmd)
     if rc != 0:
         print("Error: Shell execution of {!r} returns rc={}: {}"

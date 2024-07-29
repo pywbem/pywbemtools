@@ -17,7 +17,6 @@
 The main function of the pywbemlistener command.
 """
 
-from __future__ import absolute_import, print_function
 
 import sys
 import warnings
@@ -67,39 +66,39 @@ CONTEXT_SETTINGS = {
 @click.option('-o', '--output-format', metavar='FORMAT',
               type=click.Choice(OUTPUT_FORMATS),
               default=None,
-              help=u'Output format for the command result. '
-                   u'FORMAT is one of the table formats: [{tb}].'.
+              help='Output format for the command result. '
+                   'FORMAT is one of the table formats: [{tb}].'.
                    format(tb='|'.join(OUTPUT_FORMAT_GROUPS['TABLE'][0])))
 @click.option('-l', '--logdir',
               type=click.Path(exists=False, dir_okay=True),
               metavar='DIR',
               default=None,
               envvar=_config.PYWBEMLISTENER_LOGDIR_ENVVAR,
-              help=u"Enable logging of the 'pywbemlistener run' command output "
-                   u"to a file in a log directory. The file will be named "
-                   u"'pywbemlistener_NAME.log' where NAME is the listener "
-                   u"name. Default: EnvVar {ev}, or no logging.".
+              help="Enable logging of the 'pywbemlistener run' command output "
+                   "to a file in a log directory. The file will be named "
+                   "'pywbemlistener_NAME.log' where NAME is the listener "
+                   "name. Default: EnvVar {ev}, or no logging.".
                    format(ev=_config.PYWBEMLISTENER_LOGDIR_ENVVAR))
 @click.option('-v', '--verbose', count=True,
-              help=u'Verbosity level. Can be specified multiple times: '
-                   u'-v: {}; -vv: {}.'.
+              help='Verbosity level. Can be specified multiple times: '
+                   '-v: {}; -vv: {}.'.
               format(_config.VERBOSE_1_HELP, _config.VERBOSE_2_HELP))
 @click.option('--pdb', is_flag=True,
               default=False,
               envvar=_config.PYWBEMLISTENER_PDB_ENVVAR,
-              help=u'Pause execution in the built-in pdb debugger just before '
-                   u'executing the command within pywbemlistener. '
-                   u'Default: EnvVar {ev}, or no debugger.'.
+              help='Pause execution in the built-in pdb debugger just before '
+                   'executing the command within pywbemlistener. '
+                   'Default: EnvVar {ev}, or no debugger.'.
                    format(ev=_config.PYWBEMLISTENER_PDB_ENVVAR))
 @click.option('--warn', is_flag=True,
               default=False,
-              help=u'Enable display of all Python warnings. '
-                   u'Default: Leave warning control to the PYTHONWARNINGS '
-                   u'EnvVar, which by default displays no warnings.')
+              help='Enable display of all Python warnings. '
+                   'Default: Leave warning control to the PYTHONWARNINGS '
+                   'EnvVar, which by default displays no warnings.')
 @click.version_option(
     message='%(prog)s, version %(version)s\npywbem, version {}'.format(
         pywbem_version),
-    help=u'Show the version of this command and the pywbem package.')
+    help='Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
 def cli(ctx, output_format, logdir, verbose, pdb, warn):
