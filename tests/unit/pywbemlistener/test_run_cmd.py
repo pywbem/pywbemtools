@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN_NO_PY27
+from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN
 from .test_start_cmd import START_HELP_CALL_PATTERNS, \
     START_HELP_FORMAT_PATTERNS
 
@@ -128,7 +128,7 @@ RUN_TESTCASES = [
             stderr=RUN_EXISTS_PATTERNS,
             test='all',
         ),
-        RUN_NO_WIN_NO_PY27,
+        RUN_NO_WIN,
     ),
 ]
 

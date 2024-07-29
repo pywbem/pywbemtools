@@ -87,7 +87,7 @@ The pywbemtools package is supported in these environments:
 
 * Operating systems: Linux, Windows (native and Unix-like environments
   (ex. Cygwin), OS-X
-* Python versions: 2.7, 3.6, and greater
+* Python versions: 3.8 and greater
 * WBEM servers: Any WBEM server that conforms to the DMTF specifications listed
   in :ref:`Standards conformance`. WBEM servers supporting older versions of
   these standards are also supported, but may have limitations.
@@ -126,8 +126,7 @@ Python packages installed:
 
 - setuptools - http://pypi.python.org/pypi/setuptools
 - wheel
-- pip - generally installed with Python 3.x but may be a separate install
-  with Python 2.7 and with Cygwin Python releases.
+- pip
 
 Pywbemtools installs the pywbem package.
 

@@ -274,19 +274,10 @@ else
 endif
 pytest_end2end_opts := -v --tb=short $(pytest_opts)
 
-ifeq ($(python_mn_version),3.4)
-  pytest_cov_opts :=
-else
-  pytest_cov_opts := --cov $(package_name) $(coverage_report) --cov-config .coveragerc
-endif
+pytest_cov_opts := --cov $(package_name) $(coverage_report) --cov-config .coveragerc
 
-ifeq ($(python_m_version),3)
-  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
-  pytest_end2end_warning_opts := $(pytest_warning_opts)
-else
-  pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
-  pytest_end2end_warning_opts := $(pytest_warning_opts)
-endif
+pytest_warning_opts := -W default -W ignore::PendingDeprecationWarning
+pytest_end2end_warning_opts := $(pytest_warning_opts)
 
 # Files to be put into distribution archive.
 # Keep in sync with dist_dependent_files.
@@ -315,19 +306,7 @@ dist_dependent_files := \
     $(wildcard $(package_name)/*/*/*.py) \
 
 # Packages whose dependencies are checked using pip-missing-reqs
-ifeq ($(python_m_version),2)
-  check_reqs_packages := pytest coverage coveralls flake8 pylint twine
-else
-ifeq ($(python_mn_version),3.6)
-  check_reqs_packages := pytest coverage coveralls flake8 pylint twine
-else
-ifeq ($(python_mn_version),3.7)
-  check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety
-else
-  check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety sphinx
-endif
-endif
-endif
+check_reqs_packages := pytest coverage coveralls flake8 pylint twine safety sphinx
 
 # Scripts are required to install the OS-level components of pywbem.
 ifeq ($(PLATFORM),Windows_native)
@@ -698,20 +677,12 @@ $(bdist_file) $(sdist_file): Makefile setup.py MANIFEST.in $(doc_utility_help_fi
 # Status 1 to 16 will be bit-ORed.
 # The make command checks for statuses: 1,2,32
 $(done_dir)/pylint_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files) $(py_err_src_files)
-ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.4)
-	@echo "Makefile: Warning: Skipping Pylint on Python $(python_version)" >&2
-else
 	@echo "Makefile: Running Pylint"
 	-$(call RM_FUNC,$@)
 	pylint --version
 	pylint $(pylint_opts) --rcfile=$(pylint_rc_file) $(py_src_files) $(py_err_src_files)
 	echo "done" >$@
 	@echo "Makefile: Done running Pylint"
-endif
-endif
 
 $(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(flake8_rc_file) $(py_src_files) $(py_err_src_files)
 	@echo "Makefile: Running Flake8"
@@ -722,72 +693,37 @@ $(done_dir)/flake8_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$
 	@echo "Makefile: Done running Flake8"
 
 $(done_dir)/ruff_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(py_src_files)
-ifeq ($(python_mn_version),2.7)
-	@echo "Makefile: Warning: Skipping Ruff on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.6)
-	@echo "Makefile: Warning: Skipping Ruff on Python $(python_version)" >&2
-else
 	@echo "Makefile: Running Ruff"
 	-$(call RM_FUNC,$@)
 	ruff --version
 	ruff check --unsafe-fixes $(py_src_files)
 	echo "done" >$@
 	@echo "Makefile: Done running Ruff"
-endif
-endif
 
 $(done_dir)/safety_all_$(pymn)_$(PACKAGE_LEVEL).done: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(safety_all_policy_file) minimum-constraints.txt minimum-constraints-install.txt
-ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping Safety for all packages on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.6)
-	@echo "Makefile: Warning: Skipping Safety for all packages on Python $(python_version)" >&2
-else
 	@echo "Makefile: Running Safety for all packages"
 	-$(call RM_FUNC,$@)
 	bash -c "safety check --policy-file $(safety_all_policy_file) -r minimum-constraints.txt --full-report || test '$(RUN_TYPE)' != 'release' || exit 1"
 	echo "done" >$@
 	@echo "Makefile: Done running Safety for all packages"
-endif
-endif
 
 $(done_dir)/safety_install_$(pymn)_$(PACKAGE_LEVEL).done: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done Makefile $(safety_install_policy_file) minimum-constraints-install.txt
-ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping Safety for install packages on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.6)
-	@echo "Makefile: Warning: Skipping Safety for install packages on Python $(python_version)" >&2
-else
 	@echo "Makefile: Running Safety for install packages"
 	-$(call RM_FUNC,$@)
 	safety check --policy-file $(safety_install_policy_file) -r minimum-constraints-install.txt --full-report
 	echo "done" >$@
 	@echo "Makefile: Done running Safety for install packages"
-endif
-endif
 
 $(done_dir)/todo_$(pymn)_$(PACKAGE_LEVEL).done: Makefile $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done $(pylint_rc_file) $(py_src_files)
-ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
-else
-ifeq ($(python_mn_version),3.4)
-	@echo "Makefile: Warning: Skipping checking for TODOs on Python $(python_version)" >&2
-else
 	@echo "Makefile: Checking for TODOs"
 	-$(call RM_FUNC,$@)
 	pylint --exit-zero --reports=n --disable=all --enable=fixme $(py_src_files)
 	-grep TODO $(doc_conf_dir) -r --include="*.rst"
 	echo "done" >$@
 	@echo "Makefile: Done checking for TODOs"
-endif
-endif
 
 .PHONY: check_reqs
 check_reqs: $(done_dir)/develop_$(pymn)_$(PACKAGE_LEVEL).done minimum-constraints.txt requirements.txt
-ifeq ($(python_m_version),2)
-	@echo "Makefile: Warning: Skipping the checking of missing dependencies on Python $(python_version)" >&2
-else
 	@echo "Makefile: Checking missing dependencies of the package"
 	pip-missing-reqs $(package_name) --requirements-file=requirements.txt
 	pip-missing-reqs $(package_name) --requirements-file=minimum-constraints.txt
@@ -799,7 +735,6 @@ else
 	@echo "Makefile: Checking missing dependencies of some development packages"
 	@rc=0; for pkg in $(check_reqs_packages); do dir=$$($(PYTHON_CMD) -c "import $${pkg} as m,os; dm=os.path.dirname(m.__file__); d=dm if not dm.endswith('site-packages') else m.__file__; print(d)"); cmd="pip-missing-reqs $${dir} --requirements-file=minimum-constraints.txt"; echo $${cmd}; $${cmd}; rc=$$(expr $${rc} + $${?}); done; exit $${rc}
 	@echo "Makefile: Done checking missing dependencies of some development packages"
-endif
 endif
 	@echo "Makefile: $@ done."
 

@@ -9,8 +9,7 @@
 # Overview
 
 Pywbemtools is a collection of command line tools that communicate with
-WBEM servers. The tools are written in pure Python and support Python 2
-and Python 3.
+WBEM servers. The tools are written in pure Python and support Python 3.
 
 Pywbemtools includes the following tools:
 
@@ -68,42 +67,11 @@ system as background processes. It provides functionality to:
 
 Requirements:
 
-1.  Python 2.7, 3.6 and higher
+1.  Python 3.8 and higher
 2.  Operating Systems: Linux, OS-X, native Windows, UNIX-like
     environments on Windows (e.g. Cygwin)
-3.  On Python 2, the following OS-level packages are needed:
-    - On native Windows:
-      - `choco` - Chocolatey package manager. The pywbemtools
-        package installation uses Chocolatey to install OS-level
-        software. See <https://chocolatey.org/> for the installation
-        instructions for Chocolatey.
-      - `wget` - Download tool. Can be installed with:
-        `choco install wget`.
-    - On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
-      - `wget` - Download tool. Can be installed using the OS-level
-        package manager for the platform.
 
 Installation:
-
-- On Python 2, install OS-level packages needed by the pywbem package:
-
-  - On native Windows:
-
-    ``` bash
-    > wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.bat
-    > pywbem_os_setup.bat
-    ```
-
-  - On Linux, OS-X, UNIX-like environments on Windows (e.g. Cygwin):
-
-    ``` bash
-    $ wget -q https://raw.githubusercontent.com/pywbem/pywbem/master/pywbem_os_setup.sh
-    $ chmod 755 pywbem_os_setup.sh
-    $ ./pywbem_os_setup.sh
-    ```
-
-    The `pywbem_os_setup.sh` script uses sudo internally, so your
-    userid needs to have sudo permission.
 
 - Install the pywbemtools Python package:
 

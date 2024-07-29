@@ -27,10 +27,7 @@ from __future__ import absolute_import, print_function
 
 import socket
 import os
-import sys
 import time
-
-from pytest import skip
 
 # pylint: disable=unused-import
 from .utils import server_url, validate_namespace_exists, \
@@ -241,11 +238,6 @@ def test_indications(server_url):  # noqa: F811
     The indication test.  This function is called because server_url is a pytest
     fixture.
     """
-    # issue #3022, the container not returning all of the indications.
-    # This appears to be much more consistent with python 3.7 and 3.7
-    # PACKAGE_LEVEL=minimum
-    if sys.version_info[0:2] in ((2, 7), (3, 7)):
-        skip("Skipping test_indications for python 2.7 and 3.7")
 
     verbose = False
 

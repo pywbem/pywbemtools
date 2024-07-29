@@ -17,28 +17,18 @@
 # * pip 20.0 introduced the --no-python-version-warning option
 # * pip 20.2 introduced a new resolver whose backtracking had issues that were resolved only in 21.2.2.
 # * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
-# * pip 22.0 dropped support for Python 3.6.
-pip==19.3.1; python_version == '2.7'
-pip==21.3.1; python_version == '3.6'
-pip==23.3; python_version >= '3.7'
+pip==23.3
 
 # setuptools 41.5.0 fixes build errors with Visual C++ 14.0 on Windows
-# setuptools 41.5.1 fixes a py27 regression introduced by 41.5.0.
-# setuptools 44.0.0, last version that states py 2.7 requirement
 # setuptools 49.0.0 fixes the comparison of Python versions in requirements that was
 #   based on strings and thus ignored certain requirements on Python 3.10.
-# setuptools 65.5.1 fixes safety issue 52495
-setuptools==41.5.1; python_version == '2.7'
-setuptools==59.6.0; python_version == '3.6'
-setuptools==65.5.1; python_version >= '3.7' and python_version <= '3.11'
+setuptools==65.5.1; python_version <= '3.11'
 setuptools==66.1.0; python_version >= '3.12'
 
 # wheel 0.36.2 fixes empty and invalid tag issues in archive file name
 # wheel 0.38.0 fixes pywbemtools issue #1228
 # wheel 0.38.1 fixes CVE issue 51499
-# wheel 0.38.1 dropped support for py35+py36
-wheel==0.36.2; python_version <= '3.6'
-wheel==0.38.1; python_version >= '3.7'
+wheel==0.38.1
 
 
 # Direct dependencies for install (must be consistent with requirements.txt)
@@ -52,68 +42,51 @@ nocaselist==1.0.3
 nocasedict==1.0.1
 six==1.14.0; python_version <= '3.9'
 six==1.16.0; python_version >= '3.10'
-Click==7.1.1; python_version == '2.7'
 # Safety package requires click 8.0.2 minimum
-Click==8.0.2; python_version >= '3.6'
+Click==8.0.2
 click-spinner==0.1.8; python_version <= '3.11'
 click-spinner==0.1.10; python_version >= '3.12'
-click-repl==0.1.6; python_version == '2.7'
-click-repl==0.2; python_version >= '3.6'
+click-repl==0.2
 asciitree==0.3.3
 tabulate==0.8.2; python_version <= '3.9'
 tabulate==0.8.8; python_version >= '3.10'
 
 toposort==1.6
-# safety issue # 37765 affected psutil<=5.6.5,
 psutil==5.6.5; python_version <= '3.9'
 psutil==5.8.0; python_version >= '3.10'
 
-prompt-toolkit==1.0.15; python_version == '2.7'
-prompt-toolkit==3.0.13; python_version >= '3.6'
+prompt-toolkit==3.0.13
 
 PyYAML==5.3.1
 
 yamlloader==0.5.5
 # Packaging 21.0 is required by safety 2.2.0
-packaging==19.0; python_version == '2.7'
-packaging==21.0; python_version == '3.6'
-packaging==22.0; python_version >= '3.7'
+packaging==22.0
 
 mock==3.0.0
 
 
 # Indirect dependencies for install that are needed for some reason (must be consistent with requirements.txt)
 
-funcsigs==1.0.2; python_version == '2.7'
-
 # packaging 21.3 requires pyparsing>=2.0.2,!=3.0.5
 pyparsing==2.3.1
 
-# urllib3 < 2.0.0 required for python < 3.7
-urllib3==1.26.19; python_version == '2.7'
-urllib3==1.26.19; python_version == '3.6'
-urllib3==1.26.19; python_version >= '3.7'
+urllib3==1.26.19
 
 
 # All other indirect dependencies for install that are not in requirements.txt
 
 ply==3.10
-requests==2.25.0; python_version == '2.7'
-requests==2.26.0; python_version == '3.6'
-requests==2.31.0; python_version == '3.7'
-requests==2.32.2; python_version >= '3.8'
-certifi==2019.11.28; python_version == '2.7'
-certifi==2023.07.22; python_version >= '3.6'
+requests==2.32.2
+certifi==2023.07.22
 
 # prompt-toolkit 3.0 requires wcwidth
 wcwidth==0.1.7
 
 # nocaselist 2.0 requires typing-extensions>=3.10 (on py>=3.6,py<=3.9)
 # safety 3.0 requires typing-extensions>=4.7.1 (used on py>=3.7)
-typing-extensions==3.10.0; python_version == '3.6'
-typing-extensions==4.7.1; python_version >= '3.7'
+typing-extensions==4.7.1
 
 # requests 2.31 requires idna>=2.5,<4
 # idna>3 requires using requests >=2.26.0
-idna==2.8; python_version <= '3.5'
-idna==3.7; python_version >= '3.6'
+idna==3.7

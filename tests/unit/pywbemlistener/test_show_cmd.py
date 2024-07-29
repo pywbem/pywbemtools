@@ -21,7 +21,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN_NO_PY27
+from .cli_test_extensions import pywbemlistener_test, RUN, RUN_NO_WIN
 
 # pylint: disable=use-dict-literal
 
@@ -111,7 +111,7 @@ SHOW_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NO_WIN_NO_PY27,
+        RUN_NO_WIN,
     ),
     (
         "Verify output of 'show' on existing listener with bind-addr set",
@@ -140,7 +140,7 @@ SHOW_TESTCASES = [
             ],
             test='all',
         ),
-        RUN_NO_WIN_NO_PY27,
+        RUN_NO_WIN,
     ),
 ]
 
