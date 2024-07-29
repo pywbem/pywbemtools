@@ -14,6 +14,8 @@ Released: not yet
 
 **Incompatible changes:**
 
+* Removed support for Python 2.7, 3.6, and 3.7. (issue #1390)
+
 **Deprecations:**
 
 **Bug fixes:**
@@ -21,10 +23,6 @@ Released: not yet
 * Addressed safety issues up to 2024-07-21.
 
 * Fixed new issues reported by Pylint 3.2.
-
-* For Python 3.6 and 3.7, changed macos-latest back to macos-12 because
-  macos-latest got upgraded from 12 to 14 and no longer supports Python 3.6
-  and 3.7.
 
 **Enhancements:**
 

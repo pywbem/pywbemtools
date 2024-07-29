@@ -45,20 +45,6 @@ from six.moves import shlex_quote
 # Click version as a tuple
 CLICK_VERSION = packaging.version.parse(click.__version__).release
 
-# Click issue #1231:
-# On Windows, the Click package has the issue that it writes '\n' at the Python
-# level as '\r\r\n' at the level of the Windows shell, and Popen() with
-# universal_newlines=True does not handle this case.
-# To circumvent that issue, pywbemtools specifies universal_newlines=False and
-# performs the universal newline conversions itself (it does what Popen() does,
-# and in addition replaces the incorrectly created '\r\r\n' sequence).
-# That issue has been fixed in Click 7.1 on Python 3, but Click 7.1 has also
-# removed support for Python 3.4 so pywbemtools now requires Click 7.1 with
-# all Python versions except 3.4. It turns out that the circumvention is also
-# needed on Python 2.7, even though Click 7.1 is used there (not clear why).
-# The CLICK_ISSUE_1231 boolean indicates that the Click issue is present.
-CLICK_ISSUE_1231 = sys.version_info[0:2] == (2, 7) and sys.platform == 'win32'
-
 
 def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                     capture=True):
@@ -172,12 +158,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                 sys.stdout.flush()
             stdin = None
 
-    if CLICK_ISSUE_1231:
-        universal_newlines = False
-        if stdin and six.PY3:
-            stdin = stdin.encode('utf-8')
-    else:
-        universal_newlines = True
+    universal_newlines = True
 
     # Time in seconds allowed for command before the test considers it to have
     # timed out. With 60 seconds, we got occasional timeouts in GitHub tests.
@@ -279,7 +260,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     if stdout_str is not None:
         if isinstance(stdout_str, six.binary_type):
             stdout_str = stdout_str.decode('utf-8')
-        # Note: The CRs were originally only fixed for CLICK_ISSUE_1231, but
+        # Note: The CRs were originally only fixed for Click issue #1231, but
         # with the pywbemlistener testing, it became necessary on all Python
         # versions on Windows.
         if sys.platform == 'win32':
@@ -290,7 +271,7 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
     if stderr_str is not None:
         if isinstance(stderr_str, six.binary_type):
             stderr_str = stderr_str.decode('utf-8')
-        # Note: The CRs were originally only fixed for CLICK_ISSUE_1231, but
+        # Note: The CRs were originally only fixed for Click issue #1231, but
         # with the pywbemlistener testing, it became necessary on all Python
         # versions on Windows.
         if sys.platform == 'win32':

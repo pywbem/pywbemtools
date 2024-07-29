@@ -135,11 +135,6 @@ with a bash shell:
   fish    ~/.config/fish/completions/foo-bar.fish  eval (env _<PROG_NAME>_COMPLETE=fish_source pywbemcli)
   ======  =======================================  =========================================================
 
-.. note :: With Python 2.7 or Python 3.5 the variable value (ex. ``bash_source``)
-           must have the two words reversed  (ex. ``source_bash)`` because these
-           python versions only support an old version of the package click
-           which maintains the scripts.
-
 The above method may be difficult when the location of the pywbemcli
 executable is not in the path (ex. when pywbemtools is in a virtual environment)
 since the ``eval`` statement initiates a callback to the pywbemcli/pywbemlistener and
@@ -161,8 +156,7 @@ pywbemcli/pywbemlistener are public.
 The following table defines the shell command for supported shells to create the
 complete script file.  The naming and exact location of the file is arbitray and
 the locations shown in the table are examples.  However, 1. the file is different
-for each shell and also it is different if Python versions 2.7 or 3.5 are use rather
-than later versions of Python.
+for each shell.
 
 .. _shell-completion-script:
 
@@ -177,10 +171,6 @@ than later versions of Python.
   fish   _<PROG_NAME>_COMPLETE=fish_source pywbemcli >
          ~/.config/fish/completions/<prog_name>.fish
   =====  ===========================================================================
-
-.. note :: The variable value (ex. ``bash_source``) must have the two words reversed
-           if tab-completion is being activated with Python 2.7 or Python 3.5 (ex.
-           ``source_bash``)
 
 Once the complete script file has been created, tab-completion activation is completed
 by sourcing the complete script file to notify the shellof the complete file
@@ -260,5 +250,3 @@ Bash: The command ``complete -r pywbemcli`` removes the tab-completion for
 pywbemcli.
 
 Zsh: Depends on zsh configuration
-
-

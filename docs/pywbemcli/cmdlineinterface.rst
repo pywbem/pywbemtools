@@ -145,12 +145,6 @@ Tab-completion is available in pywbemcli for:
     * At least the following command options
         * Subscription <command> --owned / -- permanent option
 
-Tab-completion for option/argument values only works for pywbemcli running with
-Python version greater than 3.5. If pywbemcli is running on Python 3.5 or 2.7,
-option values has no support for tab-completion. Nothing happens if <TAB> is
-hit while entering an option value. However, the tab-completion of other
-command line syntax elements is supported.
-
 
 .. code-block:: text
 

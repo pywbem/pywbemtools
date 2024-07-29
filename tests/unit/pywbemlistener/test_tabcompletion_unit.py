@@ -34,7 +34,7 @@ from pywbemtools.pywbemlistener._cmd_listener import listener_name_completer
 from ..pytest_extensions import simplified_test_function
 
 from .cli_test_extensions import ensure_no_listeners, start_listeners, \
-    RUN, RUN_NOWIN
+    RUN, RUN_NO_WIN
 
 # pylint: disable=use-dict-literal
 
@@ -99,7 +99,7 @@ def test_listener_name_complete(testcase, listeners, incomplete, exp_rtn):
 
     # Do not run on windows. Setup consistently timing out trying to
     # create listeners and the target shells (bash, etc. are not on windows)
-    if not RUN_NOWIN:
+    if not RUN_NO_WIN:
         return
 
     ensure_no_listeners(verbose, 'test setup')

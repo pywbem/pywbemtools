@@ -23,7 +23,6 @@ in a module namespace for pickle to be able to load the corresponding objects.
 
 import sys
 import os
-import io
 import importlib
 import traceback
 import pywbem
@@ -100,69 +99,32 @@ def setup_script(file_path, conn, server, verbose):
       NotCacheable (py<3.5): Mock environment is not cacheable.
     """
     modpath = get_modpath(file_path)
-    if sys.version_info[0:2] >= (3, 6):
-        spec = importlib.util.spec_from_file_location(modpath, file_path)
-        module = importlib.util.module_from_spec(spec)
+    spec = importlib.util.spec_from_file_location(modpath, file_path)
+    module = importlib.util.module_from_spec(spec)
 
-        # We cannot find out whether the script has a setup() function before
-        # executing it, so we have to set the global variables for the old
-        # setup approach in any case.
-        module.CONN = conn
-        module.SERVER = server
-        module.VERBOSE = verbose
+    # We cannot find out whether the script has a setup() function before
+    # executing it, so we have to set the global variables for the old
+    # setup approach in any case.
+    module.CONN = conn
+    module.SERVER = server
+    module.VERBOSE = verbose
 
-        sys.modules[modpath] = module
+    sys.modules[modpath] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception as exc:
+        raise script_error(file_path, exc)
+
+    if hasattr(module, 'setup'):
         try:
-            spec.loader.exec_module(module)
+            module.setup(conn=conn, server=server, verbose=verbose)
         except Exception as exc:
             raise script_error(file_path, exc)
-
-        if hasattr(module, 'setup'):
-            try:
-                module.setup(conn=conn, server=server, verbose=verbose)
-            except Exception as exc:
-                raise script_error(file_path, exc)
-        else:
-            pywbemtools_warn_explicit(
-                "The support of mock scripts without setup() function is "
-                "deprecated and will be removed in a future version.",
-                DeprecatedSetupWarning, file_path, 0)
-
-    else:  # Python 2.7 + 3.4
-        with io.open(file_path, 'r', encoding='utf-8') as fp:
-            file_source = fp.read()
-
-        # Using compile+exec instead of just exec allows specifying the file
-        # name, causing it to appear in any tracebacks.
-        try:
-            file_code = compile(file_source, file_path, 'exec')
-        except Exception as exc:
-            raise script_error(file_path, exc)
-
-        # Poor man's approach to determining whether the mock script has a
-        # setup() function:
-        if 'setup' in file_code.co_names:
-            raise SetupNotSupportedError(
-                "On Python <3.5, mock scripts with setup() function are not "
-                "supported")
-
+    else:
         pywbemtools_warn_explicit(
             "The support of mock scripts without setup() function is "
             "deprecated and will be removed in a future version.",
             DeprecatedSetupWarning, file_path, 0)
-
-        globalparams = {
-            'CONN': conn,
-            'SERVER': server,
-            'VERBOSE': verbose,
-            '__name__': modpath,
-        }
-        try:
-            exec(file_code, globalparams, None)  # pylint: disable=exec-used
-        except Exception as exc:
-            raise script_error(file_path, exc)
-        raise NotCacheable(
-            "On Python <3.5, mock scripts cannot be cached")
 
 
 def import_script(file_path):
@@ -179,10 +141,6 @@ def import_script(file_path):
     Raises:
       NotCacheable
     """
-    if sys.version_info[0:2] == (2, 7):
-        raise NotCacheable(
-            "On Python 2.7, mock scripts cannot be cached")
-
     modpath = get_modpath(file_path)
     spec = importlib.util.spec_from_file_location(modpath, file_path)
     module = importlib.util.module_from_spec(spec)

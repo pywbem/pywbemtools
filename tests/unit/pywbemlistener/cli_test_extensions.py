@@ -47,12 +47,7 @@ from ..utils import execute_command, assert_rc, assert_patterns, \
 # The boolean conditions, for better readability
 RUN = True
 SKIP = False
-RUN_NOWIN = sys.platform != 'win32'
-# See issue #1327 Disable all tests that fail because of this issue
-RUN_NO_PY27 = six.PY3
-
-# Do not run tests that use either windows or python 2.7
-RUN_NO_WIN_NO_PY27 = RUN_NOWIN and RUN_NO_PY27
+RUN_NO_WIN = sys.platform != 'win32'
 
 
 def pywbemlistener_test(desc, inputs, exp_results, condition):

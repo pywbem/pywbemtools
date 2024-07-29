@@ -28,7 +28,6 @@ import inspect
 from datetime import datetime
 import mock
 import six
-import click
 
 __all__ = []
 
@@ -145,15 +144,7 @@ def get_terminal_width():
             pass
 
     if USE_TERMINAL_WIDTH:
-        # We first try shutil.get_terminal_size() which was added in Python 3.3.
-        # Click 8.0 has deprecated click.get_terminal_size() and issues a
-        # DeprecationWarning, but on Python 2.7, Click is pinned to <8.0, so we
-        # can use click.get_terminal_size() without triggering the
-        # DeprecationWarning.
-        try:
-            ts = shutil.get_terminal_size()
-        except AttributeError:
-            ts = click.get_terminal_size()  # pylint: disable=no-member
+        ts = shutil.get_terminal_size()
         return ts[0]
 
     return DEFAULT_TABLE_WIDTH
