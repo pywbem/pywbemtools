@@ -22,11 +22,7 @@ output formatting.
 
 from textwrap import fill
 from operator import itemgetter
-from collections import namedtuple
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict  # pylint: disable=import-error
+from collections import namedtuple, OrderedDict
 
 import click
 import tabulate

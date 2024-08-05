@@ -47,11 +47,6 @@ _PYWBEM_VERSION = parse_version(pywbem_version)
 # pywbem 1.0.0 or later
 PYWBEM_1_0_0 = _PYWBEM_VERSION.release >= (1, 0, 0)
 
-# Create variable that is True if python ge version 3.8.  This python version
-# was the first to impose ordering on XML attributes. Without ordering
-# XML tests against XML data returned from pywbemcli can fail. See issue #1173
-PYTHON_GE_38 = sys.version_info > (3, 8)
-
 # Mock scripts with setup() function are supported
 MOCK_SETUP_SUPPORTED = sys.version_info >= (3, 6)
 
@@ -369,8 +364,7 @@ REFERENCES_CLASS_RTN_QUALS2 = [
     '};']
 
 # pylint: disable=line-too-long
-# This output only valid for python versin ge 3.8
-ASSOCIATORS_CLASS_XML_GE_38 = """<CLASSPATH>
+ASSOCIATORS_CLASS_XML = """<CLASSPATH>
     <NAMESPACEPATH>
         <HOST>FakedUrl:5988</HOST>
         <LOCALNAMESPACEPATH>
@@ -1382,14 +1376,14 @@ TEST_CASES = [
       'general': ['--output-format', 'xml']},
      {'stdout': CIMFOO_SUB_SUB_WITH_QUALS_XML,
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173. Only good for py 3.8+
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate CIM_Foo with --no qualifiers, xml',
      {'args': ['enumerate', 'CIM_Foo_sub', '--no-qualifiers'],
       'general': ['--output-format', 'xml']},
      {'stdout': CIMFOO_SUB_SUB_NO_QUALS_XML,
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, PYTHON_GE_38],  # issue 1173, Property attribute ordering
+     SIMPLE_MOCK_FILE, OK],
 
     ['Verify class command enumerate  --di --no --namespace',
      ['enumerate', '--di', '--no', '-n', 'interop'],
@@ -2812,12 +2806,12 @@ TST_PersonSub
       'test': 'lines'},
      SIMPLE_ASSOC_MOCK_FILE, OK],
 
-    ['Verify class command associators simple request, xml output ge py_3.8,',
+    ['Verify class command associators simple request, xml output',
      {'args': ['associators', 'TST_Person'],
       'general': ['--output-format', 'xml']},
-     {'stdout': ASSOCIATORS_CLASS_XML_GE_38,
+     {'stdout': ASSOCIATORS_CLASS_XML,
       'test': 'lines'},
-     SIMPLE_ASSOC_MOCK_FILE, PYTHON_GE_38],
+     SIMPLE_ASSOC_MOCK_FILE, OK],
 
     ['Verify class command associators simple request names only,',
      ['associators', 'TST_Person', '--names-only'],
@@ -3712,7 +3706,7 @@ class CIM_FooRef2 : CIM_BaseRef {
 ''',  # noqa: E501
       'rc': 0,
       'test': 'innows'},
-     THREE_NS_MOCK_FILE, PYTHON_GE_38],
+     THREE_NS_MOCK_FILE, OK],
 
     # Test all versions by not requesting qualifiers.  see issue #1173
     # pylint: disable=line-too-long

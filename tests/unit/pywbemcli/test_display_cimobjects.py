@@ -22,13 +22,9 @@ API, not a test of pywbemcli commands.
 
 import sys
 from datetime import datetime
+from collections import OrderedDict
 from packaging.version import parse as parse_version
 import pytest
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict  # pylint: disable=import-error
 
 from pywbem import CIMProperty, CIMInstance, CIMInstanceName, Uint32, Uint64, \
     Sint32, CIMDateTime, __version__
