@@ -18,7 +18,6 @@ Tests the commands in thequalifier command group
 
 
 import os
-import sys
 import pytest
 
 from .cli_test_extensions import CLITestsBase
@@ -30,7 +29,6 @@ from .common_options_help_lines import CMD_OPTION_HELP_HELP_LINE, \
 
 TEST_DIR = os.path.dirname(__file__)
 
-PYTHON_GE_38 = sys.version_info > (3, 8)
 THREE_NS_MOCK_FILE = 'simple_three_ns_mock_script.py'
 
 # A mof file that defines basic qualifier decls, classes, and instances
@@ -717,7 +715,7 @@ TEST_CASES = [
 </QUALIFIER.DECLARATION>
 ''',  # noqa E501
       'test': 'linesnows'},
-     SIMPLE_MOCK_FILE, PYTHON_GE_38],
+     SIMPLE_MOCK_FILE, OK],
     # pylint: enable=line-too-long
 
     ['Verify qualifier command -o grid enumerate produces table out',
