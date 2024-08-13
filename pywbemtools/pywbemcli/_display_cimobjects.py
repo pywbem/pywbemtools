@@ -170,8 +170,8 @@ def display_cim_objects(context, cim_objects, output_format, summary=False,
     if isinstance(cim_objects, NocaseDict) and \
             not any(list(cim_objects.values())):
         if context.verbose:
-            click.echo("No objects returned for namespace(s): {}".
-                       format(", ".join(cim_objects.keys())))
+            click.echo('No objects returned for namespace(s): '
+                       f'{", ".join(cim_objects.keys())}')
         return
 
     # Process by type based on receiving dictionaries of ns:objects or lists
@@ -419,8 +419,7 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
             # inserting NL between instance names for readability since the
             # display is always a single line per display
             if isinstance(cim_object, CIMInstanceName):
-                click.echo("")
-                click.echo(cim_object)
+                click.echo(f"\n{cim_object}")
             elif isinstance(cim_object, CIMClassName):
                 click.echo(cim_object)
             elif isinstance(cim_object, tuple):  # representation of class assoc
@@ -434,9 +433,9 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
                 else:
                     click.echo(cim_object)
             else:
-                raise click.ClickException('output_format {} invalid for {} '
-                                           .format(output_format,
-                                                   type(cim_object)))
+                raise click.ClickException(
+                    f'output_format {output_format} invalid '
+                    f'for {type(cim_object)}')
     elif output_format == 'xml':
         try:
             if isinstance(cim_object,
@@ -458,30 +457,29 @@ def _display_one_cim_object(cim_object, output_format, namespace=None):
                 else:
                     click.echo(cim_object)
             else:
-                assert False, "Output_format {} invalid for {}".format(
-                    output_format, type(cim_object))
+                assert False, f"Output_format {output_format} invalid " \
+                              f"for {type(cim_object)}"
 
         except AttributeError:
             # no tocimxmlstr functionality
-            raise click.ClickException('Output Format {} not supported. '
-                                       'Default to\n{!r}'
-                                       .format(output_format, cim_object))
+            raise click.ClickException(
+                f'Output Format {output_format} not supported. '
+                f'Default to\n{cim_object!r}')
     elif output_format == 'repr':
         try:
             click.echo(repr(cim_object))
         except AttributeError:
-            raise click.ClickException('"repr" display of {!r} failed'
-                                       .format(cim_object))
+            raise click.ClickException(
+                f'"repr" display of {cim_object!r} failed')
 
     elif output_format == 'txt':
         try:
             click.echo(cim_object)
         except AttributeError:
-            raise click.ClickException('"txt" display of {!r} failed'
-                                       .format(cim_object))
+            raise click.ClickException(
+                f'"txt" display of {cim_object!r} failed')
     else:
-        raise click.ClickException('Invalid output format {}'
-                                   .format(output_format))
+        raise click.ClickException(f'Invalid output format {output_format}')
 
 
 class QualDeclWrapper():  # pylint: disable=too-few-public-methods
@@ -579,7 +577,7 @@ def _display_cim_objects_summary(context, objects, output_format):
             else:
                 row[cim_type_pos] = f"{row[cim_type_pos]}(s)"
             row[len_pos] = str(row[len_pos])
-            click.echo('{} returned'.format(" ".join(row)))
+            click.echo(f'{" ".join(row)} returned')
 
 
 #
@@ -686,8 +684,8 @@ def _display_paths_as_table(objects, table_width, table_format, namespace=None):
                 headers = ['host', 'namespace', 'class'] + \
                     [f"key=\n{kn}" for kn in inst_keys]
 
-                title = 'InstanceNames: {}{}'.format(inst_names[0].classname,
-                                                     table_number_str)
+                title = f'InstanceNames: {inst_names[0].classname}' \
+                        f'{table_number_str}'
 
                 # Generate multiple tables, one for each key_name and
                 # return local to this scope.
@@ -836,8 +834,7 @@ def _format_instances_as_rows(insts, max_cell_width, include_classnames=False,
 
                 # Cache value mappings for integer-typed properties
                 if INT_TYPE_PATTERN.match(prop.type) and context:
-                    vm_key = '{}.{}'.format(
-                        inst.classname.lower(), name.lower())
+                    vm_key = f'{inst.classname.lower()}.{name.lower()}'
                     try:
                         valuemapping = valuemappings[vm_key]
                     except KeyError:

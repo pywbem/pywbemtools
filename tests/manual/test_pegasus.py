@@ -68,8 +68,7 @@ class Base:
             match = re.search(regex, test_str)
             if match:
                 raise AssertionError(
-                    'Found in error search regex {}, str {}'.
-                    format(regex, test_str))
+                    f'Found in error search regex {regex}, str {test_str}')
 
     def assert_found(self, regex, test_str):
         """ Test of find regex on multiline string.
@@ -82,15 +81,13 @@ class Base:
             match = re.search(regex, test_str)
             if match is None:
                 raise AssertionError(
-                    'Failed search regex {}, str {}'.
-                    format(regex, test_str))
+                    f'Failed search regex {regex}, str {test_str}')
 
     @staticmethod
     def assert_success(exitcode, err):
         """Assert success"""
         assert exitcode == 0 and err == '', \
-            "Expected success; got exit code {} and stderr:\n{}". \
-            format(exitcode, err)
+            f"Expected success; got exit code {exitcode} and stderr:\n{err}"
 
 
 class TestClassGroup(Base):

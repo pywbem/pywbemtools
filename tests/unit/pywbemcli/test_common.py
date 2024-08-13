@@ -1610,8 +1610,7 @@ def test_sort_cimobjects(testcase, objects, exp_indexes):
     # order is incorrect.
     result_ids = [id(obj) for obj in result_objects]
     exp_ids = [id(objects[ix]) for ix in exp_indexes]
-    assert result_ids == exp_ids, "Ids misorder\n{}\n{}".format(result_ids,
-                                                                exp_ids)
+    assert result_ids == exp_ids, f"Ids misorder\n{result_ids}\n{exp_ids}"
 
 
 TESTCASES_SPLIT_ARRAY_VALUE = [

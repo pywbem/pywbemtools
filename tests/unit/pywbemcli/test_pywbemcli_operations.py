@@ -41,8 +41,11 @@ from ..utils import captured_output
 # pylint: disable=use-dict-literal
 
 OK = True
+RUN = True
 FAIL = False
 PDB = "pdb"
+
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
 
 PYWBEM_VERSION = packaging.version.parse(pywbem.__version__)
 
@@ -1120,41 +1123,37 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
             stdout_lines = []
         else:
             stdout_lines = captured.stdout.strip('\n').split('\n')
+        # pylint: disable=line-too-long
         assert len(stdout_lines) == len(exp_stdout_lines), \
             "Unexpected number of lines on stdout:\n" \
-            "Testcase: {}\n" \
-            "---- Actually: {} lines:\n{}" \
-            "---- Expected: {} lines (regexp):\n{}" \
-            "---- End\n". \
-            format(testcase.desc,
-                   len(stdout_lines),
-                   ''.join([ensure_unicode(ln) + '\n'
-                            for ln in stdout_lines]),
-                   len(exp_stdout_lines),
-                   ''.join([ensure_unicode(ln) + '\n'
-                            for ln in exp_stdout_lines]))
+            f"Testcase: {testcase.desc}\n" \
+            f"---- Actually: {len(stdout_lines)} lines:\n" \
+            f"{''.join([ensure_unicode(ln) + {EOL}for ln in stdout_lines])}" \
+            f"---- Expected: {len(exp_stdout_lines)} lines (regexp):\n" \
+            f"{''.join([ensure_unicode(ln) + {EOL}for ln in exp_stdout_lines])}" \
+            "---- End\n"  # noqa E501
+        # pylint: enable=line-too-long
+
         for i, regexp in enumerate(exp_stdout_lines):
             line = stdout_lines[i]
             assert re.search(regexp, line), \
-                "Unexpected line #{} on stdout:\n" \
-                "Testcase: {}\n" \
+                f"Unexpected line #{i + 1} on stdout:\n" \
+                f"Testcase: {testcase.desc}\n" \
                 "---- Actually:\n" \
-                "{}\n" \
+                f"{line}\n" \
                 "---- Expected (regexp):\n" \
-                "{}\n" \
-                "---- End\n". \
-                format(i + 1, testcase.desc, line, regexp)
+                f"{regexp}\n" \
+                "---- End\n"
     else:
         for regexp in exp_stdout_lines:
             assert re.search(regexp, captured.stdout), \
                 "Missing line on stdout:\n" \
-                "Testcase: {}\n" \
+                f"Testcase: {testcase.desc}\n" \
                 "---- Actual stdout:\n" \
-                "{}\n" \
+                f"{captured.stdout}\n" \
                 "---- Expected line (regexp):\n" \
-                "{}\n" \
-                "---- End\n". \
-                format(testcase.desc, captured.stdout, regexp)
+                f"{regexp}\n" \
+                "---- End\n"
 
     if captured.stderr == '':
         stderr_lines = []
@@ -1162,25 +1161,19 @@ def test_build_mockenv(testcase, test_mode, verbose, connections_file,
         stderr_lines = captured.stderr.strip('\n').split('\n')
     assert len(stderr_lines) == len(exp_stderr_lines), \
         "Unexpected number of lines on stderr:\n" \
-        "Testcase: {}\n" \
-        "---- Actually: {} lines:\n{}" \
-        "---- Expected: {} lines (regexp):\n{}" \
-        "---- End\n". \
-        format(testcase.desc,
-               len(stderr_lines),
-               ''.join([ensure_unicode(ln) + '\n'
-                        for ln in stderr_lines]),
-               len(exp_stderr_lines),
-               ''.join([ensure_unicode(ln) + '\n'
-                        for ln in exp_stderr_lines]))
+        f"Testcase: {testcase.desc}\n" \
+        f"---- Actually: {len(stderr_lines)} lines:\n" \
+        f"{''.join([ensure_unicode(ln) + EOL for ln in stderr_lines])}" \
+        f"---- Expected: {len(exp_stderr_lines)} lines (regexp):\n" \
+        f"{''.join([ensure_unicode(ln) + EOL for ln in exp_stderr_lines])}" \
+        "---- End\n"
     for i, regexp in enumerate(exp_stderr_lines):
         line = stderr_lines[i]
         assert re.search(regexp, line), \
-            "Unexpected line #{} on stderr:\n" \
-            "Testcase: {}\n" \
+            f"Unexpected line #{i + 1} on stderr:\n" \
+            f"Testcase: {testcase.desc}\n" \
             "---- Actually:\n" \
-            "{}\n" \
+            f"{line}\n" \
             "---- Expected (regexp):\n" \
-            "{}\n" \
-            "---- End\n". \
-            format(i + 1, testcase.desc, line, regexp)
+            f"{regexp}\n" \
+            "---- End\n"

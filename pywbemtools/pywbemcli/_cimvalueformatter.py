@@ -186,8 +186,8 @@ def _scalar_value_tomof(value, type, indent, maxline, line_pos=0, end_space=0,
         return _mofval(val, indent, maxline, line_pos, end_space)
     else:
         assert isinstance(value, float), \
-            "Scalar value of CIM type {} has invalid Python type {} " \
-            "for conversion to a MOF string".format(type, builtin_type(value))
+            f"Scalar value of CIM type {type} has invalid Python type " \
+            f"{builtin_type(value)} for conversion to a MOF string"
         val = repr(value)
         return _mofval(val, indent, maxline, line_pos, end_space)
 
@@ -438,9 +438,9 @@ def _mofstr(value, indent, maxline, line_pos, end_space, avoid_splits=False,
         # A safety check for endless loops
         assert value != saved_value, \
             "Endless loop in _mofstr() with state: " \
-            "mof_str={0}, value={1}, avl_len={2}, end_space={3}, " \
-            "split_pos={4} with maxline={5} input". \
-            format(''.join(mof), value, avl_len, end_space, split_pos, maxline)
+            f"mof_str={''.join(mof)}, value={value}, avl_len={avl_len}, " \
+            f"end_space={end_space}, " \
+            f"split_pos={split_pos} with maxline={maxline} input"
 
     mof_str = ''.join(mof)
     return mof_str, line_pos

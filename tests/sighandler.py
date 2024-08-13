@@ -18,6 +18,8 @@ import time
 
 SLEEP_TIME = 300
 
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
+
 
 def sigstr(signal_number):
     try:
@@ -32,8 +34,7 @@ class SignalIndication(Exception):
 
 def signal_handler(signal_number, frame):
     # pylint: disable=unused-argument
-    print("handler: Received signal {} ({})".
-          format(signal_number, sigstr(signal_number)))
+    print(f"handler: Received signal {signal_number} ({sigstr(signal_number)}")
     raise SignalIndication(
         f"signal {signal_number} ({sigstr(signal_number)})")
 
@@ -41,12 +42,12 @@ def signal_handler(signal_number, frame):
 def register_handler(signal_name, condition=True):
     if condition:
         signal_number = getattr(signal, signal_name)
-        print("main: Registering handler for signal {} ({}, {})".
-              format(signal_number, signal_name, sigstr(signal_number)))
+        print(f"main: Registering handler for signal {signal_number} "
+              f"({signal_name}, {sigstr(signal_number)})")
         signal.signal(signal_number, signal_handler)
 
 
-print("main: Python: {}".format(sys.version.replace('\n', '')))
+print(f"main: Python: {sys.version.replace(EOL, '')}")
 print(f"main: Platform: {sys.platform} / {platform.platform()}")
 print(f"main: Process: {os.getpid()}")
 register_handler('SIGINT')

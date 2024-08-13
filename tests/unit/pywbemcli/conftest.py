@@ -38,7 +38,7 @@ def default_connections_file_path():
 def save_default_connections_file(request):
     """
     Fixture that saves away an existing default connections file and its backup
-    file at the begin of a test session and restores them at the end of the
+    file at the begining of a test session and restores them at the end of the
     test session.
 
     This function is called once per test session (i.e. execution of the pytest

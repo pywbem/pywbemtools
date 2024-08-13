@@ -80,8 +80,7 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    DEFAULT_DEFAULT_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
             test='regex'
@@ -101,8 +100,7 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK1_FOO_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
             test='regex'
@@ -123,12 +121,11 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    DEFAULT_DEFAULT_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
             ],
             stderr=[
                 "CIM_ERR_INVALID_NAMESPACE.* Namespace does not exist in CIM "
-                "repository: ''{}'".format(MOCK1_FOO_NAMESPACE),
+                f"repository: ''{MOCK1_FOO_NAMESPACE}'",
             ],
             test='regex'
         ),
@@ -140,8 +137,7 @@ TEST_CASES = [
         None,
         dict(
             stdin=[
-                '-v -d {} class get {} --nq'.format(
-                    MOCK1_FOO_NAMESPACE, MOCK1_CLASS)
+                f'-v -d {MOCK1_FOO_NAMESPACE} class get {MOCK1_CLASS} --nq'
             ]
         ),
         dict(
@@ -149,8 +145,7 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK1_FOO_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
             test='regex'
@@ -165,8 +160,7 @@ TEST_CASES = [
         dict(
             general=['-d', 'bar'],
             stdin=[
-                '-v -d {} class get {} --nq'.format(
-                    MOCK1_FOO_NAMESPACE, MOCK1_CLASS)
+                f'-v -d {MOCK1_FOO_NAMESPACE} class get {MOCK1_CLASS} --nq'
             ]
         ),
         dict(
@@ -174,8 +168,7 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{MOCK1_FOO_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK1_FOO_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {MOCK1_FOO_NAMESPACE}:{MOCK1_CLASS}$",
                 f"^class {MOCK1_CLASS} {{$",
             ],
             test='regex'
@@ -189,8 +182,7 @@ TEST_CASES = [
         None,
         dict(
             stdin=[
-                '-v class get {} --nq -n {}'.format(
-                    MOCK1_CLASS, MOCK1_FOO_NAMESPACE)
+                f'-v class get {MOCK1_CLASS} --nq -n {MOCK1_FOO_NAMESPACE}'
             ]
         ),
         dict(
@@ -198,12 +190,11 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK1_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    DEFAULT_DEFAULT_NAMESPACE, MOCK1_CLASS),
+                f"^Creating class {DEFAULT_DEFAULT_NAMESPACE}:{MOCK1_CLASS}$",
             ],
             stderr=[
                 "CIM_ERR_INVALID_NAMESPACE.* Namespace does not exist in CIM "
-                "repository: ''{}'".format(MOCK1_FOO_NAMESPACE),
+                f"repository: ''{MOCK1_FOO_NAMESPACE}'",
             ],
             test='regex'
         ),
@@ -221,24 +212,21 @@ TEST_CASES = [
         dict(
             rc=1,
             stdout=[
-                "^Creating namespace {} .in mock support.".format(
-                    MOCK2_INTEROP_NAMESPACE),
+                f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
+                "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating namespace {} .in MOF compiler.".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating namespace {MOCK2_FOO_NAMESPACE} .in MOF compiler.",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
             ],
             stderr=[
-                "CIM_ERR_NOT_FOUND.: Class '{}' not found in namespace '{}'".
-                format(MOCK2_FOO_CLASS, DEFAULT_DEFAULT_NAMESPACE),
+                f"CIM_ERR_NOT_FOUND.: Class '{MOCK2_FOO_CLASS}' not found "
+                f"in namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
             ],
             test='regex'
         ),
@@ -255,18 +243,16 @@ TEST_CASES = [
         dict(
             rc=0,
             stdout=[
-                "^Creating namespace {} .in mock support.".format(
-                    MOCK2_INTEROP_NAMESPACE),
+                f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in "
+                "mock support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{MOCK2_FOO_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
             test='regex'
@@ -284,20 +270,17 @@ TEST_CASES = [
         dict(
             rc=0,
             stdout=[
-                "^Creating namespace {} .in mock support.".format(
-                    MOCK2_INTEROP_NAMESPACE),
+                f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
+                "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating namespace {} .in MOF compiler.".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating namespace {MOCK2_FOO_NAMESPACE} .in MOF compiler.",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
             test='regex'
@@ -312,25 +295,22 @@ TEST_CASES = [
         dict(
             general=['-d', 'bar'],
             stdin=[
-                '-v -d {} class get {} --nq'.format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS)
+                f'-v -d {MOCK2_FOO_NAMESPACE} class get {MOCK2_FOO_CLASS} --nq'
             ]
         ),
         dict(
             rc=0,
             stdout=[
-                "^Creating namespace {} .in mock support.".format(
-                    MOCK2_INTEROP_NAMESPACE),
+                f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
+                "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{MOCK2_FOO_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
             test='regex'
@@ -343,27 +323,23 @@ TEST_CASES = [
         None,
         dict(
             stdin=[
-                '-v class get {} --nq -n {}'.format(
-                    MOCK2_FOO_CLASS, MOCK2_FOO_NAMESPACE)
+                f'-v class get {MOCK2_FOO_CLASS} --nq -n {MOCK2_FOO_NAMESPACE}'
             ]
         ),
         dict(
             rc=0,
             stdout=[
-                "^Creating namespace {} .in mock support.".format(
-                    MOCK2_INTEROP_NAMESPACE),
+                f"^Creating namespace {MOCK2_INTEROP_NAMESPACE} .in mock "
+                "support.",
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{DEFAULT_DEFAULT_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating namespace {} .in MOF compiler.".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating namespace {MOCK2_FOO_NAMESPACE} .in MOF compiler.",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_FOO_CLASS} {{$",
             ],
             test='regex'
@@ -377,8 +353,8 @@ TEST_CASES = [
         None,
         dict(
             stdin=[
-                '-v -d {} class get {} --nq'.format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS)
+                f"-v -d {MOCK2_INTEROP_NAMESPACE} class get "
+                f"{MOCK2_INTEROP_CLASS} --nq"
             ]
         ),
         dict(
@@ -386,16 +362,13 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK2_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK2_INTEROP_NAMESPACE, MOCK2_INTEROP_CLASS),
+                f"^Creating class {MOCK2_INTEROP_NAMESPACE}:"
+                f"{MOCK2_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK2_FOO_MOF_FILE}",
                 f"^Target namespace '{MOCK2_INTEROP_NAMESPACE}'",
-                "^Switching target namespace to '{}'".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating namespace {} .in MOF compiler.".format(
-                    MOCK2_FOO_NAMESPACE),
-                "^Creating class {}:{}$".format(
-                    MOCK2_FOO_NAMESPACE, MOCK2_FOO_CLASS),
+                f"^Switching target namespace to '{MOCK2_FOO_NAMESPACE}'",
+                f"^Creating namespace {MOCK2_FOO_NAMESPACE} .in MOF compiler.",
+                f"^Creating class {MOCK2_FOO_NAMESPACE}:{MOCK2_FOO_CLASS}$",
                 f"^class {MOCK2_INTEROP_CLASS} {{$",
             ],
             test='regex'
@@ -409,8 +382,8 @@ TEST_CASES = [
         None,
         dict(
             stdin=[
-                '-v -d {} class get {} --nq'.format(
-                    MOCK3_INTEROP_NAMESPACE, MOCK3_INTEROP_CLASS)
+                f"-v -d {MOCK3_INTEROP_NAMESPACE} class get "
+                f"{MOCK3_INTEROP_CLASS} --nq"
             ]
         ),
         dict(
@@ -418,12 +391,11 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK3_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK3_INTEROP_NAMESPACE, MOCK3_INTEROP_CLASS),
+                f"^Creating class {MOCK3_INTEROP_NAMESPACE}:"
+                f"{MOCK3_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK3_FOO_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK3_INTEROP_NAMESPACE, MOCK3_FOO_CLASS),
+                f"^Creating class {MOCK3_INTEROP_NAMESPACE}:{MOCK3_FOO_CLASS}$",
                 f"^class {MOCK3_INTEROP_CLASS} {{$",
             ],
             test='regex'
@@ -445,12 +417,11 @@ TEST_CASES = [
             stdout=[
                 f"^Compiling file .*{MOCK3_INTEROP_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK3_INTEROP_NAMESPACE, MOCK3_INTEROP_CLASS),
+                f"^Creating class {MOCK3_INTEROP_NAMESPACE}:"
+                f"{MOCK3_INTEROP_CLASS}$",
                 f"^Compiling file .*{MOCK3_FOO_MOF_FILE}",
                 f"^Target namespace '{MOCK3_INTEROP_NAMESPACE}'",
-                "^Creating class {}:{}$".format(
-                    MOCK3_INTEROP_NAMESPACE, MOCK3_FOO_CLASS),
+                f"^Creating class {MOCK3_INTEROP_NAMESPACE}:{MOCK3_FOO_CLASS}$",
                 f"^class {MOCK3_INTEROP_CLASS} {{$",
             ],
             test='regex'

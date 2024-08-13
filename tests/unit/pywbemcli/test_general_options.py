@@ -1203,8 +1203,8 @@ TEST_CASES = [
                                 TEST_CONNECTIONS_FILE_DICT),
       'general': ['--server', 'http://initialserver', ],
       'stdin': ['-o table connection show',
-                '-v --connections-file {} -n blah connection list'.
-                format(TEST_CONNECTIONS_FILE_PATH),
+                f'-v --connections-file {TEST_CONNECTIONS_FILE_PATH} -n blah '
+                'connection list',
                 # Show that the original server is restored
                 'connection show']},
      {'stdout': ["| name | not-saved (current) |",     # Results, first cmd

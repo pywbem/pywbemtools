@@ -257,9 +257,8 @@ class AssociationShrub:
                 reference_instnames = [ri.path for ri in reference_instances]
                 ref_clns = {n.classname for n in reference_instnames}
                 warning_msg(
-                    'Option --assoc-name "{}" not found in associator names '
-                    '({})" from server'.format(self.assoc_class,
-                                               ", ".join(ref_clns)))
+                    f'Option --assoc-name "{self.assoc_class}" not found in '
+                    f'associator names ({", ".join(ref_clns)})" from server')
         else:
             reference_instnames = [ri.path for ri in reference_instances]
         return reference_instnames
@@ -322,8 +321,8 @@ class AssociationShrub:
             # Test for --role as valid role for this request and do warning.
             roles = list(self.instance_shrub)
             if tst_role not in [r.lower() for r in roles]:
-                warning_msg('Option --role ({}) not found in roles: ({}). '
-                            'Ignored'.format(self.role, ', '.join(roles)))
+                warning_msg(f"option --role ({self.role}) not found in roles: "
+                            f"({', '.join(roles)}). ")
             else:
                 # Remove any roles not defined in instance_shrub
                 remove_roles = [r for r in roles if r.lower() != tst_role]
@@ -458,8 +457,8 @@ class AssociationShrub:
 
                         disp_assoc_cln = assoc_cln
 
-                        key = "{}(ResultClass)({} insts)". \
-                            format(disp_assoc_cln, len(inst_names_tup))
+                        key = f"{disp_assoc_cln}(ResultClass)" \
+                              f"({len(inst_names_tup)} insts)"
 
                         # Build dictionary of associated instance names
                         assoc_clns_dict[key] = OrderedDict()
@@ -481,7 +480,7 @@ class AssociationShrub:
 
                 # Add the reference class element. Include namespace if
                 # different than conn default namespace
-                disp_ref_cln = "{}(AssocClass)". format(ref_cln)
+                disp_ref_cln = f"{ref_cln}(AssocClass)"
 
                 elementstree[disp_ref_cln] = rrole_dict
 
@@ -512,13 +511,15 @@ class AssociationShrub:
                 return len(iname_tuples)
 
             if ternary:
-                return "\n".join("{}(refinst:{})".format(
-                    self.to_wbem_uri_folded(t[0], max_len=max_len), t[1])
-                                 for t in iname_tuples)  # noqa E128
+                return "\n".join(
+                    "{}(refinst:{})".
+                    format(self.to_wbem_uri_folded(t[0], max_len=max_len),
+                           t[1])
+                           for t in iname_tuples)  # noqa E128
 
-            return "\n".join("{}".format(
-                self.to_wbem_uri_folded(t[0], max_len=max_len))
-                             for t in iname_tuples)  # noqa E128
+            return "\n".join("{}".format(self.to_wbem_uri_folded(
+                                         t[0], max_len=max_len))
+                                         for t in iname_tuples)  # noqa E128
 
         # Display shrub as table
         inst_hdr = "Assoc Inst Count" if summary else "Assoc Inst paths"
@@ -546,8 +547,8 @@ class AssociationShrub:
                                      assoc_cln,
                                      inst_col])
 
-        title = 'Shrub of {}: {}'.format(self.source_path,
-                                         'summary' if summary else 'paths')
+        rslt_type = 'summary' if summary else 'paths'
+        title = f"Shrub of {self.source_path}: {rslt_type}"
         return format_table(rows, headers, title, table_format=output_format)
 
     def build_assoc_name_tuples(self, assoc_inames, assoc_cln,
@@ -718,8 +719,8 @@ class AssociationShrub:
             # to the defining reference instance so the user can match
             # the instances to reference instances.
             if is_ternary:
-                iname_display = '{}(refinst:{})'.format(iname_display,
-                                                        inst_name_tuple.RefInst)
+                iname_display = \
+                    f'{iname_display}(refinst:{inst_name_tuple.RefInst})'
 
             # builds dict with empty value to be ascii_tree compatible
             modified_inames[iname_display] = OrderedDict()
@@ -818,6 +819,9 @@ class AssociationShrub:
             if refs:
                 rtn_roles[tst_role] = [r for r in roles if r != tst_role]
         if self.verbose:
-            print('ResultRoles: class={} ResultClass={} ResultRoles={}'
-                  .format(self.source_path.classname, ref_classname, rtn_roles))
+            click.echo(
+                f'ResultRoles: class={self.source_path.classname}  '
+                f'ResultClass={self.source_path.classname} '
+                f'ResultRoles={rtn_roles}')
+
         return rtn_roles

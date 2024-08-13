@@ -200,11 +200,11 @@ def validate_output_format(output_format, valid_format_groups,
             if name in valid_format_groups:
                 if valid_formats:
                     valid_formats += "; "
-                valid_formats += '{} formats: "({})"'.format(
-                    name, '", "'.join(fmt_list))
-        raise click.ClickException('Output format "{}" not allowed for this '
-                                   'command. Only {} allowed.'.
-                                   format(output_format, valid_formats))
+                valid_formats += f'{name} formats: "({", ".join(fmt_list)})'
+
+        raise click.ClickException(
+            f'Output format "{output_format}" not allowed for this '
+            f"command. Only {valid_formats} allowed.")
 
     assert output_format is None
 
@@ -328,8 +328,7 @@ def hide_empty_columns(headers, rows):
     # Remove empty rows
     len_hdr = len(headers)
     for row in rows:
-        assert len(row) == len_hdr, "row: {}\nhdrs: {}". \
-            format(row, headers)
+        assert len(row) == len_hdr, f"row: {row}\nhdrs: {headers}"
     for column in range(len(headers) - 1, -1, -1):
         if column_is_empty(rows, column):
             if isinstance(headers, tuple):
@@ -413,8 +412,7 @@ def format_table(rows, headers, title=None, table_format='simple',
     if table_format == 'table':
         table_format = 'psql'
     if not output_format_is_table(table_format):
-        raise click.ClickException('Invalid table format {}.'
-                                   .format(table_format))
+        raise click.ClickException(f'Invalid table format {table_format}.')
 
     # Required because tabulate applies an internally defined format
     # when floatfmt not defined.

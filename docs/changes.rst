@@ -173,6 +173,9 @@ Released: 2024-04-20
 * Changed the format of the README and README_PYPI files from RST to Markdown,
   to address formatting issues with badges on the Github site (issue #1376).
 
+* Changed string formatting statements (ex. click.echo, click.ClickException,
+  etc.) to use f-string formating as much as is logical rather than .format(...).
+
 
 pywbemtools 1.2.0
 -----------------

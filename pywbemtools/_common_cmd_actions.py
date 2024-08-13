@@ -115,12 +115,10 @@ def help_subjects_action(obj, subject, help_subjects_dict):
 
     # If multiple matches, return summary of all that match
     if len(partial_subjects) > 1:
-        title = "{0} Input: `{1}` matches multiple subjects:` `{2}`". \
-            format(minimum_subjects_table_title,
-                   subject, ', '.join(partial_subjects))
+        title = f"{minimum_subjects_table_title} Input: `{subject}` " \
+                f"matches multiple subjects:` `{', '.join(partial_subjects)}`"
 
         return get_subjects_summary_as_table(partial_subjects, obj, title)
 
-    raise click.ClickException("'{}' is not a valid help subject. "
-                               "Try commandd:'help' for list of subjects.".
-                               format(subject))
+    raise click.ClickException(f"'{subject}' is not a valid help subject. "
+                               "Try commandd:'help' for list of subjects.")

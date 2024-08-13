@@ -213,8 +213,7 @@ def rename_to_bak_fails(file1, file2):
     file ends with '.bak'.
     """
     if file2.endswith('.bak'):
-        raise OSError("Mocked failure: Cannot rename {} to {}".
-                      format(file1, file2))
+        raise OSError(f"Mocked failure: Cannot rename {file1} to {file2}")
     REAL_OS_RENAME(file1, file2)
 
 
@@ -224,8 +223,7 @@ def rename_from_tmp_fails(file1, file2):
     file ends with '.tmp'.
     """
     if file1.endswith('.tmp'):
-        raise OSError("Mocked failure: Cannot rename {} to {}".
-                      format(file1, file2))
+        raise OSError(f"Mocked failure: Cannot rename {file1} to {file2}")
     REAL_OS_RENAME(file1, file2)
 
 
@@ -233,8 +231,7 @@ def rename_fails(file1, file2):
     """
     Patch function replacing os.rename() that raises OSError.
     """
-    raise OSError("Mocked failure: Cannot rename {} to {}".
-                  format(file1, file2))
+    raise OSError(f"Mocked failure: Cannot rename {file1} to {file2}")
 
 
 @contextmanager
@@ -244,8 +241,9 @@ def open_text_file_write_fails(filename, file_mode):
     OSError when the file is opened in write mode.
     """
     if 'w' in file_mode:
-        raise OSError("Mocked failure: Cannot open {} in mode {}".
-                      format(filename, file_mode))
+        raise OSError(
+            f"Mocked failure: Cannot open {filename} in mode {file_mode}")
+
     # Delegate the context manager yield to REAL_OPEN_TEXT_FILE()
     return REAL_OPEN_TEXT_FILE(filename, file_mode)
 
@@ -257,8 +255,9 @@ def open_text_file_read_fails(filename, file_mode):
     OSError when the file is opened in read mode.
     """
     if 'r' in file_mode:
-        raise OSError("Mocked failure: Cannot open {} in mode {}".
-                      format(filename, file_mode))
+        raise OSError(
+            f"Mocked failure: Cannot open {filename} in mode {file_mode}")
+
     # Delegate the context manager yield to REAL_OPEN_TEXT_FILE()
     return REAL_OPEN_TEXT_FILE(filename, file_mode)
 

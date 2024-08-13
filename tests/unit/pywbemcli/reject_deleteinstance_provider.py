@@ -35,8 +35,7 @@ class CIM_Foo_sub_sub_RejectDeleteProvider(InstanceWriteProvider):
         """
         raise CIMError(
             CIM_ERR_FAILED,
-            "Deletion of {} instances is rejected".
-            format(self.provider_classnames))
+            f"Deletion of {self.provider_classnames} instances is rejected")
 
 
 def setup(conn, server, verbose):

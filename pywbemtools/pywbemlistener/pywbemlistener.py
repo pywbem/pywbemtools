@@ -77,27 +77,26 @@ CONTEXT_SETTINGS = {
               help="Enable logging of the 'pywbemlistener run' command output "
                    "to a file in a log directory. The file will be named "
                    "'pywbemlistener_NAME.log' where NAME is the listener "
-                   "name. Default: EnvVar {ev}, or no logging.".
-                   format(ev=_config.PYWBEMLISTENER_LOGDIR_ENVVAR))
+                   "name. Default: EnvVar "
+                   f"{_config.PYWBEMLISTENER_LOGDIR_ENVVAR}, or no logging.")
 @click.option('-v', '--verbose', count=True,
               help='Verbosity level. Can be specified multiple times: '
-                   '-v: {}; -vv: {}.'.
-              format(_config.VERBOSE_1_HELP, _config.VERBOSE_2_HELP))
+                   f'-v: {_config.VERBOSE_1_HELP}; '
+                   f'-vv: {_config.VERBOSE_2_HELP}.')
 @click.option('--pdb', is_flag=True,
               default=False,
               envvar=_config.PYWBEMLISTENER_PDB_ENVVAR,
               help='Pause execution in the built-in pdb debugger just before '
                    'executing the command within pywbemlistener. '
-                   'Default: EnvVar {ev}, or no debugger.'.
-                   format(ev=_config.PYWBEMLISTENER_PDB_ENVVAR))
+                   f'Default: EnvVar {_config.PYWBEMLISTENER_PDB_ENVVAR}, or '
+                   'no debugger.')
 @click.option('--warn', is_flag=True,
               default=False,
               help='Enable display of all Python warnings. '
                    'Default: Leave warning control to the PYTHONWARNINGS '
                    'EnvVar, which by default displays no warnings.')
 @click.version_option(
-    message='%(prog)s, version %(version)s\npywbem, version {}'.format(
-        pywbem_version),
+    message=f'%(prog)s, version %(version)s\npywbem, version {pywbem_version}',
     help='Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
@@ -140,9 +139,8 @@ def cli(ctx, output_format, logdir, verbose, pdb, warn):
     ctx.obj = ContextObj(output_format, logdir, verbose, pdb, warn)
 
     _python_nm = sys.version_info[0:2]
-    if _python_nm in ((2, 7),):
-        pywbemtools_warn(
-            "Pywbemlistener support for Python {}.{} is deprecated and will be "
-            "removed in a future version".
-            format(_python_nm[0], _python_nm[1]),
-            DeprecationWarning)
+    if _python_nm in ((2, 7),):  # TODO:  py 2.7 warning should be removed
+        pywbemtools_warn("Pywbemlistener support for Python "
+                         f"{_python_nm[0]}.{_python_nm[1]} is deprecated "
+                         "and will be removed in a future version",
+                         DeprecationWarning)

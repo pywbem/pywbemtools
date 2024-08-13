@@ -765,14 +765,14 @@ def cmd_class_find(context, classname_glob, options):
 
             if output_format_is_table(context.output_format):
                 headers = ['Namespace', 'Class count']
-                click.echo(format_table(rows,
-                                        headers,
-                                        title='Find class counts {}'.
-                                        format(classname_glob),
-                                        table_format=output_format))
+                click.echo(format_table(
+                    rows,
+                    headers,
+                    title=f'Find class counts {classname_glob}',
+                    table_format=output_format))
             else:
                 for ns, count in rows:
-                    click.echo('  {}: {}'. format(ns, count))
+                    click.echo(f'  {ns}: {count}')
             return
 
         # Not summary. Build rows of namespace, classname for each namespace
@@ -909,21 +909,22 @@ def cmd_class_delete(context, classname, options):
             ClassName=classname, namespace=namespace)
     except Error as exc:
         raise pywbem_error_exception(
-            exc, "Cannot enumerate instance names of class {} in "
-            "namespace {}".format(classname, namespace))
+            exc,
+            f"Cannot enumerate instance names of class {classname} in "
+            f"namespace {namespace}")
 
     if instnames and not include_instances:
         raise click.ClickException(
-            "Cannot delete class {} because it has {} instances".
-            format(classname, len(instnames)))
+            f"Cannot delete class {classname} because it has "
+            f"{len(instnames)} instances")
 
     depending_cln_list = depending_classnames(
         classname, namespace, conn)
 
     if depending_cln_list:
         raise click.ClickException(
-            "Cannot delete class {} because these classes depend on it: {}".
-            format(classname, ', '.join(depending_cln_list)))
+            f"Cannot delete class {classname} because these classes "
+            f"depend on it: {', '.join(depending_cln_list)}")
 
     context.spinner_stop()
     if include_instances:
@@ -941,6 +942,6 @@ def cmd_class_delete(context, classname, options):
             conn.DeleteClass(classname)
         except Error as exc:
             raise pywbem_error_exception(
-                exc, "Cannot delete class {} in namespace {}".
-                format(classname, namespace))
+                exc,
+                f"Cannot delete class {classname} in namespace {namespace}")
     click.echo(f'{dry_run_prefix}Deleted class {classname}')

@@ -84,6 +84,8 @@ USE_PULL_CHOICE = {'either': None, 'yes': True, 'no': False, 'default': None}
 # command before the current command in some cases.
 PREV_LOG_OPTION = None
 
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
+
 # OUTPUT_FORMATS must be
 OUTPUT_FORMATS_OPTION = list(OUTPUT_FORMATS)
 OUTPUT_FORMATS_OPTION.append("")
@@ -115,8 +117,8 @@ def disp_ctx_params(ctx, param, incomplete, verbose=False):
     Display parameters used in the call to a completion function
     """
     if verbose:
-        debug_log("ctx attrs:{0}\nparam:  {1}\n incomplete:  {2}".
-                  format(get_ctx_attrs(ctx), param, incomplete))
+        debug_log(f"ctx attrs:{get_ctx_attrs(ctx)}\nparam: "
+                  f"{param}\n incomplete: {incomplete}")
 
 
 def get_ctx_attrs(ctx):
@@ -125,10 +127,9 @@ def get_ctx_attrs(ctx):
     is True. This is used to debug the completion functions since the terminal
     is already in use as a result of the tab.
     """
-    attrs = vars(ctx)
-    return '{}'.format(
-        '\n  '.join(f'{i}: {v}' for (i, v) in
-                    sorted(attrs.items())))
+    sorted_ctx_vars = \
+        '\n  '.join(f'{i}: {v}' for (i, v) in sorted(vars(ctx).items()))
+    return f'{sorted_ctx_vars}'
 
 
 ###########################################################################
@@ -164,8 +165,7 @@ def connection_name_completer(ctx, param, incomplete):
         # not-existent file.
         if not connections_repo.file_exists():
             raise ConnectionsFileError(
-                "Connections file: '{}' does not exist.".
-                format(connections_file))
+                f"Connections file: '{connections_file}' does not exist.")
 
         # Returns list of click CompletionItems from list of keys in
         # the repository.
@@ -174,8 +174,8 @@ def connection_name_completer(ctx, param, incomplete):
 
     except ConnectionsFileError as cfe:
         pywbemtools_warn(
-            "Connection file: {0},  Fatal Error: {1}: {2}.".
-            format(connections_file, cfe.__class__.__name__, cfe),
+            f"Connection file: {connections_file},  "   # FIXIT: drop one space
+            f"Fatal Error: {cfe.__class__.__name__}: {cfe}.",
             TabCompletionError)
         return ""
 
@@ -205,14 +205,11 @@ def _validate_connection_name(connections_repo, connection_name):
 
     except KeyError:
         raise click.ClickException(
-            'Connection definition "{}" not found in connections '
-            'file "{}"'.
-            format(connection_name, connections_repo.connections_file))
+            f'Connection definition "{connection_name}" not found in '
+            f'connections file "{connections_repo.connections_file}"')
 
     except ConnectionsFileError as cfe:
-        click.echo('Fatal error: {0}: {1}'.
-                   format(cfe.__class__.__name__, cfe),
-                   err=True)
+        click.echo(f'Fatal error: {cfe.__class__.__name__}: {cfe}', err=True)
         raise click.Abort()
 
 
@@ -224,13 +221,12 @@ def _validate_connections_file(connections_repo, abort=False):
     """
     if not connections_repo.file_exists():
         if abort:
-            click.echo('Connections file does not exist: {}'.format(
-                connections_repo.connections_file), err=True)
+            click.echo("Connections file does not exist: "
+                       f"{connections_repo.connections_file}", err=True)
             raise click.Abort()
 
-        raise click.ClickException(
-            'Connections file does not exist: {}'.format(
-                connections_repo.connections_file))
+        raise click.ClickException("Connections file does not exist: "
+                                   f"{connections_repo.connections_file}")
 
 
 def _execute_startup_script(file_path, verbose):
@@ -245,11 +241,9 @@ def _execute_startup_script(file_path, verbose):
     ext = os.path.splitext(file_path)[1]
     if ext not in ['.py']:
         raise click.ClickException(
-            "File '{}' has invalid suffix '{}' "
-            "- must be '.py'".format(file_path, ext))
+            f"File '{file_path}' has invalid suffix '{ext}' - must be '.py'")
     if not os.path.isfile(file_path):
-        raise click.ClickException(
-            f"File '{file_path}' does not exist")
+        raise click.ClickException(f"File '{file_path}' does not exist")
 
     # Errors in executing the file cause abort
     with open(file_path, encoding='utf-8') as fp:
@@ -267,9 +261,9 @@ def _execute_startup_script(file_path, verbose):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             tb = traceback.format_exception(exc_type, exc_value, exc_traceback)
             click.echo(
-                "Python  script '{}' defined by env var "
-                "PYWBEMCLI_STARTUP_ENVVAR failed:\n{}"
-                .format(file_path, "\n".join(tb)), err=True)
+                f"Python  script '{file_path}' defined by env var "
+                f"PYWBEMCLI_STARTUP_ENVVAR failed:\n{EOL.join(tb)}",
+                err=True)
             raise click.Abort()
 
 
@@ -301,8 +295,8 @@ def _resolve_mock_server(mock_server):
         ext = os.path.splitext(file_path)[1]
         if ext not in ['.py', '.mof']:
             raise click.ClickException(
-                "Mock file '{}' has invalid suffix '{}' "
-                "- must be '.py' or '.mof'".format(file_path, ext))
+                f"Mock file '{file_path}' has invalid suffix '{ext}' "
+                "- must be '.py' or '.mof'")
         if not os.path.isfile(file_path):
             raise click.ClickException(
                 f"Mock file '{file_path}' does not exist")
@@ -357,14 +351,11 @@ def _get_default_connection(connections_repo, verbose):
                     connections_repo:
                 connections_repo.default_connection_name = None
                 raise click.ClickException(
-                    'Default connection name: "{}" not found in '
-                    'connections file "{}"; default connection '
-                    'name cleared.'.
-                    format(connection_name,
-                           connections_repo.connections_file))
+                    f'Default connection name: "{connection_name}" not found '
+                    f'in connections file "{connections_repo.connections_file}"'
+                    'default connection name cleared.')
             if verbose:
-                click.echo('Current connection: "{}"'
-                           .format(connection_name))
+                click.echo(f'Current connection: "{connection_name}"')
             return connection_name
 
         # returns no if there is no file
@@ -372,8 +363,7 @@ def _get_default_connection(connections_repo, verbose):
 
     # Account for other exception from file access
     except ConnectionsFileError as cfc:
-        click.echo("{}, {}". format(cfc.__class__.__name__, cfc),
-                   err=True)
+        click.echo(f"{cfc.__class__.__name__}, {cfc}", err=True)
         raise click.Abort()
 
 
@@ -392,12 +382,12 @@ def _validate_server_only_options(pywbem_server, user, password, timeout,
             opt_names = ["--user", "--password", "--timeout",
                          "--verify", "--certfile", "--keyfile",
                          "--ca_certs"]
-            errors = [opt_names[c] for c, i in enumerate(opts) if i]
+
+            j_errs = ", ".join([opt_names[c] for c, i in enumerate(opts) if i])
             raise click.ClickException(
-                "General option(s): ({0}) not allowed when using a mock "
-                "server. This can happen when defining a mock server with "
-                "general options '--name', or ""'--mock-server'".
-                format(", ".join(errors)))
+                f"General option(s): ({j_errs}) not allowed when "
+                "using a mock server. This can happen when defining a mock "
+                "server with general options '--name', or '--mock-server'")
 
 
 def _create_server_instance(
@@ -514,8 +504,7 @@ def _create_server_instance(
                    'definition NAME. '
                    'This option is mutually exclusive with the --server and '
                    '--mock-server options, since each defines a WBEM server. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_NAME_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_NAME_ENVVAR}, or none.')
 @click.option('-m', '--mock-server', multiple=True,
               type=click.Path(exists=True, dir_okay=False),
               metavar="FILE",
@@ -532,8 +521,7 @@ def _create_server_instance(
                    'This option may be specified multiple times, and is '
                    'mutually exclusive with the --server and --name options, '
                    'since each defines a WBEM server. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_MOCK_SERVER_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_MOCK_SERVER_ENVVAR}, or none.')
 @click.option('-s', '--server', type=str, metavar='URL',
               # defaulted in code
               cls=MutuallyExclusiveOption,
@@ -548,31 +536,28 @@ def _create_server_instance(
                    'PORT defaults to 5989 for https and 5988 for http. '
                    'This option is mutually exclusive with the --mock-server '
                    'and --name options, since each defines a WBEM server. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_SERVER_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_SERVER_ENVVAR}, or none.')
 @click.option('-u', '--user', type=str, metavar='TEXT',
 
               default=None,  # There is no default value
               envvar=PYWBEMCLI_USER_ENVVAR,
               help='User name for the WBEM server.  Use "" to set default in '
                    'interactive mode.'
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_USER_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_USER_ENVVAR}, or none.')
 @click.option('-p', '--password', type=str, metavar='TEXT',
               default=None,  # There is not default value
               envvar=PYWBEMCLI_PASSWORD_ENVVAR,
               help='Password for the WBEM server. '
-                   'Default: EnvVar {ev}, or prompted for if --user '
-                   'specified. Use "" to set default in interactive mode.'.
-                   format(ev=PYWBEMCLI_PASSWORD_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_PASSWORD_ENVVAR}, or prompted '
+                   'for if --user specified. Use "" to set default in '
+                   'interactive mode.')
 @click.option('--verify/--no-verify', 'verify', default=None,
               # defaulted in code
               envvar=PYWBEMCLI_VERIFY_ENVVAR,
               help='If --verify, client verifies the X.509 server '
                    'certificate presented by the WBEM server during TLS/SSL '
                    'handshake. If --no-verify client bypasses verification. '
-                   'Default: EnvVar {ev}, or "--verify".'.
-                   format(ev=PYWBEMCLI_VERIFY_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_VERIFY_ENVVAR}, or "--verify".')
 @click.option('--ca-certs',
               type=str,
               metavar="CACERTS",
@@ -585,11 +570,10 @@ def _create_server_instance(
                    'directory; '
                    '"certifi" (pywbem 1.0 or later): Use the certs provided '
                    'by the certifi Python package; '
-                   'Default: EnvVar {ev}, or "certifi" (pywbem 1.0 or later), '
-                   'or the certs in the PEM files in the first existing '
-                   'directory from from a system defined list of directories '
-                   '(pywbem before 1.0).'.
-                   format(ev=PYWBEMCLI_CA_CERTS_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_CA_CERTS_ENVVAR}, or "certifi" '
+                   '(pywbem 1.0 or later), or the certs in the PEM files in '
+                   'the first existing directory from from a system defined '
+                   'list of directories (pywbem before 1.0).')
 @click.option('-c', '--certfile',
               # Ignore missing file. Issue caught in cim_operations
               type=click.Path(exists=False, dir_okay=False),
@@ -601,8 +585,7 @@ def _create_server_instance(
                    'authentication by presenting the certificate to the '
                    'WBEM server during TLS/SSL handshake.  Use "" to set '
                    'default in interactive mode. '
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_CERTFILE_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_CERTFILE_ENVVAR}, or none.')
 @click.option('-k', '--keyfile',
               # Ignore missing file. Issue caught later
               type=click.Path(exists=False, dir_okay=False),
@@ -614,8 +597,7 @@ def _create_server_instance(
                    'Not required if the private key is part of the '
                    '--certfile file. Use "" to set default in interactive '
                    'mode.'
-                   'Default: EnvVar {ev}, or none.'.
-                   format(ev=PYWBEMCLI_KEYFILE_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_KEYFILE_ENVVAR}, or none.')
 @click.option('-t', '--timeout', type=click.IntRange(0, MAX_TIMEOUT),
               metavar='INT',
               # defaulted in code
@@ -623,11 +605,10 @@ def _create_server_instance(
               help='Client-side timeout (seconds) on data read for '
                    'operations with the WBEM server. This integer is the '
                    'timeout for a single server request. Pywbem retries '
-                   'reads {rt} times so the delay for read timeout failure '
-                   'may be multiple times the timeout value.'
-                   'Default: EnvVar {ev}, or {default}. Min/max: '.
-                   format(rt=HTTP_READ_RETRIES, ev=PYWBEMCLI_TIMEOUT_ENVVAR,
-                          default=DEFAULT_CONNECTION_TIMEOUT))
+                   f'reads {HTTP_READ_RETRIES} times so the delay for read '
+                   'timeout failure may be multiple times the timeout value.'
+                   f'Default: EnvVar {PYWBEMCLI_TIMEOUT_ENVVAR}, or '
+                   f'{DEFAULT_CONNECTION_TIMEOUT}. Min/max: ')
 @click.option('-U', '--use-pull', type=click.Choice(USE_PULL_OPTIONS),
               # defaulted in code
               envvar=PYWBEMCLI_USE_PULL_ENVVAR,
@@ -639,8 +620,7 @@ def _create_server_instance(
                    '"no" uses traditional operations; '
                    '"either" (default) uses pull operations if supported by '
                    'the server, and otherwise traditional operations. '
-                   'Default: EnvVar {ev}, or "either".'.
-                   format(ev=PYWBEMCLI_USE_PULL_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_USE_PULL_ENVVAR}, or "either".')
 @click.option('--pull-max-cnt', type=int, metavar='INT',
               # defaulted in code
               help='Maximum number of instances to be returned by the WBEM '
@@ -648,26 +628,23 @@ def _create_server_instance(
                    'are used. '
                    'This is a tuning parameter that does not affect the '
                    'external behavior of the commands. '
-                   'Default: EnvVar {ev}, or {default}'.
-                   format(ev=PYWBEMCLI_PULL_MAX_CNT_ENVVAR,
-                          default=DEFAULT_MAXPULLCNT))
+                   f'Default: EnvVar {PYWBEMCLI_PULL_MAX_CNT_ENVVAR}, or '
+                   f'{DEFAULT_MAXPULLCNT}')
 @click.option('-T', '--timestats/--no-timestats',
               default=None,
               envvar=PYWBEMCLI_TIMESTATS_ENVVAR,
               help='Display operation time statistics gathered by pywbemcli '
               'after each command. Otherwise statistics can be displayed with '
               '"statistics show" command. '
-              'Default: EnvVar {ev}, or no-timestats.'.
-              format(ev=PYWBEMCLI_TIMESTATS_ENVVAR))
+              f'Default: EnvVar {PYWBEMCLI_TIMESTATS_ENVVAR}, or no-timestats.')
 @click.option('-d', '--default-namespace', type=str, metavar='NAMESPACE',
               default=None,  # default value set in cli function
               envvar=PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR,
               help='Default namespace, to be used when commands do not '
                    'specify the --namespace command option. Use "" to set '
                    'default in interactive mode. '
-                   'Default: EnvVar {ev}, or {default}.'.
-                   format(ev=PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR,
-                          default=DEFAULT_NAMESPACE))
+                   f'Default: EnvVar {PYWBEMCLI_DEFAULT_NAMESPACE_ENVVAR}, '
+                   f'or {DEFAULT_NAMESPACE}.')
 @click.option('-o', '--output-format', metavar='FORMAT',
               default=None,  # There is no default value
               type=click.Choice(OUTPUT_FORMATS_OPTION),
@@ -714,13 +691,12 @@ def _create_server_instance(
               # Keep help text in sync with connections file definitions in
               # _connection_repository.py:
               help='Path name of the connections file to be used. '
-                   'Default: EnvVar {ev}, or "{cf}" in the user\'s home '
+                   f'Default: EnvVar {PYWBEMCLI_CONNECTIONS_FILE_ENVVAR}, '
+                   f'or "{CONNECTIONS_FILENAME}" in the user\'s home '
                    'directory (as determined using Python\'s '
                    'os.path.expanduser("~"). See there for details, '
                    'particularly for Windows). Use "" to set default '
-                   'in interactive mode. '.
-                   format(cf=CONNECTIONS_FILENAME,
-                          ev=PYWBEMCLI_CONNECTIONS_FILE_ENVVAR))
+                   'in interactive mode.')
 @click.option('--pdb', is_flag=True,
               # defaulted in code
               envvar=PYWBEMCLI_PDB_ENVVAR,
@@ -728,11 +704,9 @@ def _create_server_instance(
                    'executing the command within pywbemcli. Ignored in '
                    'interactive mode, but can be specified on each '
                    'interactive command. '
-                   'Default: EnvVar {ev}, or false.'.
-                   format(ev=PYWBEMCLI_PDB_ENVVAR))
+                   f'Default: EnvVar {PYWBEMCLI_PDB_ENVVAR}, or false.')
 @click.version_option(
-    message='%(prog)s, version %(version)s\npywbem, version {}'.format(
-        pywbem_version),
+    message=f'%(prog)s, version %(version)s\npywbem, version {pywbem_version}',
     help='Show the version of this command and the pywbem package.')
 @add_options(help_option)
 @click.pass_context
@@ -791,8 +765,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
 
     if keyfile and not certfile:
         raise click.ClickException(
-            'The --keyfile option "{}" is allowed only if the --certfile '
-            'option is also used'.format(keyfile))
+            f'The --keyfile option "{keyfile}" is allowed only if the '
+            '--certfile option is also used')
 
     # If this env variable is set, execute the file defined by variable.
     # This is private and to be used to preload test scripts for pywbemcli
@@ -810,8 +784,8 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
     if pull_max_cnt is not None:
         if pull_max_cnt < 1:
             raise click.ClickException(
-                'The --pull_max_cnt option value must be gt 1: "{}" received.'.
-                format(pull_max_cnt))
+                'The --pull_max_cnt option value must be gt 1: '
+                f'"{pull_max_cnt}" received.')
     resolved_pull_max_cnt = pull_max_cnt or DEFAULT_MAXPULLCNT
 
     resolved_timeout = timeout or DEFAULT_CONNECTION_TIMEOUT
@@ -1064,12 +1038,12 @@ def cli(ctx, server, connection_name, default_namespace, user, password,
         display_click_context(ctx, msg="DIAGNOSTICS-NEWCTX: Initial context:",
                               display_attrs=True)
 
+    # FIXIT Remove this since py 2.7
     _python_nm = sys.version_info[0:2]
     if _python_nm in ((2, 7),):
         pywbemtools_warn(
-            "Pywbemcli support for Python {}.{} is deprecated and will be "
-            "removed in a future version".
-            format(_python_nm[0], _python_nm[1]),
+            f"Pywbemcli support for Python {_python_nm[0]}.{_python_nm[1]} is "
+            "deprecated and will be removed in a future version",
             DeprecationWarning)
 
     # If no invoked_subcommand, there is no command to execute this flag
@@ -1136,9 +1110,8 @@ def repl(ctx):
 
     if not ctx.obj.connections_repo.file_exists():
         pywbemtools_warn(
-            "Connections file: '{}' does not exist. Server and connection "
-            "commands will not work.".
-            format(ctx.obj.connections_repo.connections_file),
+            f"Connections file: '{ctx.obj.connections_repo.connections_file}' "
+            "does not exist. Server and connection commands will not work.",
             InvalidConnectionFile, stacklevel=0)
 
     prompt_kwargs = {

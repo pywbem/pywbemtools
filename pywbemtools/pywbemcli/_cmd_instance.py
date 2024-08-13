@@ -560,8 +560,7 @@ def instance_invokemethod(context, instancename, methodname, **options):
 @click.option('--ql', '--query-language', 'query_language', type=str,
               metavar='QUERY-LANGUAGE', default=DEFAULT_QUERY_LANGUAGE,
               help='The query language to be used with --query. '
-              'Default: {default}.'.
-              format(default=DEFAULT_QUERY_LANGUAGE))
+              f'Default: {DEFAULT_QUERY_LANGUAGE}.')
 @add_options(namespace_option)
 @add_options(summary_option)
 @add_options(help_option)
@@ -886,9 +885,9 @@ def get_instancename(context, instancename, options, default_all_ns=False):
         if class_path.namespace:
             if options['namespace']:
                 raise click.ClickException(
-                    "Using --namespace option: {} conflicts with specifying "
-                    "namespace in INSTANCENAME: {}".format(options['namespace'],
-                                                           instancename))
+                    f"Using --namespace option: {options['namespace']} "
+                    "conflicts with specifying namespace in "
+                    f"INSTANCENAME: {instancename}")
 
     # If option is a tuple, expand option to get list of all namespaces
     # defined. Option may be multiple uses of the option and/or comma-separated
@@ -904,8 +903,7 @@ def get_instancename(context, instancename, options, default_all_ns=False):
         if options['key']:
             raise click.ClickException(
                 "Using the --key option conflicts with specifying a "
-                "wildcard keybinding in INSTANCENAME: {}".
-                format(instancename))
+                f"wildcard keybinding in INSTANCENAME: {instancename}")
 
         class_uri = instancename[:-2]
         try:
@@ -975,7 +973,7 @@ def get_instancename(context, instancename, options, default_all_ns=False):
         except ValueError as exc:
             raise click.ClickException(str(exc))
 
-        instancename_kb = "{}.{}".format(instancename, ','.join(kb_strs))
+        instancename_kb = f"{instancename}.{','.join(kb_strs)}"
 
         try:
             instance_path = CIMInstanceName.from_wbem_uri(instancename_kb)
@@ -1094,9 +1092,8 @@ def cmd_instance_create(context, classname, options):
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException(
-                'CIMClass: "{}" does not exist in namespace "{}" in WEB '
-                'server: {}.'.
-                format(classname, ns, conn))
+                f'CIMClass: "{classname}" does not exist in '
+                f'namespace "{ns}" in WEB server: {conn}.')
         raise pywbem_error_exception(ce)
 
     except Error as er:
@@ -1119,9 +1116,8 @@ def cmd_instance_create(context, classname, options):
         click.echo(f'{name}')
     except Error as er:
         raise click.ClickException(
-            'Server Error creating instance in namespace {}. Exception: '
-            '{}: {}'.
-            format(ns, er.__class__.__name__, er))
+            f'Server Error creating instance in namespace {ns}. Exception: '
+            f'{er.__class__.__name__}: {er}')
 
 
 def cmd_instance_modify(context, instancename, options):
@@ -1149,8 +1145,8 @@ def cmd_instance_modify(context, instancename, options):
     except CIMError as ce:
         if ce.status_code == CIM_ERR_NOT_FOUND:
             raise click.ClickException(
-                'CIMClass: {!r} does not exist in WEB server: {}'
-                .format(instancepath.classname, conn.url))
+                f'CIMClass: {instancepath.classname!r} does not exist in '
+                f'WEB server: {conn.url}')
 
         raise pywbem_error_exception(ce)
     except Error as er:
@@ -1253,8 +1249,9 @@ def enumerate_instances(conn, context, options, namespace, classname,
     except ValueError as ve:
         raise click.ClickException(
             'Instance enumerate failed because FilterQuery not allowed with '
-            'traditional EnumerateInstance. --use-pull: {}. Exception: {}: {}'
-            .format(context.pywbem_server.use_pull, ve.__class__.__name__, ve))
+            'traditional EnumerateInstance. '
+            f'--use-pull: {context.pywbem_server.use_pull}. '
+            f'Exception: {ve.__class__.__name__}: {ve}')
 
 
 def cmd_instance_enumerate(context, classname, options):
@@ -1345,9 +1342,9 @@ def cmd_instance_references(context, instancename, options):
         except ValueError as ve:
             raise click.ClickException(
                 'Instance references failed because FilterQuery not allowed '
-                'with traditional References. --use-pull {}. Exception: {}: {}'
-                .format(context.pywbem_server.use_pull, ve.__class__.__name__,
-                        ve))
+                'with traditional References. '
+                f'--use-pull {context.pywbem_server.use_pull}. '
+                f'Exception: {ve.__class__.__name__}: {ve}')
     results.display()
 
 
@@ -1407,10 +1404,9 @@ def cmd_instance_associators(context, instancename, options):
         except ValueError as ve:
             raise click.ClickException(
                 'Instance associators failed because FilterQuery not allowed '
-                'with traditional Associators. --use-pull: {}. Exception: {}: '
-                '{}'
-                .format(context.pywbem_server.use_pull, ve.__class__.__name__,
-                        ve))
+                'with traditional Associators. '
+                f'--use-pull: {context.pywbem_server.use_pull}. '
+                f'Exception: {ve.__class__.__name__}: {ve}')
 
     results.display()
 
@@ -1488,9 +1484,8 @@ def cmd_instance_count(context, classname, options):
         try:
             inst_names = conn.EnumerateInstanceNames(cln, namespace=ns)
         except CIMError as ce:
-            warning_msg("Server CIMError {} with namepace={}, class={}. "
-                        "Continuing scan."
-                        .format(ce.status_code_name, ns, cln))
+            warning_msg(f"Server CIMError {ce.status_code_name} with "
+                        f"namepace={ns}, class={cln}. Continuing scan.")
             display_tuple = (ns, cln, f"CIMError {ce.status_code_name}")
             display_data.append(display_tuple)
             continue
@@ -1498,9 +1493,8 @@ def cmd_instance_count(context, classname, options):
         # item to the display with Server Fail message instead of count
         except Error as er:
             error = er
-            warning_msg("Server Error {} with namepace={}, class={}. "
-                        "Terminating scan."
-                        .format(er, ns, cln))
+            warning_msg(f"Server Error {er} with namepace={ns}, class={cln}. "
+                        "Terminating scan.")
             display_tuple = (ns, cln, "Server Fail")
             display_data.append(display_tuple)
             continue
@@ -1533,8 +1527,8 @@ def cmd_instance_count(context, classname, options):
                             table_format=output_fmt))
     if error:
         raise click.ClickException(
-            "Server Error {} at namespace={}, class:{}. Scan incomplete."
-            .format(error, ns, cln))
+            f"Server Error {error} at namespace={ns}, class:{cln}. "
+            "Scan incomplete.")
 
 
 def cmd_instance_query(context, query, options):

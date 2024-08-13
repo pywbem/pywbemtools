@@ -421,9 +421,9 @@ class BuildMockenvMixin:
                     or not os.path.isfile(depreg_pickle_file) \
                     or not os.path.isfile(md5_file):
                 if verbose:
-                    click.echo("Mock environment for connection definition "
-                               "'{}' will be built because it was not cached.".
-                               format(connection_name))
+                    click.echo(f"Mock environment for connection definition "
+                               f"'{connection_name}' will be built because it "
+                               "was not cached.")
                 need_rebuild = True
 
             try:
@@ -462,10 +462,10 @@ class BuildMockenvMixin:
                     cached_md5_value = fp.read()
                 if new_md5_value != cached_md5_value:
                     if verbose:
-                        click.echo("Mock environment for connection "
-                                   "definition '{}' is cached but will be "
-                                   "rebuilt because the mock files have "
-                                   "changed.".format(connection_name))
+                        click.echo(f"Mock environment for connection "
+                                   f"definition '{connection_name}' is cached "
+                                   "but will be rebuilt because the mock "
+                                   "files have changed.")
                     need_rebuild = True
 
             cache_it = True
@@ -474,9 +474,9 @@ class BuildMockenvMixin:
             # User-specified connections file used.
 
             if verbose:
-                click.echo("Mock environment for connection definition '{}' "
-                           "will be built because user-specified connections "
-                           "files are not cached.".format(connection_name))
+                click.echo("Mock environment for connection definition "
+                           f"'{connection_name}' will be built because "
+                           "user-specified connections files are not cached.")
             need_rebuild = True
             cache_it = False
 
@@ -484,9 +484,9 @@ class BuildMockenvMixin:
             # No connections file context.
 
             if verbose:
-                click.echo("Mock environment for connection definition '{}' "
-                           "will be built because no connections file is "
-                           "known.".format(connection_name))
+                click.echo("Mock environment for connection definition "
+                           f"'{connection_name}' will be built because "
+                           "connections file is unknown.")
             need_rebuild = True
             cache_it = False
 
@@ -496,8 +496,8 @@ class BuildMockenvMixin:
             except mockscripts.NotCacheable as exc:
                 if verbose:
                     click.echo("Mock environment for connection definition "
-                               "'{}' will be built because it is not "
-                               "cacheable: {}.".format(connection_name, exc))
+                               f"'{connection_name}' will be built because "
+                               f"it is not cacheable: {exc}.")
             else:
                 if connections_file and cache_it:
                     self._dump_mockenv(mockenv_pickle_file)
@@ -507,8 +507,8 @@ class BuildMockenvMixin:
                         fp.write(new_md5_value)
                     if verbose:
                         click.echo("Mock environment for connection "
-                                   "definition '{}' has been written to "
-                                   "cache.".format(connection_name))
+                                   f"definition '{connection_name}' has been "
+                                   "written to cache.")
         else:
             # When no rebuild is needed, there must have been a connections
             # file set.
@@ -517,13 +517,13 @@ class BuildMockenvMixin:
                 self._load_mockenv(mockenv_pickle_file, file_path_list)
                 if verbose:
                     click.echo("Mock environment for connection definition "
-                               "'{}' has been loaded from cache.".
-                               format(connection_name))
+                               f"'{connection_name}' has been loaded from "
+                               "cache.")
             except mockscripts.NotCacheable as exc:
                 if verbose:
                     click.echo("Mock environment for connection definition "
-                               "'{}' will be rebuilt because it is not "
-                               "cacheable: {}.".format(connection_name, exc))
+                               f"'{connection_name}' will be rebuilt because "
+                               f"it is not cacheable: {exc}.")
                 self._build_mockenv(server, file_path_list, verbose)
 
     def _build_mockenv(self, server, file_path_list, verbose):
@@ -565,11 +565,11 @@ class BuildMockenvMixin:
                     else:
                         # display file name.  Error text displayed already.
                         if isinstance(er, pywbem.MOFParseError):
-                            msg = "MOF compile failed: File: '{}'" \
-                                "(see above)".format(file_path)
+                            msg = f"MOF compile failed: File: '{file_path}'" \
+                                "(see above)"
                         else:  # not parse error, display exception
-                            msg = "MOF compile failed: File: {} " \
-                                "Error: {}".format(file_path, er)
+                            msg = f"MOF compile failed: File: '{file_path}' " \
+                                f"Error: {er}"
                     new_exc = mockscripts.MockMOFCompileError(msg)
                     new_exc.__cause__ = None
                     raise new_exc
@@ -703,7 +703,7 @@ class PYWBEMCLIFakedConnection(BuildMockenvMixin,
                                pywbem_mock.FakedWBEMConnection):
     """
     PyWBEMCLIFakedConnection subclass adds the methods added by
-    PYWBEMCLIConnectionMixin
+    PYWBEMCLIConnectionMixin and BuildMockenvMixin
     """
     def __init__(self, *args, **kwargs):
         """

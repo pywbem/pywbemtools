@@ -81,8 +81,8 @@ def resolve_propertylist(propertylist):
             if ',' in item:
                 if ' ' in item:
                     raise click.ClickException(
-                        "Spaces not allowed in comma-separated PropertyList: {}"
-                        .format(','.join(propertylist)))
+                        "Spaces not allowed in comma-separated PropertyList: "
+                        f"{','.join(propertylist)}")
                 pl.extend(item.split(','))
             else:
                 pl.append(item)
@@ -186,8 +186,8 @@ def pick_one_index_from_list(context, options, title, pick_always=None):
         click.echo(f'{index}: {str_}')
     max_option = len(options) - 1
     selection = None
-    msg = 'Input integer between 0 and {} or Ctrl-C to exit selection' \
-        .format(max_option)
+    msg = f'Input integer between 0 and {max_option} or Ctrl-C to exit ' \
+          f'selection'
 
     # Loop for valid user choice until valid choice made or selection aborted
     # by user
@@ -360,8 +360,8 @@ def pick_multiple_indexes_from_list(context, options, title):
             pass
         except KeyboardInterrupt:
             raise ValueError
-        click.echo('{} Invalid. Input integer between 0 and {}; hit enter to '
-                   'stop selection.'.format(selection, index))
+        click.echo(f"{selection} Invalid. Input integer between 0 and "
+                   f"{index}; hit enter to stop selection.")
 
 
 def is_classname(astring):
@@ -417,8 +417,8 @@ def filter_namelist(pattern, name_list, ignore_case=True):
         compiled_regex = re.compile(regex, flags)
 
     except Exception as ex:
-        raise click.ClickException('Regex compile error. Regex={}. Er: {}: {}'
-                                   .format(regex, ex.__class__.__name__, ex))
+        raise click.ClickException(f'Regex compile error. Regex={regex}. '
+                                   f'Er: {ex.__class__.__name__}: {ex}')
 
     new_list = [n for n in name_list for m in [compiled_regex.match(n)] if m]
 
@@ -608,9 +608,8 @@ def to_wbem_uri_folded(path, uri_format='standard', max_len=15):
             ret.append(str(value))
             ret.append('"')
         else:
-            raise TypeError(
-                "Invalid type {} in keybinding value: {}={}"
-                .format(type(value), key, value))
+            raise TypeError(f"Invalid type {type(value)} in "
+                            f"keybinding value: {key}={value}")
 
     return ensure_unicode(''.join(ret))
 
@@ -635,16 +634,15 @@ def parse_wbemuri_str(wbemuri_str, namespace=None):
         if instance_name.namespace and namespace:
             if instance_name.namespace != namespace:
                 raise click.ClickException('Conflicting namespaces between '
-                                           'wbemuri {} and option {}'
-                                           .format(instance_name.namespace,
-                                                   namespace))
+                                           f'wbemuri {instance_name.namespace} '
+                                           f'and option {namespace}')
         elif instance_name.namespace is None and namespace:
             instance_name.namespace = namespace
 
         return instance_name
     except ValueError as ve:
-        raise click.ClickException('Invalid wbem uri input {}. Error {}'
-                                   .format(wbemuri_str, ve))
+        raise click.ClickException(f'Invalid wbem uri input {wbemuri_str}. '
+                                   f'Error {ve}')
 
 
 def str_2_bool(value):
@@ -763,8 +761,8 @@ def create_ciminstance(cim_class, kv_properties):
         try:
             cl_prop = cim_class.properties[name]
         except KeyError:
-            raise click.ClickException('Property name "{}" not in class "{}".'
-                                       .format(name, cim_class.classname))
+            raise click.ClickException(f'Property name "{name}" not in class '
+                                       f'"{cim_class.classname}".')
 
         try:
             prop = create_cimproperty(cl_prop.type,
@@ -773,12 +771,10 @@ def create_ciminstance(cim_class, kv_properties):
                                       value_str)
             properties.append((name, prop))
         except ValueError as ex:
-            raise click.ClickException("Type mismatch property '{}' between "
-                                       "expected type='{}', array={} and input "
-                                       "value='{}'. Exception: {}"
-                                       .format(name, cl_prop.type,
-                                               cl_prop.is_array,
-                                               value_str, ex))
+            raise click.ClickException(
+                f"Type mismatch property '{name}' between "
+                f"expected type='{cl_prop.type}', array={cl_prop.is_array} and "
+                f"input value='{value_str}'. Exception: {ex}")
 
     new_inst = CIMInstance(cim_class.classname, properties=properties)
 
@@ -791,8 +787,7 @@ def compare_obj(obj1, obj2, msg):
     match or False if different
     """
     if obj1 != obj2:
-        click.echo('Obj Compare {}: compare mismatch:\n{!r}\n{!r}'
-                   .format(msg, obj1, obj2))
+        click.echo(f"Obj Compare {msg}: compare mismatch:\n{obj1!r}\n{obj2!r}")
         return False
     return True
 
@@ -812,9 +807,9 @@ def compare_instances(inst1, inst2):
         if inst1.properties == inst2.properties:
             return True
         if len(inst1.properties) != len(inst2.properties):
-            click.echo('Different number of properties {} vs {}\n{}\n{}'
-                       .format(len(inst1.properties), len(inst2.properties),
-                               inst1.keys(), inst2.keys()))
+            click.echo(
+                f'Different number of properties {len(inst1.properties)} '
+                f'vs {len(inst2.properties)}\n{inst1.keys()}\n{inst2.keys()}')
             return False
         keys1 = set(inst1.keys())
         keys2 = set(inst2.keys())
@@ -932,13 +927,12 @@ def process_invokemethod(context, objectname, methodname, namespace,
             name, value_str = parse_kv_pair(p)
             if name not in cim_method.parameters:
                 raise click.ClickException(
-                    "Method {} of class {} does not have a parameter {}".
-                    format(cim_method.name, classname, name))
+                    f"Method {cim_method.name} of class {classname} does not "
+                    f"have a parameter {name}")
 
             if name in params:
                 raise click.ClickException(
-                    "Method parameter {} specified multiple times".
-                    format(name))
+                    f"Method parameter {name} specified multiple times")
 
             cl_param = cim_method.parameters[name]
             is_array = cl_param.is_array
@@ -963,8 +957,7 @@ def process_invokemethod(context, objectname, methodname, namespace,
     cim_methods = cim_class.methods
     if methodname not in cim_methods:
         raise click.ClickException(
-            "Class {} does not have a method {}"
-            .format(classname, methodname))
+            f"Class {classname} does not have a method {methodname}")
     cim_method = cim_methods[methodname]
 
     params = create_params(classname, cim_method, parameters)
@@ -1055,8 +1048,7 @@ def sort_cimobjects(cim_objects):
                 key=lambda obj: obj.path.to_wbem_uri(format="canonical"))
         except AttributeError as exc:
             new_exc = ValueError(
-                "CIMInstance object in sort list has no 'path' set: {}".
-                format(exc))
+                f"CIMInstance object in sort list has no 'path' set: {exc}")
             new_exc.__cause__ = None
             raise new_exc
 
@@ -1068,8 +1060,8 @@ def sort_cimobjects(cim_objects):
     if isinstance(tst_obj, tuple):
         if not isinstance(tst_obj[0], CIMClassName) or \
                 not isinstance(tst_obj[1], CIMClass):
-            raise TypeError("Items of type tuple ({}, {}) cannot be sorted".
-                            format(type(tst_obj[0]), type(tst_obj[1])))
+            raise TypeError(f"Items of type tuple ({type(tst_obj[0])}, "
+                            f"{type(tst_obj[1])}) cannot be sorted")
         return sorted(cim_objects,
                       key=lambda tup: tup[0].to_wbem_uri(format="canonical"))
 
@@ -1105,8 +1097,8 @@ def parse_version_value(version_str, cln):
         if isinstance(new_value, list):
             new_value = ".".join([str(v) for v in new_value])
         pywbemtools_warn(
-            "Invalid Version qualifier value {}, class {}. {}. Set to "
-            "{}".format(version_str, cln, txt, new_value),
+            f"Invalid Version qualifier value {version_str}, class {cln}. "
+            f"{txt}. Set to {new_value}",
             ToleratedSchemaIssueWarning)
 
     try:

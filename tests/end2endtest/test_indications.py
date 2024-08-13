@@ -60,17 +60,17 @@ def exec_pywbemlistener_cmd(request_params, expected_rc=0, ignore_stderr=False,
         print(f"Listener startup result rc={rc}, stderr={stderr}")
 
     if expected_rc == 0:
-        assert rc == 0, "pywbemlistener failed: params={}, rc={}, stderr={}" \
-                        .format(request_params, rc, stderr)
+        assert rc == 0, f"pywbemlistener failed: params={request_params}, " \
+            f"{rc=}, {stderr=}"
         if not ignore_stderr:
             assert stderr == '', \
                 f"pywbemlistener stderr={stderr}, rc={rc}"
         return stdout
 
     # expected rc not 0
-    assert rc == expected_rc, "pywbemlistener failed: params={} failed " \
-                              "rc={}, stderr={} " \
-                              .format(request_params, rc, stderr)
+    assert rc == expected_rc, f"pywbemlistener failed: " \
+                              f"params={request_params} failed {rc=}, " \
+                              f"{stderr=} "
     return stderr
 
 
@@ -88,10 +88,11 @@ def execute_indication_test(
     The verbose flag adds a number of console outputs as the test proceeds.
     """
     if verbose:
-        print("Test for ind_dest_scheme={}, ind_dest_addr={}, "
-              "listener_scheme={}, listener_bind_addr{}, listener_port={}".
-              format(ind_dest_scheme, ind_dest_addr, listener_scheme,
-                     listener_bind_addr, listener_port))
+        print(f"Test for {ind_dest_scheme=}, "
+              f"{ind_dest_addr=}, "
+              f"{listener_scheme=}, "
+              f"{listener_bind_addr=}, "
+              f"{listener_port=}")
     filter_id = 'ofilter1'
     dest_id = 'odest1'
     test_result = None
@@ -100,12 +101,11 @@ def execute_indication_test(
     query = 'SELECT * from Test_IndicationProviderClass'
 
     if verbose:
-        print("Create subscription. svr_url={} "
-              "ind_dest_scheme={}, ind_dest_addr={}, listener_port={}, "
-              "destid={}, filterid={}, query={}, source_namespaces={}".
-              format(svr_url, ind_dest_scheme, ind_dest_addr,
-                     listener_port, dest_id, filter_id, query,
-                     source_namespaces))
+        print(f"Create subscription. svr_url={svr_url} "
+              f"ind_dest_scheme={ind_dest_scheme}, "
+              f"ind_dest_addr={ind_dest_addr}, listener_port={listener_port}, "
+              f"destid={dest_id}, filterid={filter_id}, "
+              f"query={query}, source_namespaces={source_namespaces}")
 
     create_indication_subscription(
         svr_url, ind_dest_scheme, ind_dest_addr,
@@ -125,9 +125,8 @@ def execute_indication_test(
         pass
 
     if verbose:
-        print("Create listener name={} port={} scheme={} indi-file={}".
-              format(listener_name, listener_port, listener_scheme,
-                     indication_count_file))
+        print(f"Create listener name={listener_name} port={listener_port} "
+              f"scheme={listener_scheme} indi-file={indication_count_file}")
 
     exec_pywbemlistener_cmd(['start', listener_name,
                              '--port', str(listener_port),
@@ -139,15 +138,16 @@ def execute_indication_test(
     exec_pywbemlistener_cmd(['list'], verbose=verbose)
 
     if verbose:
-        print("Debug Send invoke method for {} instances".
-              format(indication_send_count))
+        print(f"Debug Send invoke method for {indication_send_count} instances")
     result = exec_pywbemcli_cmd(
         ['-s', svr_url, '--no-verify', '--log', 'all', 'class',
          'invokemethod',
-         'Test_IndicationProviderClass', 'SendTestIndicationsCount',
-         '--namespace', source_namespaces,
-         '--parameter', "indicationSendCount={}".
-         format(indication_send_count)])
+         'Test_IndicationProviderClass',
+         'SendTestIndicationsCount',
+         '--namespace',
+         source_namespaces,
+         '--parameter',
+         f'indicationSendCount={indication_send_count}'])
 
     if verbose:
         print(f"Debug: invoke method result {result}")
@@ -198,36 +198,33 @@ def wait_for_indications(indication_send_count, indication_count_file,
         with open(indication_count_file, encoding='UTF-8') as fp:
             rcvd_lines = len(fp.readlines())
             if verbose:
-                print("rcvd {} indications, loop {}".format(rcvd_lines,
-                                                            loop_counter))
+                print(f"rcvd {rcvd_lines} indications, loop {loop_counter}")
 
         # Restart loop counter when any indications received
         if rcvd_indication_count < rcvd_lines:
             rcvd_indication_count = rcvd_lines
             if verbose:
-                print("Rcvd {} indications  loop_counter {}".
-                      format(rcvd_indication_count, loop_counter))
+                print(f"Rcvd {rcvd_indication_count} indications  "
+                      f"loop_counter {loop_counter}")
             loop_counter = 0
 
         if rcvd_lines == indication_send_count:
             if verbose:
-                print("Received expected number of indications {0}".
-                      format(rcvd_lines))
+                print(f"Received expected number of indications {rcvd_lines}")
             break
         # If requested number of indications received, break loop
         if rcvd_lines > indication_send_count:
-            test_result = "Received too many indications rcvd={0}, " \
-                          "expected={1}". \
-                          format(rcvd_lines, indication_send_count)
+            test_result = f"Received too many indications rcvd={rcvd_lines}, " \
+                          f"expected={indication_send_count}"
             break
 
     else:
-        test_result = "Waited too long for indications. Rcvd {} \
-                      indications, expected {}. ".format(
-                      rcvd_indication_count, indication_send_count)
+        test_result = f"Waited too long for indications. " \
+                      f"Rcvd {rcvd_indication_count} " \
+                      f"indications, expected {indication_send_count}."
         if verbose:
-            print("Loop counter {} max_loop_count {}".format(loop_counter,
-                                                             max_loop_count))
+            print(
+                f"Loop counter {loop_counter} max_loop_count {max_loop_count}")
     return test_result or None
 
 

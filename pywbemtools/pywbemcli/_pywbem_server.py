@@ -41,8 +41,8 @@ def _raise_typeerror(name, value, rqd_type):
     Generate a TypeError for a property in pywbem_server setter that has an
     invalid type
     """
-    raise TypeError('Property "{}" value: {} must be type: "{}", not type: '
-                    '"{}"'.format(name, value, rqd_type, type(value)))
+    raise TypeError(f'Property "{name}" value: {value} must be type: '
+                    f'"{rqd_type}", not type: "{type(value)}"')
 
 
 def _validate_server_url(server):
@@ -69,12 +69,11 @@ def _validate_server_url(server):
         url = server
 
     elif re.match(r"^[a-zA-Z0-9]+://", server) is not None:
-        raise click.ClickException('Invalid scheme on server argument: {}.'
-                                   ' Use "http" or "https"'.format(server))
+        raise click.ClickException(
+            f'Invalid scheme on server argument: {server}. Use "http" or '
+            '"https"')
     else:
-        url = "{scheme}://{host}".format(
-            scheme=DEFAULT_URL_SCHEME,
-            host=DEFAULT_URL_SCHEME)
+        url = f"{DEFAULT_URL_SCHEME}://{DEFAULT_URL_SCHEME}"
 
     return url
 
@@ -110,9 +109,9 @@ class PywbemServer:
         """
 
         if server and mock_server:
-            raise ValueError('Simultaneous "--server" and '
-                             '"--mock-server" not allowed. Server: {}, '
-                             'mock_server {}'.format(server, mock_server))
+            raise ValueError(
+                'Simultaneous "--server" and "--mock-server" not allowed. '
+                f'Server: {server}, mock_server {mock_server}')
         self.server = server
         self.mock_server = mock_server
         self.name = name
@@ -266,8 +265,8 @@ class PywbemServer:
         if not isinstance(timeout, int):
             _raise_typeerror("timeout", timeout, 'integer')
         if not 0 < timeout <= MAX_TIMEOUT:
-            raise ValueError('Timeout option "{}" out of range {} to {} sec'
-                             .format(timeout, 0, MAX_TIMEOUT))
+            raise ValueError(f'Timeout option "{timeout}" out of range 0 to '
+                             f'{MAX_TIMEOUT} sec')
         # pylint: disable=attribute-defined-outside-init
         self._timeout = timeout
 
@@ -431,16 +430,16 @@ class PywbemServer:
         if self.user:
             ctx.spinner_stop()
             password = click.prompt(
-                "Enter password (user {user})" .format(user=self.user),
+                f"Enter password (user {self.user})",
                 hide_input=True,
                 confirmation_prompt=False, type=str, err=True)
             ctx.spinner_start()
             # pylint: disable=attribute-defined-outside-init
             self.password = password
         else:
-            raise click.ClickException("{cmd} requires user/password, but "
-                                       "no password provided."
-                                       .format(cmd=ctx.invoked_subcommand))
+            raise click.ClickException(
+                f"{ctx.invoked_subcommand} requires user/password, but "
+                "no password provided.")
 
     @property
     def subscription_manager(self):
@@ -667,7 +666,7 @@ class PywbemServer:
                                               propagate=True)
             except ValueError as ve:
                 raise click.ClickException('Logger configuration error. input: '
-                                           '{}. Exception: {}'.format(log, ve))
+                                           f'{log}. Exception: {ve}')
 
     def _create_connection(self, use_pull):
         """
@@ -717,8 +716,7 @@ class PywbemServer:
                 stats_enabled=True)
         except OSError as exc:
             raise click.ClickException(
-                'Cannot create connection to {}: {}'.
-                format(self.server, exc))
+                f'Cannot create connection to {self.server}: {exc}')
 
         # Create a WBEMServer object
         self._wbem_server = WBEMServer(conn)

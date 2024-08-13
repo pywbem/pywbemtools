@@ -273,9 +273,8 @@ class MutuallyExclusiveOption(TabCompleteOption):
         # If flag set, add comment to help
         if self.mutually_exclusive and show_mutually_exclusive_flag:
             help_txt = kwargs.get('help', '')
-            kwargs['help'] = "{0} This option is mutually exclusive with " \
-                "options: ({1}).". \
-                format(help_txt, self._mutually_exclusive_display())
+            kwargs['help'] = f"{help_txt} This option is mutually exclusive " \
+                f"with options: ({self._mutually_exclusive_display()})."
 
         super().__init__(*args, **kwargs)
 
@@ -286,11 +285,11 @@ class MutuallyExclusiveOption(TabCompleteOption):
         """
         me_internal = {i.replace('-', '_') for i in self.mutually_exclusive}
         if me_internal.intersection(opts) and self.name in opts:
+            lname = self.name.replace('_', '-')
+            ldisp = self._mutually_exclusive_display()
             raise click.UsageError(
-                "Conflicting options: `{0}` is mutually exclusive with "
-                "options: ({1}).".
-                format(self.name.replace('_', '-'),
-                       self._mutually_exclusive_display()))
+                f"Conflicting options: `{lname}` is mutually exclusive with "
+                f"options: ({ldisp}).")
 
         return super().handle_parse_result(
             ctx, opts, args)

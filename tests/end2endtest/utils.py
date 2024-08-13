@@ -104,21 +104,20 @@ def exec_pywbemcli_cmd(request_params, expected_rc=0, ignore_stderr=False):
     There is a case in the code where a non-zero stderr is returned when
     rc == 0. the ingore_stderr parameter allows bypassing this.
     """
-    # print("debug: exec_pywbemcli_cmd {}".format(" ".join(request_params)))
+    # print(f"debug: exec_pywbemcli_cmd {" ".join(request_params)}")
     rc, stdout, stderr = execute_command('pywbemcli', request_params)
-    # print("debug: rc={}, stderr={}".format(rc, stderr))
+    # print(f"debug: rc={rc}, stderr={stderr}")
 
     if expected_rc == 0:
-        assert rc == 0, "pywbemcli failed: params={}, rc={}, stderr={}" \
-                        .format(request_params, rc, stderr)
+        assert rc == 0, f"pywbemcli failed: params={request_params}, {rc=}, " \
+            f"{stderr=}"
         if not ignore_stderr:
-            assert stderr == '', f"pywbemcli stderr={stderr}, rc={rc}"
+            assert stderr == '', f"pywbemcli {stderr=}, rc={rc=}"
         return stdout
 
     # expected rc not 0
-    assert rc == expected_rc, "pywbemcli failed: params={} failed rc={}, " \
-                              "stderr={} " \
-                              .format(request_params, rc, stderr)
+    assert rc == expected_rc, f"pywbemcli failed: params={request_params} " \
+                              f"failed {rc=}, {stderr=} "
     return stderr
 
 
@@ -156,8 +155,8 @@ def validate_indication_profile(server_url, expected_profile):
         profiles.append(m.groups())
 
     # validate versions of indication profile
-    assert expected_profile in profiles, "Expected profile {} not found in " \
-        "{}".format(expected_profile, profiles)
+    assert expected_profile in profiles, \
+        f"Expected profile {expected_profile} not found in {profiles}"
 
 
 def validate_required_classes(server_url, required_classes_dict):
@@ -186,8 +185,7 @@ def create_indication_subscription(server_url, listener_scheme, listener_host,
     Source namespaces which is a parameter for the filter is optional
     """
     # Create a destination
-    listener_url = "{}://{}:{}".format(listener_scheme, listener_host,
-                                       listener_port)
+    listener_url = f"{listener_scheme}://{listener_host}:{listener_port}"
 
     stdout = exec_pywbemcli_cmd(
         ['-s', server_url, '--no-verify', 'subscription', 'add-destination',
@@ -195,7 +193,7 @@ def create_indication_subscription(server_url, listener_scheme, listener_host,
 
     good_response = stdout.strip('\n')
     assert good_response == 'Added owned destination: ' \
-        'Name=pywbemdestination:defaultpywbemcliSubMgr:{}'.format(dest_id)
+        f'Name=pywbemdestination:defaultpywbemcliSubMgr:{dest_id}'
 
     # Create a filter
     cmd = ['-s', server_url, '--no-verify', 'subscription', 'add-filter',
@@ -207,7 +205,7 @@ def create_indication_subscription(server_url, listener_scheme, listener_host,
 
     good_response = stdout.strip('\n')
     assert good_response == 'Added owned filter: Name=pywbemfilter:' \
-        'defaultpywbemcliSubMgr:{}'.format(filter_id)
+        f'defaultpywbemcliSubMgr:{filter_id}'
 
     # Test filter creation that returns CIMError since we cannot test
     # this with mock. Server should return exception because of bad filter
@@ -242,8 +240,8 @@ def remove_subscription(server_url, dest_id, filter_id):
          dest_id, filter_id])
     good_response = stdout.strip('\n')
     assert good_response == \
-        'Removed 1 subscription(s) for destination-id: {}, filter-id: ' \
-        '{}.'.format(dest_id, filter_id)
+        f'Removed 1 subscription(s) for destination-id: {dest_id}, ' \
+        f'filter-id: {filter_id}.'
 
     # Remove the filter
     stdout = exec_pywbemcli_cmd(
@@ -251,8 +249,8 @@ def remove_subscription(server_url, dest_id, filter_id):
          filter_id])
     good_response = stdout.strip('\n')
     assert good_response == \
-        'Removed owned indication filter: identity={0}, ' \
-        'Name=pywbemfilter:defaultpywbemcliSubMgr:{0}.'.format(filter_id)
+        f'Removed owned indication filter: identity={filter_id}, ' \
+        f'Name=pywbemfilter:defaultpywbemcliSubMgr:{filter_id}.'
 
     # Remove the destination
     stdout = exec_pywbemcli_cmd(
@@ -261,5 +259,5 @@ def remove_subscription(server_url, dest_id, filter_id):
 
     good_response = stdout.strip('\n')
     assert good_response == \
-        'Removed owned indication destination: identity={0}, ' \
-        'Name=pywbemdestination:defaultpywbemcliSubMgr:{0}.'.format(dest_id)
+        f'Removed owned indication destination: identity={dest_id}, ' \
+        f'Name=pywbemdestination:defaultpywbemcliSubMgr:{dest_id}.'

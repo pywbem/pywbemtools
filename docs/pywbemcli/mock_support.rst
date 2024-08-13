@@ -902,8 +902,8 @@ of the target CIM instance and returns that property in an output parameter
                 if isinstance(localobject, CIMClassName):
                     raise CIMError(
                         CIM_ERR_INVALID_PARAMETER,
-                        "CIM method {0} must be invoked on a CIM instance".
-                        format(methodname))
+                        f"CIM method {methodname} must be invoked on a "
+                        "CIM instance")
                 return self.Method1(localobject, params)
             else:
                 raise CIMError(CIM_ERR_METHOD_NOT_AVAILABLE)

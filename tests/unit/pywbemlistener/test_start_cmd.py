@@ -436,7 +436,7 @@ START_TESTCASES = [
                     r"Opening 'run' output log file at .+",
 
                     r"Added indication handler for appending to file new\.log "
-                    r"with format .{df}.".format(df=DEFAULT_INDI_FORMAT),
+                    fr"with format .{DEFAULT_INDI_FORMAT}.",
 
                     r"Running listener lis1 at http://localhost:50001",
                     r"Shut down listener lis1 running at "
@@ -463,7 +463,7 @@ START_TESTCASES = [
                 r"'50001', '--scheme', 'http', "
                 r"'--start-pid', '[0-9]+', "
                 r"'--bind-addr', u?'localhost', "
-                r"'--indi-format', u?'{df}'\]".format(df=DEFAULT_INDI_FORMAT),
+                fr"'--indi-format', u?'{DEFAULT_INDI_FORMAT}'\]",
                 r"Start process( [0-9]+)?: Waiting for run process [0-9]+ to "
                 r"complete startup",
                 r"Start process( [0-9]+)?: Handling success signal .+ from "
