@@ -261,8 +261,8 @@ def cmd_profile_centralinsts(context, options):
                 profile_disp[profile_name] = cis
             # Output warning that above call failed and continue
             except Exception as ex:  # pylint: disable=broad-except
-                click.echo('Exception: profile: {} path: {} exc: {}'.
-                           format(profile_name, inst.path, ex))
+                click.echo(f"Exception: profile: {profile_name} "
+                           f"path: {inst.path} exc: {ex}")
 
         # Get max length for profile name for table output.
         max_profile_name = max(map(len, profile_disp))
@@ -281,9 +281,10 @@ def cmd_profile_centralinsts(context, options):
                         "\n".join([to_wbem_uri_folded(path,
                                                       max_len=max_path_width)
                                    for path in paths]))
-                except ValueError as ve:  # pylint: disable=broad-except
-                    click.echo('Exception: profile: {} path: {} exc: {}'.
-                               format(profile_name, paths, ve))
+                # pylint: disable=broad-except
+                except ValueError as ve:
+                    click.echo(f"Exception: profile: {profile_name} "
+                               f"path: {paths} exc: {ve}")
                     click.echo("Continue with other profiles")
             rows.append(row)
 

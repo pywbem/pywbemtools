@@ -1392,8 +1392,7 @@ class TestSubcmdClass(CLITestsBase):
                     f'Fail. File {connections_file} should not exist'
 
             else:
-                assert False, 'File test option name {} invalid' \
-                    .format(file_test)
+                assert False, f'File test option name {file_test} invalid'
 
         if not condition:
             pytest.skip("Condition for test case not met")
@@ -1613,8 +1612,7 @@ class TestSubcmdClassError(CLITestsBase):
                     f'Fail. File {connections_file} should not exist'
 
             else:
-                assert False, 'File test option name {} invalid' \
-                    .format(file_test)
+                assert False, f'File test option name {file_test} invalid'
 
         if not condition:
             pytest.skip("Condition for test case not met")

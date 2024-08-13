@@ -207,8 +207,7 @@ def start_listeners(input_listeners, verbose, situation):
     for lis_args in input_listeners:
         assert isinstance(lis_args, Sequence)
         verbose_opts = '-vv' if verbose else ''
-        cmd_args = 'pywbemlistener {} start {}'. \
-            format(verbose_opts, ' '.join(lis_args))
+        cmd_args = f"pywbemlistener {verbose_opts} start {' '.join(lis_args)}"
         if verbose:
             print(f"{situation}: Starting listener: {cmd_args}")
         check_output(cmd_args, situation, "Starting listener failed", verbose)

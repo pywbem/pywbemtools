@@ -226,8 +226,8 @@ class CLITestsBase:
         elif isinstance(inputs, (list, tuple)):
             local_args = inputs
         else:
-            assert False, 'Invalid inputs param to test {!r}. Allowed types ' \
-                'are dict, string, list, tuple.'.format(inputs)
+            assert False, f'Invalid inputs param to test {inputs!r}. ' \
+                'Allowed types are dict, string, list, tuple.'
 
         if stdin and condition == 'pdb':
             assert False, "Condition 'pdb' cannot be used on testcases that " \
@@ -262,8 +262,7 @@ class CLITestsBase:
                                  os.path.join(TEST_DIR, mock_files)])
             else:
                 assert False, \
-                    'CLI_TEST_EXTENSIONS mock_file {} invalid' \
-                    .format(mock_files)
+                    f'CLI_TEST_EXTENSIONS mock_file {mock_files} invalid'
 
         if not stdin:
             if command_grp:
@@ -307,17 +306,16 @@ class CLITestsBase:
                 if test_definition == 'startswith':
                     assert isinstance(test_value, str)
                     assert rtn_value.startswith(test_value), \
-                        "Unexpected start of line on {} in test:\n" \
-                        "{}\n" \
+                        f"Unexpected start of line on {rtn_type} in test:\n" \
+                        f"{desc}\n" \
                         "Expected start of line:\n" \
                         "------------\n" \
-                        "{}\n" \
+                        f"{test_value}\n" \
                         "------------\n" \
                         "Actual output line(s):\n" \
                         "------------\n" \
-                        "{}\n" \
-                        "------------\n". \
-                        format(rtn_type, desc, test_value, rtn_value)
+                        f"{rtn_value}\n" \
+                        "------------\n"
                 # test that lines match between test_value and rtn_value
                 # base on regex match
                 elif test_definition == 'patterns':
@@ -357,71 +355,67 @@ class CLITestsBase:
                         assert isinstance(regex, str)
                         match_result = re.search(regex, rtn_value, re.MULTILINE)
                         assert match_result, \
-                            "Missing pattern on {} in test:\n" \
-                            "{}\n" \
+                            f"Missing pattern on {rtn_type} in test:\n" \
+                            f"{desc}\n" \
                             "Expected pattern in any line:\n" \
                             "------------\n" \
-                            "{}\n" \
+                            f"{regex}\n" \
                             "------------\n" \
                             "Actual output line(s):\n" \
                             "------------\n" \
-                            "{}\n" \
-                            "------------\n". \
-                            format(rtn_type, desc, regex, rtn_value)
+                            f"{rtn_value}\n" \
+                            "------------\n"
                 elif test_definition == 'in':
                     if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert test_str in rtn_value, \
-                            "Missing in-string on {} in test:\n" \
-                            "{}\n" \
+                            f"Missing in-string on {rtn_type} in test:\n" \
+                            f"{desc}\n" \
                             "Expected in-string in any line:\n" \
                             "------------\n" \
-                            "{}\n" \
+                            f"{test_str}\n" \
                             "------------\n" \
                             "Actual output line(s):\n" \
                             "------------\n" \
-                            "{}\n" \
-                            "------------\n". \
-                            format(rtn_type, desc, test_str, rtn_value)
+                            f"{rtn_value}\n" \
+                            "------------\n"
                 elif test_definition == 'innows':
                     if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str, join=True) in \
                             remove_ws(rtn_value, join=True), \
-                            "Missing ws-agnostic in-string on {} in test:\n" \
-                            "{}\n" \
+                            f"Missing ws-agnostic in-string on {rtn_type} in " \
+                            f"test:\n{desc}\n" \
                             "Expected ws-agnostic in-string in any line:\n" \
                             "------------\n" \
-                            "{}\n" \
+                            f"{test_str}\n" \
                             "------------\n" \
                             "Actual output line(s):\n" \
                             "------------\n" \
-                            "{}\n" \
-                            "------------\n". \
-                            format(rtn_type, desc, test_str, rtn_value)
+                            f"{rtn_value}\n" \
+                            "------------\n"
                 elif test_definition == 'not-innows':
                     if isinstance(test_value, str):
                         test_value = [test_value]
                     for test_str in test_value:
                         assert remove_ws(test_str, join=True) not in \
                             remove_ws(rtn_value, join=True), \
-                            "Unexpected ws-agnostic in-string on {} in test:\n"\
-                            "{}\n" \
+                            f"Unexpected ws-agnostic in-string on {rtn_type} " \
+                            f"in test:\n{desc}\n" \
                             "Unexpected ws-agnostic in-string in any line:\n" \
                             "------------\n" \
-                            "{}\n" \
+                            f"{test_str}\n" \
                             "------------\n" \
                             "Actual output line(s):\n" \
                             "------------\n" \
-                            "{}\n" \
-                            "------------\n". \
-                            format(rtn_type, desc, test_str, rtn_value)
+                            f"{rtn_value}\n" \
+                            "------------\n"
                 else:
                     raise AssertionError(
-                        "Test validation {!r} is invalid in test:\n"
-                        "{}\n".format(test_definition, desc))
+                        f"Test validation {test_definition!r} is invalid in "
+                        f"test:\n{desc}\n")
 
 
 def remove_ws(inputs, join=False):

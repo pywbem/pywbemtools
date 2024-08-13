@@ -393,7 +393,7 @@ def show_connection_information(context, connection,
         if is_default_connection(context, connection):
             state.append("default")
         if state:
-            state_str = ' ({})'.format(", ".join(state))
+            state_str = f' ({", ".join(state)})'
 
     if connection.password:
         disp_password = connection.password if show_password else '******'
@@ -476,21 +476,21 @@ def pick_connection(name, context, connections_repo):
 
     if not connections_repo.file_exists():
         raise click.ClickException(
-            'Connections file "{0}" does not exist'.
-            format(connections_repo.connections_file))
+            f'Connections file "{connections_repo.connections_file}" does '
+            'not exist')
 
     if name:
         if name in connections_repo:
             return name
         raise click.ClickException(
-            'Connection definition "{0}" not found in connections file "{1}"'.
-            format(name, connections_repo.connections_file))
+            f'Connection definition "{name}" not found in connections '
+            f'file "{connections_repo.connections_file}"')
 
     conn_names = sorted(list(connections_repo.keys()))
     if not conn_names:
         raise click.ClickException(
-            "No connections found in connection repository {0}".
-            format(connections_repo.connections_file))
+            "No connections found in connection repository "
+            f"{connections_repo.connections_file}")
     return pick_one_from_list(context, conn_names,
                               "Select a connection or Ctrl-C to abort.")
 
@@ -531,8 +531,8 @@ def test_pull_operations(context, test_class):
     # Find a valid instance to use in tests.
     test_instances = conn.EnumerateInstanceNames(test_class)
     if not test_instances:
-        raise click.ClickException("No instances found for test class {}".
-                                   format(test_class))
+        raise click.ClickException(
+            f"No instances found for test class {test_class}")
     test_instance = test_instances[0]
 
     # execute each command and append the results to rows as a tuple
@@ -586,29 +586,26 @@ def _set_default_connection(connections_repo, connection_name, verify=None):
     old_default = connections_repo.default_connection_name
     if old_default:
         if old_default == connection_name:
-            click.echo("{0} already set as default connection definition for "
-                       "connections file {1}.".
-                       format(connection_name,
-                              connections_repo.connections_file))
+            click.echo(f"{connection_name} already set as default connection "
+                       "definition for connections file "
+                       f"{connections_repo.connections_file}.")
             return
     else:
         if connection_name is None:
             click.echo("Default connection definition already cleared; "
-                       "connections file {0}.".
-                       format(connections_repo.connections_file))
+                       f"connections file {connections_repo.connections_file}.")
             return
 
     if verify:
         if connection_name is None:
-            if not verify_operation("Clear connection default in connections "
-                                    "file {0}".
-                                    format(connections_repo.connections_file)):
+            if not verify_operation(
+                    "Clear connection default in connections file "
+                    f"{connections_repo.connections_file}"):
                 raise click.ClickException("Default not changed.")
         else:
-            if not verify_operation("Set {0} as connection default in "
-                                    "connections file {1}".
-                                    format(connection_name,
-                                           connections_repo.connections_file)):
+            if not verify_operation(
+                    f"Set {connection_name} as connection default in "
+                    f"connections file {connections_repo.connections_file}"):
                 raise click.ClickException("Default not changed.")
 
     if old_default is None:
@@ -692,13 +689,13 @@ def cmd_connection_show(context, name, options):
     if connections_repo.file_exists():
         if name not in connections_repo:
             raise click.ClickException(
-                'Connection definition "{}" not found in connections file '
-                '"{}"'.format(name, connections_repo.connections_file))
+                f'Connection definition "{name}" not found in connections '
+                f'file "{connections_repo.connections_file}"')
         connection = connections_repo[name]
     else:   # no connections file
         raise click.ClickException(
-            'Name: "{}" not current and no connections file {}'.format(
-                name, connections_repo.connections_file))
+            f'Name: "{name}" not current and no connections file '
+            f'{connections_repo.connections_file}')
 
     show_connection_information(context,
                                 connection,
@@ -728,13 +725,10 @@ def cmd_connection_test(context, options):
             if ce.status_code == 'CIM_ERR_NOT_SUPPORTED':
                 conn.EnumerateInstances(test_classname)
         except Error as er:
-            raise click.ClickException('Cannot interact with WBEM Server '
-                                       '{}. EnumerateInstanceNames exception '
-                                       '{} and EnumerateInstances {} exception '
-                                       ' {} '.format(conn.url,
-                                                     ce.status_code,
-                                                     test_classname,
-                                                     er))
+            raise click.ClickException(
+                f'Cannot interact with WBEM Server {conn.url}. '
+                f'EnumerateInstanceNames exception {ce.status_code} and '
+                f'EnumerateInstances {test_classname} exception {er}')
     except Error as er:
         raise pywbem_error_exception(er)
 
@@ -744,8 +738,8 @@ def cmd_connection_test(context, options):
         else:
             test_class = classnames[0]
     else:
-        raise click.ClickException('No classes found to test in namespace {}.'.
-                                   format(conn.defaultnamespace))
+        raise click.ClickException(
+            f'No classes found to test in namespace {conn.defaultnamespace}.')
 
     if options['test_pull']:
         result = test_pull_operations(context, test_class)
@@ -754,8 +748,8 @@ def cmd_connection_test(context, options):
             headers = ['Operation', 'Result']
             click.echo(format_table(
                 result, headers,
-                title='Pull Operation test results (Connection OK): {}'.
-                format(conn.host),
+                title=f'Pull Operation test results (Connection OK): '
+                      f'{conn.host}',
                 table_format=output_format))
         else:
             click.echo(f'Connection OK: {conn.host}')
@@ -905,10 +899,10 @@ def cmd_connection_list(context, options):
         if connections_repo.file_exists():
             # Add connection that is current but not in connections repo
             if cname not in connections_repo:
-                cname = '{}{}'.format('*', cname)
+                cname = f"{'*'}{cname}"
                 rows.append(build_row(options, cname, current_connection))
         else:
-            cname = '{}{}'.format('*', cname)
+            cname = f"{'*'}{cname}"
             rows.append(build_row(options, cname, current_connection))
 
     # NOTE: Does not show ca_certs because that creates a very big table
@@ -925,10 +919,8 @@ def cmd_connection_list(context, options):
     click.echo(format_table(
         sorted(rows),
         headers,
-        title='WBEM server connections({}): ({}: default, {}: '
-              'current)\nfile: {}'.format(
-                  table_type, dflt_sym, cur_sym,
-                  connections_repo.connections_file),
+        title=f'WBEM server connections({table_type}): ({dflt_sym}: default, '
+              f'{cur_sym}: current)\nfile: {connections_repo.connections_file}',
         table_format=output_format))
 
 

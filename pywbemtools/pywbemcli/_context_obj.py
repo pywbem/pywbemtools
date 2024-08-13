@@ -205,12 +205,11 @@ class ContextObj:
         cmd = "{} {}".format(ctx.info_name or "",
                              ctx.invoked_subcommand or "")
         raise click.ClickException(
-            'No current server for command "{}" that requires a WBEM server. '
-            'Specify a server with the "--server", "--mock-server", or  '
+            f'No current server for command "{cmd}" that requires a WBEM '
+            'server. Specify a server with the "--server", "--mock-server", or '
             '"--name" general option, by setting the corresponding environment '
             'variables, or in interactive mode '
-            'use "connection select" to define a target server'.
-            format(cmd))
+            'use "connection select" to define a target server')
 
     @pywbem_server.setter
     def pywbem_server(self, value):
@@ -394,11 +393,9 @@ def display_click_context(ctx, msg=None, display_attrs=True):
     if not display_attrs:
         click.echo(ctx.obj)
     else:
-        click.echo('{} {}, attrs:\n    {}'.format(
-            msg, ctx,
-            '\n    '.join(
-                f'{i}: {v}'
-                for (i, v) in sorted(attrs.items()))))
+        myattrs = '\n    '.join(f'{i}: {v}' for (i, v) in
+                                sorted(attrs.items()))
+        click.echo(f'{msg} {ctx}, attrs:\n    {myattrs}')
 
 
 def display_click_context_parents(display_attrs=False):

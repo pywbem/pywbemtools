@@ -335,30 +335,29 @@ class WbemServerMock:
         self.display("Built central instances and element_conforms_to_Profile")
 
     def __str__(self):
-        return 'object_manager_name={!r}, interop_ns={!r}, system_name=' \
-            '{!r}, dmtf_schema_ver={!r}, schema_dir={!r}, wbem_server={}' \
-            .format(self.server_mock_data['object_manager']['Name'],
-                    self.interop_ns,
-                    self.server_mock_data['system_name'],
-                    self.server_mock_data['dmtf_schema']['version'],
-                    self.server_mock_data['dmtf_schema']['dir'],
-                    getattr(self, 'wbem_server', None))
+        # pylint: disable=line-too-long
+        return f"object_manager_name={self.server_mock_data['object_manager']['Name']!r}, " \
+               f"interop_ns={self.interop_ns!r}, " \
+               f"system_name={self.server_mock_data['system_name']!r}, " \
+               f"dmtf_schema_ver={self.server_mock_data['dmtf_schema']['version']!r}, " \
+               f"schema_dir={self.server_mock_data['dmtf_schema']['dir']!r}, " \
+               f"wbem_server={getattr(self, 'wbem_server', None)}"  # noqa=E501
+        # pylint: enable=line-too-long
 
     def __repr__(self):
         """
         Return a representation of the class object
         with all attributes, that is suitable for debugging.
         """
-        return 'WBEMServerMock(object_manager_name={!r}, interop_ns={!r}, ' \
-            'system_name={!r}, dmtf_schema_ver={!r}, schema_dir={!r}, ' \
-            'wbem_server={!r}, registered_profiles={!r})' \
-            .format(self.server_mock_data['object_manager']['Name'],
-                    self.interop_ns,
-                    self.server_mock_data['system_name'],
-                    self.server_mock_data['dmtf_schema']['version'],
-                    self.server_mock_data['dmtf_schema']['dir'],
-                    getattr(self, 'wbem_server', None),
-                    self.server_mock_data['registered_profiles'])
+        # pylint: disable=line-too-long
+        return f"WBEMServerMock(object_manager_name={self.server_mock_data['object_manager']['Name']!r}, " \
+               f" \"interop_ns={self.interop_ns!r}, " \
+               f"system_name={self.server_mock_data['system_name']!r}, " \
+               f"dmtf_schema_ver={self.server_mock_data['dmtf_schema']['version']!r}, " \
+               f"schema_dir={self.server_mock_data['dmtf_schema']['dir']!r}, " \
+               f"wbem_server={getattr(self, 'wbem_server', None)!r}, " \
+               f"registered_profiles={self.server_mock_data['registered_profiles']!r})"  # noqa=E501
+        # pylint: enable=line-too-long
 
     def display(self, txt):
         """Display the txt and current repository. Diagnostic only"""

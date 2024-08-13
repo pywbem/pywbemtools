@@ -33,14 +33,14 @@ def test_resourcewarning_interactive(server_url):  # noqa: F811
 
     def details(what, expected=None):
         "Return a string with details about the unexpected command result"
-        msg = """
-Unexpected {} (expected: {}):
-rc={}
+        msg = f"""
+Unexpected {what} (expected: {expected}):
+{rc=}
 stdout:
-{}
+{stdout}
 stderr:
-{}
-""".format(what, expected, rc, stdout, stderr)
+{stderr}
+"""
         return msg
 
     # Note: We want to see ResourceWarning but not other warnings, particularly

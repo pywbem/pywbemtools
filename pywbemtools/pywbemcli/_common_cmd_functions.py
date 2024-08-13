@@ -211,8 +211,8 @@ class ResultsHandler:
         for ns, exc in self.result_errors.items():
             rows.append([ns, exc.status_code_name, exc.status_description])
 
-        title = "Request Response Errors for Target: ({}) {}". \
-            format(self.obj_type, self.target_object)
+        title = f"Request Response Errors for Target: ({self.obj_type}) " \
+                f"{self.target_object}"
 
         if output_format_is_table(self.output_format):
             headers = ['namespace', 'CIMError', "Description"]
@@ -225,21 +225,23 @@ class ResultsHandler:
             click.echo(f"\n{title}")
             for row in rows:
                 click.echo(
-                    "namespace:{} CIMError:{} Description:{}".
-                    format(row[0], row[1], row[2]), err=True)
+                    f"namespace:{row[0]} CIMError:{row[1]} "
+                    f"Description:{row[2]}",
+                    err=True)
 
         elif output_format_is_textgroup(self.output_format):
             click.echo(f"\n{title}")
             for row in rows:
                 click.echo(
-                    "namespace:{} CIMError:{} Description:{}".
-                    format(row[0], row[1], row[2]), err=True)
+                    f"namespace:{row[0]} CIMError:{row[1]} "
+                    f"Description:{row[2]}",
+                    err=True)
 
         # Close with an exception so exception code is raised.
         if terminate:
             raise click.ClickException(
-                "Errors encountered on {} server request(s)".
-                format(len(self.result_errors)))
+                f"Errors encountered on {len(self.result_errors)} server "
+                "request(s)")
 
 
 def get_namespaces(context, namespaces, default_all_ns=False):
@@ -317,11 +319,11 @@ def get_namespaces(context, namespaces, default_all_ns=False):
     except CIMError as ce:
         # Allow processing to continue if no interop namespace
         if ce.status_code == CIM_ERR_NOT_FOUND:
-            warning_msg('{}. Using default_namespace {}.'
-                        .format(ce, conn.default_namespace))
+            warning_msg(
+                f'{ce}. Using default_namespace {conn.default_namespace}.')
             return get_default_ns(default_ns)
-        raise click.ClickException('Failed to find namespaces. Exception: {} '
-                                   .format(ce))
+        raise click.ClickException(
+            f'Failed to find namespaces. Exception: {ce} ')
 
     except Error as er:
         raise pywbem_error_exception(er)
@@ -449,7 +451,7 @@ def _build_filters_dict(conn, ns, options):
         set_qualifier_option('version', version_tuple)
 
     if options['schema'] is not None:
-        test_str = "{}_".format(options['schema'].lower())
+        test_str = f"{options['schema'].lower()}_"
         filters['schema'] = FILTERDEF(test_str, None, None)
 
     if options['subclass_of'] is not None:
@@ -481,12 +483,11 @@ def parse_version_str(version_str):
     except ValueError:
         raise click.ClickException('--since option value invalid. '
                                    'Must contain 3 integer elements: '
-                                   'int.int.int". {} received'.
-                                   format(version_str))
+                                   f'int.int.int". {version_str} received')
     if len(version_tuple) != 3:
         raise click.ClickException('Version value must contain 3 integer '
                                    'elements (int.int.int). '
-                                   '{} received'.format(version_str))
+                                   f'{version_str} received')
     return version_tuple
 
 
@@ -579,9 +580,10 @@ def _filter_classes(classes, filters, names_only, iq):
                 classname=filters['subclass_of'].optionvalue,
                 deep_inheritance=True)
         except ValueError:
+            ft = filters['subclass_of'].optionvalue
             raise click.ClickException(
-                'Classname {} for "subclass-of" not found in returned classes.'
-                .format(filters['subclass_of'].optionvalue))
+                f'Classname {ft} for "subclass-of" not found in returned '
+                'classes.')
 
     # Build a list of leaf class names that will be used later as a filter on
     # the classes to be returned.
@@ -596,9 +598,10 @@ def _filter_classes(classes, filters, names_only, iq):
                 leafclass_names = get_leafclass_names(classes)
 
         except ValueError:
+            ft = filters['leaf_classes'].optionvalue
             raise click.ClickException(
-                'Classname {} for "leaf_classes-of" not found in returned '
-                'classes.'.format(filters['leaf_classes'].optionvalue))
+                f'Classname {ft} for "leaf_classes-of" not found in returned '
+                'classes.')
 
     for cls in classes:
         show_class_list = []

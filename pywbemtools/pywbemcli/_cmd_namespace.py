@@ -233,8 +233,8 @@ def cmd_namespace_delete(context, namespace, options):
     interop_ns = wbem_server.interop_ns  # Determines the Interop namespace
     if namespace == interop_ns:
         raise click.ClickException(
-            "Cannot delete namespace {} because it is the Interop "
-            "namespace".format(namespace))
+            f"Cannot delete namespace {namespace} because it is the "
+            "Interop namespace")
 
     # Check whether the namespace is empty.
     # We do not check for instances, because classes are a prerequisite for
@@ -246,21 +246,20 @@ def cmd_namespace_delete(context, namespace, options):
             namespace=namespace, ClassName=None, DeepInheritance=False)
     except Error as exc:
         raise pywbem_error_exception(
-            exc, "Cannot enumerate top-level class names in namespace {}".
-            format(namespace))
+            exc,
+            f"Cannot enumerate top-level class names in namespace {namespace}")
     try:
         qualifiers = conn.EnumerateQualifiers(namespace=namespace)
     except Error as exc:
         raise pywbem_error_exception(
-            exc, "Cannot enumerate qualifier types in namespace {}".
-            format(namespace))
+            exc, f"Cannot enumerate qualifier types in namespace {namespace}")
     non_empty = top_class_paths or qualifiers
 
     if non_empty and not include_objects:
         raise click.ClickException(
-            "Cannot delete namespace {} because it has {} qualifier types "
-            "and {} top-level classes (and possibly instances)".
-            format(namespace, len(top_class_paths), len(qualifiers)))
+            f"Cannot delete namespace {namespace} because it has "
+            f"{len(qualifiers)} qualifier types and {len(top_class_paths)} "
+            f"top-level classes (and possibly instances)")
 
     if top_class_paths:
 
@@ -276,8 +275,9 @@ def cmd_namespace_delete(context, namespace, options):
                     namespace=namespace, ClassName=classname)
             except Error as exc:
                 raise pywbem_error_exception(
-                    exc, "Cannot enumerate instance names of class {} in "
-                    "namespace {}".format(classname, namespace))
+                    exc,
+                    f"Cannot enumerate instance names of class {classname} "
+                    f"in namespace {namespace}")
             for inst_path in inst_paths:
                 # Skip instances of subclasses. This only happens in dry-run
                 # mode, but we execute it always to minimize differences
@@ -291,8 +291,7 @@ def cmd_namespace_delete(context, namespace, options):
                     except Error as exc:
                         raise pywbem_error_exception(
                             exc, f"Cannot delete instance {inst_path}")
-                click.echo('{}Deleted instance {}'.
-                           format(dry_run_prefix, inst_path))
+                click.echo(f'{dry_run_prefix}Deleted instance {inst_path}')
         for classname in classnames_depsorted:
             if not dry_run:
                 try:
@@ -300,10 +299,10 @@ def cmd_namespace_delete(context, namespace, options):
                         namespace=namespace, ClassName=classname)
                 except Error as exc:
                     raise pywbem_error_exception(
-                        exc, "Cannot delete class {} in namespace {}".
-                        format(classname, namespace))
-            click.echo('{}Deleted class {}'.
-                       format(dry_run_prefix, classname))
+                        exc,
+                        f"Cannot delete class {classname} in namespace "
+                        f"{namespace}")
+            click.echo(f'{dry_run_prefix}Deleted class {classname}')
 
     if qualifiers:
         context.spinner_stop()
@@ -315,10 +314,11 @@ def cmd_namespace_delete(context, namespace, options):
                         namespace=namespace, QualifierName=qualifiername)
                 except Error as exc:
                     raise pywbem_error_exception(
-                        exc, "Cannot delete qualifier type {} in namespace {}".
-                        format(qualifiername, namespace))
-            click.echo('{}Deleted qualifier type {}'.
-                       format(dry_run_prefix, qualifiername))
+                        exc,
+                        f"Cannot delete qualifier type {qualifiername} "
+                        f"in namespace {namespace}")
+            click.echo(
+                f'{dry_run_prefix}Deleted qualifier type {qualifiername}')
 
     context.spinner_stop()
     if not dry_run:

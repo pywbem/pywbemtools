@@ -53,8 +53,8 @@ class CIM_AllTypesMethodProvider(pywbem_mock.MethodProvider):
         if not self.class_exists(namespace, classname):
             raise pywbem.CIMError(
                 pywbem.CIM_ERR_NOT_FOUND,
-                "class {} does not exist in CIM repository, "
-                "namespace {}".format(classname, namespace))
+                f"class {classname} does not exist in CIM repository, "
+                f"namespace {namespace}")
 
         # Return the input parameters as output parameters
         out_params = params

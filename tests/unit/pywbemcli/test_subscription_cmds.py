@@ -19,11 +19,21 @@ Many of the tests in of the subscription group use stdin because multiple
 pywbemcli commands must be used to add and test the various subscriptions.
 A single command can be used only  to test the add... commands. Since the
 requests sent to the mock server have a lifecycle of one interactive command
-session, stdin servers to test these commands.  Also, the mockwbemserver
-mock definition is used in a local namespace and therefore, does not get
-pickled making the time to execute each test significantly longer (ex. 5
-seconds rather than LT a second) so a number of commands were combined into
-a single test to test the create, list, and removal commands.
+session, stdin is used to generate multiple commands within a single test
+by eecuting the commands in a single command session using the pywbemcli
+repl.
+
+Users must be careful since the use of stdin and use of breakpoints are not
+compatible in the test environment.
+
+The mockwbemserver mock definition is used in a local namespace and therefore,
+does not get pickled making the time to execute each test significantly longer
+(ex. 5 seconds rather than LT a second) so a number of commands were combined
+into a single test to test the create, list, and removal commands.
+
+NOTE: This test requires a default connections file to avoid output of warnings
+from the repl code when stdin is used to generate multiple commands in the repl
+about the nonexistance of this file which messes up the stderr file.
 
 NOTE: We used long lines in the test definitions to make the tests more
 readable.
@@ -75,6 +85,7 @@ MOCK_CONFIRM_Y_FILE = "mock_confirm_y.py"
 MOCK_CONFIRM_N_FILE = "mock_confirm_n.py"
 
 # Test connections file used in some testcases
+# TODO: Currently the following not used. See issue # 1414
 TEST_SUBSCRIPTIONS_FILE_PATH = 'tmp_subscription_options.yaml'
 TEST_SUBSCRIPTIONS_FILE_DICT = {
     'connection_definitions': {
@@ -248,7 +259,7 @@ TEST_CASES = [
     # List of testcases.
     # Each testcase is a list with the following items:
     # * desc: Description of testcase.
-    # * inputs: String, or tuple/list of strings, or dict of 'env', 'args',
+    # * inputs: String, tuple/list of strings, or dict of 'env', 'args',
     #     'general', and 'stdin'. See the 'inputs' parameter of
     #     CLITestsBase.command_test() in cli_test_extensions.py for detailed
     #     documentation.
@@ -260,6 +271,12 @@ TEST_CASES = [
     # * condition: If True the test is executed, if 'pdb' the test breaks in the
     #     the debugger, if 'verbose' print verbose messages, if False the test
     #     is skipped.
+
+    #
+    #  Test of subscription command help responses.  These tests all use a
+    #  list to define the parameters of the command and use only a single
+    #  command.
+    #
 
     ['Verify subscription command --help response',
      ['--help'],
@@ -355,6 +372,9 @@ TEST_CASES = [
 
     #
     #  Create a destination and list the connection in the next command
+    # These tests use a dictionary as the input defining the 'general' key
+    # for general options, and the commands in a list defined by the 'stdin'
+    # key.
     #
     ['Verify add-destination succeeds and list.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
@@ -882,7 +902,7 @@ TEST_CASES = [
                  '};'],
       'stderr': [],
       'test': 'innows'},
-     None, RUN],
+     None, OK],
 
     ['Verify add dest, filter, subscription and remove --permanent OK.',
      {'general': ['-m', MOCK_SERVER_MODEL_PATH],
@@ -1309,10 +1329,9 @@ TEST_CASES = [
                 'subscription remove-destination duptestdest --permanent',
                 '-o simple subscription list'],
       'platform': 'win32'},  # ignore on windows
-     {'stderr': ['Remove failed. Multiple destinations meet criteria identity=duptestdest, owned=permanent',  # noqa: E501
-                 '* CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest',  # noqa: E501
-                 '* CIM_ListenerDestinationCIMXMLSub.CreationClassName="CIM_ListenerDestinationCIMXMLSub",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah'],  # noqa: E501
-
+     {'stderr': ["Remove failed. Multiple destinations meet criteria identity='duptestdest', owned='permanent'",  # noqa: E501
+                 '* CIM_ListenerDestinationCIMXML.CreationClassName="CIM_ListenerDestinationCIMXML",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="MockSystem_WBEMServerTest"',  # noqa: E501
+                 '* CIM_ListenerDestinationCIMXMLSub.CreationClassName="CIM_ListenerDestinationCIMXMLSub",Name="duptestdest",SystemCreationClassName="CIM_ComputerSystem",SystemName="blah"'],  # noqa: E501
       'rc': 0,
       'test': 'innows'},
      None, OK],
@@ -1658,13 +1677,16 @@ class TestSubcmdClass(CLITestsBase):  # pylint: disable=too-few-public-methods
                 return
 
         # Create the connection file from the 'yaml' input
-        if 'yaml' in inputs:
-            # pylint: disable=unspecified-encoding
-            with open(TEST_SUBSCRIPTIONS_FILE_PATH, "w") as repo_file:
-                repo_file.write(inputs['yaml'])
+        # The following removed because it was never used and is not docemented
+        # if 'yaml' in inputs:
+        #    # pylint: disable=unspecified-encoding
+        #    with open(TEST_SUBSCRIPTIONS_FILE_PATH, "w") as repo_file:
+        #        repo_file.write(inputs['yaml'])
 
         # All tests in for subscriptions will use the subscriptions
         # connections file.
+        # TODO: The following to be corrected.  Currently the connections
+        # file is not used in these tests. See issue #1414
         connections_file = TEST_SUBSCRIPTIONS_FILE_PATH
         if 'general' in inputs:
             inputs['general'].extend(['--connections-file', connections_file])

@@ -15,6 +15,7 @@ import pytest
 
 __all__ = ['simplified_test_function']
 
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
 
 # Pytest determines the signature of the test function by unpacking any
 # wrapped functions (this is the default of the signature() function it
@@ -175,13 +176,12 @@ def simplified_test_function(test_func):
                     if exp_warn_types is None and rec_warnings:
                         lines = []
                         for w in rec_warnings:
-                            tup = (w.filename, w.lineno, w.category.__name__,
-                                   str(w.message))
-                            line = "{t[0]}:{t[1]}: {t[2]}: {t[3]}".format(t=tup)
+                            # pylint: disable=line-too-long
+                            line = f"{w.filename}:{w.lineno}: {w.category.__name__}: {str(w.message)}"  # noqa=E501
                             if line not in lines:
                                 lines.append(line)
-                        msg = "Unexpected warnings:\n{}".format(
-                            '\n'.join(lines))
+                            # pylint: enable=line-too-long
+                        msg = f"Unexpected warnings:\n{EOL.join(lines)}"
                         raise AssertionError(msg)
         return ret
 

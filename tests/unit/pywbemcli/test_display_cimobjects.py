@@ -36,6 +36,8 @@ from pywbemtools._output_formatting import DEFAULT_MAX_CELL_WIDTH
 
 from ..pytest_extensions import simplified_test_function
 
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
+
 # pylint: disable=use-dict-literal
 
 OK = True    # mark tests OK when they execute correctly
@@ -590,19 +592,16 @@ def test_format_instances_as_rows(testcase, args, kwargs, exp_rtn):
     # result is list of lists.  we want to test each item in inner list
 
     assert len(act_rtn) == len(exp_rtn), \
-        "Unexpected number of lines in test desc: {}:\n" \
-        "Expected line cnt={}:\n" \
-        "{}\n\n" \
-        "Actual line cnt={}:\n" \
-        "{}\n". \
-        format(testcase.desc, len(act_rtn), '\n'.join(act_rtn),
-               len(exp_rtn), '\n'.join(exp_rtn))
+        f"Unexpected number of lines in test desc: {testcase.desc}:\n" \
+        f"Expected line cnt={len(act_rtn)}:\n" \
+        f"{EOL.join(act_rtn)}\n\n" \
+        f"Actual line cnt={len(exp_rtn)}:\n" \
+        f"{EOL.join(exp_rtn)}\n"
 
     assert exp_rtn == act_rtn, \
-        "Unequal values for test desc: {}:\n" \
-        "Expected = {}:\n" \
-        "Actual   = {}:\n". \
-        format(testcase.desc, exp_rtn, act_rtn)
+        f"Unequal values for test desc: {testcase.desc}:\n" \
+        f"Expected = {exp_rtn}:\n" \
+        f"Actual   = {act_rtn}:\n"
 
 
 # Testcases for _display_instances_as_table()
@@ -765,9 +764,8 @@ def test_display_instances_as_table(
     stdout, _ = capsys.readouterr()
 
     assert exp_stdout == stdout, \
-        "Unexpected output in test case: {}\n" \
+        f"Unexpected output in test case: {desc}\n" \
         "Actual:\n" \
-        "{}\n" \
+        f"{stdout}\n" \
         "Expected:\n" \
-        "{}\n" \
-        "End\n".format(desc, stdout, exp_stdout)
+        f"{exp_stdout}\n"

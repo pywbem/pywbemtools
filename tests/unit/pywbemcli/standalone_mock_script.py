@@ -46,16 +46,15 @@ class CIM_FooMethodProvider(pywbem_mock.MethodProvider):
         if not self.class_exists(namespace, classname):
             raise pywbem.CIMError(
                 pywbem.CIM_ERR_NOT_FOUND,
-                "class {} does not exist in CIM repository, "
-                "namespace {}".format(classname, namespace))
+                f"class {classname} does not exist in CIM repository, "
+                f"namespace {namespace}")
 
         if isinstance(localobject, pywbem.CIMInstanceName):
             instance_store = self.cimrepository.get_instance_store(namespace)
             if not instance_store.object_exists(localobject):
                 raise pywbem.CIMError(
                     pywbem.CIM_ERR_NOT_FOUND,
-                    "Instance {0} does not exist in CIM repository",
-                    format(localobject))
+                    f"Instance {localobject} does not exist in CIM repository")
 
         # This method expects a single parameter input
         return_params = []

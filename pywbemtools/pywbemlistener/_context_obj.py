@@ -65,10 +65,11 @@ class ContextObj:
         self._spinner_obj = click_spinner.Spinner()
 
     def __repr__(self):
-        return 'ContextObj(at {:08x}, output_format={s.output_format}, ' \
+        return f'ContextObj(at {id(self):08x}, ' \
+               'output_format={s.output_format}, ' \
                'logdir={s.logdir}, verbose={s.verbose}, pdb={s.pdb}, ' \
                'warn={s.warn}, spinner_enabled={s.spinner_enabled}' \
-               .format(id(self), s=self)
+               .format(s=self)
 
     @property
     def output_format(self):

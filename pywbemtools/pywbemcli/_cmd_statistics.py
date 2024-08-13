@@ -237,15 +237,14 @@ def get_objmgr_inst(context):
         # Use warning_msg here rather than python Warnings class since this
         # is to be always output.
         if len(objmanager_insts) > 1:
-            warning_msg(
-                "Server returned multiple  ObjectManager {} instances. Using "
-                "first instance.".format(objmanager_insts[0].classname))
+            warning_msg("Server returned multiple  ObjectManager "
+                        f"{objmanager_insts[0].classname} instances. Using "
+                        "first instance.")
 
     except Error as er:
         raise click.ClickException(
-            'Failure trying to access object manager instances of class {} '
-            'namespace {}. Error: {}'.
-            format(OBJMGR_CLN, interop_ns, er))
+            'Failure trying to access object manager instances of class '
+            f'{OBJMGR_CLN} namespace {interop_ns}. Error: {er}')
     objmgr_inst = objmanager_insts[0]
 
     return objmgr_inst
@@ -283,12 +282,12 @@ def set_server_statistics(context, desired_state):
         cur_state = objmgr[OBJMGR_STAT_PROPERTY_NAME]
     except KeyError as ke:
         raise click.ClickException(
-            'Failure accessing class {} property {}. namespace {}:Error: {}'.
-            format(OBJMGR_CLN, OBJMGR_STAT_PROPERTY_NAME, interop_ns, ke))
+            f'Failure accessing class {OBJMGR_CLN} property '
+            f'{OBJMGR_STAT_PROPERTY_NAME}. namespace {interop_ns}:Error: {ke}')
 
     if cur_state == desired_state:
-        click.echo("Server statistics gathering was already {}".
-                   format(to_on_off(desired_state)))
+        click.echo("Server statistics gathering was already "
+                   f"{to_on_off(desired_state)}")
         return
 
     objmgr[OBJMGR_STAT_PROPERTY_NAME] = desired_state
@@ -299,19 +298,18 @@ def set_server_statistics(context, desired_state):
                             IncludeQualifiers=False)
     except Error as ce:
         raise click.ClickException('Modification of GatherStatisticalData '
-                                   'property in instance {} on server failed: '
-                                   'Exception {}'.format(objmgr.path, ce))
+                                   f'property in instance {objmgr.path} on '
+                                   f'server failed: Exception {ce}')
 
     modified_objmgr = conn.GetInstance(objmgr.path)
 
     if modified_objmgr[OBJMGR_STAT_PROPERTY_NAME] != desired_state:
         raise click.ClickException(
-            'The WBEM server reported success when changing the {} property '
-            'in its {} instance to {} but did not actually change it.'.
-            format(OBJMGR_STAT_PROPERTY_NAME, OBJMGR_CLN, interop_ns))
+            'The WBEM server reported success when changing the '
+            f'{OBJMGR_STAT_PROPERTY_NAME} property in its {OBJMGR_CLN} '
+            f'instance to {interop_ns} but did not actually change it.')
 
-    click.echo("Server statistics gathering set to {}".
-               format(to_on_off(desired_state)))
+    click.echo(f"Server statistics gathering set to {to_on_off(desired_state)}")
 
 
 ###############################################################
@@ -373,8 +371,8 @@ def cmd_statistics_status(context):
                 ['server statistics gathering', svr_status]]
         click.echo(format_table(rows, headers, "Statistics status"))
     else:
-        click.echo("Statistics status: client={}; server={}".
-                   format(pywbemcli_stats_status, svr_status))
+        click.echo(f"Statistics status: client={pywbemcli_stats_status}; "
+                   f"server={svr_status}")
 
 
 def cmd_statistics_reset(context):
@@ -469,8 +467,8 @@ def cmd_statistics_server_show(context):
         svr_status = f"Not settable {er}"
 
     if isinstance(svr_status, str):
-        raise click.ClickException("ObjectManager config setting not found {}".
-                                   format(svr_status))
+        raise click.ClickException(
+            f"ObjectManager config setting not found {svr_status}")
 
     if not svr_status:
         raise click.ClickException("WBEM server CIM_ObjectManager "
@@ -503,13 +501,12 @@ def cmd_statistics_server_show(context):
 
     if not results:
         raise click.ClickException(
-            "No WBEM server class {} or class returns no data on "
-            "WBEM Server".
-            format(CIMOM_STATISTICAL_DATA_CLASS))
+            f"No WBEM server class {CIMOM_STATISTICAL_DATA_CLASS} or class "
+            "returns no data on WBEM Server")
 
     if context.verbose:
-        click.echo("{} returns instances in namespace {}".
-                   format(CIMOM_STATISTICAL_DATA_CLASS, stats_namespace))
+        click.echo(f"{CIMOM_STATISTICAL_DATA_CLASS} returns instances in "
+                   f"namespace {stats_namespace}")
 
     try:
         op_type_vm = ValueMapping.for_property(conn, stats_namespace,
@@ -525,8 +522,8 @@ def cmd_statistics_server_show(context):
             IncludeClassOrigin=False)
         if not results:
             raise click.ClickException(
-                "WBEM server Class {} returns no data".
-                format(CIMOM_STATISTICAL_DATA_CLASS))
+                f"WBEM server Class {CIMOM_STATISTICAL_DATA_CLASS} returns no "
+                "data")
 
         row_tuples = []
         for inst in results:
@@ -592,6 +589,5 @@ def cmd_statistics_server_show(context):
             title='Server statistics',
             table_format=output_fmt))
     except Error as er:
-        raise click.ClickException("Statistics retrieval from WBEM server "
-                                   "failed. Exception {}".
-                                   format(er))
+        raise click.ClickException(
+            f"Statistics retrieval from WBEM server failed. Exception {er}")

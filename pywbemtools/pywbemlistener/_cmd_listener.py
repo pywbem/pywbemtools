@@ -83,13 +83,13 @@ LISTEN_OPTIONS = [
                  required=False, default=DEFAULT_LISTENER_PORT,
                  help='The port number the listener will open to receive '
                  'indications. This can be any available port. '
-                 'Default: {}'.format(DEFAULT_LISTENER_PORT)),
+                 f'Default: {DEFAULT_LISTENER_PORT}'),
     click.option('-s', '--scheme',
                  type=click.Choice(['http', 'https']),
                  metavar='SCHEME',
                  required=False, default=DEFAULT_LISTENER_SCHEME,
                  help='The scheme used by the listener (http, https). '
-                 'Default: {}'.format(DEFAULT_LISTENER_SCHEME)),
+                 f'Default: {DEFAULT_LISTENER_SCHEME}'),
     click.option('-b', '--bind-addr',
                  type=str,
                  metavar='HOST',
@@ -111,8 +111,8 @@ LISTEN_OPTIONS = [
                  'SSL/TLS handshake. Required when using https. '
                  'The file may in addition contain the private key of the '
                  'certificate. '
-                 'Default: EnvVar {ev}, or no certificate file.'.
-                 format(ev=_config.PYWBEMLISTENER_CERTFILE_ENVVAR)),
+                 f'Default: EnvVar {_config.PYWBEMLISTENER_CERTFILE_ENVVAR}, '
+                 'or no certificate file.'),
     click.option('-k', '--keyfile',
                  type=click.Path(exists=False, dir_okay=False),
                  metavar='FILE',
@@ -122,8 +122,8 @@ LISTEN_OPTIONS = [
                  'of the server certificate. '
                  'Required when using https and when the certificate file '
                  'does not contain the private key. '
-                 'Default: EnvVar {ev}, or no key file.'.
-                 format(ev=_config.PYWBEMLISTENER_KEYFILE_ENVVAR)),
+                 f'Default: EnvVar {_config.PYWBEMLISTENER_KEYFILE_ENVVAR}, '
+                 'or no key file.'),
     click.option('--indi-call', type=str, metavar='MODULE.FUNCTION',
                  required=False, default=None,
                  help='Call a Python function for each received indication. '
@@ -143,7 +143,7 @@ LISTEN_OPTIONS = [
                  'indications. '
                  'Invoke with --help-format for details on the format '
                  'specification. '
-                 'Default: "{dif}".'.format(dif=DEFAULT_INDI_FORMAT)),
+                 f'Default: "{DEFAULT_INDI_FORMAT}".'),
     click.option('--help-format', is_flag=True,
                  required=False, default=False, is_eager=True,
                  help='Show help message for the format specification used '
@@ -582,8 +582,8 @@ def success_signal_handler(sig, frame):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Start process: Handling success signal ({}) from run "
-                  "process".format(sig))
+        print_out(f"Start process: Handling success signal ({sig}) from run "
+                  "process")
 
     RUN_STARTUP_STATUS = 'success'
     with RUN_STARTUP_COND:
@@ -600,8 +600,8 @@ def failure_signal_handler(sig, frame):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Start process: Handling failure signal ({}) from run "
-                  "process".format(sig))
+        print_out(f"Start process: Handling failure signal ({sig}) from run "
+                  f"process")
 
     RUN_STARTUP_STATUS = 'failure'
     with RUN_STARTUP_COND:
@@ -621,8 +621,8 @@ def wait_startup_completion(child_pid):
     global RUN_STARTUP_STATUS, RUN_STARTUP_COND
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Start process: Waiting for run process {} to complete "
-                  "startup".format(child_pid))
+        print_out(f"Start process: Waiting for run process {child_pid} to "
+                  "complete startup")
 
     RUN_STARTUP_STATUS = 'failure'
     with RUN_STARTUP_COND:
@@ -637,8 +637,8 @@ def wait_startup_completion(child_pid):
 
     if status == 'success':
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Start process: Startup of run process {} succeeded".
-                      format(child_pid))
+            print_out(f"Start process: Startup of run process {child_pid} "
+                      "succeeded")
         return 0
 
     if status == 'timeout':
@@ -653,8 +653,7 @@ def wait_startup_completion(child_pid):
     sleep(0.5)  # Give it some time to finish by itself before we clean it up
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Start process: Startup of run process {} failed".
-                  format(child_pid))
+        print_out(f"Start process: Startup of run process {child_pid} failed")
     child_exists = False
     try:
         child_ps = psutil.Process(child_pid)
@@ -667,19 +666,19 @@ def wait_startup_completion(child_pid):
 
     if child_exists:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Start process: Cleaning up run process {} and status {}".
-                      format(child_pid, child_status))
+            print_out("Start process: Cleaning up run process "
+                      f"{child_pid} and status {child_status}")
         try:
             child_ps.terminate()
             child_ps.wait()
         except OSError as exc:
             raise click.ClickException(
-                "Cannot clean up 'run' child process with PID {}: {}: {}".
-                format(child_pid, type(exc), exc))
+                f"Cannot clean up 'run' child process with PID {child_pid}: "
+                f"{type(exc)}: {exc}")
     else:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Start process: Run process {} does not exist anymore".
-                      format(child_pid))
+            print_out(f"Start process: Run process {child_pid} "
+                      f"does not exist anymore")
     return 1
 
 
@@ -701,9 +700,9 @@ def run_exit_handler(start_pid, log_fp):
 
     if start_p:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Run process exit handler: Sending failure signal ({}) "
-                      "to start process {}".
-                      format(SIGNAL_RUN_STARTUP_FAILURE, start_pid))
+            print_out("Run process exit handler: Sending failure signal "
+                      f"({SIGNAL_RUN_STARTUP_FAILURE}) to "
+                      f"start process {start_pid}")
         try:
             os.kill(start_pid, SIGNAL_RUN_STARTUP_FAILURE)  # Sends the signal
         except OSError:
@@ -714,8 +713,8 @@ def run_exit_handler(start_pid, log_fp):
             # window between checking for it at the begin of this function,
             # and here.
             if _config.VERBOSE_PROCESSES_ENABLED:
-                print_out("Run process exit handler: Start process {} does "
-                          "not exist anymore".format(start_pid))
+                print_out("Run process exit handler: Start process "
+                          f"{start_pid} does not exist anymore")
 
     if log_fp:
         print_out(f"Closing 'run' output log file at {datetime.now()}")
@@ -1002,8 +1001,7 @@ def cmd_listener_run(context, name, options):
 
         # This message goes to the original stdout of the run process (wherever
         # that is directed to)
-        print_out("Run process {}: Output is logged to: {}".
-                  format(pid, logfile))
+        print_out(f"Run process {pid}: Output is logged to: {logfile}")
 
         # pylint: disable=consider-using-with
         log_fp = open(logfile, 'a', encoding='utf-8')
@@ -1106,8 +1104,8 @@ def cmd_listener_run(context, name, options):
                                             indi_format)
         except Exception as exc:  # pylint: disable=broad-except
             display_str = ("Error: Cannot format indication using format "
-                           "\"{}\": {}: {}".
-                           format(indi_format, exc.__class__.__name__, exc))
+                           f"\"{indi_format}\": {exc.__class__.__name__}: "
+                           f"{exc}")
         with open(indi_file, 'a', encoding='utf-8') as fp:
             fp.write(display_str)
             fp.write('\n')
@@ -1116,8 +1114,8 @@ def cmd_listener_run(context, name, options):
         mod_func = indi_call.rsplit('.', 1)
         if len(mod_func) < 2:
             raise click.ClickException(
-                "The --indi-call option does not specify MODULE.FUNCTION: {}".
-                format(indi_call))
+                "The --indi-call option does not specify MODULE.FUNCTION: "
+                f"{indi_call}")
         mod_name = mod_func[0]
         func_name = mod_func[1]
 
@@ -1125,44 +1123,41 @@ def cmd_listener_run(context, name, options):
         if sys.path[0] != curdir:
             if context.verbose >= _config.VERBOSE_SETTINGS:
                 click.echo("Inserting current directory into front of Python "
-                           "module search path: {}".format(curdir))
+                           f"module search path: {curdir}")
             sys.path.insert(0, curdir)
 
         try:
             module = importlib.import_module(mod_name)
         except ImportError as exc:
             raise click.ClickException(
-                "Cannot import module {}: {}".
-                format(mod_name, exc))
+                f"Cannot import module {mod_name}: {exc}")
         except SyntaxError as exc:
             raise click.ClickException(
-                "Cannot import module {}: SyntaxError: {}".
-                format(mod_name, exc))
+                f"Cannot import module {mod_name}: SyntaxError: {exc}")
         try:
             func = getattr(module, func_name)
         except AttributeError:
             raise click.ClickException(
-                "Function {}() not found in module {}".
-                format(func_name, mod_name))
+                f"Function {func_name}() not found in module {mod_name}")
         listener.add_callback(func)
         if context.verbose >= _config.VERBOSE_SETTINGS:
-            click.echo("Added indication handler for calling function {}() "
-                       "in module {}".format(func_name, mod_name))
+            click.echo("Added indication handler for calling function "
+                       f"{func_name}() in module {mod_name}")
 
     if indi_file:
         listener.add_callback(file_func)
         if context.verbose >= _config.VERBOSE_SETTINGS:
-            click.echo("Added indication handler for appending to file {} "
-                       "with format \"{}\"".format(indi_file, indi_format))
+            click.echo('Added indication handler for appending to file '
+                       f'{indi_file} with format "{indi_format}"')
 
     click.echo(f"Running listener {name} at {url}")
 
     # Signal successful startup completion to the parent 'start' process.
     if start_pid:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Run process: Sending success signal ({}) to "
-                      "start process {}".
-                      format(SIGNAL_RUN_STARTUP_SUCCESS, start_pid))
+            print_out("Run process: Sending success signal "
+                      f"({SIGNAL_RUN_STARTUP_SUCCESS}) to start process "
+                      f"{start_pid}")
         os.kill(start_pid, SIGNAL_RUN_STARTUP_SUCCESS)  # Sends the signal
 
     try:
@@ -1170,8 +1165,7 @@ def cmd_listener_run(context, name, options):
             sleep(60)
     except (KeyboardInterrupt, SystemExit) as exc:
         if _config.VERBOSE_PROCESSES_ENABLED:
-            print_out("Run process: Caught exception {}: {}".
-                      format(type(exc), exc))
+            print_out(f"Run process: Caught exception {type(exc)}: {exc}")
         # Note: SystemExit occurs only due to being raised in the signal handler
         # that was registered.
 
@@ -1205,7 +1199,9 @@ def cmd_listener_start(context, name, options):
         'pywbemlistener',
     ]
     if context.verbose:
-        run_args.append('-{}'.format('v' * context.verbose))
+        # python v < 3.10 char repeat in f-string invalid
+        v_arg = 'v' * context.verbose
+        run_args.append(f'-{v_arg}')
     if context.logdir:
         run_args.extend(['--logdir', context.logdir])
     run_args.extend([
@@ -1241,8 +1237,7 @@ def cmd_listener_start(context, name, options):
     popen_kwargs['start_new_session'] = True
 
     if _config.VERBOSE_PROCESSES_ENABLED:
-        print_out("Start process {}: Starting run process as: {}".
-                  format(pid, run_args))
+        print_out(f"Start process {pid}: Starting run process as: {run_args}")
 
     # pylint: disable=consider-using-with
     p = subprocess.Popen(run_args, **popen_kwargs)
@@ -1346,8 +1341,7 @@ def cmd_listener_test(context, name, options):
 
     context.spinner_stop()
 
-    click.echo("Sending the following test indication:\n{}".
-               format(indication.tomof()))
+    click.echo(f"Sending the following test indication:\n{indication.tomof()}")
 
     for i in range(1, count + 1):
 
@@ -1371,5 +1365,4 @@ def cmd_listener_test(context, name, options):
         except Error as exc:
             raise click.ClickException(str(exc))
 
-        click.echo("Sent test indication #{} to listener {} at {}".
-                   format(i, name, url))
+        click.echo(f"Sent test indication #{i} to listener {name} at {url}")

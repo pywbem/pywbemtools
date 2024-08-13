@@ -58,9 +58,8 @@ def test_tell_append_diff(file_path):
     new_size = os.stat(file_path).st_size
     exp_size = size
     assert new_size == exp_size, \
-        "original size: {}, tell() result: {}, actual new size: {}, " \
-        "expected new size: {}". \
-        format(size, pos, new_size, exp_size)
+        f"original size: {size}, tell() result: {pos}, " \
+        f"actual new size: {new_size}, expected new size: {exp_size}"
 
 
 def test_truncate_append_same(file_path):
@@ -84,5 +83,5 @@ def test_truncate_append_same(file_path):
     new_size = os.stat(file_path).st_size
     exp_size = size
     assert new_size == exp_size, \
-        "original size: {}, actual new size: {}, expected new size: {}". \
-        format(size, new_size, exp_size)
+        f"original size: {size}, actual new size: {new_size}, " \
+        f"expected new size: {exp_size}"

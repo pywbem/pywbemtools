@@ -156,8 +156,8 @@ def import_script(file_path):
         # We report the reason was the old setup approach. If it was en error,
         # this will surface during rebuild.
         raise NotCacheable(
-            "Mock script {} implements old setup approach with global "
-            "variables".format(file_path))
+            f"Mock script {file_path} implements old setup approach with "
+            "global variables")
 
     # This is just checked for additional safety - normally the execution
     # of mock script has failed due to missing global variables.
@@ -173,14 +173,12 @@ def script_error(file_path, exc):
     exception message, ready to be displayed.
     """
     if isinstance(exc, pywbem.Error):
-        new_exc = MockScriptError(
-            "Mock script {} failed: {}".
-            format(file_path, exc))
+        new_exc = MockScriptError(f"Mock script {file_path} failed: {exc}")
     else:
         tb = traceback.format_exception(*sys.exc_info())
+        fail_list = "\n".join(tb)
         new_exc = MockScriptError(
-            "Mock script {} failed:\n{}".
-            format(file_path, "\n".join(tb)))
+            f"Mock script {file_path} failed:\n{fail_list}")
     new_exc.__cause__ = None
     return new_exc
 

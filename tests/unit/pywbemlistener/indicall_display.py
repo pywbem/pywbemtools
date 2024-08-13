@@ -16,6 +16,6 @@ def display(indication, host):
       host (:term:`string`):
         Host name or IP address of WBEM server sending the indication.
     """
-    props = [f'{pn}={p.value!r}'
-             for pn, p in indication.properties.items()]
-    print("{}:{}:{}".format(host, indication.classname, ','.join(props)))
+    props = ','.join([f'{pn}={p.value!r}'
+                      for pn, p in indication.properties.items()])
+    print(f"{host}:{indication.classname}:{props}")

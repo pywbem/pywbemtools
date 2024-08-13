@@ -66,10 +66,9 @@ class ConnectionsFileWriteError(ConnectionsFileError):
           connections_file (:term:`string`): Path name of connections file.
 
           message (:term:`string`): Text describing just the error
-            (without text like 'Cannot write connection file {file}').
+            (without text like 'Cannot write connection file "file name"').
         """
-        msg = 'Cannot write connections file "{0}": {1}'. \
-            format(connections_file, message)
+        msg = f'Cannot write connections file "{connections_file}": {message}'
         super().__init__(msg)
 
 
@@ -88,7 +87,7 @@ class ConnectionsFileLoadError(ConnectionsFileError):
           connections_file (:term:`string`): Path name of connections file.
 
           message (:term:`string`): Text describing just the error
-            (without text like 'Cannot load connection file {file}').
+            (without text like 'Cannot load connection file "file name"').
         """
         msg = f'Cannot load connections file "{connections_file}": {message}'
         super().__init__(msg)
@@ -272,8 +271,7 @@ class ConnectionRepository:
             self._default_connection_name = name
             self._write_connections_file()
         else:
-            raise KeyError('Connection definition {!r} not found'.
-                           format(name))
+            raise KeyError('Connection definition {name!r} not found')
 
     def file_exists(self):
         """
@@ -299,9 +297,8 @@ class ConnectionRepository:
         exists = 'exists' if self.file_exists() else "does not exist"
         self._load_connections_file()
         count = len(self)
-        return ('Connection repository with {0} connection definitions and '
-                'connections file "{1}" ({2})'.
-                format(count, self._connections_file, exists))
+        return (f'Connection repository with {count} connection definitions '
+                f'and connections file "{self._connections_file}" ({exists})')
 
     def __repr__(self):
         """
@@ -318,9 +315,9 @@ class ConnectionRepository:
         items = [f"{k!r}: {v}"
                  for k, v in self._pywbemcli_servers.items()]
         items_str = ', '.join(items)
-        return ("{0}({{{1}}}, connections_file={2!r} ({3}), loaded={4!r})".
-                format(self.__class__.__name__, items_str,
-                       self._connections_file, exists, self._loaded))
+        return (f"{self.__class__.__name__}({{{items_str}}}, "
+                f"connections_file={self._connections_file!r} ({exists}), "
+                f"loaded={self._loaded!r})")
 
     def __contains__(self, name):
         """
@@ -457,12 +454,12 @@ class ConnectionRepository:
             except OSError as exc:
                 raise ConnectionsFileLoadError(
                     self._connections_file,
-                    'Error migrating old connections file "{0}": {1}'.
-                    format(B08_DEFAULT_CONNECTIONS_FILE, exc))
+                    f'Error migrating old connections file '
+                    f'"{B08_DEFAULT_CONNECTIONS_FILE}": {exc}')
 
-            click.echo("Migrated old connections file {0!r} to {1!r}".
-                       format(B08_DEFAULT_CONNECTIONS_FILE,
-                              DEFAULT_CONNECTIONS_FILE))
+            click.echo(f"Migrated old connections file "
+                       f"{B08_DEFAULT_CONNECTIONS_FILE!r} to "
+                       f"{DEFAULT_CONNECTIONS_FILE!r}")
 
         # If the file does not exist, the connection repo still has the
         # initial state at this point, and it remains empty.
@@ -486,13 +483,13 @@ class ConnectionRepository:
                 except TypeError as te:
                     raise ConnectionsFileLoadError(
                         self._connections_file,
-                        'Invalid type of YAML property {0}: {1}'.
-                        format(ConnectionRepository.connections_group_name, te))
+                        'Invalid type of YAML property '
+                        f'{ConnectionRepository.connections_group_name}: {te}')
                 except KeyError:
                     raise ConnectionsFileLoadError(
                         self._connections_file,
-                        'Missing YAML property {0}'.
-                        format(ConnectionRepository.connections_group_name))
+                        'Missing YAML property '
+                        f'{ConnectionRepository.connections_group_name}')
 
                 # Try getting the default connection name
                 try:
@@ -501,9 +498,8 @@ class ConnectionRepository:
                 except KeyError:
                     raise ConnectionsFileLoadError(
                         self._connections_file,
-                        'Missing YAML property {0}'.
-                        format(
-                            ConnectionRepository.default_connection_grp_name))
+                        'Missing YAML property '
+                        f'{ConnectionRepository.default_connection_grp_name}')
 
                 # Build the PywbemServer object for each connection definition
                 for name, svr in connections_dict.items():
@@ -516,17 +512,17 @@ class ConnectionRepository:
                         raise ConnectionsFileLoadError(
                             self._connections_file,
                             'Invalid attribute type in connection '
-                            'definition "{}": {}'.format(name, te))
+                            f'definition "{name}": {te}')
                     except ValueError as ve:
                         raise ConnectionsFileLoadError(
                             self._connections_file,
                             'Invalid attribute value in connection '
-                            'definition "{}": {}'.format(name, ve))
+                            f'definition "{name}": {ve}')
                     self._pywbemcli_servers[name] = server
                 self._loaded = True
                 if self._verbose:
-                    click.echo("Connections file loaded: {}".
-                               format(self._connections_file))
+                    click.echo(
+                        f"Connections file loaded: {self._connections_file}")
 
         except OSError as exc:
             raise ConnectionsFileLoadError(

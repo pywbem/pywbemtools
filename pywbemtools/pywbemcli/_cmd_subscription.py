@@ -53,6 +53,7 @@ DEFAULT_SUB_MGR_ID = "defaultpywbemcliSubMgr"
 
 OWNED_STR = True
 ALL_STR = 'all'
+EOL = '\n'
 
 ownedadd_flag_option = [              # pylint: disable=invalid-name
     click.option("--owned/--permanent", default=True,
@@ -215,7 +216,7 @@ def subscription_add_destination(context, identity, **options):
               default=DEFAULT_QUERY_LANGUAGE,
               help="Filter query language for this subscription The query "
                    "languages normally implemented are 'DMTF:CQL' and 'WQL' . "
-                   " Default: {}".format(DEFAULT_QUERY_LANGUAGE))
+                   f" Default: {DEFAULT_QUERY_LANGUAGE}")
 @click.option('--source-namespaces', type=str, metavar='TEXT',
               required=False, default=None,
               multiple=True,
@@ -708,8 +709,8 @@ class CmdSubscriptionManager:
 
         except Error as er:
             raise click.ClickException(
-                self.err_msg("Get {0} destinations failed".
-                             format(owned_flag_str(owned_flag)), er))
+                self.err_msg(f"Get {owned_flag_str(owned_flag)} destinations "
+                             "failed", er))
 
     def get_filters(self, owned_flag):
         """
@@ -738,8 +739,8 @@ class CmdSubscriptionManager:
 
         except Error as er:
             raise click.ClickException(
-                self.err_msg("Get {0} filters failed".
-                             format(owned_flag_str(owned_flag)), er))
+                self.err_msg(f"Get {owned_flag_str(owned_flag)} filters failed",
+                             er))
 
     def get_subscriptions(self, owned_flag):
         """
@@ -764,8 +765,9 @@ class CmdSubscriptionManager:
 
         except Error as er:
             raise click.ClickException(
-                self.err_msg("Get {0} subscriptions failed".
-                             format(owned_flag_str(owned_flag)), er))
+                self.err_msg(
+                    f"Get {owned_flag_str(owned_flag)} subscriptions failed",
+                    er))
 
     def add_destination(self, listener_url, owned_flag, destination_id,
                         destination_name, persistence_type=None):
@@ -797,8 +799,8 @@ class CmdSubscriptionManager:
                 f"add-destination failed: {ve}")
         except Error as er:
             raise click.ClickException(
-                self.err_msg("add-destination {0} failed".
-                             format(owned_flag_str(owned_flag)), er))
+                self.err_msg(f"add-destination {owned_flag_str(owned_flag)} "
+                             "failed", er))
 
     def add_filter(self, source_namespaces, query,
                    query_language=DEFAULT_QUERY_LANGUAGE, owned_flag=True,
@@ -832,9 +834,8 @@ class CmdSubscriptionManager:
             if ce.status_code == CIM_ERR_ALREADY_EXISTS:
                 name_value = filter_id or name
                 raise click.ClickException(
-                    "add-filter Failed. Filter name='{0}' already exists".
-                    format(name_value))
-
+                    f"add-filter Failed. Filter name='{name_value}' already "
+                    "exists")
             raise click.ClickException(
                 self.err_msg("add-filter failed with server exception", ce))
         except Error as er:
@@ -858,7 +859,7 @@ class CmdSubscriptionManager:
         except ValueError as ex:
             raise click.ClickException(
                 "add-subscription failed. pybwem SubscriptionManager "
-                "exception: {}.".format(ex))
+                f"exception: {ex}.")
         except Error as er:
             raise click.ClickException(
                 self.err_msg("add-subscription failed", er))
@@ -891,8 +892,8 @@ class CmdSubscriptionManager:
             return self.submgr.remove_filter(self.server_id, filter_path)
         except Error as er:
             raise click.ClickException(
-                self.err_msg("remove-filter failed: {0} path: {1} failed".
-                             format(er, filter_path), er))
+                self.err_msg(f"remove-filter failed: {er} path: {filter_path} "
+                             "failed", er))
 
     def remove_subscriptions(self, subscription_paths):
         """
@@ -1246,8 +1247,8 @@ def pick_one_path_from_instances_list(csm, instances, pick_msg):
         display_list = \
             [IndicationSubscription(csm, i).select_id_str() for i in instances]
     else:
-        click.echo("Class {0} is not one of pywbem subscription mgr classes".
-                   format(paths[0].classname))
+        click.echo(f"Class {paths[0].classname} is not one of pywbem "
+                   "subscription mgr classes")
         display_list = paths
     try:
         index = pick_one_index_from_list(csm.context, display_list, pick_msg)
@@ -1296,8 +1297,8 @@ def resolve_instances(csm, instances, identity, obj_type_name,
     """
     # Exception, at least one instance must exist.
     if not instances:
-        raise click.ClickException("No {0} found for identity: {1}".
-                                   format(obj_type_name, identity))
+        raise click.ClickException(
+            f"No {obj_type_name} found for identity: {identity}")
     # Return the single item
     if len(instances) == 1:
         return instances[0]
@@ -1306,16 +1307,17 @@ def resolve_instances(csm, instances, identity, obj_type_name,
     if select_opt:
         # FUTURE: Need better than path for prompt info.
         inst = pick_one_inst_from_instances_list(
-            csm, instances, "Pick one {0} to use for {1}:".
-            format(obj_type_name, cmd_str))
+            csm,
+            instances,
+            f"Pick one {obj_type_name} to use for {cmd_str}:")
         return inst
 
     # Generate an exception with summary info on the instances
     paths_str = "\n  *".join([str(i.path) for i in instances])
     raise click.ClickException(
-        "The identity: '{0}' returned multiple {1} instances. "
-        "Use --select option to pick one instance from:\n  * {2}".
-        format(identity, obj_type_name, paths_str))
+        f"The identity: '{identity}' returned multiple {obj_type_name} "
+        "instances. Use --select option to pick one instance from:"
+        f"\n  * {paths_str}")
 
 
 def get_insts_for_subscription_identities(csm, destination_identity,
@@ -1359,8 +1361,8 @@ def get_insts_for_subscription_identities(csm, destination_identity,
     # If Identity not specifically owned, look also in owned with the owned
     # prefix. This may result  in multiples that must be resolved
     if not filter_id_owned:
-        f2 = csm.find_filters_for_name("{}:{}".format(
-            csm.owned_filter_prefix, filter_identity))
+        f2 = csm.find_filters_for_name(
+            f"{csm.owned_filter_prefix}:{filter_identity}")
         if f2:
             filter_instances.extend(f2)
 
@@ -1417,12 +1419,11 @@ def cmd_subscription_add_destination(context, identity, options):
         if dests:
             dests_str = ", ".join([str(d.path) for d in dests])
             raise click.ClickException(
-                "{0} destination: Name=[{1}] add failed. Duplicates URL of "
-                "existing destination(s): [{2}. Pywbemcli does not allow "
-                "permanent destinations with same Name property to keep Name "
-                "properties unique.".
-                format(owned_flag_str(owned_flag_opt), destination_name,
-                       dests_str))
+                f"{owned_flag_str(owned_flag_opt)} destination: "
+                f"Name=[{destination_name}] add failed. Duplicates URL of "
+                f"existing destination(s): [{dests_str}. Pywbemcli does not "
+                "allow permanent destinations with same Name property to "
+                "keep Name properties unique.")
 
     destination_result = csm.add_destination(
         options['listener_url'], owned_flag_opt, destination_id,
@@ -1437,22 +1438,20 @@ def cmd_subscription_add_destination(context, identity, options):
             f":{destination_id}"):
         rslt_info = IndicationDestination(csm, destination_result)
         raise click.ClickException(
-            "{0} destination: Name={1} Not added. Duplicates URL of "
-            "existing {2} destination: {3} URL: {4} PersistenceType: {5}.".
-            format(owned_flag_str(owned_flag_opt),
-                   destination_id,
-                   rslt_info.owned_flag_str,
-                   destination_result['Name'],
-                   destination_result['Destination'],
-                   destination_result['PersistenceType']))
+            f"{owned_flag_str(owned_flag_opt)} destination: "
+            f"Name={destination_id} Not added. Duplicates URL of "
+            f"existing {rslt_info.owned_flag_str} "
+            f"destination: {destination_result['Name']} URL: "
+            f"{destination_result['Destination']} "
+            f"PersistenceType: {destination_result['PersistenceType']}.")
+
     click.echo(
-        "Added {0} destination: Name={1}".
-        format(owned_flag_str(owned_flag_opt), destination_result['Name']))
+        f"Added {owned_flag_str(owned_flag_opt)} destination: "
+        f"Name={destination_result['Name']}")
 
     if context.verbose:
-        click.echo("\npath={0}\n\n{1}".
-                   format(str(destination_result.path),
-                          destination_result.tomof()))
+        click.echo(f"\npath={str(destination_result.path)}\n"
+                   f"\n{destination_result.tomof()}")
 
 
 def cmd_subscription_add_filter(context, identity, options):
@@ -1481,12 +1480,11 @@ def cmd_subscription_add_filter(context, identity, options):
         if filters:
             filters_str = ", ".join([str(f.path) for f in filters])
             raise click.ClickException(
-                "{0} filter: Name=[{1}] add failed. Duplicates URL of "
-                "existing filters(s): [{2}. Pywbemcli does not allow "
-                "permanent filters with same Name property to keep Name "
-                "properties unique.".
-                format(owned_flag_str(owned_flag_opt), filter_name,
-                       filters_str))
+                f"{owned_flag_str(owned_flag_opt)} filter: "
+                f"Name=[{filter_name}] add failed. Duplicates URL of "
+                f"existing filters(s): [{filters_str}. Pywbemcli does not "
+                "allow permanent filters with same Name property to keep Name "
+                "properties unique.")
 
     result_inst = csm.add_filter(source_namespaces, options['query'],
                                  options['query_language'],
@@ -1495,12 +1493,11 @@ def cmd_subscription_add_filter(context, identity, options):
 
     # Success: Show resulting name and conditionally, details
     context.spinner_stop()
-    click.echo("Added {0} filter: Name={1}".
-               format(owned_flag_str(owned_flag_opt), result_inst['Name']))
+    click.echo(f"Added {owned_flag_str(owned_flag_opt)} filter: "
+               f"Name={result_inst['Name']}")
 
     if context.verbose:
-        click.echo("\npath={0}\n\n{1}".
-                   format(str(result_inst.path), result_inst.tomof()))
+        click.echo(f"\npath={str(result_inst.path)}\n\n{result_inst.tomof()}")
 
 
 def cmd_subscription_add_subscription(context, destination_identity,
@@ -1611,8 +1608,8 @@ def cmd_subscription_list(context, options):
                      sum([r[3] for r in rows])])
 
     summary_str = "summary" if summary_opt else ""
-    title = "Subscription instance {0} counts: submgr-id={1}, svr-id={2}". \
-            format(summary_str, csm.submgr_id, csm.server_id)
+    title = f"Subscription instance {summary_str} counts: " \
+            f"submgr-id={csm.submgr_id}, svr-id={csm.server_id}"
 
     context.spinner_stop()
     if output_format_is_table(output_format):
@@ -1714,17 +1711,15 @@ def cmd_subscription_list_destinations(context, options):
 
             rows.append(row)
 
-        title = "Indication Destinations: submgr-id={0}, svr-id={1}, " \
-            "type={2}". \
-            format(csm.submgr_id, csm.server_id, ownedchoice_opt)
+        title = f"Indication Destinations: submgr-id={csm.submgr_id}, " \
+                f"svr-id={csm.server_id}, type={ownedchoice_opt}"
 
         context.spinner_stop()
         click.echo(format_table(rows, headers, title=title,
                                 table_format=output_format))
 
     else:
-        assert False, "{0} Invalid output format for this command". \
-            format(output_format)
+        assert False, f"{output_format} Invalid output format for this command"
 
 
 def cmd_subscription_list_filters(context, options):
@@ -1789,16 +1784,15 @@ def cmd_subscription_list_filters(context, options):
                     f.instance_property('SystemCreationClassName'),
                     f.instance_property('SystemName')])
             rows.append(row)
-        title = "Indication Filters: submgr-id={0}, svr-id={1} type={2}". \
-            format(csm.submgr_id, csm.server_id, filterchoice_opt)
+        title = f"Indication Filters: submgr-id={csm.submgr_id}, " \
+                f"svr-id={csm.server_id} type={filterchoice_opt}"
 
         context.spinner_stop()
         click.echo(format_table(rows, headers, title=title,
                                 table_format=output_format))
 
     else:
-        assert False, "{0} Invalid output format for this command". \
-            format(output_format)
+        assert False, f"{output_format} Invalid output format for this command"
 
 
 def cmd_subscription_list_subscriptions(context, options):
@@ -1888,16 +1882,15 @@ def cmd_subscription_list_subscriptions(context, options):
                     is_.instance_property('SystemCreationClassName')])
             rows.append(row)
 
-        title = "Indication Subscriptions: submgr-id={}, svr-id={}, " \
-            "type={}".format(csm.submgr_id, csm.server_id, options['type'])
+        title = f"Indication Subscriptions: submgr-id={csm.submgr_id}, " \
+                f"svr-id={csm.server_id}, type={options['type']}"
 
         context.spinner_stop()
         click.echo(format_table(rows, headers, title=title,
                                 table_format=output_format))
 
     else:
-        assert False, "{0} Invalid output format for this command". \
-            format(output_format)
+        assert False, f"{output_format} Invalid output format for this command"
 
 
 def verify_instances_removal(instance_names, instance_type):
@@ -1908,8 +1901,8 @@ def verify_instances_removal(instance_names, instance_type):
     else:
         verify_paths = instance_names
 
-    verify_msg = "Verify {0} instance(s) to be removed:\n {1}". \
-        format(instance_type, verify_paths)
+    verify_msg = \
+        f"Verify {instance_type} instance(s) to be removed:\n{verify_paths}"
 
     if not verify_operation(verify_msg):
         raise click.ClickException("Instances not removed.")
@@ -1932,30 +1925,32 @@ def cmd_subscription_remove_destination(context, identity, options):
 
     if not matching_destinations:
         raise click.ClickException(
-            "No {0} destination found for identity={1}, Name-property={2}".
-            format(owned_flag_str(owned_flag_opt), identity, target_name))
+            f"No {owned_flag_str(owned_flag_opt)} destination found for "
+            f"identity={identity}, Name-property={target_name}")
 
     if len(matching_destinations) == 1:
         destination_path = matching_destinations[0].path
 
     else:  # Multiple instances returned
         context.spinner_stop()
-        click.echo('{0} "{1}" multiple matching destinations'.
-                   format(owned_flag_str(owned_flag_opt), identity))
+        click.echo(f'{owned_flag_str(owned_flag_opt)} '
+                   f'"{identity}" multiple matching destinations')
 
         if options['select']:
             destination_path = pick_one_path_from_instances_list(
                 csm, matching_destinations,
                 "Pick indication destination to remove")
         else:
-            inst_display = [IndicationDestination(csm, d).select_id_str() for
-                            d in matching_destinations]
+            inst_ids = [IndicationDestination(csm, d).select_id_str() for
+                        d in matching_destinations]
+            # put each on new line with leading *
+            inst_display_line = "".join([f"EOL * {i}" for i in inst_ids])
+            owned = owned_flag_str(owned_flag_opt)
             raise click.ClickException(
                 "Remove failed. Multiple destinations meet criteria "
-                "identity={0}, owned={1}. Use --select option to pick one "
-                "destination:\n  * {2}".
-                format(identity, owned_flag_str(owned_flag_opt),
-                       "\n  * ".join(inst_display)))
+                f"{identity=}, {owned=}. "
+                "Use --select option to pick one destination:"
+                f"{inst_display_line}")
 
     if options['verify']:
         verify_instances_removal(destination_path, 'destination')
@@ -1964,8 +1959,9 @@ def cmd_subscription_remove_destination(context, identity, options):
     csm.remove_destinations(destination_path)
 
     context.spinner_stop()
-    click.echo("Removed {0} indication destination: identity={1}, Name={2}.".
-               format(owned_flag_str(owned_flag_opt), identity, name_property))
+    click.echo(f"Removed {owned_flag_str(owned_flag_opt)} "
+               f"indication destination: identity={identity}, "
+               f"Name={name_property}.")
     if context.verbose:
         click.echo(f"indication destination path: {destination_path}.")
 
@@ -1993,27 +1989,31 @@ def cmd_subscription_remove_filter(context, identity, options):
 
     if not matching_filters:
         raise click.ClickException(
-            "No {0} filter found for identity={1}, Name-property={2}, ".
-            format(owned_flag_str(owned_flag_opt), identity, target_name))
+            f"No {owned_flag_str(owned_flag_opt)} filter found for "
+            f"identity={identity}, Name-property={target_name}, ")
+
     # Multiples can only occur if outside client has added filters that match
     # name but not other components of path. Owned flag on cmd eliminates
     # multiples if permanent and owned ids are the same.
     if len(matching_filters) > 1:
         context.spinner_stop()
-        click.echo('{0} "{1}" multiple matching filters.'.
-                   format(owned_flag_str(owned_flag_opt), identity))
+        click.echo(f'{owned_flag_str(owned_flag_opt)} "{identity}" multiple '
+                   'matching filters.')
 
         if options['select']:
             filter_path = pick_one_path_from_instances_list(
                 csm, matching_filters, "Pick indication filter to remove")
         else:
-            inst_disp = [IndicationFilter(csm, f).select_id_str()
-                         for f in matching_filters]
+
+            filter_ids = [IndicationFilter(csm, f).select_id_str()
+                          for f in matching_filters]
+            # put each on new line with leading * char
+            inst_disp = "".join([f"EOL * {i}" for i in filter_ids])
+
             raise click.ClickException(
-                "Remove failed. Multiple filters meet criteria identity={0}, "
-                "owned={1}. Use --select option to pick one filter:\n  * {2}".
-                format(identity, owned_flag_str(owned_flag_opt),
-                       "\n  * ".join(inst_disp)))
+                "Remove failed. Multiple filters meet criteria "
+                f"identity={identity}, owned={owned_flag_str(owned_flag_opt)}. "
+                f"Use --select option to pick one filter:{inst_disp}")
 
     else:  # one filter returned
         filter_path = matching_filters[0].path
@@ -2025,8 +2025,8 @@ def cmd_subscription_remove_filter(context, identity, options):
     csm.remove_filter(filter_path)
 
     context.spinner_stop()
-    click.echo("Removed {0} indication filter: identity={1}, Name={2}.".
-               format(owned_flag_str(owned_flag_opt), identity, name_property))
+    click.echo(f"Removed {owned_flag_str(owned_flag_opt)} indication "
+               f"filter: identity={identity}, Name={name_property}.")
     if context.verbose:
         click.echo(f"Indication filter path: {filter_path}.")
 
@@ -2063,9 +2063,9 @@ def cmd_subscription_remove_subscription(context, destination_identity,
 
     if not remove_list:
         raise click.ClickException(
-            "Arguments destination_id={} and filter_id={} did not locate "
-            "any subscriptions to remove."
-            .format(destination_identity, filter_identity))
+            f"Arguments destination_id={destination_identity} and "
+            f"filter_id={filter_identity} did not locate "
+            "any subscriptions to remove.")
 
     if remove_list:
         remove_paths = [i.path for i in remove_list]
@@ -2081,15 +2081,14 @@ def cmd_subscription_remove_subscription(context, destination_identity,
         csm.remove_subscriptions(remove_paths)
 
         context.spinner_stop()
-        click.echo("Removed {0} subscription(s) for destination-id: {1}, "
-                   "filter-id: {2}.".
-                   format(len(remove_paths), destination_identity,
-                          filter_identity))
+        click.echo(f"Removed {len(remove_paths)} subscription(s) for "
+                   f"destination-id: {destination_identity}, "
+                   f"filter-id: {filter_identity}.")
 
         if context.verbose:
             subscription_paths_str = '\n'.join([str(x) for x in remove_paths])
-            click.echo("Removed subscription(s) paths: {0}".
-                       format(subscription_paths_str))
+            click.echo(
+                f"Removed subscription(s) paths: {subscription_paths_str}")
 
         # If option set, remove filter and destination if not used in other
         # associations:
@@ -2102,8 +2101,7 @@ def cmd_subscription_remove_subscription(context, destination_identity,
                     Role='Handler')
                 if not dest_refs:
                     csm.remove_destinations(dest_path)
-                    click.echo("Removed destination: {0}".
-                               format(dest_path))
+                    click.echo(f"Removed destination: {dest_path}")
             for filter_path in filter_paths:
                 filter_refs = conn.ReferenceNames(
                     filter_path, ResultClass=SUBSCRIPTION_CLASSNAME,
@@ -2125,10 +2123,10 @@ def cmd_subscription_remove_server(context, options):
     subscripts = csm.get_subscriptions(True)
 
     context.spinner_stop()
-    click.echo("Removing owned destinations, filters, and subscriptions "
-               "for server-id {0}. Remove counts: destinations={1}, "
-               "filters={2}, subscriptions={3}".
-               format(csm.server_id, len(dests), len(filters), len(subscripts)))
+    click.echo(f"Removing owned destinations, filters, and subscriptions "
+               f"for server-id {csm.server_id}. Remove counts: "
+               f"destinations={len(dests)}, filters={len(filters)}, "
+               f"subscriptions={len(subscripts)}")
 
     csm.remove_server()
     context.pywbem_server.subscription_manager = None

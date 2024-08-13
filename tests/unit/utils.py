@@ -33,6 +33,8 @@ import click
 # Click version as a tuple
 CLICK_VERSION = packaging.version.parse(click.__version__).release
 
+EOL = '\n'  # Replace "\n" f-strings. "\" not fails in {} with python lt 3.12
+
 
 def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                     capture=True):
@@ -182,9 +184,8 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
         except TimeoutExpired:
             proc.kill()
             rc = 255
-            print("Error: Timeout ({} sec) when waiting for command to "
-                  "complete; Killed process and setting rc={}".
-                  format(cmd_timeout, rc))
+            print(f"Error: Timeout ({cmd_timeout} sec) when waiting for "
+                  f"command to complete; Killed process and setting {rc=}")
             sys.stdout.flush()
 
         with open(out_log, 'rb') as fp:
@@ -213,10 +214,10 @@ def execute_command(cmdname, args, env=None, stdin=None, verbose=False,
                 stdout_str, stderr_str = proc.communicate(timeout=10)
             except TimeoutExpired:
                 stdout_str = stderr_str = None
-            print("Error: Timeout ({} sec) when waiting for command to "
-                  "complete; Killed process and setting rc={}; Stdout "
-                  "produced so far: {!r}; Stderr produced so far: {!r}".
-                  format(cmd_timeout, rc, stdout_str, stderr_str))
+            print(f"Error: Timeout ({cmd_timeout} sec) when waiting for "
+                  f"command to complete; Killed process and setting {rc=};"
+                  f" Stdout produced so far: {stdout_str!r}; Stderr produced "
+                  f"so far: {stderr_str!r}")
             sys.stdout.flush()
 
     # Restore environment of current process
@@ -281,18 +282,17 @@ def assert_rc(exp_rc, rc, stdout, stderr, desc):
 
     assert exp_rc == rc, \
         "Unexpected exit code in test:\n" \
-        "{}\n" \
-        "Expected rc: {}\n" \
-        "Actual rc: {}\n" \
+        f"{desc}\n" \
+        f"Expected rc: {exp_rc}\n" \
+        f"Actual rc: {rc}\n" \
         "Stdout:\n" \
         "------------\n" \
-        "{}\n" \
+        f"{stdout}\n" \
         "------------\n" \
         "Stderr:\n" \
         "------------\n" \
-        "{}\n" \
-        "------------\n". \
-        format(desc, exp_rc, rc, stdout, stderr)
+        f"{stderr}\n" \
+        "------------\n"
 
 
 def assert_patterns(exp_patterns, act_lines, source, desc):
@@ -315,33 +315,30 @@ def assert_patterns(exp_patterns, act_lines, source, desc):
       desc (string): Testcase description.
     """
     assert len(act_lines) == len(exp_patterns), \
-        "Unexpected number of lines on {} in test:\n" \
-        "{}\n" \
-        "Expected patterns (cnt={}):\n" \
+        f"Unexpected number of lines on {source} in test:\n" \
+        f"{desc}\n" \
+        f"Expected patterns (cnt={len(exp_patterns)}):\n" \
         "------------\n" \
-        "{}\n" \
+        f"{EOL.join(exp_patterns)}\n" \
         "------------\n" \
-        "Actual lines (cnt={}):\n" \
+        f"Actual lines (cnt={len(act_lines)}):\n" \
         "------------\n" \
-        "{}\n" \
-        "------------\n". \
-        format(source, desc, len(exp_patterns), '\n'.join(exp_patterns),
-               len(act_lines), '\n'.join(act_lines))
+        f"{EOL.join(act_lines)}\n" \
+        "------------\n"
 
     for i, act_line in enumerate(act_lines):
         exp_pattern = exp_patterns[i]
         assert re.search(exp_pattern, act_line), \
-            "Unexpected line #{} on {} in test:\n" \
-            "{}\n" \
+            f"Unexpected line #{i} on {source} in test:\n" \
+            f"{desc}\n" \
             "Expected pattern:\n" \
             "------------\n" \
-            "{}\n" \
+            f"{exp_pattern}\n" \
             "------------\n" \
             "Actual line:\n" \
             "------------\n" \
-            "{}\n" \
-            "------------\n". \
-            format(i, source, desc, exp_pattern, act_line)
+            f"{act_line}\n" \
+            "------------\n"
 
 
 def assert_patterns_in_lines(exp_patterns, act_lines, source, desc):
@@ -379,22 +376,20 @@ def assert_patterns_in_lines(exp_patterns, act_lines, source, desc):
                 act_line = next(act_lines_iter)
     except StopIteration:
         raise AssertionError(
-            "Pattern #{} not found in order on {} in test:\n"
-            "{}\n"
+            f"Pattern #{i} not found in order on {source} in test:\n"
+            f"{desc}\n"
             "Expected pattern:\n"
             "------------\n"
-            "{!r}\n"
+            f"{exp_pattern!r}\n"
             "------------\n"
             "Start line for search:\n"
             "------------\n"
-            "{!r}\n"
+            f"{start_line!r}\n"
             "------------\n"
             "Actual lines:\n"
             "------------\n"
-            "{}\n"
-            "------------\n".
-            format(i, source, desc, exp_pattern, start_line,
-                   '\n'.join(act_lines)))
+            f"{EOL.join(act_lines)}\n"
+            "------------\n")
 
 
 def assert_lines(exp_lines, act_lines, source, desc):
@@ -418,33 +413,30 @@ def assert_lines(exp_lines, act_lines, source, desc):
       desc (string): Testcase description.
     """
     assert len(act_lines) == len(exp_lines), \
-        "Unexpected number of lines on {} in test:\n" \
-        "{}\n" \
-        "Expected lines cnt={}:\n" \
+        f"Unexpected number of lines on {source} in test:\n" \
+        f"{desc}\n" \
+        f"Expected lines cnt={len(exp_lines)}:\n" \
         "------------\n" \
-        "{}\n" \
+        f"{EOL.join(exp_lines)}\n" \
         "------------\n" \
-        "Actual lines cnt={}:\n" \
+        f"Actual lines cnt={len(act_lines)}:\n" \
         "------------\n" \
-        "{}\n" \
-        "------------\n". \
-        format(source, desc, len(exp_lines), '\n'.join(exp_lines),
-               len(act_lines), '\n'.join(act_lines))
+        f"{EOL.join(act_lines)}\n" \
+        "------------\n"
 
     for i, act_line in enumerate(act_lines):
         exp_line = exp_lines[i]
         assert exp_line == act_line, \
-            "Unexpected line #{} on {} in test:\n" \
-            "{}\n" \
+            f"Unexpected line #{i} on {source} in test:\n" \
+            f"{desc}\n" \
             "Expected line:\n" \
             "------------\n" \
-            "{}\n" \
+            f"{exp_line}\n" \
             "------------\n" \
             "Actual line:\n" \
             "------------\n" \
-            "{}\n" \
-            "------------\n". \
-            format(i, source, desc, exp_line, act_line)
+            f"{act_line}\n" \
+            "------------\n"
 
 
 class captured_output:
