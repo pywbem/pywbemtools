@@ -201,11 +201,12 @@ tomli==2.0.1; python_version >= '3.7'
 tornado==4.4.2; python_version == '2.7'
 tornado==6.1; python_version == '3.6'
 tornado==6.2; python_version == '3.7'
-tornado==6.3.3; python_version >= '3.8'
+tornado==6.4.1; python_version >= '3.8'
 tqdm==4.28.1; python_version <= '3.6'
 tqdm==4.66.3; python_version >= '3.7'
 traceback2==1.4.0
 traitlets==4.3.1
 webencodings==0.5.1
 widgetsnbextension==1.2.6
-zipp==0.5.2
+zipp==0.5.2; python_version <= '3.7'
+zipp==3.19.1; python_version >= '3.8'
