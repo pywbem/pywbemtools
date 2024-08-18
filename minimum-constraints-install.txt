@@ -19,11 +19,7 @@
 # * pip>=21.0 is needed for the cryptography package on Windows on GitHub Actions.
 pip==23.3
 
-# setuptools 41.5.0 fixes build errors with Visual C++ 14.0 on Windows
-# setuptools 49.0.0 fixes the comparison of Python versions in requirements that was
-#   based on strings and thus ignored certain requirements on Python 3.10.
-setuptools==65.5.1; python_version <= '3.11'
-setuptools==66.1.0; python_version >= '3.12'
+setuptools==70.0.0
 
 # wheel 0.36.2 fixes empty and invalid tag issues in archive file name
 # wheel 0.38.0 fixes pywbemtools issue #1228
