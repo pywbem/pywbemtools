@@ -9,29 +9,11 @@ that code.
 import functools
 from collections import namedtuple
 import warnings
-from inspect import Signature, Parameter
+from inspect import signature
 
 import pytest
 
 __all__ = ['simplified_test_function']
-
-
-# Pytest determines the signature of the test function by unpacking any
-# wrapped functions (this is the default of the signature() function it
-# uses. We correct this behavior by setting the __signature__ attribute of
-# the wrapper function to its correct signature. To do that, we cannot use
-# signature() because its follow_wrapped parameter was introduced only in
-# Python 3.5. Instead, we build the signature manually.
-# TODO: Simplify this.
-TESTFUNC_SIGNATURE = Signature(
-    parameters=[
-        Parameter('desc', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('kwargs', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('exp_exc_types', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('exp_warn_types', Parameter.POSITIONAL_OR_KEYWORD),
-        Parameter('condition', Parameter.POSITIONAL_OR_KEYWORD),
-    ]
-)
 
 
 def simplified_test_function(test_func):
@@ -185,7 +167,11 @@ def simplified_test_function(test_func):
                         raise AssertionError(msg)
         return ret
 
-    # Needed because the decorator is signature-changin
-    wrapper_func.__signature__ = TESTFUNC_SIGNATURE
+    # Pytest determines the signature of the test function by unpacking any
+    # wrapped functions (this is the default of the signature() function it
+    # uses. We correct this behavior by setting the __signature__ attribute of
+    # the wrapper function to its correct signature.
+    # Needed because the decorator is signature-changing
+    wrapper_func.__signature__ = signature(wrapper_func, follow_wrapped=False)
 
     return functools.update_wrapper(wrapper_func, test_func)

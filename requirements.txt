@@ -15,10 +15,9 @@ pywbem>=1.7.2
 
 nocaselist>=1.0.3
 nocasedict>=1.0.1
-# Click 7.0 has issue #1231 on Windows which we circumvent in the test code
-# Click 7.1 has a bug with output capturing
-# Click 8.0 is incompatible with python <3.0. See issues #816 (python 2.7 not
-#     supported) and #819 (click-repl incompatible)
+
+# Click 8.0 is incompatible with python <3.0. See issue  #819
+# (click-repl incompatible)
 # The Click requirements were copied into dev-requirements.txt in order not to
 # have the safety package upgrade it. Keep them in sync.
 # Safety package requires click 8.0.2 minimum

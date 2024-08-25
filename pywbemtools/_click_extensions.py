@@ -2,8 +2,6 @@
 This file contains extensions to Click for pywbemtools.
 """
 
-import sys
-from collections import OrderedDict
 import packaging.version
 
 import click
@@ -43,9 +41,6 @@ class PywbemtoolsGroup(click.Group):
         """
         super().__init__(name, commands, **attrs)
 
-        if sys.version_info < (3, 6):
-            self.commands = commands or OrderedDict()
-
         # Replace Click.Command.format_usage with local version
         click.core.Command.format_usage = pywbemtools_format_usage
         click.core.Command.format_options = pywbemtools_format_options
@@ -64,10 +59,10 @@ class PywbemtoolsTopGroup(click.Group):
     Extend Click Group class to:
 
     1.  Order the display of the commands and command groups in the top level
-        help output to sort and then put names defined in the predefined_list
-        at the end of the list of commands/groups. Since ordering of the top
-        level cannot be tied to order commands are inserted in list, we elected
-        to just move the generic ones to the end of the list.
+        help output to sort and then put names defined in the __init__ argument
+        move_to_end at the end of the list of commands/groups. Since ordering
+        of the top level cannot be tied to order commands are inserted in list,
+        we elected to just move the generic ones to the end of the list.
 
     This class is used by specifying it for the 'cls' argument on the top
     level group, for example:
@@ -197,42 +192,11 @@ def pywbemtools_format_options(self, ctx, formatter):
             formatter.write_dl(opts)
 
 
-class TabCompleteArgument(click.Argument):
-    """
-    click.argument subclass to be used wherever shell_complete is part of the
-    attributes. Removes the shell_complete attribute if Click version less that
-    version 8 since it is not defined for Click 7
-    """
-    def __init__(self, *args, **kwargs):
-        # Remove the shell_complete option which is not defined in click 7
-        if CLICK_VERSION[0] < 8:
-            kwargs.pop('shell_complete', [])
-
-        super().__init__(*args, **kwargs)
-
-
-class TabCompleteOption(click.Option):
-    """
-    click.Option subclass to override Option for any option that sets the
-    shell_complete attribute. If click version 7, remove the click8 only
-    attribute since that attribute does not exist in Click 7
-    """
-    def __init__(self, *args, **kwargs):
-        """
-        Remove shell_complete option and pass other args and kwargs to
-        superclass
-        """
-        # Remove the shell_complete option which is not defined in click 7
-        if CLICK_VERSION[0] < 8:
-            kwargs.pop('shell_complete', [])
-        super().__init__(*args, **kwargs)
-
-
 # The following MutuallyExclusiveOption originated with a number of
 # discussions on stack overflow and a github gist at
 # https://gist.github.com/stanchan/bce1c2d030c76fe9223b5ff6ad0f03db
 
-class MutuallyExclusiveOption(TabCompleteOption):
+class MutuallyExclusiveOption(click.Option):
     """
     This class subclasses Click option to allow defining mutually exclusive
     options.
@@ -307,12 +271,6 @@ def click_completion_item(name):
         object.  This is the click class that must be returned by user
         tab-completion functions for each string that is proposed as a
         tab completion.
-
-        Click does not include shell_completion in click versions less that
-        v 8 so this method should not be called when click versions lt 8 are
-        used.
     """
-    assert CLICK_VERSION[0] >= 8
-
     # pylint: disable=no-member
     return click.shell_completion.CompletionItem(name)

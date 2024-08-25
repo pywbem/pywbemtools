@@ -40,7 +40,7 @@ from ._common import pick_one_from_list, pywbem_error_exception, \
 from ._connection_repository import ConnectionsFileError
 from ._context_obj import ContextObj
 from .._click_extensions import PywbemtoolsGroup, PywbemtoolsCommand, \
-    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT, TabCompleteArgument
+    CMD_OPTS_TXT, GENERAL_OPTS_TXT, SUBCMD_HELP_TXT
 
 from .._options import add_options, help_option
 from .._output_formatting import output_format_is_table, \
@@ -153,8 +153,7 @@ def connection_show(context, name, **options):
 @connection_group.command('delete', cls=PywbemtoolsCommand,
                           options_metavar=CMD_OPTS_TXT)
 @click.argument('name', type=str, metavar='NAME', required=False,
-                shell_complete=connection_name_completer,
-                cls=TabCompleteArgument)
+                shell_complete=connection_name_completer)
 @add_options(help_option)
 @click.pass_obj
 def connection_delete(context, name):

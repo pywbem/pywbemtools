@@ -24,8 +24,6 @@ each classname (see show_detail parameter).
 from asciitree import LeftAligned
 import click
 
-# Use an ordered Nocase dictionary for the tree. Ordered dictionary creates
-# tree output that has the same order in multiple versions of python.
 from pywbem._nocasedict import NocaseDict
 
 
